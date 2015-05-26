@@ -1,5 +1,5 @@
 //
-//  FirstViewController.swift
+//  DetailViewController.swift
 //  JamAlpha2
 //
 //  Created by Song Liao on 5/26/15.
@@ -8,18 +8,24 @@
 
 import UIKit
 
-class FirstViewController: UIViewController {
+class DetailViewController: UIViewController {
 
+    var getit:String!
+    
+    @IBOutlet weak var label: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        if let omg = getit {
+            label.text = omg
+        }
+        
+        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
+    
 }
-

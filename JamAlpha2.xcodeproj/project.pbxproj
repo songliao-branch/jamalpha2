@@ -8,12 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		E48877431B151628004785D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877421B151628004785D3 /* AppDelegate.swift */; };
-		E48877451B151628004785D3 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* FirstViewController.swift */; };
-		E48877471B151628004785D3 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877461B151628004785D3 /* SecondViewController.swift */; };
-		E488774A1B151628004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E48877481B151628004785D3 /* Main.storyboard */; };
+		E48877451B151628004785D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* SearchViewController.swift */; };
+		E48877471B151628004785D3 /* MusicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877461B151628004785D3 /* MusicViewController.swift */; };
 		E488774C1B151628004785D3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E488774B1B151628004785D3 /* Images.xcassets */; };
 		E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E488774D1B151628004785D3 /* LaunchScreen.xib */; };
 		E488775B1B151628004785D3 /* JamAlpha2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E488775A1B151628004785D3 /* JamAlpha2Tests.swift */; };
+		E48877681B151E2B004785D3 /* MusicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877671B151E2B004785D3 /* MusicCell.swift */; };
+		E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* DetailViewController.swift */; };
+		E488776F1B152742004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E488776D1B152742004785D3 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,14 +32,16 @@
 		E488773D1B151628004785D3 /* JamAlpha2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamAlpha2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E48877421B151628004785D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E48877441B151628004785D3 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
-		E48877461B151628004785D3 /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
-		E48877491B151628004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E48877441B151628004785D3 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		E48877461B151628004785D3 /* MusicViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewController.swift; sourceTree = "<group>"; };
 		E488774B1B151628004785D3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E488774E1B151628004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		E48877541B151628004785D3 /* JamAlpha2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JamAlpha2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877591B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E488775A1B151628004785D3 /* JamAlpha2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamAlpha2Tests.swift; sourceTree = "<group>"; };
+		E48877671B151E2B004785D3 /* MusicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
+		E48877691B1520A0004785D3 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,13 +83,13 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
+				E48877641B151A58004785D3 /* Controllers */,
 				E48877421B151628004785D3 /* AppDelegate.swift */,
-				E48877441B151628004785D3 /* FirstViewController.swift */,
-				E48877461B151628004785D3 /* SecondViewController.swift */,
-				E48877481B151628004785D3 /* Main.storyboard */,
 				E488774B1B151628004785D3 /* Images.xcassets */,
+				E488776D1B152742004785D3 /* Main.storyboard */,
 				E488774D1B151628004785D3 /* LaunchScreen.xib */,
 				E48877401B151628004785D3 /* Supporting Files */,
+				E48877671B151E2B004785D3 /* MusicCell.swift */,
 			);
 			path = JamAlpha2;
 			sourceTree = "<group>";
@@ -113,6 +117,16 @@
 				E48877591B151628004785D3 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E48877641B151A58004785D3 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				E48877441B151628004785D3 /* SearchViewController.swift */,
+				E48877461B151628004785D3 /* MusicViewController.swift */,
+				E48877691B1520A0004785D3 /* DetailViewController.swift */,
+			);
+			name = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,7 +209,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E488774A1B151628004785D3 /* Main.storyboard in Resources */,
+				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
 				E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */,
 				E488774C1B151628004785D3 /* Images.xcassets in Resources */,
 			);
@@ -215,9 +229,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E48877471B151628004785D3 /* SecondViewController.swift in Sources */,
+				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
-				E48877451B151628004785D3 /* FirstViewController.swift in Sources */,
+				E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */,
+				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
+				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,20 +256,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		E48877481B151628004785D3 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E48877491B151628004785D3 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		E488774D1B151628004785D3 /* LaunchScreen.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E488774E1B151628004785D3 /* Base */,
 			);
 			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+		E488776D1B152742004785D3 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E488776E1B152742004785D3 /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -413,6 +429,7 @@
 				E48877601B151628004785D3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E48877611B151628004785D3 /* Build configuration list for PBXNativeTarget "JamAlpha2Tests" */ = {
 			isa = XCConfigurationList;
@@ -421,6 +438,7 @@
 				E48877631B151628004785D3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
