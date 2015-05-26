@@ -10,22 +10,18 @@ import UIKit
 
 class DetailViewController: UIViewController {
 
-    var getit:String!
+    @IBOutlet weak var haha: UILabel!
     
-    @IBOutlet weak var label: UILabel!
+
+    @IBOutlet weak var imageView: UIImageView!
+    var demoString:String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let omg = getit {
-            label.text = omg
-        }
+        haha.text = demoString
+        println("detail view load and string is \(demoString)")
         
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        //imageView.image = UIImage(named: demoString)
     }
     
 }

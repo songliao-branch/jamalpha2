@@ -10,56 +10,58 @@ import UIKit
 
 class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
     
+
     @IBOutlet weak var musicTable: UITableView!
-    var fakedata = ["彩虹", "Thinking out loud", "海阔天空"]
-    var items: NSMutableArray! = NSMutableArray()
-    
+    var demoTitles = ["彩虹", "Thinking out loud", "海阔天空","Sugar"]
+    var demoArtist = ["周杰伦","Ed","Beyond","Maroon 5"]
+   
     @IBOutlet weak var musicTypeSegment: UISegmentedControl!
+    
+    
+    @IBAction func musicSelectionChanged(sender: UISegmentedControl) {
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.items.addObject("Apple watch")
-        self.items.addObject("Apple car")
-        self.items.addObject("Apple tea")
-        
         self.musicTable.reloadData()
-        
         // Do any additional setup after loading the view, typically from a nib.
     }
     
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return fakedata.count
-        
+        return demoTitles.count
     }
-//    @IBAction func listChanged(sender: UISegmentedControl) {
-//        if sender.selectedSegmentIndex == 0 {
-//            //tracks
-//        }
-//        else if sender.selectedSegmentIndex == 1{
-//            //artist
-//        }
-//        else if sender.selectedSegmentIndex == 2 {
-//            //album
-//        }
-//    }
-//    
+
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
         
-        cell.titleLabel.text = fakedata[indexPath.row]
-        cell.subtitleLabel.text = fakedata[indexPath.row]
-        
+        cell.titleLabel.text = demoTitles[indexPath.row]
+        cell.subtitleLabel.text = demoArtist[indexPath.row]
+        //being working on this for entire past 5 hours now gota stuck on this crap
         return cell
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if musicTypeSegment.selectedSegmentIndex == 0 {
-           
-            
+            println("\(indexPath.row) selected")
+            self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
+        }
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "gosong" {
+            var detailVC = segue.destinationViewController as! DetailViewController
+            let index = self.musicTable.indexPathForSelectedRow()!.row
+            detailVC.demoString = demoArtist[index]
             
         }
     }
+    
+    
+    
+    
     
 
 }
