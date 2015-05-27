@@ -22,7 +22,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     var demoArtist = ["周杰伦","Ed","Beyond","Maroon 5"]
    
     @IBOutlet weak var musicTypeSegment: UISegmentedControl!
-    
+
     
     @IBAction func musicSelectionChanged(sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue {
@@ -73,21 +73,38 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if musicTypeSegment.selectedSegmentIndex == 0 {
-            println("\(indexPath.row) selected")
-            self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
-        }
-    }
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "gosong" {
-            var detailVC = segue.destinationViewController as! DetailViewController
-            let index = self.musicTable.indexPathForSelectedRow()!.row
-            detailVC.demoString = demoArtist[index]
+        if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue  {
+            println("song \(indexPath.row) selected")
+            let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
+            
+            self.showViewController(detailVC, sender: self)
+            
             
         }
+        else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue {
+             println("album \(indexPath.row) selected")
+            let headVC = self.storyboard?.instantiateViewControllerWithIdentifier("headviewstoryboard") as! HeadViewController
+            
+            self.showViewController(headVC, sender: self)
+            
+        }
+        else if  musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue {
+            
+        }
+        self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
+    
+//    
+//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+//        if segue.identifier == "gosong" {
+//            var detailVC = segue.destinationViewController as! DetailViewController
+//            let index = self.musicTable.indexPathForSelectedRow()!.row
+//            detailVC.demoString = demoArtist[index]
+//            
+//        }
+//    }
+//    
     
     
     

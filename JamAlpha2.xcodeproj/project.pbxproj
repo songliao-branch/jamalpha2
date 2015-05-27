@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		E45F6B201B15600F0018645D /* Toucan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B1F1B15600F0018645D /* Toucan.swift */; };
+		E45F6B221B156BC20018645D /* HeadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B211B156BC20018645D /* HeadViewController.swift */; };
+		E45F6B271B156D070018645D /* OneLineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B261B156D070018645D /* OneLineCell.swift */; };
 		E48877431B151628004785D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877421B151628004785D3 /* AppDelegate.swift */; };
 		E48877451B151628004785D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* SearchViewController.swift */; };
 		E48877471B151628004785D3 /* MusicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877461B151628004785D3 /* MusicViewController.swift */; };
@@ -31,6 +33,8 @@
 
 /* Begin PBXFileReference section */
 		E45F6B1F1B15600F0018645D /* Toucan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toucan.swift; sourceTree = "<group>"; };
+		E45F6B211B156BC20018645D /* HeadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeadViewController.swift; sourceTree = "<group>"; };
+		E45F6B261B156D070018645D /* OneLineCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OneLineCell.swift; sourceTree = "<group>"; };
 		E488773D1B151628004785D3 /* JamAlpha2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamAlpha2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E48877421B151628004785D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -73,6 +77,15 @@
 			path = JamAlpha2;
 			sourceTree = "<group>";
 		};
+		E45F6B231B156CD70018645D /* TableCells */ = {
+			isa = PBXGroup;
+			children = (
+				E48877671B151E2B004785D3 /* MusicCell.swift */,
+				E45F6B261B156D070018645D /* OneLineCell.swift */,
+			);
+			name = TableCells;
+			sourceTree = "<group>";
+		};
 		E48877341B151628004785D3 = {
 			isa = PBXGroup;
 			children = (
@@ -95,13 +108,13 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
+				E45F6B231B156CD70018645D /* TableCells */,
 				E48877641B151A58004785D3 /* Controllers */,
 				E48877421B151628004785D3 /* AppDelegate.swift */,
 				E488774B1B151628004785D3 /* Images.xcassets */,
 				E488776D1B152742004785D3 /* Main.storyboard */,
 				E488774D1B151628004785D3 /* LaunchScreen.xib */,
 				E48877401B151628004785D3 /* Supporting Files */,
-				E48877671B151E2B004785D3 /* MusicCell.swift */,
 			);
 			path = JamAlpha2;
 			sourceTree = "<group>";
@@ -137,6 +150,7 @@
 				E48877441B151628004785D3 /* SearchViewController.swift */,
 				E48877461B151628004785D3 /* MusicViewController.swift */,
 				E48877691B1520A0004785D3 /* DetailViewController.swift */,
+				E45F6B211B156BC20018645D /* HeadViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -241,11 +255,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E45F6B221B156BC20018645D /* HeadViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
+				E45F6B271B156D070018645D /* OneLineCell.swift in Sources */,
 				E45F6B201B15600F0018645D /* Toucan.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
