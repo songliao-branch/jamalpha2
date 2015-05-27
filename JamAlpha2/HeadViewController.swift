@@ -10,9 +10,18 @@ import UIKit
 
 class HeadViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+    @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var avatarImage: UIImageView!
+    @IBOutlet weak var artistDescription: UILabel!
+    
     var demoSongs = ["Sing","Don't","I see fire", "I'm a mess"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //tell me when it kicks in
+        
+        avatarImage.image = Toucan(image: avatarImage.image!).maskWithEllipse(borderWidth: 2, borderColor: UIColor.orangeColor()).image
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -200,7 +200,7 @@
                                     <constraint firstAttribute="width" constant="240" id="oIy-9o-Y61"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="song is:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iSF-uD-XUq">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="song is:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iSF-uD-XUq">
                                 <rect key="frame" x="270" y="289" width="60" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -333,10 +333,15 @@
                             <constraint firstAttribute="trailing" secondItem="WRu-2z-jbT" secondAttribute="trailing" id="lds-ex-HTM"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="artistDescription" destination="dVA-Lc-lGA" id="uIQ-2t-hyw"/>
+                        <outlet property="artistLabel" destination="cGY-lH-CU1" id="9Vf-0P-8Rx"/>
+                        <outlet property="avatarImage" destination="hm3-XN-WGu" id="rma-qf-AwZ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="A28-6j-wWz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1857" y="205"/>
+            <point key="canvasLocation" x="1873" y="127"/>
         </scene>
         <!--Me-->
         <scene sceneID="eAN-Ol-AA5">
