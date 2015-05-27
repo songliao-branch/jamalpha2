@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E45F6B201B15600F0018645D /* Toucan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B1F1B15600F0018645D /* Toucan.swift */; };
 		E48877431B151628004785D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877421B151628004785D3 /* AppDelegate.swift */; };
 		E48877451B151628004785D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* SearchViewController.swift */; };
 		E48877471B151628004785D3 /* MusicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877461B151628004785D3 /* MusicViewController.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E45F6B1F1B15600F0018645D /* Toucan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toucan.swift; sourceTree = "<group>"; };
 		E488773D1B151628004785D3 /* JamAlpha2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamAlpha2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E48877421B151628004785D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -62,12 +64,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E45F6B1A1B155F140018645D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E45F6B1F1B15600F0018645D /* Toucan.swift */,
+			);
+			name = Frameworks;
+			path = JamAlpha2;
+			sourceTree = "<group>";
+		};
 		E48877341B151628004785D3 = {
 			isa = PBXGroup;
 			children = (
 				E488773F1B151628004785D3 /* JamAlpha2 */,
 				E48877571B151628004785D3 /* JamAlpha2Tests */,
 				E488773E1B151628004785D3 /* Products */,
+				E45F6B1A1B155F140018645D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -234,6 +246,7 @@
 				E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
+				E45F6B201B15600F0018645D /* Toucan.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +373,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Toucan-master/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = JamAlpha2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -370,6 +387,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Toucan-master/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = JamAlpha2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";

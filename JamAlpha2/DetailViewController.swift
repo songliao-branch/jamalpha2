@@ -19,9 +19,9 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         haha.text = demoString
+
+        imageView.image = Toucan(image: imageView.image!).maskWithEllipse(borderWidth: 2, borderColor: UIColor.orangeColor()).image
         println("detail view load and string is \(demoString)")
-        
-        //imageView.image = UIImage(named: demoString)
-    }
+   }
     
 }
