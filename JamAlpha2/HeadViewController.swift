@@ -16,13 +16,17 @@ class HeadViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     var demoSongs = ["Sing","Don't","I see fire", "I'm a mess"]
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //tell me when it kicks in
-        
         avatarImage.image = Toucan(image: avatarImage.image!).maskWithEllipse(borderWidth: 2, borderColor: UIColor.orangeColor()).image
     }
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "header"
+    }
+    
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return demoSongs.count

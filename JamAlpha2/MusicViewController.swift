@@ -83,9 +83,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue {
              println("album \(indexPath.row) selected")
-            let headVC = self.storyboard?.instantiateViewControllerWithIdentifier("headviewstoryboard") as! HeadViewController
+            let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             
-            self.showViewController(headVC, sender: self)
+            self.showViewController(artistVC, sender: self)
             
         }
         else if  musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue {
@@ -93,20 +93,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
-    
-    
-//    
-//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-//        if segue.identifier == "gosong" {
-//            var detailVC = segue.destinationViewController as! DetailViewController
-//            let index = self.musicTable.indexPathForSelectedRow()!.row
-//            detailVC.demoString = demoArtist[index]
-//            
-//        }
-//    }
-//    
-    
-    
     
     
 
