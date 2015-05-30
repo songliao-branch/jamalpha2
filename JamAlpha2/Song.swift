@@ -2,7 +2,7 @@
 
 import Foundation
 
-class Song {
+class Song:NSObject {
     let title:String
     
     init(title:String){

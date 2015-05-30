@@ -1,7 +1,7 @@
 
 import Foundation
 
-class Album{
+class Album:NSObject{
     let name:String
     let songs:[Song]
     
