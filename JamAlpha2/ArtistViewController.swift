@@ -5,11 +5,15 @@
 
 
 import UIKit
-
+import MediaPlayer
 class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate, UISearchResultsUpdating {
     
-    @IBOutlet weak var artistTable: UITableView!
     
+    var musicPlayer:MPMusicPlayerController!
+    
+    
+    @IBOutlet weak var artistTable: UITableView!
+   
     var resultSearchController:UISearchController!
     
     var ed:Artist!
@@ -22,7 +26,9 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         loadArtistData()
         setUpSearchBar()
         self.artistTable.reloadData()
+        
     }
+    
     
     func loadArtistData(){
         ed = MusicAPI.sharedIntance.getArtist()[0]

@@ -24,6 +24,7 @@
 		E48877681B151E2B004785D3 /* MusicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877671B151E2B004785D3 /* MusicCell.swift */; };
 		E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* DetailViewController.swift */; };
 		E488776F1B152742004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E488776D1B152742004785D3 /* Main.storyboard */; };
+		E49CE4241B1BB39D00F59AA4 /* SystemMusicManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E49CE4231B1BB39D00F59AA4 /* SystemMusicManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,9 @@
 		E48877671B151E2B004785D3 /* MusicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
 		E48877691B1520A0004785D3 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E49CE4211B1BB39D00F59AA4 /* JamAlpha2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JamAlpha2-Bridging-Header.h"; sourceTree = "<group>"; };
+		E49CE4221B1BB39D00F59AA4 /* SystemMusicManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemMusicManager.h; sourceTree = "<group>"; };
+		E49CE4231B1BB39D00F59AA4 /* SystemMusicManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SystemMusicManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +141,7 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
+				E49CE4251B1BB3A700F59AA4 /* MusicManager */,
 				E44359031B1959B20091E926 /* API */,
 				E44358FC1B1947120091E926 /* Models */,
 				E45F6B231B156CD70018645D /* TableCells */,
@@ -182,8 +187,18 @@
 				E48877461B151628004785D3 /* MusicViewController.swift */,
 				E48877691B1520A0004785D3 /* DetailViewController.swift */,
 				E45F6BB71B16C1860018645D /* ArtistViewController.swift */,
+				E49CE4211B1BB39D00F59AA4 /* JamAlpha2-Bridging-Header.h */,
 			);
 			name = Controllers;
+			sourceTree = "<group>";
+		};
+		E49CE4251B1BB3A700F59AA4 /* MusicManager */ = {
+			isa = PBXGroup;
+			children = (
+				E49CE4221B1BB39D00F59AA4 /* SystemMusicManager.h */,
+				E49CE4231B1BB39D00F59AA4 /* SystemMusicManager.m */,
+			);
+			name = MusicManager;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -293,6 +308,7 @@
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E44358FE1B19471B0091E926 /* Artist.swift in Sources */,
 				E44359001B19475F0091E926 /* Song.swift in Sources */,
+				E49CE4241B1BB39D00F59AA4 /* SystemMusicManager.m in Sources */,
 				E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
@@ -426,6 +442,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -436,6 +453,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "JamAlpha2/JamAlpha2-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -443,6 +462,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -453,6 +473,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "JamAlpha2/JamAlpha2-Bridging-Header.h";
 			};
 			name = Release;
 		};
