@@ -35,6 +35,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     }
     
     func setUpSearchBar(){
+        
         self.resultSearchController = UISearchController(searchResultsController: nil)
         self.resultSearchController.searchResultsUpdater = self
         self.resultSearchController.dimsBackgroundDuringPresentation = true;
@@ -43,7 +44,6 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         //        self.searchController.searchBar.barStyle = UIBarStyle.
         //        self.searchController.searchBar.barTintColor = UIColor.whiteColor()
         //        self.searchController.searchBar.backgroundColor = UIColor.clearColor()
-        
         self.artistTable.tableHeaderView = resultSearchController.searchBar
 
     }

@@ -3,9 +3,11 @@
 import Foundation
 
 class Song:NSObject {
-    let title:String
+    
+    var title:String
     
     init(title:String){
+ 
         self.title = title
     }
 }

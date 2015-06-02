@@ -8,6 +8,7 @@
 
 #import "SystemMusicManager.h"
 
+#define isMusic(x) (x & MPMediaTypeMusic)
 @implementation SystemMusicManager:NSObject
 
 +(NSMutableArray *)allTitles{
@@ -19,8 +20,25 @@
         for (MPMediaItem *song in itemsFromGenericQuery) {
             NSString *songTitle = [song valueForProperty: MPMediaItemPropertyTitle];
             [collection addObject: songTitle];
+           
+            NSInteger type = [[song valueForProperty:MPMediaItemPropertyMediaType] integerValue];
+            if (isMusic(type)){
+                
+            }
+            
+            NSLog(@"Song: %@ has media type %@",songTitle, [song valueForProperty:MPMediaItemPropertyMediaType]);
             
         }
+    
+//    MPMediaPropertyPredicate *titlePredicate = [MPMediaPropertyPredicate predicateWithValue:@"give me love" forProperty:MPMediaItemPropertyTitle comparisonType:MPMediaPredicateComparisonContains];
+//    
+//    NSPredicate *test = [NSPredicate predicateWithFormat:@"title contains[cd] OR albumTitle contains[cd] %@ OR artist contains[cd] %@",@"",@"",@""];
+//    NSArray *filteredTitle = [[everything items] filteredArrayUsingPredicate:test];
+//    
+//    for (MPMediaItem *song in filteredTitle) {
+//        
+//    }
+    
     return collection;
 }
 @end
