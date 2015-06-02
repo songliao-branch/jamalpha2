@@ -32,7 +32,7 @@ class PersistencyManager: NSObject{
             var previousId = artistItems[index-1].artistPersistentID as CUnsignedLongLong
             if currentId != previousId {
                 uniqueArtist.append(artistItems[index])
-
+                
             }
         }
         artistItems = uniqueArtist

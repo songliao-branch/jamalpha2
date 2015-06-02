@@ -77,6 +77,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             println("song \(indexPath.row) selected")
             let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
             
+            detailVC.theSong = MusicAPI.sharedIntance.getSongs()[indexPath.row]
+            
             self.showViewController(detailVC, sender: self)
             
             
