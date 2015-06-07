@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MediaPlayer
 
 class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
     
@@ -18,57 +19,56 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     }
     
     @IBOutlet weak var musicTable: UITableView!
-    var demoTitles = ["彩虹", "Thinking out loud", "海阔天空","Sugar"]
-    var demoArtist = ["周杰伦","Ed","Beyond","Maroon 5"]
-   
     @IBOutlet weak var musicTypeSegment: UISegmentedControl!
 
-    
     @IBAction func musicSelectionChanged(sender: UISegmentedControl) {
-        if sender.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue {
-        
-            musicTable.reloadData()
-
-            
-        } else if sender.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue {
-            
-            musicTable.reloadData()
-            
-        } else if sender.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ALBUM.rawValue {
-            
-        }
+         musicTable.reloadData()
     }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //self.musicTable.reloadData()
-        // Do any additional setup after loading the view, typically from a nib.
     }
     
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return demoTitles.count
+        if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue {
+            return MusicAPI.sharedIntance.getSongs().count
+        }else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue{
+            return MusicAPI.sharedIntance.getArtists().count
+        }
+        else
+        {
+            return MusicAPI.sharedIntance.getAlbums().count
+        }
+        
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
         
         if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue {
-            cell.titleLabel.text = demoTitles[indexPath.row]
-            cell.subtitleLabel.text = demoArtist[indexPath.row]
+            
+            cell.titleLabel.text = MusicAPI.sharedIntance.getSongs()[indexPath.row].title
+            cell.subtitleLabel.text = MusicAPI.sharedIntance.getSongs()[indexPath.row].albumArtist
             
         } else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue {
             
-           cell.titleLabel.text = demoArtist[indexPath.row]
-           cell.subtitleLabel.text = "1 Track"
+           cell.titleLabel.text = MusicAPI.sharedIntance.getArtists()[indexPath.row].albumArtist
+           let albumTrackCount = MusicAPI.sharedIntance.getArtists()[indexPath.row].albumTrackCount
+            var albumCountString = ""
+            
+            if albumTrackCount == 1 {
+                 cell.subtitleLabel.text = "\(albumTrackCount) track"
+            }else{
+                cell.subtitleLabel.text = "\(albumTrackCount) tracks"
+            }
             
         } else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ALBUM.rawValue {
             
+            cell.titleLabel.text = MusicAPI.sharedIntance.getAlbums()[indexPath.row].albumTitle
+            cell.subtitleLabel.text = MusicAPI.sharedIntance.getAlbums()[indexPath.row].albumArtist
         }
-        
-       
         return cell
     }
 
@@ -76,6 +76,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue  {
             println("song \(indexPath.row) selected")
             let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
+            
+            detailVC.theSong = MusicAPI.sharedIntance.getSongs()[indexPath.row]
             
             self.showViewController(detailVC, sender: self)
             

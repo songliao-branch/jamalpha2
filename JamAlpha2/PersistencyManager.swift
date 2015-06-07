@@ -1,19 +1,55 @@
-//
-//  PersistencyManager.swift
-//  JamAlpha2
-//
-//  Created by Song Liao on 5/29/15.
-//  Copyright (c) 2015 Song Liao. All rights reserved.
-//
+
+// Abstraction layer for system music library fetching
+
 
 import Foundation
+import MediaPlayer
 
 class PersistencyManager: NSObject{
     
     private var artists = [Artist]()
     
+    private var songItems:[MPMediaItem]!
+    private var artistItems:[MPMediaItem]!//unique
+    private var albumItems:[MPMediaItem]!
+    
     override init(){
+        super.init()
+
+        println("Persistancy manager initialized")
         
+        var songCollection = MPMediaQuery.songsQuery()
+        songItems = songCollection.items as! [MPMediaItem]
+        
+        var artistCollection = MPMediaQuery.artistsQuery()
+        artistItems = artistCollection.items as! [MPMediaItem]
+
+        
+        //TODO: fix this filtering
+        var uniqueArtist = [MPMediaItem]()
+        for index in 1...artistItems.count-1 {
+            var currentId = artistItems[index].artistPersistentID as CUnsignedLongLong
+            var previousId = artistItems[index-1].artistPersistentID as CUnsignedLongLong
+            if currentId != previousId {
+                uniqueArtist.append(artistItems[index])
+                
+            }
+        }
+        artistItems = uniqueArtist
+        
+        var albumCollection = MPMediaQuery.albumsQuery()
+        albumItems = albumCollection.items as! [MPMediaItem]
+        var uniqueAlbums = [MPMediaItem]()
+        for index in 1...albumItems.count-1 {
+            var currentId = albumItems[index].albumPersistentID as CUnsignedLongLong
+            var previousId = albumItems[index-1].albumPersistentID as CUnsignedLongLong
+            if currentId != previousId {
+                uniqueAlbums.append(albumItems[index])
+            }
+        }
+        albumItems = uniqueAlbums
+        
+        //delete this
         let theATeam = Song(title: "The A Team")
         let drunk = Song(title: "Drunk")
         let UNI = Song(title: "UNI")
@@ -43,7 +79,19 @@ class PersistencyManager: NSObject{
         let ed = Artist(name: "Ed Sheeran", albums: albs)
         
         artists = [ed]
-
+        
+    }
+    
+    func getSongItems()->[MPMediaItem]{
+        return self.songItems
+    }
+    
+    func getAlbumItems()->[MPMediaItem]{
+        return self.albumItems
+    }
+    
+    func getArtistItem()->[MPMediaItem]{
+        return self.artistItems
     }
     
     func getArtists() -> [Artist] {

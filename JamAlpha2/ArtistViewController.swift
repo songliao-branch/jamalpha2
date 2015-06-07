@@ -5,11 +5,15 @@
 
 
 import UIKit
-
+import MediaPlayer
 class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate, UISearchResultsUpdating {
     
-    @IBOutlet weak var artistTable: UITableView!
     
+    var musicPlayer:MPMusicPlayerController!
+    
+    
+    @IBOutlet weak var artistTable: UITableView!
+   
     var resultSearchController:UISearchController!
     
     var ed:Artist!
@@ -22,13 +26,16 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         loadArtistData()
         setUpSearchBar()
         self.artistTable.reloadData()
+        
     }
+    
     
     func loadArtistData(){
         ed = MusicAPI.sharedIntance.getArtist()[0]
     }
     
     func setUpSearchBar(){
+        
         self.resultSearchController = UISearchController(searchResultsController: nil)
         self.resultSearchController.searchResultsUpdater = self
         self.resultSearchController.dimsBackgroundDuringPresentation = true;
@@ -37,7 +44,6 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         //        self.searchController.searchBar.barStyle = UIBarStyle.
         //        self.searchController.searchBar.barTintColor = UIColor.whiteColor()
         //        self.searchController.searchBar.backgroundColor = UIColor.clearColor()
-        
         self.artistTable.tableHeaderView = resultSearchController.searchBar
 
     }
