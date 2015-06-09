@@ -1,8 +1,8 @@
 
-
-// Singelton Access API for music
+// THIS CLASS IS USED FOR TESTING and Practicing, not used anymore
 
 import Foundation
+import MediaPlayer
 
 class MusicAPI: NSObject{
 
@@ -36,6 +36,10 @@ class MusicAPI: NSObject{
     
     func getArtists()->[MPMediaItem]{
         return persistancyManager.getArtistItem()
+    }
+    
+    func getRightAlbum()->[Album]{
+        return persistancyManager.getAlbums()
     }
     
     
