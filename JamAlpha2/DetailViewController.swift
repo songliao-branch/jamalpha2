@@ -21,9 +21,18 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var albumCoverImage: UIImageView!
     
+    @IBOutlet weak var playPauseButton: UIButton!
+    
+    var isPlaying = false
+    
+    let player = MPMusicPlayerController.applicationMusicPlayer()
+
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         renderView()
+        setUpSong()
     }
     
     func renderView(){
@@ -41,7 +50,6 @@ class DetailViewController: UIViewController {
             var bounds = artwork.bounds
             if let art = artwork {
                 let uncroppedImage = art.imageWithSize(bounds.size)
-                
                  albumCoverImage.image = Toucan(image: uncroppedImage).maskWithEllipse(borderWidth: 0, borderColor: UIColor.clearColor()).image
             }
         }
@@ -50,15 +58,26 @@ class DetailViewController: UIViewController {
             println("song cannot be loaded")
         }
     }
-    
-    @IBAction func playPause(sender: UIButton) {
-        println("play button pressed")
-        let player = MPMusicPlayerController.applicationMusicPlayer()
+    func setUpSong(){
         var items = [MPMediaItem]()
         items.append(theSong)
         var collection = MPMediaItemCollection(items: items)
         player.setQueueWithItemCollection(collection)
-        player.play()
+    }
+
+    @IBAction func playPause(sender: UIButton) {
+        println("play button pressed")
+        //if not playing,starts
+        if !isPlaying {
+
+            player.play()
+            playPauseButton.setTitle("Pause", forState: UIControlState.Normal)
+            isPlaying = true
+        } else {
+            player.pause()
+            playPauseButton.setTitle("Play", forState: UIControlState.Normal)
+            isPlaying = false
+        }
         
         
     }

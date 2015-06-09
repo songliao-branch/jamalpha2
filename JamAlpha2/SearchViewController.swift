@@ -1,11 +1,5 @@
-//
-//  FirstViewController.swift
-//  JamAlpha2
-//
-//  Created by Song Liao on 5/26/15.
-//  Copyright (c) 2015 Song Liao. All rights reserved.
-//
 
+//TODO: implement Search results in tableview with sections with sources from Spotify API
 import UIKit
 
 class SearchViewController: UIViewController {
@@ -19,7 +13,5 @@ class SearchViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
 }
 
