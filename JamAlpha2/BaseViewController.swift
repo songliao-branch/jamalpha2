@@ -11,7 +11,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         self.pageTitles = ["Song","Album","Artist"]
         self.pageImages = ["song","album","artist"]
         
@@ -22,7 +22,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource {
         var viewControllers = [startVC]
         self.pageViewController.setViewControllers(viewControllers as [AnyObject], direction: .Forward, animated: true, completion: nil)
         
-        self.pageViewController.view.frame = CGRectMake(0,100,self.view.frame.width, self.view.frame.size.height)
+        self.pageViewController.view.frame = CGRectMake(0,self.navigationController!.navigationBar.frame.height * 2,self.view.frame.width, self.view.frame.size.height)
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMoveToParentViewController(self)
@@ -35,6 +35,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource {
         if ((self.pageTitles.count == 0 ) || (index >= self.pageTitles.count)){
             return MusicViewController() //suppose to return nil here
         }
+        println("viewControllerAtIndex \(index)")
        // changeButtonColorFromIndex(index)
         var vc: MusicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
       
@@ -50,7 +51,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource {
         if (index==0) || index == NSNotFound {
             return nil
         }
-        println("beforeViewController  \(index)")
+        //println("beforeViewController  \(index)")
         changeIndicatorText(index)
         index--
         return self.viewControllerAtIndex(index)
@@ -62,7 +63,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource {
         if (index == NSNotFound){
             return nil
         }
-        println("afterViewcontroller  \(index)")
+        
         changeIndicatorText(index)
         index++
         if (index == self.pageTitles.count){
@@ -80,6 +81,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource {
         
         return 0
     }
+
+    
     //TODO: not correct
     func changeIndicatorText(index:Int){
         if index == 0 {

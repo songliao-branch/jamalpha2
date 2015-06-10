@@ -69,7 +69,6 @@ class DetailViewController: UIViewController {
         println("play button pressed")
         //if not playing,starts
         if !isPlaying {
-
             player.play()
             playPauseButton.setTitle("Pause", forState: UIControlState.Normal)
             isPlaying = true
