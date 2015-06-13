@@ -16,6 +16,7 @@ class MusicCell: UITableViewCell {
     
     override func awakeFromNib() {
         //This is Xing
+        //my branch
         super.awakeFromNib()
     }
 
