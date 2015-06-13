@@ -15,6 +15,7 @@ class MusicCell: UITableViewCell {
     @IBOutlet weak var checkImage: UIImageView!
     
     override func awakeFromNib() {
+        //This is Xing
         super.awakeFromNib()
     }
 
