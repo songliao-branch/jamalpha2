@@ -2,8 +2,7 @@
 
 // Display all songs in all albums of a particular artist
 // each section is an album
-//HEY IT"S ME
-
+///Whta't good
 import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate {
