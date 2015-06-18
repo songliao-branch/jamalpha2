@@ -37,6 +37,11 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         loadLocalArtist()
     }
 
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        self.navigationController?.hidesBarsOnSwipe = true
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 //        if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue {
 //            return uniqueSongs.count
@@ -61,28 +66,23 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
-//        
-//        if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue {
-//            cell.titleLabel.text = uniqueSongs[indexPath.row].title
-//            cell.subtitleLabel.text = uniqueSongs[indexPath.row].artist
-//        } else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue {
-//            cell.titleLabel.text = theArtists[indexPath.row].artistName
-//            cell.subtitleLabel.text = "\(theArtists[indexPath.row].numberOfTracks) tracks"
-//        } else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ALBUM.rawValue {
-//            cell.titleLabel.text = theAlbums[indexPath.row].albumTitle
-//            cell.subtitleLabel.text = "\(theAlbums[indexPath.row].numberOfTracks) tracks"
-//        }
+        let cell = tableView.dequeueReusableCellWithIdentifier("subtitlecell", forIndexPath: indexPath) as! UITableViewCell
         
         if pageIndex == 0 {
-            cell.titleLabel.text = uniqueSongs[indexPath.row].title
-            cell.subtitleLabel.text = uniqueSongs[indexPath.row].artist
+            let image = uniqueSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 55, height: 55))
+            cell.imageView?.frame = CGRectMake(10, 10, 55, 55)
+            
+            cell.imageView?.image = Toucan(image: image).maskWithRoundedRect(cornerRadius: 2).image
+            
+            cell.textLabel?.text = uniqueSongs[indexPath.row].title
+            cell.detailTextLabel?.text = uniqueSongs[indexPath.row].artist
         } else if pageIndex == 1  {
-            cell.titleLabel.text = theArtists[indexPath.row].artistName
-            cell.subtitleLabel.text = "\(theArtists[indexPath.row].numberOfTracks) tracks"
+            
+            cell.textLabel?.text = theArtists[indexPath.row].artistName
+            cell.detailTextLabel?.text = "\(theArtists[indexPath.row].numberOfTracks) tracks"
         } else if pageIndex == 2 {
-            cell.titleLabel.text = theAlbums[indexPath.row].albumTitle
-            cell.subtitleLabel.text = "\(theAlbums[indexPath.row].numberOfTracks) tracks"
+            cell.textLabel?.text = theAlbums[indexPath.row].albumTitle
+            cell.detailTextLabel?.text = "\(theAlbums[indexPath.row].numberOfTracks) tracks"
         }
         return cell
     }
