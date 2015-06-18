@@ -79,12 +79,10 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
         let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
     
         detailVC.theSong = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
         self.showViewController(detailVC, sender: self)
-
     }
 //    // MARK: Search
 //    func filterSongs(searchText:String)
