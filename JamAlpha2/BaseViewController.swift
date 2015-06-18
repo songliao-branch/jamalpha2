@@ -112,25 +112,43 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func tapButton(button:UIButton){
         
         if !self.isPageScrolling { //if done scrolling
-            let index = self.currentPageIndex
+            let current = self.currentPageIndex
             
             var direction:UIPageViewControllerNavigationDirection
-            
+            var indexScrollingFrom:Int
             //todo: underline moves too fast scrolling through two viewcontrollers, causing a disturbance
             
-            if button.tag > index {
+
+            
+            if button.tag > current { //swipe left to right
+    
                 direction = UIPageViewControllerNavigationDirection.Forward
+                
+                for i in current+1...button.tag {
+                    var theVC = self.viewControllerAtIndex(i) as UIViewController
+                    var tobeMovedViewControllers = [theVC]
+                    
+                    self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
+                        self.updateCurrentPageIndex(i)
+                    })
+                }
+                
             }
-            else {
+            else { //swipe right to left
                 direction = UIPageViewControllerNavigationDirection.Reverse
+
+                 for i in reverse(button.tag...current-1) {
+                    var theVC = self.viewControllerAtIndex(i) as UIViewController
+                    var tobeMovedViewControllers = [theVC]
+                    
+                    self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
+                        self.updateCurrentPageIndex(i)
+                    })
+                }
             }
             
-            var theVC = self.viewControllerAtIndex(button.tag) as UIViewController
-            var tobeMovedViewControllers = [theVC]
-            
-            self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
-                self.updateCurrentPageIndex(button.tag)
-            })
+   
+
         }
     }
 
@@ -193,7 +211,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         if(completed){
             
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController
-            //I'm such a fucking genius
+            
             self.currentPageIndex = lastViewController.pageIndex
             
             for i in 0..<3 {
@@ -205,7 +223,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                 }
             }
             
-            println("currentIndex is \(currentPageIndex)")
         }
     }
     
