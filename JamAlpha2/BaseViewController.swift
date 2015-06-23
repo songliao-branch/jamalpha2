@@ -50,7 +50,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                 self.scrollView = view as! UIScrollView
                 self.scrollView.delegate = self
             }
-            
         }
         
         self.currentPageIndex = 0
@@ -109,16 +108,24 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.musicTypeButtonContainer.addSubview(musicUnderlineSelector)
     }
     
+    
     func tapButton(button:UIButton){
         
         if !self.isPageScrolling { //if done scrolling
+            
             let current = self.currentPageIndex
             
             var direction:UIPageViewControllerNavigationDirection
             var indexScrollingFrom:Int
-            //todo: underline moves too fast scrolling through two viewcontrollers, causing a disturbance
             
+            //return if pressed on current button
+            if button.tag == current {
+                return
+            }
+            
+            self.isPageScrolling = true
 
+            //TODO: bug: consecutively tapping buttons causing disturbance
             
             if button.tag > current { //swipe left to right
     
@@ -130,9 +137,10 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                     
                     self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
                         self.updateCurrentPageIndex(i)
+                        self.changeButtonColorOnScroll()
+                        self.isPageScrolling = false
                     })
                 }
-                
             }
             else { //swipe right to left
                 direction = UIPageViewControllerNavigationDirection.Reverse
@@ -143,7 +151,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                     
                     self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
                         self.updateCurrentPageIndex(i)
+                        self.changeButtonColorOnScroll()
+                        self.isPageScrolling = false
+
                     })
+                    
                 }
             }
             
@@ -214,15 +226,20 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             
             self.currentPageIndex = lastViewController.pageIndex
             
-            for i in 0..<3 {
-                if i == currentPageIndex {
-                    buttonHolder[i].setTitleColor(mainPinkColor, forState: UIControlState.Normal)
-                }
-                else {
-                    buttonHolder[i].setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-                }
-            }
+            println("change color")
+            changeButtonColorOnScroll()
             
+        }
+    }
+    
+    func changeButtonColorOnScroll() {
+        for i in 0..<3 {
+            if i == currentPageIndex {
+                buttonHolder[i].setTitleColor(mainPinkColor, forState: UIControlState.Normal)
+            }
+            else {
+                buttonHolder[i].setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
+            }
         }
     }
     
@@ -234,11 +251,4 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         musicUnderlineSelector.frame = CGRectMake(xCoordinate - xFromCenter / 3, musicUnderlineSelector.frame.origin.y, musicUnderlineSelector.frame.width, musicUnderlineSelector.frame.height)
     }
     
-    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        self.isPageScrolling = true
-    }
-    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        self.isPageScrolling = false
-    }
-
 }

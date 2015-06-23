@@ -39,7 +39,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        self.navigationController?.hidesBarsOnSwipe = true
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
