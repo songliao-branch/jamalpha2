@@ -26,6 +26,7 @@
 		E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* DetailViewController.swift */; };
 		E488776F1B152742004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E488776D1B152742004785D3 /* Main.storyboard */; };
 		E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49AF0961B2699C800DD3342 /* BaseViewController.swift */; };
+		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 		E48877691B1520A0004785D3 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E49AF0961B2699C800DD3342 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +90,7 @@
 				E44358FD1B19471B0091E926 /* Artist.swift */,
 				E44358FF1B19475F0091E926 /* Song.swift */,
 				E44359011B1947660091E926 /* Album.swift */,
+				E4F01BC01B3B8CA00097E766 /* Chord.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -299,6 +302,7 @@
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E44358FE1B19471B0091E926 /* Artist.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
+				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E44359001B19475F0091E926 /* Song.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
 				E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */,

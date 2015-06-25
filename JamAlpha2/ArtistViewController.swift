@@ -17,9 +17,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
-        
-        
+               
         //setUpSearchBar()
         //self.artistTable.reloadData()
     }
@@ -84,6 +82,9 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         detailVC.theSong = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
         self.showViewController(detailVC, sender: self)
     }
+    
+    
+    
 //    // MARK: Search
 //    func filterSongs(searchText:String)
 //    {

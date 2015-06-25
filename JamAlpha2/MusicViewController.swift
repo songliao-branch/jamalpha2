@@ -2,12 +2,6 @@ import UIKit
 import MediaPlayer
 
 class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
-    
-//    enum MUSIC_SELECTION_TYPE: Int {
-//        case TRACKS = 0
-//        case ARTIST = 1
-//        case ALBUM = 2
-//    }
 
     var uniqueSongs :[MPMediaItem]!
     
@@ -21,11 +15,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     @IBOutlet weak var musicTable: UITableView!
     
-//    @IBOutlet weak var musicTypeSegment: UISegmentedControl!
-//                            
-//    @IBAction func musicSelectionChanged(sender: UISegmentedControl) {
-//        musicTable.reloadData()
-//    }
     
     var hello:[String]!
     
@@ -42,25 +31,16 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.TRACKS.rawValue {
-//            return uniqueSongs.count
-//        }else if musicTypeSegment.selectedSegmentIndex == MUSIC_SELECTION_TYPE.ARTIST.rawValue{
-//            return theArtists.count
-//        }
-//        else
-//        {
-//            return theAlbums.count
-//        }
-//        
-                if pageIndex == 0  {
-                    return uniqueSongs.count
-                }else if pageIndex == 1 {
-                    return theArtists.count
-                }
-                else
-                {
-                    return theAlbums.count
-                }
+        if pageIndex == 0  {
+                return uniqueSongs.count
+        }
+        else if pageIndex == 1 {
+            return theArtists.count
+        }
+        else
+        {
+            return theAlbums.count
+        }
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {

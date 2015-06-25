@@ -197,7 +197,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BQ-D9-G6T">
-                                <rect key="frame" x="108" y="268" width="104" height="66"/>
+                                <rect key="frame" x="108" y="427" width="104" height="66"/>
                                 <color key="backgroundColor" red="0.18907663471072755" green="1" blue="0.19044531304766343" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="104" id="5Dy-mW-inv"/>
@@ -210,6 +210,20 @@
                                     <action selector="playPause:" destination="e5l-3U-enU" eventType="touchUpInside" id="9U1-nY-0ds"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pw7-CQ-QOl">
+                                <rect key="frame" x="139" y="347" width="42" height="20"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM">
+                                <rect key="frame" x="80" y="194" width="160" height="200"/>
+                                <color key="backgroundColor" red="1" green="0.4703511796" blue="0.55983143690000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="AES-Za-kvD"/>
+                                    <constraint firstAttribute="width" constant="160" id="EA2-RC-elf"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -224,15 +238,18 @@
                             <constraint firstItem="ip6-Ft-EmR" firstAttribute="leading" secondItem="BGo-rS-auO" secondAttribute="leadingMargin" constant="-46" id="Np1-YL-iYI"/>
                             <constraint firstAttribute="trailingMargin" secondItem="ip6-Ft-EmR" secondAttribute="trailing" constant="94" id="P4l-BU-sF5"/>
                             <constraint firstItem="TbG-Fh-z4M" firstAttribute="leading" secondItem="Xpa-aa-pxW" secondAttribute="leading" id="Tvx-ea-xhF"/>
+                            <constraint firstAttribute="centerY" secondItem="LdE-bG-dmM" secondAttribute="centerY" constant="-10" id="WYY-15-WQX"/>
+                            <constraint firstAttribute="centerX" secondItem="LdE-bG-dmM" secondAttribute="centerX" id="aNq-gh-ODo"/>
                             <constraint firstItem="Xpa-aa-pxW" firstAttribute="trailing" secondItem="7tr-ft-MmH" secondAttribute="trailing" id="aSS-kO-oTJ"/>
                             <constraint firstItem="7tr-ft-MmH" firstAttribute="trailing" secondItem="BGo-rS-auO" secondAttribute="trailingMargin" id="fRv-5C-ccx"/>
-                            <constraint firstItem="yHS-s7-Kh9" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="234" id="iSW-VW-COx"/>
+                            <constraint firstItem="yHS-s7-Kh9" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="75" id="iSW-VW-COx"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="albumCoverImage" destination="ip6-Ft-EmR" id="Rux-9o-CTI"/>
                         <outlet property="albumLabel" destination="TbG-Fh-z4M" id="cQO-gm-1WB"/>
                         <outlet property="artistLabel" destination="Xpa-aa-pxW" id="vpP-SF-GK8"/>
+                        <outlet property="chordBase" destination="LdE-bG-dmM" id="61f-vS-llh"/>
                         <outlet property="playPauseButton" destination="9BQ-D9-G6T" id="d8u-fh-LYf"/>
                         <outlet property="titleLabel" destination="7tr-ft-MmH" id="9wu-JQ-9LF"/>
                     </connections>
@@ -384,7 +401,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="H" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1lf-kd-Tmc">
                                 <rect key="frame" x="0.0" y="64" width="15" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>

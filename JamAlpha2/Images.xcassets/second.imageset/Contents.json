@@ -1,8 +1,15 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "filename" : "second.pdf"
+    },
+    {
+      "idiom" : "iphone",
+      "subtype" : "retina4"
+    },
+    {
+      "idiom" : "ipad"
     }
   ],
   "info" : {

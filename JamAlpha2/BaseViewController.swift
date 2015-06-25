@@ -62,7 +62,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         
         setupSegmentButtons()
     }
-    
 
     var buttonHolder = [UIButton]()
     
@@ -174,7 +173,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         vc.pageIndex = index
         return vc
     }
-    
+
     //MARK: page view controller data source
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         
@@ -225,10 +224,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController
             
             self.currentPageIndex = lastViewController.pageIndex
-            
-            println("change color")
             changeButtonColorOnScroll()
-            
         }
     }
     
@@ -244,7 +240,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     
     //scrollview delegate methods
-    
     func scrollViewDidScroll(scrollView: UIScrollView) {
         let xFromCenter:CGFloat = self.view.frame.size.width - scrollView.contentOffset.x
         let xCoordinate:CGFloat = musicUnderlineSelector.frame.size.width *  CGFloat(self.currentPageIndex)
