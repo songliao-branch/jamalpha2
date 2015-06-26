@@ -13,13 +13,13 @@ class DetailViewController: UIViewController {
 
     var theSong:MPMediaItem!
     
-    @IBOutlet weak var titleLabel: UILabel!
-
-    @IBOutlet weak var artistLabel: UILabel!
-    
-    @IBOutlet weak var albumLabel: UILabel!
-    
-    @IBOutlet weak var albumCoverImage: UIImageView!
+//    @IBOutlet weak var titleLabel: UILabel!
+//
+//    @IBOutlet weak var artistLabel: UILabel!
+//    
+//    @IBOutlet weak var albumLabel: UILabel!
+//    
+//    @IBOutlet weak var albumCoverImage: UIImageView!
     
     @IBOutlet weak var chordBase: UIView!
     
@@ -92,7 +92,7 @@ class DetailViewController: UIViewController {
         chords.append(chord14)
         chords.append(chord15)
         chords.append(chord16)
-        
+
     }
     
     func initializeChordOnView(){
@@ -178,16 +178,16 @@ class DetailViewController: UIViewController {
             println("song album: \(song.albumTitle)")
             
       
-            titleLabel.text = song.title
-            
-            artistLabel.text = song.artist
-            albumLabel.text = song.albumTitle
-            var artwork = song.artwork
-            var bounds = artwork.bounds
-            if let art = artwork {
-                let uncroppedImage = art.imageWithSize(bounds.size)
-                 albumCoverImage.image = Toucan(image: uncroppedImage).maskWithEllipse(borderWidth: 0, borderColor: UIColor.clearColor()).image
-            }
+//            titleLabel.text = song.title
+//            
+//            artistLabel.text = song.artist
+//            albumLabel.text = song.albumTitle
+//            var artwork = song.artwork
+//            var bounds = artwork.bounds
+//            if let art = artwork {
+//                let uncroppedImage = art.imageWithSize(bounds.size)
+//                 albumCoverImage.image = Toucan(image: uncroppedImage).maskWithEllipse(borderWidth: 0, borderColor: UIColor.clearColor()).image
+//            }
         }
         else
         {
