@@ -13,15 +13,15 @@ class DetailViewController: UIViewController {
 
     var theSong:MPMediaItem!
     
-    @IBOutlet weak var titleLabel: UILabel!
-
-    @IBOutlet weak var artistLabel: UILabel!
+//    @IBOutlet weak var titleLabel: UILabel!
+//
+//    @IBOutlet weak var artistLabel: UILabel!
+//    
+//    @IBOutlet weak var albumLabel: UILabel!
+//    
+//    @IBOutlet weak var albumCoverImage: UIImageView!
     
-    @IBOutlet weak var albumLabel: UILabel!
-    
-    @IBOutlet weak var albumCoverImage: UIImageView!
-    
-    @IBOutlet weak var chordBase: UIView!
+    @IBOutlet weak var base: ChordBase!
     
     @IBOutlet weak var playPauseButton: UIButton!
     
@@ -33,7 +33,8 @@ class DetailViewController: UIViewController {
     var current = 0
     var delcur = 0
     var labels = [UILabel]()
-    var startTime = 0
+    var startTime: Float = 0
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,33 +43,33 @@ class DetailViewController: UIViewController {
         setUpDemoChords()
         
         initializeChordOnView()
-      
+        
+        
     }
     
     
     
     func setUpDemoChords(){
         
-        var chord1 = Chord(content: "C", time: 1)
-        var chord2 = Chord(content: "G", time: 3)
-        var chord3 = Chord(content: "Em", time: 6)
-        var chord4 = Chord(content: "D", time: 10)
+        var chord1 = Chord(content: "C", time: 1.2)
+        var chord2 = Chord(content: "F", time: 3.1)
+        var chord3 = Chord(content: "Em", time: 6.2)
+        var chord4 = Chord(content: "D", time: 10.6)
         
+        var chord5 = Chord(content: "D", time: 13.4)
+        var chord6 = Chord(content: "Em", time: 14.3)
+        var chord7 = Chord(content: "F", time: 16.2)
+        var chord8 = Chord(content: "D", time: 17.1)
         
-        var chord5 = Chord(content: "C", time: 13)
-        var chord6 = Chord(content: "G", time: 14)
-        var chord7 = Chord(content: "Em", time: 16)
-        var chord8 = Chord(content: "D", time: 17)
+        var chord9 = Chord(content: "C", time: 20.1)
+        var chord10 = Chord(content: "G", time: 21.2)
+        var chord11 = Chord(content: "Em", time: 22.9)
+        var chord12 = Chord(content: "D", time: 24.5)
         
-        var chord9 = Chord(content: "C", time: 20)
-        var chord10 = Chord(content: "G", time: 21)
-        var chord11 = Chord(content: "Em", time: 22)
-        var chord12 = Chord(content: "D", time: 24)
-        
-        var chord13 = Chord(content: "C", time: 29)
-        var chord14 = Chord(content: "G", time: 33)
-        var chord15 = Chord(content: "Em", time: 34)
-        var chord16 = Chord(content: "D", time: 40)
+        var chord13 = Chord(content: "C", time: 29.2)
+        var chord14 = Chord(content: "G", time: 33.5)
+        var chord15 = Chord(content: "Em", time: 34.2)
+        var chord16 = Chord(content: "D", time: 40.1)
         
         chords.append(chord1)
         chords.append(chord2)
@@ -92,7 +93,7 @@ class DetailViewController: UIViewController {
         chords.append(chord14)
         chords.append(chord15)
         chords.append(chord16)
-        
+
     }
     
     func initializeChordOnView(){
@@ -109,15 +110,14 @@ class DetailViewController: UIViewController {
                     //1
                     let widthOfLabel : CGFloat = 30
                     let heightOfLabel:CGFloat = 20
-                    let segmentForOneSecond:CGFloat = chordBase.frame.height / 5
-                    let yPosition : CGFloat = chordBase.frame.height - CGFloat(theChord.mTime * Int(segmentForOneSecond))
+                    let segmentForOneSecond: Float = Float(base.frame.height / 5)
+                    let yPosition : CGFloat = CGFloat(Float(base.frame.height) - Float(theChord.mTime) * segmentForOneSecond)
                     let label = UILabel(frame: CGRectMake(0, 0, widthOfLabel, heightOfLabel))
-                    label.center = CGPointMake(self.chordBase.frame.width / 2, yPosition)
+                    label.center = CGPointMake(self.base.frame.width / 2, yPosition)
                     label.text = theChord.mContent
                     label.textAlignment = NSTextAlignment.Center
                     labels.append(label)
-                    self.chordBase.addSubview(label)
-                    
+                    self.base.addSubview(label)
                 }
                 else {
                     isLessThan5 = false
@@ -130,45 +130,42 @@ class DetailViewController: UIViewController {
     }
     
     func startAnimate(){
-        var timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        var timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         
         //animate the initial labels first
         for i in 0...current-1{
             UIView.animateWithDuration( NSTimeInterval(chords[i].mTime), animations: {
-                self.labels[i].center.y = self.chordBase.frame.height
+                self.labels[i].center.y = self.base.frame.height
             })
         }
     }
     
+
     func update(){
-        startTime++
-        
-        if delcur+1 < chords.count && startTime == chords[delcur+1].mTime - 1
+        startTime += 0.1
+        if delcur+1 < chords.count && abs(startTime - Float(chords[delcur+1].mTime)+1) < 0.001
         {
-            UIView.animateWithDuration( 0.6, animations: {
+            UIView.animateWithDuration(0.6, animations: {
                 self.labels[self.delcur].alpha = 0
-                
             })
             delcur++
         }
         
-        if current < chords.count && startTime == chords[current].mTime - 5 {
+        if current < chords.count && abs(startTime - Float(chords[current].mTime) + 5) < 0.001 {
             var label = UILabel(frame: CGRectMake(0, 0, 30,20))
             label.text = chords[current].mContent
             label.textAlignment = NSTextAlignment.Center
-            label.center = CGPointMake(self.chordBase.frame.width/2, 0 - 20/2)
+            label.center = CGPointMake(self.base.frame.width/2, 0 - 20/2)
             
-            self.chordBase.addSubview(label)
+            self.base.addSubview(label)
             labels.append(label)
             
             UIView.animateWithDuration( NSTimeInterval(5), animations: {
-                label.center.y = self.chordBase.frame.height
+                label.center.y = self.base.frame.height
                 
             })
-            
             current++
         }
-        
     }
     
     func renderView(){
@@ -178,16 +175,16 @@ class DetailViewController: UIViewController {
             println("song album: \(song.albumTitle)")
             
       
-            titleLabel.text = song.title
-            
-            artistLabel.text = song.artist
-            albumLabel.text = song.albumTitle
-            var artwork = song.artwork
-            var bounds = artwork.bounds
-            if let art = artwork {
-                let uncroppedImage = art.imageWithSize(bounds.size)
-                 albumCoverImage.image = Toucan(image: uncroppedImage).maskWithEllipse(borderWidth: 0, borderColor: UIColor.clearColor()).image
-            }
+//            titleLabel.text = song.title
+//            
+//            artistLabel.text = song.artist
+//            albumLabel.text = song.albumTitle
+//            var artwork = song.artwork
+//            var bounds = artwork.bounds
+//            if let art = artwork {
+//                let uncroppedImage = art.imageWithSize(bounds.size)
+//                 albumCoverImage.image = Toucan(image: uncroppedImage).maskWithEllipse(borderWidth: 0, borderColor: UIColor.clearColor()).image
+//            }
         }
         else
         {
@@ -200,7 +197,7 @@ class DetailViewController: UIViewController {
         var collection = MPMediaItemCollection(items: items)
         player.setQueueWithItemCollection(collection)
     }
-
+    
     @IBAction func playPause(sender: UIButton) {
         println("play button pressed")
         //if not playing,starts

@@ -10,9 +10,8 @@
 		E44358FE1B19471B0091E926 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44358FD1B19471B0091E926 /* Artist.swift */; };
 		E44359001B19475F0091E926 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44358FF1B19475F0091E926 /* Song.swift */; };
 		E44359021B1947660091E926 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359011B1947660091E926 /* Album.swift */; };
-		E44359061B1959CA0091E926 /* MusicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359051B1959CA0091E926 /* MusicAPI.swift */; };
-		E44359081B195B0B0091E926 /* PersistencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359071B195B0B0091E926 /* PersistencyManager.swift */; };
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
+		E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456457D1B3BB15C00276287 /* ChordBase.swift */; };
 		E45F6B201B15600F0018645D /* Toucan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B1F1B15600F0018645D /* Toucan.swift */; };
 		E45F6B271B156D070018645D /* OneLineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B261B156D070018645D /* OneLineCell.swift */; };
 		E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6BB71B16C1860018645D /* ArtistViewController.swift */; };
@@ -43,9 +42,8 @@
 		E44358FD1B19471B0091E926 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		E44358FF1B19475F0091E926 /* Song.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
 		E44359011B1947660091E926 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
-		E44359051B1959CA0091E926 /* MusicAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicAPI.swift; sourceTree = "<group>"; };
-		E44359071B195B0B0091E926 /* PersistencyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistencyManager.swift; sourceTree = "<group>"; };
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
+		E456457D1B3BB15C00276287 /* ChordBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordBase.swift; sourceTree = "<group>"; };
 		E45F6B1F1B15600F0018645D /* Toucan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toucan.swift; sourceTree = "<group>"; };
 		E45F6B261B156D070018645D /* OneLineCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OneLineCell.swift; sourceTree = "<group>"; };
 		E45F6BB71B16C1860018645D /* ArtistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistViewController.swift; sourceTree = "<group>"; };
@@ -95,13 +93,12 @@
 			name = Models;
 			sourceTree = "<group>";
 		};
-		E44359031B1959B20091E926 /* API */ = {
+		E456457C1B3BB14200276287 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
-				E44359051B1959CA0091E926 /* MusicAPI.swift */,
-				E44359071B195B0B0091E926 /* PersistencyManager.swift */,
+				E456457D1B3BB15C00276287 /* ChordBase.swift */,
 			);
-			name = API;
+			name = CustomViews;
 			sourceTree = "<group>";
 		};
 		E45F6B1A1B155F140018645D /* Frameworks */ = {
@@ -144,7 +141,7 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
-				E44359031B1959B20091E926 /* API */,
+				E456457C1B3BB14200276287 /* CustomViews */,
 				E44358FC1B1947120091E926 /* Models */,
 				E45F6B231B156CD70018645D /* TableCells */,
 				E48877641B151A58004785D3 /* Controllers */,
@@ -296,7 +293,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E44359061B1959CA0091E926 /* MusicAPI.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
@@ -311,7 +307,7 @@
 				E44359021B1947660091E926 /* Album.swift in Sources */,
 				E45F6B271B156D070018645D /* OneLineCell.swift in Sources */,
 				E45F6B201B15600F0018645D /* Toucan.swift in Sources */,
-				E44359081B195B0B0091E926 /* PersistencyManager.swift in Sources */,
+				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
