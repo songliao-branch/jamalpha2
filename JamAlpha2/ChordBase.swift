@@ -5,7 +5,9 @@ import UIKit
 
 @IBDesignable
 class ChordBase: UIView {
-
+    
+    var va1:Int!
+    
     override func drawRect(rect: CGRect) {
         
         let width = rect.width
@@ -24,10 +26,11 @@ class ChordBase: UIView {
         path.addLineToPoint(CGPoint(x: 0, y: height))
         path.addLineToPoint(CGPoint(x: initialPoint, y: 0))
         
-        let color = UIColor(white: 1.0, alpha: 0.3)
-        
-//        UIColor.blackColor().setFill()
-//        path.fill()
+        let color = UIColor(red: 1, green: 0, blue: 0, alpha: 0.3)
+ 
+        //MARK: fix color and add gradient
+        color.setFill()
+        path.fill()
         
         let scale:Float = 1 / 12
         let topWidth = Float(rightTopPoint) - Float(initialPoint)
@@ -47,22 +50,18 @@ class ChordBase: UIView {
         
         let innerpath = UIBezierPath()
         innerpath.lineWidth = 4
-        innerpath.miterLimit = 0
         
         UIColor.whiteColor().setStroke()
         
         //draw lines
         for i in 0..<6 {
-            
             let startPoint:CGPoint = CGPoint(x: topPoints[i], y: 0)
             innerpath.moveToPoint(startPoint)
-//            innerpath.addLineToPoint(CGPoint(x: bottomPoints[i], y: height))
-            let endPoint:CGPoint = CGPoint(x: bottomPoints[i], y: height)
-            innerpath.addCurveToPoint(endPoint, controlPoint1: startPoint, controlPoint2: endPoint)
-            
-            innerpath.stroke()
+            innerpath.addLineToPoint(CGPoint(x: bottomPoints[i], y: height))
         }
-    
+        //this has to be set outside for loop to avoid spikes, IDK why
+        innerpath.stroke()
+
         
     }
 }

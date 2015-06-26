@@ -4,14 +4,13 @@ import Foundation
 
 class Chord: NSObject {
 
-    var mContent:String!
-    //NSTimerInterval
-    var mTime : Int!
+    var mContent:String!//G
     
-    init(content:String, time : Int){
+    var mTime: NSTimeInterval
+    
+    init(content:String, time: NSTimeInterval){
         self.mContent = content
         self.mTime = time
     }
-    
     
 }

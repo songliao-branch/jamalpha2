@@ -181,7 +181,7 @@
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
                                 <rect key="frame" x="35" y="95" width="250" height="330"/>
-                                <color key="backgroundColor" red="1" green="0.4703511796" blue="0.55983143690000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -195,7 +195,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="chordBase" destination="LdE-bG-dmM" id="61f-vS-llh"/>
+                        <outlet property="base" destination="LdE-bG-dmM" id="pzI-Cp-FiC"/>
                         <outlet property="playPauseButton" destination="9BQ-D9-G6T" id="d8u-fh-LYf"/>
                     </connections>
                 </viewController>
