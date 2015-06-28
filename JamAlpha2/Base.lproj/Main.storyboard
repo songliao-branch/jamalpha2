@@ -183,20 +183,33 @@
                                 <rect key="frame" x="35" y="95" width="250" height="330"/>
                                 <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="vzb-rN-jGk">
+                                <rect key="frame" x="44" y="518" width="234" height="31"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="230" id="dxp-Ie-SCE"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="sliderTouchDown:" destination="e5l-3U-enU" eventType="touchDown" id="x9G-D6-1Lz"/>
+                                    <action selector="sliderTouchUp:" destination="e5l-3U-enU" eventType="touchUpInside" id="rAB-Gg-dAp"/>
+                                </connections>
+                            </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="vzb-rN-jGk" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="25" id="6tY-vi-pjh"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="leading" secondItem="BGo-rS-auO" secondAttribute="leadingMargin" constant="19" id="Ah5-L4-6Vl"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="HOU-2g-bpe"/>
                             <constraint firstItem="9BQ-D9-G6T" firstAttribute="centerX" secondItem="BGo-rS-auO" secondAttribute="centerX" id="LJD-eX-UEF"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="75" id="VXL-3R-kWB"/>
                             <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LdE-bG-dmM" secondAttribute="bottom" constant="2" id="bof-LX-OvB"/>
+                            <constraint firstAttribute="centerX" secondItem="vzb-rN-jGk" secondAttribute="centerX" constant="-1" id="bsH-n4-nb5"/>
                             <constraint firstItem="yHS-s7-Kh9" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="75" id="iSW-VW-COx"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="base" destination="LdE-bG-dmM" id="pzI-Cp-FiC"/>
                         <outlet property="playPauseButton" destination="9BQ-D9-G6T" id="d8u-fh-LYf"/>
+                        <outlet property="playerProgressSlider" destination="vzb-rN-jGk" id="gGf-W5-kbo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D84-uR-1Md" userLabel="First Responder" sceneMemberID="firstResponder"/>
