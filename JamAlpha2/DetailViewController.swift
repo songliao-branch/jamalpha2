@@ -21,6 +21,7 @@ class DetailViewController: UIViewController {
 //    
 //    @IBOutlet weak var albumCoverImage: UIImageView!
     
+    @IBOutlet weak var playerProgressSlider: UISlider!
     @IBOutlet weak var base: ChordBase!
     
     @IBOutlet weak var playPauseButton: UIButton!
@@ -34,7 +35,10 @@ class DetailViewController: UIViewController {
     var delcur = 0
     var labels = [UILabel]()
     var startTime: Float = 0
+    var timer: NSTimer!
     
+    let widthOfLabel : CGFloat = 30
+    let heightOfLabel:CGFloat = 20
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,6 +47,10 @@ class DetailViewController: UIViewController {
         setUpDemoChords()
         
         initializeChordOnView()
+        
+        playerProgressSlider.maximumValue = Float(theSong.playbackDuration)
+        playerProgressSlider.minimumValue = 0
+        playerProgressSlider.value = 0
         
         
     }
@@ -108,8 +116,7 @@ class DetailViewController: UIViewController {
                     
                     println(theChord.mTime)
                     //1
-                    let widthOfLabel : CGFloat = 30
-                    let heightOfLabel:CGFloat = 20
+
                     let segmentForOneSecond: Float = Float(base.frame.height / 5)
                     let yPosition : CGFloat = CGFloat(Float(base.frame.height) - Float(theChord.mTime) * segmentForOneSecond)
                     let label = UILabel(frame: CGRectMake(0, 0, widthOfLabel, heightOfLabel))
@@ -129,19 +136,38 @@ class DetailViewController: UIViewController {
         }
     }
     
-    func startAnimate(){
-        var timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+ 
+    func startTimer(){
+        timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         
-        //animate the initial labels first
-        for i in 0...current-1{
-            UIView.animateWithDuration( NSTimeInterval(chords[i].mTime), animations: {
-                self.labels[i].center.y = self.base.frame.height
-            })
+    }
+    
+    func stopTimer(){
+        if timer.valid {
+            timer.invalidate()
         }
     }
     
-
+  
+    
+    
     func update(){
+        //update slider
+        
+        if startTime == 0 {
+            for i in 0...current-1{
+ 
+                
+                UIView.animateWithDuration( NSTimeInterval(chords[i].mTime), animations: {
+                    self.labels[i].center.y = CGFloat(Float(self.base.frame.height) - self.heightOfLabel / 2)
+                })
+            }
+        }
+        
+        
+        playerProgressSlider.value = Float(player.currentPlaybackTime)
+        
+        
         startTime += 0.1
         if delcur+1 < chords.count && abs(startTime - Float(chords[delcur+1].mTime)+1) < 0.001
         {
@@ -160,14 +186,17 @@ class DetailViewController: UIViewController {
             self.base.addSubview(label)
             labels.append(label)
             
-            UIView.animateWithDuration( NSTimeInterval(5), animations: {
+            
+            UIView.animateWithDuration(NSTimeInterval(5), delay: 0, options: UIViewAnimationOptions.CurveLinear, animations: {
                 label.center.y = self.base.frame.height
-                
-            })
+            
+                }, completion: nil)
+            
             current++
         }
     }
     
+
     func renderView(){
         if let song = theSong {
             println("song title: \(song.title)")
@@ -198,6 +227,15 @@ class DetailViewController: UIViewController {
         player.setQueueWithItemCollection(collection)
     }
     
+    @IBAction func sliderTouchDown(sender: AnyObject) {
+        stopTimer()
+    }
+    
+    @IBAction func sliderTouchUp(sender: UISlider) {
+        player.currentPlaybackTime = NSTimeInterval(sender.value)
+        startTimer()
+    }
+
     @IBAction func playPause(sender: UIButton) {
         println("play button pressed")
         //if not playing,starts
@@ -206,14 +244,15 @@ class DetailViewController: UIViewController {
             playPauseButton.setTitle("Pause", forState: UIControlState.Normal)
             isPlaying = true
             
-            
-            startAnimate()
+            startTimer()
             
             
         } else {
             player.pause()
             playPauseButton.setTitle("Play", forState: UIControlState.Normal)
             isPlaying = false
+
+            stopTimer()
         }
         
         
