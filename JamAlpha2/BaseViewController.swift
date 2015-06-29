@@ -8,6 +8,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     var pageTitles: [String]!
     var pageImages: [String]!
     
+    
     var musicTypeButtonContainer :UIView!
     var musicUnderlineSelector: UIView!
     
@@ -23,6 +24,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     override func viewDidLoad() {
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
+       
         
         self.pageTitles = ["Song","Album","Artist"]
         self.pageImages = ["song","album","artist"]
@@ -59,17 +61,18 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = mainPinkColor
         
-        
-        setupSegmentButtons()
+         setupSegmentButtons()
+       
     }
 
     var buttonHolder = [UIButton]()
     
     func setupSegmentButtons() {
         self.placeHolderForSub.hidden = true
-
+        
+        let heightOfPlaceHolder = self.placeHolderForSub.frame.height
         musicTypeButtonContainer = UIView(frame: CGRectMake(0 , placeHolderForSub.frame.origin.y , self.view.frame.size.width,
-           20))
+           heightOfPlaceHolder))
         
         let numControllers = 3
         
@@ -77,10 +80,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             buttonText = ["Tracks","Artist","Album"]
         }
         
-        let buttonTracks = UIButton(frame: CGRectMake(0, 0, self.view.frame.width / 3, 20))
-        let buttonArtist = UIButton(frame: CGRectMake(self.view.frame.width / 3, 0, self.view.frame.width / 3, 20))
-        let buttonAlbum = UIButton(frame: CGRectMake(CGFloat(2) * self.view.frame.width / 3, 0, self.view.frame.width / 3, 20))
+        let buttonTracks = UIButton(frame: CGRectMake(0, 0, self.view.frame.width / 3, heightOfPlaceHolder))
+        let buttonArtist = UIButton(frame: CGRectMake(self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
+        let buttonAlbum = UIButton(frame: CGRectMake(CGFloat(2) * self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
         
+        
+      
          buttonHolder = [ buttonTracks, buttonArtist, buttonAlbum]
         
         buttonTracks.setTitleColor(mainPinkColor, forState: UIControlState.Normal)
@@ -90,7 +95,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             buttonHolder[i].backgroundColor = UIColor.whiteColor()
             buttonHolder[i].setTitle(buttonText[i], forState: UIControlState.Normal)
             buttonHolder[i].tag = i
+            
+            //set font
+            buttonHolder[i].titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
             buttonHolder[i].setTitleColor(mainPinkColor, forState: UIControlState.Selected)
+            //vertically align at the bottom
+            buttonHolder[i].contentVerticalAlignment = UIControlContentVerticalAlignment.Bottom
             buttonHolder[i].addTarget(self, action: "tapButton:", forControlEvents: UIControlEvents.TouchUpInside)
             musicTypeButtonContainer.addSubview(buttonHolder[i])
         }
@@ -101,7 +111,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     
     func setUpSelector(){
-        musicUnderlineSelector = UIView(frame: CGRectMake(0, self.musicTypeButtonContainer.frame.height, self.view.frame.width / 3, 4))
+        musicUnderlineSelector = UIView(frame: CGRectMake(0, self.musicTypeButtonContainer.frame.height, self.view.frame.width / 3, 2))
         musicUnderlineSelector.backgroundColor = mainPinkColor
         musicUnderlineSelector.alpha = 0.8
         self.musicTypeButtonContainer.addSubview(musicUnderlineSelector)
@@ -124,8 +134,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             
             self.isPageScrolling = true
 
-            //TODO: bug: consecutively tapping buttons causing disturbance
-            
             if button.tag > current { //swipe left to right
     
                 direction = UIPageViewControllerNavigationDirection.Forward
@@ -152,24 +160,19 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                         self.updateCurrentPageIndex(i)
                         self.changeButtonColorOnScroll()
                         self.isPageScrolling = false
-
                     })
-                    
                 }
             }
-            
-   
-
         }
     }
-
+    
     func viewControllerAtIndex(index:Int) -> MusicViewController {
         if ((self.pageTitles.count == 0 ) || (index >= self.pageTitles.count)){
             return MusicViewController() //suppose to return nil here
         }
        
         var vc: MusicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
-      
+        
         vc.pageIndex = index
         return vc
     }
