@@ -71,25 +71,32 @@ class DetailViewController: UIViewController {
     
     func setUpDemoChords(){
         
-        var chord1 = Chord(content: "C", time: 1.2)
-        var chord2 = Chord(content: "F", time: 3.1)
-        var chord3 = Chord(content: "Em", time: 6.2)
-        var chord4 = Chord(content: "D", time: 10.6)
+        var CMajor = Tab(name:"C",content:"032010")
+        var DMajor = Tab(name:"D",content:"000232")
+        var EMinor = Tab(name:"Em",content:"022000")
+        var FMajor = Tab(name:"F",content:"133210")
         
-        var chord5 = Chord(content: "D", time: 13.4)
-        var chord6 = Chord(content: "Em", time: 14.3)
-        var chord7 = Chord(content: "F", time: 16.2)
-        var chord8 = Chord(content: "D", time: 17.1)
         
-        var chord9 = Chord(content: "C", time: 20.1)
-        var chord10 = Chord(content: "G", time: 21.2)
-        var chord11 = Chord(content: "Em", time: 22.9)
-        var chord12 = Chord(content: "D", time: 24.5)
+        var chord1 = Chord(tab: CMajor, time: 1.2)
         
-        var chord13 = Chord(content: "C", time: 29.2)
-        var chord14 = Chord(content: "G", time: 33.5)
-        var chord15 = Chord(content: "Em", time: 34.2)
-        var chord16 = Chord(content: "D", time: 40.1)
+        var chord2 = Chord(tab: FMajor, time: 3.1)
+        var chord3 = Chord(tab: EMinor, time: 6.2)
+        var chord4 = Chord(tab: DMajor, time: 10.6)
+        
+        var chord5 = Chord(tab: DMajor, time: 13.4)
+        var chord6 = Chord(tab: EMinor, time: 14.3)
+        var chord7 = Chord(tab: FMajor, time: 16.2)
+        var chord8 = Chord(tab: DMajor, time: 17.1)
+        
+        var chord9 = Chord(tab: CMajor, time: 20.1)
+        var chord10 = Chord(tab: CMajor, time: 21.2)
+        var chord11 = Chord(tab: EMinor, time: 22.9)
+        var chord12 = Chord(tab: DMajor, time: 24.5)
+        
+        var chord13 = Chord(tab: CMajor, time: 29.2)
+        var chord14 = Chord(tab: FMajor, time: 33.5)
+        var chord15 = Chord(tab: EMinor, time: 34.2)
+        var chord16 = Chord(tab: DMajor, time: 40.1)
         
         chords.append(chord1)
         chords.append(chord2)
@@ -134,7 +141,7 @@ class DetailViewController: UIViewController {
                     let yPosition : CGFloat = CGFloat(Float(base.frame.height) - Float(theChord.mTime) * segmentForOneSecond)
                     let label = UILabel(frame: CGRectMake(0, 0, widthOfLabel, heightOfLabel))
                     label.center = CGPointMake(self.base.frame.width / 2, yPosition)
-                    label.text = theChord.mContent
+                    label.text = theChord.tab.name
                     label.textAlignment = NSTextAlignment.Center
                     labels.append(label)
                     self.base.addSubview(label)
@@ -174,7 +181,7 @@ class DetailViewController: UIViewController {
         
         if current < chords.count && abs(startTime - Float(chords[current].mTime) + 5) < 0.001 {
             var label = UILabel(frame: CGRectMake(0, 0, 30,20))
-            label.text = chords[current].mContent
+            label.text = chords[current].tab.content
             label.textAlignment = NSTextAlignment.Center
             label.center = CGPointMake(self.base.frame.width/2, 0 - 20/2)
             
@@ -195,7 +202,6 @@ class DetailViewController: UIViewController {
             println("song artist: \(song.artist)")
             println("song album: \(song.albumTitle)")
             
-      
 //            titleLabel.text = song.title
 //            
 //            artistLabel.text = song.artist
@@ -206,6 +212,7 @@ class DetailViewController: UIViewController {
 //                let uncroppedImage = art.imageWithSize(bounds.size)
 //                 albumCoverImage.image = Toucan(image: uncroppedImage).maskWithEllipse(borderWidth: 0, borderColor: UIColor.clearColor()).image
 //            }
+            
         }
         else
         {
