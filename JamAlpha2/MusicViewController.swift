@@ -18,9 +18,10 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     var hello:[String]!
     
+    var tableOriginY:CGFloat = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-       
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
@@ -45,16 +46,19 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("subtitlecell", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
         
         if pageIndex == 0 {
-            let image = uniqueSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 55, height: 55))
-            cell.imageView?.frame = CGRectMake(10, 10, 55, 55)
+            let image = uniqueSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 54, height: 54))
             
-            cell.imageView?.image = Toucan(image: image).maskWithRoundedRect(cornerRadius: 2).image
             
-            cell.textLabel?.text = uniqueSongs[indexPath.row].title
-            cell.detailTextLabel?.text = uniqueSongs[indexPath.row].artist
+           // cell.imageView?.frame = CGRectMake(10, 10, 55, 55)
+            
+            //cell.imageView?.image = Toucan(image: image).maskWithRoundedRect(cornerRadius: 2).image
+            cell.coverImage.image = image
+            
+            cell.mainTitle.text = uniqueSongs[indexPath.row].title
+            cell.subtitle.text = uniqueSongs[indexPath.row].artist
         } else if pageIndex == 1  {
             
             cell.textLabel?.text = theArtists[indexPath.row].artistName

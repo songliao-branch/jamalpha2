@@ -6,8 +6,6 @@ import UIKit
 @IBDesignable
 class ChordBase: UIView {
     
-    var va1:Int!
-    
     override func drawRect(rect: CGRect) {
         
         let width = rect.width
@@ -49,7 +47,9 @@ class ChordBase: UIView {
         }
         
         let innerpath = UIBezierPath()
-        innerpath.lineWidth = 4
+        
+        innerpath.lineWidth = 1
+    
         
         UIColor.whiteColor().setStroke()
         
@@ -59,9 +59,11 @@ class ChordBase: UIView {
             innerpath.moveToPoint(startPoint)
             innerpath.addLineToPoint(CGPoint(x: bottomPoints[i], y: height))
         }
-        //this has to be set outside for loop to avoid spikes, IDK why
+        //this has to be set outside for loop to avoid spikes, IDK why  
+        
         innerpath.stroke()
-
         
     }
+    
+    
 }
