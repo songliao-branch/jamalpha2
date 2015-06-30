@@ -1,10 +1,4 @@
-//
-//  DetailViewController.swift
-//  JamAlpha2
-//
-//  Created by Song Liao on 5/26/15.
-//  Copyright (c) 2015 Song Liao. All rights reserved.
-//
+
 
 import UIKit
 import MediaPlayer
@@ -35,6 +29,8 @@ class DetailViewController: UIViewController {
     var labels = [UILabel]()
     var startTime: Float = 0
     
+    var topPoints = [CGFloat]()
+    var bottomPoints = [CGFloat]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,10 +40,34 @@ class DetailViewController: UIViewController {
         
         initializeChordOnView()
         
-        
+        calculateXPoints()
     }
     
-    
+ 
+    func calculateXPoints(){
+        let width = base.frame.width
+        
+        let margin:Float = 0.2
+        let initialPoint:CGFloat = CGFloat(Float(width) * margin)
+        let rightTopPoint:CGFloat = CGFloat(Float(width) * (1 - margin))
+        
+        let scale:Float = 1 / 12
+        let topWidth = Float(rightTopPoint) - Float(initialPoint)
+        let topLeft = Float(initialPoint) + Float(topWidth) * scale
+        topPoints = [CGFloat](count: 6, repeatedValue: 0)
+        
+        topPoints[0] = CGFloat(topLeft)
+        for i in 1..<6 {
+            topPoints[i] = CGFloat(Float(topPoints[i - 1]) + Float(topWidth * scale * 2))
+            println("topPoints \(topPoints[i])")
+        }
+        
+        bottomPoints = [CGFloat](count: 6, repeatedValue: 0)
+        bottomPoints[0] = CGFloat(Float(width) * scale)
+        for i in 1..<6 {
+            bottomPoints[i] = CGFloat(Float(bottomPoints[i - 1]) + Float(width) * scale * 2)
+        }
+    }
     
     func setUpDemoChords(){
         
@@ -151,6 +171,7 @@ class DetailViewController: UIViewController {
             delcur++
         }
         
+        
         if current < chords.count && abs(startTime - Float(chords[current].mTime) + 5) < 0.001 {
             var label = UILabel(frame: CGRectMake(0, 0, 30,20))
             label.text = chords[current].mContent
@@ -206,9 +227,7 @@ class DetailViewController: UIViewController {
             playPauseButton.setTitle("Pause", forState: UIControlState.Normal)
             isPlaying = true
             
-            
             startAnimate()
-            
             
         } else {
             player.pause()
