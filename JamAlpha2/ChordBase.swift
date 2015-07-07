@@ -14,7 +14,8 @@ class ChordBase: UIView {
         let path = UIBezierPath()
         path.lineWidth = 1
         
-        let margin:Float = 0.2
+        let margin:Float = 0.25
+        
         let initialPoint:CGFloat = CGFloat(Float(width) * margin)
         let rightTopPoint:CGFloat = CGFloat(Float(width) * (1 - margin))
 
@@ -25,7 +26,7 @@ class ChordBase: UIView {
         path.addLineToPoint(CGPoint(x: initialPoint, y: 0))
         
         let color = UIColor(red: 1, green: 0, blue: 0, alpha: 0.3)
- 
+        
         //MARK: fix color and add gradient
         color.setFill()
         path.fill()

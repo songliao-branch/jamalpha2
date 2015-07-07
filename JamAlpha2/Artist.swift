@@ -15,6 +15,7 @@ class Artist: NSObject {
     init(artist:String){
         self.artistName = artist
     }
+    
 //    init(albums: [Album]){
 //        super.init()
 //        self.artistName = albums[0].artistName
@@ -23,7 +24,8 @@ class Artist: NSObject {
 //            self.numberOfTracks += album.numberOfTracks
 //            self.totalRunningTime += album.totalRunningTime
 //        }
-//    }
+//    } 
+    
     func addAlbum(album:Album){
         self.albums.append(album)
         self.numberOfTracks += album.numberOfTracks

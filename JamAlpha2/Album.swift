@@ -47,8 +47,6 @@ class Album:NSObject{
         }
         self.numberOfTracks = songsIntheAlbum.count
 
-       // println(totalRunningTime)
-     //   println(numberOfTracks)
         
     }
     

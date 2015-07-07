@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
@@ -137,7 +137,7 @@
                                                         <constraint firstAttribute="height" constant="20.5" id="Myp-nQ-5iB"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" name="AppleSDGothicNeo-Regular" family="Apple SD Gothic Neo" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -152,6 +152,9 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="coverImage" destination="Fr8-BH-Ncz" id="hsJ-x8-QgD"/>
+                                            <outlet property="imageHeight" destination="ko5-ea-bU7" id="0Oq-Z7-THq"/>
+                                            <outlet property="imageLeadingConstraint" destination="w34-XI-AEg" id="CYt-hg-9hk"/>
+                                            <outlet property="imageWidth" destination="aFw-se-8ZS" id="idl-dr-kaZ"/>
                                             <outlet property="mainTitle" destination="Z1R-2h-uq0" id="fUl-nS-b5p"/>
                                             <outlet property="subtitle" destination="VXR-6p-k1c" id="u8b-dt-Bmz"/>
                                         </connections>
@@ -194,7 +197,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BQ-D9-G6T">
+                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BQ-D9-G6T">
                                 <rect key="frame" x="108" y="427" width="104" height="66"/>
                                 <color key="backgroundColor" red="0.18907663471072755" green="1" blue="0.19044531304766343" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -208,24 +211,34 @@
                                     <action selector="playPause:" destination="e5l-3U-enU" eventType="touchUpInside" id="9U1-nY-0ds"/>
                                 </connections>
                             </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
+                            <view hidden="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
                                 <rect key="frame" x="35" y="95" width="250" height="330"/>
                                 <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="SRs-ti-xBr">
+                                <rect key="frame" x="33" y="511" width="245" height="31"/>
+                                <connections>
+                                    <action selector="progressBarChangeEnded:" destination="e5l-3U-enU" eventType="touchUpInside" id="gV1-sh-78s"/>
+                                    <action selector="progressBarChanged:" destination="e5l-3U-enU" eventType="valueChanged" id="Hif-gl-4le"/>
+                                </connections>
+                            </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="LdE-bG-dmM" firstAttribute="leading" secondItem="BGo-rS-auO" secondAttribute="leadingMargin" constant="19" id="Ah5-L4-6Vl"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="HOU-2g-bpe"/>
-                            <constraint firstItem="9BQ-D9-G6T" firstAttribute="centerX" secondItem="BGo-rS-auO" secondAttribute="centerX" id="LJD-eX-UEF"/>
+                            <constraint firstItem="SRs-ti-xBr" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="18" id="J5K-B3-0b6"/>
+                            <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="LdE-bG-dmM" secondAttribute="leading" id="SzM-rs-JXb"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="75" id="VXL-3R-kWB"/>
                             <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LdE-bG-dmM" secondAttribute="bottom" constant="2" id="bof-LX-OvB"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="SRs-ti-xBr" secondAttribute="trailing" constant="28" id="ePY-lD-z6y"/>
                             <constraint firstItem="yHS-s7-Kh9" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="75" id="iSW-VW-COx"/>
+                            <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="BGo-rS-auO" secondAttribute="leadingMargin" constant="19" id="red-wV-xnB"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="base" destination="LdE-bG-dmM" id="pzI-Cp-FiC"/>
                         <outlet property="playPauseButton" destination="9BQ-D9-G6T" id="d8u-fh-LYf"/>
+                        <outlet property="progressBar" destination="SRs-ti-xBr" id="iru-QB-zU9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D84-uR-1Md" userLabel="First Responder" sceneMemberID="firstResponder"/>

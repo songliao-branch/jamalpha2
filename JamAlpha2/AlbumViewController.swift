@@ -7,10 +7,17 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
 
     var theAlbum:Album!
     
-    override func viewDidLoad() {
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false
-        
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        //change status bar text to light
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = mainPinkColor
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

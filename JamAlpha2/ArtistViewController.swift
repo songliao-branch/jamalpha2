@@ -2,7 +2,7 @@
 
 // Display all songs in all albums of a particular artist
 // each section is an album
-///Whta't good
+
 import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate {
@@ -17,9 +17,17 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
-               
+        self.automaticallyAdjustsScrollViewInsets = false
+
         //setUpSearchBar()
         //self.artistTable.reloadData()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        //change status bar text to light
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = mainPinkColor
     }
 
 //    func setUpSearchBar(){

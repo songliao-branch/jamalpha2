@@ -1,6 +1,8 @@
 //to set up pageviewcontroller for musicviewcontroller that switches between tracks, artist and albums
 import UIKit
 
+let mainPinkColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+
 class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
     var scrollView:UIScrollView!
@@ -13,7 +15,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     var musicUnderlineSelector: UIView!
     
     var buttonText :[String] = []
-    let mainPinkColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+    
     var currentPageIndex:Int!
     
     var isPageScrolling = false //prevent scrolling / button tap crash
@@ -24,8 +26,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     override func viewDidLoad() {
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
-       
-        
         self.pageTitles = ["Song","Album","Artist"]
         self.pageImages = ["song","album","artist"]
         
@@ -62,7 +62,14 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.navigationController?.navigationBar.barTintColor = mainPinkColor
         
          setupSegmentButtons()
-       
+       println("base view did load")
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        //change status bar text to light
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = mainPinkColor
     }
 
     var buttonHolder = [UIButton]()

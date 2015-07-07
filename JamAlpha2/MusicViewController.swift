@@ -22,14 +22,12 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
+   
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
     }
-
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-    }
+    
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
@@ -61,19 +59,85 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             cell.subtitle.text = uniqueSongs[indexPath.row].artist
         } else if pageIndex == 1  {
             
-            cell.textLabel?.text = theArtists[indexPath.row].artistName
-            cell.detailTextLabel?.text = "\(theArtists[indexPath.row].numberOfTracks) tracks"
+            cell.mainTitle.font = UIFont(name: cell.mainTitle.font.fontName, size: 20)
+            
+            let image = theArtists[indexPath.row].getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
+            
+            let roundImage = Toucan(image: image).maskWithEllipse().image
+            
+            cell.imageWidth.constant = 80
+            cell.imageHeight.constant = 80
+            
+            cell.coverImage.image = roundImage
+
+            cell.mainTitle.text = theArtists[indexPath.row].artistName
+            
+            var endingAlbumString = ""
+
+            if theArtists[indexPath.row].getAlbums().count == 1 {
+                endingAlbumString = "album"
+            }
+            else {
+                endingAlbumString = "albums"
+            }
+            
+            var endingTracksString = ""
+            
+            if theArtists[indexPath.row].numberOfTracks == 1 {
+                endingTracksString = "track"
+            }
+            else {
+                endingTracksString = "tracks"
+            }
+            
+            
+            cell.subtitle.text = "\(theArtists[indexPath.row].getAlbums().count) \(endingAlbumString),  \(theArtists[indexPath.row].numberOfTracks) \(endingTracksString)"
+            
         } else if pageIndex == 2 {
-            cell.textLabel?.text = theAlbums[indexPath.row].albumTitle
-            cell.detailTextLabel?.text = "\(theAlbums[indexPath.row].numberOfTracks) tracks"
+            
+            let image = theAlbums[indexPath.row].coverImage.imageWithSize(CGSize(width: 80, height: 80))
+            
+            cell.imageWidth.constant = 80
+            cell.imageHeight.constant = 80
+            
+            let rectImage = Toucan(image: image).maskWithRoundedRect(cornerRadius: 30).image
+            cell.coverImage.image = rectImage
+            
+            var endingTracksString = ""
+            
+            if theAlbums[indexPath.row].numberOfTracks == 1 {
+                endingTracksString = "track"
+            }
+            else {
+                endingTracksString = "tracks"
+            }
+            
+            cell.mainTitle.font = UIFont(name: cell.mainTitle.font.fontName, size: 20)
+            cell.mainTitle.text = theAlbums[indexPath.row].albumTitle
+            cell.subtitle.text = "\(theAlbums[indexPath.row].numberOfTracks) \(endingTracksString)"
         }
         return cell
     }
     
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if pageIndex == 0 {
+        
+            return 60
+        }
+        else if pageIndex == 1 {
+        
+            return 100
+        }
+        else if pageIndex == 2 {
+            return 100
+        }
+        //will never get here
+        return 0
+        
+    }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if  pageIndex == 0 {
-           // println("song \(indexPath.row) selected")
-            
+
             let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
             detailVC.theSong = uniqueSongs[indexPath.row]
             self.showViewController(detailVC, sender: self)
