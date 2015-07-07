@@ -4,7 +4,7 @@ class Chord: NSObject {
     
     var mTime: NSTimeInterval
     var tab: Tab!
-    
+
     init(tab:Tab, time: NSTimeInterval){
         self.tab = tab
         self.mTime = time

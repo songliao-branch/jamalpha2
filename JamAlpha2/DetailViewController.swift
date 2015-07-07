@@ -4,10 +4,10 @@ import UIKit
 import MediaPlayer
 
 class DetailViewController: UIViewController {
-
+    
     var theSong:MPMediaItem!
     
-   //@IBOutlet weak var base: ChordBase!
+    //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
     @IBOutlet weak var progressBar: UISlider!
     
@@ -16,9 +16,9 @@ class DetailViewController: UIViewController {
     let heightOfLabel:CGFloat = 20
     
     var isPause: Bool = true
-
+    
     let player = MPMusicPlayerController.applicationMusicPlayer()
-
+    
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
@@ -28,7 +28,7 @@ class DetailViewController: UIViewController {
     var topPoints = [CGFloat]()
     var bottomPoints = [CGFloat]()
     
-    //speed to control playback speed and 
+    //speed to control playback speed and
     //corresponding playback speed
     var speed = 1
     
@@ -63,7 +63,7 @@ class DetailViewController: UIViewController {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.hidden = false
     }
- 
+    
     func calculateXPoints(){
         let width = base.frame.width
         
@@ -139,8 +139,8 @@ class DetailViewController: UIViewController {
         chords.append(chord15)
         chords.append(chord16)
     }
-
-
+    
+    
     func update(){
         startTime += 0.01
         progressBar.value = startTime
