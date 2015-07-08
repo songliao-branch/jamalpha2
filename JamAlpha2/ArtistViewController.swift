@@ -3,6 +3,8 @@
 // Display all songs in all albums of a particular artist
 // each section is an album
 
+//THis is twistjam team saying
+//July 7, 2015
 import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate {
