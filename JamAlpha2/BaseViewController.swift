@@ -19,12 +19,13 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     var currentPageIndex:Int!
     
     var isPageScrolling = false //prevent scrolling / button tap crash
-
     
     @IBOutlet weak var placeHolderForSub: UILabel!
     
+  
     override func viewDidLoad() {
         super.viewDidLoad()
+ 
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         self.pageTitles = ["Song","Album","Artist"]
         self.pageImages = ["song","album","artist"]
@@ -133,6 +134,13 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             
             var direction:UIPageViewControllerNavigationDirection
             var indexScrollingFrom:Int
+            
+            // MARK : purely for testing purpose
+            if button.tag == 2 {
+                let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
+                detailVC.isTesting = true
+                self.showViewController(detailVC, sender: self)
+            }
             
             //return if pressed on current button
             if button.tag == current {
