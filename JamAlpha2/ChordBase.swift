@@ -14,7 +14,7 @@ class ChordBase: UIView {
         let path = UIBezierPath()
         path.lineWidth = 1
         
-        let margin:Float = 0.2
+        let margin:Float = 0.25
         let initialPoint:CGFloat = CGFloat(Float(width) * margin)
         let rightTopPoint:CGFloat = CGFloat(Float(width) * (1 - margin))
 
