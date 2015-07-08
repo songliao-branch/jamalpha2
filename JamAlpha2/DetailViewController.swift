@@ -2,8 +2,14 @@
 
 import UIKit
 import MediaPlayer
+import AVFoundation
 
 class DetailViewController: UIViewController {
+    
+    // MARK: for testing in simulator
+    var audioPlayer = AVAudioPlayer()
+    var isTesting = false
+    
     
     var theSong:MPMediaItem!
     
@@ -11,14 +17,12 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var playPauseButton: UIButton!
     @IBOutlet weak var progressBar: UISlider!
     
+    // MARK : Custom views
     var base : ChordBase!
-    let widthOfLabel : CGFloat = 30
-    let heightOfLabel:CGFloat = 20
+    var progressView : UIView!
     
     var isPause: Bool = true
-    
     let player = MPMusicPlayerController.applicationMusicPlayer()
-    
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
@@ -28,6 +32,7 @@ class DetailViewController: UIViewController {
     var topPoints = [CGFloat]()
     var bottomPoints = [CGFloat]()
     
+    var labelHeight:CGSize!
     //speed to control playback speed and
     //corresponding playback speed
     var speed = 1
@@ -44,17 +49,55 @@ class DetailViewController: UIViewController {
         base.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(base)
         
+        
+        
         calculateXPoints()
-        setUpSong()
         setUpDemoChords()
-        
         progressBar.minimumValue = 0
-        progressBar.maximumValue = Float(theSong.playbackDuration)
+        var progressViewWidth:CGFloat
+        if isTesting {
+            
+            setUpTestSong()
+    
+            progressBar.maximumValue = Float(audioPlayer.duration)
+     
+            println("duration \(audioPlayer.duration)")
+            progressViewWidth = CGFloat(audioPlayer.duration) * 8
+           
+            
+        } else {
+            setUpSong()
+           
+            progressBar.minimumValue = 0
+            progressBar.maximumValue = Float(theSong.playbackDuration)
+            progressBar.value = 0
+            progressViewWidth = CGFloat(theSong.playbackDuration) * 8
+
+
+        }
+        progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 10))
         progressBar.value = 0
-        
+        progressView.backgroundColor = mainPinkColor
+        self.view.addSubview(progressView)
         updateAll(0)
+       
+    
     }
     
+    func setUpTestSong(){
+
+            if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
+                
+                var fileWithPath = NSURL.fileURLWithPath(filePath)
+                audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
+            }
+            else{
+                println("mp3 not found")
+            }
+        
+        
+        audioPlayer.prepareToPlay()
+    }
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
@@ -62,6 +105,9 @@ class DetailViewController: UIViewController {
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.hidden = false
+        if isTesting {
+            audioPlayer.stop()
+        }
     }
     
     func calculateXPoints(){
@@ -89,15 +135,12 @@ class DetailViewController: UIViewController {
     }
     
     func setUpDemoChords(){
-        
         var CMajor = Tab(name:"C",content:"032010")
         var DMajor = Tab(name:"D",content:"000232")
         var EMinor = Tab(name:"Em",content:"022000")
         var FMajor = Tab(name:"F",content:"133210")
         
-        
         var chord1 = Chord(tab: CMajor, time: 1.2)
-        
         var chord2 = Chord(tab: FMajor, time: 3.1)
         var chord3 = Chord(tab: EMinor, time: 6.2)
         var chord4 = Chord(tab: DMajor, time: 10.6)
@@ -143,8 +186,10 @@ class DetailViewController: UIViewController {
     
     func update(){
         startTime += 0.01
+        
         progressBar.value = startTime
         
+   
         if activelabels.count > 0 && start+1 < chords.count && abs(startTime - Float(chords[start+1].mTime) + 0.6) < 0.001
         {
             var labels = activelabels.removeAtIndex(0)
@@ -205,6 +250,16 @@ class DetailViewController: UIViewController {
         }
         
         refresh()
+        //update progress view
+        var xOffset : CGFloat
+        if isTesting {
+            xOffset = CGFloat((startTime / Float(audioPlayer.duration)) ) * self.view.frame.width
+        }
+        else {
+            xOffset = CGFloat((startTime / Float(theSong.playbackDuration))) * progressView.frame.width
+        }
+        println("x offset \(xOffset)")
+        progressView.frame = CGRectOffset(progressView.frame, -xOffset, 0)
     }
     
     func setUpSong(){
@@ -215,19 +270,32 @@ class DetailViewController: UIViewController {
     }
     
     @IBAction func playPause(sender: UIButton) {
-        if self.isPause{
-            startTimer()
-            self.isPause = false
-            player.play()
-            
-            sender.setTitle("Pause", forState: .Normal)
-        }
-        else {
-            timer.invalidate()
-            self.isPause = true
-            player.pause()
-            sender.setTitle("Continue", forState: .Normal)
-        }
+       
+            if self.isPause{
+                startTimer()
+                self.isPause = false
+                
+                if isTesting {
+                    audioPlayer.play()
+                }else {
+                     player.play()
+                }
+               
+                
+                sender.setTitle("Pause", forState: .Normal)
+            }
+            else {
+                timer.invalidate()
+                self.isPause = true
+
+                
+                if isTesting {
+                    audioPlayer.pause()
+                }else {
+                    player.pause()
+                }
+                sender.setTitle("Continue", forState: .Normal)
+            }
     }
     @IBAction func progressBarChanged(sender: UISlider) {
         timer.invalidate()
@@ -237,9 +305,14 @@ class DetailViewController: UIViewController {
         }
     }
     
+    
     @IBAction func progressBarChangeEnded(sender: UISlider) {
-        player.currentPlaybackTime = NSTimeInterval(sender.value)
-        player.playbackState
+        if isTesting {
+            audioPlayer.currentTime = NSTimeInterval(sender.value)
+        }else {
+            player.currentPlaybackTime = NSTimeInterval(sender.value)
+        }
+
     }
     
     func refresh(){
@@ -259,23 +332,24 @@ class DetailViewController: UIViewController {
                     xPosition = bottomPoints[j]
                 }
                 
-                labels[j].center = CGPointMake(xPosition, CGFloat(yPosition))
+                labels[j].center = CGPointMake(xPosition, CGFloat(yPosition - Float(labels[j].frame.height / 2) ))
             }
-            println("\(yPosition) +  \(Float(self.base.frame.height))")
+            //println("\(yPosition) +  \(Float(self.base.frame.height))")
         }
-        println("Refresh\(startTime)")
+      //  println("Refresh\(startTime)")
     }
     
     func startTimer(){
         timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
     }
     
+   
     func createLabels(content: String) -> [UILabel]{
         var res = [UILabel]()
         
         for i in 0...count(content)-1{
-            let label = UILabel(frame: CGRectMake(0, 0, widthOfLabel, heightOfLabel))
-            label.font = UIFont.systemFontOfSize(20)
+            let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
+            label.font = UIFont.systemFontOfSize(25)
             label.text = String(Array(content)[i])
             label.sizeToFit()
             label.textAlignment = NSTextAlignment.Center

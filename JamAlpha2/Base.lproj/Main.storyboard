@@ -386,7 +386,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Placeholder" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1lf-kd-Tmc">
-                                <rect key="frame" x="0.0" y="64" width="91" height="30"/>
+                                <rect key="frame" x="0.0" y="64" width="90.5" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="Bdi-Vl-C1t"/>
                                 </constraints>
