@@ -41,61 +41,53 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.navigationBar.barTintColor = UIColor.whiteColor()
         
+        //make navigation bar transparent
+        self.navigationController?.navigationBar.barTintColor = UIColor.clearColor()
+
+        //set a background image
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "background")!)
+        
+        //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         base = ChordBase(frame: CGRect(x: 0, y: 100, width: self.view.frame.width * 0.7, height: self.view.frame.height * 0.4))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(base)
         
-        
-        
         calculateXPoints()
         setUpDemoChords()
         progressBar.minimumValue = 0
+        
         var progressViewWidth:CGFloat
         if isTesting {
-            
             setUpTestSong()
-    
             progressBar.maximumValue = Float(audioPlayer.duration)
-     
-            println("duration \(audioPlayer.duration)")
-            progressViewWidth = CGFloat(audioPlayer.duration) * 8
-           
+            progressViewWidth = CGFloat(audioPlayer.duration) * 2
             
         } else {
             setUpSong()
-           
-            progressBar.minimumValue = 0
             progressBar.maximumValue = Float(theSong.playbackDuration)
-            progressBar.value = 0
-            progressViewWidth = CGFloat(theSong.playbackDuration) * 8
-
-
+            progressViewWidth = CGFloat(theSong.playbackDuration) * 2
         }
-        progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 10))
+        progressBar.value = 0
+        
+        //make it bigger to drag it first
+        progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 20))
         progressBar.value = 0
         progressView.backgroundColor = mainPinkColor
         self.view.addSubview(progressView)
         updateAll(0)
-       
-    
     }
     
     func setUpTestSong(){
-
-            if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
-                
-                var fileWithPath = NSURL.fileURLWithPath(filePath)
-                audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
-            }
-            else{
-                println("mp3 not found")
-            }
-        
-        
+        if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
+            var fileWithPath = NSURL.fileURLWithPath(filePath)
+            audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
+        }
+        else{
+            println("mp3 not found")
+        }
         audioPlayer.prepareToPlay()
     }
     override func prefersStatusBarHidden() -> Bool {
@@ -104,7 +96,9 @@ class DetailViewController: UIViewController {
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        self.navigationController?.navigationBar.tintColor = mainPinkColor
         self.tabBarController?.tabBar.hidden = false
+        
         if isTesting {
             audioPlayer.stop()
         }
