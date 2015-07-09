@@ -10,7 +10,6 @@ class DetailViewController: UIViewController {
     var audioPlayer = AVAudioPlayer()
     var isTesting = false
     
-    
     var theSong:MPMediaItem!
     
     //@IBOutlet weak var base: ChordBase!
@@ -37,7 +36,16 @@ class DetailViewController: UIViewController {
     //corresponding playback speed
     var speed = 1
     
-    var rangeOfChords:Float = 3
+    var rangeOfChords:Float = 5
+    
+    //Lyric
+    var lyricbase: UIView = UIView()
+    
+    var label1: UILabel = UILabel()
+    var label2: UILabel = UILabel()
+    
+    var current: Int = 0    //current line of lyric
+    var lyric: Lyric = Lyric()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,13 +83,35 @@ class DetailViewController: UIViewController {
 
 
         }
+        
         progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 10))
         progressBar.value = 0
         progressView.backgroundColor = mainPinkColor
         self.view.addSubview(progressView)
+        
+        //Lyric labels
+        current = -1
+        lyricbase.frame = CGRectMake(base.frame.origin.x, base.frame.origin.y + base.frame.height, base.frame.width, base.frame.height / 3)
+        lyricbase.backgroundColor = mainPinkColor
+        self.view.addSubview(lyricbase)
+        
+        label1.frame = CGRectMake(0, 0, lyricbase.frame.width, 2 * lyricbase.frame.height/3)
+        label1.center = CGPointMake(lyricbase.frame.width/2, lyricbase.frame.height/3)
+        label1.numberOfLines = 2
+        label1.textAlignment = NSTextAlignment.Center
+        label1.font = UIFont.systemFontOfSize(15)
+        label1.lineBreakMode = .ByWordWrapping
+        lyricbase.addSubview(label1)
+        
+        label2.frame = CGRectMake(0, 0, lyricbase.frame.width, lyricbase.frame.height / 3)
+        label2.center = CGPointMake(lyricbase.frame.width/2, 5 * lyricbase.frame.height/6)
+        label2.numberOfLines = 2
+        label2.textAlignment = NSTextAlignment.Center
+        label2.font = UIFont.systemFontOfSize(10)
+        label2.lineBreakMode = .ByWordWrapping
+        lyricbase.addSubview(label2)
+        
         updateAll(0)
-       
-    
     }
     
     func setUpTestSong(){
@@ -181,6 +211,21 @@ class DetailViewController: UIViewController {
         chords.append(chord14)
         chords.append(chord15)
         chords.append(chord16)
+        
+        lyric.addLine(1.21, str: "They Told Him \nDon't You")
+        lyric.addLine(3.10, str: "Ever Come Around Here")
+        lyric.addLine(6.25, str: "Don't Wanna\n See Your Face")
+        lyric.addLine(10.67, str: "You Better Disappear")
+        lyric.addLine(13.45, str: "The Fire's In Their Eyes")
+        lyric.addLine(14.32, str: "And Their Words Are Really Clear")
+        lyric.addLine(16.28, str: "So Beat It, Just Beat It")
+        lyric.addLine(25.88, str: "You Better Do What You Can")
+        lyric.addLine(30, str: "You Wanna Be Tough")
+        lyric.addLine(41.01, str: "Who's Wrong Or Right")
+        lyric.addLine(59.88, str: "Showin' How Funky Strong Is Your Fighter")
+        lyric.addLine(70.88, str: "It Doesn't Matter Who's Wrong Or Right")
+        lyric.addLine(78.08, str: "Showin' How Funky Strong Is Your Fighter")
+        lyric.addLine(90.78, str: "So Beat It, Just Beat It")
     }
     
     
@@ -208,6 +253,20 @@ class DetailViewController: UIViewController {
         if end < chords.count && abs(startTime - Float(chords[end].mTime) + rangeOfChords) < 0.001 {
             activelabels.append(createLabels(chords[end].tab.content))
         }
+        
+        if current + 1 < lyric.lyric.count && abs(startTime - Float(lyric.get(current+1).time)) < 0.001 {
+            current++
+            label1.text = lyric.get(current).str
+            
+            if current + 1 < lyric.lyric.count {
+                label2.text = lyric.get(current+1).str
+                label2.alpha = 0
+                UIView.animateWithDuration(0.1, animations: {
+                    self.label2.alpha = 1
+                })
+            }
+        }
+        
         refresh()
     }
     
@@ -250,6 +309,29 @@ class DetailViewController: UIViewController {
         }
         
         refresh()
+        
+        //Update the content of the lyric
+        current = -1
+        while(current + 1 < lyric.lyric.count){
+            if Float(lyric.get(current + 1).time) > startTime {
+                break
+            }
+            current++
+        }
+        
+        if current == -1{
+            label1.text = "title of the song"//theSong.title
+        }
+        else {
+            label1.text = lyric.get(current).str
+        }
+        if current + 1 < lyric.lyric.count {
+            label2.text = lyric.get(current+1).str
+        }
+        else {
+            label2.text = "End~"
+        }
+        
         //update progress view
         var xOffset : CGFloat
         if isTesting {
