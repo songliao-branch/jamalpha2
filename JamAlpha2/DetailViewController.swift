@@ -10,7 +10,6 @@ class DetailViewController: UIViewController {
     var audioPlayer = AVAudioPlayer()
     var isTesting = false
     
-    
     var theSong:MPMediaItem!
     
     //@IBOutlet weak var base: ChordBase!
@@ -37,7 +36,16 @@ class DetailViewController: UIViewController {
     //corresponding playback speed
     var speed = 1
     
-    var rangeOfChords:Float = 3
+    var rangeOfChords:Float = 5
+    
+    //Lyric
+    var lyricbase: UIView = UIView()
+    
+    var label1: UILabel = UILabel()
+    var label2: UILabel = UILabel()
+    
+    var current: Int = 0    //current line of lyric
+    var lyric: Lyric = Lyric()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,13 +78,40 @@ class DetailViewController: UIViewController {
             progressBar.maximumValue = Float(theSong.playbackDuration)
             progressViewWidth = CGFloat(theSong.playbackDuration) * 2
         }
+        
+        progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 10))
+
         progressBar.value = 0
         
         //make it bigger to drag it first
         progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 20))
+
         progressBar.value = 0
         progressView.backgroundColor = mainPinkColor
         self.view.addSubview(progressView)
+        
+        //Lyric labels
+        current = -1
+        lyricbase.frame = CGRectMake(base.frame.origin.x, base.frame.origin.y + base.frame.height, base.frame.width, base.frame.height / 3)
+        lyricbase.backgroundColor = mainPinkColor
+        self.view.addSubview(lyricbase)
+        
+        label1.frame = CGRectMake(0, 0, lyricbase.frame.width, 2 * lyricbase.frame.height/3)
+        label1.center = CGPointMake(lyricbase.frame.width/2, lyricbase.frame.height/3)
+        label1.numberOfLines = 2
+        label1.textAlignment = NSTextAlignment.Center
+        label1.font = UIFont.systemFontOfSize(15)
+        label1.lineBreakMode = .ByWordWrapping
+        lyricbase.addSubview(label1)
+        
+        label2.frame = CGRectMake(0, 0, lyricbase.frame.width, lyricbase.frame.height / 3)
+        label2.center = CGPointMake(lyricbase.frame.width/2, 5 * lyricbase.frame.height/6)
+        label2.numberOfLines = 2
+        label2.textAlignment = NSTextAlignment.Center
+        label2.font = UIFont.systemFontOfSize(10)
+        label2.lineBreakMode = .ByWordWrapping
+        lyricbase.addSubview(label2)
+        
         updateAll(0)
     }
     
@@ -129,30 +164,41 @@ class DetailViewController: UIViewController {
     }
     
     func setUpDemoChords(){
-        var CMajor = Tab(name:"C",content:"032010")
-        var DMajor = Tab(name:"D",content:"000232")
-        var EMinor = Tab(name:"Em",content:"022000")
-        var FMajor = Tab(name:"F",content:"133210")
+        var C = Tab(name:"C",content:" 32010")
+        var Dm7 = Tab(name:"Dm7",content:"  0211")
+        var Am7 = Tab(name:"Am7",content:" 02013")
+        var G = Tab(name:"G",content:"3 0030")
+        var E = Tab(name: "E", content: "022100")
+        var Am = Tab(name: "Am", content:" 02210")
+        var AmG = Tab(name: "Am/G", content: "302210")
+        var F = Tab(name: "F", content: "133211")
+        var Gsus4 = Tab(name: "Gsus4", content:"320013")
         
-        var chord1 = Chord(tab: CMajor, time: 1.2)
-        var chord2 = Chord(tab: FMajor, time: 3.1)
-        var chord3 = Chord(tab: EMinor, time: 6.2)
-        var chord4 = Chord(tab: DMajor, time: 10.6)
         
-        var chord5 = Chord(tab: DMajor, time: 13.4)
-        var chord6 = Chord(tab: EMinor, time: 14.3)
-        var chord7 = Chord(tab: FMajor, time: 16.2)
-        var chord8 = Chord(tab: DMajor, time: 17.1)
+        //intro
+        var chord1 = Chord(tab: C, time: 0.33)
+        var chord2 = Chord(tab: Dm7, time: 1.97)
+        var chord3 = Chord(tab: Am7, time: 3.6)
+        var chord4 = Chord(tab: Dm7, time: 5.24)
+        var chord5 = Chord(tab: C, time: 7.02)
+        var chord6 = Chord(tab: Dm7, time: 8.57)
+        var chord7 = Chord(tab: G, time: 10.18)
         
-        var chord9 = Chord(tab: CMajor, time: 20.1)
-        var chord10 = Chord(tab: CMajor, time: 21.2)
-        var chord11 = Chord(tab: EMinor, time: 22.9)
-        var chord12 = Chord(tab: DMajor, time: 24.5)
+        //verse1
+        var chord8 = Chord(tab: C, time: 13.20)
+        var chord9 = Chord(tab: Dm7, time: 15.05)
+        var chord10 = Chord(tab: Am7, time: 16.64)
+        var chord11 = Chord(tab: Dm7, time: 22.9)
+        var chord12 = Chord(tab: C, time: 24.5)
         
-        var chord13 = Chord(tab: CMajor, time: 29.2)
-        var chord14 = Chord(tab: FMajor, time: 33.5)
-        var chord15 = Chord(tab: EMinor, time: 34.2)
-        var chord16 = Chord(tab: DMajor, time: 40.1)
+        var chord13 = Chord(tab: E, time: 29.2)
+        var chord14 = Chord(tab: Am, time: 33.5)
+        var chord15 = Chord(tab: AmG, time: 34.2)
+        var chord16 = Chord(tab: F, time: 40.1)
+        var chord17 = Chord(tab: G, time: 40.1)
+        var chord18 = Chord(tab: Dm7, time: 40.1)
+        var chord19 = Chord(tab: Gsus4, time: 2)
+        
         
         chords.append(chord1)
         chords.append(chord2)
@@ -175,6 +221,24 @@ class DetailViewController: UIViewController {
         chords.append(chord14)
         chords.append(chord15)
         chords.append(chord16)
+        chords.append(chord17)
+        
+        lyric.addLine(12.56, str: "哪里有彩虹告诉我")
+        lyric.addLine(18.80, str: "能不能把我的愿望还给我")
+        lyric.addLine(25.82, str: "为什么天这么安静")
+        lyric.addLine(31.98, str: "所有的云都跑到我这里")
+        lyric.addLine(38.91, str: "有没有口罩一个给我")
+        lyric.addLine(44.79, str: "释怀说了太多就成真不了")
+        lyric.addLine(51.90, str: "也许时间是一种解药")
+        lyric.addLine(57.82, str: "也是我现在正服下的毒药")
+        lyric.addLine(63.91, str: "看不见妳的笑 我怎么睡得着")
+        lyric.addLine(70.44, str: "妳的声音这么近我却抱不到")
+        lyric.addLine(76.78, str: "没有地球 太阳还是会绕")
+        lyric.addLine(83.18, str: "没有理由 我也能自己走")
+        lyric.addLine(89.99, str: "妳要离开 我知道很简单")
+        lyric.addLine(96.2, str: "妳说依赖 是我们的阻碍")
+        lyric.addLine(102.74, str: "就算放开 但能不能别没收我的爱")
+        lyric.addLine(110.27, str: "当作我最后才明白")
     }
     
     
@@ -202,6 +266,20 @@ class DetailViewController: UIViewController {
         if end < chords.count && abs(startTime - Float(chords[end].mTime) + rangeOfChords) < 0.001 {
             activelabels.append(createLabels(chords[end].tab.content))
         }
+        
+        if current + 1 < lyric.lyric.count && abs(startTime - Float(lyric.get(current+1).time)) < 0.001 {
+            current++
+            label1.text = lyric.get(current).str
+            
+            if current + 1 < lyric.lyric.count {
+                label2.text = lyric.get(current+1).str
+                label2.alpha = 0
+                UIView.animateWithDuration(0.1, animations: {
+                    self.label2.alpha = 1
+                })
+            }
+        }
+        
         refresh()
     }
     
@@ -244,6 +322,29 @@ class DetailViewController: UIViewController {
         }
         
         refresh()
+        
+        //Update the content of the lyric
+        current = -1
+        while(current + 1 < lyric.lyric.count){
+            if Float(lyric.get(current + 1).time) > startTime {
+                break
+            }
+            current++
+        }
+        
+        if current == -1{
+            label1.text = "title of the song"//theSong.title
+        }
+        else {
+            label1.text = lyric.get(current).str
+        }
+        if current + 1 < lyric.lyric.count {
+            label2.text = lyric.get(current+1).str
+        }
+        else {
+            label2.text = "End~"
+        }
+        
         //update progress view
         var xOffset : CGFloat
         if isTesting {
@@ -275,7 +376,6 @@ class DetailViewController: UIViewController {
                      player.play()
                 }
                
-                
                 sender.setTitle("Pause", forState: .Normal)
             }
             else {
