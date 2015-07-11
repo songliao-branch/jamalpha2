@@ -2,10 +2,10 @@ import Foundation
 
 class Chord: NSObject {
     
-    var mTime: NSTimeInterval
+    var mTime: TimeNumber
     var tab: Tab!
 
-    init(tab:Tab, time: NSTimeInterval){
+    init(tab:Tab, time: TimeNumber){
         self.tab = tab
         self.mTime = time
     }

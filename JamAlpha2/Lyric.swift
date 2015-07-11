@@ -15,7 +15,7 @@ class Lyric: NSObject{
         lyric = [Line]()
     }
     
-    func addLine(time: NSTimeInterval, str: String){
+    func addLine(time: TimeNumber, str: String){
         lyric.append(Line(time: time, str: str))
     }
     
@@ -29,6 +29,6 @@ class Lyric: NSObject{
 }
 
 struct  Line {
-    var time: NSTimeInterval
+    var time: TimeNumber
     var str: String
 }

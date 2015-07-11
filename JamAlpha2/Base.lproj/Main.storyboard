@@ -233,7 +233,7 @@
                                 <rect key="frame" x="33" y="511" width="245" height="31"/>
                                 <connections>
                                     <action selector="progressBarChangeEnded:" destination="e5l-3U-enU" eventType="touchUpInside" id="gV1-sh-78s"/>
-                                    <action selector="progressBarChanged:" destination="e5l-3U-enU" eventType="valueChanged" id="Hif-gl-4le"/>
+                                    <action selector="progressBarChanged:" destination="e5l-3U-enU" eventType="valueChanged" id="aT8-xN-RRE"/>
                                 </connections>
                             </slider>
                         </subviews>

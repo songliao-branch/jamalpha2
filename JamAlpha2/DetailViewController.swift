@@ -25,7 +25,7 @@ class DetailViewController: UIViewController {
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
-    var startTime: Float = 0
+    var startTime: TimeNumber = TimeNumber(second: 0,decimal: 0)
     var timer: NSTimer = NSTimer()
     
     var topPoints = [CGFloat]()
@@ -36,7 +36,7 @@ class DetailViewController: UIViewController {
     //corresponding playback speed
     var speed = 1
     
-    var rangeOfChords:Float = 5
+    var rangeOfChords:Float = 3
     
     //Lyric
     var lyricbase: UIView = UIView()
@@ -49,6 +49,8 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        var startTime: TimeNumber = TimeNumber(second: 0,decimal: 0)
         
         //make navigation bar transparent
         self.navigationController?.navigationBar.barTintColor = UIColor.clearColor()
@@ -176,28 +178,28 @@ class DetailViewController: UIViewController {
         
         
         //intro
-        var chord1 = Chord(tab: C, time: 0.33)
-        var chord2 = Chord(tab: Dm7, time: 1.97)
-        var chord3 = Chord(tab: Am7, time: 3.6)
-        var chord4 = Chord(tab: Dm7, time: 5.24)
-        var chord5 = Chord(tab: C, time: 7.02)
-        var chord6 = Chord(tab: Dm7, time: 8.57)
-        var chord7 = Chord(tab: G, time: 10.18)
+        var chord1 = Chord(tab: C, time: TimeNumber(time: 0.33))
+        var chord2 = Chord(tab: Dm7, time: TimeNumber(time:1.97))
+        var chord3 = Chord(tab: Am7, time: TimeNumber(time:3.6))
+        var chord4 = Chord(tab: Dm7, time: TimeNumber(time:5.24))
+        var chord5 = Chord(tab: C, time: TimeNumber(time:7.02))
+        var chord6 = Chord(tab: Dm7, time: TimeNumber(time:8.57))
+        var chord7 = Chord(tab: G, time: TimeNumber(time:10.18))
         
         //verse1
-        var chord8 = Chord(tab: C, time: 13.20)
-        var chord9 = Chord(tab: Dm7, time: 15.05)
-        var chord10 = Chord(tab: Am7, time: 16.64)
-        var chord11 = Chord(tab: Dm7, time: 22.9)
-        var chord12 = Chord(tab: C, time: 24.5)
+        var chord8 = Chord(tab: C, time: TimeNumber(time:13.20))
+        var chord9 = Chord(tab: Dm7, time: TimeNumber(time:15.05))
+        var chord10 = Chord(tab: Am7, time: TimeNumber(time:16.64))
+        var chord11 = Chord(tab: Dm7, time: TimeNumber(time:22.9))
+        var chord12 = Chord(tab: C, time: TimeNumber(time:24.5))
         
-        var chord13 = Chord(tab: E, time: 29.2)
-        var chord14 = Chord(tab: Am, time: 33.5)
-        var chord15 = Chord(tab: AmG, time: 34.2)
-        var chord16 = Chord(tab: F, time: 40.1)
-        var chord17 = Chord(tab: G, time: 40.1)
-        var chord18 = Chord(tab: Dm7, time: 40.1)
-        var chord19 = Chord(tab: Gsus4, time: 2)
+        var chord13 = Chord(tab: E, time: TimeNumber(time:29.2))
+        var chord14 = Chord(tab: Am, time: TimeNumber(time:33.5))
+        var chord15 = Chord(tab: AmG, time: TimeNumber(time:34.2))
+        var chord16 = Chord(tab: F, time: TimeNumber(time:40.1))
+        var chord17 = Chord(tab: G, time: TimeNumber(time:45.1))
+        var chord18 = Chord(tab: Dm7, time: TimeNumber(time:48.1))
+        var chord19 = Chord(tab: Gsus4, time: TimeNumber(time:55.0))
         
         
         chords.append(chord1)
@@ -223,32 +225,31 @@ class DetailViewController: UIViewController {
         chords.append(chord16)
         chords.append(chord17)
         
-        lyric.addLine(12.56, str: "哪里有彩虹告诉我")
-        lyric.addLine(18.80, str: "能不能把我的愿望还给我")
-        lyric.addLine(25.82, str: "为什么天这么安静")
-        lyric.addLine(31.98, str: "所有的云都跑到我这里")
-        lyric.addLine(38.91, str: "有没有口罩一个给我")
-        lyric.addLine(44.79, str: "释怀说了太多就成真不了")
-        lyric.addLine(51.90, str: "也许时间是一种解药")
-        lyric.addLine(57.82, str: "也是我现在正服下的毒药")
-        lyric.addLine(63.91, str: "看不见妳的笑 我怎么睡得着")
-        lyric.addLine(70.44, str: "妳的声音这么近我却抱不到")
-        lyric.addLine(76.78, str: "没有地球 太阳还是会绕")
-        lyric.addLine(83.18, str: "没有理由 我也能自己走")
-        lyric.addLine(89.99, str: "妳要离开 我知道很简单")
-        lyric.addLine(96.2, str: "妳说依赖 是我们的阻碍")
-        lyric.addLine(102.74, str: "就算放开 但能不能别没收我的爱")
-        lyric.addLine(110.27, str: "当作我最后才明白")
+        lyric.addLine(TimeNumber(time:12.56), str: "哪里有彩虹告诉我")
+        lyric.addLine(TimeNumber(time:18.80), str: "能不能把我的愿望还给我")
+        lyric.addLine(TimeNumber(time:25.82), str: "为什么天这么安静")
+        lyric.addLine(TimeNumber(time:31.98), str: "所有的云都跑到我这里")
+        lyric.addLine(TimeNumber(time:38.91), str: "有没有口罩一个给我")
+        lyric.addLine(TimeNumber(time:44.79), str: "释怀说了太多就成真不了")
+        lyric.addLine(TimeNumber(time:51.90), str: "也许时间是一种解药")
+        lyric.addLine(TimeNumber(time:57.82), str: "也是我现在正服下的毒药")
+        lyric.addLine(TimeNumber(time:63.91), str: "看不见妳的笑 我怎么睡得着")
+        lyric.addLine(TimeNumber(time:70.44), str: "妳的声音这么近我却抱不到")
+        lyric.addLine(TimeNumber(time:76.78), str: "没有地球 太阳还是会绕")
+        lyric.addLine(TimeNumber(time:83.18), str: "没有理由 我也能自己走")
+        lyric.addLine(TimeNumber(time:89.99), str: "妳要离开 我知道很简单")
+        lyric.addLine(TimeNumber(time:96.2), str: "妳说依赖 是我们的阻碍")
+        lyric.addLine(TimeNumber(time:102.74), str: "就算放开 但能不能别没收我的爱")
+        lyric.addLine(TimeNumber(time:110.27), str: "当作我最后才明白")
     }
     
     
     func update(){
-        startTime += 0.01
+        startTime.addMinimal()
         
-        progressBar.value = startTime
+        progressBar.value = startTime.toDecimalNumer()
         
-   
-        if activelabels.count > 0 && start+1 < chords.count && abs(startTime - Float(chords[start+1].mTime) + 0.6) < 0.001
+        if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + 0.6))
         {
             var labels = activelabels.removeAtIndex(0)
             for label in labels {
@@ -263,11 +264,13 @@ class DetailViewController: UIViewController {
         
         /// Add new chord
         let end = start + activelabels.count
-        if end < chords.count && abs(startTime - Float(chords[end].mTime) + rangeOfChords) < 0.001 {
+        if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: rangeOfChords + startTime.toDecimalNumer())) {
             activelabels.append(createLabels(chords[end].tab.content))
         }
         
-        if current + 1 < lyric.lyric.count && abs(startTime - Float(lyric.get(current+1).time)) < 0.001 {
+        
+        //Change the content of the lyric labels
+        if current + 1 < lyric.lyric.count && lyric.get(current+1).time.isEqual(startTime) {
             current++
             label1.text = lyric.get(current).str
             
@@ -278,6 +281,9 @@ class DetailViewController: UIViewController {
                     self.label2.alpha = 1
                 })
             }
+            else{
+                label2.text = "End~"
+            }
         }
         
         refresh()
@@ -286,8 +292,7 @@ class DetailViewController: UIViewController {
     
     func updateAll(time: Float){
         ///Set the start time
-        let startTime_int: Int = Int(time*100)
-        startTime = Float(startTime_int)/100
+        startTime = TimeNumber(time: time)
         
         ///Remove all label in current screen
         for labels in activelabels{
@@ -295,30 +300,45 @@ class DetailViewController: UIViewController {
                 label.removeFromSuperview()
             }
         }
-        activelabels.removeAll(keepCapacity: true)
+        activelabels.removeAll(keepCapacity: false)
         
+        //find the start of the chord whose time is larger than current time
         start = 0;
         var index: Int = 0
         var in_interval = true;
-        while in_interval && index < chords.count{
-            let chord_time = Float(chords[index].mTime)
-            if chord_time > (startTime + rangeOfChords) {
+        while in_interval && index < chords.count {
+            let chord_time = chords[index].mTime
+            if chord_time.isLongerThan(TimeNumber(time: startTime.toDecimalNumer() + rangeOfChords)) {
                 in_interval = false
-            }else if chord_time >= startTime {
+            }else if chord_time.isLongerThan(startTime) || chord_time.isEqual(startTime) {
                 /// Add labels to activelabels
                 activelabels.append(createLabels(chords[index].tab.content))
                 
                 //Set the start value
-                if index == 0 || Float(chords[index-1].mTime) < startTime {
+                if index == 0 || !chords[index-1].mTime.isLongerThan(startTime) {
                     start = index
                 }
             }
             index++
         }
         
-        if start > 0 && Float(chords[start].mTime) - startTime > 0.6{
+        //current label has not fallen to the buttom
+        if start > 0 && chords[start].mTime.isLongerThan(TimeNumber(time: startTime.toDecimalNumer() + 0.6)){
             start--
             activelabels.insert(createLabels(chords[start].tab.content), atIndex: 0)
+        }
+        
+        //
+        if in_interval{
+            ///Remove all label in current screen
+            for labels in activelabels{
+                for label in labels{
+                    label.removeFromSuperview()
+                }
+            }
+            activelabels.removeAll(keepCapacity: false)
+            activelabels.append(createLabels(chords[chords.count-1].tab.content))
+            start = chords.count - 1
         }
         
         refresh()
@@ -326,7 +346,7 @@ class DetailViewController: UIViewController {
         //Update the content of the lyric
         current = -1
         while(current + 1 < lyric.lyric.count){
-            if Float(lyric.get(current + 1).time) > startTime {
+            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
                 break
             }
             current++
@@ -348,12 +368,11 @@ class DetailViewController: UIViewController {
         //update progress view
         var xOffset : CGFloat
         if isTesting {
-            xOffset = CGFloat((startTime / Float(audioPlayer.duration)) ) * self.view.frame.width
+            xOffset = CGFloat((startTime.toDecimalNumer() / Float(audioPlayer.duration)) ) * self.view.frame.width
         }
         else {
-            xOffset = CGFloat((startTime / Float(theSong.playbackDuration))) * progressView.frame.width
+            xOffset = CGFloat((startTime.toDecimalNumer() / Float(theSong.playbackDuration))) * progressView.frame.width
         }
-        println("x offset \(xOffset)")
         progressView.frame = CGRectOffset(progressView.frame, -xOffset, 0)
     }
     
@@ -391,6 +410,7 @@ class DetailViewController: UIViewController {
                 sender.setTitle("Continue", forState: .Normal)
             }
     }
+    
     @IBAction func progressBarChanged(sender: UISlider) {
         timer.invalidate()
         updateAll(sender.value)
@@ -413,15 +433,15 @@ class DetailViewController: UIViewController {
         /// Change the location of each label
         for var i = 0; i < activelabels.count; ++i{
             var labels = activelabels[i]
-            let t = Float(chords[start+i].mTime)
-            var yPosition = Float(self.base.frame.height)*(startTime + rangeOfChords - t) / rangeOfChords
+            let t = chords[start+i].mTime
+            var yPosition = Float(self.base.frame.height)*(startTime.toDecimalNumer() + rangeOfChords - t.toDecimalNumer()) / rangeOfChords
             if yPosition > Float(self.base.frame.height){
                 yPosition = Float(self.base.frame.height)
             }
             for var j = 0; j < labels.count; ++j{
                 var bottom = Float(bottomPoints[j])
                 var top = Float(topPoints[j])
-                var xPosition = CGFloat(bottom + (top - bottom) * (t - startTime) / rangeOfChords)
+                var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / rangeOfChords)
                 if yPosition == Float(self.base.frame.height){
                     xPosition = bottomPoints[j]
                 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		840D77211B50AE4D00EADD2D /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840D77201B50AE4D00EADD2D /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
 		E44358FE1B19471B0091E926 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44358FD1B19471B0091E926 /* Artist.swift */; };
 		E44359021B1947660091E926 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359011B1947660091E926 /* Album.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		840D77201B50AE4D00EADD2D /* TimeNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeNumber.swift; sourceTree = "<group>"; };
 		84DA61A31B4E211100979A42 /* Lyric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lyric.swift; sourceTree = "<group>"; };
 		E44358FD1B19471B0091E926 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		E44359011B1947660091E926 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 		E44358FC1B1947120091E926 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				840D77201B50AE4D00EADD2D /* TimeNumber.swift */,
 				84DA61A31B4E211100979A42 /* Lyric.swift */,
 				E44358FD1B19471B0091E926 /* Artist.swift */,
 				E44359011B1947660091E926 /* Album.swift */,
@@ -304,6 +307,7 @@
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
+				840D77211B50AE4D00EADD2D /* TimeNumber.swift in Sources */,
 				E44358FE1B19471B0091E926 /* Artist.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
