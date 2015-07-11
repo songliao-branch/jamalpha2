@@ -49,42 +49,43 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.navigationBar.barTintColor = UIColor.whiteColor()
         
+        //make navigation bar transparent
+        self.navigationController?.navigationBar.barTintColor = UIColor.clearColor()
+
+        //set a background image
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "background")!)
+        
+        //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         base = ChordBase(frame: CGRect(x: 0, y: 100, width: self.view.frame.width * 0.7, height: self.view.frame.height * 0.4))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(base)
         
-        
-        
         calculateXPoints()
         setUpDemoChords()
         progressBar.minimumValue = 0
+        
         var progressViewWidth:CGFloat
         if isTesting {
-            
             setUpTestSong()
-    
             progressBar.maximumValue = Float(audioPlayer.duration)
-     
-            println("duration \(audioPlayer.duration)")
-            progressViewWidth = CGFloat(audioPlayer.duration) * 8
-           
+            progressViewWidth = CGFloat(audioPlayer.duration) * 2
             
         } else {
             setUpSong()
-           
-            progressBar.minimumValue = 0
             progressBar.maximumValue = Float(theSong.playbackDuration)
-            progressBar.value = 0
-            progressViewWidth = CGFloat(theSong.playbackDuration) * 8
-
-
+            progressViewWidth = CGFloat(theSong.playbackDuration) * 2
         }
         
         progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 10))
+
+        progressBar.value = 0
+        
+        //make it bigger to drag it first
+        progressView = UIView(frame: CGRect(x: self.view.frame.width / 2, y: self.playPauseButton.frame.origin.y - 50, width: progressViewWidth, height: 20))
+
         progressBar.value = 0
         progressView.backgroundColor = mainPinkColor
         self.view.addSubview(progressView)
@@ -115,17 +116,13 @@ class DetailViewController: UIViewController {
     }
     
     func setUpTestSong(){
-
-            if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
-                
-                var fileWithPath = NSURL.fileURLWithPath(filePath)
-                audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
-            }
-            else{
-                println("mp3 not found")
-            }
-        
-        
+        if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
+            var fileWithPath = NSURL.fileURLWithPath(filePath)
+            audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
+        }
+        else{
+            println("mp3 not found")
+        }
         audioPlayer.prepareToPlay()
     }
     override func prefersStatusBarHidden() -> Bool {
@@ -134,7 +131,9 @@ class DetailViewController: UIViewController {
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        self.navigationController?.navigationBar.tintColor = mainPinkColor
         self.tabBarController?.tabBar.hidden = false
+        
         if isTesting {
             audioPlayer.stop()
         }
@@ -165,30 +164,41 @@ class DetailViewController: UIViewController {
     }
     
     func setUpDemoChords(){
-        var CMajor = Tab(name:"C",content:"032010")
-        var DMajor = Tab(name:"D",content:"000232")
-        var EMinor = Tab(name:"Em",content:"022000")
-        var FMajor = Tab(name:"F",content:"133210")
+        var C = Tab(name:"C",content:" 32010")
+        var Dm7 = Tab(name:"Dm7",content:"  0211")
+        var Am7 = Tab(name:"Am7",content:" 02013")
+        var G = Tab(name:"G",content:"3 0030")
+        var E = Tab(name: "E", content: "022100")
+        var Am = Tab(name: "Am", content:" 02210")
+        var AmG = Tab(name: "Am/G", content: "302210")
+        var F = Tab(name: "F", content: "133211")
+        var Gsus4 = Tab(name: "Gsus4", content:"320013")
         
-        var chord1 = Chord(tab: CMajor, time: 1.2)
-        var chord2 = Chord(tab: FMajor, time: 3.1)
-        var chord3 = Chord(tab: EMinor, time: 6.2)
-        var chord4 = Chord(tab: DMajor, time: 10.6)
         
-        var chord5 = Chord(tab: DMajor, time: 13.4)
-        var chord6 = Chord(tab: EMinor, time: 14.3)
-        var chord7 = Chord(tab: FMajor, time: 16.2)
-        var chord8 = Chord(tab: DMajor, time: 17.1)
+        //intro
+        var chord1 = Chord(tab: C, time: 0.33)
+        var chord2 = Chord(tab: Dm7, time: 1.97)
+        var chord3 = Chord(tab: Am7, time: 3.6)
+        var chord4 = Chord(tab: Dm7, time: 5.24)
+        var chord5 = Chord(tab: C, time: 7.02)
+        var chord6 = Chord(tab: Dm7, time: 8.57)
+        var chord7 = Chord(tab: G, time: 10.18)
         
-        var chord9 = Chord(tab: CMajor, time: 20.1)
-        var chord10 = Chord(tab: CMajor, time: 21.2)
-        var chord11 = Chord(tab: EMinor, time: 22.9)
-        var chord12 = Chord(tab: DMajor, time: 24.5)
+        //verse1
+        var chord8 = Chord(tab: C, time: 13.20)
+        var chord9 = Chord(tab: Dm7, time: 15.05)
+        var chord10 = Chord(tab: Am7, time: 16.64)
+        var chord11 = Chord(tab: Dm7, time: 22.9)
+        var chord12 = Chord(tab: C, time: 24.5)
         
-        var chord13 = Chord(tab: CMajor, time: 29.2)
-        var chord14 = Chord(tab: FMajor, time: 33.5)
-        var chord15 = Chord(tab: EMinor, time: 34.2)
-        var chord16 = Chord(tab: DMajor, time: 40.1)
+        var chord13 = Chord(tab: E, time: 29.2)
+        var chord14 = Chord(tab: Am, time: 33.5)
+        var chord15 = Chord(tab: AmG, time: 34.2)
+        var chord16 = Chord(tab: F, time: 40.1)
+        var chord17 = Chord(tab: G, time: 40.1)
+        var chord18 = Chord(tab: Dm7, time: 40.1)
+        var chord19 = Chord(tab: Gsus4, time: 2)
+        
         
         chords.append(chord1)
         chords.append(chord2)
@@ -211,21 +221,24 @@ class DetailViewController: UIViewController {
         chords.append(chord14)
         chords.append(chord15)
         chords.append(chord16)
+        chords.append(chord17)
         
-        lyric.addLine(1.21, str: "They Told Him \nDon't You")
-        lyric.addLine(3.10, str: "Ever Come Around Here")
-        lyric.addLine(6.25, str: "Don't Wanna\n See Your Face")
-        lyric.addLine(10.67, str: "You Better Disappear")
-        lyric.addLine(13.45, str: "The Fire's In Their Eyes")
-        lyric.addLine(14.32, str: "And Their Words Are Really Clear")
-        lyric.addLine(16.28, str: "So Beat It, Just Beat It")
-        lyric.addLine(25.88, str: "You Better Do What You Can")
-        lyric.addLine(30, str: "You Wanna Be Tough")
-        lyric.addLine(41.01, str: "Who's Wrong Or Right")
-        lyric.addLine(59.88, str: "Showin' How Funky Strong Is Your Fighter")
-        lyric.addLine(70.88, str: "It Doesn't Matter Who's Wrong Or Right")
-        lyric.addLine(78.08, str: "Showin' How Funky Strong Is Your Fighter")
-        lyric.addLine(90.78, str: "So Beat It, Just Beat It")
+        lyric.addLine(12.56, str: "哪里有彩虹告诉我")
+        lyric.addLine(18.80, str: "能不能把我的愿望还给我")
+        lyric.addLine(25.82, str: "为什么天这么安静")
+        lyric.addLine(31.98, str: "所有的云都跑到我这里")
+        lyric.addLine(38.91, str: "有没有口罩一个给我")
+        lyric.addLine(44.79, str: "释怀说了太多就成真不了")
+        lyric.addLine(51.90, str: "也许时间是一种解药")
+        lyric.addLine(57.82, str: "也是我现在正服下的毒药")
+        lyric.addLine(63.91, str: "看不见妳的笑 我怎么睡得着")
+        lyric.addLine(70.44, str: "妳的声音这么近我却抱不到")
+        lyric.addLine(76.78, str: "没有地球 太阳还是会绕")
+        lyric.addLine(83.18, str: "没有理由 我也能自己走")
+        lyric.addLine(89.99, str: "妳要离开 我知道很简单")
+        lyric.addLine(96.2, str: "妳说依赖 是我们的阻碍")
+        lyric.addLine(102.74, str: "就算放开 但能不能别没收我的爱")
+        lyric.addLine(110.27, str: "当作我最后才明白")
     }
     
     
@@ -363,7 +376,6 @@ class DetailViewController: UIViewController {
                      player.play()
                 }
                
-                
                 sender.setTitle("Pause", forState: .Normal)
             }
             else {
