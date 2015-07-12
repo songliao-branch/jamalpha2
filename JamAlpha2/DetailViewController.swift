@@ -151,18 +151,24 @@ class DetailViewController: UIViewController {
         let scale:Float = 1 / 12
         let topWidth = Float(rightTopPoint) - Float(initialPoint)
         let topLeft = Float(initialPoint) + Float(topWidth) * scale
-        topPoints = [CGFloat](count: 6, repeatedValue: 0)
+        topPoints = [CGFloat](count: 7, repeatedValue: 0)
         
         topPoints[0] = CGFloat(topLeft)
         for i in 1..<6 {
             topPoints[i] = CGFloat(Float(topPoints[i - 1]) + Float(topWidth * scale * 2))
         }
         
-        bottomPoints = [CGFloat](count: 6, repeatedValue: 0)
+        bottomPoints = [CGFloat](count: 7, repeatedValue: 0)
         bottomPoints[0] = CGFloat(Float(width) * scale)
         for i in 1..<6 {
             bottomPoints[i] = CGFloat(Float(bottomPoints[i - 1]) + Float(width) * scale * 2)
         }
+        
+        let top0: CGFloat = CGFloat(margin * Float(base.frame.width) - 20)
+        let buttom0: CGFloat = CGFloat(-20)
+        
+        topPoints.insert(top0, atIndex: 0)
+        bottomPoints.insert(buttom0, atIndex: 0)
     }
     
     func setUpDemoChords(){
@@ -265,7 +271,7 @@ class DetailViewController: UIViewController {
         /// Add new chord
         let end = start + activelabels.count
         if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: rangeOfChords + startTime.toDecimalNumer())) {
-            activelabels.append(createLabels(chords[end].tab.content))
+            activelabels.append(createLabels(chords[end].tab.name, content: chords[end].tab.content))
         }
         
         
@@ -312,7 +318,7 @@ class DetailViewController: UIViewController {
                 in_interval = false
             }else if chord_time.isLongerThan(startTime) || chord_time.isEqual(startTime) {
                 /// Add labels to activelabels
-                activelabels.append(createLabels(chords[index].tab.content))
+                activelabels.append(createLabels(chords[index].tab.name, content: chords[index].tab.content))
                 
                 //Set the start value
                 if index == 0 || !chords[index-1].mTime.isLongerThan(startTime) {
@@ -325,7 +331,7 @@ class DetailViewController: UIViewController {
         //current label has not fallen to the buttom
         if start > 0 && chords[start].mTime.isLongerThan(TimeNumber(time: startTime.toDecimalNumer() + 0.6)){
             start--
-            activelabels.insert(createLabels(chords[start].tab.content), atIndex: 0)
+            activelabels.insert(createLabels(chords[start].tab.name, content: chords[start].tab.content), atIndex: 0)
         }
         
         //
@@ -337,7 +343,7 @@ class DetailViewController: UIViewController {
                 }
             }
             activelabels.removeAll(keepCapacity: false)
-            activelabels.append(createLabels(chords[chords.count-1].tab.content))
+            activelabels.append(createLabels(chords[chords.count-1].tab.name ,content: chords[chords.count-1].tab.content))
             start = chords.count - 1
         }
         
@@ -458,10 +464,18 @@ class DetailViewController: UIViewController {
     }
     
    
-    func createLabels(content: String) -> [UILabel]{
+    func createLabels(name: String, content: String) -> [UILabel]{
         var res = [UILabel]()
         
-        for i in 0...count(content)-1{
+        let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
+        label.font = UIFont.systemFontOfSize(25)
+        label.text = name
+        label.sizeToFit()
+        label.textAlignment = NSTextAlignment.Center
+        res.append(label)
+        self.base.addSubview(label)
+        
+        for i in 0...count(content)-1 {
             let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
             label.font = UIFont.systemFontOfSize(25)
             label.text = String(Array(content)[i])
