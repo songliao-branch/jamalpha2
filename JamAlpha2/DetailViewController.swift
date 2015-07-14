@@ -265,6 +265,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         for i in 1..<6 {
             bottomPoints[i] = CGFloat(Float(bottomPoints[i - 1]) + Float(width) * scale * 2)
         }
+        //add things
     }
 
     
