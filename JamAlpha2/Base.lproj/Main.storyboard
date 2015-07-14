@@ -211,13 +211,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BQ-D9-G6T">
-                                <rect key="frame" x="108" y="427" width="104" height="66"/>
+                            <view hidden="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
+                                <rect key="frame" x="35" y="95" width="250" height="330"/>
+                                <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BQ-D9-G6T">
+                                <rect key="frame" x="136" y="37" width="47" height="30"/>
                                 <color key="backgroundColor" red="0.18907663471072755" green="1" blue="0.19044531304766343" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="104" id="5Dy-mW-inv"/>
-                                    <constraint firstAttribute="height" constant="66" id="khd-KF-Lk1"/>
-                                </constraints>
                                 <state key="normal" title="START">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -225,11 +225,7 @@
                                     <action selector="playPause:" destination="e5l-3U-enU" eventType="touchUpInside" id="9U1-nY-0ds"/>
                                 </connections>
                             </button>
-                            <view hidden="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
-                                <rect key="frame" x="35" y="95" width="250" height="330"/>
-                                <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
-                            </view>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="SRs-ti-xBr">
+                            <slider opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="SRs-ti-xBr">
                                 <rect key="frame" x="33" y="511" width="245" height="31"/>
                                 <connections>
                                     <action selector="progressBarChangeEnded:" destination="e5l-3U-enU" eventType="touchUpInside" id="gV1-sh-78s"/>
@@ -239,14 +235,12 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="LdE-bG-dmM" firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="HOU-2g-bpe"/>
-                            <constraint firstItem="SRs-ti-xBr" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="18" id="J5K-B3-0b6"/>
+                            <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="17" id="L3g-8o-sQi"/>
                             <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="LdE-bG-dmM" secondAttribute="leading" id="SzM-rs-JXb"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="75" id="VXL-3R-kWB"/>
-                            <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LdE-bG-dmM" secondAttribute="bottom" constant="2" id="bof-LX-OvB"/>
                             <constraint firstAttribute="trailingMargin" secondItem="SRs-ti-xBr" secondAttribute="trailing" constant="28" id="ePY-lD-z6y"/>
-                            <constraint firstItem="yHS-s7-Kh9" firstAttribute="top" secondItem="9BQ-D9-G6T" secondAttribute="bottom" constant="75" id="iSW-VW-COx"/>
                             <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="BGo-rS-auO" secondAttribute="leadingMargin" constant="19" id="red-wV-xnB"/>
+                            <constraint firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="yTS-qC-Y9j"/>
                         </constraints>
                     </view>
                     <connections>
