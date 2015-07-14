@@ -49,7 +49,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var rangeOfChords:Float = 5
     
     //Lyric
-    var lyricbase: UIView = UIView()
+    var lyricbase: UIView!
     
     var label1: UILabel = UILabel()
     var label2: UILabel = UILabel()
@@ -65,12 +65,12 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
-        //load data
-        setUpDemoChords()
-        setUpLyrics()
-        
+        //load data 载入彩虹吉他谱和歌词
+        setUpRainbowData()
+      
         //set up views from top to bottom
         setUpChordBase()
+        setUpLyricsBase()
         setUpDurationBar()
         setUpTimeLabels()
         
@@ -80,15 +80,15 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     }
     
     
-    func setUpDemoChords(){
+    func setUpRainbowData(){
         chords = Chord.getRainbowChords()
+        lyric = Lyric.getRainbowLyrics()
     }
     
-    func setUpLyrics(){
+    func setUpLyricsBase(){
         //Lyric labels
-        lyric = Lyric.getRainbowLyrics()
         current = -1
-        lyricbase.frame = CGRectMake(base.frame.origin.x, base.frame.origin.y + base.frame.height, base.frame.width, base.frame.height / 3)
+        lyricbase = UIView(frame: CGRect(x: base.frame.origin.x, y: base.frame.origin.y + base.frame.height, width: base.frame.width, height: base.frame.height / 3))
         lyricbase.backgroundColor = mainPinkColor
         self.view.addSubview(lyricbase)
         
