@@ -246,6 +246,8 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
             (alert:UIAlertAction!) -> Void in
             
+            let editTabsVC = EditTabsViewController()
+            self.presentViewController(editTabsVC, animated: true, completion: nil)
             //Go to edit tabs screen
             
         })
