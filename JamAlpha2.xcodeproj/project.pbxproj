@@ -13,7 +13,6 @@
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
 		E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456457D1B3BB15C00276287 /* ChordBase.swift */; };
 		E45F6B201B15600F0018645D /* Toucan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B1F1B15600F0018645D /* Toucan.swift */; };
-		E45F6B271B156D070018645D /* OneLineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6B261B156D070018645D /* OneLineCell.swift */; };
 		E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6BB71B16C1860018645D /* ArtistViewController.swift */; };
 		E48877431B151628004785D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877421B151628004785D3 /* AppDelegate.swift */; };
 		E48877451B151628004785D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* SearchViewController.swift */; };
@@ -47,7 +46,6 @@
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		E456457D1B3BB15C00276287 /* ChordBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordBase.swift; sourceTree = "<group>"; };
 		E45F6B1F1B15600F0018645D /* Toucan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toucan.swift; sourceTree = "<group>"; };
-		E45F6B261B156D070018645D /* OneLineCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OneLineCell.swift; sourceTree = "<group>"; };
 		E45F6BB71B16C1860018645D /* ArtistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistViewController.swift; sourceTree = "<group>"; };
 		E488773D1B151628004785D3 /* JamAlpha2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamAlpha2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -120,7 +118,6 @@
 			isa = PBXGroup;
 			children = (
 				E48877671B151E2B004785D3 /* MusicCell.swift */,
-				E45F6B261B156D070018645D /* OneLineCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -313,7 +310,6 @@
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
 				E44359021B1947660091E926 /* Album.swift in Sources */,
-				E45F6B271B156D070018645D /* OneLineCell.swift in Sources */,
 				E45F6B201B15600F0018645D /* Toucan.swift in Sources */,
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
 			);
