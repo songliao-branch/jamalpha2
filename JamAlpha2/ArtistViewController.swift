@@ -20,7 +20,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false
-
+        
         //setUpSearchBar()
         //self.artistTable.reloadData()
     }

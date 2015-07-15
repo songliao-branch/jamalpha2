@@ -1,5 +1,6 @@
 import Foundation
 
+//Chord is timed..
 class Chord: NSObject {
     
     var mTime: NSTimeInterval
@@ -13,6 +14,7 @@ class Chord: NSObject {
     //example
     class func getRainbowChords() -> [Chord]{
         var chords = [Chord]()
+        
         var C = Tab(name:"C",content:" 32010")
         var Dm7 = Tab(name:"Dm7",content:"  0211")
         var Am7 = Tab(name:"Am7",content:" 02013")
@@ -48,13 +50,11 @@ class Chord: NSObject {
         var chord18 = Chord(tab: Dm7, time: 40.1)
         var chord19 = Chord(tab: Gsus4, time: 2)
         
-        
         chords.append(chord1)
         chords.append(chord2)
         chords.append(chord3)
         chords.append(chord4)
-        
-        
+    
         chords.append(chord5)
         chords.append(chord6)
         chords.append(chord7)
@@ -76,8 +76,9 @@ class Chord: NSObject {
     }
 }
 
+//Tab represents full six numbers on a guitar board
+//For example, C major is 032010
 struct Tab {
     var name:String! //Cmajor
     var content:String! //032010
 }
-

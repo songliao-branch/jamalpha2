@@ -50,15 +50,17 @@ class EditTabsViewController: UIViewController, UIPickerViewDataSource, UIPicker
     var backgroundColor: UIColor = UIColor.whiteColor()
     var textColor: UIColor = UIColor(red: 0.5607, green: 0.2126, blue: 0.2266, alpha: 1.0)
     
+    //exit button
+    var exitButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        
-        
+    
         //play sound
         
-        var alertSound = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("Jay", ofType: "mp3")!)
+        var alertSound = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("彩虹", ofType: "mp3")!)
         println(alertSound)
         
         AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, error: nil)
@@ -182,6 +184,15 @@ class EditTabsViewController: UIViewController, UIPickerViewDataSource, UIPicker
         
         var timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         //var timer2 = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("update2"), userInfo: nil, repeats: true)
+        
+        exitButton = UIButton(frame: CGRect(x: 10, y: 10, width: 30, height: 30))
+        exitButton.setTitle("Back", forState: UIControlState.Normal)
+        exitButton.backgroundColor = UIColor.blackColor()
+        self.view.addSubview(exitButton)
+        exitButton.addTarget(self, action: "exit:", forControlEvents: UIControlEvents.TouchUpInside)
+    }
+    func exit(button:UIButton){
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     func update2() {

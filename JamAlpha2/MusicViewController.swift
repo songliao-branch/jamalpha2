@@ -22,6 +22,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
@@ -44,7 +45,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
-        
+
         if pageIndex == 0 {
             let image = uniqueSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 54, height: 54))
             
@@ -138,6 +139,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
             let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
             detailVC.theSong = uniqueSongs[indexPath.row]
+            
             self.showViewController(detailVC, sender: self)
             
         }
