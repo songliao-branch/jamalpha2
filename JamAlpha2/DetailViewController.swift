@@ -57,6 +57,13 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var current: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
     
+    //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
+    var bottomView:UIView!
+    var buttonFavoriate:UIButton!
+    var buttonShuffle:UIButton!
+    var buttonChangeVersion:UIButton!
+    var buttonDots:UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -73,7 +80,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         setUpLyricsBase()
         setUpDurationBar()
         setUpTimeLabels()
-        
+        setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
         updateAll(0)
@@ -212,12 +219,54 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         else {
          totalTimeLabel.text = "\(theSong.playbackDuration)"
         }
-       
         totalTimeLabel.sizeToFit()
         self.view.addSubview(totalTimeLabel)
     }
 
+    func setUpBottomViewWithButtons(){
+        let bottomViewHeight:CGFloat = 60
+        let edgeButtonSideMargin:CGFloat = 10
+        bottomView = UIView(frame: CGRect(x: 0, y: self.view.frame.height - bottomViewHeight, width: self.view.frame.width, height: bottomViewHeight))
+        bottomView.backgroundColor = UIColor.blackColor()
+        bottomView.alpha = 0.3
+        self.view.addSubview(bottomView)
+        buttonDots = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        buttonDots.setTitle("Others", forState: UIControlState.Normal)
+        buttonDots.center.x = bottomView.frame.width - edgeButtonSideMargin
+        buttonDots.center.y = bottomViewHeight / 2
+        buttonDots.backgroundColor = UIColor.redColor()
+        buttonDots.addTarget(self, action: "showActionSheet", forControlEvents: UIControlEvents.TouchUpInside)
+        self.bottomView.addSubview(buttonDots)
+        
+
+    }
     
+    func showActionSheet(){
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+        let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
+            (alert:UIAlertAction!) -> Void in
+            
+            let editTabsVC = EditTabsViewController()
+            self.presentViewController(editTabsVC, animated: true, completion: nil)
+            //Go to edit tabs screen
+            
+        })
+        
+        let addLyricsAction = UIAlertAction(title: "Add your lyrics", style: .Default, handler: {
+            (alert:UIAlertAction!) -> Void in
+            //TODO: Go to edit lyrics screens
+            
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
+        
+        optionMenu.addAction(addTabsAction)
+        optionMenu.addAction(addLyricsAction)
+        optionMenu.addAction(cancelAction)
+        
+        self.presentViewController(optionMenu, animated: true, completion: nil)
+    }
+
     func setUpTestSong(){
         if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
             var fileWithPath = NSURL.fileURLWithPath(filePath)
