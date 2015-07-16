@@ -211,10 +211,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view hidden="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
-                                <rect key="frame" x="35" y="95" width="250" height="330"/>
-                                <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
-                            </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BQ-D9-G6T">
                                 <rect key="frame" x="136" y="37" width="47" height="30"/>
                                 <color key="backgroundColor" red="0.18907663471072755" green="1" blue="0.19044531304766343" alpha="1" colorSpace="calibratedRGB"/>
@@ -225,28 +221,21 @@
                                     <action selector="playPause:" destination="e5l-3U-enU" eventType="touchUpInside" id="9U1-nY-0ds"/>
                                 </connections>
                             </button>
-                            <slider opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="SRs-ti-xBr">
-                                <rect key="frame" x="33" y="511" width="245" height="31"/>
-                                <connections>
-                                    <action selector="progressBarChangeEnded:" destination="e5l-3U-enU" eventType="touchUpInside" id="gV1-sh-78s"/>
-                                    <action selector="progressBarChanged:" destination="e5l-3U-enU" eventType="valueChanged" id="Hif-gl-4le"/>
-                                </connections>
-                            </slider>
+                            <view hidden="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
+                                <rect key="frame" x="35" y="95" width="250" height="330"/>
+                                <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="17" id="L3g-8o-sQi"/>
-                            <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="LdE-bG-dmM" secondAttribute="leading" id="SzM-rs-JXb"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="75" id="VXL-3R-kWB"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="SRs-ti-xBr" secondAttribute="trailing" constant="28" id="ePY-lD-z6y"/>
-                            <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="BGo-rS-auO" secondAttribute="leadingMargin" constant="19" id="red-wV-xnB"/>
                             <constraint firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="yTS-qC-Y9j"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="base" destination="LdE-bG-dmM" id="pzI-Cp-FiC"/>
                         <outlet property="playPauseButton" destination="9BQ-D9-G6T" id="d8u-fh-LYf"/>
-                        <outlet property="progressBar" destination="SRs-ti-xBr" id="iru-QB-zU9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D84-uR-1Md" userLabel="First Responder" sceneMemberID="firstResponder"/>
