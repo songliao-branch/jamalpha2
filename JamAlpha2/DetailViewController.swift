@@ -4,25 +4,25 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
+var audioPlayer = AVAudioPlayer()
 let player = MPMusicPlayerController.applicationMusicPlayer()
 
 class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // MARK: for testing in simulator
-    var audioPlayer = AVAudioPlayer()
+
     var isTesting = false
     
     var theSong:MPMediaItem!
     
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
-    @IBOutlet weak var progressBar: UISlider!
     
     // MARK: Custom views
     var base : ChordBase!
     
     //MARK:Scrollview 
-    var scrollView:UIScrollView!
+    var durationScrollView:UIScrollView!
     var durationBar:UIView!
     var timeToJumpTo:NSTimeInterval!
     
@@ -31,7 +31,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var totalTimeLabel:UILabel!
     
     var isPause: Bool = true
-
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
@@ -127,68 +126,90 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     //TODO: the container does not fully wrap duration bar, huge bug must fix
     func setUpDurationBar(){
         let scrollViewHeight:CGFloat = 100
-        scrollView = UIScrollView(frame: CGRect(x: 0, y: lyricbase.frame.origin.y + lyricbase.frame.height, width: self.view.frame.width, height: scrollViewHeight))
-        scrollView.delegate = self
-        scrollView.backgroundColor = UIColor.brownColor()
-        self.view.addSubview(scrollView)
+        durationScrollView = UIScrollView(frame: CGRect(x: 0, y: lyricbase.frame.origin.y + lyricbase.frame.height, width: self.view.frame.width, height: scrollViewHeight))
+        durationScrollView.delegate = self
+        durationScrollView.backgroundColor = UIColor.brownColor()
+        self.view.addSubview(durationScrollView)
         
         var barWidth:CGFloat
         
-        //TODO: delete progress bar after
-        progressBar.minimumValue = 0
         if isTesting {
             setUpTestSong()
-            //TODO: delete progress bar after
-            progressBar.maximumValue = Float(audioPlayer.duration)
             barWidth = CGFloat(audioPlayer.duration)
         }
         else {
             setUpSong()
-            //TODO: delete progress bar after
-            progressBar.maximumValue = Float(theSong.playbackDuration)
-            barWidth = CGFloat(theSong.playbackDuration) * 2
+            barWidth = CGFloat(theSong.playbackDuration)
         }
         
-        let containerSize = CGSize(width: self.view.frame.width / 2  + barWidth , height: scrollViewHeight)
+        let containerSize = CGSize(width: self.view.frame.width + barWidth , height: scrollViewHeight)
         let containerView = UIView(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: containerSize))
-        scrollView.addSubview(containerView)
+        durationScrollView.addSubview(containerView)
         
-        durationBar = UIView(frame: CGRect(x: self.view.frame.width / 2, y: 0, width: barWidth, height: 10))
+        durationBar = UIView(frame: CGRect(x: self.view.frame.width / 2, y: 0, width: barWidth , height: 10))
         durationBar.center.y = containerView.frame.height / 2
         durationBar.backgroundColor = UIColor.purpleColor()
-        scrollView.addSubview(durationBar)
+        durationScrollView.addSubview(durationBar)
         
-        scrollView.contentSize = containerSize
-        scrollView.showsHorizontalScrollIndicator = true
+        durationScrollView.contentSize = containerSize
+        durationScrollView.showsHorizontalScrollIndicator = true
         
     }
 
+    //TODO: scrollview still can be overscrolled!Need fix!
+    var scrollViewIsDragging = false
+    
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        scrollViewIsDragging = true
+    }
+    
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        println("end dragging")
+        
         if isTesting {
-            audioPlayer.currentTime = timeToJumpTo
+            audioPlayer.currentTime = NSTimeInterval(scrollView.contentOffset.x)
         } else{
-            player.currentPlaybackTime = timeToJumpTo
+            player.currentPlaybackTime = NSTimeInterval(scrollView.contentOffset.x)
         }
+        
+        scrollViewIsDragging = false
     }
     
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+       println("end decelerating")
+        
         if isTesting {
-            audioPlayer.currentTime = timeToJumpTo
+            audioPlayer.currentTime = NSTimeInterval(scrollView.contentOffset.x)
         } else{
-            player.currentPlaybackTime = timeToJumpTo
+            player.currentPlaybackTime = NSTimeInterval(scrollView.contentOffset.x)
         }
+        scrollViewIsDragging = false
     }
     
+    
+    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        
+        println("will end dragging  with velocity \(velocity.x)")
+        
+    }
     func scrollViewDidScroll(scrollView: UIScrollView) {
-        let xFromCenter:CGFloat = scrollView.contentOffset.x
-        var playTime:CGFloat
-        if isTesting {
-            timeToJumpTo = NSTimeInterval(xFromCenter / self.durationBar.frame.width * CGFloat(audioPlayer.duration))
+        
+        println("is scroll")
+
+        if scrollView.contentOffset.x < 0 || scrollView.contentOffset.x > self.durationBar.frame.width {
+            
+            println("scrolling out of bounds")
+            return
         }
-        else {
-            timeToJumpTo = NSTimeInterval(xFromCenter / self.durationBar.frame.width * CGFloat(theSong.playbackDuration))
+        
+        if scrollViewIsDragging {
+            println("is dragging \(scrollView.contentOffset.x)")
+            timer.invalidate()
+            updateAll(Float(scrollView.contentOffset.x))
+            if !isPause {
+                startTimer()
+            }
         }
-        updateAll(Float(timeToJumpTo))
     }
     
     
@@ -196,14 +217,14 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //Timed bar
         currentTimeBar = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 30))
         currentTimeBar.center.x = self.view.center.x
-        currentTimeBar.center.y = self.scrollView.frame.origin.y + 50 //TODO: make better margins
+        currentTimeBar.center.y = self.durationScrollView.frame.origin.y + 50 //TODO: make better margins
         currentTimeBar.backgroundColor = UIColor.redColor()
         self.view.addSubview(currentTimeBar)
         
         let marginFromCenter:CGFloat = 30
         currentTimeLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
         currentTimeLabel.center.x = self.view.frame.width / 2 - marginFromCenter
-        currentTimeLabel.center.y = scrollView.frame.origin.y + scrollView.frame.height / 2
+        currentTimeLabel.center.y = durationScrollView.frame.origin.y + durationScrollView.frame.height / 2
         currentTimeLabel.text = "0:00     "
         currentTimeLabel.sizeToFit()
         currentTimeLabel.textColor = UIColor.whiteColor()
@@ -211,7 +232,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         
         totalTimeLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
         totalTimeLabel.center.x = self.view.frame.width / 2 + marginFromCenter
-        totalTimeLabel.center.y = scrollView.frame.origin.y + scrollView.frame.height / 2
+        totalTimeLabel.center.y = durationScrollView.frame.origin.y + durationScrollView.frame.height / 2
         totalTimeLabel.textColor = UIColor.whiteColor()
         if isTesting {
          totalTimeLabel.text = "\(audioPlayer.duration)"
@@ -273,7 +294,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
         }
         else{
-            println("mp3 not found")
+            NSLog("mp3 not found")
         }
         audioPlayer.prepareToPlay()
     }
@@ -314,15 +335,12 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         for i in 1..<6 {
             bottomPoints[i] = CGFloat(Float(bottomPoints[i - 1]) + Float(width) * scale * 2)
         }
-        //add things
+       
     }
 
     
     func update(){
         startTime += 0.01
-        
-        progressBar.value = startTime
-        
    
         if activelabels.count > 0 && start+1 < chords.count && abs(startTime - Float(chords[start+1].mTime) + 0.6) < 0.01
         {
@@ -457,26 +475,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
     }
     
-    
-    @IBAction func progressBarChanged(sender: UISlider) {
-        timer.invalidate()
-        updateAll(sender.value)
-        if !isPause{
-            startTimer()
-        }
-    }
-    
-    
-    //TODO:Delete ths UISlider after replacing it with a fully functional uiscrollviews
-    @IBAction func progressBarChangeEnded(sender: UISlider) {
-        if isTesting {
-            audioPlayer.currentTime = NSTimeInterval(sender.value)
-        }else {
-            player.currentPlaybackTime = NSTimeInterval(sender.value)
-        }
-
-    }
-    
     func refresh(){
         /// Change the location of each label
         for var i = 0; i < activelabels.count; ++i{
@@ -511,8 +509,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         else {
             xOffset = CGFloat(startTime) * self.durationBar.frame.width / CGFloat(theSong.playbackDuration)
         }
-        durationBar.frame = CGRectMake(self.view.frame.width / 2 - xOffset, durationBar.frame.origin.y, durationBar.frame.width, durationBar.frame.height)
-        
+        durationScrollView.contentOffset.x = xOffset
     }
     func refreshTimeLabel(){
         currentTimeLabel.text = "\(startTime)"
