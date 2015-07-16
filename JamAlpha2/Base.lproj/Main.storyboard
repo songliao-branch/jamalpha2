@@ -221,20 +221,14 @@
                                     <action selector="playPause:" destination="e5l-3U-enU" eventType="touchUpInside" id="9U1-nY-0ds"/>
                                 </connections>
                             </button>
-                            <view hidden="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LdE-bG-dmM" customClass="ChordBase" customModule="JamAlpha2" customModuleProvider="target">
-                                <rect key="frame" x="35" y="95" width="250" height="330"/>
-                                <color key="backgroundColor" red="0.9809026144210744" green="1" blue="0.96297638980071665" alpha="1" colorSpace="calibratedRGB"/>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="17" id="L3g-8o-sQi"/>
-                            <constraint firstItem="LdE-bG-dmM" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="75" id="VXL-3R-kWB"/>
                             <constraint firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="yTS-qC-Y9j"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="base" destination="LdE-bG-dmM" id="pzI-Cp-FiC"/>
                         <outlet property="playPauseButton" destination="9BQ-D9-G6T" id="d8u-fh-LYf"/>
                     </connections>
                 </viewController>
