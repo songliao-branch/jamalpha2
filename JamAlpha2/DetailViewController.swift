@@ -5,6 +5,8 @@ import MediaPlayer
 import AVFoundation
 
 let player = MPMusicPlayerController.applicationMusicPlayer()
+let chordwithname:Int = 1
+let fullchord:Int = 0
 
 class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
@@ -35,11 +37,14 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
-    var startTime: Float = 0
+    var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     var timer: NSTimer = NSTimer()
     
     var topPoints = [CGFloat]()
     var bottomPoints = [CGFloat]()
+    
+    var topPointModes = [Int: [CGFloat]]()
+    var bottomPointModes = [Int: [CGFloat]]()
     
     var labelHeight:CGSize!
     //speed to control playback speed and
@@ -56,6 +61,8 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     
     var current: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
+    
+    var mode:Int = 0
     
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
     var bottomView:UIView!
@@ -302,29 +309,48 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         let scale:Float = 1 / 12
         let topWidth = Float(rightTopPoint) - Float(initialPoint)
         let topLeft = Float(initialPoint) + Float(topWidth) * scale
-        topPoints = [CGFloat](count: 6, repeatedValue: 0)
+        topPoints = [CGFloat](count: 7, repeatedValue: 0)
         
         topPoints[0] = CGFloat(topLeft)
         for i in 1..<6 {
             topPoints[i] = CGFloat(Float(topPoints[i - 1]) + Float(topWidth * scale * 2))
         }
         
-        bottomPoints = [CGFloat](count: 6, repeatedValue: 0)
+        bottomPoints = [CGFloat](count: 7, repeatedValue: 0)
         bottomPoints[0] = CGFloat(Float(width) * scale)
         for i in 1..<6 {
             bottomPoints[i] = CGFloat(Float(bottomPoints[i - 1]) + Float(width) * scale * 2)
         }
         //add things
+        let top0: CGFloat = CGFloat(margin * Float(base.frame.width) - 20)
+        let buttom0: CGFloat = CGFloat(-20)
+        
+        topPoints.insert(top0, atIndex: 0)
+        bottomPoints.insert(buttom0, atIndex: 0)
+        
+        //Mode 0
+        topPointModes[0] = topPoints
+        bottomPointModes[0] = bottomPoints
+        
+        //Mode 1
+        topPoints = [width / 2]
+        bottomPoints = [width / 2]
+        
+        topPointModes[1] = topPoints
+        bottomPointModes[1] = bottomPoints
+        
+        topPoints = topPointModes[mode]!
+        bottomPoints = bottomPointModes[mode]!
     }
 
     
     func update(){
-        startTime += 0.01
+        startTime.addMinimal()
         
-        progressBar.value = startTime
+        progressBar.value = startTime.toDecimalNumer()
         
    
-        if activelabels.count > 0 && start+1 < chords.count && abs(startTime - Float(chords[start+1].mTime) + 0.6) < 0.01
+        if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + 0.6))
         {
             var labels = activelabels.removeAtIndex(0)
             for label in labels {
@@ -339,11 +365,11 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         
         /// Add new chord
         let end = start + activelabels.count
-        if end < chords.count && abs(startTime - Float(chords[end].mTime) + rangeOfChords) < 0.01 {
-            activelabels.append(createLabels(chords[end].tab.content))
+        if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: rangeOfChords + startTime.toDecimalNumer())) {
+            activelabels.append(createLabels(chords[end].tab.name, content: chords[end].tab.content))
         }
         
-        if current + 1 < lyric.lyric.count && abs(startTime - Float(lyric.get(current+1).time)) < 0.001 {
+        if current + 1 < lyric.lyric.count && lyric.get(current+1).time.isEqual(startTime) {
             current++
             label1.text = lyric.get(current).str
             
@@ -362,8 +388,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     
     func updateAll(time: Float){
         ///Set the start time
-        let startTime_int: Int = Int(time*100)
-        startTime = Float(startTime_int)/100
+        startTime = TimeNumber(time: time)
         
         ///Remove all label in current screen
         for labels in activelabels{
@@ -373,28 +398,60 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
         activelabels.removeAll(keepCapacity: true)
         
-        start = 0;
-        var index: Int = 0
-        var in_interval = true;
-        while in_interval && index < chords.count{
-            let chord_time = Float(chords[index].mTime)
-            if chord_time > (startTime + rangeOfChords) {
-                in_interval = false
-            }else if chord_time >= startTime {
-                /// Add labels to activelabels
-                activelabels.append(createLabels(chords[index].tab.content))
-                
-                //Set the start value
-                if index == 0 || Float(chords[index-1].mTime) < startTime {
-                    start = index
-                }
+        //find the start of the chord whose time is larger than current time
+        start = 0
+        var last: Int = 0 //the end index of the chord that would show on the screen
+        
+        var begin: Int = 0
+        var end: Int = chords.count - 1
+        
+        while true {
+            var mid: Int = (begin + end) / 2
+            if startTime.isLongerThan(chords[mid].mTime) {
+                begin = mid
+            } else {
+                end = mid
             }
-            index++
+            if begin == (end - 1) {
+                start = begin
+                if startTime.isLongerThan(chords[end].mTime) {
+                    start = end
+                }
+                break
+            }
         }
         
-        if start > 0 && Float(chords[start].mTime) - startTime > 0.6{
-            start--
-            activelabels.insert(createLabels(chords[start].tab.content), atIndex: 0)
+        begin = 0
+        end = chords.count - 1
+        let tn = TimeNumber(time: startTime.toDecimalNumer() + rangeOfChords)
+        while true {
+            var mid: Int = (begin + end) / 2
+            if tn.isLongerThan(chords[mid].mTime) {
+                begin = mid
+            } else {
+                end = mid
+            }
+            if begin == (end - 1) {
+                last = begin
+                if tn.isLongerThan( chords[end].mTime ) {
+                    last = end
+                }
+                break
+            }
+        }
+
+        if start == last {
+            activelabels.append(createLabels(chords[start].tab.name, content: chords[start].tab.content))
+        }
+        
+        if start < last {
+            if startTime.isLongerThan(chords[start].mTime) && (TimeNumber(time: startTime.toDecimalNumer() + 0.6)).isLongerThan(chords[start+1].mTime) {
+                self.start++
+            }
+            
+            for i in start...last {
+                activelabels.append(createLabels(chords[i].tab.name, content: chords[i].tab.content))
+            }
         }
         
         refresh()
@@ -402,7 +459,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //Update the content of the lyric
         current = -1
         while(current + 1 < lyric.lyric.count){
-            if Float(lyric.get(current + 1).time) > startTime {
+            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
                 break
             }
             current++
@@ -458,6 +515,17 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     }
     
     
+    @IBAction func changeChordMode(sender: UIButton) {
+        timer.invalidate()
+        mode = 1 - mode
+        topPoints = topPointModes[mode]!
+        bottomPoints = bottomPointModes[mode]!
+        updateAll(startTime.toDecimalNumer())
+        if !isPause{
+            startTimer()
+        }
+    }
+    
     @IBAction func progressBarChanged(sender: UISlider) {
         timer.invalidate()
         updateAll(sender.value)
@@ -481,15 +549,15 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         /// Change the location of each label
         for var i = 0; i < activelabels.count; ++i{
             var labels = activelabels[i]
-            let t = Float(chords[start+i].mTime)
-            var yPosition = Float(self.base.frame.height)*(startTime + rangeOfChords - t) / rangeOfChords
+            let t = chords[start+i].mTime
+            var yPosition = Float(self.base.frame.height)*(startTime.toDecimalNumer() + rangeOfChords - t.toDecimalNumer()) / rangeOfChords
             if yPosition > Float(self.base.frame.height){
                 yPosition = Float(self.base.frame.height)
             }
             for var j = 0; j < labels.count; ++j{
                 var bottom = Float(bottomPoints[j])
                 var top = Float(topPoints[j])
-                var xPosition = CGFloat(bottom + (top - bottom) * (t - startTime) / rangeOfChords)
+                var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / rangeOfChords)
                 if yPosition == Float(self.base.frame.height){
                     xPosition = bottomPoints[j]
                 }
@@ -506,10 +574,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     {
         var xOffset:CGFloat
         if isTesting {
-            xOffset = CGFloat(startTime) * self.durationBar.frame.width / CGFloat(audioPlayer.duration)
+            xOffset = CGFloat(startTime.toDecimalNumer()) * self.durationBar.frame.width / CGFloat(audioPlayer.duration)
         }
         else {
-            xOffset = CGFloat(startTime) * self.durationBar.frame.width / CGFloat(theSong.playbackDuration)
+            xOffset = CGFloat(startTime.toDecimalNumer()) * self.durationBar.frame.width / CGFloat(theSong.playbackDuration)
         }
         durationBar.frame = CGRectMake(self.view.frame.width / 2 - xOffset, durationBar.frame.origin.y, durationBar.frame.width, durationBar.frame.height)
         
@@ -523,17 +591,27 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     }
     
     
-    func createLabels(content: String) -> [UILabel]{
+    func createLabels(name: String, content: String) -> [UILabel]{
         var res = [UILabel]()
         
-        for i in 0...count(content)-1{
-            let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
-            label.font = UIFont.systemFontOfSize(25)
-            label.text = String(Array(content)[i])
-            label.sizeToFit()
-            label.textAlignment = NSTextAlignment.Center
-            res.append(label)
-            self.base.addSubview(label)
+        let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
+        label.font = UIFont.systemFontOfSize(25)
+        label.text = name
+        label.sizeToFit()
+        label.textAlignment = NSTextAlignment.Center
+        res.append(label)
+        self.base.addSubview(label)
+        
+        if mode == fullchord {
+            for i in 0...count(content)-1 {
+                let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
+                label.font = UIFont.systemFontOfSize(25)
+                label.text = String(Array(content)[i])
+                label.sizeToFit()
+                label.textAlignment = NSTextAlignment.Center
+                res.append(label)
+                self.base.addSubview(label)
+        }
         }
         return res
     }

@@ -232,13 +232,25 @@
                                     <action selector="progressBarChanged:" destination="e5l-3U-enU" eventType="valueChanged" id="Hif-gl-4le"/>
                                 </connections>
                             </slider>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iRS-Ws-TFd">
+                                <rect key="frame" x="245" y="37" width="40" height="30"/>
+                                <state key="normal" title="Mode">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="changeChordMode:" destination="e5l-3U-enU" eventType="touchUpInside" id="r0v-MI-r9t"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="iRS-Ws-TFd" firstAttribute="leading" secondItem="9BQ-D9-G6T" secondAttribute="trailing" constant="62" id="GoX-jK-OhE"/>
+                            <constraint firstItem="iRS-Ws-TFd" firstAttribute="baseline" secondItem="9BQ-D9-G6T" secondAttribute="baseline" id="H49-5q-aQl"/>
                             <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="17" id="L3g-8o-sQi"/>
                             <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="LdE-bG-dmM" secondAttribute="leading" id="SzM-rs-JXb"/>
                             <constraint firstItem="LdE-bG-dmM" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="75" id="VXL-3R-kWB"/>
                             <constraint firstAttribute="trailingMargin" secondItem="SRs-ti-xBr" secondAttribute="trailing" constant="28" id="ePY-lD-z6y"/>
+                            <constraint firstItem="iRS-Ws-TFd" firstAttribute="trailing" secondItem="LdE-bG-dmM" secondAttribute="trailing" id="qGh-Kr-CkS"/>
                             <constraint firstItem="SRs-ti-xBr" firstAttribute="leading" secondItem="BGo-rS-auO" secondAttribute="leadingMargin" constant="19" id="red-wV-xnB"/>
                             <constraint firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="yTS-qC-Y9j"/>
                         </constraints>

@@ -3,10 +3,10 @@ import Foundation
 //Chord is timed..
 class Chord: NSObject {
     
-    var mTime: NSTimeInterval
+    var mTime: TimeNumber
     var tab: Tab!
 
-    init(tab:Tab, time: NSTimeInterval){
+    init(tab:Tab, time: TimeNumber){
         self.tab = tab
         self.mTime = time
     }
@@ -27,28 +27,28 @@ class Chord: NSObject {
         
         
         //intro
-        var chord1 = Chord(tab: C, time: 0.33)
-        var chord2 = Chord(tab: Dm7, time: 1.97)
-        var chord3 = Chord(tab: Am7, time: 3.6)
-        var chord4 = Chord(tab: Dm7, time: 5.24)
-        var chord5 = Chord(tab: C, time: 7.02)
-        var chord6 = Chord(tab: Dm7, time: 8.57)
-        var chord7 = Chord(tab: G, time: 10.18)
+        var chord1 = Chord(tab: C, time: TimeNumber(time: 0.33))
+        var chord2 = Chord(tab: Dm7, time: TimeNumber(time:1.97))
+        var chord3 = Chord(tab: Am7, time: TimeNumber(time:3.6))
+        var chord4 = Chord(tab: Dm7, time: TimeNumber(time:5.24))
+        var chord5 = Chord(tab: C, time: TimeNumber(time:7.02))
+        var chord6 = Chord(tab: Dm7, time: TimeNumber(time:8.57))
+        var chord7 = Chord(tab: G, time: TimeNumber(time:10.18))
         
         //verse1
-        var chord8 = Chord(tab: C, time: 13.20) //哪里有彩虹
-        var chord9 = Chord(tab: Dm7, time: 15.05)
-        var chord10 = Chord(tab: Am7, time: 16.64)
-        var chord11 = Chord(tab: Dm7, time: 22.9)
-        var chord12 = Chord(tab: C, time: 24.5)
+        var chord8 = Chord(tab: C, time: TimeNumber(time:13.20)) //哪里有彩虹
+        var chord9 = Chord(tab: Dm7, time: TimeNumber(time:15.05))
+        var chord10 = Chord(tab: Am7, time: TimeNumber(time:16.64))
+        var chord11 = Chord(tab: Dm7, time: TimeNumber(time:22.9))
+        var chord12 = Chord(tab: C, time: TimeNumber(time:24.5))
         
-        var chord13 = Chord(tab: E, time: 29.2)
-        var chord14 = Chord(tab: Am, time: 33.5)
-        var chord15 = Chord(tab: AmG, time: 34.2)
-        var chord16 = Chord(tab: F, time: 40.1)
-        var chord17 = Chord(tab: G, time: 40.1)
-        var chord18 = Chord(tab: Dm7, time: 40.1)
-        var chord19 = Chord(tab: Gsus4, time: 2)
+        var chord13 = Chord(tab: E, time: TimeNumber(time:29.2))
+        var chord14 = Chord(tab: Am, time: TimeNumber(time:33.5))
+        var chord15 = Chord(tab: AmG, time: TimeNumber(time:34.2))
+        var chord16 = Chord(tab: F, time: TimeNumber(time:40.1))
+        var chord17 = Chord(tab: G, time: TimeNumber(time:45.1))
+        var chord18 = Chord(tab: Dm7, time: TimeNumber(time:48.1))
+        var chord19 = Chord(tab: Gsus4, time: TimeNumber(time:55.0))
         
         chords.append(chord1)
         chords.append(chord2)
