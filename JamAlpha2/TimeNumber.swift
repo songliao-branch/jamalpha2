@@ -52,6 +52,19 @@ class TimeNumber {
         return "\(second).\(decimal)"
     }
     
+    //1:12.23
+    func toDisplayString() -> String {
+        var result: String = ""
+        if second > 60 {
+            result += "\(second/60):"
+        }
+        else{
+            result += "0:"
+        }
+        result += "\((second%60)/10)\(second%10).\(decimal/10)"
+        return result
+    }
+    
     func isLongerThan(tn: TimeNumber) -> Bool{
         var res: Bool = true
         if self.second == tn.second{
