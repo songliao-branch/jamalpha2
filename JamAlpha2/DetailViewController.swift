@@ -1,19 +1,19 @@
 
-
 import UIKit
 import MediaPlayer
 import AVFoundation
 
-var audioPlayer = AVAudioPlayer()
-let player = MPMusicPlayerController.applicationMusicPlayer()
+
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
 class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // MARK: for testing in simulator
-
     var isTesting = false
+    
+    var audioPlayer = AVAudioPlayer()
+    let player = MPMusicPlayerController.applicationMusicPlayer()
     
     var theSong:MPMediaItem!
     
@@ -23,12 +23,14 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     // MARK: Custom views
     var base : ChordBase!
     
-    //MARK:Scrollview 
-    var durationScrollView:UIScrollView!
-    var durationBar:UIView!
-    var timeToJumpTo:NSTimeInterval!
+    //MARK: progress Container
+    var progressBlock:UIView!
+    var progressBlockContainer:UIView!
+    var progressChangedOrigin:CGFloat!
+    let progressWidthMultiplier:CGFloat = 2
+    var recognizer:UIPanGestureRecognizer!
     
-    var currentTimeBar:UIView!
+    var verticalBar:UIView!
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
     
@@ -64,33 +66,35 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var mode:Int = 0
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
     var bottomView:UIView!
-    var buttonFavoriate:UIButton!
-    var buttonShuffle:UIButton!
-    var buttonChangeVersion:UIButton!
-    var buttonDots:UIButton!
     
+    var favoriateButton:UIButton!
+    var shuffleButton:UIButton!
+    var shareButton:UIButton!
+    var othersButton:UIButton!
+    
+    //constant 
+    let bottomViewHeight:CGFloat = 40 //this is fixed
+    let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //set a background image
-        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "background")!)
         
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         //load data 载入彩虹吉他谱和歌词
         setUpRainbowData()
+        loadSong()
       
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
-        setUpDurationBar()
+        setUpProgressContainer()
         setUpTimeLabels()
         setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
+        
         updateAll(0)
     }
-    
     
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
@@ -127,145 +131,135 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         base.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(base)
     }
-
     
-    //TODO: the container does not fully wrap duration bar, huge bug must fix
-    func setUpDurationBar(){
-        let scrollViewHeight:CGFloat = 100
-        durationScrollView = UIScrollView(frame: CGRect(x: 0, y: lyricbase.frame.origin.y + lyricbase.frame.height, width: self.view.frame.width, height: scrollViewHeight))
-        durationScrollView.delegate = self
-        durationScrollView.backgroundColor = UIColor.brownColor()
-        self.view.addSubview(durationScrollView)
-        
-        var barWidth:CGFloat
-        
+    func loadSong(){
         if isTesting {
             setUpTestSong()
-            barWidth = CGFloat(audioPlayer.duration)
         }
         else {
             setUpSong()
-            barWidth = CGFloat(theSong.playbackDuration)
         }
-        
-        let containerSize = CGSize(width: self.view.frame.width + barWidth , height: scrollViewHeight)
-        let containerView = UIView(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: containerSize))
-        durationScrollView.addSubview(containerView)
-        
-        durationBar = UIView(frame: CGRect(x: self.view.frame.width / 2, y: 0, width: barWidth , height: 10))
-        durationBar.center.y = containerView.frame.height / 2
-        durationBar.backgroundColor = UIColor.purpleColor()
-        durationScrollView.addSubview(durationBar)
-        
-        durationScrollView.contentSize = containerSize
-        durationScrollView.showsHorizontalScrollIndicator = true
-        
-    }
-
-    //TODO: scrollview still can be overscrolled!Need fix!
-    var scrollViewIsDragging = false
-    
-    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        scrollViewIsDragging = true
     }
     
-    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        println("end dragging")
+    func setUpProgressContainer(){
+        progressChangedOrigin = self.view.frame.width / 2
+        progressBlockContainer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: progressContainerHeight))
         
+        progressBlockContainer.center.y = self.view.frame.height - bottomViewHeight - progressContainerHeight / 2
+        
+        progressBlockContainer.backgroundColor = UIColor.clearColor()
+        self.view.addSubview(progressBlockContainer)
+        
+        var blockWidth:CGFloat
         if isTesting {
-            audioPlayer.currentTime = NSTimeInterval(scrollView.contentOffset.x)
-        } else{
-            player.currentPlaybackTime = NSTimeInterval(scrollView.contentOffset.x)
+            blockWidth = CGFloat(audioPlayer.duration) * progressWidthMultiplier
+        } else {
+            blockWidth = CGFloat(theSong.playbackDuration) * progressWidthMultiplier
         }
         
-        scrollViewIsDragging = false
+        progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: blockWidth, height: 5))
+        progressBlock.center.y = progressContainerHeight / 2
+        progressBlock.backgroundColor = mainPinkColor
+        progressBlockContainer.addSubview(progressBlock)
+        recognizer = UIPanGestureRecognizer(target: self, action:Selector("handlePan:"))
+        recognizer.delegate = self
+        progressBlockContainer.addGestureRecognizer(recognizer)
     }
     
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-       println("end decelerating")
-        
-        if isTesting {
-            audioPlayer.currentTime = NSTimeInterval(scrollView.contentOffset.x)
-        } else{
-            player.currentPlaybackTime = NSTimeInterval(scrollView.contentOffset.x)
-        }
-        scrollViewIsDragging = false
-    }
-    
-    
-    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        
-        println("will end dragging  with velocity \(velocity.x)")
-        
-    }
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        
-        println("is scroll")
-
-        if scrollView.contentOffset.x < 0 || scrollView.contentOffset.x > self.durationBar.frame.width {
+    func handlePan(recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translationInView(self.view)
+        for childview in recognizer.view!.subviews {
+            let child = childview as! UIView
             
-            println("scrolling out of bounds")
-            return
-        }
-        
-        if scrollViewIsDragging {
-            println("is dragging \(scrollView.contentOffset.x)")
+            var newPosition = progressChangedOrigin + translation.x
+            
+            // leftmost point of inner bar cannot be more than half of the view
+            if newPosition > self.view.frame.width / 2 {
+                newPosition = self.view.frame.width / 2
+            }
+            
+            // the end of inner bar cannot be smaller left half of view
+            if newPosition + child.frame.width < self.view.frame.width / 2 {
+                newPosition = self.view.frame.width / 2 - child.frame.width
+            }
+            
+            //update all chords, lyrics
             timer.invalidate()
-            updateAll(Float(scrollView.contentOffset.x))
+            println("newPosition:\(newPosition)")
+            //new Position from 160 to -357
+            //-self.view.frame.width /2 
+            //= from 0 ot -517
+            //divide by -2: from 0 to 258
+            let toTime = Float(newPosition - self.view.frame.width / 2) / -Float(self.progressWidthMultiplier)
+            //258  517
+            updateAll(toTime)
             if !isPause {
                 startTimer()
+            }
+            child.frame.origin.x = newPosition
+            
+            if recognizer.state == UIGestureRecognizerState.Ended {
+                progressChangedOrigin = newPosition
+                
+                if isTesting {
+                    audioPlayer.currentTime = NSTimeInterval(toTime)
+                }
+                else {
+                    player.currentPlaybackTime = NSTimeInterval(toTime)
+                
+                }
             }
         }
     }
     
     
     func setUpTimeLabels(){
-        //Timed bar
-        currentTimeBar = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 30))
-        currentTimeBar.center.x = self.view.center.x
-        currentTimeBar.center.y = self.durationScrollView.frame.origin.y + 50 //TODO: make better margins
-        currentTimeBar.backgroundColor = UIColor.redColor()
-        self.view.addSubview(currentTimeBar)
+        verticalBar = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: progressContainerHeight / 2))
+        verticalBar.center = progressBlockContainer.center
+        verticalBar.backgroundColor = UIColor.blueColor()
+        self.view.addSubview(verticalBar)
         
-        let marginFromCenter:CGFloat = 30
-        //TODO:Change origin position upon UI
-        currentTimeLabel = UILabel(frame: CGRect(x: 10, y: 0, width: 100, height: 20))
-        currentTimeLabel.center.y = durationScrollView.frame.origin.y + durationScrollView.frame.height / 2
-        currentTimeLabel.text = "0:00     "
-        currentTimeLabel.sizeToFit()
-        currentTimeLabel.textColor = UIColor.whiteColor()
+        currentTimeLabel = UILabel(frame: CGRect(x: 0, y: progressBlockContainer.frame.origin.y, width: 100, height: 30))
+        
+        currentTimeLabel.font = UIFont.systemFontOfSize(10)
+        currentTimeLabel.text = "0:00.00"
+        currentTimeLabel.textColor = UIColor.blueColor()
         self.view.addSubview(currentTimeLabel)
         
-        //change these constants upon UI
-        totalTimeLabel = UILabel(frame: CGRect(x: self.view.frame.width - 200, y: 0, width: 100, height: 20))
-        totalTimeLabel.center.y = durationScrollView.frame.origin.y + durationScrollView.frame.height / 2
-        totalTimeLabel.textColor = UIColor.whiteColor()
+        totalTimeLabel = UILabel(frame: CGRect(x: self.view.frame.width - 50, y: progressBlockContainer.frame.origin.y, width: 0, height: 30))
+        totalTimeLabel.textColor = UIColor.blackColor()
+        totalTimeLabel.font = UIFont.systemFontOfSize(10)
+        
         if isTesting {
-         totalTimeLabel.text = "\(audioPlayer.duration)"
+         totalTimeLabel.text = TimeNumber(time: Float(audioPlayer.duration)).toDisplayString()
+        } else {
+         totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
         }
-        else {
-         totalTimeLabel.text = "\(theSong.playbackDuration)"
-        }
+        
         totalTimeLabel.sizeToFit()
+        totalTimeLabel.center.x = self.view.frame.width - totalTimeLabel.frame.width / 2 - 5
         self.view.addSubview(totalTimeLabel)
+        
     }
 
+    //from left to right: share, favoriate, shuffle, others
     func setUpBottomViewWithButtons(){
-        let bottomViewHeight:CGFloat = 60
-        let edgeButtonSideMargin:CGFloat = 10
+        let edgeButtonSideMargin:CGFloat = 50
         bottomView = UIView(frame: CGRect(x: 0, y: self.view.frame.height - bottomViewHeight, width: self.view.frame.width, height: bottomViewHeight))
         bottomView.backgroundColor = UIColor.blackColor()
-        bottomView.alpha = 0.3
+        bottomView.alpha = 0.6
         self.view.addSubview(bottomView)
-        buttonDots = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-        buttonDots.setTitle("Others", forState: UIControlState.Normal)
-        buttonDots.center.x = bottomView.frame.width - edgeButtonSideMargin
-        buttonDots.center.y = bottomViewHeight / 2
-        buttonDots.backgroundColor = UIColor.redColor()
-        buttonDots.addTarget(self, action: "showActionSheet", forControlEvents: UIControlEvents.TouchUpInside)
-        self.bottomView.addSubview(buttonDots)
         
-
+        
+        othersButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        
+        othersButton.setTitle("Others", forState: UIControlState.Normal)
+        othersButton.center.x = bottomView.frame.width - edgeButtonSideMargin
+        othersButton.sizeToFit()
+        othersButton.center.y = bottomViewHeight / 2
+        othersButton.backgroundColor = UIColor.redColor()
+        othersButton.addTarget(self, action: "showActionSheet", forControlEvents: UIControlEvents.TouchUpInside)
+        bottomView.addSubview(othersButton)
     }
     
     func showActionSheet(){
@@ -376,9 +370,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     func update(){
 
         startTime.addMinimal()
-        
-        //progressBar.value = startTime.toDecimalNumer()
-        
 
         if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + 0.6))
         {
@@ -393,7 +384,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             start++
         }
         
-        /// Add new chord
+        // Add new chord
         let end = start + activelabels.count
         if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: rangeOfChords + startTime.toDecimalNumer())) {
             activelabels.append(createLabels(chords[end].tab.name, content: chords[end].tab.content))
@@ -412,9 +403,55 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
         }
         
-        refresh()
+        refreshChordLabel()
+        refreshProgressBlock()
+        refreshTimeLabel()
+        
     }
     
+    
+    func refreshChordLabel(){
+        /// Change the location of each label
+        for var i = 0; i < activelabels.count; ++i{
+            var labels = activelabels[i]
+            let t = chords[start+i].mTime
+            var yPosition = Float(self.base.frame.height)*(startTime.toDecimalNumer() + rangeOfChords - t.toDecimalNumer()) / rangeOfChords
+            if yPosition > Float(self.base.frame.height){
+                yPosition = Float(self.base.frame.height)
+            }
+            for var j = 0; j < labels.count; ++j{
+                var bottom = Float(bottomPoints[j])
+                var top = Float(topPoints[j])
+                var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / rangeOfChords)
+                if yPosition == Float(self.base.frame.height){
+                    xPosition = bottomPoints[j]
+                }
+                
+                labels[j].center = CGPointMake(xPosition, CGFloat(yPosition - Float(labels[j].frame.height / 2)))
+            }
+        }
+        
+    }
+    
+    func refreshProgressBlock(){
+        var barWidth:CGFloat
+        
+        if isTesting {
+            barWidth = CGFloat(audioPlayer.duration)
+        }
+        else {
+            barWidth = CGFloat(theSong.playbackDuration)
+        }
+        
+        self.progressBlock.frame.origin.x = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / barWidth
+    }
+    
+    
+    
+    func refreshTimeLabel(){
+        //update current time label
+        currentTimeLabel.text = startTime.toDisplayString()
+    }
     
     func updateAll(time: Float){
         ///Set the start time
@@ -484,7 +521,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
         }
         
-        refresh()
+        refreshChordLabel()
         
         //Update the content of the lyric
         current = -1
@@ -507,10 +544,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         else {
             label2.text = "End~"
         }
-        
-        println("startTime\(startTime)")
-        //update progress view
-        
+
     }
     
     func setUpSong(){
@@ -554,68 +588,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             startTimer()
         }
     }
-    
-//    
-//    @IBAction func progressBarChanged(sender: UISlider) {
-//        timer.invalidate()
-//        updateAll(sender.value)
-//        if !isPause{
-//            startTimer()
-//        }
-//    }
-//    
-    
-    //TODO:Delete ths UISlider after replacing it with a fully functional uiscrollviews
-    @IBAction func progressBarChangeEnded(sender: UISlider) {
-        if isTesting {
-            audioPlayer.currentTime = NSTimeInterval(sender.value)
-        }else {
-            player.currentPlaybackTime = NSTimeInterval(sender.value)
-        }
 
-    }
-    
-
-    func refresh(){
-        /// Change the location of each label
-        for var i = 0; i < activelabels.count; ++i{
-            var labels = activelabels[i]
-            let t = chords[start+i].mTime
-            var yPosition = Float(self.base.frame.height)*(startTime.toDecimalNumer() + rangeOfChords - t.toDecimalNumer()) / rangeOfChords
-            if yPosition > Float(self.base.frame.height){
-                yPosition = Float(self.base.frame.height)
-            }
-            for var j = 0; j < labels.count; ++j{
-                var bottom = Float(bottomPoints[j])
-                var top = Float(topPoints[j])
-                var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / rangeOfChords)
-                if yPosition == Float(self.base.frame.height){
-                    xPosition = bottomPoints[j]
-                }
-                
-                labels[j].center = CGPointMake(xPosition, CGFloat(yPosition - Float(labels[j].frame.height / 2)))
-            }
-        }
-        
-        refreshDurationBar()
-        refreshTimeLabel()
-    }
-    
-    func refreshDurationBar()
-    {
-        var xOffset:CGFloat
-        if isTesting {
-            xOffset = CGFloat(startTime.toDecimalNumer()) * self.durationBar.frame.width / CGFloat(audioPlayer.duration)
-        }
-        else {
-            xOffset = CGFloat(startTime.toDecimalNumer()) * self.durationBar.frame.width / CGFloat(theSong.playbackDuration)
-        }
-        durationScrollView.contentOffset.x = xOffset
-    }
-    func refreshTimeLabel(){
-        currentTimeLabel.text = "\(startTime.toDecimalNumer())"
-    }
-    
     func startTimer(){
         timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
     }
