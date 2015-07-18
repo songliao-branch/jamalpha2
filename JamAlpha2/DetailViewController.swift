@@ -68,6 +68,11 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
     var bottomView:UIView!
     
+    //Simulate the process of animation for disappearing labels
+    let timeToDisappear:Float = 0.6
+    var disappearingLabels: [UILabel] = [UILabel]()
+    var disapperingLabelAlpha: Int = 0
+    
     var favoriateButton:UIButton!
     var shuffleButton:UIButton!
     var shareButton:UIButton!
@@ -375,20 +380,15 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
 
         startTime.addMinimal()
 
-        if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + 0.6))
+        if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
         {
-
-            var labels = activelabels.removeAtIndex(0)
-            for label in labels {
-                UIView.animateWithDuration(0.01 * 60 / Double(speed), animations: {
-                  
-                    label.alpha = 0
-                    }, completion: {
-                        Void in
-                        
-                        label.removeFromSuperview()
-                })
+            for label in disappearingLabels {
+                label.removeFromSuperview()
             }
+            
+            disappearingLabels = activelabels.removeAtIndex(0)
+            disapperingLabelAlpha = Int(timeToDisappear / 0.01)
+            
             start++
         }
         
@@ -408,6 +408,18 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
 //                UIView.animateWithDuration(0.1, animations: {
 //                    self.label2.alpha = 1
 //                })
+            }
+        }
+        
+        if disapperingLabelAlpha > 0 {
+            let totalalpha: Float = timeToDisappear / 0.01
+            let currentalpha: CGFloat = CGFloat(Float(disapperingLabelAlpha) / totalalpha)
+            disapperingLabelAlpha--
+            for label in disappearingLabels {
+                label.alpha = currentalpha
+                if disapperingLabelAlpha == 0 {
+                    label.removeFromSuperview()
+                }
             }
         }
         
@@ -525,7 +537,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
         
         if start < last {
-            if startTime.isLongerThan(chords[start].mTime) && (TimeNumber(time: startTime.toDecimalNumer() + 0.6)).isLongerThan(chords[start+1].mTime) {
+            if startTime.isLongerThan(chords[start].mTime) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].mTime) {
                 self.start++
             }
             

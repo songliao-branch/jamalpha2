@@ -156,6 +156,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if  pageIndex == 0 {
             
+            //Check if we are going back to the song we just played
+            //If so, save the state
             lastSelectedIndex = indexPath.row
             
             let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
