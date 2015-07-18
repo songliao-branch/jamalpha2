@@ -188,7 +188,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             
             //update all chords, lyrics
             timer.invalidate()
-            println("newPosition:\(newPosition)")
+            
             //new Position from 160 to -357
             //-self.view.frame.width /2 
             //= from 0 ot -517
@@ -377,11 +377,15 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
 
         if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + 0.6))
         {
+
             var labels = activelabels.removeAtIndex(0)
             for label in labels {
                 UIView.animateWithDuration(0.01 * 60 / Double(speed), animations: {
+                  
                     label.alpha = 0
-                    }, completion: { finished in
+                    }, completion: {
+                        Void in
+                        
                         label.removeFromSuperview()
                 })
             }
@@ -400,10 +404,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             
             if current + 1 < lyric.lyric.count {
                 label2.text = lyric.get(current+1).str
-                label2.alpha = 0
-                UIView.animateWithDuration(0.1, animations: {
-                    self.label2.alpha = 1
-                })
+                
+//                UIView.animateWithDuration(0.1, animations: {
+//                    self.label2.alpha = 1
+//                })
             }
         }
         

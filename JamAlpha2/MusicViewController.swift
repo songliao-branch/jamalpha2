@@ -20,14 +20,33 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     var tableOriginY:CGFloat = 0
     
+    
+    //for transition view animator
+    var animator:CustomTransitionAnimation?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        createTransitionAnimation()
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
     }
     
+    func createTransitionAnimation(){
+        if(animator == nil){
+            println("animator created")
+            self.animator = CustomTransitionAnimation()
+        }
+    }
+    
+    var lastSelectedIndex = 0
+    func popUpSong(){
+        let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
+        detailVC.theSong = uniqueSongs[lastSelectedIndex]
+        detailVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(detailVC)
+        self.presentViewController(detailVC, animated: true, completion: nil)
+    }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
@@ -136,11 +155,14 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if  pageIndex == 0 {
-
+            
+            lastSelectedIndex = indexPath.row
+            
             let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
             detailVC.theSong = uniqueSongs[indexPath.row]
-            
-            self.showViewController(detailVC, sender: self)
+            detailVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(detailVC)
+            self.presentViewController(detailVC, animated: true, completion: nil)
             
         }
         else if pageIndex == 1 {
