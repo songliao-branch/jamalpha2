@@ -29,6 +29,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var progressChangedOrigin:CGFloat!
     let progressWidthMultiplier:CGFloat = 2
     var recognizer:UIPanGestureRecognizer!
+    var isPanning = false
     
     var verticalBar:UIView!
     var currentTimeLabel:UILabel!
@@ -165,11 +166,13 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         recognizer.delegate = self
         progressBlockContainer.addGestureRecognizer(recognizer)
     }
+
     
     func handlePan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translationInView(self.view)
         for childview in recognizer.view!.subviews {
             let child = childview as! UIView
+            self.isPanning = true
             
             var newPosition = progressChangedOrigin + translation.x
             
@@ -198,9 +201,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
             child.frame.origin.x = newPosition
             
+            //when finger is lifted
             if recognizer.state == UIGestureRecognizerState.Ended {
                 progressChangedOrigin = newPosition
-                
+                isPanning = false
                 if isTesting {
                     audioPlayer.currentTime = NSTimeInterval(toTime)
                 }
@@ -443,7 +447,12 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             barWidth = CGFloat(theSong.playbackDuration)
         }
         
-        self.progressBlock.frame.origin.x = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / barWidth
+        let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / barWidth
+        if !isPanning {
+            self.progressChangedOrigin = newOriginX
+        }
+        
+        self.progressBlock.frame.origin.x = newOriginX
     }
     
     
