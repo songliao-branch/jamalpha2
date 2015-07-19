@@ -7,6 +7,7 @@ import AVFoundation
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
+
 class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // MARK: for testing in simulator
@@ -16,7 +17,8 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     let player = MPMusicPlayerController.applicationMusicPlayer()
     
     var theSong:MPMediaItem!
-    
+    var isPause: Bool = true
+
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
     
@@ -34,8 +36,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var verticalBar:UIView!
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
-    
-    var isPause: Bool = true
+
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
@@ -68,6 +69,11 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
     var bottomView:UIView!
     
+    //Simulate the process of animation for disappearing labels
+    let timeToDisappear:Float = 0.6
+    var disappearingLabels: [UILabel] = [UILabel]()
+    var disapperingLabelAlpha: Int = 0
+    
     var favoriateButton:UIButton!
     var shuffleButton:UIButton!
     var shareButton:UIButton!
@@ -84,7 +90,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //load data 载入彩虹吉他谱和歌词
         setUpRainbowData()
         loadSong()
-      
+        
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -93,8 +99,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
-        
-        updateAll(0)
+        playSong()
     }
     
     func setUpRainbowData(){
@@ -142,6 +147,43 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
     }
     
+    func playSong(){
+        isPause = false
+        if isTesting {
+            //we are always coming back to the same song
+            if audioPlayer.currentTime > 0  { //if already started playing
+                startTime = TimeNumber(time: Float(audioPlayer.currentTime))
+                updateAll(startTime.toDecimalNumer())
+                startTimer()
+            } else {
+                updateAll(0)
+                startTimer()
+                audioPlayer.play()
+            }
+        }
+        else{ //if not testing
+
+            //the player is not null
+            if let currentSong = player.nowPlayingItem {
+                //if we are coming back for the same song
+                if currentSong == theSong {
+                    
+                    startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+                    updateAll(startTime.toDecimalNumer())
+                }
+                else { //if not the same song
+                    updateAll(0)
+                }
+            }
+            else {
+            //player hasn't started yet
+                updateAll(0)
+            }
+            
+            startTimer()
+            player.play()
+        }
+    }
     func setUpProgressContainer(){
         progressChangedOrigin = self.view.frame.width / 2
         progressBlockContainer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: progressContainerHeight))
@@ -188,7 +230,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             
             //update all chords, lyrics
             timer.invalidate()
-            println("newPosition:\(newPosition)")
+            
             //new Position from 160 to -357
             //-self.view.frame.width /2 
             //= from 0 ot -517
@@ -215,6 +257,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
         }
     }
+    
     
     
     func setUpTimeLabels(){
@@ -375,16 +418,15 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
 
         startTime.addMinimal()
 
-        if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + 0.6))
+        if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
         {
-            var labels = activelabels.removeAtIndex(0)
-            for label in labels {
-                UIView.animateWithDuration(0.01 * 60 / Double(speed), animations: {
-                    label.alpha = 0
-                    }, completion: { finished in
-                        label.removeFromSuperview()
-                })
+            for label in disappearingLabels {
+                label.removeFromSuperview()
             }
+            
+            disappearingLabels = activelabels.removeAtIndex(0)
+            disapperingLabelAlpha = Int(timeToDisappear / 0.01)
+            
             start++
         }
         
@@ -400,10 +442,22 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             
             if current + 1 < lyric.lyric.count {
                 label2.text = lyric.get(current+1).str
-                label2.alpha = 0
-                UIView.animateWithDuration(0.1, animations: {
-                    self.label2.alpha = 1
-                })
+                
+//                UIView.animateWithDuration(0.1, animations: {
+//                    self.label2.alpha = 1
+//                })
+            }
+        }
+        
+        if disapperingLabelAlpha > 0 {
+            let totalalpha: Float = timeToDisappear / 0.01
+            let currentalpha: CGFloat = CGFloat(Float(disapperingLabelAlpha) / totalalpha)
+            disapperingLabelAlpha--
+            for label in disappearingLabels {
+                label.alpha = currentalpha
+                if disapperingLabelAlpha == 0 {
+                    label.removeFromSuperview()
+                }
             }
         }
         
@@ -521,7 +575,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
         
         if start < last {
-            if startTime.isLongerThan(chords[start].mTime) && (TimeNumber(time: startTime.toDecimalNumer() + 0.6)).isLongerThan(chords[start+1].mTime) {
+            if startTime.isLongerThan(chords[start].mTime) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].mTime) {
                 self.start++
             }
             
@@ -564,9 +618,9 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     }
     
     @IBAction func playPause(sender: UIButton) {
-            if self.isPause{
+            if isPause{
                 startTimer()
-                self.isPause = false
+                isPause = false
                 
                 if isTesting {
                     audioPlayer.play()
@@ -577,7 +631,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
             else {
                 timer.invalidate()
-                self.isPause = true
+                isPause = true
                 if isTesting {
                     audioPlayer.pause()
                 }else {

@@ -226,7 +226,6 @@ class EditTabsViewController: UIViewController, UIPickerViewDataSource, UIPicker
             signLabel[signLabel.count - 1].removeFromSuperview()
             signLabel.removeLast()
         }
-        
     }
     
     func pressSignButton(sender: UIButton) {

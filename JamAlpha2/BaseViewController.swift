@@ -10,19 +10,19 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     var pageTitles: [String]!
     var pageImages: [String]!
     
-    
     var musicTypeButtonContainer :UIView!
     var musicUnderlineSelector: UIView!
     
     var buttonText :[String] = []
-    
     var currentPageIndex:Int!
     
     var isPageScrolling = false //prevent scrolling / button tap crash
     
     @IBOutlet weak var placeHolderForSub: UILabel!
     
-  
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
  
@@ -56,14 +56,14 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         }
         
         self.currentPageIndex = 0
-       
+        
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = mainPinkColor
         
-         setupSegmentButtons()
-       println("base view did load")
+        setupSegmentButtons()
+        setUpSelector()//the horizontal bar that moves with button tapped
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -72,14 +72,27 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = mainPinkColor
     }
+    
+    @IBAction func goToNowPlaying(sender: UIBarButtonItem) {
+        for vc in self.pageViewController.viewControllers as! [MusicViewController] {
+            if vc.pageIndex == 0 {
+                vc.popUpSong()
+            } else if vc.pageIndex == 1 {
+                //TODO: find DetailViewController Under ArtistViewController
+            } else if vc.pageIndex == 2 {
+                //TODO: find DetailViewController Under AlbumViewController
+            }
+        }
+    }
 
     var buttonHolder = [UIButton]()
     
+
     func setupSegmentButtons() {
         self.placeHolderForSub.hidden = true
         
         let heightOfPlaceHolder = self.placeHolderForSub.frame.height
-        musicTypeButtonContainer = UIView(frame: CGRectMake(0 , placeHolderForSub.frame.origin.y , self.view.frame.size.width,
+        musicTypeButtonContainer = UIView(frame: CGRectMake(0 , self.navigationController!.navigationBar.frame.height , self.view.frame.size.width,
            heightOfPlaceHolder))
         
         let numControllers = 3
@@ -92,8 +105,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let buttonArtist = UIButton(frame: CGRectMake(self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
         let buttonAlbum = UIButton(frame: CGRectMake(CGFloat(2) * self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
         
-        
-      
          buttonHolder = [ buttonTracks, buttonArtist, buttonAlbum]
         
         buttonTracks.setTitleColor(mainPinkColor, forState: UIControlState.Normal)
@@ -113,7 +124,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             musicTypeButtonContainer.addSubview(buttonHolder[i])
         }
         
-        self.setUpSelector()
+    
         self.view.addSubview(musicTypeButtonContainer)
         
     }
@@ -263,5 +274,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let xCoordinate:CGFloat = musicUnderlineSelector.frame.size.width *  CGFloat(self.currentPageIndex)
         musicUnderlineSelector.frame = CGRectMake(xCoordinate - xFromCenter / 3, musicUnderlineSelector.frame.origin.y, musicUnderlineSelector.frame.width, musicUnderlineSelector.frame.height)
     }
+    
+    
+    //MARK : Navigation item action
     
 }
