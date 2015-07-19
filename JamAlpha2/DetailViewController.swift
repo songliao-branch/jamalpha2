@@ -30,8 +30,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var progressBlockContainer:UIView!
     var progressChangedOrigin:CGFloat!
     let progressWidthMultiplier:CGFloat = 2
-    var recognizer:UIPanGestureRecognizer!
+    var panRecognizer:UIPanGestureRecognizer!
     var isPanning = false
+    
+    var tapRecognizer: UITapGestureRecognizer!
     
     var verticalBar:UIView!
     var currentTimeLabel:UILabel!
@@ -204,11 +206,14 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         progressBlock.center.y = progressContainerHeight / 2
         progressBlock.backgroundColor = mainPinkColor
         progressBlockContainer.addSubview(progressBlock)
-        recognizer = UIPanGestureRecognizer(target: self, action:Selector("handlePan:"))
-        recognizer.delegate = self
-        progressBlockContainer.addGestureRecognizer(recognizer)
+        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handlePan:"))
+        panRecognizer.delegate = self
+        progressBlockContainer.addGestureRecognizer(panRecognizer)
+        tapRecognizer = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
+        progressBlockContainer.addGestureRecognizer(tapRecognizer)
+        
     }
-
+    
     
     func handlePan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translationInView(self.view)
@@ -617,17 +622,15 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         player.setQueueWithItemCollection(collection)
     }
     
-    @IBAction func playPause(sender: UIButton) {
+    func playPause(recognizer: UITapGestureRecognizer) {
             if isPause{
                 startTimer()
                 isPause = false
-                
                 if isTesting {
                     audioPlayer.play()
                 }else {
                      player.play()
                 }
-                sender.setTitle("Pause", forState: .Normal)
             }
             else {
                 timer.invalidate()
@@ -637,7 +640,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
                 }else {
                     player.pause()
                 }
-                sender.setTitle("Continue", forState: .Normal)
             }
     }
     

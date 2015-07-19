@@ -211,27 +211,8 @@
                     <view key="view" contentMode="scaleToFill" id="BGo-rS-auO">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BQ-D9-G6T">
-                                <rect key="frame" x="136" y="37" width="47" height="30"/>
-                                <color key="backgroundColor" red="0.18907663471072755" green="1" blue="0.19044531304766343" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" title="START">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="playPause:" destination="e5l-3U-enU" eventType="touchUpInside" id="9U1-nY-0ds"/>
-                                </connections>
-                            </button>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="9BQ-D9-G6T" firstAttribute="top" secondItem="LOZ-8l-jwk" secondAttribute="bottom" constant="17" id="L3g-8o-sQi"/>
-                            <constraint firstAttribute="centerX" secondItem="9BQ-D9-G6T" secondAttribute="centerX" id="yTS-qC-Y9j"/>
-                        </constraints>
                     </view>
-                    <connections>
-                        <outlet property="playPauseButton" destination="9BQ-D9-G6T" id="d8u-fh-LYf"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D84-uR-1Md" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
