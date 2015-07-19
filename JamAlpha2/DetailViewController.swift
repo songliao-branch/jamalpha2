@@ -7,6 +7,7 @@ import AVFoundation
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
+
 class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // MARK: for testing in simulator
@@ -16,7 +17,8 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     let player = MPMusicPlayerController.applicationMusicPlayer()
     
     var theSong:MPMediaItem!
-    
+    var isPause: Bool = true
+
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
     
@@ -34,8 +36,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var verticalBar:UIView!
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
-    
-    var isPause: Bool = true
+
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
@@ -89,7 +90,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //load data 载入彩虹吉他谱和歌词
         setUpRainbowData()
         loadSong()
-      
+        
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -98,8 +99,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
-        
-        updateAll(0)
+        playSong()
     }
     
     func setUpRainbowData(){
@@ -147,6 +147,43 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
     }
     
+    func playSong(){
+        isPause = false
+        if isTesting {
+            //we are always coming back to the same song
+            if audioPlayer.currentTime > 0  { //if already started playing
+                startTime = TimeNumber(time: Float(audioPlayer.currentTime))
+                updateAll(startTime.toDecimalNumer())
+                startTimer()
+            } else {
+                updateAll(0)
+                startTimer()
+                audioPlayer.play()
+            }
+        }
+        else{ //if not testing
+
+            //the player is not null
+            if let currentSong = player.nowPlayingItem {
+                //if we are coming back for the same song
+                if currentSong == theSong {
+                    
+                    startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+                    updateAll(startTime.toDecimalNumer())
+                }
+                else { //if not the same song
+                    updateAll(0)
+                }
+            }
+            else {
+            //player hasn't started yet
+                updateAll(0)
+            }
+            
+            startTimer()
+            player.play()
+        }
+    }
     func setUpProgressContainer(){
         progressChangedOrigin = self.view.frame.width / 2
         progressBlockContainer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: progressContainerHeight))
@@ -220,6 +257,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
         }
     }
+    
     
     
     func setUpTimeLabels(){
@@ -580,9 +618,9 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     }
     
     @IBAction func playPause(sender: UIButton) {
-            if self.isPause{
+            if isPause{
                 startTimer()
-                self.isPause = false
+                isPause = false
                 
                 if isTesting {
                     audioPlayer.play()
@@ -593,7 +631,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             }
             else {
                 timer.invalidate()
-                self.isPause = true
+                isPause = true
                 if isTesting {
                     audioPlayer.pause()
                 }else {
