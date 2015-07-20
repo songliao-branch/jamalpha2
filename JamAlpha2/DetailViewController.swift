@@ -20,6 +20,9 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
     
+    var pulldownButton:UIButton!
+    var tuningButton:UIButton!
+    
     // MARK: Custom views
     var base : ChordBase!
     
@@ -91,6 +94,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         setUpRainbowData()
         loadSong()
         
+        setUpTopButtons()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -105,6 +109,29 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
+    }
+    
+    func setUpTopButtons() {
+        let buttonCenterY: CGFloat = 25
+        pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        //TODO: change image source
+        pulldownButton.setImage(UIImage(named: "pulldown"), forState: UIControlState.Normal)
+        pulldownButton.sizeToFit()
+        pulldownButton.center = CGPoint(x: self.view.frame.width / 10, y: buttonCenterY)
+        pulldownButton.backgroundColor = UIColor.greenColor()
+        pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.view.addSubview(pulldownButton)
+        
+        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: 50, height: 50))
+        tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
+        tuningButton.sizeToFit()
+        tuningButton.backgroundColor = UIColor.greenColor() //TODO: remove this background color
+        tuningButton.center = CGPoint(x: self.view.frame.width * 9 / 10, y: buttonCenterY)
+        self.view.addSubview(tuningButton)
+    }
+    
+    func dismissController(sender: UIButton) {
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     func setUpLyricsBase(){
@@ -383,14 +410,17 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         return true
     }
     
+    //stop timer,stop refreshing UIs after view is completely gone of sight
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        println("view will disappear")
+        timer.invalidate()
+    }
+    
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.navigationBar.tintColor = mainPinkColor
         self.tabBarController?.tabBar.hidden = false
-        
-        if isTesting {
-            audioPlayer.stop()
-        }
     }
     
     func calculateXPoints(){
@@ -443,7 +473,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     func update(){
 
         startTime.addMinimal()
-
+        println("update:\(startTime.toDecimalNumer())")
         if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
         {
             for label in disappearingLabels {
