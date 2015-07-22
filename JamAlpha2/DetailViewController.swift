@@ -91,7 +91,8 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         //load data 载入彩虹吉他谱和歌词
-        setUpRainbowData()
+        setUpMoreThanWordsData()
+        //setUpRainbowData()
         loadSong()
         
         setUpTopButtons()
@@ -104,6 +105,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //get top and bottom points of six lines
         calculateXPoints()
         playSong()
+        
     }
     
     func setUpRainbowData(){
@@ -113,19 +115,17 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     
     func setUpTopButtons() {
         let buttonCenterY: CGFloat = 25
-        pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 75))
         //TODO: change image source
         pulldownButton.setImage(UIImage(named: "pulldown"), forState: UIControlState.Normal)
         pulldownButton.sizeToFit()
         pulldownButton.center = CGPoint(x: self.view.frame.width / 10, y: buttonCenterY)
-        pulldownButton.backgroundColor = UIColor.greenColor()
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(pulldownButton)
         
-        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: 50, height: 50))
+        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: 75, height: 75))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
         tuningButton.sizeToFit()
-        tuningButton.backgroundColor = UIColor.greenColor() //TODO: remove this background color
         tuningButton.center = CGPoint(x: self.view.frame.width * 9 / 10, y: buttonCenterY)
         self.view.addSubview(tuningButton)
     }
@@ -134,6 +134,12 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+
+    func setUpMoreThanWordsData(){
+        chords = Chord.getExtremeChords()
+        lyric = Lyric.getExtremeLyrics()
+    }
+
     func setUpLyricsBase(){
         //Lyric labels
         current = -1
@@ -341,6 +347,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         guitarButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         guitarButton.setImage((UIImage(named: "guitar_settings")), forState: UIControlState.Normal)
         guitarButton.sizeToFit()
+        guitarButton.addTarget(self, action: "showGuitarActions", forControlEvents: UIControlEvents.TouchUpInside)
         
         othersButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         othersButton.setImage(UIImage(named: "more_options"), forState: UIControlState.Normal)
@@ -362,13 +369,23 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
     }
     
-    func showActionSheet(){
+    func showGuitarActions(){
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
         
         let changeTabsMode = UIAlertAction(title: "Change Tab Mode", style: .Default, handler: {
             (alert:UIAlertAction!) -> Void in
             self.changeChordMode()
         })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
+        
+        optionMenu.addAction(changeTabsMode)
+        optionMenu.addAction(cancelAction)
+        self.presentViewController(optionMenu, animated: true, completion: nil)
+        
+    }
+    func showActionSheet(){
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+        
 
         
         let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
@@ -387,7 +404,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         })
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
-        optionMenu.addAction(changeTabsMode)
         optionMenu.addAction(addTabsAction)
         optionMenu.addAction(addLyricsAction)
         optionMenu.addAction(cancelAction)
@@ -396,7 +412,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     }
 
     func setUpTestSong(){
-        if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
+        if var filePath = NSBundle.mainBundle().pathForResource("more",ofType:"mp3"){
             var fileWithPath = NSURL.fileURLWithPath(filePath)
             audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
         }

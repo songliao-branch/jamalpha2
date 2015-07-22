@@ -49,6 +49,46 @@ class Lyric: NSObject{
         lyric.addLine(TimeNumber(time:110.27), str: "当作我最后才明白")
         return lyric
     }
+    
+    class func getExtremeLyrics()-> Lyric {
+        var lyric = Lyric()
+        
+        lyric.addLine(TimeNumber(time: 22.11), str: "Saying I love you")
+        lyric.addLine(TimeNumber(time: 25.96 ), str: "Is not the words I want to hear from you")
+        lyric.addLine(TimeNumber(time: 32.82), str: "It's not that I want you not to say")
+        lyric.addLine(TimeNumber(time: 36.82), str: "But if you only knew")
+        
+        lyric.addLine(TimeNumber(time: 42.9), str: "How easy it would be to show me how you feel")
+        lyric.addLine(TimeNumber(time: 53.73), str: "More than words is all you have to do to make it real")
+        lyric.addLine(TimeNumber(time: 63.88), str: "Then you wouldn't have to say that you love me")
+        lyric.addLine(TimeNumber(time: 72.41), str: "Cos I'd already know")
+        
+        lyric.addLine(TimeNumber(time: 79.69), str: "What would you do if my heart was torn in two")
+        lyric.addLine(TimeNumber(time: 90.09), str: "More than words to show you feel")
+        lyric.addLine(TimeNumber(time: 94.69), str: "That your love for me is real")
+        
+        lyric.addLine(TimeNumber(time: 100.52), str: "What would you say if I took those words away")
+        lyric.addLine(TimeNumber(time: 110.8), str: "Then you couldn't make things new")
+        lyric.addLine(TimeNumber(time: 115.9), str: "Just by saying I love you")
+        
+        lyric.addLine(TimeNumber(time: 142.3), str: "Now I've tried to talk to you and make you understand")
+        lyric.addLine(TimeNumber(time: 153.18), str: "All you have to do is close your eyes")
+        lyric.addLine(TimeNumber(time: 159.19), str: "And just reach out your hands and touch me")
+        lyric.addLine(TimeNumber(time: 167.3), str: "Hold me close don't ever let me go")
+        
+        lyric.addLine(TimeNumber(time: 174.63), str: "More than words is all I ever needed you to show")
+        lyric.addLine(TimeNumber(time: 184.34), str: "Then you wouldn't have to say that you love me")
+        lyric.addLine(TimeNumber(time: 193.62), str: "Cos I'd already know")
+        
+        lyric.addLine(TimeNumber(time: 201.15), str: "What would you do if my heart was torn in two")
+        lyric.addLine(TimeNumber(time: 211.26), str: "More than words to show you feel")
+        lyric.addLine(TimeNumber(time: 216.64), str: "That your love for me is real")
+        
+        lyric.addLine(TimeNumber(time: 224.8), str: "What would you say if I took those words away")
+        lyric.addLine(TimeNumber(time: 232.4), str: "Then you couldn't make things new")
+        lyric.addLine(TimeNumber(time: 237.88), str: "Just by saying I love you")
+        return lyric
+    }
 }
 
 struct  Line {
