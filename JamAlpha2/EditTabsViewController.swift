@@ -181,7 +181,6 @@ class EditTabsViewController: UIViewController, UIPickerViewDataSource, UIPicker
         self.view.addSubview(bar)
         
         thirdView.addSubview(chordPicker)
-        
         var timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         //var timer2 = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("update2"), userInfo: nil, repeats: true)
         
@@ -352,24 +351,7 @@ class EditTabsViewController: UIViewController, UIPickerViewDataSource, UIPicker
         if n % 4 == 1 {
             plusButtonmoveup()
         }
-        //        var i = row
-        //        var j = line
-        //        for i in 0 ... row {
-        //            var temp = 4
-        //            if i == row {
-        //                temp = line
-        //            }
-        //            for j in 0 ..< temp {
-        //                var newSign: UIButton = UIButton()
-        //                newSign.frame = CGRectMake(CGFloat(x + 40 * j), CGFloat(y - i * 40), 30, 30 )
-        //                var name = chord_temp[4 * i + j].chord_Name
-        //                newSign.setTitle("\(name)", forState: UIControlState.Normal)
-        //                newSign.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        //                newSign.alpha = 0
-        //                chordSign.append(newSign)
-        //                self.view.addSubview(newSign)
-        //            }
-        //        }
+        
         for i in 0 ..< n {
             UIView.animateWithDuration(0.5, animations: {
                 self.chordSign[i].alpha = 1
@@ -397,22 +379,10 @@ class EditTabsViewController: UIViewController, UIPickerViewDataSource, UIPicker
         UIView.animateWithDuration(0.5, animations: {
             self.plusButton.center.y -= 80
         })
-        //moveupCount++
-        //plusButton.center.x -= 30
     }
-    
-    //    func addchordSign() {
-    //        var newButton: UIButton = UIButton()
-    //
-    //    }
-    
-    
+
     func pressplusButton(sender: UIButton!) {
-        //        var alertView: UIAlertView = UIAlertView()
-        //        alertView.addButtonWithTitle("OK")
-        //        alertView.title = "Title"
-        //        alertView.message = "messgae"
-        //        alertView.show()
+
         self.view.addSubview(secondView)
         showAnimate()
     }

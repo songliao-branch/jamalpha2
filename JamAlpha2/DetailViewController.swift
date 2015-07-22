@@ -90,7 +90,8 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         //load data 载入彩虹吉他谱和歌词
-        setUpRainbowData()
+        setUpMoreThanWordsData()
+        //setUpRainbowData()
         loadSong()
         
         //set up views from top to bottom
@@ -102,6 +103,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //get top and bottom points of six lines
         calculateXPoints()
         playSong()
+        
     }
     
     func setUpRainbowData(){
@@ -109,6 +111,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         lyric = Lyric.getRainbowLyrics()
     }
     
+    func setUpMoreThanWordsData(){
+        chords = Chord.getExtremeChords()
+        lyric = Lyric.getExtremeLyrics()
+    }
     func setUpLyricsBase(){
         //Lyric labels
         current = -1
@@ -348,7 +354,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     }
 
     func setUpTestSong(){
-        if var filePath = NSBundle.mainBundle().pathForResource("彩虹",ofType:"mp3"){
+        if var filePath = NSBundle.mainBundle().pathForResource("more",ofType:"mp3"){
             var fileWithPath = NSURL.fileURLWithPath(filePath)
             audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
         }
