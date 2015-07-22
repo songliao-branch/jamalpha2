@@ -3,10 +3,8 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
-
 let chordwithname:Int = 1
 let fullchord:Int = 0
-
 
 class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
@@ -21,6 +19,9 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
 
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
+    
+    var pulldownButton:UIButton!
+    var tuningButton:UIButton!
     
     // MARK: Custom views
     var base : ChordBase!
@@ -78,10 +79,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     
     var favoriateButton:UIButton!
     var shuffleButton:UIButton!
-    var shareButton:UIButton!
+    var guitarButton:UIButton!
     var othersButton:UIButton!
     
-    //constant 
+    //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
     let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
     override func viewDidLoad() {
@@ -94,6 +95,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //setUpRainbowData()
         loadSong()
         
+        setUpTopButtons()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -111,10 +113,33 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         lyric = Lyric.getRainbowLyrics()
     }
     
+    func setUpTopButtons() {
+        let buttonCenterY: CGFloat = 25
+        pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 75))
+        //TODO: change image source
+        pulldownButton.setImage(UIImage(named: "pulldown"), forState: UIControlState.Normal)
+        pulldownButton.sizeToFit()
+        pulldownButton.center = CGPoint(x: self.view.frame.width / 10, y: buttonCenterY)
+        pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.view.addSubview(pulldownButton)
+        
+        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: 75, height: 75))
+        tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
+        tuningButton.sizeToFit()
+        tuningButton.center = CGPoint(x: self.view.frame.width * 9 / 10, y: buttonCenterY)
+        self.view.addSubview(tuningButton)
+    }
+    
+    func dismissController(sender: UIButton) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+
     func setUpMoreThanWordsData(){
         chords = Chord.getExtremeChords()
         lyric = Lyric.getExtremeLyrics()
     }
+
     func setUpLyricsBase(){
         //Lyric labels
         current = -1
@@ -193,6 +218,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
     }
     func setUpProgressContainer(){
+        
         progressChangedOrigin = self.view.frame.width / 2
         progressBlockContainer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: progressContainerHeight))
         
@@ -219,7 +245,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         progressBlockContainer.addGestureRecognizer(tapRecognizer)
         
     }
-    
     
     func handlePan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translationInView(self.view)
@@ -308,25 +333,59 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         bottomView.alpha = 0.6
         self.view.addSubview(bottomView)
         
+        //TODO: Add glowing effect when pressed
+        //divide view width into eigth to distribute center x for each of four buttons
+        favoriateButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
+        favoriateButton.sizeToFit()
         
-        othersButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+
+        shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        shuffleButton.setImage(UIImage(named: "loop_playlist"), forState: UIControlState.Normal)
+        shuffleButton.sizeToFit()
         
-        othersButton.setTitle("Others", forState: UIControlState.Normal)
-        othersButton.center.x = bottomView.frame.width - edgeButtonSideMargin
+        guitarButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        guitarButton.setImage((UIImage(named: "guitar_settings")), forState: UIControlState.Normal)
+        guitarButton.sizeToFit()
+        guitarButton.addTarget(self, action: "showGuitarActions", forControlEvents: UIControlEvents.TouchUpInside)
+        
+        othersButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        othersButton.setImage(UIImage(named: "more_options"), forState: UIControlState.Normal)
         othersButton.sizeToFit()
         othersButton.center.y = bottomViewHeight / 2
-        othersButton.backgroundColor = UIColor.redColor()
         othersButton.addTarget(self, action: "showActionSheet", forControlEvents: UIControlEvents.TouchUpInside)
-        bottomView.addSubview(othersButton)
+        
+        var bottomButtons = [favoriateButton, shuffleButton, guitarButton, othersButton]
+        var orderIndex: [CGFloat] = [1, 3, 5 , 7]//1/8, 3/8, 5/8, 7/8 of the width
+        let eigthOfWidth = self.bottomView.frame.width / 8
+        favoriateButton.center.x = eigthOfWidth
+        favoriateButton.center.y = bottomViewHeight / 2
+        bottomView.addSubview(favoriateButton)
+        
+        for i in 0...3{
+            bottomButtons[i].center.x = orderIndex[i] * eigthOfWidth
+            bottomButtons[i].center.y = bottomViewHeight / 2
+            bottomView.addSubview(bottomButtons[i])
+        }
     }
     
-    func showActionSheet(){
+    func showGuitarActions(){
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
         
         let changeTabsMode = UIAlertAction(title: "Change Tab Mode", style: .Default, handler: {
             (alert:UIAlertAction!) -> Void in
             self.changeChordMode()
         })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
+        
+        optionMenu.addAction(changeTabsMode)
+        optionMenu.addAction(cancelAction)
+        self.presentViewController(optionMenu, animated: true, completion: nil)
+        
+    }
+    func showActionSheet(){
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+        
 
         
         let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
@@ -345,7 +404,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         })
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
-        optionMenu.addAction(changeTabsMode)
         optionMenu.addAction(addTabsAction)
         optionMenu.addAction(addLyricsAction)
         optionMenu.addAction(cancelAction)
@@ -368,14 +426,17 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         return true
     }
     
+    //stop timer,stop refreshing UIs after view is completely gone of sight
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        println("view will disappear")
+        timer.invalidate()
+    }
+    
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.navigationBar.tintColor = mainPinkColor
         self.tabBarController?.tabBar.hidden = false
-        
-        if isTesting {
-            audioPlayer.stop()
-        }
     }
     
     func calculateXPoints(){
@@ -428,7 +489,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     func update(){
 
         startTime.addMinimal()
-
+        println("update:\(startTime.toDecimalNumer())")
         if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
         {
             for label in disappearingLabels {

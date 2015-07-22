@@ -15,11 +15,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     @IBOutlet weak var musicTable: UITableView!
     
-    
     var hello:[String]!
-    
     var tableOriginY:CGFloat = 0
-    
     
     //for transition view animator
     var animator:CustomTransitionAnimation?
@@ -80,13 +77,13 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             cell.mainTitle.font = UIFont(name: cell.mainTitle.font.fontName, size: 20)
             
             let image = theArtists[indexPath.row].getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
-            
-            let roundImage = Toucan(image: image).maskWithEllipse().image
+            //this causes lagging when scrolling
+            //let roundImage = Toucan(image: image).maskWithEllipse().image
             
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             
-            cell.coverImage.image = roundImage
+            cell.coverImage.image = image
 
             cell.mainTitle.text = theArtists[indexPath.row].artistName
             
@@ -118,8 +115,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             
-            let rectImage = Toucan(image: image).maskWithRoundedRect(cornerRadius: 30).image
-            cell.coverImage.image = rectImage
+//            let rectImage = Toucan(image: image).maskWithRoundedRect(cornerRadius: 30).image
+            cell.coverImage.image = image
             
             var endingTracksString = ""
             
