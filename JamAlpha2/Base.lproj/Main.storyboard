@@ -18,32 +18,51 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" misplaced="YES" text="Search History" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="KQZ-1w-vlD">
-                                <rect key="frame" x="221" y="263" width="158" height="42"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="36"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <searchBar contentMode="redraw" searchBarStyle="prominent" placeholder="Find your jam" translatesAutoresizingMaskIntoConstraints="NO" id="BrU-PC-y0G">
-                                <rect key="frame" x="0.0" y="20" width="320" height="44"/>
-                                <textInputTraits key="textInputTraits"/>
-                                <scopeButtonTitles>
-                                    <string>Title</string>
-                                    <string>Title</string>
-                                </scopeButtonTitles>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="70" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Ar1-WT-qam">
+                                <rect key="frame" x="0.0" y="20" width="320" height="499"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" rowHeight="70" id="b9N-Xc-ley" customClass="LocalSearchResultCell" customModule="JamAlpha2" customModuleProvider="target">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="b9N-Xc-ley" id="MSY-Ju-Lyg">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SsX-8j-86w">
+                                                    <rect key="frame" x="8" y="7" width="53" height="53.5"/>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H8i-UD-2ZW">
+                                                    <rect key="frame" x="69" y="35" width="243" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3yA-Cf-ShZ">
+                                                    <rect key="frame" x="69" y="14" width="243" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="albumCover" destination="SsX-8j-86w" id="VYE-xW-DLC"/>
+                                            <outlet property="subtitleLabel" destination="H8i-UD-2ZW" id="b8R-pQ-US9"/>
+                                            <outlet property="titleLabel" destination="3yA-Cf-ShZ" id="WR3-tY-xLX"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
                                 <connections>
-                                    <outlet property="delegate" destination="9pv-A4-QxB" id="KhG-It-roH"/>
+                                    <outlet property="dataSource" destination="9pv-A4-QxB" id="ZTi-gG-905"/>
+                                    <outlet property="delegate" destination="9pv-A4-QxB" id="vDW-Nx-czA"/>
                                 </connections>
-                            </searchBar>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="BrU-PC-y0G" firstAttribute="leading" secondItem="tsR-hK-woN" secondAttribute="leading" id="5os-gp-3Mu"/>
-                            <constraint firstAttribute="centerX" secondItem="KQZ-1w-vlD" secondAttribute="centerX" id="6BV-lF-sBN"/>
-                            <constraint firstItem="BrU-PC-y0G" firstAttribute="top" secondItem="Ia1-K6-d13" secondAttribute="bottom" id="Zjf-vb-Tbj"/>
-                            <constraint firstAttribute="centerY" secondItem="KQZ-1w-vlD" secondAttribute="centerY" id="exm-UA-ej4"/>
-                            <constraint firstItem="BrU-PC-y0G" firstAttribute="centerX" secondItem="KQZ-1w-vlD" secondAttribute="centerX" id="ldV-vT-GIR"/>
+                            <constraint firstItem="Ar1-WT-qam" firstAttribute="bottom" secondItem="4ug-Mw-9AY" secondAttribute="top" id="BxO-1A-OmF"/>
+                            <constraint firstItem="Ar1-WT-qam" firstAttribute="top" secondItem="Ia1-K6-d13" secondAttribute="bottom" id="k7S-lE-IGU"/>
+                            <constraint firstItem="Ar1-WT-qam" firstAttribute="leading" secondItem="tsR-hK-woN" secondAttribute="leading" id="oBt-zi-XS0"/>
+                            <constraint firstAttribute="trailing" secondItem="Ar1-WT-qam" secondAttribute="trailing" id="tTl-cY-VUi"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Search" image="search" selectedImage="search" id="acW-dT-cKf">
@@ -56,13 +75,13 @@
                     </tabBarItem>
                     <connections>
                         <outlet property="searchDisplayController" destination="5A0-67-WPg" id="vh2-cL-xPI"/>
+                        <outlet property="searchResultTableView" destination="Ar1-WT-qam" id="a25-km-hym"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
                 <searchDisplayController id="5A0-67-WPg">
                     <connections>
                         <outlet property="delegate" destination="9pv-A4-QxB" id="pla-4A-65t"/>
-                        <outlet property="searchBar" destination="BrU-PC-y0G" id="HEi-EH-6EW"/>
                         <outlet property="searchContentsController" destination="9pv-A4-QxB" id="Bwz-bv-ol7"/>
                         <outlet property="searchResultsDataSource" destination="9pv-A4-QxB" id="tv7-8P-shS"/>
                         <outlet property="searchResultsDelegate" destination="9pv-A4-QxB" id="m31-tr-AJc"/>
