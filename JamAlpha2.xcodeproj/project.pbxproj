@@ -24,7 +24,7 @@
 		E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E488774D1B151628004785D3 /* LaunchScreen.xib */; };
 		E488775B1B151628004785D3 /* JamAlpha2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E488775A1B151628004785D3 /* JamAlpha2Tests.swift */; };
 		E48877681B151E2B004785D3 /* MusicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877671B151E2B004785D3 /* MusicCell.swift */; };
-		E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* DetailViewController.swift */; };
+		E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* SongViewController.swift */; };
 		E488776F1B152742004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E488776D1B152742004785D3 /* Main.storyboard */; };
 		E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49AF0961B2699C800DD3342 /* BaseViewController.swift */; };
 		E4D2F1991B4CA60B00091A45 /* 彩虹.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E4D2F1981B4CA60B00091A45 /* 彩虹.mp3 */; };
@@ -66,7 +66,7 @@
 		E48877591B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E488775A1B151628004785D3 /* JamAlpha2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamAlpha2Tests.swift; sourceTree = "<group>"; };
 		E48877671B151E2B004785D3 /* MusicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
-		E48877691B1520A0004785D3 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		E48877691B1520A0004785D3 /* SongViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongViewController.swift; sourceTree = "<group>"; };
 		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E49AF0961B2699C800DD3342 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		E4D2F1981B4CA60B00091A45 /* 彩虹.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "彩虹.mp3"; sourceTree = "<group>"; };
@@ -202,7 +202,7 @@
 			children = (
 				E48877441B151628004785D3 /* SearchViewController.swift */,
 				E48877461B151628004785D3 /* MusicViewController.swift */,
-				E48877691B1520A0004785D3 /* DetailViewController.swift */,
+				E48877691B1520A0004785D3 /* SongViewController.swift */,
 				E45F6BB71B16C1860018645D /* ArtistViewController.swift */,
 				E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */,
 				E49AF0961B2699C800DD3342 /* BaseViewController.swift */,
@@ -322,7 +322,7 @@
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
-				E488776A1B1520A0004785D3 /* DetailViewController.swift in Sources */,
+				E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */,
 				84DA61A41B4E211100979A42 /* Lyric.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */,

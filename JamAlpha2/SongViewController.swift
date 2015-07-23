@@ -6,7 +6,7 @@ import AVFoundation
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
-class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // MARK: for testing in simulator
     var isTesting = false

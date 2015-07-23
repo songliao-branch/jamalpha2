@@ -33,10 +33,10 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
 
-        detailVC.theSong = theAlbum.songsIntheAlbum[indexPath.row]
-        self.showViewController(detailVC, sender: self)
+        songVC.theSong = theAlbum.songsIntheAlbum[indexPath.row]
+        self.showViewController(songVC, sender: self)
         
     }
 }

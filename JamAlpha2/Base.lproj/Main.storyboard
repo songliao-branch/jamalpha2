@@ -219,10 +219,10 @@
             </objects>
             <point key="canvasLocation" x="1001" y="64"/>
         </scene>
-        <!--Detail View Controller-->
+        <!--Song View Controller-->
         <scene sceneID="7iB-Ok-Ywx">
             <objects>
-                <viewController storyboardIdentifier="detailviewstoryboard" id="e5l-3U-enU" customClass="DetailViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="songviewcontroller" id="e5l-3U-enU" customClass="SongViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="LOZ-8l-jwk"/>
                         <viewControllerLayoutGuide type="bottom" id="yHS-s7-Kh9"/>
