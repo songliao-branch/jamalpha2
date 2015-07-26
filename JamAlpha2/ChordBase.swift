@@ -18,17 +18,16 @@ class ChordBase: UIView {
         
         let initialPoint:CGFloat = CGFloat(Float(width) * margin)
         let rightTopPoint:CGFloat = CGFloat(Float(width) * (1 - margin))
-
+        
         path.moveToPoint(CGPoint(x: initialPoint, y: 0))
         path.addLineToPoint(CGPoint(x: rightTopPoint, y: 0))
         path.addLineToPoint(CGPoint(x: width, y: height))
         path.addLineToPoint(CGPoint(x: 0, y: height))
         path.addLineToPoint(CGPoint(x: initialPoint, y: 0))
         
-        let color = UIColor(red: 1, green: 0, blue: 0, alpha: 0.3)
-        
+        let whiteColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         //MARK: fix color and add gradient
-        color.setFill()
+        whiteColor.setFill()
         path.fill()
         
         let scale:Float = 1 / 12

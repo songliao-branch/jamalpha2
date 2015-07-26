@@ -5,6 +5,7 @@ import AVFoundation
 
 let chordwithname:Int = 1
 let fullchord:Int = 0
+let silverGrey = UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alpha: 1)
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
@@ -30,6 +31,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     // MARK: Custom views
     var base : ChordBase!
+    var chordAndLyricBaseHeight:CGFloat!
     
     //MARK: progress Container
     var progressBlock:UIView!
@@ -67,8 +69,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //Lyric
     var lyricbase: UIView!
     
-    var label1: UILabel = UILabel()
-    var label2: UILabel = UILabel()
+    var topLyricLabel: UILabel = UILabel()
+    var bottomLyricLabel: UILabel = UILabel()
     
     var current: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
@@ -99,7 +101,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpMoreThanWordsData()
         //setUpRainbowData()
         loadSong()
-        
+        setUpBackgroundImage()
         setUpTopButtons()
         setUpNameAndArtistButtons()
         //set up views from top to bottom
@@ -118,6 +120,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
     }
+    func setUpBackgroundImage(){
+        //TODO: use a blured image of current album cover
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "KP_bg")!)
+    }
+    
     
     func setUpTopButtons() {
         let buttonCenterY: CGFloat = 25
@@ -193,31 +200,42 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func setUpLyricsBase(){
         //Lyric labels
         current = -1
-        lyricbase = UIView(frame: CGRect(x: base.frame.origin.x, y: base.frame.origin.y + base.frame.height, width: base.frame.width, height: base.frame.height / 3))
-        lyricbase.backgroundColor = mainPinkColor
+        let sideMargin: CGFloat = 20
+        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: chordAndLyricBaseHeight * 0.4))
+        lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         self.view.addSubview(lyricbase)
         
-        label1.frame = CGRectMake(0, 0, lyricbase.frame.width, 2 * lyricbase.frame.height/3)
-        label1.center = CGPointMake(lyricbase.frame.width/2, lyricbase.frame.height/3)
-        label1.numberOfLines = 2
-        label1.textAlignment = NSTextAlignment.Center
-        label1.font = UIFont.systemFontOfSize(15)
-        label1.lineBreakMode = .ByWordWrapping
-        lyricbase.addSubview(label1)
+        let contentMargin: CGFloat = 5
         
-        label2.frame = CGRectMake(0, 0, lyricbase.frame.width, lyricbase.frame.height / 3)
-        label2.center = CGPointMake(lyricbase.frame.width/2, 5 * lyricbase.frame.height/6)
-        label2.numberOfLines = 2
-        label2.textAlignment = NSTextAlignment.Center
-        label2.font = UIFont.systemFontOfSize(10)
-        label2.lineBreakMode = .ByWordWrapping
-        lyricbase.addSubview(label2)
+        lyricbase.layer.cornerRadius = 20
+        
+        topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
+        topLyricLabel.center.y = lyricbase.frame.height / 3
+        topLyricLabel.numberOfLines = 2
+        topLyricLabel.textAlignment = NSTextAlignment.Center
+        topLyricLabel.font = UIFont.systemFontOfSize(23)
+        topLyricLabel.lineBreakMode = .ByWordWrapping
+        topLyricLabel.textColor = silverGrey
+        lyricbase.addSubview(topLyricLabel)
+        
+        bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
+        bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
+        bottomLyricLabel.numberOfLines = 2
+        bottomLyricLabel.textAlignment = NSTextAlignment.Center
+        bottomLyricLabel.font = UIFont.systemFontOfSize(16)
+        bottomLyricLabel.lineBreakMode = .ByWordWrapping
+        bottomLyricLabel.textColor = silverGrey
+        lyricbase.addSubview(bottomLyricLabel)
     }
     
+    let marginBetweenBases: CGFloat = 15
+    
     func setUpChordBase(){
-        base = ChordBase(frame: CGRect(x: 0, y: 100, width: self.view.frame.width * 0.7, height: self.view.frame.height * 0.4))
+        let marginToArtistButton: CGFloat = 15
+        chordAndLyricBaseHeight = self.view.frame.height - CGRectGetMaxY(artistNameButton.frame) - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases
+        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameButton.frame) + marginToArtistButton, width: self.view.frame.width * 0.68, height: chordAndLyricBaseHeight * 0.6))
         base.center.x = self.view.center.x
-        base.backgroundColor = UIColor.whiteColor()
+        base.backgroundColor = UIColor.clearColor()
         self.view.addSubview(base)
     }
     
@@ -560,10 +578,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if current + 1 < lyric.lyric.count && lyric.get(current+1).time.isEqual(startTime) {
             current++
-            label1.text = lyric.get(current).str
+            topLyricLabel.text = lyric.get(current).str
             
             if current + 1 < lyric.lyric.count {
-                label2.text = lyric.get(current+1).str
+                bottomLyricLabel.text = lyric.get(current+1).str
                 
 //                UIView.animateWithDuration(0.1, animations: {
 //                    self.label2.alpha = 1
@@ -718,16 +736,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if current == -1{
-            label1.text = "..."//theSong.title
+            topLyricLabel.text = "..."//theSong.title
         }
         else {
-            label1.text = lyric.get(current).str
+            topLyricLabel.text = lyric.get(current).str
         }
         if current + 1 < lyric.lyric.count {
-            label2.text = lyric.get(current+1).str
+            bottomLyricLabel.text = lyric.get(current+1).str
         }
         else {
-            label2.text = "End~"
+            bottomLyricLabel.text = "End~"
         }
 
     }
