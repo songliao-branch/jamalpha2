@@ -34,8 +34,8 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-
-        songVC.theSong = theAlbum.songsIntheAlbum[indexPath.row]
+        songVC.songCollection = theAlbum.songsIntheAlbum
+        songVC.songIndex = indexPath.row
         self.showViewController(songVC, sender: self)
         
     }

@@ -39,7 +39,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     var lastSelectedIndex = 0
     func popUpSong(){
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.theSong = uniqueSongs[lastSelectedIndex]
+        songVC.songCollection = uniqueSongs
+        songVC.songIndex = lastSelectedIndex
+        
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.presentViewController(songVC, animated: true, completion: nil)
@@ -157,8 +159,10 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             //If so, save the state
             lastSelectedIndex = indexPath.row
             
-            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewstoryboard") as! SongViewController
-            songVC.theSong = uniqueSongs[indexPath.row]
+            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+            songVC.songCollection = uniqueSongs
+            songVC.songIndex = indexPath.row
+
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)

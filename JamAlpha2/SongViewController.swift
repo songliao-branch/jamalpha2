@@ -14,7 +14,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var audioPlayer = AVAudioPlayer()
     let player = MPMusicPlayerController.applicationMusicPlayer()
     
-    var theSong:MPMediaItem!
+    var songCollection: [MPMediaItem]!
+    var songIndex:Int!
+    
     var isPause: Bool = true
 
     //@IBOutlet weak var base: ChordBase!
@@ -22,6 +24,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var pulldownButton:UIButton!
     var tuningButton:UIButton!
+    
+    var songNameButton: UIButton!
+    var artistNameButton: UIButton!
     
     // MARK: Custom views
     var base : ChordBase!
@@ -96,6 +101,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         loadSong()
         
         setUpTopButtons()
+        setUpNameAndArtistButtons()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -119,15 +125,59 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //TODO: change image source
         pulldownButton.setImage(UIImage(named: "pulldown"), forState: UIControlState.Normal)
         pulldownButton.sizeToFit()
-        pulldownButton.center = CGPoint(x: self.view.frame.width / 10, y: buttonCenterY)
+        pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(pulldownButton)
         
         tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: 75, height: 75))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
         tuningButton.sizeToFit()
-        tuningButton.center = CGPoint(x: self.view.frame.width * 9 / 10, y: buttonCenterY)
+        tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
         self.view.addSubview(tuningButton)
+    }
+    
+    func setUpNameAndArtistButtons(){
+        songNameButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 0, height: 30)))
+        
+        artistNameButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 0, height: 20)))
+        
+        
+        if isTesting {
+            songNameButton.setTitle("More than words", forState: UIControlState.Normal)
+            artistNameButton.setTitle("Extreme", forState: UIControlState.Normal)
+            
+        }
+        else {
+            songNameButton.setTitle(songCollection[songIndex].title, forState: UIControlState.Normal)
+            artistNameButton.setTitle(songCollection[songIndex].artist, forState: UIControlState.Normal)
+        }
+        
+        artistNameButton.titleLabel?.font = UIFont.systemFontOfSize(13)
+        songNameButton.sizeToFit()
+        artistNameButton.sizeToFit()
+        
+        //increase edge width
+        //TODO: set a max of width to avoid clashing with pulldown and tuning button
+        songNameButton.frame.size = CGSize(width: songNameButton.frame.width + 20, height: 30)
+        artistNameButton.frame.size = CGSize(width: artistNameButton.frame.width + 20, height: 30)
+        songNameButton.center.x = self.view.frame.width / 2
+        songNameButton.center.y = pulldownButton.center.y
+        
+        artistNameButton.center.x = self.view.frame.width / 2
+        artistNameButton.center.y = CGRectGetMaxY(songNameButton.frame) + 20
+        
+        
+        songNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        artistNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        
+        songNameButton.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        artistNameButton.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        
+        songNameButton.layer.cornerRadius = CGRectGetHeight(songNameButton.frame) / 2
+        artistNameButton.layer.cornerRadius = CGRectGetHeight(artistNameButton.frame) / 2
+        
+        self.view.addSubview(songNameButton)
+        self.view.addSubview(artistNameButton)
     }
     
     func dismissController(sender: UIButton) {
@@ -199,7 +249,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //the player is not null
             if let currentSong = player.nowPlayingItem {
                 //if we are coming back for the same song
-                if currentSong == theSong {
+                if currentSong == songCollection[songIndex] {
                     
                     startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
                     updateAll(startTime.toDecimalNumer())
@@ -231,7 +281,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isTesting {
             blockWidth = CGFloat(audioPlayer.duration) * progressWidthMultiplier
         } else {
-            blockWidth = CGFloat(theSong.playbackDuration) * progressWidthMultiplier
+            blockWidth = CGFloat(songCollection[songIndex].playbackDuration) * progressWidthMultiplier
         }
         
         progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: blockWidth, height: 5))
@@ -316,7 +366,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isTesting {
          totalTimeLabel.text = TimeNumber(time: Float(audioPlayer.duration)).toDisplayString()
         } else {
-         totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
+         totalTimeLabel.text = TimeNumber(time: Float(songCollection[songIndex].playbackDuration)).toDisplayString()
         }
         
         totalTimeLabel.sizeToFit()
@@ -570,7 +620,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             barWidth = CGFloat(audioPlayer.duration)
         }
         else {
-            barWidth = CGFloat(theSong.playbackDuration)
+            barWidth = CGFloat(songCollection[songIndex].playbackDuration)
         }
         
         let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / barWidth
@@ -683,10 +733,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpSong(){
-        var items = [MPMediaItem]()
-        items.append(theSong)
-        var collection = MPMediaItemCollection(items: items)
+        //songCollection comes in as ["A","B","C","D","E"]
+        //but we are playing an item with a selected index for example index 2,i.e. item:C
+        //so we need to sort it to be ["C","D","E","A","B"]
+        var rearrangedCollection:[MPMediaItem] = [MPMediaItem]()
+        
+        for i in songIndex..<songCollection.count {
+            rearrangedCollection.append(songCollection[i])
+        }
+        for i in 0..<songIndex {
+            rearrangedCollection.append(songCollection[i])
+        }
+        
+        var collection = MPMediaItemCollection(items: rearrangedCollection)
         player.setQueueWithItemCollection(collection)
+
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
