@@ -13,7 +13,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var isTesting = false
     
     var audioPlayer = AVAudioPlayer()
-    let player = MPMusicPlayerController.applicationMusicPlayer()
+    let player = MPMusicPlayerController.systemMusicPlayer()
     
     var songCollection: [MPMediaItem]!
     var songIndex:Int!
@@ -808,20 +808,29 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func createLabels(name: String, content: String) -> [UILabel]{
         var res = [UILabel]()
         
-        let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
-        label.font = UIFont.systemFontOfSize(25)
-        label.text = name
-        label.sizeToFit()
-        label.textAlignment = NSTextAlignment.Center
-        res.append(label)
-        self.base.addSubview(label)
+        let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 0, 0))
+        if count(name) > 3 {
+            chordNameLabel.font = UIFont.systemFontOfSize(18)
+            chordNameLabel.numberOfLines = 2
+        }
+        else {
+            chordNameLabel.font = UIFont.systemFontOfSize(25)
+        }
+        chordNameLabel.text = name
+        chordNameLabel.textColor = UIColor.blackColor()
+        chordNameLabel.sizeToFit()
+        chordNameLabel.textAlignment = NSTextAlignment.Center
+        res.append(chordNameLabel)
+        self.base.addSubview(chordNameLabel)
         
         if mode == fullchord {
             for i in 0...count(content)-1 {
+                //if not a integer
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
                 label.font = UIFont.systemFontOfSize(25)
                 label.text = String(Array(content)[i])
                 label.sizeToFit()
+                label.textColor = silverGrey
                 label.textAlignment = NSTextAlignment.Center
                 res.append(label)
                 self.base.addSubview(label)
