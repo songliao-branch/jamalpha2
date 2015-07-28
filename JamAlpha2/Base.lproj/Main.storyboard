@@ -219,10 +219,10 @@
             </objects>
             <point key="canvasLocation" x="1001" y="64"/>
         </scene>
-        <!--Detail View Controller-->
+        <!--Song View Controller-->
         <scene sceneID="7iB-Ok-Ywx">
             <objects>
-                <viewController storyboardIdentifier="detailviewstoryboard" id="e5l-3U-enU" customClass="DetailViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="songviewcontroller" id="e5l-3U-enU" customClass="SongViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="LOZ-8l-jwk"/>
                         <viewControllerLayoutGuide type="bottom" id="yHS-s7-Kh9"/>
@@ -230,7 +230,6 @@
                     <view key="view" contentMode="scaleToFill" id="BGo-rS-auO">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D84-uR-1Md" userLabel="First Responder" sceneMemberID="firstResponder"/>

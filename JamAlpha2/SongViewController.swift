@@ -5,16 +5,19 @@ import AVFoundation
 
 let chordwithname:Int = 1
 let fullchord:Int = 0
+let silverGrey = UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alpha: 1)
 
-class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // MARK: for testing in simulator
     var isTesting = false
     
     var audioPlayer = AVAudioPlayer()
-    let player = MPMusicPlayerController.applicationMusicPlayer()
+    let player = MPMusicPlayerController.systemMusicPlayer()
     
-    var theSong:MPMediaItem!
+    var songCollection: [MPMediaItem]!
+    var songIndex:Int!
+    
     var isPause: Bool = true
 
     //@IBOutlet weak var base: ChordBase!
@@ -23,8 +26,12 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     var pulldownButton:UIButton!
     var tuningButton:UIButton!
     
+    var songNameButton: UIButton!
+    var artistNameButton: UIButton!
+    
     // MARK: Custom views
     var base : ChordBase!
+    var chordAndLyricBaseHeight:CGFloat!
     
     //MARK: progress Container
     var progressBlock:UIView!
@@ -62,8 +69,8 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     //Lyric
     var lyricbase: UIView!
     
-    var label1: UILabel = UILabel()
-    var label2: UILabel = UILabel()
+    var topLyricLabel: UILabel = UILabel()
+    var bottomLyricLabel: UILabel = UILabel()
     
     var current: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
@@ -94,8 +101,9 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         setUpMoreThanWordsData()
         //setUpRainbowData()
         loadSong()
-        
+        setUpBackgroundImage()
         setUpTopButtons()
+        setUpNameAndArtistButtons()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -112,6 +120,11 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
     }
+    func setUpBackgroundImage(){
+        //TODO: use a blured image of current album cover
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "KP_bg")!)
+    }
+    
     
     func setUpTopButtons() {
         let buttonCenterY: CGFloat = 25
@@ -119,15 +132,59 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         //TODO: change image source
         pulldownButton.setImage(UIImage(named: "pulldown"), forState: UIControlState.Normal)
         pulldownButton.sizeToFit()
-        pulldownButton.center = CGPoint(x: self.view.frame.width / 10, y: buttonCenterY)
+        pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(pulldownButton)
         
         tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: 75, height: 75))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
         tuningButton.sizeToFit()
-        tuningButton.center = CGPoint(x: self.view.frame.width * 9 / 10, y: buttonCenterY)
+        tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
         self.view.addSubview(tuningButton)
+    }
+    
+    func setUpNameAndArtistButtons(){
+        songNameButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 0, height: 30)))
+        
+        artistNameButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 0, height: 20)))
+        
+        
+        if isTesting {
+            songNameButton.setTitle("More than words", forState: UIControlState.Normal)
+            artistNameButton.setTitle("Extreme", forState: UIControlState.Normal)
+            
+        }
+        else {
+            songNameButton.setTitle(songCollection[songIndex].title, forState: UIControlState.Normal)
+            artistNameButton.setTitle(songCollection[songIndex].artist, forState: UIControlState.Normal)
+        }
+        
+        artistNameButton.titleLabel?.font = UIFont.systemFontOfSize(13)
+        songNameButton.sizeToFit()
+        artistNameButton.sizeToFit()
+        
+        //increase edge width
+        //TODO: set a max of width to avoid clashing with pulldown and tuning button
+        songNameButton.frame.size = CGSize(width: songNameButton.frame.width + 20, height: 30)
+        artistNameButton.frame.size = CGSize(width: artistNameButton.frame.width + 20, height: 30)
+        songNameButton.center.x = self.view.frame.width / 2
+        songNameButton.center.y = pulldownButton.center.y
+        
+        artistNameButton.center.x = self.view.frame.width / 2
+        artistNameButton.center.y = CGRectGetMaxY(songNameButton.frame) + 20
+        
+        
+        songNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        artistNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        
+        songNameButton.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        artistNameButton.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        
+        songNameButton.layer.cornerRadius = CGRectGetHeight(songNameButton.frame) / 2
+        artistNameButton.layer.cornerRadius = CGRectGetHeight(artistNameButton.frame) / 2
+        
+        self.view.addSubview(songNameButton)
+        self.view.addSubview(artistNameButton)
     }
     
     func dismissController(sender: UIButton) {
@@ -143,31 +200,42 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     func setUpLyricsBase(){
         //Lyric labels
         current = -1
-        lyricbase = UIView(frame: CGRect(x: base.frame.origin.x, y: base.frame.origin.y + base.frame.height, width: base.frame.width, height: base.frame.height / 3))
-        lyricbase.backgroundColor = mainPinkColor
+        let sideMargin: CGFloat = 20
+        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: chordAndLyricBaseHeight * 0.4))
+        lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         self.view.addSubview(lyricbase)
         
-        label1.frame = CGRectMake(0, 0, lyricbase.frame.width, 2 * lyricbase.frame.height/3)
-        label1.center = CGPointMake(lyricbase.frame.width/2, lyricbase.frame.height/3)
-        label1.numberOfLines = 2
-        label1.textAlignment = NSTextAlignment.Center
-        label1.font = UIFont.systemFontOfSize(15)
-        label1.lineBreakMode = .ByWordWrapping
-        lyricbase.addSubview(label1)
+        let contentMargin: CGFloat = 5
         
-        label2.frame = CGRectMake(0, 0, lyricbase.frame.width, lyricbase.frame.height / 3)
-        label2.center = CGPointMake(lyricbase.frame.width/2, 5 * lyricbase.frame.height/6)
-        label2.numberOfLines = 2
-        label2.textAlignment = NSTextAlignment.Center
-        label2.font = UIFont.systemFontOfSize(10)
-        label2.lineBreakMode = .ByWordWrapping
-        lyricbase.addSubview(label2)
+        lyricbase.layer.cornerRadius = 20
+        
+        topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
+        topLyricLabel.center.y = lyricbase.frame.height / 3
+        topLyricLabel.numberOfLines = 2
+        topLyricLabel.textAlignment = NSTextAlignment.Center
+        topLyricLabel.font = UIFont.systemFontOfSize(23)
+        topLyricLabel.lineBreakMode = .ByWordWrapping
+        topLyricLabel.textColor = silverGrey
+        lyricbase.addSubview(topLyricLabel)
+        
+        bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
+        bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
+        bottomLyricLabel.numberOfLines = 2
+        bottomLyricLabel.textAlignment = NSTextAlignment.Center
+        bottomLyricLabel.font = UIFont.systemFontOfSize(16)
+        bottomLyricLabel.lineBreakMode = .ByWordWrapping
+        bottomLyricLabel.textColor = silverGrey
+        lyricbase.addSubview(bottomLyricLabel)
     }
     
+    let marginBetweenBases: CGFloat = 15
+    
     func setUpChordBase(){
-        base = ChordBase(frame: CGRect(x: 0, y: 100, width: self.view.frame.width * 0.7, height: self.view.frame.height * 0.4))
+        let marginToArtistButton: CGFloat = 15
+        chordAndLyricBaseHeight = self.view.frame.height - CGRectGetMaxY(artistNameButton.frame) - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases
+        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameButton.frame) + marginToArtistButton, width: self.view.frame.width * 0.68, height: chordAndLyricBaseHeight * 0.6))
         base.center.x = self.view.center.x
-        base.backgroundColor = UIColor.whiteColor()
+        base.backgroundColor = UIColor.clearColor()
         self.view.addSubview(base)
     }
     
@@ -199,7 +267,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             //the player is not null
             if let currentSong = player.nowPlayingItem {
                 //if we are coming back for the same song
-                if currentSong == theSong {
+                if currentSong == songCollection[songIndex] {
                     
                     startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
                     updateAll(startTime.toDecimalNumer())
@@ -231,7 +299,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         if isTesting {
             blockWidth = CGFloat(audioPlayer.duration) * progressWidthMultiplier
         } else {
-            blockWidth = CGFloat(theSong.playbackDuration) * progressWidthMultiplier
+            blockWidth = CGFloat(songCollection[songIndex].playbackDuration) * progressWidthMultiplier
         }
         
         progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: blockWidth, height: 5))
@@ -316,7 +384,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         if isTesting {
          totalTimeLabel.text = TimeNumber(time: Float(audioPlayer.duration)).toDisplayString()
         } else {
-         totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
+         totalTimeLabel.text = TimeNumber(time: Float(songCollection[songIndex].playbackDuration)).toDisplayString()
         }
         
         totalTimeLabel.sizeToFit()
@@ -510,10 +578,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         
         if current + 1 < lyric.lyric.count && lyric.get(current+1).time.isEqual(startTime) {
             current++
-            label1.text = lyric.get(current).str
+            topLyricLabel.text = lyric.get(current).str
             
             if current + 1 < lyric.lyric.count {
-                label2.text = lyric.get(current+1).str
+                bottomLyricLabel.text = lyric.get(current+1).str
                 
 //                UIView.animateWithDuration(0.1, animations: {
 //                    self.label2.alpha = 1
@@ -570,7 +638,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
             barWidth = CGFloat(audioPlayer.duration)
         }
         else {
-            barWidth = CGFloat(theSong.playbackDuration)
+            barWidth = CGFloat(songCollection[songIndex].playbackDuration)
         }
         
         let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / barWidth
@@ -668,25 +736,36 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
         }
         
         if current == -1{
-            label1.text = "..."//theSong.title
+            topLyricLabel.text = "..."//theSong.title
         }
         else {
-            label1.text = lyric.get(current).str
+            topLyricLabel.text = lyric.get(current).str
         }
         if current + 1 < lyric.lyric.count {
-            label2.text = lyric.get(current+1).str
+            bottomLyricLabel.text = lyric.get(current+1).str
         }
         else {
-            label2.text = "End~"
+            bottomLyricLabel.text = "End~"
         }
 
     }
     
     func setUpSong(){
-        var items = [MPMediaItem]()
-        items.append(theSong)
-        var collection = MPMediaItemCollection(items: items)
+        //songCollection comes in as ["A","B","C","D","E"]
+        //but we are playing an item with a selected index for example index 2,i.e. item:C
+        //so we need to sort it to be ["C","D","E","A","B"]
+        var rearrangedCollection:[MPMediaItem] = [MPMediaItem]()
+        
+        for i in songIndex..<songCollection.count {
+            rearrangedCollection.append(songCollection[i])
+        }
+        for i in 0..<songIndex {
+            rearrangedCollection.append(songCollection[i])
+        }
+        
+        var collection = MPMediaItemCollection(items: rearrangedCollection)
         player.setQueueWithItemCollection(collection)
+
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
@@ -729,20 +808,29 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate, UIScr
     func createLabels(name: String, content: String) -> [UILabel]{
         var res = [UILabel]()
         
-        let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
-        label.font = UIFont.systemFontOfSize(25)
-        label.text = name
-        label.sizeToFit()
-        label.textAlignment = NSTextAlignment.Center
-        res.append(label)
-        self.base.addSubview(label)
+        let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 0, 0))
+        if count(name) > 3 {
+            chordNameLabel.font = UIFont.systemFontOfSize(18)
+            chordNameLabel.numberOfLines = 2
+        }
+        else {
+            chordNameLabel.font = UIFont.systemFontOfSize(25)
+        }
+        chordNameLabel.text = name
+        chordNameLabel.textColor = UIColor.blackColor()
+        chordNameLabel.sizeToFit()
+        chordNameLabel.textAlignment = NSTextAlignment.Center
+        res.append(chordNameLabel)
+        self.base.addSubview(chordNameLabel)
         
         if mode == fullchord {
             for i in 0...count(content)-1 {
+                //if not a integer
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
                 label.font = UIFont.systemFontOfSize(25)
                 label.text = String(Array(content)[i])
                 label.sizeToFit()
+                label.textColor = silverGrey
                 label.textAlignment = NSTextAlignment.Center
                 res.append(label)
                 self.base.addSubview(label)

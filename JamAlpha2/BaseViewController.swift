@@ -148,9 +148,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             
             // MARK : purely for testing purpose
             if button.tag == 2 {
-                let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
-                detailVC.isTesting = true
-                self.showViewController(detailVC, sender: self)
+                let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+                songVC.isTesting = true
+                self.showViewController(songVC, sender: self)
             }
             
             //return if pressed on current button

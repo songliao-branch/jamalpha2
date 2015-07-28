@@ -38,11 +38,13 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     var lastSelectedIndex = 0
     func popUpSong(){
-        let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
-        detailVC.theSong = uniqueSongs[lastSelectedIndex]
-        detailVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(detailVC)
-        self.presentViewController(detailVC, animated: true, completion: nil)
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        songVC.songCollection = uniqueSongs
+        songVC.songIndex = lastSelectedIndex
+        
+        songVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(songVC)
+        self.presentViewController(songVC, animated: true, completion: nil)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -157,11 +159,13 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             //If so, save the state
             lastSelectedIndex = indexPath.row
             
-            let detailVC = self.storyboard?.instantiateViewControllerWithIdentifier("detailviewstoryboard") as! DetailViewController
-            detailVC.theSong = uniqueSongs[indexPath.row]
-            detailVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(detailVC)
-            self.presentViewController(detailVC, animated: true, completion: nil)
+            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+            songVC.songCollection = uniqueSongs
+            songVC.songIndex = indexPath.row
+
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            self.presentViewController(songVC, animated: true, completion: nil)
             
         }
         else if pageIndex == 1 {
