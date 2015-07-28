@@ -119,9 +119,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
     }
+    var blurEffect: UIBlurEffect!
     
     func setUpBackgroundImage(){
-
         //create an UIImageView
         var backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
@@ -130,7 +130,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         backgroundImageView.center.x = self.view.center.x
         
         //add a blur background to UIImageView
-        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
+        blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = backgroundImageView.frame
         backgroundImageView.addSubview(blurEffectView)
@@ -216,6 +216,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sideMargin: CGFloat = 20
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: chordAndLyricBaseHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
+        //add vibrancy effect
+    
+        let vibrancyEffect = UIVibrancyEffect(forBlurEffect: blurEffect)
+        let vibrancyLayer = UIVisualEffectView(effect: vibrancyEffect)
+        
+        vibrancyLayer.frame = lyricbase.frame
+        lyricbase.addSubview(vibrancyLayer)
         self.view.addSubview(lyricbase)
         
         let contentMargin: CGFloat = 5
