@@ -113,16 +113,29 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //get top and bottom points of six lines
         calculateXPoints()
         playSong()
-        
     }
     
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
     }
+    
     func setUpBackgroundImage(){
-        //TODO: use a blured image of current album cover
-        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "KP_bg")!)
+
+        //create an UIImageView
+        var backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
+        //get the image from MPMediaItem
+        let image = songCollection[songIndex].artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
+        backgroundImageView.image = image
+        backgroundImageView.center.x = self.view.center.x
+        
+        //add a blur background to UIImageView
+        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = backgroundImageView.frame
+        backgroundImageView.addSubview(blurEffectView)
+
+        self.view.addSubview(backgroundImageView)
     }
     
     
@@ -557,7 +570,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func update(){
 
         startTime.addMinimal()
-        println("update:\(startTime.toDecimalNumer())")
+        //println("update:\(startTime.toDecimalNumer())")
         if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
         {
             for label in disappearingLabels {

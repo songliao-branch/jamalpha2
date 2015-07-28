@@ -67,8 +67,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         if pageIndex == 0 {
             let image = uniqueSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 54, height: 54))
             
-           // cell.imageView?.frame = CGRectMake(10, 10, 55, 55)
-            
+            //cell.imageView?.frame = CGRectMake(10, 10, 55, 55)
             //cell.imageView?.image = Toucan(image: image).maskWithRoundedRect(cornerRadius: 2).image
             cell.coverImage.image = image
             
@@ -81,6 +80,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             let image = theArtists[indexPath.row].getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
             //this causes lagging when scrolling
             //let roundImage = Toucan(image: image).maskWithEllipse().image
+            
             
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
