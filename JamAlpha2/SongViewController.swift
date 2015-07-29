@@ -113,16 +113,29 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //get top and bottom points of six lines
         calculateXPoints()
         playSong()
-        
     }
     
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
     }
+    var blurEffect: UIBlurEffect!
+    
     func setUpBackgroundImage(){
-        //TODO: use a blured image of current album cover
-        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "KP_bg")!)
+        //create an UIImageView
+        var backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
+        //get the image from MPMediaItem
+        let image = songCollection[songIndex].artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
+        backgroundImageView.image = image
+        backgroundImageView.center.x = self.view.center.x
+        
+        //add a blur background to UIImageView
+        blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = backgroundImageView.frame
+        backgroundImageView.addSubview(blurEffectView)
+
+        self.view.addSubview(backgroundImageView)
     }
     
     
@@ -203,6 +216,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sideMargin: CGFloat = 20
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: chordAndLyricBaseHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
+        //add vibrancy effect
+    
+        let vibrancyEffect = UIVibrancyEffect(forBlurEffect: blurEffect)
+        let vibrancyLayer = UIVisualEffectView(effect: vibrancyEffect)
+        
+        vibrancyLayer.frame = lyricbase.frame
+        lyricbase.addSubview(vibrancyLayer)
         self.view.addSubview(lyricbase)
         
         let contentMargin: CGFloat = 5
@@ -557,7 +577,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func update(){
 
         startTime.addMinimal()
-        println("update:\(startTime.toDecimalNumer())")
+        //println("update:\(startTime.toDecimalNumer())")
         if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
         {
             for label in disappearingLabels {
