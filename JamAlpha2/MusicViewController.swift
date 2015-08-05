@@ -29,6 +29,11 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         loadLocalArtist()
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        //println("First song is \(uniqueSongs[0].title)")
+        
+    }
     func createTransitionAnimation(){
         if(animator == nil){
             println("animator created")

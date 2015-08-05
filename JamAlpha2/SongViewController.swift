@@ -112,9 +112,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
-        playSong()
     }
     
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        println("view will appear")
+        resumeSong()
+        
+    }
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
@@ -131,13 +137,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //add a blur background to UIImageView
         blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
+        
+        let grayOverlay = UIView(frame: CGRectZero)
+        grayOverlay.frame = backgroundImageView.frame
+        grayOverlay.backgroundColor = UIColor.grayColor()
+        grayOverlay.alpha = 0.5
+        
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = backgroundImageView.frame
         backgroundImageView.addSubview(blurEffectView)
-
+        backgroundImageView.addSubview(grayOverlay)
         self.view.addSubview(backgroundImageView)
     }
-    
     
     func setUpTopButtons() {
         let buttonCenterY: CGFloat = 25
@@ -268,7 +279,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
-    func playSong(){
+    func resumeSong(){
         isPause = false
         if isTesting {
             //we are always coming back to the same song
@@ -287,7 +298,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //the player is not null
             if let currentSong = player.nowPlayingItem {
                 //if we are coming back for the same song
+                
+                
                 if currentSong == songCollection[songIndex] {
+                    
+                    println("It's the same song!")
                     
                     startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
                     updateAll(startTime.toDecimalNumer())
@@ -431,6 +446,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         shuffleButton.setImage(UIImage(named: "loop_playlist"), forState: UIControlState.Normal)
         shuffleButton.sizeToFit()
+        shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
         guitarButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         guitarButton.setImage((UIImage(named: "guitar_settings")), forState: UIControlState.Normal)
@@ -455,6 +471,36 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomButtons[i].center.y = bottomViewHeight / 2
             bottomView.addSubview(bottomButtons[i])
         }
+    }
+    
+    func toggleShuffle(button: UIButton){
+      //toggle among, repeat one song, repeat all, shuffle all mode (in the list)
+      //check shuffle state
+        //initial one will be shuffle list
+        //shuffle all -> repeat one -> repeat all -> shuffle all
+        println("shuffleMode \(player.shuffleMode.rawValue)")
+        println("repeatMode \(player.repeatMode.rawValue)")
+//        shuffleButton.setImage(UIImage(named: "loop_song"), forState: .Normal)
+//        shuffleButton.sizeToFit()
+//        
+//        return
+        if player.shuffleMode == MPMusicShuffleMode.Songs && player.repeatMode == MPMusicRepeatMode.All {
+            
+            player.repeatMode = MPMusicRepeatMode.One
+            player.shuffleMode = MPMusicShuffleMode.Off
+            shuffleButton.setImage(UIImage(named: "loop_song"), forState: .Normal)
+        }
+        else if player.repeatMode == MPMusicRepeatMode.One {
+            player.repeatMode = MPMusicRepeatMode.All
+            player.shuffleMode = MPMusicShuffleMode.Off
+            shuffleButton.setImage(UIImage(named: "loop_playlist"), forState: .Normal)
+        }
+        else if player.repeatMode == MPMusicRepeatMode.All  {
+            player.shuffleMode = MPMusicShuffleMode.Songs
+            player.repeatMode = MPMusicRepeatMode.All
+            shuffleButton.setImage(UIImage(named: "shuffle"), forState: .Normal)
+        }
+        
     }
     
     func showGuitarActions(){
@@ -514,6 +560,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         return true
     }
     
+    // ISSUE: when app goes to background this is not called
     //stop timer,stop refreshing UIs after view is completely gone of sight
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
@@ -537,8 +584,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let scale:Float = 1 / 12
         let topWidth = Float(rightTopPoint) - Float(initialPoint)
         let topLeft = Float(initialPoint) + Float(topWidth) * scale
-        topPoints = [CGFloat](count: 7, repeatedValue: 0)
         
+        topPoints = [CGFloat](count: 7, repeatedValue: 0)
         topPoints[0] = CGFloat(topLeft)
         for i in 1..<6 {
             topPoints[i] = CGFloat(Float(topPoints[i - 1]) + Float(topWidth * scale * 2))
@@ -785,7 +832,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         var collection = MPMediaItemCollection(items: rearrangedCollection)
         player.setQueueWithItemCollection(collection)
-
+        
+        //set up initial mode 
+        //TODO: change to the one saved
+        player.repeatMode = MPMusicRepeatMode.All
+        player.shuffleMode = MPMusicShuffleMode.Off
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
