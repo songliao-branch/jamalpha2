@@ -114,7 +114,10 @@ class Chord: NSObject {
         var chord12 = Chord(tab: C, time: TimeNumber(time: 18.28))
         var chord13 = Chord(tab: D, time: TimeNumber(time: 19.69))
         var chord14 = Chord(tab: Dsus4, time: TimeNumber(time: 20.12))
-//
+        
+        //TODO: the following are not correct
+        
+        
 //        //it's not that I want you not to say
 //        var chord15 = Chord(tab: G, time: TimeNumber(time: 0.33))
 //        var chord16 = Chord(tab: GB, time: TimeNumber(time:1.97))

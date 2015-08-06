@@ -167,7 +167,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             songVC.songCollection = uniqueSongs
             songVC.songIndex = indexPath.row
-
+            
+            //no matter the playback state of the player, we are playing the song
+            songVC.selectedFromTable = true
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)

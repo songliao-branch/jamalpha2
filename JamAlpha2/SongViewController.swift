@@ -7,11 +7,13 @@ let chordwithname:Int = 1
 let fullchord:Int = 0
 let silverGrey = UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alpha: 1)
 
+
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // MARK: for testing in simulator
     var isTesting = false
     
+    var selectedFromTable = false
     var viewDidFullyDisappear = true
     var audioPlayer = AVAudioPlayer()
     let player = MPMusicPlayerController.systemMusicPlayer()
@@ -19,7 +21,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var songCollection: [MPMediaItem]!
     var songIndex:Int!
     
-    var isPause = false
 
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
@@ -108,6 +109,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpMoreThanWordsData()
         //setUpRainbowData()
         loadSong()
+        registerMediaPlayerNotification()
         setUpBackgroundImage()
         setUpTopButtons()
         setUpNameAndArtistButtons()
@@ -123,6 +125,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        // viewWillAppear is called everytime the view is dragged down
+        // to prevent resumeSong() everytime, we make sure resumeSong() 
+        // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
             println("resume song")
             resumeSong()
@@ -289,6 +295,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    func registerMediaPlayerNotification(){
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
+        
+         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playerVolumeChanged:"), name:MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
+        player.beginGeneratingPlaybackNotifications()
+    }
+    
+    func currentSongChanged(notification: NSNotification){
+        println("song changed and current song is \(player.nowPlayingItem.title)")
+    }
+    
+    func playbackStateChanged(notification: NSNotification){
+        
+    }
+    
+    func playerVolumeChanged(notification: NSNotification){
+    
+    }
+    
     func resumeSong(){
         if isTesting {
             //we are always coming back to the same song
@@ -307,26 +334,40 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //the player is not null
             if let currentSong = player.nowPlayingItem {
                 //if we are coming back for the same song
-                
-                
                 if currentSong == songCollection[songIndex] {
                     
                     println("It's the same song!")
+                    
+                    //we are playing the song no matter the playback state of the player
+                    // if it is selected from the table
+                    // but if it is selected from the 'now' button we checks the playback state
+                    if selectedFromTable || player.playbackState == MPMusicPlaybackState.Playing {
+                        startTimer()
+                        player.play()
+                    }
+                    else if player.playbackState == MPMusicPlaybackState.Paused {
+                        timer.invalidate()
+                        player.pause()
+                    }
                     
                     startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
                     updateAll(startTime.toDecimalNumer())
                 }
                 else { //if not the same song
+                    
+                    startTimer()
+                    player.play()
                     updateAll(0)
                 }
             }
             else {
             //player hasn't started yet
+                startTimer()
+                player.play()
                 updateAll(0)
             }
             
-            startTimer()
-            player.play()
+            
         }
     }
     func setUpProgressContainer(){
@@ -386,9 +427,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let toTime = Float(newPosition - self.view.frame.width / 2) / -Float(self.progressWidthMultiplier)
             //258  517
             updateAll(toTime)
-            if !isPause {
+            if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
             }
+            
             child.frame.origin.x = newPosition
             
             //when finger is lifted
@@ -669,10 +711,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             if current + 1 < lyric.lyric.count {
                 bottomLyricLabel.text = lyric.get(current+1).str
-                
-//                UIView.animateWithDuration(0.1, animations: {
-//                    self.label2.alpha = 1
-//                })
             }
         }
         
@@ -812,6 +850,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         refreshChordLabel()
+        refreshProgressBlock()
         
         //Update the content of the lyric
         current = -1
@@ -834,7 +873,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         else {
             bottomLyricLabel.text = "End~"
         }
-
+        
+    
     }
     
     func setUpSong(){
@@ -853,16 +893,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var collection = MPMediaItemCollection(items: rearrangedCollection)
         player.setQueueWithItemCollection(collection)
         
-        //set up initial mode 
-        //TODO: change to the one saved
-        player.repeatMode = MPMusicRepeatMode.All
-        player.shuffleMode = MPMusicShuffleMode.Off
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
-            if isPause{
+            if player.playbackState == MPMusicPlaybackState.Paused {
                 startTimer()
-                isPause = false
+
                 if isTesting {
                     audioPlayer.play()
                 }else {
@@ -871,7 +907,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             else {
                 timer.invalidate()
-                isPause = true
+                
                 if isTesting {
                     audioPlayer.pause()
                 }else {
@@ -886,7 +922,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topPoints = topPointModes[mode]!
         bottomPoints = bottomPointModes[mode]!
         updateAll(startTime.toDecimalNumer())
-        if !isPause{
+        if player.playbackState == .Playing{
             startTimer()
         }
     }
