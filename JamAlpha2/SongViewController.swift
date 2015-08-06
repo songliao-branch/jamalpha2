@@ -12,13 +12,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // MARK: for testing in simulator
     var isTesting = false
     
+    var viewDidFullyDisappear = true
     var audioPlayer = AVAudioPlayer()
     let player = MPMusicPlayerController.systemMusicPlayer()
     
     var songCollection: [MPMediaItem]!
     var songIndex:Int!
     
-    var isPause: Bool = true
+    var isPause = false
 
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
@@ -89,6 +90,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var guitarButton:UIButton!
     var othersButton:UIButton!
     
+    //default is 0
+    //0-repeat all, 1-repeat song, 2-shuffle all
+    let shuffleStateKey = "SHUFFLESTATE"
+    let firstTimeSetShuffleState = "FirstTimeSetShuffleState"
+    var shuffleButtonImageNames = ["loop_playlist","loop_song","shuffle"]
+    
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
     let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
@@ -114,17 +121,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         calculateXPoints()
     }
     
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        println("view will appear")
-        resumeSong()
-        
+        if viewDidFullyDisappear {
+            println("resume song")
+            resumeSong()
+            viewDidFullyDisappear = false
+        }
     }
+    
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
     }
+    
     var blurEffect: UIBlurEffect!
     
     func setUpBackgroundImage(){
@@ -280,7 +290,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func resumeSong(){
-        isPause = false
         if isTesting {
             //we are always coming back to the same song
             if audioPlayer.currentTime > 0  { //if already started playing
@@ -444,7 +453,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
 
         shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        shuffleButton.setImage(UIImage(named: "loop_playlist"), forState: UIControlState.Normal)
+        
+       
+        // Set shuffle state to 0 if user never sets before, 
+        // this if statement is only accessed once throught
+        // one installation time of the app
+        if NSUserDefaults.standardUserDefaults().boolForKey(firstTimeSetShuffleState) {
+            NSUserDefaults.standardUserDefaults().setInteger(0, forKey: shuffleStateKey)
+            NSUserDefaults.standardUserDefaults().setBool(false, forKey: firstTimeSetShuffleState)
+        }
+        
+        let stateInteger = NSUserDefaults.standardUserDefaults().integerForKey(shuffleStateKey)
+        shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[stateInteger]), forState: UIControlState.Normal)
         shuffleButton.sizeToFit()
         shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
@@ -474,35 +494,34 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func toggleShuffle(button: UIButton){
-      //toggle among, repeat one song, repeat all, shuffle all mode (in the list)
-      //check shuffle state
-        //initial one will be shuffle list
-        //shuffle all -> repeat one -> repeat all -> shuffle all
-        println("shuffleMode \(player.shuffleMode.rawValue)")
-        println("repeatMode \(player.repeatMode.rawValue)")
-//        shuffleButton.setImage(UIImage(named: "loop_song"), forState: .Normal)
-//        shuffleButton.sizeToFit()
-//        
-//        return
-        if player.shuffleMode == MPMusicShuffleMode.Songs && player.repeatMode == MPMusicRepeatMode.All {
-            
+        var latestShufflestate = NSUserDefaults.standardUserDefaults().integerForKey(shuffleStateKey)
+        
+        if latestShufflestate == 0 { //is repeat all
+            latestShufflestate = 1
+            //change to repeat one
             player.repeatMode = MPMusicRepeatMode.One
             player.shuffleMode = MPMusicShuffleMode.Off
-            shuffleButton.setImage(UIImage(named: "loop_song"), forState: .Normal)
-        }
-        else if player.repeatMode == MPMusicRepeatMode.One {
+            
+        }else if latestShufflestate == 1 { //is repeat song
+            
+            //change to shuffle all
             player.repeatMode = MPMusicRepeatMode.All
-            player.shuffleMode = MPMusicShuffleMode.Off
-            shuffleButton.setImage(UIImage(named: "loop_playlist"), forState: .Normal)
-        }
-        else if player.repeatMode == MPMusicRepeatMode.All  {
             player.shuffleMode = MPMusicShuffleMode.Songs
-            player.repeatMode = MPMusicRepeatMode.All
-            shuffleButton.setImage(UIImage(named: "shuffle"), forState: .Normal)
+            latestShufflestate = 2
+        }
+        else if latestShufflestate == 2 { //is shuffle all
+            //change to repeat all
+           player.repeatMode = MPMusicRepeatMode.All
+           player.shuffleMode = MPMusicShuffleMode.Off
+            latestShufflestate = 0
         }
         
+        println("new shuffleState: \(latestShufflestate)")
+        
+        button.setImage(UIImage(named: shuffleButtonImageNames[latestShufflestate]), forState: UIControlState.Normal)
+        NSUserDefaults.standardUserDefaults().setInteger(latestShufflestate, forKey: shuffleStateKey)
     }
-    
+
     func showGuitarActions(){
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
         
@@ -566,6 +585,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewDidDisappear(animated)
         println("view will disappear")
         timer.invalidate()
+        viewDidFullyDisappear = true
     }
     
     override func viewWillDisappear(animated: Bool) {
