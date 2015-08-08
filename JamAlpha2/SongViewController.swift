@@ -96,6 +96,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let shuffleStateKey = "SHUFFLESTATE"
     let firstTimeSetShuffleState = "FirstTimeSetShuffleState"
     var shuffleButtonImageNames = ["loop_playlist","loop_song","shuffle"]
+    enum ShuffleState: Int {
+        case RepeatAll = 0, RepeatOne, ShuffleAll
+    }
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
@@ -313,7 +316,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playerVolumeChanged(notification: NSNotification){
-    
+        
     }
     
     func resumeSong(){
@@ -493,15 +496,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
         favoriateButton.sizeToFit()
         
-
         shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         
-       
         // Set shuffle state to 0 if user never sets before, 
         // this if statement is only accessed once throught
         // one installation time of the app
         if NSUserDefaults.standardUserDefaults().boolForKey(firstTimeSetShuffleState) {
-            NSUserDefaults.standardUserDefaults().setInteger(0, forKey: shuffleStateKey)
+            NSUserDefaults.standardUserDefaults().setInteger(ShuffleState.RepeatAll.rawValue, forKey: shuffleStateKey)
             NSUserDefaults.standardUserDefaults().setBool(false, forKey: firstTimeSetShuffleState)
         }
         
@@ -534,28 +535,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomView.addSubview(bottomButtons[i])
         }
     }
-    
+
     func toggleShuffle(button: UIButton){
         var latestShufflestate = NSUserDefaults.standardUserDefaults().integerForKey(shuffleStateKey)
         
-        if latestShufflestate == 0 { //is repeat all
-            latestShufflestate = 1
+        if latestShufflestate == ShuffleState.RepeatAll.rawValue { //is repeat all
+            latestShufflestate = ShuffleState.RepeatOne.rawValue
             //change to repeat one
             player.repeatMode = MPMusicRepeatMode.One
             player.shuffleMode = MPMusicShuffleMode.Off
             
-        }else if latestShufflestate == 1 { //is repeat song
+        }else if latestShufflestate == ShuffleState.RepeatOne.rawValue { //is repeat song
             
             //change to shuffle all
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Songs
-            latestShufflestate = 2
+            latestShufflestate = ShuffleState.ShuffleAll.rawValue
         }
-        else if latestShufflestate == 2 { //is shuffle all
+        else if latestShufflestate == ShuffleState.ShuffleAll.rawValue { //is shuffle all
             //change to repeat all
            player.repeatMode = MPMusicRepeatMode.All
            player.shuffleMode = MPMusicShuffleMode.Off
-            latestShufflestate = 0
+            latestShufflestate = ShuffleState.RepeatAll.rawValue
         }
         
         println("new shuffleState: \(latestShufflestate)")
