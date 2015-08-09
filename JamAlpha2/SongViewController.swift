@@ -283,12 +283,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func setUpChordBase(){
         let marginToArtistButton: CGFloat = 15
         chordAndLyricBaseHeight = self.view.frame.height - CGRectGetMaxY(artistNameButton.frame) - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases
-        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameButton.frame) + marginToArtistButton, width: self.view.frame.width * 0.68, height: chordAndLyricBaseHeight * 0.6))
+        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameButton.frame) + marginToArtistButton, width: self.view.frame.width * 0.62, height: chordAndLyricBaseHeight * 0.6))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.clearColor()
         self.view.addSubview(base)
     }
-    
+
     func loadSong(){
         if isTesting {
             setUpTestSong()
