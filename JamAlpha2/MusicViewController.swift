@@ -29,6 +29,11 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         loadLocalArtist()
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        //println("First song is \(uniqueSongs[0].title)")
+        
+    }
     func createTransitionAnimation(){
         if(animator == nil){
             println("animator created")
@@ -162,7 +167,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             songVC.songCollection = uniqueSongs
             songVC.songIndex = indexPath.row
-
+            
+            //no matter the playback state of the player, we are playing the song
+            songVC.selectedFromTable = true
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)
