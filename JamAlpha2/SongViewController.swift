@@ -305,14 +305,34 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
          NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playerVolumeChanged:"), name:MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
         player.beginGeneratingPlaybackNotifications()
+        
     }
     
     func currentSongChanged(notification: NSNotification){
         println("song changed and current song is \(player.nowPlayingItem.title)")
+        
+        println("repeat mode \(player.repeatMode.rawValue)")
     }
     
     func playbackStateChanged(notification: NSNotification){
-        
+        let playbackState = player.playbackState
+        if playbackState == .Paused {
+            timer.invalidate()
+        }
+        else if playbackState == .Playing {
+            startTimer()
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        println("memory warning")
+        removeMusicPlayerObserver()
+        player.endGeneratingPlaybackNotifications()
+    }
+    func removeMusicPlayerObserver(){
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
     }
     
     func playerVolumeChanged(notification: NSNotification){
@@ -898,22 +918,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playPause(recognizer: UITapGestureRecognizer) {
             if player.playbackState == MPMusicPlaybackState.Paused {
-                startTimer()
-
-                if isTesting {
-                    audioPlayer.play()
-                }else {
-                     player.play()
-                }
+                player.play()
+                //startTimer()
+//                
+//                if isTesting {
+//                    audioPlayer.play()
+//                }else {
+//                     player.play()
+//                }
             }
             else {
-                timer.invalidate()
-                
-                if isTesting {
-                    audioPlayer.pause()
-                }else {
-                    player.pause()
-                }
+               // timer.invalidate()
+                player.pause()
+//                if isTesting {
+//                    audioPlayer.pause()
+//                }else {
+//                    player.pause()
+//                }
             }
     }
     
@@ -927,9 +948,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             startTimer()
         }
     }
-
+    
+    
     func startTimer(){
-        timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        //NOTE: To prevent startTimer() to be called consecutively
+        //which would double the update speed. We only
+        //start the timer when it is not valid
+        //In case of receiving song changed and playback state 
+        //notifications, notifications are triggered twice somehow
+        if !timer.valid {
+            timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        }
     }
     
     
