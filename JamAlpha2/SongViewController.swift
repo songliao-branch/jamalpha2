@@ -305,13 +305,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
          NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playerVolumeChanged:"), name:MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
         player.beginGeneratingPlaybackNotifications()
-        
     }
     
     func currentSongChanged(notification: NSNotification){
-        println("song changed and current song is \(player.nowPlayingItem.title)")
-        
-        println("repeat mode \(player.repeatMode.rawValue)")
+//        println("song changed and current song is \(player.nowPlayingItem.title)")
+//        
+//        println("repeat mode \(player.repeatMode.rawValue)")
     }
     
     func playbackStateChanged(notification: NSNotification){
@@ -518,16 +517,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         
-        // Set shuffle state to 0 if user never sets before, 
-        // this if statement is only accessed once throught
-        // one installation time of the app
-        if NSUserDefaults.standardUserDefaults().boolForKey(firstTimeSetShuffleState) {
-            NSUserDefaults.standardUserDefaults().setInteger(ShuffleState.RepeatAll.rawValue, forKey: shuffleStateKey)
-            NSUserDefaults.standardUserDefaults().setBool(false, forKey: firstTimeSetShuffleState)
+        if player.repeatMode == .All {
+             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
+        } else if player.repeatMode == .One {
+             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
+        } else if player.shuffleMode == .Songs {
+            shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
         }
         
-        let stateInteger = NSUserDefaults.standardUserDefaults().integerForKey(shuffleStateKey)
-        shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[stateInteger]), forState: UIControlState.Normal)
         shuffleButton.sizeToFit()
         shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
@@ -557,32 +554,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func toggleShuffle(button: UIButton){
-        var latestShufflestate = NSUserDefaults.standardUserDefaults().integerForKey(shuffleStateKey)
-        
-        if latestShufflestate == ShuffleState.RepeatAll.rawValue { //is repeat all
-            latestShufflestate = ShuffleState.RepeatOne.rawValue
-            //change to repeat one
-            player.repeatMode = MPMusicRepeatMode.One
-            player.shuffleMode = MPMusicShuffleMode.Off
-            
-        }else if latestShufflestate == ShuffleState.RepeatOne.rawValue { //is repeat song
-            
-            //change to shuffle all
+        if player.repeatMode == .All && player.shuffleMode == .Off { //is repeat all
+            player.repeatMode = .One
+            player.shuffleMode = .Off
+            button.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
+        } else if player.repeatMode == .One && player.shuffleMode == .Off { //is repeat one
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Songs
-            latestShufflestate = ShuffleState.ShuffleAll.rawValue
+            button.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
+            
+        } else if player.shuffleMode == .Songs && player.repeatMode == .All { // is shuffle songs
+            player.repeatMode = MPMusicRepeatMode.All
+            player.shuffleMode = MPMusicShuffleMode.Off
+            button.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
         }
-        else if latestShufflestate == ShuffleState.ShuffleAll.rawValue { //is shuffle all
-            //change to repeat all
-           player.repeatMode = MPMusicRepeatMode.All
-           player.shuffleMode = MPMusicShuffleMode.Off
-            latestShufflestate = ShuffleState.RepeatAll.rawValue
-        }
-        
-        println("new shuffleState: \(latestShufflestate)")
-        
-        button.setImage(UIImage(named: shuffleButtonImageNames[latestShufflestate]), forState: UIControlState.Normal)
-        NSUserDefaults.standardUserDefaults().setInteger(latestShufflestate, forKey: shuffleStateKey)
     }
 
     func showGuitarActions(){
