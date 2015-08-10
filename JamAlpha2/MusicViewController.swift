@@ -5,7 +5,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
     var uniqueSongs :[MPMediaItem]!
     
-    //not used
+    //not used hello
     var uniqueArtists:[MPMediaItem]!
     
     var theAlbums = [Album]()
