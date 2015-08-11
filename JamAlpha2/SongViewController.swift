@@ -31,6 +31,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var songNameButton: UIButton!
     var artistNameButton: UIButton!
     
+    var previousButton: UIButton!
+    var nextButton: UIButton!
+    
     // MARK: Custom views
     var base : ChordBase!
     var chordAndLyricBaseHeight:CGFloat!
@@ -115,15 +118,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         registerMediaPlayerNotification()
         setUpBackgroundImage()
         setUpTopButtons()
+        
         setUpNameAndArtistButtons()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
+        setUpControlButtons()
         setUpProgressContainer()
         setUpTimeLabels()
         setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -145,6 +151,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     var blurEffect: UIBlurEffect!
+    var backgroundImageView: UIImageView?
     
     func setUpBackgroundImage(){
         //create an UIImageView
@@ -216,7 +223,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameButton.center.x = self.view.frame.width / 2
         artistNameButton.center.y = CGRectGetMaxY(songNameButton.frame) + 20
         
-        
         songNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
         artistNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
         
@@ -230,10 +236,37 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(artistNameButton)
     }
     
+    func setUpControlButtons(){
+        previousButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 50, height: 50)))
+        previousButton.center = CGPoint(x: 0, y: base.frame.origin.y)
+        
+        previousButton.backgroundColor = UIColor.grayColor()
+        previousButton.layer.cornerRadius = 5
+        previousButton.addTarget(self, action: "previousPressed:", forControlEvents: .TouchUpInside)
+        nextButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 50, height: 50)))
+        nextButton.center = CGPoint(x: self.view.frame.width, y: base.frame.origin.y)
+        
+        nextButton.backgroundColor = UIColor.grayColor()
+        nextButton.layer.cornerRadius = 5
+        nextButton.addTarget(self, action: "nextPressed:", forControlEvents: .TouchUpInside)
+        
+        self.view.addSubview(previousButton)
+        self.view.addSubview(nextButton)
+    }
+    
+    func previousPressed(button: UIButton){
+        player.skipToPreviousItem()
+    }
+    
+    func nextPressed(button: UIButton){
+        player.skipToNextItem()
+    }
+    
     func dismissController(sender: UIButton) {
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+
 
     func setUpMoreThanWordsData(){
         chords = Chord.getExtremeChords()
@@ -308,9 +341,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func currentSongChanged(notification: NSNotification){
-//        println("song changed and current song is \(player.nowPlayingItem.title)")
-//        
-//        println("repeat mode \(player.repeatMode.rawValue)")
+        println("songIndex: \(songIndex)")
+        println("playerIndex: \(player.indexOfNowPlayingItem)")
+        // Don't update when coming from the table
+        // Only update when song changes
+        
+        // The following won't run when selected from table
+        if !selectedFromTable {
+            println("song changed and current song is \(player.nowPlayingItem.title)")
+            songNameButton.setTitle(player.nowPlayingItem.title, forState: .Normal)
+            artistNameButton.setTitle(player.nowPlayingItem.artist, forState: .Normal)
+            startTime = TimeNumber(time: 0)
+            updateAll(0)
+        }
+        selectedFromTable = false
     }
     
     func playbackStateChanged(notification: NSNotification){
@@ -388,8 +432,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 player.play()
                 updateAll(0)
             }
-            
-            
         }
     }
     func setUpProgressContainer(){
@@ -517,11 +559,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         
-        if player.repeatMode == .All {
+        if player.repeatMode == .All && player.shuffleMode == .Off {
              shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
-        } else if player.repeatMode == .One {
+        } else if player.repeatMode == .One && player.shuffleMode == .Off{
              shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
-        } else if player.shuffleMode == .Songs {
+        } else if player.shuffleMode == .Songs && player.repeatMode == .All {
             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
         }
         
