@@ -95,6 +95,32 @@ class ChordBase: UIView {
         
         innerpath.stroke()
         
+        let innerTopPath = UIBezierPath()
+        
+        
+        innerTopPath.lineWidth = 2
+        
+        innerTopPath
+        
+        UIColor.darkGrayColor().setStroke()
+        
+        for i in 0..<6 {
+            if (i == 0) {
+                innerTopPath.moveToPoint(CGPoint(x: topPoints[i]-3.5, y: 1))
+                innerTopPath.addLineToPoint(CGPoint(x: topPoints[i]+4, y: 1))
+            } else if (i == 5 ){
+                innerTopPath.moveToPoint(CGPoint(x: topPoints[i]-4, y: 1))
+                innerTopPath.addLineToPoint(CGPoint(x: topPoints[i]+3.5, y: 1))
+            } else {
+                innerTopPath.moveToPoint(CGPoint(x: topPoints[i]-4, y: 1))
+                innerTopPath.addLineToPoint(CGPoint(x: topPoints[i]+4, y: 1))
+            }
+            
+        }
+        
+        
+        innerTopPath.stroke()
+        
     }
     
     
