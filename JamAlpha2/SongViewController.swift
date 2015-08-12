@@ -1,4 +1,3 @@
-
 import UIKit
 import MediaPlayer
 import AVFoundation
@@ -9,7 +8,7 @@ let silverGrey = UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alph
 
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
-    
+
     // MARK: for testing in simulator
     var isTesting = false
     
@@ -21,7 +20,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var songCollection: [MPMediaItem]!
     var songIndex:Int!
     
-
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
     
@@ -51,7 +49,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var verticalBar:UIView!
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
-
+    
     var chords = [Chord]()
     var start: Int = 0
     var activelabels = [[UILabel]]()
@@ -85,7 +83,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var bottomView:UIView!
     
     //Simulate the process of animation for disappearing labels
-    let timeToDisappear:Float = 0.6
+    let timeToDisappear:Float = 0.8
     var disappearingLabels: [UILabel] = [UILabel]()
     var disapperingLabelAlpha: Int = 0
     
@@ -94,10 +92,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var guitarButton:UIButton!
     var othersButton:UIButton!
     
+    var textColor:UIColor!
+    
     //default is 0
     //0-repeat all, 1-repeat song, 2-shuffle all
-    let shuffleStateKey = "SHUFFLESTATE"
-    let firstTimeSetShuffleState = "FirstTimeSetShuffleState"
     var shuffleButtonImageNames = ["loop_playlist","loop_song","shuffle"]
     enum ShuffleState: Int {
         case RepeatAll = 0, RepeatOne, ShuffleAll
@@ -136,7 +134,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewWillAppear(animated)
         
         // viewWillAppear is called everytime the view is dragged down
-        // to prevent resumeSong() everytime, we make sure resumeSong() 
+        // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
             println("resume song")
@@ -158,21 +156,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
         let image = songCollection[songIndex].artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
-        backgroundImageView.image = image
+        
+        //create blurred image
+        var blurredImage:UIImage = image.applyLightEffect()!
+        
+        //backgroundImageView.image = image
         backgroundImageView.center.x = self.view.center.x
+        backgroundImageView.image = blurredImage
+        textColor = blurredImage.averageColor()
         
         //add a blur background to UIImageView
         blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
         
-        let grayOverlay = UIView(frame: CGRectZero)
-        grayOverlay.frame = backgroundImageView.frame
-        grayOverlay.backgroundColor = UIColor.grayColor()
-        grayOverlay.alpha = 0.5
-        
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = backgroundImageView.frame
-        backgroundImageView.addSubview(blurEffectView)
-        backgroundImageView.addSubview(grayOverlay)
         self.view.addSubview(backgroundImageView)
     }
     
@@ -266,13 +261,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-
-
     func setUpMoreThanWordsData(){
         chords = Chord.getExtremeChords()
         lyric = Lyric.getExtremeLyrics()
     }
-
+    
     func setUpLyricsBase(){
         //Lyric labels
         current = -1
@@ -280,12 +273,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: chordAndLyricBaseHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         //add vibrancy effect
-    
+        
         let vibrancyEffect = UIVibrancyEffect(forBlurEffect: blurEffect)
         let vibrancyLayer = UIVisualEffectView(effect: vibrancyEffect)
         
         vibrancyLayer.frame = lyricbase.frame
-        lyricbase.addSubview(vibrancyLayer)
+        //lyricbase.addSubview(vibrancyLayer)
         self.view.addSubview(lyricbase)
         
         let contentMargin: CGFloat = 5
@@ -321,7 +314,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         base.backgroundColor = UIColor.clearColor()
         self.view.addSubview(base)
     }
-
+    
     func loadSong(){
         if isTesting {
             setUpTestSong()
@@ -336,7 +329,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
         
-         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playerVolumeChanged:"), name:MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playerVolumeChanged:"), name:MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
         player.beginGeneratingPlaybackNotifications()
     }
     
@@ -396,7 +389,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         else{ //if not testing
-
+            
             //the player is not null
             if let currentSong = player.nowPlayingItem {
                 //if we are coming back for the same song
@@ -427,7 +420,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
             else {
-            //player hasn't started yet
+                //player hasn't started yet
                 startTimer()
                 player.play()
                 updateAll(0)
@@ -485,7 +478,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             timer.invalidate()
             
             //new Position from 160 to -357
-            //-self.view.frame.width /2 
+            //-self.view.frame.width /2
             //= from 0 ot -517
             //divide by -2: from 0 to 258
             let toTime = Float(newPosition - self.view.frame.width / 2) / -Float(self.progressWidthMultiplier)
@@ -506,7 +499,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
                 else {
                     player.currentPlaybackTime = NSTimeInterval(toTime)
-                
+                    
                 }
             }
         }
@@ -532,9 +525,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel.font = UIFont.systemFontOfSize(10)
         
         if isTesting {
-         totalTimeLabel.text = TimeNumber(time: Float(audioPlayer.duration)).toDisplayString()
+            totalTimeLabel.text = TimeNumber(time: Float(audioPlayer.duration)).toDisplayString()
         } else {
-         totalTimeLabel.text = TimeNumber(time: Float(songCollection[songIndex].playbackDuration)).toDisplayString()
+            totalTimeLabel.text = TimeNumber(time: Float(songCollection[songIndex].playbackDuration)).toDisplayString()
         }
         
         totalTimeLabel.sizeToFit()
@@ -542,7 +535,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(totalTimeLabel)
         
     }
-
+    
     //from left to right: share, favoriate, shuffle, others
     func setUpBottomViewWithButtons(){
         let edgeButtonSideMargin:CGFloat = 50
@@ -559,11 +552,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         
-        if player.repeatMode == .All && player.shuffleMode == .Off {
+        if player.repeatMode == .All  {
              shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
-        } else if player.repeatMode == .One && player.shuffleMode == .Off{
+        } else if player.repeatMode == .One {
              shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
-        } else if player.shuffleMode == .Songs && player.repeatMode == .All {
+        } else if player.shuffleMode == .Songs {
             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
         }
         
@@ -594,7 +587,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomView.addSubview(bottomButtons[i])
         }
     }
-
+    
     func toggleShuffle(button: UIButton){
         if player.repeatMode == .All && player.shuffleMode == .Off { //is repeat all
             player.repeatMode = .One
@@ -611,13 +604,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             button.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
         }
     }
-
+    
     func showGuitarActions(){
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
         
         let changeTabsMode = UIAlertAction(title: "Change Tab Mode", style: .Default, handler: {
             (alert:UIAlertAction!) -> Void in
-            self.changeChordMode()
+             self.changeChordMode()
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
         
@@ -626,10 +619,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.presentViewController(optionMenu, animated: true, completion: nil)
         
     }
+    
     func showActionSheet(){
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
         
-
+        
         
         let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
             (alert:UIAlertAction!) -> Void in
@@ -653,7 +647,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         self.presentViewController(optionMenu, animated: true, completion: nil)
     }
-
+    
     func setUpTestSong(){
         if var filePath = NSBundle.mainBundle().pathForResource("more",ofType:"mp3"){
             var fileWithPath = NSURL.fileURLWithPath(filePath)
@@ -706,7 +700,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         for i in 1..<6 {
             bottomPoints[i] = CGFloat(Float(bottomPoints[i - 1]) + Float(width) * scale * 2)
         }
-
+        
         //add things
         let top0: CGFloat = CGFloat(margin * Float(base.frame.width) - 20)
         let buttom0: CGFloat = CGFloat(-20)
@@ -727,12 +721,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         topPoints = topPointModes[mode]!
         bottomPoints = bottomPointModes[mode]!
-
+        
     }
-
+    
     
     func update(){
-
+        
         startTime.addMinimal()
         //println("update:\(startTime.toDecimalNumer())")
         if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
@@ -750,7 +744,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // Add new chord
         let end = start + activelabels.count
         if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: rangeOfChords + startTime.toDecimalNumer())) {
-            activelabels.append(createLabels(chords[end].tab.name, content: chords[end].tab.content))
+            self.activelabelAppend(end)
         }
         
         if current + 1 < lyric.lyric.count && lyric.get(current+1).time.isEqual(startTime) {
@@ -768,6 +762,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             disapperingLabelAlpha--
             for label in disappearingLabels {
                 label.alpha = currentalpha
+                //label.textColor = UIColor.blackColo()
                 if disapperingLabelAlpha == 0 {
                     label.removeFromSuperview()
                 }
@@ -795,6 +790,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 var top = Float(topPoints[j])
                 var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / rangeOfChords)
                 if yPosition == Float(self.base.frame.height){
+                    if(j != 0 ){
+                       // labels[j].font = UIFont.systemFontOfSize(16.6)
+                        labels[j].textColor = UIColor.blackColor()
+                    }
+                    
                     xPosition = bottomPoints[j]
                 }
                 
@@ -882,9 +882,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 break
             }
         }
-
+        
         if start == last {
-            activelabels.append(createLabels(chords[start].tab.name, content: chords[start].tab.content))
+            self.activelabelAppend(start)
         }
         
         if start < last {
@@ -893,7 +893,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             for i in start...last {
-                activelabels.append(createLabels(chords[i].tab.name, content: chords[i].tab.content))
+                self.activelabelAppend(i)
             }
         }
         
@@ -922,7 +922,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomLyricLabel.text = "End~"
         }
         
-    
+        
     }
     
     func setUpSong(){
@@ -944,27 +944,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
-            if player.playbackState == MPMusicPlaybackState.Paused {
-                player.play()
-                //startTimer()
-//                
-//                if isTesting {
-//                    audioPlayer.play()
-//                }else {
-//                     player.play()
-//                }
-            }
-            else {
-               // timer.invalidate()
-                player.pause()
-//                if isTesting {
-//                    audioPlayer.pause()
-//                }else {
-//                    player.pause()
-//                }
-            }
+        if player.playbackState == MPMusicPlaybackState.Paused {
+            player.play()
+        } else {
+            player.pause()
+        }
     }
-    
+
+
     func changeChordMode() {
         timer.invalidate()
         mode = 1 - mode
@@ -975,8 +962,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             startTimer()
         }
     }
-    
-    
+
     func startTimer(){
         //NOTE: To prevent startTimer() to be called consecutively
         //which would double the update speed. We only
@@ -987,19 +973,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         }
     }
-    
-    
+
     func createLabels(name: String, content: String) -> [UILabel]{
         var res = [UILabel]()
         
         let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 0, 0))
-        if count(name) > 3 {
-            chordNameLabel.font = UIFont.systemFontOfSize(18)
-            chordNameLabel.numberOfLines = 2
-        }
-        else {
-            chordNameLabel.font = UIFont.systemFontOfSize(25)
-        }
+
         chordNameLabel.text = name
         chordNameLabel.textColor = UIColor.blackColor()
         chordNameLabel.sizeToFit()
@@ -1018,8 +997,52 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 label.textAlignment = NSTextAlignment.Center
                 res.append(label)
                 self.base.addSubview(label)
-        }
+            }
         }
         return res
     }
+    
+    //////////////////////////////////
+
+    func activelabelAppend(index: Int){
+        activelabels.append(createLabels(chords[index].tab.name, content: chords[index].tab.content))
+        dealWithLabelofChordName(activelabels.last!.first!)
+    }
+
+    private func dealWithLabelofChordName(chordLabel:UILabel){
+        //make the text glow
+        chordLabel.textColor = textColor
+        var color:UIColor = chordLabel.textColor
+        chordLabel.layer.shadowColor = color.CGColor
+        chordLabel.layer.shadowRadius = 4.0
+        chordLabel.layer.shadowOpacity = 0.9
+        chordLabel.layer.shadowOffset = CGSizeZero
+        chordLabel.layer.masksToBounds = false
+        
+        chordLabel.alpha = 0.9
+        
+        //make the frame of the label fit to the text
+        var chordNSString:NSString = NSString(string: chordLabel.text!)
+        if(chordNSString.length >= 2 && chordNSString.length <= 3){
+            
+            let fontSize:CGFloat = 18.0
+            
+            let textFont = UIFont.systemFontOfSize(fontSize)
+            
+            
+            chordLabel.font = textFont
+       
+            chordLabel.sizeToFit()
+            
+        } else if(chordNSString.length >= 4 ){
+            
+            let fontSize:CGFloat = 16.0
+            
+            let textFont = UIFont.systemFontOfSize(fontSize)
+            
+            chordLabel.font = textFont
+            chordLabel.sizeToFit()
+        }
+    }
 }
+
