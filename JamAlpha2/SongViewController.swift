@@ -818,11 +818,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if !isPanning {
             self.progressChangedOrigin = newOriginX
         }
-        
         self.progressBlock.frame.origin.x = newOriginX
     }
-    
-    
     
     func refreshTimeLabel(){
         //update current time label
@@ -899,7 +896,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         refreshChordLabel()
         refreshProgressBlock()
-        
+        refreshTimeLabel()
         //Update the content of the lyric
         current = -1
         while(current + 1 < lyric.lyric.count){
@@ -921,9 +918,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         else {
             bottomLyricLabel.text = "End~"
         }
-        
-        
     }
+  
     
     func setUpSong(){
         //songCollection comes in as ["A","B","C","D","E"]
