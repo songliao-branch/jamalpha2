@@ -80,7 +80,7 @@ class ChordBase: UIView {
         
         let innerpath = UIBezierPath()
         
-        innerpath.lineWidth = 1
+        innerpath.lineWidth = 2.5
         
         
         UIColor.whiteColor().setStroke()

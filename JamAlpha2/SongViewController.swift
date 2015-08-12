@@ -1037,7 +1037,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 //            
 //            chordLabel.attributedText = attributedString
 //            
-            //chordLabel.sizeToFit()
+            chordLabel.sizeToFit()
             
         }else if(chordNSString.length >= 4 ){
             
@@ -1047,7 +1047,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             
             chordLabel.font = textFont
-            //chordLabel.sizeToFit()
+            chordLabel.sizeToFit()
         }
     }
     ////////////////////////////////////////
