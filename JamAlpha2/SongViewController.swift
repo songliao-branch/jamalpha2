@@ -8,7 +8,7 @@ let silverGrey = UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alph
 
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
-    
+
     // MARK: for testing in simulator
     var isTesting = false
     
@@ -20,7 +20,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var songCollection: [MPMediaItem]!
     var songIndex:Int!
     
-    
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
     
@@ -29,6 +28,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var songNameButton: UIButton!
     var artistNameButton: UIButton!
+    
+    var previousButton: UIButton!
+    var nextButton: UIButton!
     
     // MARK: Custom views
     var base : ChordBase!
@@ -94,8 +96,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //default is 0
     //0-repeat all, 1-repeat song, 2-shuffle all
-    let shuffleStateKey = "SHUFFLESTATE"
-    let firstTimeSetShuffleState = "FirstTimeSetShuffleState"
     var shuffleButtonImageNames = ["loop_playlist","loop_song","shuffle"]
     enum ShuffleState: Int {
         case RepeatAll = 0, RepeatOne, ShuffleAll
@@ -116,15 +116,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         registerMediaPlayerNotification()
         setUpBackgroundImage()
         setUpTopButtons()
+        
         setUpNameAndArtistButtons()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
+        setUpControlButtons()
         setUpProgressContainer()
         setUpTimeLabels()
         setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -146,6 +149,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     var blurEffect: UIBlurEffect!
+    var backgroundImageView: UIImageView?
     
     func setUpBackgroundImage(){
         //create an UIImageView
@@ -163,11 +167,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //add a blur background to UIImageView
         blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
-        
-//        let grayOverlay = UIView(frame: CGRectZero)
-//        grayOverlay.frame = backgroundImageView.frame
-//        grayOverlay.backgroundColor = UIColor.grayColor()
-//        grayOverlay.alpha = 0.5
         
         self.view.addSubview(backgroundImageView)
     }
@@ -219,7 +218,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameButton.center.x = self.view.frame.width / 2
         artistNameButton.center.y = CGRectGetMaxY(songNameButton.frame) + 20
         
-        
         songNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
         artistNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
         
@@ -233,10 +231,35 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(artistNameButton)
     }
     
+    func setUpControlButtons(){
+        previousButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 50, height: 50)))
+        previousButton.center = CGPoint(x: 0, y: base.frame.origin.y)
+        
+        previousButton.backgroundColor = UIColor.grayColor()
+        previousButton.layer.cornerRadius = 5
+        previousButton.addTarget(self, action: "previousPressed:", forControlEvents: .TouchUpInside)
+        nextButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 50, height: 50)))
+        nextButton.center = CGPoint(x: self.view.frame.width, y: base.frame.origin.y)
+        
+        nextButton.backgroundColor = UIColor.grayColor()
+        nextButton.layer.cornerRadius = 5
+        nextButton.addTarget(self, action: "nextPressed:", forControlEvents: .TouchUpInside)
+        
+        self.view.addSubview(previousButton)
+        self.view.addSubview(nextButton)
+    }
+    
+    func previousPressed(button: UIButton){
+        player.skipToPreviousItem()
+    }
+    
+    func nextPressed(button: UIButton){
+        player.skipToNextItem()
+    }
+    
     func dismissController(sender: UIButton) {
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
     
     func setUpMoreThanWordsData(){
         chords = Chord.getExtremeChords()
@@ -311,11 +334,41 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func currentSongChanged(notification: NSNotification){
-        println("song changed and current song is \(player.nowPlayingItem.title)")
+        println("songIndex: \(songIndex)")
+        println("playerIndex: \(player.indexOfNowPlayingItem)")
+        // Don't update when coming from the table
+        // Only update when song changes
+        
+        // The following won't run when selected from table
+        if !selectedFromTable {
+            println("song changed and current song is \(player.nowPlayingItem.title)")
+            songNameButton.setTitle(player.nowPlayingItem.title, forState: .Normal)
+            artistNameButton.setTitle(player.nowPlayingItem.artist, forState: .Normal)
+            startTime = TimeNumber(time: 0)
+            updateAll(0)
+        }
+        selectedFromTable = false
     }
     
     func playbackStateChanged(notification: NSNotification){
-        
+        let playbackState = player.playbackState
+        if playbackState == .Paused {
+            timer.invalidate()
+        }
+        else if playbackState == .Playing {
+            startTimer()
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        println("memory warning")
+        removeMusicPlayerObserver()
+        player.endGeneratingPlaybackNotifications()
+    }
+    func removeMusicPlayerObserver(){
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
     }
     
     func playerVolumeChanged(notification: NSNotification){
@@ -372,8 +425,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 player.play()
                 updateAll(0)
             }
-            
-            
         }
     }
     func setUpProgressContainer(){
@@ -501,16 +552,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         
-        // Set shuffle state to 0 if user never sets before,
-        // this if statement is only accessed once throught
-        // one installation time of the app
-        if NSUserDefaults.standardUserDefaults().boolForKey(firstTimeSetShuffleState) {
-            NSUserDefaults.standardUserDefaults().setInteger(ShuffleState.RepeatAll.rawValue, forKey: shuffleStateKey)
-            NSUserDefaults.standardUserDefaults().setBool(false, forKey: firstTimeSetShuffleState)
+        if player.repeatMode == .All  {
+             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
+        } else if player.repeatMode == .One {
+             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
+        } else if player.shuffleMode == .Songs {
+            shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
         }
         
-        let stateInteger = NSUserDefaults.standardUserDefaults().integerForKey(shuffleStateKey)
-        shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[stateInteger]), forState: UIControlState.Normal)
         shuffleButton.sizeToFit()
         shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
@@ -540,32 +589,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func toggleShuffle(button: UIButton){
-        var latestShufflestate = NSUserDefaults.standardUserDefaults().integerForKey(shuffleStateKey)
-        
-        if latestShufflestate == ShuffleState.RepeatAll.rawValue { //is repeat all
-            latestShufflestate = ShuffleState.RepeatOne.rawValue
-            //change to repeat one
-            player.repeatMode = MPMusicRepeatMode.One
-            player.shuffleMode = MPMusicShuffleMode.Off
-            
-        }else if latestShufflestate == ShuffleState.RepeatOne.rawValue { //is repeat song
-            
-            //change to shuffle all
+        if player.repeatMode == .All && player.shuffleMode == .Off { //is repeat all
+            player.repeatMode = .One
+            player.shuffleMode = .Off
+            button.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
+        } else if player.repeatMode == .One && player.shuffleMode == .Off { //is repeat one
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Songs
-            latestShufflestate = ShuffleState.ShuffleAll.rawValue
-        }
-        else if latestShufflestate == ShuffleState.ShuffleAll.rawValue { //is shuffle all
-            //change to repeat all
+            button.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
+            
+        } else if player.shuffleMode == .Songs && player.repeatMode == .All { // is shuffle songs
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Off
-            latestShufflestate = ShuffleState.RepeatAll.rawValue
+            button.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
         }
-        
-        println("new shuffleState: \(latestShufflestate)")
-        
-        button.setImage(UIImage(named: shuffleButtonImageNames[latestShufflestate]), forState: UIControlState.Normal)
-        NSUserDefaults.standardUserDefaults().setInteger(latestShufflestate, forKey: shuffleStateKey)
     }
     
     func showGuitarActions(){
@@ -573,7 +610,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         let changeTabsMode = UIAlertAction(title: "Change Tab Mode", style: .Default, handler: {
             (alert:UIAlertAction!) -> Void in
-            self.changeChordMode()
+             self.changeChordMode()
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
         
@@ -582,6 +619,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.presentViewController(optionMenu, animated: true, completion: nil)
         
     }
+    
     func showActionSheet(){
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
         
@@ -907,25 +945,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
-            startTimer()
-            
-            if isTesting {
-                audioPlayer.play()
-            }else {
-                player.play()
-            }
-        }
-        else {
-            timer.invalidate()
-            
-            if isTesting {
-                audioPlayer.pause()
-            }else {
-                player.pause()
-            }
+            player.play()
+        } else {
+            player.pause()
         }
     }
-    
+
+
     func changeChordMode() {
         timer.invalidate()
         mode = 1 - mode
@@ -936,23 +962,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             startTimer()
         }
     }
-    
+
     func startTimer(){
-        timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        //NOTE: To prevent startTimer() to be called consecutively
+        //which would double the update speed. We only
+        //start the timer when it is not valid
+        //In case of receiving song changed and playback state 
+        //notifications, notifications are triggered twice somehow
+        if !timer.valid {
+            timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        }
     }
-    
-    
+
     func createLabels(name: String, content: String) -> [UILabel]{
         var res = [UILabel]()
         
         let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 0, 0))
-//        if count(name) > 3 {
-//            chordNameLabel.font = UIFont.systemFontOfSize(18)
-//            chordNameLabel.numberOfLines = 2
-//        }
-//        else {
-//            chordNameLabel.font = UIFont.systemFontOfSize(25)
-//        }
+
         chordNameLabel.text = name
         chordNameLabel.textColor = UIColor.blackColor()
         chordNameLabel.sizeToFit()
@@ -977,26 +1003,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     //////////////////////////////////
-    func activelabelAppend(index:Int){
-        activelabels.append(createLabels(dealWithChordName(chords[index].tab.name) , content: chords[index].tab.content))
+
+    func activelabelAppend(index: Int){
+        activelabels.append(createLabels(chords[index].tab.name, content: chords[index].tab.content))
         dealWithLabelofChordName(activelabels.last!.first!)
-        
     }
-    
-    private func dealWithChordName(chordName:String) -> String {
-        
-        var newChordName:String = chordName
-//        var chordNameNSString:NSString = NSString(string: newChordName)
-//        if(chordNameNSString.length > 2){
-//            var chordNameFirstPart:String = chordNameNSString.substringWithRange(NSRange(location: 0, length: 2))
-//            var chordNameSecondPart:String = chordNameNSString.substringFromIndex(2)
-//            newChordName = chordNameFirstPart + "\n" + chordNameSecondPart
-//        }
-        
-        return newChordName
-    }
-    
-    
+
     private func dealWithLabelofChordName(chordLabel:UILabel){
         //make the text glow
         chordLabel.textColor = textColor
@@ -1019,36 +1031,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             
             chordLabel.font = textFont
-            
-//            chordLabel.lineBreakMode = NSLineBreakMode.ByWordWrapping
-//            
-//            
-//            chordLabel.numberOfLines = 0
-//            
-//            
-//            var attributedString:NSMutableAttributedString = NSMutableAttributedString(string: chordLabel.text!)
-//            var paragraphStyle:NSMutableParagraphStyle = NSMutableParagraphStyle()
-//            paragraphStyle.lineSpacing = 0
-//            paragraphStyle.alignment = NSTextAlignment.Center
-//            paragraphStyle.lineHeightMultiple = 0.8
-//            
-//            attributedString.addAttribute(NSParagraphStyleAttributeName, value: paragraphStyle, range: NSMakeRange( 0, chordNSString.length))
-//            
-//            
-//            chordLabel.attributedText = attributedString
-//            
+       
             chordLabel.sizeToFit()
             
-        }else if(chordNSString.length >= 4 ){
+        } else if(chordNSString.length >= 4 ){
             
             let fontSize:CGFloat = 16.0
             
             let textFont = UIFont.systemFontOfSize(fontSize)
             
-            
             chordLabel.font = textFont
             chordLabel.sizeToFit()
         }
     }
-    ////////////////////////////////////////
 }
+
