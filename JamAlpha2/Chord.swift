@@ -106,7 +106,6 @@ class Chord: NSObject {
         var chord6 = Chord(tab: D, time: TimeNumber(time:9.16))
         var chord7 = Chord(tab: Dsus4, time: TimeNumber(time:9.82))
         
-        //verse 1  saying 'I love you'
         var chord8 = Chord(tab: G, time: TimeNumber(time: 10.76))
         var chord9 = Chord(tab: GB, time: TimeNumber(time: 11.87))
         var chord10 = Chord(tab: Csus9, time: TimeNumber(time: 13.28))
@@ -115,7 +114,15 @@ class Chord: NSObject {
         var chord13 = Chord(tab: D, time: TimeNumber(time: 19.69))
         var chord14 = Chord(tab: Dsus4, time: TimeNumber(time: 20.12))
         
-        //TODO: the following are not correct
+        //verse 1: saying i'm love you
+        var chord15 = Chord(tab: G, time: TimeNumber(time: 21.16))
+        var chord16 = Chord(tab: GB, time: TimeNumber(time: 22.19))
+        var chord17 = Chord(tab: Csus9, time: TimeNumber(time: 23.65))
+        var chord18 = Chord(tab: Am7, time: TimeNumber(time: 26.23))
+        var chord19 = Chord(tab: C, time: TimeNumber(time:28.88))
+        var chord20 = Chord(tab: D, time: TimeNumber(time: 30.21))
+        var chord21 = Chord(tab: Dsus4, time: TimeNumber(time: 30.89))
+
         
         
 //        //it's not that I want you not to say
