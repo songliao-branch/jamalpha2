@@ -67,7 +67,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //corresponding playback speed
     var speed = 1
     
-    var rangeOfChords:Float = 5
+    //time for chords to fall from top to bottom of chordbase
+    var freefallTime:Float = 5
     
     //Lyric
     var lyricbase: UIView!
@@ -312,6 +313,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameButton.frame) + marginToArtistButton, width: self.view.frame.width * 0.62, height: chordAndLyricBaseHeight * 0.6))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.clearColor()
+        
+        
+        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
+        panRecognizer.delaysTouchesEnded = true
+        
+        panRecognizer.delegate = self
+        base.addGestureRecognizer(panRecognizer)
+        
+        
         self.view.addSubview(base)
     }
     
@@ -448,7 +458,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlock.center.y = progressContainerHeight / 2
         progressBlock.backgroundColor = mainPinkColor
         progressBlockContainer.addSubview(progressBlock)
-        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handlePan:"))
+        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
         panRecognizer.delegate = self
         progressBlockContainer.addGestureRecognizer(panRecognizer)
         tapRecognizer = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
@@ -456,7 +466,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     
-    func handlePan(recognizer: UIPanGestureRecognizer) {
+    func handleProgressPan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translationInView(self.view)
         for childview in recognizer.view!.subviews {
             let child = childview as! UIView
@@ -484,9 +494,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let toTime = Float(newPosition - self.view.frame.width / 2) / -Float(self.progressWidthMultiplier)
             //258  517
             updateAll(toTime)
-            if player.playbackState == MPMusicPlaybackState.Playing {
-                startTimer()
-            }
+            
             
             child.frame.origin.x = newPosition
             
@@ -499,12 +507,52 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
                 else {
                     player.currentPlaybackTime = NSTimeInterval(toTime)
+                    if player.playbackState == MPMusicPlaybackState.Playing {
+                        startTimer()
+                    }
                     
                 }
             }
         }
     }
     
+    var currentChordTime:Float = 0
+    var toChordTime:Float = 0
+    
+    func handleChordBasePan(recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translationInView(self.view)
+        
+        switch recognizer.state {
+        case UIGestureRecognizerState.Began:
+            isPanning = true
+            currentChordTime = startTime.toDecimalNumer()+0.01
+            timer.invalidate()
+            updateAll(currentChordTime)
+            break;
+        case UIGestureRecognizerState.Changed:
+            var deltaTime = Float(translation.y)*(freefallTime/Float(base.frame.size.height))
+            toChordTime = currentChordTime + deltaTime
+            if(toChordTime < 0){
+                toChordTime = 0
+            }else if(toChordTime > Float(player.nowPlayingItem.playbackDuration)){
+                toChordTime = Float(player.nowPlayingItem.playbackDuration)
+            }
+            updateAll(toChordTime)
+            break;
+        case UIGestureRecognizerState.Ended:
+            isPanning = false
+            player.currentPlaybackTime = NSTimeInterval(toChordTime)
+            if player.playbackState == MPMusicPlaybackState.Playing {
+                startTimer()
+            }
+            currentChordTime = 0
+            toChordTime = 0
+            break;
+        default:
+            break;
+        }
+    }
+
     
     
     func setUpTimeLabels(){
@@ -743,7 +791,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         // Add new chord
         let end = start + activelabels.count
-        if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: rangeOfChords + startTime.toDecimalNumer())) {
+        if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: freefallTime + startTime.toDecimalNumer())) {
             self.activelabelAppend(end)
         }
         
@@ -781,14 +829,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         for var i = 0; i < activelabels.count; ++i{
             var labels = activelabels[i]
             let t = chords[start+i].mTime
-            var yPosition = Float(self.base.frame.height)*(startTime.toDecimalNumer() + rangeOfChords - t.toDecimalNumer()) / rangeOfChords
+            var yPosition = Float(self.base.frame.height)*(startTime.toDecimalNumer() + freefallTime - t.toDecimalNumer()) / freefallTime
             if yPosition > Float(self.base.frame.height){
                 yPosition = Float(self.base.frame.height)
             }
             for var j = 0; j < labels.count; ++j{
                 var bottom = Float(bottomPoints[j])
                 var top = Float(topPoints[j])
-                var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / rangeOfChords)
+                var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / freefallTime)
                 if yPosition == Float(self.base.frame.height){
                     if(j != 0 ){
                        // labels[j].font = UIFont.systemFontOfSize(16.6)
@@ -866,7 +914,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         begin = 0
         end = chords.count - 1
-        let tn = TimeNumber(time: startTime.toDecimalNumer() + rangeOfChords)
+        let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
         while true {
             var mid: Int = (begin + end) / 2
             if tn.isLongerThan(chords[mid].mTime) {
