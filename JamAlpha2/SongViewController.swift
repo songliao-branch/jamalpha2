@@ -551,50 +551,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         default:
             break;
         }
-            
-            
-        
-        
-//            var newPosition = progressChangedOrigin + translation.y
-//            
-//            // leftmost point of inner bar cannot be more than half of the view
-//            if newPosition > self.view.frame.width / 2 {
-//                newPosition = self.view.frame.width / 2
-//            }
-//            
-//            // the end of inner bar cannot be smaller left half of view
-//            if newPosition + child.frame.width < self.view.frame.width / 2 {
-//                newPosition = self.view.frame.width / 2 - child.frame.width
-//            }
-//            
-//            //update all chords, lyrics
-//            timer.invalidate()
-//            
-//            //new Position from 160 to -357
-//            //-self.view.frame.width /2
-//            //= from 0 ot -517
-//            //divide by -2: from 0 to 258
-//            let toTime = Float(newPosition - self.view.frame.width / 2) / -Float(self.progressWidthMultiplier)
-//            //258  517
-//            updateAll(toTime)
-//            
-//            child.frame.origin.x = newPosition
-//            
-//            //when finger is lifted
-//            if recognizer.state == UIGestureRecognizerState.Ended {
-//                progressChangedOrigin = newPosition
-//                isPanning = false
-//                if isTesting {
-//                    audioPlayer.currentTime = NSTimeInterval(toTime)
-//                }
-//                else {
-//                    player.currentPlaybackTime = NSTimeInterval(toTime)
-//                    if player.playbackState == MPMusicPlaybackState.Playing {
-//                        startTimer()
-//                    }
-//                }
-//            }
- //       }
     }
 
     
