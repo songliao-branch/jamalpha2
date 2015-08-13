@@ -18,7 +18,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let player = MPMusicPlayerController.systemMusicPlayer()
     
     var songCollection: [MPMediaItem]!
-    var songIndex:Int!
+    var songIndex:Int = 0
     
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
@@ -250,11 +250,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func previousPressed(button: UIButton){
-        player.skipToPreviousItem()
+        
+        // [A,B,C,D,E]  original collection
+        // [C,D,E,A,B], current collection being parsed to player, songIndex = 2, indexOfPlayingItem = 0
+        // need to rearrange collection to [B,C
+        // TODO: skip to previous one on tableview..
+        if player.indexOfNowPlayingItem >= 0 {
+            player.skipToPreviousItem()
+            songIndex--
+        }
     }
     
     func nextPressed(button: UIButton){
         player.skipToNextItem()
+        songIndex++
     }
     
     func dismissController(sender: UIButton) {
@@ -345,6 +354,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             songNameButton.setTitle(player.nowPlayingItem.title, forState: .Normal)
             artistNameButton.setTitle(player.nowPlayingItem.artist, forState: .Normal)
             startTime = TimeNumber(time: 0)
+            progressBlock.frame = CGRectMake(self.view.center.x, 0, CGFloat(player.nowPlayingItem.playbackDuration) * progressWidthMultiplier, 5)
+            progressBlock.center.y = progressContainerHeight / 2
+            
+            
             updateAll(0)
         }
         selectedFromTable = false
@@ -447,6 +460,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: blockWidth, height: 5))
         progressBlock.center.y = progressContainerHeight / 2
         progressBlock.backgroundColor = mainPinkColor
+        
         progressBlockContainer.addSubview(progressBlock)
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handlePan:"))
         panRecognizer.delegate = self
@@ -484,9 +498,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let toTime = Float(newPosition - self.view.frame.width / 2) / -Float(self.progressWidthMultiplier)
             //258  517
             updateAll(toTime)
-            if player.playbackState == MPMusicPlaybackState.Playing {
-                startTimer()
-            }
             
             child.frame.origin.x = newPosition
             
@@ -499,7 +510,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
                 else {
                     player.currentPlaybackTime = NSTimeInterval(toTime)
-                    
+                    if player.playbackState == .Playing {
+                        startTimer()
+                    }
                 }
             }
         }
@@ -811,7 +824,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             barWidth = CGFloat(audioPlayer.duration)
         }
         else {
-            barWidth = CGFloat(songCollection[songIndex].playbackDuration)
+            barWidth = CGFloat(player.nowPlayingItem.playbackDuration)
         }
         
         let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / barWidth
@@ -824,6 +837,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func refreshTimeLabel(){
         //update current time label
         currentTimeLabel.text = startTime.toDisplayString()
+        totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem.playbackDuration)).toDisplayString()
     }
     
     func updateAll(time: Float){
@@ -936,8 +950,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         var collection = MPMediaItemCollection(items: rearrangedCollection)
         player.setQueueWithItemCollection(collection)
-        
     }
+    
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
@@ -946,8 +960,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             player.pause()
         }
     }
-
-
+    
     func changeChordMode() {
         timer.invalidate()
         mode = 1 - mode
