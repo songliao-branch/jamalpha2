@@ -5,6 +5,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
     var uniqueSongs :[MPMediaItem]!
     
+    let player = MPMusicPlayerController.systemMusicPlayer()
+    
     //not used hello
     var uniqueArtists:[MPMediaItem]!
     
@@ -12,6 +14,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     var theArtists = [Artist]()
     
     var pageIndex = 0
+    var lastSelectedIndex = 0
     
     @IBOutlet weak var musicTable: UITableView!
     
@@ -27,6 +30,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
+        setUpSong()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -41,16 +45,11 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
     }
     
-    var lastSelectedIndex = 0
     func popUpSong(){
-        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.songCollection = uniqueSongs
-        songVC.songIndex = lastSelectedIndex
-        
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
-        self.presentViewController(songVC, animated: true, completion: nil)
+        setUpSongVC(lastSelectedIndex,selectedFromTable: false)
     }
+    
+    
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
@@ -157,23 +156,10 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         return 0
         
     }
+    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if  pageIndex == 0 {
-            
-            //Check if we are going back to the song we just played
-            //If so, save the state
-            lastSelectedIndex = indexPath.row
-            
-            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-            songVC.songCollection = uniqueSongs
-            songVC.songIndex = indexPath.row
-            
-            //no matter the playback state of the player, we are playing the song
-            songVC.selectedFromTable = true
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            self.presentViewController(songVC, animated: true, completion: nil)
-            
+                 setUpSongVC(indexPath.row,selectedFromTable: true)
         }
         else if pageIndex == 1 {
           //  println("artist \(indexPath.row) selected")
@@ -237,4 +223,41 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             theArtists.append(artist)
         }
     }
+    
+    func setUpSong(){
+        MPMusicPlayerController.systemMusicPlayer().stop()
+        //but we are playing an item with a selected index for example index 2,i.e. item:C
+        var collection = MPMediaItemCollection(items: uniqueSongs)
+        player.setQueueWithItemCollection(collection)
+        player.repeatMode = .All
+        player.shuffleMode = .Off
+    }
+    
+    func setUpSongVC(selectedSong:Int, selectedFromTable:Bool){
+        if(selectedFromTable){
+            if(player.repeatMode == .One && player.shuffleMode == .Off){
+                player.repeatMode = .All
+                if(lastSelectedIndex != selectedSong){
+                    player.nowPlayingItem = uniqueSongs[selectedSong]
+                }
+                player.repeatMode = .One
+            }else{
+                if(lastSelectedIndex != selectedSong){
+                    player.nowPlayingItem = uniqueSongs[selectedSong]
+                }
+            }
+        }
+        lastSelectedIndex = selectedSong
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        songVC.mc = self
+        songVC.songCollection = uniqueSongs
+        songVC.songIndex = selectedSong
+        songVC.player = self.player
+        songVC.selectedFromTable = selectedFromTable
+        
+        songVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(songVC)
+        self.presentViewController(songVC, animated: true, completion: nil)
+    }
+    
 }
