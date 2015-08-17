@@ -16,6 +16,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     var buttonText :[String] = []
     var currentPageIndex:Int!
     
+    var nowView:VisualizerView! = VisualizerView()
+    
     var isPageScrolling = false //prevent scrolling / button tap crash
     
     @IBOutlet weak var placeHolderForSub: UILabel!
@@ -25,7 +27,17 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     override func viewDidLoad() {
         super.viewDidLoad()
- 
+        nowView.initWithNumberOfBars(4)
+        nowView.frame = CGRectMake(self.view.frame.width-55,0,45,40)
+//        var frame:CGRect = nowView.frame
+//        frame.origin.x = (self.navigationController!.navigationBar.frame.size.width - nowView.frame.size.width)-0
+//        frame.origin.y = (self.navigationController!.navigationBar.frame.size.height - nowView.frame.size.height)/2;
+//        nowView.frame = frame;
+        
+        let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
+        nowView.addGestureRecognizer(tapRecognizer)
+        self.navigationController!.navigationBar.addSubview(nowView)
+        
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         self.pageTitles = ["Song","Album","Artist"]
         self.pageImages = ["song","album","artist"]
@@ -66,14 +78,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         setUpSelector()//the horizontal bar that moves with button tapped
     }
     
-    override func viewWillAppear(animated: Bool) {
-        //change status bar text to light
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = mainPinkColor
-    }
     
-    @IBAction func goToNowPlaying(sender: UIBarButtonItem) {
+    func goToNowPlaying() {
         for vc in self.pageViewController.viewControllers as! [MusicViewController] {
             if vc.pageIndex == 0 {
                 vc.popUpSong()
@@ -84,7 +90,15 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             }
         }
     }
-
+    
+    override func viewWillAppear(animated: Bool) {
+        //change status bar text to light
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = mainPinkColor
+    }
+    
+    
     var buttonHolder = [UIButton]()
     
 
@@ -200,6 +214,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         var vc: MusicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         
         vc.pageIndex = index
+        vc.nowView = self.nowView!
         return vc
     }
 

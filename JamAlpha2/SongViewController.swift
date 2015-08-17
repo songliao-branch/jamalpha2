@@ -30,8 +30,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var pulldownButton:UIButton!
     var tuningButton:UIButton!
     
-    var songNameButton: UIButton!
-    var artistNameButton: UIButton!
+    var songNameLabel: MarqueeLabel!
+    var artistNameLabel: UILabel!
     
     var previousButton: UIButton!
     var nextButton: UIButton!
@@ -90,6 +90,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var mode:Int = 0
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
+    var topView:UIView!
     var bottomView:UIView!
     
     //Simulate the process of animation for disappearing labels
@@ -201,46 +202,65 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpNameAndArtistButtons(){
-        songNameButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 0, height: 30)))
         
-        artistNameButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 0, height: 20)))
+        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50*self.view.frame.width/320))
+        topView.backgroundColor = UIColor.darkGrayColor()
+        topView.alpha = 0.7
+        self.view.addSubview(topView)
+        
+        songNameLabel = MarqueeLabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 20)))
+        songNameLabel.type = .Continuous
+        songNameLabel.scrollDuration = 15.0
+        songNameLabel.fadeLength = 5.0
+        songNameLabel.trailingBuffer = 30.0
+        
+        
+        artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
+        artistNameLabel.textAlignment = NSTextAlignment.Center
         
         
         if isTesting {
-            songNameButton.setTitle("More than words", forState: UIControlState.Normal)
-            artistNameButton.setTitle("Extreme", forState: UIControlState.Normal)
-            
+            let attributedString = NSMutableAttributedString(string:"More than words")
+            songNameLabel.attributedText = attributedString
+            artistNameLabel.text = "Extreme"
         }
         else {
-            songNameButton.setTitle(songCollection[songIndex].title, forState: UIControlState.Normal)
-            artistNameButton.setTitle(songCollection[songIndex].artist, forState: UIControlState.Normal)
+            var title:String = songCollection[songIndex].title
+            let attributedString = NSMutableAttributedString(string:title)
+            songNameLabel.attributedText = attributedString
+            songNameLabel.textAlignment = NSTextAlignment.Center
+            
+            artistNameLabel.text = songCollection[songIndex].artist
         }
         
-        artistNameButton.titleLabel?.font = UIFont.systemFontOfSize(13)
-        songNameButton.sizeToFit()
-        artistNameButton.sizeToFit()
+        songNameLabel!.font = UIFont.systemFontOfSize(18)
+        artistNameLabel!.font = UIFont.systemFontOfSize(12)
+        //artistNameLabel.sizeToFit()
+        
+        
         
         //increase edge width
         //TODO: set a max of width to avoid clashing with pulldown and tuning button
-        songNameButton.frame.size = CGSize(width: songNameButton.frame.width + 20, height: 30)
-        artistNameButton.frame.size = CGSize(width: artistNameButton.frame.width + 20, height: 30)
-        songNameButton.center.x = self.view.frame.width / 2
-        songNameButton.center.y = pulldownButton.center.y
+        songNameLabel.frame.size = CGSize(width: songNameLabel.frame.width + 20, height: 30)
+        artistNameLabel.frame.size = CGSize(width: artistNameLabel.frame.width + 20, height: 30)
+        songNameLabel.center.x = self.view.frame.width / 2
+        songNameLabel.center.y = pulldownButton.center.y - 7
         
-        artistNameButton.center.x = self.view.frame.width / 2
-        artistNameButton.center.y = CGRectGetMaxY(songNameButton.frame) + 20
+        artistNameLabel.center.x = self.view.frame.width / 2
+        artistNameLabel.center.y = CGRectGetMaxY(songNameLabel.frame) + 5
         
-        songNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
-        artistNameButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
         
-        songNameButton.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
-        artistNameButton.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        songNameLabel.textColor = UIColor.whiteColor()
+        artistNameLabel.textColor =  UIColor.whiteColor()
         
-        songNameButton.layer.cornerRadius = CGRectGetHeight(songNameButton.frame) / 2
-        artistNameButton.layer.cornerRadius = CGRectGetHeight(artistNameButton.frame) / 2
+        // songNameLabel.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        artistNameLabel.backgroundColor = UIColor.clearColor()
         
-        self.view.addSubview(songNameButton)
-        self.view.addSubview(artistNameButton)
+//        songNameLabel.layer.cornerRadius = CGRectGetHeight(songNameLabel.frame) / 2
+//        artistNameLabel.layer.cornerRadius = CGRectGetHeight(artistNameLabel.frame) / 2
+        
+        topView.addSubview(songNameLabel)
+        topView.addSubview(artistNameLabel)
     }
     
     func setUpControlButtons(){
@@ -324,8 +344,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpChordBase(){
         let marginToArtistButton: CGFloat = 15
-        chordAndLyricBaseHeight = self.view.frame.height - CGRectGetMaxY(artistNameButton.frame) - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases
-        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameButton.frame) + marginToArtistButton, width: self.view.frame.width * 0.62, height: chordAndLyricBaseHeight * 0.6))
+        chordAndLyricBaseHeight = self.view.frame.height - CGRectGetMaxY(artistNameLabel.frame) - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases
+        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameLabel.frame) + marginToArtistButton, width: self.view.frame.width * 0.62, height: chordAndLyricBaseHeight * 0.6))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.clearColor()
         
@@ -363,8 +383,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let nowPlayingItem = player.nowPlayingItem
                 let nowPlayingItemDuration = nowPlayingItem.playbackDuration
             
-                songNameButton.setTitle(nowPlayingItem.title, forState: .Normal)
-                artistNameButton.setTitle(nowPlayingItem.artist, forState: .Normal)
+                var title:String = nowPlayingItem.title
+                let attributedString = NSMutableAttributedString(string:title)
+                songNameLabel.attributedText = attributedString
+                songNameLabel.textAlignment = NSTextAlignment.Center
+                artistNameLabel.text = nowPlayingItem.artist
+        
+        
                 startTime = TimeNumber(time: 0)
                 //progressBlock.frame.origin.x = 0
                 progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * progressWidthMultiplier, 5)
@@ -442,21 +467,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     //we are playing the song no matter the playback state of the player
                     // if it is selected from the table
                     // but if it is selected from the 'now' button we checks the playback state
+                    mc!.nowView!.stop()
                     if selectedFromTable {
                         player.play()
-                    }
-                    if player.playbackState == MPMusicPlaybackState.Playing {
                         startTimer()
-                       
+                    }else{
+                        if player.playbackState == MPMusicPlaybackState.Playing {
+                            startTimer()
+                        }
+                        else if player.playbackState == MPMusicPlaybackState.Paused {
+                            timer.invalidate()
+                        }
                     }
-                    else if player.playbackState == MPMusicPlaybackState.Paused {
-                        timer.invalidate()
-                    }
-                    
                     startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
                     updateAll(startTime.toDecimalNumer())
         }
     }
+    
     
     
     func setUpProgressContainer(){
@@ -762,6 +789,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewWillDisappear(animated)
         self.navigationController?.navigationBar.tintColor = mainPinkColor
         self.tabBarController?.tabBar.hidden = false
+        if player.playbackState == MPMusicPlaybackState.Playing {
+            mc!.nowView!.start()
+        }
+        else if player.playbackState == MPMusicPlaybackState.Paused {
+            mc!.nowView!.stop()
+        }
         
     }
     
@@ -1014,8 +1047,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
+            println("play")
         } else {
             player.pause()
+            mc!.nowView!.stop()
         }
     }
     
@@ -1082,7 +1117,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var color:UIColor = chordLabel.textColor
         chordLabel.layer.shadowColor = color.CGColor
         chordLabel.layer.shadowRadius = 4.0
-        chordLabel.layer.shadowOpacity = 0.9
+        chordLabel.layer.shadowOpacity = 1.0
         chordLabel.layer.shadowOffset = CGSizeZero
         chordLabel.layer.masksToBounds = false
         
