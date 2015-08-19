@@ -1,8 +1,6 @@
 //to set up pageviewcontroller for musicviewcontroller that switches between tracks, artist and albums
 import UIKit
 
-let mainPinkColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
-
 class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
     var scrollView:UIScrollView!
@@ -72,7 +70,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = mainPinkColor
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         
         setupSegmentButtons()
         setUpSelector()//the horizontal bar that moves with button tapped
@@ -95,7 +93,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = mainPinkColor
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
     }
     
     
@@ -121,7 +119,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         
          buttonHolder = [ buttonTracks, buttonArtist, buttonAlbum]
         
-        buttonTracks.setTitleColor(mainPinkColor, forState: UIControlState.Normal)
+        buttonTracks.setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Normal)
         buttonArtist.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
         buttonAlbum.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
         for i in 0..<3 {
@@ -131,7 +129,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             
             //set font
             buttonHolder[i].titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
-            buttonHolder[i].setTitleColor(mainPinkColor, forState: UIControlState.Selected)
+            buttonHolder[i].setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Selected)
             //vertically align at the bottom
             buttonHolder[i].contentVerticalAlignment = UIControlContentVerticalAlignment.Bottom
             buttonHolder[i].addTarget(self, action: "tapButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -145,7 +143,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func setUpSelector(){
         musicUnderlineSelector = UIView(frame: CGRectMake(0, self.musicTypeButtonContainer.frame.height, self.view.frame.width / 3, 2))
-        musicUnderlineSelector.backgroundColor = mainPinkColor
+        musicUnderlineSelector.backgroundColor = UIColor.mainPinkColor()
         musicUnderlineSelector.alpha = 0.8
         self.musicTypeButtonContainer.addSubview(musicUnderlineSelector)
     }
@@ -275,7 +273,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func changeButtonColorOnScroll() {
         for i in 0..<3 {
             if i == currentPageIndex {
-                buttonHolder[i].setTitleColor(mainPinkColor, forState: UIControlState.Normal)
+                buttonHolder[i].setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Normal)
             }
             else {
                 buttonHolder[i].setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)

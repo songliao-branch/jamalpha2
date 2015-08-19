@@ -21,15 +21,13 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false
         
-        //setUpSearchBar()
-        //self.artistTable.reloadData()
     }
     
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = mainPinkColor
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
     }
 
 //    func setUpSearchBar(){

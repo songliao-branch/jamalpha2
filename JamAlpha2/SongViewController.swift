@@ -4,8 +4,6 @@ import AVFoundation
 
 let chordwithname:Int = 1
 let fullchord:Int = 0
-let silverGrey = UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alpha: 1)
-
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
@@ -327,7 +325,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topLyricLabel.textAlignment = NSTextAlignment.Center
         topLyricLabel.font = UIFont.systemFontOfSize(23)
         topLyricLabel.lineBreakMode = .ByWordWrapping
-        topLyricLabel.textColor = silverGrey
+        topLyricLabel.textColor = UIColor.silverGray()
         lyricbase.addSubview(topLyricLabel)
         
         bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
@@ -336,7 +334,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         bottomLyricLabel.textAlignment = NSTextAlignment.Center
         bottomLyricLabel.font = UIFont.systemFontOfSize(16)
         bottomLyricLabel.lineBreakMode = .ByWordWrapping
-        bottomLyricLabel.textColor = silverGrey
+        bottomLyricLabel.textColor = UIColor.silverGray()
         lyricbase.addSubview(bottomLyricLabel)
     }
     
@@ -505,7 +503,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: progressBarWidth!, height: 5))
         progressBlock.center.y = progressContainerHeight / 2
-        progressBlock.backgroundColor = mainPinkColor
+        progressBlock.backgroundColor = UIColor.mainPinkColor()
         
         progressBlockContainer.addSubview(progressBlock)
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
@@ -787,7 +785,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.navigationBar.tintColor = mainPinkColor
+        self.navigationController?.navigationBar.tintColor = UIColor.mainPinkColor()
         self.tabBarController?.tabBar.hidden = false
         if player.playbackState == MPMusicPlaybackState.Playing {
             mc!.nowView!.start()
@@ -1095,7 +1093,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 label.font = UIFont.systemFontOfSize(25)
                 label.text = String(Array(content)[i])
                 label.sizeToFit()
-                label.textColor = silverGrey
+                label.textColor = UIColor.silverGray()
                 label.textAlignment = NSTextAlignment.Center
                 res.append(label)
                 self.base.addSubview(label)

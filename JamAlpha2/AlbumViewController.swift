@@ -17,7 +17,7 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = mainPinkColor
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
