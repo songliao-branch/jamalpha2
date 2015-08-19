@@ -158,13 +158,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             var direction:UIPageViewControllerNavigationDirection
             var indexScrollingFrom:Int
             
-            // MARK : purely for testing purpose
-            if button.tag == 2 {
-                let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-                songVC.isTesting = true
-                self.showViewController(songVC, sender: self)
-            }
-            
             //return if pressed on current button
             if button.tag == current {
                 return

@@ -1,6 +1,5 @@
 import UIKit
 import MediaPlayer
-import AVFoundation
 
 let chordwithname:Int = 1
 let fullchord:Int = 0
@@ -8,12 +7,10 @@ let fullchord:Int = 0
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
     var mc:MusicViewController?
-    // MARK: for testing in simulator
-    var isTesting = false
+
     var selectedFromTable = false
     
     var viewDidFullyDisappear = true
-    var audioPlayer = AVAudioPlayer()
     var player:MPMusicPlayerController!
     
     var songCollection: [MPMediaItem]!
@@ -217,25 +214,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameLabel.textAlignment = NSTextAlignment.Center
         
         
-        if isTesting {
-            let attributedString = NSMutableAttributedString(string:"More than words")
-            songNameLabel.attributedText = attributedString
-            artistNameLabel.text = "Extreme"
-        }
-        else {
-            var title:String = songCollection[songIndex].title
-            let attributedString = NSMutableAttributedString(string:title)
-            songNameLabel.attributedText = attributedString
-            songNameLabel.textAlignment = NSTextAlignment.Center
+        var title:String = songCollection[songIndex].title
+        let attributedString = NSMutableAttributedString(string:title)
+        songNameLabel.attributedText = attributedString
+        songNameLabel.textAlignment = NSTextAlignment.Center
             
-            artistNameLabel.text = songCollection[songIndex].artist
-        }
+        artistNameLabel.text = songCollection[songIndex].artist
+        
         
         songNameLabel!.font = UIFont.systemFontOfSize(18)
         artistNameLabel!.font = UIFont.systemFontOfSize(12)
-        //artistNameLabel.sizeToFit()
-        
-        
         
         //increase edge width
         //TODO: set a max of width to avoid clashing with pulldown and tuning button
@@ -251,11 +239,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         songNameLabel.textColor = UIColor.whiteColor()
         artistNameLabel.textColor =  UIColor.whiteColor()
         
-        // songNameLabel.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         artistNameLabel.backgroundColor = UIColor.clearColor()
-        
-//        songNameLabel.layer.cornerRadius = CGRectGetHeight(songNameLabel.frame) / 2
-//        artistNameLabel.layer.cornerRadius = CGRectGetHeight(artistNameLabel.frame) / 2
         
         topView.addSubview(songNameLabel)
         topView.addSubview(artistNameLabel)
@@ -277,18 +261,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func previousPressed(button: UIButton){
-        
-        // [A,B,C,D,E]  original collection
-        // [C,D,E,A,B], current collection being parsed to player, songIndex = 2, indexOfPlayingItem = 0
-        // need to rearrange collection to [B,C
-        // TODO: sometimes crashes
-            player.skipToPreviousItem()
-            //songIndex--
+        player.skipToPreviousItem()
     }
     
     func nextPressed(button: UIButton){
         player.skipToNextItem()
-        //songIndex++
     }
     
     func dismissController(sender: UIButton) {
@@ -447,39 +424,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func resumeSong(){
-        if isTesting {
-            //we are always coming back to the same song
-            if audioPlayer.currentTime > 0  { //if already started playing
-                startTime = TimeNumber(time: Float(audioPlayer.currentTime))
-                updateAll(startTime.toDecimalNumer())
+        mc!.nowView!.stop()
+        if selectedFromTable {
+            player.play()
+            startTimer()
+        }else{
+            if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
-            } else {
-                updateAll(0)
-                startTimer()
-                audioPlayer.play()
+            }
+            else if player.playbackState == MPMusicPlaybackState.Paused {
+                timer.invalidate()
             }
         }
-        else{ //if not testing
-            //the player is not null
-                //if we are coming back for the same song
-                    //we are playing the song no matter the playback state of the player
-                    // if it is selected from the table
-                    // but if it is selected from the 'now' button we checks the playback state
-                    mc!.nowView!.stop()
-                    if selectedFromTable {
-                        player.play()
-                        startTimer()
-                    }else{
-                        if player.playbackState == MPMusicPlaybackState.Playing {
-                            startTimer()
-                        }
-                        else if player.playbackState == MPMusicPlaybackState.Paused {
-                            timer.invalidate()
-                        }
-                    }
-                    startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
-                    updateAll(startTime.toDecimalNumer())
-        }
+        startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+        updateAll(startTime.toDecimalNumer())
     }
     
     
@@ -495,11 +453,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(progressBlockContainer)
         
         var progressBarWidth:CGFloat!
-        if isTesting {
-            progressBarWidth = CGFloat(audioPlayer.duration) * progressWidthMultiplier
-        } else {
-            progressBarWidth = CGFloat(songCollection[songIndex].playbackDuration) * progressWidthMultiplier
-        }
+        progressBarWidth = CGFloat(songCollection[songIndex].playbackDuration) * progressWidthMultiplier
+        
         
         progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: progressBarWidth!, height: 5))
         progressBlock.center.y = progressContainerHeight / 2
@@ -553,14 +508,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if recognizer.state == UIGestureRecognizerState.Ended {
                 progressChangedOrigin = newPosition
                 isPanning = false
-                if isTesting {
-                    audioPlayer.currentTime = NSTimeInterval(toTime)
-                }
-                else {
-                    player.currentPlaybackTime = NSTimeInterval(toTime)
-                    if player.playbackState == .Playing {
-                        startTimer()
-                    }
+                player.currentPlaybackTime = NSTimeInterval(toTime)
+                if player.playbackState == .Playing {
+                    startTimer()
                 }
             }
         }
@@ -626,12 +576,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel = UILabel(frame: CGRect(x: (self.view.frame.size.width - 58), y: progressBlockContainer.frame.origin.y+20, width: 38, height: 18))
         totalTimeLabel.textColor = UIColor.blackColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(14)
-        if isTesting {
-            totalTimeLabel.text = TimeNumber(time: Float(audioPlayer.duration)).toDisplayString()
-        } else {
-            var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(songCollection[songIndex].playbackDuration)).toDisplayString())
-            totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
-        }
+
+        var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(songCollection[songIndex].playbackDuration)).toDisplayString())
+        totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
+        
         
         totalTimeLabel.textAlignment = NSTextAlignment.Center
         totalTimeLabel.textColor = UIColor.blackColor()
@@ -755,17 +703,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         optionMenu.addAction(cancelAction)
         
         self.presentViewController(optionMenu, animated: true, completion: nil)
-    }
-    
-    func setUpTestSong(){
-        if var filePath = NSBundle.mainBundle().pathForResource("more",ofType:"mp3"){
-            var fileWithPath = NSURL.fileURLWithPath(filePath)
-            audioPlayer = AVAudioPlayer(contentsOfURL: fileWithPath, error: nil)
-        }
-        else{
-            NSLog("mp3 not found")
-        }
-        audioPlayer.prepareToPlay()
     }
     
     override func prefersStatusBarHidden() -> Bool {
@@ -926,13 +863,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func refreshProgressBlock(){
         
         
-        if isTesting {
-            progressBlockViewWidth = CGFloat(audioPlayer.duration)
+        if progressBlockViewWidth == nil {
+            progressBlockViewWidth = CGFloat(player.nowPlayingItem.playbackDuration)
         }
-        else {
-            if(progressBlockViewWidth == nil)
-            { progressBlockViewWidth = CGFloat(player.nowPlayingItem.playbackDuration)}
-        }
+        
         
         let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!
         if !isPanning {
