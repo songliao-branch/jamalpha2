@@ -27,6 +27,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var blurEffect: UIBlurEffect!
     var backgroundImageView: UIImageView!
     
+    var buttonDimension: CGFloat = 50
     var pulldownButton:UIButton!
     var tuningButton:UIButton!
     
@@ -185,17 +186,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpTopButtons() {
         let buttonCenterY: CGFloat = 25
-        pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 75))
+        pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
         //TODO: change image source
         pulldownButton.setImage(UIImage(named: "pulldown"), forState: UIControlState.Normal)
-        pulldownButton.sizeToFit()
         pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(pulldownButton)
         
-        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: 75, height: 75))
+        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
-        tuningButton.sizeToFit()
         tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
         self.view.addSubview(tuningButton)
     }
@@ -244,16 +243,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpControlButtons(){
-        previousButton = UIButton(frame: CGRect(x: 0, y: base.frame.origin.y, width: 50, height: 50))
+        previousButton = UIButton(frame: CGRect(x: 0, y: base.frame.origin.y, width: buttonDimension, height: buttonDimension))
         previousButton.setImage(UIImage(named: "previous"), forState: .Normal)
         previousButton.addTarget(self, action: "previousPressed:", forControlEvents: .TouchUpInside)
-        previousButton.sizeToFit()
+        previousButton.contentHorizontalAlignment = .Left
         
-        nextButton = UIButton(frame: CGRect(x: 0, y: base.frame.origin.y, width: 50, height: 50))
+        nextButton = UIButton(frame: CGRect(x: 0, y: base.frame.origin.y, width: buttonDimension, height: buttonDimension))
         nextButton.setImage(UIImage(named: "next"), forState: .Normal)
         nextButton.addTarget(self, action: "nextPressed:", forControlEvents: .TouchUpInside)
-        nextButton.sizeToFit()
         nextButton.frame.origin.x = self.view.frame.width - nextButton.frame.width
+        nextButton.contentHorizontalAlignment = .Right
         self.view.addSubview(previousButton)
         self.view.addSubview(nextButton)
     }
@@ -623,18 +622,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //from left to right: share, favoriate, shuffle, others
     func setUpBottomViewWithButtons(){
         let edgeButtonSideMargin:CGFloat = 50
+        
+        
         bottomView = UIView(frame: CGRect(x: 0, y: self.view.frame.height - bottomViewHeight, width: self.view.frame.width, height: bottomViewHeight))
         bottomView.backgroundColor = UIColor.darkGrayColor()
         bottomView.alpha = 0.7
         self.view.addSubview(bottomView)
         
+        let bottomButtonSize: CGSize = CGSizeMake(bottomView.frame.width / 4, bottomView.frame.height)
+
         //TODO: Add glowing effect when pressed
         //divide view width into eigth to distribute center x for each of four buttons
-        favoriateButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        favoriateButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
         favoriateButton.sizeToFit()
         
-        shuffleButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        shuffleButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         
         if player.repeatMode == .All && player.shuffleMode == .Off {
              shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
@@ -644,17 +647,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
         }
         
-        shuffleButton.sizeToFit()
         shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
-        guitarButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        guitarButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         guitarButton.setImage((UIImage(named: "guitar_settings")), forState: UIControlState.Normal)
-        guitarButton.sizeToFit()
+
         guitarButton.addTarget(self, action: "showGuitarActions", forControlEvents: UIControlEvents.TouchUpInside)
-        
-        othersButton = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        othersButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         othersButton.setImage(UIImage(named: "more_options"), forState: UIControlState.Normal)
-        othersButton.sizeToFit()
         othersButton.center.y = bottomViewHeight / 2
         othersButton.addTarget(self, action: "showActionSheet", forControlEvents: UIControlEvents.TouchUpInside)
         

@@ -7,12 +7,11 @@
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "tuning-1.png"
+      "filename" : "tuning.png"
     },
     {
       "idiom" : "universal",
-      "scale" : "3x",
-      "filename" : "tuning.png"
+      "scale" : "3x"
     }
   ],
   "info" : {
