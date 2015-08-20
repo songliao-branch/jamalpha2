@@ -32,6 +32,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         loadLocalAlbums()
         loadLocalArtist()
         setUpSong()
+        
     }
     
     override func viewDidAppear(animated: Bool) {

@@ -168,7 +168,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //create an UIImageView
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
-        currentImage = songCollection[songIndex].artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
+        currentImage = player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
         
         //create blurred image
         var blurredImage:UIImage = currentImage!.applyLightEffect()!
@@ -225,12 +225,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             artistNameLabel.text = "Extreme"
         }
         else {
-            var title:String = songCollection[songIndex].title
+            var title:String = player.nowPlayingItem.title
             let attributedString = NSMutableAttributedString(string:title)
             songNameLabel.attributedText = attributedString
             songNameLabel.textAlignment = NSTextAlignment.Center
             
-            artistNameLabel.text = songCollection[songIndex].artist
+            artistNameLabel.text = player.nowPlayingItem.artist
         }
         
         songNameLabel!.font = UIFont.systemFontOfSize(18)
@@ -416,9 +416,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let playbackState = player.playbackState
         if playbackState == .Paused {
             timer.invalidate()
+            mc!.nowView.stop()
         }
         else if playbackState == .Playing {
             startTimer()
+            mc!.nowView.start()
         }
     }
     
@@ -481,6 +483,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     }
                     startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
                     updateAll(startTime.toDecimalNumer())
+            
+                  // println( (songCollection as NSArray).indexOfObject(player.nowPlayingItem))
         }
     }
     
@@ -500,7 +504,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isTesting {
             progressBarWidth = CGFloat(audioPlayer.duration) * progressWidthMultiplier
         } else {
-            progressBarWidth = CGFloat(songCollection[songIndex].playbackDuration) * progressWidthMultiplier
+            progressBarWidth = CGFloat(player.nowPlayingItem.playbackDuration) * progressWidthMultiplier
         }
         
         progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: progressBarWidth!, height: 5))
@@ -631,7 +635,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isTesting {
             totalTimeLabel.text = TimeNumber(time: Float(audioPlayer.duration)).toDisplayString()
         } else {
-            var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(songCollection[songIndex].playbackDuration)).toDisplayString())
+            var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(player.nowPlayingItem.playbackDuration)).toDisplayString())
             totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
         }
         
@@ -781,8 +785,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         println("view will disappear")
         timer.invalidate()
         viewDidFullyDisappear = true
-        mc?.lastSelectedIndex = getActualSongIndex()
-        //player.shuffleMode = MPMusicShuffleMode.Off
+        //mc?.lastSelectedIndex = getActualSongIndex()
     }
     
     override func viewWillDisappear(animated: Bool) {

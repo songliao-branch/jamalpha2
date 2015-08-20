@@ -82,7 +82,10 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func goToNowPlaying() {
         for vc in self.pageViewController.viewControllers as! [MusicViewController] {
             if vc.pageIndex == 0 {
-                vc.popUpSong()
+                if(vc.player.nowPlayingItem != nil){
+                     vc.popUpSong()
+                }
+               
             } else if vc.pageIndex == 1 {
                 //TODO: find DetailViewController Under ArtistViewController
             } else if vc.pageIndex == 2 {
