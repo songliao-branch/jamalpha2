@@ -4,6 +4,8 @@ import MediaPlayer
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
+let mostRecentlyPlayedIndexKey = "mostRecentlyPlayedIndexKey"
+
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
     var mc:MusicViewController?
@@ -345,6 +347,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func currentSongChanged(notification: NSNotification){
+        
+       
+       
+        if player.repeatMode != .All && player.shuffleMode != .Songs {
+            NSUserDefaults.standardUserDefaults().setInteger(songIndex, forKey: mostRecentlyPlayedIndexKey)
+        }
+        else {
+            NSUserDefaults.standardUserDefaults().setInteger(getActualSongIndex(), forKey: mostRecentlyPlayedIndexKey)
+        }
             println("songIndex: \(songIndex)")
             println("playerIndex: \(player.indexOfNowPlayingItem)")
             // Don't update when coming from the table
@@ -391,9 +402,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let playbackState = player.playbackState
         if playbackState == .Paused {
             timer.invalidate()
+            mc?.nowView.stop()
         }
         else if playbackState == .Playing {
             startTimer()
+            mc?.nowView.start()
         }
     }
     
@@ -424,6 +437,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func resumeSong(){
+        // save this song to default
+        NSUserDefaults.standardUserDefaults().setInteger(songIndex, forKey: mostRecentlyPlayedIndexKey)
+        
         mc!.nowView!.stop()
         if selectedFromTable {
             player.play()

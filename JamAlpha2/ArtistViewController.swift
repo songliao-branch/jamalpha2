@@ -43,6 +43,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
 //        self.artistTable.tableHeaderView = resultSearchController.searchBar
 //
 //    }
+    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
 //        if self.resultSearchController.active{
 //             return self.filterdAlbums.count
@@ -93,6 +94,8 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     }
     
 
+    
+    
 //    MARK: Search
 //    func filterSongs(searchText:String)
 //    {

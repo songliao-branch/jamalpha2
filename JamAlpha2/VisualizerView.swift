@@ -25,7 +25,7 @@ class VisualizerView: UIView {
         var tempBarArray:NSMutableArray = NSMutableArray(capacity: numberOfBars)
         
         for i in 0..<numberOfBars {
-            var bar:UIImageView = UIImageView(frame: CGRectMake(CGFloat(kWidth*2+i*kWidth+i*kPadding), 5 , CGFloat(kWidth), CGFloat(2+i*5)))
+            var bar:UIImageView = UIImageView(frame: CGRectMake(CGFloat(kWidth*2+i*kWidth+i*kPadding), 5 , CGFloat(kWidth), 10))
             
             bar.backgroundColor = UIColor.whiteColor()
             
