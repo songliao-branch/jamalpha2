@@ -3,6 +3,7 @@
 
 //TODO: whole model upon change when figuring out spotify api music model and ipod music library
 import Foundation
+import MediaPlayer
 
 class Artist: NSObject {
     
@@ -11,7 +12,7 @@ class Artist: NSObject {
     var numberOfTracks:Int = 0
     var totalRunningTime:NSTimeInterval = 0.0
     private var albums = [Album]()
-    
+    private var allSongs: [MPMediaItem]!
     init(artist:String){
         self.artistName = artist
     }
@@ -24,5 +25,15 @@ class Artist: NSObject {
     
     func getAlbums() -> [Album]{
         return self.albums
+    }
+    
+    func getSongs()-> [MPMediaItem] {
+        allSongs = [MPMediaItem]()
+        for album in albums {
+            for song in album.songsIntheAlbum {
+                allSongs.append(song)
+            }
+        }
+        return allSongs
     }
 }
