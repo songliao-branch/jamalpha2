@@ -28,17 +28,19 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         createTransitionAnimation()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         if(pageIndex == 0){
             loadLocalSongs()
-             setUpSong()
+            setCollectionToPlayer()
         }else{
             loadLocalAlbums()
             loadLocalArtist()
         }
     }
-    
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         //println("First song is \(uniqueSongs[0].title)")
@@ -175,7 +177,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             artistVC.theArtist = theArtists[indexPath.row]
             artistVC.player = self.player
             artistVC.createdNewPage = self.createdNewPage
-            artistVC.mc = self
+            artistVC.musicViewController = self
             
             self.showViewController(artistVC, sender: self)
             
@@ -187,7 +189,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             albumVC.theAlbum = theAlbums[indexPath.row]
             albumVC.player = self.player
            // albumVC.createdNewPage = self.createdNewPage
-            albumVC.mc = self
+            albumVC.musicViewController = self
             
             self.showViewController(albumVC, sender: self)
             
@@ -247,7 +249,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
     }
     
-    func setUpSong(){
+    func setCollectionToPlayer(){
             //but we are playing an item with a selected index for example index 2,i.e. item:C
             var collection: MPMediaItemCollection!
             collection = MPMediaItemCollection(items: uniqueSongs)
@@ -281,7 +283,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         
         lastSelectedIndex = selectedSong
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.mc = self
+        songVC.musicViewController = self
        // songVC.songCollection = uniqueSongs
        // songVC.songIndex = selectedSong
         songVC.player = self.player
@@ -294,7 +296,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     func setUpNowSongVC(){
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.mc = self
+        songVC.musicViewController = self
         songVC.player = self.player
         songVC.selectedFromTable = false
         

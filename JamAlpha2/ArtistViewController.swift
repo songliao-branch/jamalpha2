@@ -13,10 +13,9 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     var createdNewPage:Bool = false
     var player:MPMusicPlayerController!
     var lastSelectedIndex = -1
-    var lastSelectedSection = -1
-    var mc:MusicViewController?
+    var musicViewController: MusicViewController?
     var animator: CustomTransitionAnimation?
-    var uniqueArtist:[MPMediaItem]!
+    var artistAllSongs:[MPMediaItem]!
     
     @IBOutlet weak var artistTable: UITableView!
    
@@ -26,6 +25,8 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        artistAllSongs = theArtist.getSongs()
+        setCollectionToPlayer()
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         
@@ -98,23 +99,37 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         return cell
     }
     
+    // We want to put the entire artist collection in the player queue, however the tableView only
+    // returns a section and its row, this is different from a single index in the collection
+    // so we mock out a single index based on all previous album tracks
+    // e.g. album 0 (section 0 ) has songs a b c, album 1 has songs d e, album 2 has songs f g
+    // when selecting section 2 2nd song, we iterate through all previous albums tracks
+    // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if(lastSelectedSection != indexPath.section){
-            createdNewPage = true
-            mc?.createdNewPage = true
-            lastSelectedIndex = -1
-            lastSelectedSection = indexPath.section
-            uniqueArtist = theArtist.getAlbums()[indexPath.section].songsIntheAlbum
-            var collection: MPMediaItemCollection!
-            collection = MPMediaItemCollection(items: uniqueArtist)
-            player.setQueueWithItemCollection(collection)
-        }
-        println(indexPath.row)
         
-        setUpSongVC(uniqueArtist, selectedSong: indexPath.row,selectedFromTable: true)
+        createdNewPage = true
+        musicViewController?.createdNewPage = true
+        
+        var albumIndex = indexPath.section
+        var songsInPreviousSections = 0
+        if albumIndex > 0 {
+            for i in 1...albumIndex {
+               songsInPreviousSections += theArtist.getAlbums()[i-1].numberOfTracks
+            }
+        }
+        var indexToBePlayed = songsInPreviousSections + indexPath.row
+       
+        
+        setUpSongVC(artistAllSongs, selectedSong: indexToBePlayed, selectedFromTable: true)
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
-    func setUpSongVC(colloectForSongs:[MPMediaItem],selectedSong:Int,selectedFromTable:Bool){
+    func setCollectionToPlayer(){
+        var collection: MPMediaItemCollection!
+        collection = MPMediaItemCollection(items: artistAllSongs)
+        player.setQueueWithItemCollection(collection)
+    }
+    func setUpSongVC(collection: [MPMediaItem],selectedSong:Int,selectedFromTable:Bool){
         if(selectedFromTable){
             if(createdNewPage){
                 println("createdNewPage")
@@ -125,33 +140,34 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
                 player.repeatMode = repeatMode
                 player.shuffleMode = shuffle
                 createdNewPage = false
-                mc?.createdNewPage = false
+                musicViewController?.createdNewPage = false
             }
             
             if(player.repeatMode == .One && player.shuffleMode == .Off){
                 player.repeatMode = .All
                 if(lastSelectedIndex != selectedSong){
-                    player.nowPlayingItem = colloectForSongs[selectedSong]
+                    
+                    player.nowPlayingItem = collection[selectedSong]
                 }
                 player.repeatMode = .One
             }else{
                 if(lastSelectedIndex != selectedSong){
-                    player.nowPlayingItem = colloectForSongs[selectedSong]
+                    player.nowPlayingItem = collection[selectedSong]
                 }
             }
         }
         
-        lastSelectedIndex = selectedSong
+       
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.mc = self.mc
-       // songVC.songCollection = colloectForSongs
-        //songVC.songIndex = selectedSong
+        songVC.musicViewController = self.musicViewController
         songVC.player = self.player
         songVC.selectedFromTable = selectedFromTable
         
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.presentViewController(songVC, animated: true, completion: nil)
+        
+         lastSelectedIndex = selectedSong
     }
 
     

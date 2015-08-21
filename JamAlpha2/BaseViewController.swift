@@ -235,7 +235,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         vc.lastSelectedIndex = -1
         var index = vc.pageIndex
         if(index == 0){
-            vc.setUpSong()
+            vc.setCollectionToPlayer()
         }
         if (index==0) || index == NSNotFound {
             return nil
@@ -251,7 +251,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         vc.createdNewPage = true
         vc.lastSelectedIndex = -1
         if(index == 0){
-            vc.setUpSong()
+            vc.setCollectionToPlayer()
         }
         if (index == NSNotFound){
             return nil

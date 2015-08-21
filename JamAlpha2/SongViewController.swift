@@ -8,7 +8,7 @@ let mostRecentlyPlayedIndexKey = "mostRecentlyPlayedIndexKey"
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
-    var mc:MusicViewController?
+    var musicViewController: MusicViewController?
 
     var selectedFromTable = false
     
@@ -394,11 +394,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let playbackState = player.playbackState
         if playbackState == .Paused {
             timer.invalidate()
-            mc!.nowView.stop()
+            musicViewController!.nowView.stop()
         }
         else if playbackState == .Playing {
             startTimer()
-            mc!.nowView.start()
+            musicViewController!.nowView.start()
         }
     }
     
@@ -432,7 +432,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // save this song to default
         //NSUserDefaults.standardUserDefaults().setInteger(songIndex, forKey: mostRecentlyPlayedIndexKey)
         
-        mc!.nowView!.stop()
+        musicViewController!.nowView!.stop()
         if selectedFromTable {
             player.play()
             startTimer()
@@ -734,10 +734,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.navigationController?.navigationBar.tintColor = UIColor.mainPinkColor()
         self.tabBarController?.tabBar.hidden = false
         if player.playbackState == MPMusicPlaybackState.Playing {
-            mc!.nowView!.start()
+            musicViewController!.nowView!.start()
         }
         else if player.playbackState == MPMusicPlaybackState.Paused {
-            mc!.nowView!.stop()
+            musicViewController!.nowView!.stop()
         }
         
     }
@@ -991,7 +991,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             println("play")
         } else {
             player.pause()
-            mc!.nowView!.stop()
+            musicViewController!.nowView!.stop()
         }
     }
     
