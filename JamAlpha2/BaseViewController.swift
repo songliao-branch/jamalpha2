@@ -4,6 +4,9 @@ import MediaPlayer
 
 class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
+    
+    var musicViewController: MusicViewController!
+    
     let player = MPMusicPlayerController.systemMusicPlayer()
     var scrollView:UIScrollView!
     var pageViewController: UIPageViewController!
@@ -85,22 +88,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     
     func goToNowPlaying() {
-        for vc in self.pageViewController.viewControllers as! [MusicViewController] {
-            
-            if vc.pageIndex == 0 {
-                if vc.player.nowPlayingItem != nil {
-                    vc.popUpSong()
-                }
-            } else if vc.pageIndex == 1 {
-                //TODO: find DetailViewController Under ArtistViewController
-                if vc.player.nowPlayingItem != nil {
-                    vc.popUpSong()
-                }
-            } else if vc.pageIndex == 2 {
-                //TODO: find DetailViewController Under AlbumViewController
-                if vc.player.nowPlayingItem != nil {
-                    vc.popUpSong()
-                }
+        if self.pageViewController.viewControllers.count > 0 {
+            if musicViewController.player.nowPlayingItem != nil {
+                musicViewController.popUpSong()
             }
         }
     }
@@ -212,19 +202,19 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             }
         }
     }
-    
+
     func viewControllerAtIndex(index:Int) -> MusicViewController {
         if ((self.pageTitles.count == 0 ) || (index >= self.pageTitles.count)){
             return MusicViewController() //suppose to return nil here
         }
-       
-        var vc: MusicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
-        vc.pageIndex = index
-        vc.player = self.player
-        vc.createdNewPage = true
-        vc.lastSelectedIndex = -1
-        vc.nowView = self.nowView!
-        return vc
+        
+        musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
+        musicViewController.pageIndex = index
+        musicViewController.player = self.player
+        musicViewController.createdNewPage = true
+        musicViewController.lastSelectedIndex = -1
+        musicViewController.nowView = self.nowView!
+        return musicViewController
     }
 
     //MARK: page view controller data source

@@ -28,11 +28,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        createTransitionAnimation()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
         if(pageIndex == 0){
             loadLocalSongs()
             setCollectionToPlayer()
@@ -40,7 +35,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             loadLocalAlbums()
             loadLocalArtist()
         }
+        createTransitionAnimation()
     }
+    
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         //println("First song is \(uniqueSongs[0].title)")
@@ -48,16 +45,12 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     }
     func createTransitionAnimation(){
         if(animator == nil){
-            println("animator created")
             self.animator = CustomTransitionAnimation()
         }
     }
     
     func popUpSong(){
-        println("createdNewPage: \(createdNewPage)")
-        //if(!createdNewPage){
-            setUpNowSongVC()
-        //}
+        setUpNowSongVC()
     }
     
 

@@ -263,10 +263,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func previousPressed(button: UIButton){
+        if selectedFromTable {
+            selectedFromTable = false
+        }
         player.skipToPreviousItem()
     }
     
     func nextPressed(button: UIButton){
+        if selectedFromTable {
+            selectedFromTable = false
+        }
         player.skipToNextItem()
     }
     
@@ -348,46 +354,45 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func currentSongChanged(notification: NSNotification){
-        
-            println("playerIndex: \(player.indexOfNowPlayingItem)")
+        if selectedFromTable {
+            return
+        }
+        println("playerIndex: \(player.indexOfNowPlayingItem)")
             // Don't update when coming from the table
             // Only update when song changes
             
             // The following won't run when selected from table
                 // update the progressblockWidth
-                progressBlockViewWidth = nil
-                println("song changed and current song is \(player.nowPlayingItem.title)")
+        progressBlockViewWidth = nil
+        println("song changed and current song is \(player.nowPlayingItem.title)")
         
-                let nowPlayingItem = player.nowPlayingItem
-                let nowPlayingItemDuration = nowPlayingItem.playbackDuration
+        let nowPlayingItem = player.nowPlayingItem
+        let nowPlayingItemDuration = nowPlayingItem.playbackDuration
         
         
-                startTime = TimeNumber(time: 0)
-                //progressBlock.frame.origin.x = 0
-                progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * progressWidthMultiplier, 5)
-                progressBlock.center.y = progressContainerHeight / 2
-                
-                // Delay this, add a animation to show this
+        startTime = TimeNumber(time: 0)
+        progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * progressWidthMultiplier, 5)
+        progressBlock.center.y = progressContainerHeight / 2
         
-            if(player.repeatMode != .One){
-                var title:String = nowPlayingItem.title
-                let attributedString = NSMutableAttributedString(string:title)
-                songNameLabel.attributedText = attributedString
-                songNameLabel.textAlignment = NSTextAlignment.Center
-                artistNameLabel.text = nowPlayingItem.artist
+        if(player.repeatMode != .One){
+            var title:String = nowPlayingItem.title
+            let attributedString = NSMutableAttributedString(string:title)
+            songNameLabel.attributedText = attributedString
+            songNameLabel.textAlignment = NSTextAlignment.Center
+            artistNameLabel.text = nowPlayingItem.artist
         
-                let image = self.player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
-                let blurredImage = image.applyLightEffect()!
-                self.textColor = blurredImage.averageColor()
+            let image = self.player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
+            let blurredImage = image.applyLightEffect()!
+            self.textColor = blurredImage.averageColor()
             
-                self.backgroundImageView.center.x = self.view.center.x
-                self.backgroundImageView.image = blurredImage
+            self.backgroundImageView.center.x = self.view.center.x
+            self.backgroundImageView.image = blurredImage
        
-                // update the totalTimeLabel
-                var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString())
-                totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
-            }
-            updateAll(0)
+            // update the totalTimeLabel
+            var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString())
+            totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
+        }
+        updateAll(0)
     }
     
     func playbackStateChanged(notification: NSNotification){
