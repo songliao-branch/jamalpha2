@@ -229,6 +229,15 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             uniqueArtists.append(representativeItem)
             
             var artist = Artist(artist: representativeItem.artist)
+            
+            theAlbums.sort({ album1, album2 in
+                if let album1date = album1.releasedDate, let album2date = album2.releasedDate {
+                    return album1date.isGreaterThanDate(album2date)
+                } else {
+                    return false
+                }
+            })
+            
             for album in theAlbums {
                 if representativeItem.artistPersistentID == album.artistPersistantId {
                     artist.addAlbum(album)
@@ -237,7 +246,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             theArtists.append(artist)
         }
     }
-
+    
     func setUpSong(){
             //but we are playing an item with a selected index for example index 2,i.e. item:C
             var collection: MPMediaItemCollection!

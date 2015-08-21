@@ -13,11 +13,13 @@ class Album:NSObject{
     var numberOfTracks:Int = 0
     var totalRunningTime:NSTimeInterval = 0.0
     
+    var releasedDate: NSDate? //can be nil if user add their own songs
+    
     let representativeItem:MPMediaItem // this value must exist, it is not an optional
     
     var songsIntheAlbum:[MPMediaItem]!
     
-    init(theItem:MPMediaItem){
+    init(theItem: MPMediaItem){
      
         self.representativeItem = theItem
        // println("Album represent item: \(representativeItem.title)")
@@ -27,6 +29,11 @@ class Album:NSObject{
         self.artistName = representativeItem.artist!
       //  println(artistName)
         self.coverImage = representativeItem.artwork!
+        
+        if let date = representativeItem.valueForProperty(MPMediaItemPropertyReleaseDate) as? NSDate {
+            self.releasedDate = date
+        }
+
         self.artistPersistantId = representativeItem.artistPersistentID
         var albumPredicate = MPMediaPropertyPredicate(value: albumTitle, forProperty: MPMediaItemPropertyAlbumTitle)
         var artistPredicate = MPMediaPropertyPredicate(value:artistName, forProperty:
