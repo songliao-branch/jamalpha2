@@ -15,8 +15,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var viewDidFullyDisappear = true
     var player:MPMusicPlayerController!
     
-    var songCollection: [MPMediaItem]!
-    var songIndex:Int = 0
+    //var songCollection: [MPMediaItem]!
+    //var songIndex:Int = 0
     
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
@@ -117,7 +117,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        NSNotificationCenter.defaultCenter().removeObserver(self)
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         //load data 载入彩虹吉他谱和歌词
@@ -165,6 +165,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //create an UIImageView
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
+        println(player.nowPlayingItem.title)
         currentImage = player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
         
         //create blurred image
@@ -336,6 +337,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(base)
     }
     
+    
     func registerMediaPlayerNotification(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
         
@@ -347,15 +349,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func currentSongChanged(notification: NSNotification){
         
-       
-       
-        if player.repeatMode != .All && player.shuffleMode != .Songs {
-            NSUserDefaults.standardUserDefaults().setInteger(songIndex, forKey: mostRecentlyPlayedIndexKey)
-        }
-        else {
-            NSUserDefaults.standardUserDefaults().setInteger(getActualSongIndex(), forKey: mostRecentlyPlayedIndexKey)
-        }
-            println("songIndex: \(songIndex)")
             println("playerIndex: \(player.indexOfNowPlayingItem)")
             // Don't update when coming from the table
             // Only update when song changes
@@ -367,12 +360,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
                 let nowPlayingItem = player.nowPlayingItem
                 let nowPlayingItemDuration = nowPlayingItem.playbackDuration
-            
-                var title:String = nowPlayingItem.title
-                let attributedString = NSMutableAttributedString(string:title)
-                songNameLabel.attributedText = attributedString
-                songNameLabel.textAlignment = NSTextAlignment.Center
-                artistNameLabel.text = nowPlayingItem.artist
         
         
                 startTime = TimeNumber(time: 0)
@@ -383,6 +370,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // Delay this, add a animation to show this
         
             if(player.repeatMode != .One){
+                var title:String = nowPlayingItem.title
+                let attributedString = NSMutableAttributedString(string:title)
+                songNameLabel.attributedText = attributedString
+                songNameLabel.textAlignment = NSTextAlignment.Center
+                artistNameLabel.text = nowPlayingItem.artist
+        
                 let image = self.player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
                 let blurredImage = image.applyLightEffect()!
                 self.textColor = blurredImage.averageColor()
@@ -424,20 +417,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     
-    func getActualSongIndex() -> Int{
-        var index:Int = 0
-        let nowItem = player.nowPlayingItem
-        for(index;index<songCollection.count;index++){
-            if(nowItem == songCollection[index]){
-                return index
-            }
-        }
-        return 0
-    }
+//    func getActualSongIndex() -> Int{
+//        var index:Int = 0
+//        let nowItem = player.nowPlayingItem
+//        for(index;index<songCollection.count;index++){
+//            if(nowItem == songCollection[index]){
+//                return index
+//            }
+//        }
+//        return 0
+//    }
     
     func resumeSong(){
         // save this song to default
-        NSUserDefaults.standardUserDefaults().setInteger(songIndex, forKey: mostRecentlyPlayedIndexKey)
+        //NSUserDefaults.standardUserDefaults().setInteger(songIndex, forKey: mostRecentlyPlayedIndexKey)
         
         mc!.nowView!.stop()
         if selectedFromTable {

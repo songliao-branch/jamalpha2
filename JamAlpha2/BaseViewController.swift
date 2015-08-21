@@ -1,8 +1,10 @@
 //to set up pageviewcontroller for musicviewcontroller that switches between tracks, artist and albums
 import UIKit
+import MediaPlayer
 
 class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
+    let player = MPMusicPlayerController.systemMusicPlayer()
     var scrollView:UIScrollView!
     var pageViewController: UIPageViewController!
     var pageTitles: [String]!
@@ -25,6 +27,10 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        MPMusicPlayerController.systemMusicPlayer().stop()
+        player.repeatMode = .All
+        player.shuffleMode = .Off
+        
         nowView.initWithNumberOfBars(4)
         nowView.frame = CGRectMake(self.view.frame.width-55,0,45,40)
         
@@ -87,8 +93,14 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                 }
             } else if vc.pageIndex == 1 {
                 //TODO: find DetailViewController Under ArtistViewController
+                if vc.player.nowPlayingItem != nil {
+                    vc.popUpSong()
+                }
             } else if vc.pageIndex == 2 {
                 //TODO: find DetailViewController Under AlbumViewController
+                if vc.player.nowPlayingItem != nil {
+                    vc.popUpSong()
+                }
             }
         }
     }
@@ -207,8 +219,10 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         }
        
         var vc: MusicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
-        
         vc.pageIndex = index
+        vc.player = self.player
+        vc.createdNewPage = true
+        vc.lastSelectedIndex = -1
         vc.nowView = self.nowView!
         return vc
     }
@@ -217,7 +231,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         
         var vc = viewController as! MusicViewController
+        vc.createdNewPage = true
+        vc.lastSelectedIndex = -1
         var index = vc.pageIndex
+        if(index == 0){
+            vc.setUpSong()
+        }
         if (index==0) || index == NSNotFound {
             return nil
         }
@@ -229,6 +248,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         var vc = viewController as! MusicViewController
         var index = vc.pageIndex
+        vc.createdNewPage = true
+        vc.lastSelectedIndex = -1
+        if(index == 0){
+            vc.setUpSong()
+        }
         if (index == NSNotFound){
             return nil
         }
