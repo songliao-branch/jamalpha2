@@ -199,7 +199,7 @@ public extension UIImage {
             return UIColor.whiteColor()
         }
         else {
-            return UIColor.darkGrayColor()
+            return UIColor.blackColor()
         }
     }
 }

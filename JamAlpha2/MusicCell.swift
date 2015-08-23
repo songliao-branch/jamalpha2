@@ -8,11 +8,8 @@ class MusicCell: UITableViewCell {
     @IBOutlet weak var coverImage: UIImageView!
     
     @IBOutlet weak var imageWidth: NSLayoutConstraint!
-    
     @IBOutlet weak var imageHeight: NSLayoutConstraint!
-    
     @IBOutlet weak var imageLeadingConstraint: NSLayoutConstraint!
-    
     
     override func awakeFromNib() {
 

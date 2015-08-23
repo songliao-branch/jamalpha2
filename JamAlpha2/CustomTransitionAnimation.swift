@@ -69,6 +69,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             //获取Dismiss完将要显示的VC
             let toVc:UIViewController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey)!
             //在Present视图下面插入视图
+            toVc.view.alpha = 0.2
             containerView.insertSubview(toVc.view, belowSubview: fromVc.view)
             //设置最终位置
             let boundsRect:CGRect = UIScreen.mainScreen().bounds
@@ -79,6 +80,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             
             UIView .animateWithDuration(interval, delay: 0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
                 fromVc.view.frame = finalFrame;
+                toVc.view.alpha = 1.0
                 }, completion: {
                     //通知动画已经完成
                     finished in transitionContext.completeTransition(!transitionContext.transitionWasCancelled())

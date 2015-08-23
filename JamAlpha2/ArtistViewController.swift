@@ -10,6 +10,12 @@ import MediaPlayer
 class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate {
     
     var theArtist:Artist!
+    var createdNewPage:Bool = false
+    var player:MPMusicPlayerController!
+    var lastSelectedIndex = -1
+    var musicViewController: MusicViewController?
+    var animator: CustomTransitionAnimation?
+    var artistAllSongs:[MPMediaItem]!
     
     @IBOutlet weak var artistTable: UITableView!
    
@@ -19,17 +25,24 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        artistAllSongs = theArtist.getSongs()
+        setCollectionToPlayer()
+        self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         
-        //setUpSearchBar()
-        //self.artistTable.reloadData()
     }
     
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = mainPinkColor
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+    }
+    
+    func createTransitionAnimation(){
+        if(animator == nil){
+            self.animator = CustomTransitionAnimation()
+        }
     }
 
 //    func setUpSearchBar(){
@@ -45,6 +58,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
 //        self.artistTable.tableHeaderView = resultSearchController.searchBar
 //
 //    }
+    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
 //        if self.resultSearchController.active{
 //             return self.filterdAlbums.count
@@ -58,6 +72,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 50
     }
+    
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 //        if self.resultSearchController.active {
 //            return self.filterdAlbums[section].name
@@ -80,21 +95,83 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! UITableViewCell
-
-        cell.textLabel?.text = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row].title
-        
+        cell.textLabel?.text = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row].title        
         return cell
     }
     
+    // We want to put the entire artist collection in the player queue, however the tableView only
+    // returns a section and its row, this is different from a single index in the collection
+    // so we mock out a single index based on all previous album tracks
+    // e.g. album 0 (section 0 ) has songs a b c, album 1 has songs d e, album 2 has songs f g
+    // when selecting section 2 2nd song, we iterate through all previous albums tracks
+    // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
-        songVC.songCollection = theArtist.getAlbums()[indexPath.section].songsIntheAlbum
-        songVC.songIndex = indexPath.row
-        self.showViewController(songVC, sender: self)
+        createdNewPage = true
+        musicViewController?.createdNewPage = true
+        
+        var albumIndex = indexPath.section
+        var songsInPreviousSections = 0
+        if albumIndex > 0 {
+            for i in 1...albumIndex {
+               songsInPreviousSections += theArtist.getAlbums()[i-1].numberOfTracks
+            }
+        }
+        var indexToBePlayed = songsInPreviousSections + indexPath.row
+       
+        
+        setUpSongVC(artistAllSongs, selectedSong: indexToBePlayed, selectedFromTable: true)
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
+    func setCollectionToPlayer(){
+        var collection: MPMediaItemCollection!
+        collection = MPMediaItemCollection(items: artistAllSongs)
+        player.setQueueWithItemCollection(collection)
+    }
+    func setUpSongVC(collection: [MPMediaItem],selectedSong:Int,selectedFromTable:Bool){
+        if(selectedFromTable){
+            if(createdNewPage){
+                println("createdNewPage")
+                let repeatMode = player.repeatMode
+                let shuffle = player.shuffleMode
+                NSNotificationCenter.defaultCenter().removeObserver(MPMusicPlayerController.systemMusicPlayer())
+                MPMusicPlayerController.systemMusicPlayer().stop()
+                player.repeatMode = repeatMode
+                player.shuffleMode = shuffle
+                createdNewPage = false
+                musicViewController?.createdNewPage = false
+            }
+            
+            if(player.repeatMode == .One && player.shuffleMode == .Off){
+                player.repeatMode = .All
+                if(lastSelectedIndex != selectedSong){
+                    
+                    player.nowPlayingItem = collection[selectedSong]
+                }
+                player.repeatMode = .One
+            }else{
+                if(lastSelectedIndex != selectedSong){
+                    player.nowPlayingItem = collection[selectedSong]
+                }
+            }
+        }
+        
+       
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        songVC.musicViewController = self.musicViewController
+        songVC.player = self.player
+        songVC.selectedFromTable = selectedFromTable
+        
+        songVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(songVC)
+        self.presentViewController(songVC, animated: true, completion: nil)
+        
+         lastSelectedIndex = selectedSong
+    }
 
+    
+    
 //    MARK: Search
 //    func filterSongs(searchText:String)
 //    {
