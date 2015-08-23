@@ -23,7 +23,9 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         self.automaticallyAdjustsScrollViewInsets = false
     }
 
-    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black

@@ -31,6 +31,9 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         self.automaticallyAdjustsScrollViewInsets = false
         
     }
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
     
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
