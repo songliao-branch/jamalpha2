@@ -10,7 +10,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     var musicViewController: MusicViewController?
 
-    var selectedFromTable = false
+    var selectedFromTable = true
     
     var viewDidFullyDisappear = true
     var player:MPMusicPlayerController!
@@ -20,6 +20,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //@IBOutlet weak var base: ChordBase!
     @IBOutlet weak var playPauseButton: UIButton!
+    
+    // the previous song time
+    var firstLoadSongTime:NSTimeInterval!
     
     var blurEffect: UIBlurEffect!
     var backgroundImageView: UIImageView!
@@ -117,7 +120,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        firstLoadSongTime = self.player.nowPlayingItem.playbackDuration
+        removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         //load data 载入彩虹吉他谱和歌词
@@ -139,6 +143,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     
+    func removeAllObserver(){
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
+    }
+
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -146,7 +156,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
-            println("resume song when Fully Disapper")
+            //println("resume song when Fully Disapper")
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -154,7 +164,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        registerMediaPlayerNotification()
+        self.registerMediaPlayerNotification()
     }
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
@@ -166,7 +176,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
         println(player.nowPlayingItem.title)
-        currentImage = player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
+        currentImage = player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
         
         //create blurred image
         var blurredImage:UIImage = currentImage!.applyLightEffect()!
@@ -263,16 +273,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func previousPressed(button: UIButton){
-        if selectedFromTable {
-            selectedFromTable = false
-        }
         player.skipToPreviousItem()
     }
     
     func nextPressed(button: UIButton){
-        if selectedFromTable {
-            selectedFromTable = false
-        }
         player.skipToNextItem()
     }
     
@@ -353,46 +357,58 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         player.beginGeneratingPlaybackNotifications()
     }
     
+    func synced(lock: AnyObject, closure: () -> ()) {
+        objc_sync_enter(lock)
+        closure()
+        objc_sync_exit(lock)
+    }
+    
     func currentSongChanged(notification: NSNotification){
-        if selectedFromTable {
-            return
-        }
-        println("playerIndex: \(player.indexOfNowPlayingItem)")
-            // Don't update when coming from the table
-            // Only update when song changes
+        synced(self) {
+            let nowPlayingItem = self.player.nowPlayingItem
+        
+            if self.firstLoadSongTime != nowPlayingItem.playbackDuration {
             
-            // The following won't run when selected from table
-                // update the progressblockWidth
-        progressBlockViewWidth = nil
-        println("song changed and current song is \(player.nowPlayingItem.title)")
-        
-        let nowPlayingItem = player.nowPlayingItem
-        let nowPlayingItemDuration = nowPlayingItem.playbackDuration
-        
-        
-        startTime = TimeNumber(time: 0)
-        progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * progressWidthMultiplier, 5)
-        progressBlock.center.y = progressContainerHeight / 2
-        
-        if(player.repeatMode != .One){
-            var title:String = nowPlayingItem.title
-            let attributedString = NSMutableAttributedString(string:title)
-            songNameLabel.attributedText = attributedString
-            songNameLabel.textAlignment = NSTextAlignment.Center
-            artistNameLabel.text = nowPlayingItem.artist
-        
-            let image = self.player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/6, height: self.view.frame.height/6))
-            let blurredImage = image.applyLightEffect()!
-            self.textColor = blurredImage.averageColor()
+                self.firstLoadSongTime = nowPlayingItem.playbackDuration
+                // Don't update when coming from the table
+                // Only update when song changes
             
-            self.backgroundImageView.center.x = self.view.center.x
-            self.backgroundImageView.image = blurredImage
+                // The following won't run when selected from table
+                    // update the progressblockWidth
+                self.progressBlockViewWidth = nil
+                println("song changed and current song is \(self.player.nowPlayingItem.title)")
+        
+                let nowPlayingItemDuration = nowPlayingItem.playbackDuration
+        
+        
+                //self.startTime = TimeNumber(time: 0)
+                self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 5)
+                self.progressBlock.center.y = self.progressContainerHeight / 2
+        
+                if(self.player.repeatMode != .One){
+                    var title:String = nowPlayingItem.title
+                    let attributedString = NSMutableAttributedString(string:title)
+                    self.songNameLabel.attributedText = attributedString
+                    self.songNameLabel.textAlignment = NSTextAlignment.Center
+                    self.artistNameLabel.text = nowPlayingItem.artist
+        
+                    let image = self.player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+                    let blurredImage = image.applyLightEffect()!
+                    self.textColor = blurredImage.averageColor()
+            
+                    self.backgroundImageView.center.x = self.view.center.x
+                    self.backgroundImageView.image = blurredImage
        
-            // update the totalTimeLabel
-            var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString())
-            totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
+                    // update the totalTimeLabel
+                    var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString())
+                    self.totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
+                }
+                self.updateAll(0)
+            }else if(self.firstLoadSongTime == nowPlayingItem.playbackDuration){
+                println("same song and current song is \(self.player.nowPlayingItem.title)")
+                self.updateAll(0)
+            }
         }
-        updateAll(0)
     }
     
     func playbackStateChanged(notification: NSNotification){
@@ -441,6 +457,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if selectedFromTable {
             player.play()
             startTimer()
+            println("selectedFromTable~~~~~~~~~~~~~~~~")
         }else{
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
@@ -452,7 +469,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
         updateAll(startTime.toDecimalNumer())
-
     }
     
     
@@ -592,6 +608,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel = UILabel(frame: CGRect(x: (self.view.frame.size.width - 58), y: progressBlockContainer.frame.origin.y+20, width: 38, height: 18))
         totalTimeLabel.textColor = UIColor.blackColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(14)
+        
         var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(player.nowPlayingItem.playbackDuration)).toDisplayString())
         totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
 
@@ -731,7 +748,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         println("view will disappear")
         timer.invalidate()
         viewDidFullyDisappear = true
-        //mc?.lastSelectedIndex = getActualSongIndex()
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -744,7 +761,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         else if player.playbackState == MPMusicPlaybackState.Paused {
             musicViewController!.nowView!.stop()
         }
-        
     }
     
     func calculateXPoints(){

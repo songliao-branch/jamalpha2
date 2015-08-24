@@ -88,9 +88,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     
     func goToNowPlaying() {
-        if self.pageViewController.viewControllers.count > 0 {
-            if musicViewController.player.nowPlayingItem != nil {
-                musicViewController.popUpSong()
+        for vc in self.pageViewController.viewControllers as! [MusicViewController] {
+            if player.nowPlayingItem != nil {
+                vc.popUpSong()
             }
         }
     }
@@ -211,8 +211,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         musicViewController.pageIndex = index
         musicViewController.player = self.player
-        musicViewController.createdNewPage = true
-        musicViewController.lastSelectedIndex = -1
+        if(index == 0){
+            musicViewController.setCollectionToPlayer()
+        }
         musicViewController.nowView = self.nowView!
         return musicViewController
     }
@@ -221,8 +222,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         
         var vc = viewController as! MusicViewController
-        vc.createdNewPage = true
-        vc.lastSelectedIndex = -1
         var index = vc.pageIndex
         if(index == 0){
             vc.setCollectionToPlayer()
@@ -238,8 +237,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         var vc = viewController as! MusicViewController
         var index = vc.pageIndex
-        vc.createdNewPage = true
-        vc.lastSelectedIndex = -1
         if(index == 0){
             vc.setCollectionToPlayer()
         }
