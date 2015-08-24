@@ -85,7 +85,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             buttonHolder[i].tag = i
             
             //set font
-            buttonHolder[i].titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
+            buttonHolder[i].titleLabel?.font = UIFont.systemFontOfSize(17)
             buttonHolder[i].setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Selected)
             //vertically align at the bottom
             buttonHolder[i].contentVerticalAlignment = UIControlContentVerticalAlignment.Bottom
