@@ -8,7 +8,6 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     var theAlbum:Album!
     var createdNewPage:Bool = true
     var player: MPMusicPlayerController!
-    var lastSelectedIndex = -1
     var musicViewController: MusicViewController?
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
@@ -66,23 +65,21 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
                 println("createdNewPage")
                 let repeatMode = player.repeatMode
                 let shuffle = player.shuffleMode
-                NSNotificationCenter.defaultCenter().removeObserver(MPMusicPlayerController.systemMusicPlayer())
                 MPMusicPlayerController.systemMusicPlayer().stop()
                 player.repeatMode = repeatMode
                 player.shuffleMode = shuffle
                 createdNewPage = false
-                musicViewController?.createdNewPage = false
             }
             
             if(player.repeatMode == .One && player.shuffleMode == .Off){
                 player.repeatMode = .All
-                if(lastSelectedIndex != selectedSong){
+                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
                     
                     player.nowPlayingItem = collection[selectedSong]
                 }
                 player.repeatMode = .One
             }else{
-                if(lastSelectedIndex != selectedSong){
+                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
                     player.nowPlayingItem = collection[selectedSong]
                 }
             }
@@ -97,8 +94,6 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.presentViewController(songVC, animated: true, completion: nil)
-        
-        lastSelectedIndex = selectedSong
     }
 
     

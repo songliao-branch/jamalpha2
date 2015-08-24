@@ -10,9 +10,8 @@ import MediaPlayer
 class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate {
     
     var theArtist:Artist!
-    var createdNewPage:Bool = false
+    var createdNewPage:Bool = true
     var player:MPMusicPlayerController!
-    var lastSelectedIndex = -1
     var musicViewController: MusicViewController?
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
@@ -38,6 +37,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
     }
+    
     
     func createTransitionAnimation(){
         if(animator == nil){
@@ -106,10 +106,6 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     // when selecting section 2 2nd song, we iterate through all previous albums tracks
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
-        createdNewPage = true
-        musicViewController?.createdNewPage = true
-        
         var albumIndex = indexPath.section
         var songsInPreviousSections = 0
         if albumIndex > 0 {
@@ -135,23 +131,21 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
                 println("createdNewPage")
                 let repeatMode = player.repeatMode
                 let shuffle = player.shuffleMode
-                NSNotificationCenter.defaultCenter().removeObserver(MPMusicPlayerController.systemMusicPlayer())
                 MPMusicPlayerController.systemMusicPlayer().stop()
                 player.repeatMode = repeatMode
                 player.shuffleMode = shuffle
                 createdNewPage = false
-                musicViewController?.createdNewPage = false
             }
             
             if(player.repeatMode == .One && player.shuffleMode == .Off){
                 player.repeatMode = .All
-                if(lastSelectedIndex != selectedSong){
+                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
                     
                     player.nowPlayingItem = collection[selectedSong]
                 }
                 player.repeatMode = .One
             }else{
-                if(lastSelectedIndex != selectedSong){
+                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
                     player.nowPlayingItem = collection[selectedSong]
                 }
             }
@@ -166,8 +160,6 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.presentViewController(songVC, animated: true, completion: nil)
-        
-         lastSelectedIndex = selectedSong
     }
 
     

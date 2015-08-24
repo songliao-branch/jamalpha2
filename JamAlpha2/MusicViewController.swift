@@ -6,7 +6,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     var uniqueSongs :[MPMediaItem]!
     
     var player:MPMusicPlayerController!
-    var createdNewPage:Bool = false
+    var createdNewPage:Bool = true
     
     //not used hello
     var uniqueArtists:[MPMediaItem]!
@@ -15,7 +15,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     var theArtists = [Artist]()
     
     var pageIndex = 0
-    var lastSelectedIndex = -1
     
     @IBOutlet weak var musicTable: UITableView!
     
@@ -30,7 +29,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         super.viewDidLoad()
         if(pageIndex == 0){
             loadLocalSongs()
-            setCollectionToPlayer()
         }else{
             loadLocalAlbums()
             loadLocalArtist()
@@ -43,6 +41,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         //println("First song is \(uniqueSongs[0].title)")
         
     }
+    
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -169,7 +168,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         
             artistVC.theArtist = theArtists[indexPath.row]
             artistVC.player = self.player
-            artistVC.createdNewPage = self.createdNewPage
             artistVC.musicViewController = self
             
             self.showViewController(artistVC, sender: self)
@@ -181,7 +179,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
       
             albumVC.theAlbum = theAlbums[indexPath.row]
             albumVC.player = self.player
-           // albumVC.createdNewPage = self.createdNewPage
             albumVC.musicViewController = self
             
             self.showViewController(albumVC, sender: self)
@@ -254,7 +251,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             if(createdNewPage){
                 let repeatMode = player.repeatMode
                 let shuffle = player.shuffleMode
-                NSNotificationCenter.defaultCenter().removeObserver(MPMusicPlayerController.systemMusicPlayer())
                 MPMusicPlayerController.systemMusicPlayer().stop()
                 player.repeatMode = repeatMode
                 player.shuffleMode = shuffle
@@ -263,22 +259,19 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             if(player.repeatMode == .One && player.shuffleMode == .Off){
                 player.repeatMode = .All
-                if(lastSelectedIndex != selectedSong){
+                if(player.nowPlayingItem != colloectForSongs[selectedSong]||player.nowPlayingItem == nil){
                     player.nowPlayingItem = colloectForSongs[selectedSong]
                 }
                 player.repeatMode = .One
             }else{
-                if(lastSelectedIndex != selectedSong){
+                if(player.nowPlayingItem != colloectForSongs[selectedSong]||player.nowPlayingItem == nil){
                     player.nowPlayingItem = colloectForSongs[selectedSong]
                 }
             }
         }
         
-        lastSelectedIndex = selectedSong
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.musicViewController = self
-       // songVC.songCollection = uniqueSongs
-       // songVC.songIndex = selectedSong
         songVC.player = self.player
         songVC.selectedFromTable = selectedFromTable
         
@@ -295,7 +288,11 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
-        self.presentViewController(songVC, animated: true, completion: nil)
+        self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
     }
     
 }
