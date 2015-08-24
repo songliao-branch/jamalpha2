@@ -45,8 +45,18 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel!.text = theAlbum.songsIntheAlbum[indexPath.row].title
+        let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
+        let song = theAlbum.songsIntheAlbum[indexPath.row]
+
+        let trackNumber = song.albumTrackNumber
+        let title = song.title
+        
+        if trackNumber < 1 {
+            cell.trackNumberLabel.hidden = true
+        } else {
+            cell.trackNumberLabel.text = "\(trackNumber)"
+        }
+        cell.titleLabel.text = title
         return cell
     }
     
