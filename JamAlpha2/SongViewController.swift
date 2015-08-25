@@ -194,26 +194,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpTopButtons() {
+        
+        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50*self.view.frame.width/320))
+        topView.backgroundColor = UIColor.mainPinkColor()
+        topView.alpha = 1
+        self.view.addSubview(topView)
+        
         let buttonCenterY: CGFloat = 25
         pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
         //TODO: change image source
-        pulldownButton.setImage(UIImage(named: "pulldown"), forState: UIControlState.Normal)
+        pulldownButton.setImage(UIImage(named: "pullDown"), forState: UIControlState.Normal)
         pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
-        self.view.addSubview(pulldownButton)
+        topView.addSubview(pulldownButton)
         
         tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
         tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
-        self.view.addSubview(tuningButton)
+        topView.addSubview(tuningButton)
     }
     
     func setUpNameAndArtistButtons(){
-        
-        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50*self.view.frame.width/320))
-        topView.backgroundColor = UIColor.darkGrayColor()
-        topView.alpha = 0.7
-        self.view.addSubview(topView)
+       
         
         songNameLabel = MarqueeLabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 20)))
         songNameLabel.type = .Continuous
@@ -246,7 +248,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameLabel.center.x = self.view.frame.width / 2
         artistNameLabel.center.y = CGRectGetMaxY(songNameLabel.frame) + 5
         
-        
         songNameLabel.textColor = UIColor.whiteColor()
         artistNameLabel.textColor =  UIColor.whiteColor()
         
@@ -255,6 +256,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topView.addSubview(songNameLabel)
         topView.addSubview(artistNameLabel)
     }
+
     
     func setUpControlButtons(){
         previousButton = UIButton(frame: CGRect(x: 0, y: base.frame.origin.y, width: buttonDimension, height: buttonDimension))

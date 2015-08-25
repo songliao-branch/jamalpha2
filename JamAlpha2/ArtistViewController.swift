@@ -30,6 +30,9 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         self.automaticallyAdjustsScrollViewInsets = false
         
     }
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
     
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
@@ -44,6 +47,24 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
             self.animator = CustomTransitionAnimation()
         }
     }
+    
+    
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let cell = tableView.dequeueReusableCellWithIdentifier("albumsectioncell") as! AlbumSectionCell
+        let image = theArtist.getAlbums()[section].coverImage.imageWithSize(CGSize(width: 85, height: 85))
+        cell.albumImageView.image = image
+        cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
+        
+        if let date = theArtist.getAlbums()[section].releasedDate {
+            let comps = NSCalendar.currentCalendar().components(.CalendarUnitYear, fromDate: date)
+            cell.albumYearLabel.text = "\(comps.year)"
+        } else {
+            cell.albumYearLabel.hidden = true
+        }
+       
+        return cell
+    }
+    
 
 //    func setUpSearchBar(){
 //        
@@ -70,17 +91,9 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 50
+        return 100
     }
     
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if self.resultSearchController.active {
-//            return self.filterdAlbums[section].name
-//        }else{
-//            return ed.albums[section].name
-//        }
-        return theArtist.getAlbums()[section].albumTitle
-    }
     
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -94,8 +107,18 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel?.text = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row].title        
+        let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
+        
+        let song = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
+        let trackNumber = song.albumTrackNumber
+        let title = song.title
+        if trackNumber < 1 {
+            cell.trackNumberLabel.hidden = true
+        } else {
+            cell.trackNumberLabel.text = "\(trackNumber)"
+        }
+        
+        cell.titleLabel.text = title
         return cell
     }
     

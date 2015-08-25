@@ -70,26 +70,20 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         if pageIndex == 0 {
             let image = uniqueSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 54, height: 54))
             
-            //cell.imageView?.frame = CGRectMake(10, 10, 55, 55)
-            //cell.imageView?.image = Toucan(image: image).maskWithRoundedRect(cornerRadius: 2).image
             cell.coverImage.image = image
             
             cell.mainTitle.text = uniqueSongs[indexPath.row].title
             cell.subtitle.text = uniqueSongs[indexPath.row].artist
+            
         } else if pageIndex == 1  {
             
-            cell.mainTitle.font = UIFont(name: cell.mainTitle.font.fontName, size: 20)
-            
             let image = theArtists[indexPath.row].getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
-            //this causes lagging when scrolling
-            //let roundImage = Toucan(image: image).maskWithEllipse().image
-            
             
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             
             cell.coverImage.image = image
-
+            
             cell.mainTitle.text = theArtists[indexPath.row].artistName
             
             var endingAlbumString = ""
@@ -110,7 +104,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
                 endingTracksString = "tracks"
             }
             
-            
             cell.subtitle.text = "\(theArtists[indexPath.row].getAlbums().count) \(endingAlbumString),  \(theArtists[indexPath.row].numberOfTracks) \(endingTracksString)"
             
         } else if pageIndex == 2 {
@@ -119,8 +112,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
-            
-//            let rectImage = Toucan(image: image).maskWithRoundedRect(cornerRadius: 30).image
             cell.coverImage.image = image
             
             var endingTracksString = ""
@@ -131,8 +122,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             else {
                 endingTracksString = "tracks"
             }
-            
-            cell.mainTitle.font = UIFont(name: cell.mainTitle.font.fontName, size: 20)
+
             cell.mainTitle.text = theAlbums[indexPath.row].albumTitle
             cell.subtitle.text = "\(theAlbums[indexPath.row].numberOfTracks) \(endingTracksString)"
         }
