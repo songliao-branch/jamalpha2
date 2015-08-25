@@ -7,12 +7,13 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     var musicViewController: MusicViewController!
     
+    var musicViewInitialKeyForPageIndexOne:Bool = true
+    
     let player = MPMusicPlayerController.systemMusicPlayer()
     var scrollView:UIScrollView!
     var pageViewController: UIPageViewController!
     var pageTitles: [String]!
-    
-    var buttonHolder = [UIButton]()
+    var pageImages: [String]!
     
     var musicTypeButtonContainer :UIView!
     var musicUnderlineSelector: UIView!
@@ -31,79 +32,25 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
-        //change status bar text to light
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-        
         MPMusicPlayerController.systemMusicPlayer().stop()
         player.repeatMode = .All
         player.shuffleMode = .Off
         
-        setUpNowView()
-        setupSegmentButtons()
-        setUpSelector()//the horizontal bar that moves with button tapped
-        setUpPageViewController()
-    }
-    
-    func setUpNowView(){
         nowView.initWithNumberOfBars(4)
         nowView.frame = CGRectMake(self.view.frame.width-55,0,45,40)
+        
+//        var frame:CGRect = nowView.frame
+//        frame.origin.x = (self.navigationController!.navigationBar.frame.size.width - nowView.frame.size.width)-0
+//        frame.origin.y = (self.navigationController!.navigationBar.frame.size.height - nowView.frame.size.height)/2;
+//        nowView.frame = frame;
         
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         nowView.addGestureRecognizer(tapRecognizer)
         self.navigationController!.navigationBar.addSubview(nowView)
-    }
-    
-    func setupSegmentButtons() {
         
-        self.placeHolderForSub.hidden = true
-        
-        let heightOfPlaceHolder = self.placeHolderForSub.frame.height
-        musicTypeButtonContainer = UIView(frame: CGRectMake(0 , self.navigationController!.navigationBar.frame.height , self.view.frame.size.width,
-            heightOfPlaceHolder))
-        
-        let numControllers = 3
-        
-        if (buttonText.count == 0) {
-            buttonText = ["Tracks","Artist","Album"]
-        }
-        
-        let buttonTracks = UIButton(frame: CGRectMake(0, 0, self.view.frame.width / 3, heightOfPlaceHolder))
-        let buttonArtist = UIButton(frame: CGRectMake(self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
-        let buttonAlbum = UIButton(frame: CGRectMake(CGFloat(2) * self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
-        
-        buttonHolder = [ buttonTracks, buttonArtist, buttonAlbum]
-        
-        buttonTracks.setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Normal)
-        buttonArtist.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        buttonAlbum.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        for i in 0..<3 {
-            buttonHolder[i].backgroundColor = UIColor.whiteColor()
-            buttonHolder[i].setTitle(buttonText[i], forState: UIControlState.Normal)
-            buttonHolder[i].tag = i
-            
-            //set font
-            buttonHolder[i].titleLabel?.font = UIFont.systemFontOfSize(17)
-            buttonHolder[i].setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Selected)
-            //vertically align at the bottom
-            buttonHolder[i].contentVerticalAlignment = UIControlContentVerticalAlignment.Bottom
-            buttonHolder[i].addTarget(self, action: "tapButton:", forControlEvents: UIControlEvents.TouchUpInside)
-            musicTypeButtonContainer.addSubview(buttonHolder[i])
-        }
-        self.view.addSubview(musicTypeButtonContainer)
-    }
-    
-    func setUpSelector(){
-        musicUnderlineSelector = UIView(frame: CGRectMake(0, self.musicTypeButtonContainer.frame.height, self.view.frame.width / 3, 2))
-        musicUnderlineSelector.backgroundColor = UIColor.mainPinkColor()
-        musicUnderlineSelector.alpha = 0.8
-        self.musicTypeButtonContainer.addSubview(musicUnderlineSelector)
-    }
-    
-    func setUpPageViewController(){
+        self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         self.pageTitles = ["Song","Album","Artist"]
+        self.pageImages = ["song","album","artist"]
         
         self.pageViewController = self.storyboard?.instantiateViewControllerWithIdentifier("pageviewcontroller") as! UIPageViewController
         
@@ -116,11 +63,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         var allViewControllers = [startVC]
         self.pageViewController.setViewControllers(allViewControllers as [AnyObject], direction: .Forward, animated: true, completion: nil)
         
-        self.pageViewController.view.frame = CGRectMake(0, CGRectGetMaxY(musicUnderlineSelector.frame) + self.navigationController!.navigationBar.frame.height, self.view.frame.width, self.view.frame.size.height)
+        self.pageViewController.view.frame = CGRectMake(0,self.navigationController!.navigationBar.frame.height * 2,self.view.frame.width, self.view.frame.size.height)
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMoveToParentViewController(self)
-
+        
+        
         //set up scroll view
         for view in self.pageViewController.view.subviews {
             if view.isKindOfClass(UIScrollView){
@@ -128,14 +76,23 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                 self.scrollView.delegate = self
             }
         }
+        
         self.currentPageIndex = 0
+        
+        //change status bar text to light
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        
+        setupSegmentButtons()
+        setUpSelector()//the horizontal bar that moves with button tapped
     }
     
     
     func goToNowPlaying() {
-        if self.pageViewController.viewControllers.count > 0 {
-            if musicViewController.player.nowPlayingItem != nil {
-                musicViewController.popUpSong()
+        for vc in self.pageViewController.viewControllers as! [MusicViewController] {
+            if player.nowPlayingItem != nil {
+                vc.popUpSong()
             }
         }
     }
@@ -146,6 +103,59 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
     }
+    
+    
+    var buttonHolder = [UIButton]()
+    
+
+    func setupSegmentButtons() {
+        self.placeHolderForSub.hidden = true
+        
+        let heightOfPlaceHolder = self.placeHolderForSub.frame.height
+        musicTypeButtonContainer = UIView(frame: CGRectMake(0 , self.navigationController!.navigationBar.frame.height , self.view.frame.size.width,
+           heightOfPlaceHolder))
+        
+        let numControllers = 3
+        
+        if (buttonText.count == 0) {
+            buttonText = ["Tracks","Artist","Album"]
+        }
+        
+        let buttonTracks = UIButton(frame: CGRectMake(0, 0, self.view.frame.width / 3, heightOfPlaceHolder))
+        let buttonArtist = UIButton(frame: CGRectMake(self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
+        let buttonAlbum = UIButton(frame: CGRectMake(CGFloat(2) * self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
+        
+         buttonHolder = [ buttonTracks, buttonArtist, buttonAlbum]
+        
+        buttonTracks.setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Normal)
+        buttonArtist.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
+        buttonAlbum.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
+        for i in 0..<3 {
+            buttonHolder[i].backgroundColor = UIColor.whiteColor()
+            buttonHolder[i].setTitle(buttonText[i], forState: UIControlState.Normal)
+            buttonHolder[i].tag = i
+            
+            //set font
+            buttonHolder[i].titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
+            buttonHolder[i].setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Selected)
+            //vertically align at the bottom
+            buttonHolder[i].contentVerticalAlignment = UIControlContentVerticalAlignment.Bottom
+            buttonHolder[i].addTarget(self, action: "tapButton:", forControlEvents: UIControlEvents.TouchUpInside)
+            musicTypeButtonContainer.addSubview(buttonHolder[i])
+        }
+        
+    
+        self.view.addSubview(musicTypeButtonContainer)
+        
+    }
+    
+    func setUpSelector(){
+        musicUnderlineSelector = UIView(frame: CGRectMake(0, self.musicTypeButtonContainer.frame.height, self.view.frame.width / 3, 2))
+        musicUnderlineSelector.backgroundColor = UIColor.mainPinkColor()
+        musicUnderlineSelector.alpha = 0.8
+        self.musicTypeButtonContainer.addSubview(musicUnderlineSelector)
+    }
+    
     
     func tapButton(button:UIButton){
         
@@ -203,22 +213,22 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         musicViewController.pageIndex = index
         musicViewController.player = self.player
-        musicViewController.createdNewPage = true
-        musicViewController.lastSelectedIndex = -1
+        if musicViewInitialKeyForPageIndexOne {
+                musicViewController.setCollectionToPlayer()
+                musicViewInitialKeyForPageIndexOne = false
+        }
         musicViewController.nowView = self.nowView!
         return musicViewController
     }
 
     //MARK: page view controller data source
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        
         var vc = viewController as! MusicViewController
-        vc.createdNewPage = true
-        vc.lastSelectedIndex = -1
+       // vc.createdNewPage = true
         var index = vc.pageIndex
-        if(index == 0){
-            vc.setCollectionToPlayer()
-        }
+//        if(index == 0){
+//            vc.setCollectionToPlayer()
+//        }
         if (index==0) || index == NSNotFound {
             return nil
         }
@@ -229,12 +239,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         var vc = viewController as! MusicViewController
+       // vc.createdNewPage = true
         var index = vc.pageIndex
-        vc.createdNewPage = true
-        vc.lastSelectedIndex = -1
-        if(index == 0){
-            vc.setCollectionToPlayer()
-        }
+//        if(index == 0){
+//            vc.setCollectionToPlayer()
+//        }
         if (index == NSNotFound){
             return nil
         }
@@ -269,6 +278,10 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController
             
             self.currentPageIndex = lastViewController.pageIndex
+            if(currentPageIndex == 0){
+                lastViewController.setCollectionToPlayer()
+                println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            }
             changeButtonColorOnScroll()
         }
     }
@@ -290,6 +303,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let xCoordinate:CGFloat = musicUnderlineSelector.frame.size.width *  CGFloat(self.currentPageIndex)
         musicUnderlineSelector.frame = CGRectMake(xCoordinate - xFromCenter / 3, musicUnderlineSelector.frame.origin.y, musicUnderlineSelector.frame.width, musicUnderlineSelector.frame.height)
     }
-
+    
+    
+    //MARK : Navigation item action
     
 }
