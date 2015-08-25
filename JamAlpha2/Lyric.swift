@@ -50,6 +50,26 @@ class Lyric: NSObject{
         return lyric
     }
     
+    class func getRollingLyrics()-> Lyric {
+        var lyric = Lyric()
+        lyric.addLine(TimeNumber(time:5.35), str: "There's a fire starting in my heart")
+        lyric.addLine(TimeNumber(time: 9.85), str: "Reaching a fever pitch, it's bringing me out the dark")
+        lyric.addLine(TimeNumber(time:14.66), str: "Finally I can see you crystal clear")
+        lyric.addLine(TimeNumber(time: 18.85), str: "Go 'head and sell me out and I'll lay your ship bare")
+        lyric.addLine(TimeNumber(time:23.13), str: "See how I leave with every piece of you")
+        lyric.addLine(TimeNumber(time:27.88), str: "Don't underestimate the things that I will do")
+        lyric.addLine(TimeNumber(time:32.22), str: "There's a fire starting in my heart")
+        lyric.addLine(TimeNumber(time:37.21), str: "Reaching a fever pitch And it's brining me out the dark")
+        lyric.addLine(TimeNumber(time:42.88), str: "The scars of your love remind me of us")
+        lyric.addLine(TimeNumber(time:47.31), str: "They keep me thinking that we almost had it all")
+        lyric.addLine(TimeNumber(time:51.84), str: "The scars of your love, they leave breathless")
+        lyric.addLine(TimeNumber(time:56.88), str: "I can't help feeling")
+        lyric.addLine(TimeNumber(time:58.44), str: "We could have had it all")
+        
+        return lyric
+    }
+    
+    
     class func getExtremeLyrics()-> Lyric {
         var lyric = Lyric()
         

@@ -75,6 +75,48 @@ class Chord: NSObject {
         return chords
     }
     
+    class func getRollingChords ()-> [Chord]{ //capo 3
+        var stuff = [Chord]()
+        var Am7 = Tab(name: "Am7",content:"x02013")
+        var Em =    Tab(name: "Em", content: "022000")
+        var G =     Tab(name: "G",content:"320003")
+        
+        var chord1 = Chord(tab: Am7, time: TimeNumber(time: 1.11))
+        var chord2 = Chord(tab: Em, time: TimeNumber(time:7.98))
+        var chord3 = Chord(tab: G, time: TimeNumber(time:10.26))
+        var chord4 = Chord(tab: Em, time: TimeNumber(time:12.25))
+        var chord5 = Chord(tab: G, time: TimeNumber(time:13.11))
+        
+        var chord6 = Chord(tab: Am7, time: TimeNumber(time: 14.35))
+        var chord7 = Chord(tab: Em, time: TimeNumber(time:17.48))
+        var chord8 = Chord(tab: G, time: TimeNumber(time:19.16))
+        var chord9 = Chord(tab: Em, time: TimeNumber(time:21.05))
+        var chord10 = Chord(tab: G, time: TimeNumber(time:22.51))
+        
+        var chord11 = Chord(tab: Am7, time: TimeNumber(time: 23.15))
+        var chord12 = Chord(tab: Em, time: TimeNumber(time:26.50))
+        var chord13 = Chord(tab: G, time: TimeNumber(time:28.76))
+        var chord14 = Chord(tab: Em, time: TimeNumber(time:30.87))
+        var chord15 = Chord(tab: G, time: TimeNumber(time:31.88))
+        
+        stuff.append(chord1)
+        stuff.append(chord2)
+        stuff.append(chord3)
+        stuff.append(chord4)
+        stuff.append(chord5)
+        stuff.append(chord6)
+        stuff.append(chord7)
+        stuff.append(chord8)
+        stuff.append(chord9)
+        stuff.append(chord10)
+        stuff.append(chord11)
+        stuff.append(chord12)
+        stuff.append(chord13)
+        stuff.append(chord14)
+        stuff.append(chord15)
+        return stuff
+    }
+    
     class func getExtremeChords() -> [Chord] {
         var stuff = [Chord]()
         
