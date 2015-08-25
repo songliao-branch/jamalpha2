@@ -7,6 +7,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     var musicViewController: MusicViewController!
     
+    var musicViewInitialKeyForPageIndexOne:Bool = true
+    
     let player = MPMusicPlayerController.systemMusicPlayer()
     var scrollView:UIScrollView!
     var pageViewController: UIPageViewController!
@@ -211,8 +213,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         musicViewController.pageIndex = index
         musicViewController.player = self.player
-        if(index == 0){
-            musicViewController.setCollectionToPlayer()
+        if musicViewInitialKeyForPageIndexOne {
+                musicViewController.setCollectionToPlayer()
+                musicViewInitialKeyForPageIndexOne = false
         }
         musicViewController.nowView = self.nowView!
         return musicViewController
@@ -220,12 +223,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
 
     //MARK: page view controller data source
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        
         var vc = viewController as! MusicViewController
+       // vc.createdNewPage = true
         var index = vc.pageIndex
-        if(index == 0){
-            vc.setCollectionToPlayer()
-        }
+//        if(index == 0){
+//            vc.setCollectionToPlayer()
+//        }
         if (index==0) || index == NSNotFound {
             return nil
         }
@@ -236,10 +239,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         var vc = viewController as! MusicViewController
+       // vc.createdNewPage = true
         var index = vc.pageIndex
-        if(index == 0){
-            vc.setCollectionToPlayer()
-        }
+//        if(index == 0){
+//            vc.setCollectionToPlayer()
+//        }
         if (index == NSNotFound){
             return nil
         }
@@ -274,6 +278,10 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController
             
             self.currentPageIndex = lastViewController.pageIndex
+            if(currentPageIndex == 0){
+                lastViewController.setCollectionToPlayer()
+                println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            }
             changeButtonColorOnScroll()
         }
     }
