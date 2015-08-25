@@ -126,7 +126,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         //load data 载入彩虹吉他谱和歌词
-        setUpMoreThanWordsData()
+        setUpMusicData(player.nowPlayingItem)
         //setUpRainbowData()
         setUpBackgroundImage()
         setUpTopButtons()
@@ -285,9 +285,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    func setUpMoreThanWordsData(){
-        chords = Chord.getExtremeChords()
-        lyric = Lyric.getExtremeLyrics()
+    func setUpMusicData(song: MPMediaItem){
+        
+         if song.title == "Rolling In The Deep" {
+            chords = Chord.getRollingChords()
+            lyric = Lyric.getRollingLyrics()
+        } else if song.title == "彩虹" {
+            chords = Chord.getRainbowChords()
+            lyric = Lyric.getRainbowLyrics()
+         } else { // use more than words for everything else for now
+            chords = Chord.getExtremeChords()
+            lyric = Lyric.getExtremeLyrics()
+        }
     }
     
     func setUpLyricsBase(){
@@ -373,7 +382,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.firstLoadSongTime = nowPlayingItem.playbackDuration
                 // Don't update when coming from the table
                 // Only update when song changes
-            
+                self.setUpMusicData(nowPlayingItem)
                 // The following won't run when selected from table
                     // update the progressblockWidth
                 self.progressBlockViewWidth = nil
