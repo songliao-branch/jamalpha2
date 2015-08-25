@@ -27,12 +27,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if(pageIndex == 0){
-            loadLocalSongs()
-        }else{
-            loadLocalAlbums()
-            loadLocalArtist()
-        }
+        loadLocalSongs()
+        loadLocalAlbums()
+        loadLocalArtist()
         createTransitionAnimation()
     }
     
