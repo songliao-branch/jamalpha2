@@ -36,34 +36,39 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         player.repeatMode = .All
         player.shuffleMode = .Off
         
+        self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
+        //change status bar text to light
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        setUpNowView()
+        setupSegmentButtons()
+        setUpSelector()//the horizontal bar that moves with button tapped
+        setUpPageViewController()
+    }
+    
+    func setUpNowView(){
         nowView.initWithNumberOfBars(4)
-        nowView.frame = CGRectMake(self.view.frame.width-55,0,45,40)
-        
-//        var frame:CGRect = nowView.frame
-//        frame.origin.x = (self.navigationController!.navigationBar.frame.size.width - nowView.frame.size.width)-0
-//        frame.origin.y = (self.navigationController!.navigationBar.frame.size.height - nowView.frame.size.height)/2;
-//        nowView.frame = frame;
-        
+        nowView.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         nowView.addGestureRecognizer(tapRecognizer)
         self.navigationController!.navigationBar.addSubview(nowView)
-        
-        self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
+    }
+    
+    func setUpPageViewController(){
         self.pageTitles = ["Song","Album","Artist"]
-        self.pageImages = ["song","album","artist"]
-        
         self.pageViewController = self.storyboard?.instantiateViewControllerWithIdentifier("pageviewcontroller") as! UIPageViewController
         
         //for didFinishAnimating to work
         self.pageViewController.delegate = self
-        
         self.pageViewController.dataSource = self
         
         var startVC = self.viewControllerAtIndex(0) as UIViewController
         var allViewControllers = [startVC]
         self.pageViewController.setViewControllers(allViewControllers as [AnyObject], direction: .Forward, animated: true, completion: nil)
         
-        self.pageViewController.view.frame = CGRectMake(0,self.navigationController!.navigationBar.frame.height * 2,self.view.frame.width, self.view.frame.size.height)
+        
+        self.pageViewController.view.frame = CGRectMake(0, CGRectGetMaxY(musicUnderlineSelector.frame) + self.navigationController!.navigationBar.frame.height, self.view.frame.width, self.view.frame.size.height + 15)
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMoveToParentViewController(self)
@@ -78,16 +83,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         }
         
         self.currentPageIndex = 0
-        
-        //change status bar text to light
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        //change navigation bar color
-        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-        
-        setupSegmentButtons()
-        setUpSelector()//the horizontal bar that moves with button tapped
     }
-    
     
     func goToNowPlaying() {
         for vc in self.pageViewController.viewControllers as! [MusicViewController] {
@@ -226,9 +222,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         var vc = viewController as! MusicViewController
        // vc.createdNewPage = true
         var index = vc.pageIndex
-//        if(index == 0){
-//            vc.setCollectionToPlayer()
-//        }
+
         if (index==0) || index == NSNotFound {
             return nil
         }
@@ -241,9 +235,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         var vc = viewController as! MusicViewController
        // vc.createdNewPage = true
         var index = vc.pageIndex
-//        if(index == 0){
-//            vc.setCollectionToPlayer()
-//        }
+
         if (index == NSNotFound){
             return nil
         }
