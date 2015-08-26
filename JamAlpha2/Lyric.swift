@@ -69,6 +69,42 @@ class Lyric: NSObject{
         return lyric
     }
     
+    class func getJasonMrazLyrics() -> Lyric {
+        var lyric = Lyric()
+        lyric.addLine(TimeNumber(time: 12.77), str: "Well, you done done me and you bet I felt it")
+        lyric.addLine(TimeNumber(time: 16.31), str: "I tried to be chill, but you're so hot that I melted")
+        lyric.addLine(TimeNumber(time: 19.70), str: "I fell right through the cracks")
+        lyric.addLine(TimeNumber(time: 22.51), str: "Now I'm trying to get back")
+        lyric.addLine(TimeNumber(time: 25.66), str: "Before the cool done run out")
+        lyric.addLine(TimeNumber(time: 27.16), str: "I'll be giving it my bestest")
+        lyric.addLine(TimeNumber(time: 29.11), str: "And nothing's gonna stop me but divine intervention.")
+        lyric.addLine(TimeNumber(time: 32.44), str: "I reckon, it's again my turn")
+        lyric.addLine(TimeNumber(time: 35.21), str: "To win some or learn some.")
+        lyric.addLine(TimeNumber(time: 38.55), str: "But I won't hesitate")
+        lyric.addLine(TimeNumber(time: 42.61), str: "No more, no more.")
+        lyric.addLine(TimeNumber(time: 45.55), str: "It cannot wait,")
+        lyric.addLine(TimeNumber(time: 48.88), str: "I'm yours")
+        return lyric
+    }
+    
+    class func getDaughters() -> Lyric {
+        var lyric = Lyric()
+        lyric.addLine(TimeNumber(time: 21.33), str: "I know a girl")
+        lyric.addLine(TimeNumber(time: 25.88), str: "She puts the color inside of my world")
+        lyric.addLine(TimeNumber(time: 33.35), str: "But she's just like a maze")
+        lyric.addLine(TimeNumber(time: 36.66), str: "Where all of the walls all continually change")
+        lyric.addLine(TimeNumber(time: 44.77), str: "And I've done all I can")
+        lyric.addLine(TimeNumber(time: 49.01), str: "To stand on her steps with my heart in my hands")
+        
+        lyric.addLine(TimeNumber(time: 57.55), str: "Now I'm starting to see")
+        lyric.addLine(TimeNumber(time: 62.24), str: "Maybe it's got nothing to do with me")
+        
+        lyric.addLine(TimeNumber(time: 69.21), str: "Fathers, be good to your daughters")
+        lyric.addLine(TimeNumber(time: 75.00), str: "Daughters will love like you do")
+        lyric.addLine(TimeNumber(time: 80.88), str: "Girls become lovers who turn into mothers")
+        lyric.addLine(TimeNumber(time: 85.88), str: "So mothers, be good to your daughters too")
+        return lyric
+    }
     
     class func getExtremeLyrics()-> Lyric {
         var lyric = Lyric()

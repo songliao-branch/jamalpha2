@@ -78,7 +78,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var speed:Float = 1
     
     //time for chords to fall from top to bottom of chordbase
-    var freefallTime:Float = 5
+    var freefallTime:Float = 3
     
     //Lyric
     var lyricbase: UIView!
@@ -195,7 +195,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpTopButtons() {
         
-        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50*self.view.frame.width/320))
+        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50 ))
+        
         topView.backgroundColor = UIColor.mainPinkColor()
         topView.alpha = 1
         self.view.addSubview(topView)
@@ -293,10 +294,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else if song.title == "彩虹" {
             chords = Chord.getRainbowChords()
             lyric = Lyric.getRainbowLyrics()
+         } else if song.title == "I'm Yours"{
+            chords = Chord.getJasonMrazChords()
+            lyric = Lyric.getJasonMrazLyrics()
+         }else if song.title == "Daughters" {
+            chords = Chord.getDaughters()
+            lyric = Lyric.getDaughters()
+            
          } else { // use more than words for everything else for now
             chords = Chord.getExtremeChords()
             lyric = Lyric.getExtremeLyrics()
         }
+        
+        
     }
     
     func setUpLyricsBase(){
@@ -602,7 +612,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         verticalBar.backgroundColor = UIColor.blueColor()
         self.view.addSubview(verticalBar)
         
-        currentTimeLabel = UILabel(frame: CGRect(x: 20, y: progressBlockContainer.frame.origin.y+20, width: 38, height: 18))
+        currentTimeLabel = UILabel(frame: CGRect(x: 20, y: progressBlockContainer.frame.origin.y+20, width: 60, height: 18))
         
         currentTimeLabel.font = UIFont.systemFontOfSize(14)
         currentTimeLabel.text = "0:00"
@@ -917,9 +927,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshTimeLabel(){
-        //update current time label
-        var tempcurrentTime:NSString = NSString(string: startTime.toDisplayString())
-        currentTimeLabel.text = tempcurrentTime.substringToIndex(tempcurrentTime.length-2)
+        // update current time label
+        // var tempcurrentTime:NSString = NSString(string: startTime.toDisplayString())
+        // currentTimeLabel.text = tempcurrentTime.substringToIndex(tempcurrentTime.length-2)
+        currentTimeLabel.text = startTime.toDisplayString()
     }
     
     func updateAll(time: Float){
@@ -1086,7 +1097,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     private func dealWithLabelofChordName(chordLabel:UILabel){
         //make the text glow
-        chordLabel.textColor = textColor
+        chordLabel.textColor = UIColor.blackColor()
         var color:UIColor = chordLabel.textColor
         chordLabel.layer.shadowColor = color.CGColor
         chordLabel.layer.shadowRadius = 4.0
