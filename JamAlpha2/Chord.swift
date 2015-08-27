@@ -11,7 +11,102 @@ class Chord: NSObject {
         self.mTime = time
     }
     
-    //example
+    class func getJasonMrazChords()-> [Chord]{
+        var chords = [Chord]()
+        var G = Tab(name:"G",content:"320030")
+        var D = Tab(name:"D",content:"xx0232")
+        var Em =    Tab(name: "Em", content: "022000")
+        var C = Tab(name:"C",content:"x32010")
+        
+        chords.append(Chord(tab: G, time: TimeNumber(time: 1.00)))
+        chords.append(Chord(tab: D, time: TimeNumber(time: 3.88)))
+        chords.append(Chord(tab: Em, time: TimeNumber(time: 6.99)))
+        chords.append(Chord(tab: C, time: TimeNumber(time: 10.11)))
+        
+        chords.append(Chord(tab: G, time: TimeNumber(time: 13.44)))
+        chords.append(Chord(tab: D, time: TimeNumber(time: 16.55)))
+        chords.append(Chord(tab: Em, time: TimeNumber(time: 19.88)))
+        chords.append(Chord(tab: C, time: TimeNumber(time: 22.84)))
+        
+        chords.append(Chord(tab: G, time: TimeNumber(time: 26.11)))
+        chords.append(Chord(tab: D, time: TimeNumber(time: 29.44)))
+        chords.append(Chord(tab: Em, time: TimeNumber(time: 32.33)))
+        chords.append(Chord(tab: C, time: TimeNumber(time: 35.55)))
+        
+        chords.append(Chord(tab: G, time: TimeNumber(time: 38.88)))
+        chords.append(Chord(tab: D, time: TimeNumber(time: 41.92)))
+        chords.append(Chord(tab: Em, time: TimeNumber(time: 45.22)))
+        chords.append(Chord(tab: C, time: TimeNumber(time: 48.31)))
+        return chords
+    }
+    
+    class func getDaughters() -> [Chord] {
+        var chords = [Chord]()
+        var chord1 = Tab(name:"",content:"707700")
+        var chord2 = Tab(name:"",content:"075700")
+        var chord3 = Tab(name: "", content: "505700")
+        var chord4 = Tab(name:"",content:"054700")
+        
+        var chord5 = Tab(name: "", content: "076700")
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 0.22)))
+        chords.append(Chord(tab: chord2, time: TimeNumber(time: 3.10)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 6.39)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 8.60)))
+        
+        
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 11.80)))
+        chords.append(Chord(tab: chord2, time: TimeNumber(time: 14.85)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 17.60)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 20.77)))
+        
+        
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 23.84)))
+        chords.append(Chord(tab: chord2, time: TimeNumber(time: 26.4)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 29.33)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 32.40)))
+        
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 35.10)))
+        chords.append(Chord(tab: chord2, time: TimeNumber(time: 37.62)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 40.7)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 43.41)))
+
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 46.41)))
+        chords.append(Chord(tab: chord2, time: TimeNumber(time: 49.33)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 52.23)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 55.12)))
+        
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 57.75)))
+        chords.append(Chord(tab: chord2, time: TimeNumber(time: 60.81)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 63.9)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 66.61)))
+        
+        //chorus
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 69.50)))
+        chords.append(Chord(tab: chord5, time: TimeNumber(time: 70.81)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 72.4)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 73.9)))
+        
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 75.20)))
+        chords.append(Chord(tab: chord5, time: TimeNumber(time: 76.80)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 78.1)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 79.6)))
+        
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 80.8)))
+        chords.append(Chord(tab: chord5, time: TimeNumber(time: 82.6)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 84.3)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 85.5)))
+
+        
+        chords.append(Chord(tab: chord1, time: TimeNumber(time: 87.2)))
+        chords.append(Chord(tab: chord5, time: TimeNumber(time: 88.4)))
+        chords.append(Chord(tab: chord3, time: TimeNumber(time: 89.6)))
+        chords.append(Chord(tab: chord4, time: TimeNumber(time: 91.1)))
+        
+        return chords
+        
+    }
+    
+    // standard tuning no capo
     class func getRainbowChords() -> [Chord]{
         var chords = [Chord]()
         
@@ -75,6 +170,7 @@ class Chord: NSObject {
         return chords
     }
     
+    // standard tuning, 3rd capo
     class func getRollingChords ()-> [Chord]{ //capo 3
         var stuff = [Chord]()
         var Am7 = Tab(name: "Am7",content:"x02013")
@@ -117,6 +213,7 @@ class Chord: NSObject {
         return stuff
     }
     
+    // all strings half note down tuning
     class func getExtremeChords() -> [Chord] {
         var stuff = [Chord]()
         

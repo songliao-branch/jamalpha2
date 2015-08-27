@@ -30,12 +30,13 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         MPMusicPlayerController.systemMusicPlayer().stop()
         player.repeatMode = .All
         player.shuffleMode = .Off
-        
+        title = "twistjam"
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
