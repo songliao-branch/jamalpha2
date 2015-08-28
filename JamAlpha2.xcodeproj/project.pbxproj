@@ -12,6 +12,9 @@
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
+		E4399C351B90041900906DBD /* FVSoundWaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4399C331B90041900906DBD /* FVSoundWaveView.swift */; };
+		E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4399C341B90041900906DBD /* SoundWaveView.swift */; };
+		E4399C381B90048F00906DBD /* UIView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4399C371B90048F00906DBD /* UIView+Geometry.swift */; };
 		E44358FE1B19471B0091E926 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44358FD1B19471B0091E926 /* Artist.swift */; };
 		E44359021B1947660091E926 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359011B1947660091E926 /* Album.swift */; };
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
@@ -57,6 +60,9 @@
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
+		E4399C331B90041900906DBD /* FVSoundWaveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FVSoundWaveView.swift; sourceTree = "<group>"; };
+		E4399C341B90041900906DBD /* SoundWaveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundWaveView.swift; sourceTree = "<group>"; };
+		E4399C371B90048F00906DBD /* UIView+Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Geometry.swift"; sourceTree = "<group>"; };
 		E44358FD1B19471B0091E926 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		E44359011B1947660091E926 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
@@ -109,6 +115,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E4399C391B90049600906DBD /* SoundWave */ = {
+			isa = PBXGroup;
+			children = (
+				E4399C331B90041900906DBD /* FVSoundWaveView.swift */,
+				E4399C341B90041900906DBD /* SoundWaveView.swift */,
+				E4399C371B90048F00906DBD /* UIView+Geometry.swift */,
+			);
+			name = SoundWave;
+			sourceTree = "<group>";
+		};
 		E44358FC1B1947120091E926 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +140,7 @@
 		E456457C1B3BB14200276287 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
+				E4399C391B90049600906DBD /* SoundWave */,
 				E456457D1B3BB15C00276287 /* ChordBase.swift */,
 				E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */,
 				C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */,
@@ -343,12 +360,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4399C381B90048F00906DBD /* UIView+Geometry.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
+				E4399C351B90041900906DBD /* FVSoundWaveView.swift in Sources */,
 				E44358FE1B19471B0091E926 /* Artist.swift in Sources */,
+				E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,

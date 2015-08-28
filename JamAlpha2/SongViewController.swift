@@ -42,8 +42,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var chordAndLyricBaseHeight:CGFloat!
     
     //MARK: progress Container
-    var progressBlock:UIView!
+    var progressBlock: SoundWaveView!
     var progressBlockViewWidth:CGFloat?
+    var progressChangedPosition: CGFloat!
     var progressBlockContainer:UIView!
     var progressChangedOrigin:CGFloat!
     let progressWidthMultiplier:CGFloat = 2
@@ -507,10 +508,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         progressBarWidth = CGFloat(player.nowPlayingItem.playbackDuration) * progressWidthMultiplier
 
+        progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+        progressBlock.center.y = progressContainerHeight
+        let assetURL = player.nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) as? NSURL
+        self.progressBlock.SetSoundURL(assetURL!)
         
-        progressBlock = UIView(frame: CGRect(x: progressChangedOrigin, y: 0, width: progressBarWidth!, height: 5))
-        progressBlock.center.y = progressContainerHeight / 2
-        progressBlock.backgroundColor = UIColor.mainPinkColor()
+        self.progressBlockContainer.addSubview(self.progressBlock)
         
         progressBlockContainer.addSubview(progressBlock)
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
@@ -529,20 +532,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             var newPosition = progressChangedOrigin + translation.x
          
+            var newProgressPosition = progressChangedPosition - translation.x/self.progressBlock.frame.size.width
             
             // leftmost point of inner bar cannot be more than half of the view
             if newPosition > self.view.frame.width / 2 {
                 newPosition = self.view.frame.width / 2
+                newProgressPosition = 0
             }
             
             
             // the end of inner bar cannot be smaller left half of view
             if newPosition + child.frame.width < self.view.frame.width / 2 {
                 newPosition = self.view.frame.width / 2 - child.frame.width
-                println(newPosition)
-                println(self.view.frame.width / 2)
+                newProgressPosition = child.frame.width/self.progressBlock.frame.size.width
             }
             
+            self.progressBlock.setProgress(newProgressPosition)
             //update all chords, lyrics
             timer.invalidate()
             
@@ -918,10 +923,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             progressBlockViewWidth = CGFloat(player.nowPlayingItem.playbackDuration)
         }
         
+        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!) / self.progressBlock.frame.size.width
         
         let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!
         if !isPanning {
             self.progressChangedOrigin = newOriginX
+            self.progressChangedPosition = newProgressPosition
+            self.progressBlock.setProgress(newProgressPosition)
         }
         self.progressBlock.frame.origin.x = newOriginX
     }
@@ -1032,9 +1040,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
             println("play")
+            
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+                //self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                self.progressBlock!.alpha = 1.0
+                }, completion: { finished in
+                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
+                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                        }, completion: {
+                            finished in self.progressBlockContainer.addGestureRecognizer(self.tapRecognizer)
+                    })
+                    
+            })
+            
         } else {
             player.pause()
             musicViewController!.nowView!.stop()
+            
+            UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
+                println("pause1")
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                //self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                self.progressBlock!.alpha = 0.5
+                }, completion: { finished in self.progressBlockContainer.addGestureRecognizer(self.tapRecognizer)
+                    
+            })
         }
     }
     
