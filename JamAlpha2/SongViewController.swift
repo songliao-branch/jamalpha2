@@ -52,8 +52,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var isPanning = false
     
     var tapRecognizer: UITapGestureRecognizer!
-    
-    var verticalBar:UIView!
+
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
     
@@ -579,11 +578,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let translation = recognizer.translationInView(self.view)
         
         switch recognizer.state {
+            
         case UIGestureRecognizerState.Began:
             isPanning = true
             currentChordTime = startTime.toDecimalNumer()+0.01
             timer.invalidate()
             updateAll(currentChordTime)
+            
             break;
         case UIGestureRecognizerState.Changed:
             var deltaTime = Float(translation.y)*(freefallTime/Float(base.frame.size.height))
@@ -594,6 +595,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 toChordTime = Float(player.nowPlayingItem.playbackDuration)
             }
             updateAll(toChordTime)
+            
+
             break;
         case UIGestureRecognizerState.Ended:
             isPanning = false
@@ -612,11 +615,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func setUpTimeLabels(){
-        verticalBar = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: progressContainerHeight / 2))
-        verticalBar.center = progressBlockContainer.center
-        verticalBar.backgroundColor = UIColor.blueColor()
-        self.view.addSubview(verticalBar)
-        
         currentTimeLabel = UILabel(frame: CGRect(x: 20, y: progressBlockContainer.frame.origin.y+20, width: 60, height: 18))
         
         currentTimeLabel.font = UIFont.systemFontOfSize(14)
@@ -917,7 +915,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func refreshProgressBlock(){
-        
         
         if progressBlockViewWidth == nil {
             progressBlockViewWidth = CGFloat(player.nowPlayingItem.playbackDuration)
