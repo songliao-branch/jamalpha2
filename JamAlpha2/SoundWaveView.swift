@@ -101,8 +101,7 @@ class SoundWaveView: UIView {
                 
                 outputSettingsDict=[
                     AVFormatIDKey:NSNumber(int:Int32(kAudioFormatLinearPCM)),
-                    AVNumberOfChannelsKey:NSNumber(int: 1),
-                    AVLinearPCMBitDepthKey:NSNumber(int: 8),
+                    AVLinearPCMBitDepthKey:NSNumber(int: 16),
                     AVLinearPCMIsBigEndianKey:NSNumber(bool: false),
                     AVLinearPCMIsFloatKey:NSNumber(bool: false),
                     AVLinearPCMIsNonInterleaved:NSNumber(bool: false)]
@@ -193,11 +192,11 @@ class SoundWaveView: UIView {
                             bigSample += Double(sample)
                             bigSampleCount++
                             
-                            if(bigSampleCount == 3*samplesPerPixel){
+                            if(bigSampleCount == 8*samplesPerPixel){
                                 var averageSample:Double = bigSample / Double(bigSampleCount)
                                 
                                 
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*12)
+                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*8)
                                 
                                 currentX++
                                 bigSample = 0
@@ -209,11 +208,11 @@ class SoundWaveView: UIView {
                     }
                 }
                 
-//                bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
-//                while(currentX < 450){
-//                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*12)
-//                    currentX++
-//                }
+                bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
+                while(currentX < 450){
+                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*8)
+                    currentX++
+                }
                 
             }
         }
