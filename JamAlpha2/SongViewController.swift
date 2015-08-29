@@ -4,8 +4,6 @@ import MediaPlayer
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
-let mostRecentlyPlayedIndexKey = "mostRecentlyPlayedIndexKey"
-
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
     var musicViewController: MusicViewController?
@@ -15,10 +13,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var viewDidFullyDisappear = true
     var player:MPMusicPlayerController!
     
-    //var songCollection: [MPMediaItem]!
-    //var songIndex:Int = 0
-    
-    //@IBOutlet weak var base: ChordBase!
+
     @IBOutlet weak var playPauseButton: UIButton!
     
     // the previous song time
@@ -112,10 +107,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //default is 0
     //0-repeat all, 1-repeat song, 2-shuffle all
     var shuffleButtonImageNames = ["loop_playlist","loop_song","shuffle"]
-    enum ShuffleState: Int {
-        case RepeatAll = 0, RepeatOne, ShuffleAll
-    }
-    var song: Song!
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
@@ -387,30 +378,30 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func currentSongChanged(notification: NSNotification){
         synced(self) {
             let nowPlayingItem = self.player.nowPlayingItem
-        
+            
+            // use current item's playbackduration to validate nowPlayingItem duration
+            // if they are not equal, i.e. not the same song
             if self.firstLoadSongTime != nowPlayingItem.playbackDuration {
             
                 self.firstLoadSongTime = nowPlayingItem.playbackDuration
-                // Don't update when coming from the table
-                // Only update when song changes
+                
                 self.setUpMusicData(nowPlayingItem)
                 // The following won't run when selected from table
-                    // update the progressblockWidth
+                // update the progressblockWidth
                 
                 self.progressBlockViewWidth = nil
                 println("song changed and current song is \(self.player.nowPlayingItem.title)")
         
                 let nowPlayingItemDuration = nowPlayingItem.playbackDuration
                 
-                // self.startTime = TimeNumber(time: 0)
-                
+
                 self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 5)
                 self.progressBlock.center.y = self.progressContainerHeight / 2
         
-                if(self.player.repeatMode != .One){
-                    var title:String = nowPlayingItem.title
-                    let attributedString = NSMutableAttributedString(string:title)
-                    self.songNameLabel.attributedText = attributedString
+                // if we are NOT repeating song
+                if self.player.repeatMode != .One {
+                    
+                    self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem.title)
                     self.songNameLabel.textAlignment = NSTextAlignment.Center
                     self.artistNameLabel.text = nowPlayingItem.artist
         
@@ -425,11 +416,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString())
                     self.totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
                 }
-                self.updateAll(0)
+                
             }else if(self.firstLoadSongTime == nowPlayingItem.playbackDuration){
                 println("same song and current song is \(self.player.nowPlayingItem.title)")
-                self.updateAll(0)
             }
+            self.updateAll(0)
         }
     }
     
@@ -459,28 +450,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playerVolumeChanged(notification: NSNotification){
         
     }
-    
-//    func getActualSongIndex() -> Int{
-//        var index:Int = 0
-//        let nowItem = player.nowPlayingItem
-//        for(index;index<songCollection.count;index++){
-//            if(nowItem == songCollection[index]){
-//                return index
-//            }
-//        }
-//        return 0
-//    }
+
     
     func resumeSong(){
-        // save this song to default
-        //NSUserDefaults.standardUserDefaults().setInteger(songIndex, forKey: mostRecentlyPlayedIndexKey)
-        
+
         musicViewController!.nowView!.stop()
         if selectedFromTable {
             player.play()
             startTimer()
             println("selectedFromTable~~~~~~~~~~~~~~~~")
-        }else{
+        }else{ // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
             }
