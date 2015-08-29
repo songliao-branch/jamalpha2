@@ -12,6 +12,10 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
     
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()

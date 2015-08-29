@@ -21,6 +21,10 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     //TODO: this search functionality will be used for all the Songs,Artist and Album
     var resultSearchController:UISearchController!
     var filterdAlbums = [Album]()
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
