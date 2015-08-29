@@ -3,7 +3,7 @@ import MediaPlayer
 
 class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
     
-    var uniqueSongs :[MPMediaItem]!
+    //var uniqueSongs :[MPMediaItem]!
     
     var player:MPMusicPlayerController!
     var createdNewPage:Bool = true
@@ -27,7 +27,10 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadLocalSongs()
+        
+        
+//        loadAllSongs()
+//        loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
         createTransitionAnimation()
@@ -52,7 +55,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
-                return uniqueSongs.count
+                return SongManager.sharedInstance.getAllMediaItems().count
         }
         else if pageIndex == 1 {
             return theArtists.count
@@ -68,12 +71,15 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
 
         if pageIndex == 0 {
-            let image = uniqueSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 54, height: 54))
+            
+            let song = SongManager.sharedInstance.getAllSongs()[indexPath.row]
+            
+            let image = song.mediaItem.artwork.imageWithSize(CGSize(width: 54, height: 54))
             
             cell.coverImage.image = image
             
-            cell.mainTitle.text = uniqueSongs[indexPath.row].title
-            cell.subtitle.text = uniqueSongs[indexPath.row].artist
+            cell.mainTitle.text = song.title
+            cell.subtitle.text = song.artist
             
         } else if pageIndex == 1  {
             
@@ -147,7 +153,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if  pageIndex == 0 {
-            setUpSongVC(uniqueSongs,selectedSong: indexPath.row,selectedFromTable: true)
+            setUpSongVC(SongManager.sharedInstance.getAllMediaItems(), selectedSong: indexPath.row,selectedFromTable: true)
         }
         else if pageIndex == 1 {
           //  println("artist \(indexPath.row) selected")
@@ -176,10 +182,23 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     
     
-    func loadLocalSongs(){
-        var songCollection = MPMediaQuery.songsQuery()
-        uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
-    }
+//    func loadLocalSongs(){
+//        var songCollection = MPMediaQuery.songsQuery()
+//        uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
+//    }
+//    
+//    var allSongs = [Song]()
+//        
+//    func loadAllSongs(){
+//        var songCollection = MPMediaQuery.songsQuery()
+//        var uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
+//        for song in uniqueSongs {
+//            allSongs.append(Song(mediaItem: song))
+//        }
+//        
+//        
+//    }
+    
     func loadLocalAlbums(){
         //start new albums fresh
         var uniqueAlbums = [MPMediaItem]()
@@ -229,7 +248,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     func setCollectionToPlayer(){
             //but we are playing an item with a selected index for example index 2,i.e. item:C
             var collection: MPMediaItemCollection!
-            collection = MPMediaItemCollection(items: uniqueSongs)
+            collection = MPMediaItemCollection(items: SongManager.sharedInstance.getAllMediaItems())
             player.setQueueWithItemCollection(collection)
     }
     

@@ -115,10 +115,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     enum ShuffleState: Int {
         case RepeatAll = 0, RepeatOne, ShuffleAll
     }
+    var song: Song!
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
     let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         firstLoadSongTime = self.player.nowPlayingItem.playbackDuration
@@ -223,7 +225,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         songNameLabel.scrollDuration = 15.0
         songNameLabel.fadeLength = 5.0
         songNameLabel.trailingBuffer = 30.0
-        
         
         artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
         artistNameLabel.textAlignment = NSTextAlignment.Center
@@ -395,13 +396,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.setUpMusicData(nowPlayingItem)
                 // The following won't run when selected from table
                     // update the progressblockWidth
+                
                 self.progressBlockViewWidth = nil
                 println("song changed and current song is \(self.player.nowPlayingItem.title)")
         
                 let nowPlayingItemDuration = nowPlayingItem.playbackDuration
-        
-        
-                //self.startTime = TimeNumber(time: 0)
+                
+                // self.startTime = TimeNumber(time: 0)
+                
                 self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 5)
                 self.progressBlock.center.y = self.progressContainerHeight / 2
         
@@ -539,7 +541,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 newProgressPosition = 0
             }
             
-            
             // the end of inner bar cannot be smaller left half of view
             if newPosition + child.frame.width < self.view.frame.width / 2 {
                 newPosition = self.view.frame.width / 2 - child.frame.width
@@ -589,14 +590,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         case UIGestureRecognizerState.Changed:
             var deltaTime = Float(translation.y)*(freefallTime/Float(base.frame.size.height))
             toChordTime = currentChordTime + deltaTime
-            if(toChordTime < 0){
+            
+            if toChordTime < 0 {
                 toChordTime = 0
-            }else if(toChordTime > Float(player.nowPlayingItem.playbackDuration)){
+            } else if (toChordTime > Float(player.nowPlayingItem.playbackDuration)){
                 toChordTime = Float(player.nowPlayingItem.playbackDuration)
             }
+            
             updateAll(toChordTime)
             
-
             break;
         case UIGestureRecognizerState.Ended:
             isPanning = false
@@ -1050,8 +1052,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     })
                     
             })
-            
         } else {
+            
             player.pause()
             musicViewController!.nowView!.stop()
             
@@ -1087,7 +1089,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         }
     }
-
+    
     func createLabels(name: String, content: String) -> [UILabel]{
         var res = [UILabel]()
         
