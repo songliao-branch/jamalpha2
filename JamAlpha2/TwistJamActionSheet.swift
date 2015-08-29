@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MediaPlayer
 
  let kDefaultAnimationDuration:NSTimeInterval = 0.3
  let kBlurFadeRangeSize:CGFloat = 200.0
@@ -132,7 +133,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
                 slider.minimumValue = -0.5
                 slider.maximumValue = 0.5
                 self.updateSliderPopoverText()
-                slider.setValue(songVC.player.currentPlaybackRate - 1, animated: false)
+                slider.setValue(songVC.nowPlayingItemSpeed - 1, animated: false)
                 cell.addSubview(slider)
                 cell.addSubview(slider.popOver)
                 cell.addSubview(resetButton)
@@ -163,12 +164,19 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func resetSlider(){
-        println("here")
-        self.slider.setValue(0.0, animated: true)
-        songVC!.player.currentPlaybackRate = 1
+        println("reset")
         songVC!.speed = 1
-        songVC!.timer.invalidate()
-        songVC!.startTimer()
+        
+        self.slider.setValue(0.0, animated: true)
+        if songVC!.player.playbackState == MPMusicPlaybackState.Playing {
+            songVC!.player.currentPlaybackRate = 1
+            songVC!.nowPlayingItemSpeed = 1
+            songVC!.timer.invalidate()
+            songVC!.startTimer()
+        }else{
+            songVC!.player.currentPlaybackRate = 0
+            songVC!.nowPlayingItemSpeed = 1
+        }
     }
     
     
