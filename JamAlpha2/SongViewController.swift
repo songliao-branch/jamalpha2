@@ -20,7 +20,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // the previous song time
     var firstLoadSongTime:NSTimeInterval!
     
-    var blurEffect: UIBlurEffect!
     var backgroundImageView: UIImageView!
     
     var buttonDimension: CGFloat = 50
@@ -73,6 +72,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //speed to control playback speed and
     //corresponding playback speed
     var speed:Float = 1
+    //as a recorder to write down the current rate
+    var nowPlayingItemSpeed:Float = 1
     
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 3
@@ -187,11 +188,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         backgroundImageView.image = blurredImage
         textColor = blurredImage.averageColor()
         
-        //add a blur background to UIImageView
-        blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
-        
         self.view.addSubview(backgroundImageView)
-        println("setUpBackgroundImage")
     }
     
     func setUpTopButtons() {
@@ -315,13 +312,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sideMargin: CGFloat = 20
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: chordAndLyricBaseHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
-        //add vibrancy effect
+        lyricbase.alpha = 0.8
         
-        let vibrancyEffect = UIVibrancyEffect(forBlurEffect: blurEffect)
-        let vibrancyLayer = UIVisualEffectView(effect: vibrancyEffect)
-        
-        vibrancyLayer.frame = lyricbase.frame
-        //lyricbase.addSubview(vibrancyLayer)
         self.view.addSubview(lyricbase)
         
         let contentMargin: CGFloat = 5
@@ -355,7 +347,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameLabel.frame) + marginToArtistButton, width: self.view.frame.width * 0.62, height: chordAndLyricBaseHeight * 0.6))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.clearColor()
-        
+        base.alpha = 0.8
         
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
         panRecognizer.delaysTouchesEnded = true
@@ -407,8 +399,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let nowPlayingItemDuration = nowPlayingItem.playbackDuration
                 
 
-                self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 5)
-                self.progressBlock.center.y = self.progressContainerHeight / 2
+                self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 161)
+                self.progressBlock.center.y = self.progressContainerHeight
         
                 // if we are NOT repeating song
                 if self.player.repeatMode != .One {
@@ -429,9 +421,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
                 }
                 
-            }else if(self.firstLoadSongTime == nowPlayingItem.playbackDuration){
-                println("same song and current song is \(self.player.nowPlayingItem.title)")
             }
+            self.speed = 1
+            self.nowPlayingItemSpeed = 1
+            self.timer.invalidate()
+            self.startTimer()
             self.updateAll(0)
         }
     }
@@ -470,13 +464,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if selectedFromTable {
             player.play()
             startTimer()
-            println("selectedFromTable~~~~~~~~~~~~~~~~")
         }else{ // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
             }
             else if player.playbackState == MPMusicPlaybackState.Paused {
                 timer.invalidate()
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                self.progressBlock!.alpha = 0.5
+                self.speed = player.currentPlaybackRate
             }
         }
 
@@ -523,22 +519,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.isPanning = true
             
             var newPosition = progressChangedOrigin + translation.x
-         
-            var newProgressPosition = progressChangedPosition - translation.x/self.progressBlock.frame.size.width
             
             // leftmost point of inner bar cannot be more than half of the view
             if newPosition > self.view.frame.width / 2 {
                 newPosition = self.view.frame.width / 2
-                newProgressPosition = 0
             }
             
             // the end of inner bar cannot be smaller left half of view
             if newPosition + child.frame.width < self.view.frame.width / 2 {
                 newPosition = self.view.frame.width / 2 - child.frame.width
-                newProgressPosition = child.frame.width/self.progressBlock.frame.size.width
             }
             
-            self.progressBlock.setProgress(newProgressPosition)
             //update all chords, lyrics
             timer.invalidate()
             
@@ -547,6 +538,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //= from 0 ot -517
             //divide by -2: from 0 to 258
             let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(self.progressWidthMultiplier))
+            self.progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem.playbackDuration))
             //258  517
             updateAll(toTime)
             
@@ -579,14 +571,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             break;
         case UIGestureRecognizerState.Changed:
+            let tempNowPlayingItem = player.nowPlayingItem
             var deltaTime = Float(translation.y)*(freefallTime/Float(base.frame.size.height))
             toChordTime = currentChordTime + deltaTime
             
             if toChordTime < 0 {
                 toChordTime = 0
-            } else if (toChordTime > Float(player.nowPlayingItem.playbackDuration)){
-                toChordTime = Float(player.nowPlayingItem.playbackDuration)
+            } else if (toChordTime > Float(tempNowPlayingItem.playbackDuration)){
+                toChordTime = Float(tempNowPlayingItem.playbackDuration)
             }
+            
+            //update soundwave progress
+            progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItem.playbackDuration))
             
             updateAll(toChordTime)
             
@@ -775,6 +771,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         println("view will disappear")
         timer.invalidate()
         viewDidFullyDisappear = true
+        if player.playbackState == MPMusicPlaybackState.Playing {
+            player.currentPlaybackRate = 1
+        }
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
     }
     
@@ -1039,6 +1038,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
+            player.currentPlaybackRate = nowPlayingItemSpeed
             println("play")
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
@@ -1054,7 +1054,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     
             })
         } else {
-            
+            nowPlayingItemSpeed = player.currentPlaybackRate
             player.pause()
             musicViewController!.nowView!.stop()
             

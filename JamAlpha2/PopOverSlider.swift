@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MediaPlayer
 
 class PopOverSlider: UISlider {
 
@@ -44,10 +45,13 @@ class PopOverSlider: UISlider {
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
         println("touchesEnded")
-        songVC!.player.currentPlaybackRate = self.value + 1
         songVC!.speed = self.value + 1
-        songVC!.timer.invalidate()
-        songVC!.startTimer()
+        songVC!.nowPlayingItemSpeed = self.value + 1
+        if songVC!.player.playbackState == MPMusicPlaybackState.Playing {
+            songVC!.player.currentPlaybackRate = self.value + 1
+            songVC!.timer.invalidate()
+            songVC!.startTimer()
+        }
         self.hidePopoverAnimated(true)
         super.touchesEnded(touches, withEvent: event)
     }
