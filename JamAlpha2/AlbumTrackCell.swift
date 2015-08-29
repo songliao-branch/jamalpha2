@@ -14,4 +14,5 @@ class AlbumTrackCell: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
 
+    @IBOutlet weak var loudspeakerImage: UIImageView!
 }

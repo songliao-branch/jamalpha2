@@ -44,37 +44,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         setupSegmentButtons()
         setUpSelector()//the horizontal bar that moves with button tapped
         setUpPageViewController()
-        registerMusicPlayerNotificationForSongChanged()
+        //registerMusicPlayerNotificationForSongChanged()
     }
     
 
-    func registerMusicPlayerNotificationForSongChanged(){
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-    }
-    
-    func synced(lock: AnyObject, closure: () -> ()) {
-        objc_sync_enter(lock)
-        closure()
-        objc_sync_exit(lock)
-    }
-    
-    func currentSongChanged(notification: NSNotification){
-        synced(self) {
-            if self.player.repeatMode == .One {
-                println("\(self.player.nowPlayingItem.title) is repeating")
-                return
-            }
-            
-            if self.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
-                    // only for tracks only ,TODO: index might be different for artist and album
-                    if musicViewController.pageIndex == 0 {
-                        musicViewController.musicTable.reloadData()
-                    }
-                }
-            }
-        }
-    }
+
     
     func setUpNowView(){
         nowView.initWithNumberOfBars(4)
