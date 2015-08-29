@@ -149,6 +149,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             
+            //reload the table to show loudspeaker icon
+            tableView.reloadData()
+            
             self.presentViewController(songVC, animated: true, completion: nil)
 
         }
@@ -165,10 +168,10 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         else if pageIndex == 2 {
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
-      
+            
+            
             albumVC.theAlbum = uniqueAlbums[indexPath.row]
             albumVC.musicViewController = self
-            
             self.showViewController(albumVC, sender: self)
             
         }

@@ -13,11 +13,13 @@ class MusicManager: NSObject {
     let _TAG = "MusicManager"
     var player: MPMusicPlayerController!
     
+    
     // A queue that keep tracks the last queue to the player
     // this should never be accessed outside MusicManager
     // a current collection is always passed in from function
     // 'setPlayerQueue'
     private var lastPlayerQueue = [MPMediaItem]()
+    var lastSelectedIndex = -1
     
     var uniqueSongs : [MPMediaItem]!
     var uniqueAlbums = [Album]()
@@ -87,6 +89,8 @@ class MusicManager: NSObject {
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
         }
+        
+        lastSelectedIndex = selectedIndex
         
     }
     
