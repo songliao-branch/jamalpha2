@@ -29,7 +29,6 @@ class MusicManager: NSObject {
     
     override init() {
         super.init()
-        
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
@@ -37,9 +36,44 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
+        println("initialize Player")
         player = MPMusicPlayerController.systemMusicPlayer()
+        player.stop()
         player.repeatMode = .All
         player.shuffleMode = .Off
+        
+        self.setPlayerQueue(uniqueSongs)
+    }
+    
+    var lastPlayerQueue = [MPMediaItem]()
+    
+    func setPlayerQueue(collection: [MPMediaItem]){
+        if lastPlayerQueue == collection { // if we are the same queue
+           println("same collection")
+        } else { //if different queue, means we are getting a new collection, reset the player queue
+            player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
+            lastPlayerQueue = collection
+            println("setting a new queue")
+            
+            //testing
+            for song in collection {
+                println("setting up queue of song: \(song.title)")
+            }
+        }
+    }
+    
+    func setIndexInTheQueue(selectedIndex: Int){
+        if(player.repeatMode == .One && player.shuffleMode == .Off){
+            player.repeatMode = .All
+            if(player.nowPlayingItem != lastPlayerQueue[selectedIndex]||player.nowPlayingItem == nil){
+                player.nowPlayingItem = lastPlayerQueue[selectedIndex]
+            }
+            player.repeatMode = .One
+        }else{
+            if(player.nowPlayingItem != lastPlayerQueue[selectedIndex]||player.nowPlayingItem == nil){
+                player.nowPlayingItem = lastPlayerQueue[selectedIndex]
+            }
+        }
     }
     
     // MARK: get all MPMediaItems

@@ -11,6 +11,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var selectedFromTable = true
     
     var viewDidFullyDisappear = true
+    
     var player:MPMusicPlayerController!
     
 
@@ -38,6 +39,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //MARK: progress Container
     var progressBlock: SoundWaveView!
+    
     var progressBlockViewWidth:CGFloat?
     var progressChangedPosition: CGFloat!
     var progressBlockContainer:UIView!
@@ -114,6 +116,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        player = MusicManager.sharedInstance.player
         firstLoadSongTime = self.player.nowPlayingItem.playbackDuration
         removeAllObserver()
         //hide tab bar

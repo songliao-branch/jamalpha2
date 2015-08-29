@@ -25,7 +25,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         artistAllSongs = theArtist.getSongs()
-        setCollectionToPlayer()
+        //MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         
@@ -137,53 +137,59 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
             }
         }
         var indexToBePlayed = songsInPreviousSections + indexPath.row
-       
         
-        setUpSongVC(artistAllSongs, selectedSong: indexToBePlayed, selectedFromTable: true)
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
-    }
-    
-    func setCollectionToPlayer(){
-        var collection: MPMediaItemCollection!
-        collection = MPMediaItemCollection(items: artistAllSongs)
-        player.setQueueWithItemCollection(collection)
-    }
-    func setUpSongVC(collection: [MPMediaItem],selectedSong:Int,selectedFromTable:Bool){
-        if(selectedFromTable){
-            if(createdNewPage){
-                println("createdNewPage")
-                let repeatMode = player.repeatMode
-                let shuffle = player.shuffleMode
-                MPMusicPlayerController.systemMusicPlayer().stop()
-                player.repeatMode = repeatMode
-                player.shuffleMode = shuffle
-                createdNewPage = false
-            }
-            
-            if(player.repeatMode == .One && player.shuffleMode == .Off){
-                player.repeatMode = .All
-                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-                    
-                    player.nowPlayingItem = collection[selectedSong]
-                }
-                player.repeatMode = .One
-            }else{
-                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-                    player.nowPlayingItem = collection[selectedSong]
-                }
-            }
-        }
+        //MusicManager.sharedInstance.setCurrentSongInTheQueue(artistAllSongs, selectedIndex: indexPath.row)
         
-       
+        MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
+        MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+        
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.musicViewController = self.musicViewController
         songVC.player = self.player
-        songVC.selectedFromTable = selectedFromTable
+        songVC.selectedFromTable = true
         
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.presentViewController(songVC, animated: true, completion: nil)
+        
+        //setUpSongVC(artistAllSongs, selectedSong: indexToBePlayed, selectedFromTable: true)
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
+    
+//    func setCollectionToPlayer(){
+//        var collection: MPMediaItemCollection!
+//        collection = MPMediaItemCollection(items: artistAllSongs)
+//        player.setQueueWithItemCollection(collection)
+//    }
+//    func setUpSongVC(collection: [MPMediaItem],selectedSong:Int,selectedFromTable:Bool){
+//        if(selectedFromTable){
+//            if(createdNewPage){
+//                println("createdNewPage")
+//                let repeatMode = player.repeatMode
+//                let shuffle = player.shuffleMode
+//                MPMusicPlayerController.systemMusicPlayer().stop()
+//                player.repeatMode = repeatMode
+//                player.shuffleMode = shuffle
+//                createdNewPage = false
+//            }
+//            
+//            if(player.repeatMode == .One && player.shuffleMode == .Off){
+//                player.repeatMode = .All
+//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
+//                    
+//                    player.nowPlayingItem = collection[selectedSong]
+//                }
+//                player.repeatMode = .One
+//            }else{
+//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
+//                    player.nowPlayingItem = collection[selectedSong]
+//                }
+//            }
+//        }
+//        
+//       
+//
+//    }
 
     
     

@@ -5,11 +5,12 @@ import MediaPlayer
 class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
     
+    var player: MPMusicPlayerController! // set to singleton in MusicManager
+    
     var musicViewController: MusicViewController!
     
-    var musicViewInitialKeyForPageIndexOne:Bool = true
+   // var musicViewInitialKeyForPageIndexOne: Bool = true
     
-    let player = MPMusicPlayerController.systemMusicPlayer()
     var scrollView:UIScrollView!
     var pageViewController: UIPageViewController!
     var pageTitles: [String]!
@@ -33,9 +34,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        MPMusicPlayerController.systemMusicPlayer().stop()
-        player.repeatMode = .All
-        player.shuffleMode = .Off
+        player = MusicManager.sharedInstance.player
+        
         title = "twistjam"
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         //change status bar text to light
@@ -87,9 +87,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     
     func goToNowPlaying() {
-        for vc in self.pageViewController.viewControllers as! [MusicViewController] {
+        for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
             if player.nowPlayingItem != nil {
-                vc.popUpSong()
+                musicViewController.popToCurrentSong()
             }
         }
     }
@@ -209,11 +209,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         
         musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         musicViewController.pageIndex = index
-        musicViewController.player = self.player
-        if musicViewInitialKeyForPageIndexOne {
-                musicViewController.setCollectionToPlayer()
-                musicViewInitialKeyForPageIndexOne = false
-        }
+
+//        if musicViewInitialKeyForPageIndexOne {
+//            MusicManager.sharedInstance.setPlayerQueue(MusicManager.sharedInstance.uniqueSongs)
+//               // musicViewController.setCollectionToPlayer()
+//                musicViewInitialKeyForPageIndexOne = false
+//        }
         musicViewController.nowView = self.nowView!
         return musicViewController
     }
@@ -271,10 +272,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController
             
             self.currentPageIndex = lastViewController.pageIndex
-            if(currentPageIndex == 0){
-                lastViewController.setCollectionToPlayer()
-                println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            }
+//            if currentPageIndex == 0 {
+//                
+//                MusicManager.sharedInstance.setPlayerQueue(MusicManager.sharedInstance.uniqueSongs)
+//                println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+//            }
             changeButtonColorOnScroll()
         }
     }
