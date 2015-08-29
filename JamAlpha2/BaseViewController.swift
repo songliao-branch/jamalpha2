@@ -5,11 +5,10 @@ import MediaPlayer
 class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
     
+    var player: MPMusicPlayerController! // set to singleton in MusicManager
+    
     var musicViewController: MusicViewController!
-    
-    var musicViewInitialKeyForPageIndexOne:Bool = true
-    
-    let player = MPMusicPlayerController.systemMusicPlayer()
+
     var scrollView:UIScrollView!
     var pageViewController: UIPageViewController!
     var pageTitles: [String]!
@@ -33,9 +32,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        MPMusicPlayerController.systemMusicPlayer().stop()
-        player.repeatMode = .All
-        player.shuffleMode = .Off
+        player = MusicManager.sharedInstance.player
+        
         title = "twistjam"
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         //change status bar text to light
@@ -54,6 +52,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         nowView.addGestureRecognizer(tapRecognizer)
         self.navigationController!.navigationBar.addSubview(nowView)
+
     }
     
     func setUpPageViewController(){
@@ -82,14 +81,13 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                 self.scrollView.delegate = self
             }
         }
-        
         self.currentPageIndex = 0
     }
     
     func goToNowPlaying() {
-        for vc in self.pageViewController.viewControllers as! [MusicViewController] {
+        for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
             if player.nowPlayingItem != nil {
-                vc.popUpSong()
+                musicViewController.popToCurrentSong()
             }
         }
     }
@@ -209,11 +207,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         
         musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         musicViewController.pageIndex = index
-        musicViewController.player = self.player
-        if musicViewInitialKeyForPageIndexOne {
-                musicViewController.setCollectionToPlayer()
-                musicViewInitialKeyForPageIndexOne = false
-        }
+
         musicViewController.nowView = self.nowView!
         return musicViewController
     }
@@ -271,10 +265,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController
             
             self.currentPageIndex = lastViewController.pageIndex
-            if(currentPageIndex == 0){
-                lastViewController.setCollectionToPlayer()
-                println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            }
+            
             changeButtonColorOnScroll()
         }
     }
