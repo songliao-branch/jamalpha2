@@ -52,6 +52,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         nowView.addGestureRecognizer(tapRecognizer)
         self.navigationController!.navigationBar.addSubview(nowView)
+
     }
     
     func setUpPageViewController(){

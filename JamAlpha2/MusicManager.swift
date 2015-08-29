@@ -46,16 +46,20 @@ class MusicManager: NSObject {
         println("\(_TAG) Initialize Player")
         player = MPMusicPlayerController.systemMusicPlayer()
         
-        player.stop()
+        player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
+        // 暂时解决方法 App每次start就是先停下来
         player.repeatMode = .All
         player.shuffleMode = .Off
         
         self.setPlayerQueue(uniqueSongs)
     }
     
-   
+    // used to detect if same song is selected for different queues
+    // if so, we resume playing
+    private var lastPlayingItem = 0
     
     func setPlayerQueue(collection: [MPMediaItem]){
+
         if lastPlayerQueue == collection { // if we are the same queue
            println("\(_TAG) same collection")
         } else { //if different queue, means we are getting a new collection, reset the player queue
@@ -71,14 +75,18 @@ class MusicManager: NSObject {
     }
     
     func setIndexInTheQueue(selectedIndex: Int){
-        if(player.repeatMode == .One && player.shuffleMode == .Off){
-            player.repeatMode = .All
-            if(player.nowPlayingItem != lastPlayerQueue[selectedIndex]||player.nowPlayingItem == nil){
+        // 如果单曲循环的话 切出去 再换一首歌的话 还是之前那个首歌
+        if player.repeatMode == .One && player.shuffleMode == .Off {
+            player.repeatMode = .All  //暂时让他变成列表循环
+            if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
+                println("\(_TAG)  ")
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
-            player.repeatMode = .One
-        }else{
-            if(player.nowPlayingItem != lastPlayerQueue[selectedIndex]||player.nowPlayingItem == nil){
+            player.repeatMode = .One //set player item 还是还原为单曲循环
+        } else {  //如果是其他循环模式
+            
+            //如果现在播放的不是选中的
+            if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
         }
