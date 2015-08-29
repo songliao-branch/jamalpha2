@@ -6,8 +6,6 @@ import MediaPlayer
 class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewDataSource {
 
     var theAlbum:Album!
-    var createdNewPage:Bool = true
-    var player: MPMusicPlayerController!
     var musicViewController: MusicViewController?
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
@@ -18,8 +16,7 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         songsInTheAlbum = [MPMediaItem]()
         songsInTheAlbum = theAlbum.songsIntheAlbum
         self.createTransitionAnimation()
-        //setCollectionToPlayer()
-        //MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
+
         self.automaticallyAdjustsScrollViewInsets = false
     }
 
@@ -62,15 +59,13 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-       // setUpSongVC(songsInTheAlbum, selectedSong: indexPath.row, selectedFromTable: true)
-        
-        //MusicManager.sharedInstance.setCurrentSongInTheQueue(songsInTheAlbum, selectedIndex: indexPath.row)
+
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
         MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.musicViewController = self.musicViewController
-        songVC.player = self.player
+        
         songVC.selectedFromTable = true
         
         songVC.transitioningDelegate = self.animator
@@ -79,50 +74,5 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
-    
-//    func setCollectionToPlayer(){
-//        var collection: MPMediaItemCollection!
-//        collection = MPMediaItemCollection(items: songsInTheAlbum)
-//        player.setQueueWithItemCollection(collection)
-//
-//    }
-//    func setUpSongVC(collection: [MPMediaItem],selectedSong:Int,selectedFromTable:Bool){
-//        if(selectedFromTable){
-//            if(createdNewPage){
-//                println("createdNewPage")
-//                let repeatMode = player.repeatMode
-//                let shuffle = player.shuffleMode
-//                MPMusicPlayerController.systemMusicPlayer().stop()
-//                player.repeatMode = repeatMode
-//                player.shuffleMode = shuffle
-//                createdNewPage = false
-//            }
-//            
-//            if(player.repeatMode == .One && player.shuffleMode == .Off){
-//                player.repeatMode = .All
-//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-//                    
-//                    player.nowPlayingItem = collection[selectedSong]
-//                }
-//                player.repeatMode = .One
-//            }else{
-//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-//                    player.nowPlayingItem = collection[selectedSong]
-//                }
-//            }
-//        }
-//        
-//        
-//        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-//        songVC.musicViewController = self.musicViewController
-//        songVC.player = self.player
-//        songVC.selectedFromTable = selectedFromTable
-//        
-//        songVC.transitioningDelegate = self.animator
-//        self.animator!.attachToViewController(songVC)
-//        self.presentViewController(songVC, animated: true, completion: nil)
-//    }
-
-    
 
 }

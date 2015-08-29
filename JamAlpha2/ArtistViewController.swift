@@ -7,20 +7,15 @@
 //July 7, 2015
 import UIKit
 import MediaPlayer
-class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDelegate {
+class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var theArtist:Artist!
-    var createdNewPage:Bool = true
-    var player:MPMusicPlayerController!
+
     var musicViewController: MusicViewController?
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
     
     @IBOutlet weak var artistTable: UITableView!
-   
-    //TODO: this search functionality will be used for all the Songs,Artist and Album
-    var resultSearchController:UISearchController!
-    var filterdAlbums = [Album]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,26 +61,8 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     }
     
 
-//    func setUpSearchBar(){
-//        
-//        self.resultSearchController = UISearchController(searchResultsController: nil)
-//        self.resultSearchController.searchResultsUpdater = self
-//        self.resultSearchController.dimsBackgroundDuringPresentation = true;
-//        //self.searchController.searchBar.delegate = self
-//        self.resultSearchController.searchBar.sizeToFit()
-//        //        self.searchController.searchBar.barStyle = UIBarStyle.
-//        //        self.searchController.searchBar.barTintColor = UIColor.whiteColor()
-//        //        self.searchController.searchBar.backgroundColor = UIColor.clearColor()
-//        self.artistTable.tableHeaderView = resultSearchController.searchBar
-//
-//    }
-    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-//        if self.resultSearchController.active{
-//             return self.filterdAlbums.count
-//        } else{
-//            return ed.albums.count
-//        }
+
         return theArtist.getAlbums().count
     }
     
@@ -97,12 +74,7 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
     
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        if self.resultSearchController.active {
-//            return self.filterdAlbums[section].songs.count
-//        }
-//        else {
-//         return ed.albums[section].songs.count
-//        }
+
         return theArtist.getAlbums()[section].numberOfTracks
     }
     
@@ -138,81 +110,17 @@ class ArtistViewController: UIViewController,UITableViewDataSource,UITableViewDe
         }
         var indexToBePlayed = songsInPreviousSections + indexPath.row
         
-        //MusicManager.sharedInstance.setCurrentSongInTheQueue(artistAllSongs, selectedIndex: indexPath.row)
-        
         MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
         MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.musicViewController = self.musicViewController
-        songVC.player = self.player
         songVC.selectedFromTable = true
         
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.presentViewController(songVC, animated: true, completion: nil)
         
-        //setUpSongVC(artistAllSongs, selectedSong: indexToBePlayed, selectedFromTable: true)
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
-    
-//    func setCollectionToPlayer(){
-//        var collection: MPMediaItemCollection!
-//        collection = MPMediaItemCollection(items: artistAllSongs)
-//        player.setQueueWithItemCollection(collection)
-//    }
-//    func setUpSongVC(collection: [MPMediaItem],selectedSong:Int,selectedFromTable:Bool){
-//        if(selectedFromTable){
-//            if(createdNewPage){
-//                println("createdNewPage")
-//                let repeatMode = player.repeatMode
-//                let shuffle = player.shuffleMode
-//                MPMusicPlayerController.systemMusicPlayer().stop()
-//                player.repeatMode = repeatMode
-//                player.shuffleMode = shuffle
-//                createdNewPage = false
-//            }
-//            
-//            if(player.repeatMode == .One && player.shuffleMode == .Off){
-//                player.repeatMode = .All
-//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-//                    
-//                    player.nowPlayingItem = collection[selectedSong]
-//                }
-//                player.repeatMode = .One
-//            }else{
-//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-//                    player.nowPlayingItem = collection[selectedSong]
-//                }
-//            }
-//        }
-//        
-//       
-//
-//    }
-
-    
-    
-//    MARK: Search
-//    func filterSongs(searchText:String)
-//    {
-//        self.filterdAlbums = [Album]()
-//        
-//        for i in 0...self.ed.albums.count-1{
-//            var songs = self.ed.albums[i].songs as [Song]
-//            var tempSongs:[Song]
-//            tempSongs = songs.filter({(song:Song)->Bool in
-//                let stringMatch = song.title.lowercaseString.rangeOfString(searchText.lowercaseString)
-//                return (stringMatch != nil)
-//            })
-//            if tempSongs.count > 0 {
-//                var tempAlbum = Album(name: self.ed.albums[i].name, songs: tempSongs)
-//                self.filterdAlbums.append(tempAlbum)
-//            }
-//        }
-//    }
-//    func updateSearchResultsForSearchController(searchController: UISearchController) {
-//        filterSongs(searchController.searchBar.text)
-//        self.artistTable.reloadData()
-//    }
 }

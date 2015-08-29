@@ -3,9 +3,6 @@ import MediaPlayer
 
 class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
 
-    //var player:MPMusicPlayerController!
-    //var createdNewPage: Bool = true
-    
     private var uniqueSongs = [MPMediaItem]()
     private var uniqueArtists = [Artist]()
     private var uniqueAlbums = [Album]()
@@ -13,9 +10,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     var pageIndex = 0
     
     @IBOutlet weak var musicTable: UITableView!
-    
-    var hello:[String]!
-    var tableOriginY:CGFloat = 0
     
     //for transition view animator
     var animator: CustomTransitionAnimation?
@@ -166,38 +160,4 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
-
-
-    
-    func setUpSongVC(collection: [MPMediaItem], selectedIndex: Int, selectedFromTable: Bool){
-//        if selectedFromTable {
-//            
-////            if createdNewPage {
-////                let repeatMode = player.repeatMode
-////                let shuffle = player.shuffleMode
-////                MPMusicPlayerController.systemMusicPlayer().stop()
-////                player.repeatMode = repeatMode
-////                player.shuffleMode = shuffle
-////                createdNewPage = false
-////            }
-//            // if repeat song mode 
-//            
-//            if(player.repeatMode == .One && player.shuffleMode == .Off){
-//                player.repeatMode = .All
-//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-//                    player.nowPlayingItem = collection[selectedSong]
-//                }
-//                player.repeatMode = .One
-//            }else{
-//                if(player.nowPlayingItem != collection[selectedSong]||player.nowPlayingItem == nil){
-//                    player.nowPlayingItem = collection[selectedSong]
-//                }
-//            }
-//        }
-        
-
-    }
-    
-
-    
 }

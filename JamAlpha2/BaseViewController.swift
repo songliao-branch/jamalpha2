@@ -8,9 +8,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     var player: MPMusicPlayerController! // set to singleton in MusicManager
     
     var musicViewController: MusicViewController!
-    
-   // var musicViewInitialKeyForPageIndexOne: Bool = true
-    
+
     var scrollView:UIScrollView!
     var pageViewController: UIPageViewController!
     var pageTitles: [String]!
@@ -82,7 +80,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                 self.scrollView.delegate = self
             }
         }
-        
         self.currentPageIndex = 0
     }
     
@@ -210,11 +207,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         musicViewController.pageIndex = index
 
-//        if musicViewInitialKeyForPageIndexOne {
-//            MusicManager.sharedInstance.setPlayerQueue(MusicManager.sharedInstance.uniqueSongs)
-//               // musicViewController.setCollectionToPlayer()
-//                musicViewInitialKeyForPageIndexOne = false
-//        }
         musicViewController.nowView = self.nowView!
         return musicViewController
     }
@@ -272,11 +264,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController
             
             self.currentPageIndex = lastViewController.pageIndex
-//            if currentPageIndex == 0 {
-//                
-//                MusicManager.sharedInstance.setPlayerQueue(MusicManager.sharedInstance.uniqueSongs)
-//                println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-//            }
+            
             changeButtonColorOnScroll()
         }
     }

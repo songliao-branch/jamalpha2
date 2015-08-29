@@ -131,6 +131,16 @@
 			name = MusicManager;
 			sourceTree = "<group>";
 		};
+		E431BA9E1B91552400E32A0B /* MusicListControllers */ = {
+			isa = PBXGroup;
+			children = (
+				E48877461B151628004785D3 /* MusicViewController.swift */,
+				E45F6BB71B16C1860018645D /* ArtistViewController.swift */,
+				E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */,
+			);
+			name = MusicListControllers;
+			sourceTree = "<group>";
+		};
 		E4399C391B90049600906DBD /* SoundWave */ = {
 			isa = PBXGroup;
 			children = (
@@ -255,11 +265,9 @@
 		E48877641B151A58004785D3 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				E431BA9E1B91552400E32A0B /* MusicListControllers */,
 				E48877441B151628004785D3 /* SearchViewController.swift */,
-				E48877461B151628004785D3 /* MusicViewController.swift */,
 				E48877691B1520A0004785D3 /* SongViewController.swift */,
-				E45F6BB71B16C1860018645D /* ArtistViewController.swift */,
-				E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */,
 				E49AF0961B2699C800DD3342 /* BaseViewController.swift */,
 				E46340241B54BA0E003582BB /* EditTabsViewController.swift */,
 			);

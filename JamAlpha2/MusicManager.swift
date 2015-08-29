@@ -38,6 +38,7 @@ class MusicManager: NSObject {
     func initializePlayer(){
         println("initialize Player")
         player = MPMusicPlayerController.systemMusicPlayer()
+        
         player.stop()
         player.repeatMode = .All
         player.shuffleMode = .Off
