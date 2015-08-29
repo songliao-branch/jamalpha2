@@ -120,7 +120,11 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
+        
+        tableView.reloadData()
+        
         self.presentViewController(songVC, animated: true, completion: nil)
+        
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }

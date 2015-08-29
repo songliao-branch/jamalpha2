@@ -172,6 +172,13 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="loudspeaker" translatesAutoresizingMaskIntoConstraints="NO" id="l6i-W8-1hA">
+                                                    <rect key="frame" x="275" y="20" width="30" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="30" id="D5H-D7-pwL"/>
+                                                        <constraint firstAttribute="height" constant="30" id="aJT-Qk-WGn"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="centerY" secondItem="VXR-6p-k1c" secondAttribute="top" id="2dw-sN-eQH"/>
@@ -179,6 +186,8 @@
                                                 <constraint firstItem="Z1R-2h-uq0" firstAttribute="leading" secondItem="Fr8-BH-Ncz" secondAttribute="trailing" constant="11" id="86z-5z-P1m"/>
                                                 <constraint firstItem="VXR-6p-k1c" firstAttribute="leading" secondItem="Fr8-BH-Ncz" secondAttribute="trailing" constant="11" id="AUN-tv-Vn7"/>
                                                 <constraint firstAttribute="centerY" secondItem="Z1R-2h-uq0" secondAttribute="bottom" id="CJG-4b-irN"/>
+                                                <constraint firstAttribute="centerY" secondItem="l6i-W8-1hA" secondAttribute="centerY" id="Ocd-So-xLn"/>
+                                                <constraint firstAttribute="trailing" secondItem="l6i-W8-1hA" secondAttribute="trailing" constant="15" id="Zmi-V4-ajT"/>
                                                 <constraint firstAttribute="trailing" secondItem="VXR-6p-k1c" secondAttribute="trailing" constant="15" id="r1E-9r-Idd"/>
                                                 <constraint firstItem="Fr8-BH-Ncz" firstAttribute="leading" secondItem="02W-lP-F99" secondAttribute="leading" constant="15" id="w34-XI-AEg"/>
                                                 <constraint firstAttribute="centerY" secondItem="Fr8-BH-Ncz" secondAttribute="centerY" id="xyh-34-A7o"/>
@@ -187,8 +196,8 @@
                                         <connections>
                                             <outlet property="coverImage" destination="Fr8-BH-Ncz" id="hsJ-x8-QgD"/>
                                             <outlet property="imageHeight" destination="ko5-ea-bU7" id="0Oq-Z7-THq"/>
-                                            <outlet property="imageLeadingConstraint" destination="w34-XI-AEg" id="CYt-hg-9hk"/>
                                             <outlet property="imageWidth" destination="aFw-se-8ZS" id="idl-dr-kaZ"/>
+                                            <outlet property="loudspeakerImage" destination="l6i-W8-1hA" id="OQk-NN-Cs4"/>
                                             <outlet property="mainTitle" destination="Z1R-2h-uq0" id="fUl-nS-b5p"/>
                                             <outlet property="subtitle" destination="VXR-6p-k1c" id="u8b-dt-Bmz"/>
                                         </connections>
@@ -546,6 +555,7 @@
     <resources>
         <image name="jamlist" width="193" height="244"/>
         <image name="list" width="20" height="25"/>
+        <image name="loudspeaker" width="110" height="103"/>
         <image name="me" width="20" height="25"/>
         <image name="music" width="25" height="25"/>
         <image name="search" width="23" height="25"/>

@@ -69,17 +69,19 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
             if MusicManager.sharedInstance.player.nowPlayingItem != nil {
                 if song == MusicManager.sharedInstance.player.nowPlayingItem {
-                    cell.coverImage.image = UIImage(named: "loudspeaker")?.imageWithRenderingMode(.AlwaysTemplate)
-                    cell.coverImage.tintColor = UIColor.mainPinkColor()
+                    
+                    // TODO: change asset icon to pink
+                    cell.loudspeakerImage.hidden = false
                 }
                 else {
-                    let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
-                    cell.coverImage.image = image
+                    cell.loudspeakerImage.hidden = true
                 }
             } else {
-                let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
-                cell.coverImage.image = image
+                cell.loudspeakerImage.hidden = true
             }
+            
+            let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
+            cell.coverImage.image = image
             cell.mainTitle.text = song.title
             cell.subtitle.text = song.artist
             
@@ -88,6 +90,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             let theArtist = uniqueArtists[indexPath.row]
             
             let image = theArtist.getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
+            cell.loudspeakerImage.hidden = true
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             cell.coverImage.image = image
@@ -109,6 +112,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             cell.coverImage.image = image
+            cell.loudspeakerImage.hidden = true
             
             let numberOfTracks = theAlbum.numberOfTracks
             let trackPrompt = "track".addPluralSubscript(numberOfTracks)
@@ -151,9 +155,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             //reload the table to show loudspeaker icon
             tableView.reloadData()
-            
             self.presentViewController(songVC, animated: true, completion: nil)
-
         }
         else if pageIndex == 1 {
 

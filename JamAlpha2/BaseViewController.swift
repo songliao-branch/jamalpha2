@@ -69,7 +69,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
                 for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
                     // only for tracks only ,TODO: index might be different for artist and album
                     if musicViewController.pageIndex == 0 {
-
                         musicViewController.musicTable.reloadData()
                     }
                 }
