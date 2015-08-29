@@ -121,9 +121,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
-        //load data 载入彩虹吉他谱和歌词
         setUpMusicData(player.nowPlayingItem)
-        //setUpRainbowData()
         setUpBackgroundImage()
         setUpTopButtons()
         

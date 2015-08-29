@@ -10,8 +10,15 @@ import Foundation
 import MediaPlayer
 class MusicManager: NSObject {
     
+    let _TAG = "MusicManager"
     var player: MPMusicPlayerController!
-
+    
+    // A queue that keep tracks the last queue to the player
+    // this should never be accessed outside MusicManager
+    // a current collection is always passed in from function
+    // 'setPlayerQueue'
+    private var lastPlayerQueue = [MPMediaItem]()
+    
     var uniqueSongs : [MPMediaItem]!
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
@@ -36,7 +43,7 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-        println("initialize Player")
+        println("\(_TAG) Initialize Player")
         player = MPMusicPlayerController.systemMusicPlayer()
         
         player.stop()
@@ -46,19 +53,19 @@ class MusicManager: NSObject {
         self.setPlayerQueue(uniqueSongs)
     }
     
-    var lastPlayerQueue = [MPMediaItem]()
+   
     
     func setPlayerQueue(collection: [MPMediaItem]){
         if lastPlayerQueue == collection { // if we are the same queue
-           println("same collection")
+           println("\(_TAG) same collection")
         } else { //if different queue, means we are getting a new collection, reset the player queue
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
-            println("setting a new queue")
+            println("\(_TAG) setting a new queue")
             
             //testing
             for song in collection {
-                println("setting up queue of song: \(song.title)")
+                println("\(_TAG) setting up queue of song: \(song.title)")
             }
         }
     }
