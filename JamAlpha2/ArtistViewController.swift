@@ -16,7 +16,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
     var artistAllSongs:[MPMediaItem]!
     
     @IBOutlet weak var artistTable: UITableView!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         artistAllSongs = theArtist.getSongs()

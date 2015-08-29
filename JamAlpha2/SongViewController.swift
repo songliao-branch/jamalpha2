@@ -103,6 +103,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var textColor:UIColor!
     
+    var actionSheet:TwistJamActionSheet!
+    
     //background images
     var currentImage:UIImage?
     
@@ -113,7 +115,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
     let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
-    
+
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         player = MusicManager.sharedInstance.player
@@ -161,6 +167,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewDidAppear(animated)
         self.registerMediaPlayerNotification()
     }
+    
     func setUpRainbowData(){
         chords = Chord.getRainbowChords()
         lyric = Lyric.getRainbowLyrics()
@@ -383,7 +390,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
             if self.firstLoadSongTime != nowPlayingItem.playbackDuration {
-            
+                
+                if(self.actionSheet != nil && self.actionSheet.isTwistJamActionSheetShow == true){
+                    println("self.actionSheet")
+                    self.actionSheet!.dismissAnimated(true)
+                }
                 self.firstLoadSongTime = nowPlayingItem.playbackDuration
                 
                 self.setUpMusicData(nowPlayingItem)
@@ -701,50 +712,60 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func showGuitarActions(){
-        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+        actionSheet = TwistJamActionSheet()
+        actionSheet.needRunningManSlider = true
+        actionSheet.songVC = self
+        //actionSheet.initWithTitle("")
+        var handler:TwistJamActionSheet = TwistJamActionSheet()
         
-        let changeTabsMode = UIAlertAction(title: "Change Tab Mode", style: .Default, handler: {
-            (alert:UIAlertAction!) -> Void in
-             self.changeChordMode()
+        actionSheet.addButtonWithTitle(NSString(string:""), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
+            println("here")
         })
-        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
-        
-        optionMenu.addAction(changeTabsMode)
-        optionMenu.addAction(cancelAction)
-        self.presentViewController(optionMenu, animated: true, completion: nil)
-        
+        actionSheet.addButtonWithTitle(NSString(string:"Change Tab Mode"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
+            self.changeChordMode()
+        })
+        actionSheet.show()
     }
     
     func showActionSheet(){
-        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+//        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+//        
+//        
+//        
+//        let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
+//            (alert:UIAlertAction!) -> Void in
+//            
+//            let editTabsVC = EditTabsViewController()
+//            self.presentViewController(editTabsVC, animated: true, completion: nil)
+//            //Go to edit tabs screen
+//            
+//        })
+//        
+//        let addLyricsAction = UIAlertAction(title: "Add your lyrics", style: .Default, handler: {
+//            (alert:UIAlertAction!) -> Void in
+//            //TODO: Go to edit lyrics screens
+//            
+//        })
+//        
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
+//        optionMenu.addAction(addTabsAction)
+//        optionMenu.addAction(addLyricsAction)
+//        optionMenu.addAction(cancelAction)
+//        
+//        self.presentViewController(optionMenu, animated: true, completion: nil)
         
+        actionSheet = TwistJamActionSheet()
+        //actionSheet.initWithTitle("")
+        var handler:TwistJamActionSheet = TwistJamActionSheet()
         
-        
-        let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
-            (alert:UIAlertAction!) -> Void in
-            
+        actionSheet.addButtonWithTitle(NSString(string:"Add your tabs"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
             let editTabsVC = EditTabsViewController()
             self.presentViewController(editTabsVC, animated: true, completion: nil)
-            //Go to edit tabs screen
+        })
+        actionSheet.addButtonWithTitle(NSString(string:"Add your lyrics"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
             
         })
-        
-        let addLyricsAction = UIAlertAction(title: "Add your lyrics", style: .Default, handler: {
-            (alert:UIAlertAction!) -> Void in
-            //TODO: Go to edit lyrics screens
-            
-        })
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
-        optionMenu.addAction(addTabsAction)
-        optionMenu.addAction(addLyricsAction)
-        optionMenu.addAction(cancelAction)
-        
-        self.presentViewController(optionMenu, animated: true, completion: nil)
-    }
-    
-    override func prefersStatusBarHidden() -> Bool {
-        return true
+        actionSheet.show()
     }
     
     // ISSUE: when app goes to background this is not called
