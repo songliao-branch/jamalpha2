@@ -9,6 +9,7 @@ import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    
     var theArtist:Artist!
 
     var musicViewController: MusicViewController?

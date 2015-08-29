@@ -25,6 +25,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         createTransitionAnimation()
     }
     
+
+    
     
     func createTransitionAnimation(){
         if(animator == nil){
