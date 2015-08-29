@@ -64,10 +64,20 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             let song = uniqueSongs[indexPath.row]
             
-            let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
-            
-            cell.coverImage.image = image
-            
+
+            if MusicManager.sharedInstance.player.nowPlayingItem != nil {
+                if song == MusicManager.sharedInstance.player.nowPlayingItem {
+                    cell.coverImage.image = UIImage(named: "loudspeaker")?.imageWithRenderingMode(.AlwaysTemplate)
+                    cell.coverImage.tintColor = UIColor.mainPinkColor()
+                }
+                else {
+                    let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
+                    cell.coverImage.image = image
+                }
+            } else {
+                let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
+                cell.coverImage.image = image
+            }
             cell.mainTitle.text = song.title
             cell.subtitle.text = song.artist
             
@@ -126,6 +136,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if  pageIndex == 0 {
             
+            
             MusicManager.sharedInstance.setPlayerQueue(uniqueSongs)
             MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
   
@@ -135,6 +146,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
+            
             self.presentViewController(songVC, animated: true, completion: nil)
 
         }

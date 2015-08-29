@@ -54,10 +54,7 @@ class MusicManager: NSObject {
         self.setPlayerQueue(uniqueSongs)
     }
     
-    // used to detect if same song is selected for different queues
-    // if so, we resume playing
-    private var lastPlayingItem = 0
-    
+
     func setPlayerQueue(collection: [MPMediaItem]){
 
         if lastPlayerQueue == collection { // if we are the same queue
@@ -90,6 +87,7 @@ class MusicManager: NSObject {
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
         }
+        
     }
     
     // MARK: get all MPMediaItems
