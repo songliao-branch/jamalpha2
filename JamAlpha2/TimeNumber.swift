@@ -37,11 +37,12 @@ class TimeNumber {
         return (self.toString() as NSString).floatValue
     }
     
-    func addMinimal(){
-        decimal++
-        if(decimal == 100) {
-            decimal = 0
-            second++
+    //add a number of 0.01 second to the time
+    func addTime(decimal: Int){
+        self.decimal += decimal
+        if(self.decimal >= 100) {
+            self.second++
+            self.decimal -= 100
         }
     }
     

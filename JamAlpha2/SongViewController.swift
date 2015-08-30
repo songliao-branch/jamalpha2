@@ -4,6 +4,22 @@ import MediaPlayer
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
+let stepPerSecond: Float = 100   //steps of chord move persecond
+
+//time for chords to fall from top to bottom of chordbase
+let freefallTime:Float = 4
+
+let minfont: CGFloat = 15
+
+//Parameters to simulate the disappearing
+let timeToDisappear: Float = 0.8
+let timeDisappeared: Float = 0.4
+let totalalpha: Int = Int((timeToDisappear - timeDisappeared) * stepPerSecond)
+
+//Mode the chords
+let FullMode: Int = 0
+let SingleMode: Int = 1
+
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
     var musicViewController: MusicViewController?
@@ -14,7 +30,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var player:MPMusicPlayerController!
     
-
     @IBOutlet weak var playPauseButton: UIButton!
     
     // the previous song time
@@ -57,7 +72,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var chords = [Chord]()
     var start: Int = 0
-    var activelabels = [[UILabel]]()
+    var startdisappearing: Int = 0
+    var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     
     //time
@@ -68,18 +84,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var topPoints = [CGFloat]()
     var bottomPoints = [CGFloat]()
     
-    var topPointModes = [Int: [CGFloat]]()
-    var bottomPointModes = [Int: [CGFloat]]()
-    
     var labelHeight:CGSize!
     //speed to control playback speed and
     //corresponding playback speed
-    var speed:Float = 1
+    var speed: Float = 1
     //as a recorder to write down the current rate
     var nowPlayingItemSpeed:Float = 1
-    
-    //time for chords to fall from top to bottom of chordbase
-    var freefallTime:Float = 3
     
     //Lyric
     var lyricbase: UIView!
@@ -91,14 +101,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var lyric: Lyric = Lyric()
     
     var mode:Int = 0
+    
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
     var topView:UIView!
     var bottomView:UIView!
-    
-    //Simulate the process of animation for disappearing labels
-    let timeToDisappear:Float = 0.8
-    var disappearingLabels: [UILabel] = [UILabel]()
-    var disapperingLabelAlpha: Int = 0
     
     var favoriateButton:UIButton!
     var shuffleButton:UIButton!
@@ -115,6 +121,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //default is 0
     //0-repeat all, 1-repeat song, 2-shuffle all
     var shuffleButtonImageNames = ["loop_playlist","loop_song","shuffle"]
+    
+    //The labels move distance of each step in the base UIView
+    var movePerstep: CGFloat = 0
+    
+    //the max y location of labels in the base view
+    var maxylocation: CGFloat = 0
+    
+    //the width of base UIView
+    var widthofbasetop: CGFloat!
+    var tan: Float!
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
@@ -148,6 +164,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //get top and bottom points of six lines
         calculateXPoints()
         
+        movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
     func removeAllObserver(){
@@ -490,8 +507,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         updateAll(startTime.toDecimalNumer())
     }
     
-    
-    
     func setUpProgressContainer(){
         
         progressChangedOrigin = self.view.frame.width / 2
@@ -783,69 +798,57 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let initialPoint:CGFloat = CGFloat(Float(width) * margin)
         let rightTopPoint:CGFloat = CGFloat(Float(width) * (1 - margin))
         
-        let scale:Float = 1 / 12
-        let topWidth = Float(rightTopPoint) - Float(initialPoint)
-        let topLeft = Float(initialPoint) + Float(topWidth) * scale
+        let scale: CGFloat = 1 / 12
+        let topWidth = rightTopPoint - initialPoint
+        widthofbasetop = topWidth
+        tan = Float(base.frame.height) / Float(initialPoint)
+        let topLeft = initialPoint + topWidth * scale
         
-        topPoints = [CGFloat](count: 7, repeatedValue: 0)
+        topPoints = [CGFloat](count: 6, repeatedValue: 0)
         topPoints[0] = CGFloat(topLeft)
         for i in 1..<6 {
-            topPoints[i] = CGFloat(Float(topPoints[i - 1]) + Float(topWidth * scale * 2))
+            topPoints[i] = topPoints[i - 1] + topWidth * scale * 2
         }
         
-        bottomPoints = [CGFloat](count: 7, repeatedValue: 0)
-        bottomPoints[0] = CGFloat(Float(width) * scale)
+        bottomPoints = [CGFloat](count: 6, repeatedValue: 0)
+        bottomPoints[0] = width * scale
         for i in 1..<6 {
-            bottomPoints[i] = CGFloat(Float(bottomPoints[i - 1]) + Float(width) * scale * 2)
+            bottomPoints[i] = bottomPoints[i - 1] + width * scale * 2
         }
         
         //add things
-        let top0: CGFloat = CGFloat(margin * Float(base.frame.width) - 20)
-        let buttom0: CGFloat = CGFloat(-20)
+        let top0: CGFloat = CGFloat(margin * Float(base.frame.width) - 25)
+        let buttom0: CGFloat = CGFloat(-25)
         
         topPoints.insert(top0, atIndex: 0)
         bottomPoints.insert(buttom0, atIndex: 0)
         
-        //Mode 0
-        topPointModes[0] = topPoints
-        bottomPointModes[0] = bottomPoints
+        var labelExample = UILabel()
+        labelExample.text = "1"
+        labelExample.font = UIFont.systemFontOfSize(minfont * base.frame.width / widthofbasetop)
+        labelExample.sizeToFit()
+        let lenGoup = labelExample.frame.width / 2;
         
-        //Mode 1
-        topPoints = [width / 2]
-        bottomPoints = [width / 2]
-        
-        topPointModes[1] = topPoints
-        bottomPointModes[1] = bottomPoints
-        
-        topPoints = topPointModes[mode]!
-        bottomPoints = bottomPointModes[mode]!
-        
+        maxylocation = base.frame.height - lenGoup - base.frame.height / 40
     }
     
     
     func update(){
+        startTime.addTime(Int(100 / stepPerSecond))
         
-        startTime.addMinimal()
-        //println("update:\(startTime.toDecimalNumer())")
-        if activelabels.count > 0 && start+1 < chords.count && chords[start+1].mTime.isEqual(TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear))
+        if activelabels.count > 0 && start+1 < chords.count && (TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].mTime)
         {
-            for label in disappearingLabels {
-                label.removeFromSuperview()
-            }
-            
-            disappearingLabels = activelabels.removeAtIndex(0)
-            disapperingLabelAlpha = Int(timeToDisappear / 0.01)
-            
+            activelabels[start-startdisappearing].alpha--
             start++
         }
         
         // Add new chord
         let end = start + activelabels.count
-        if end < chords.count && chords[end].mTime.isEqual(TimeNumber(time: freefallTime + startTime.toDecimalNumer())) {
+        if end < chords.count && (TimeNumber(time: freefallTime + startTime.toDecimalNumer())).isLongerThan(chords[end].mTime) {
             self.activelabelAppend(end)
         }
         
-        if current + 1 < lyric.lyric.count && lyric.get(current+1).time.isEqual(startTime) {
+        if current + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(current+1).time) {
             current++
             topLyricLabel.text = lyric.get(current).str
             
@@ -854,54 +857,58 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         
-        if disapperingLabelAlpha > 0 {
-            let totalalpha: Float = timeToDisappear / 0.01
-            let currentalpha: CGFloat = CGFloat(Float(disapperingLabelAlpha) / totalalpha)
-            disapperingLabelAlpha--
-            for label in disappearingLabels {
+        var index: Int = 0
+        while index < start - startdisappearing {
+            let currentalpha: CGFloat = CGFloat(Float(activelabels[index].alpha) / Float(totalalpha))
+            activelabels[index].alpha = activelabels[index].alpha - 1
+            for label in activelabels[index].labels {
                 label.alpha = currentalpha
-                //label.textColor = UIColor.blackColo()
-                if disapperingLabelAlpha == 0 {
-                    label.removeFromSuperview()
-                }
             }
+            index++
+        }
+        
+        if startdisappearing < start && (activelabels[0].alpha == 0 || TimeNumber(time: startTime.toDecimalNumer() + timeDisappeared).isLongerThan(chords[startdisappearing+1].mTime)) {
+            for label in activelabels[0].labels{
+                label.removeFromSuperview()
+            }
+            activelabels.removeAtIndex(0)
+            startdisappearing++
         }
         
         refreshChordLabel()
         refreshProgressBlock()
         refreshTimeLabel()
-        
     }
-    
     
     func refreshChordLabel(){
-        /// Change the location of each label
-        for var i = 0; i < activelabels.count; ++i{
-            var labels = activelabels[i]
-            let t = chords[start+i].mTime
-            var yPosition = Float(self.base.frame.height)*(startTime.toDecimalNumer() + freefallTime - t.toDecimalNumer()) / freefallTime
-            if yPosition > Float(self.base.frame.height){
-                yPosition = Float(self.base.frame.height)
+        // Change the location of each label
+        for var i = 0; i < activelabels.count; ++i {
+            let activelabel = activelabels[i]
+            let yPosition = activelabel.ylocation
+            let labels: [UIView] = activelabel.labels
+            
+            var scale = 2 * Float(yPosition) / tan / Float(widthofbasetop) + 1
+            
+            let transformsize = CGAffineTransformMakeScale(CGFloat(scale), CGFloat(scale))
+            
+            var xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
+            
+            if mode == FullMode {
+                labels[0].center = CGPointMake(xPosition, CGFloat(yPosition))
+                labels[1].center.y = CGFloat(yPosition)
+                labels[1].transform = transformsize
             }
-            for var j = 0; j < labels.count; ++j{
-                var bottom = Float(bottomPoints[j])
-                var top = Float(topPoints[j])
-                var xPosition = CGFloat(bottom + (top - bottom) * (t.toDecimalNumer() - startTime.toDecimalNumer()) / freefallTime)
-                if yPosition == Float(self.base.frame.height){
-                    if(j != 0 ){
-                       // labels[j].font = UIFont.systemFontOfSize(16.6)
-                        labels[j].textColor = UIColor.blackColor()
-                    }
-                    
-                    xPosition = bottomPoints[j]
-                }
-                
-                labels[j].center = CGPointMake(xPosition, CGFloat(yPosition - Float(labels[j].frame.height / 2)))
+            else {
+                labels[0].center = CGPointMake(base.frame.width / 2, CGFloat(yPosition))
+            }
+            
+            activelabels[i].ylocation = activelabel.ylocation + movePerstep
+            if( activelabels[i].ylocation > maxylocation){
+                activelabels[i].ylocation = maxylocation
             }
         }
-        
+
     }
-    
     
     func refreshProgressBlock(){
         
@@ -933,7 +940,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         ///Remove all label in current screen
         for labels in activelabels{
-            for label in labels{
+            for label in labels.labels{
                 label.removeFromSuperview()
             }
         }
@@ -992,6 +999,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             for i in start...last {
                 self.activelabelAppend(i)
+            }
+        }
+        
+        startdisappearing = start
+        
+        //set the location of labels
+        for var i = 0; i < activelabels.count; i++ {
+            activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].mTime.toDecimalNumer()) * stepPerSecond)
+            if activelabels[i].ylocation > maxylocation {
+                activelabels[i].ylocation = maxylocation
             }
         }
         
@@ -1059,8 +1076,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func changeChordMode() {
         timer.invalidate()
         mode = 1 - mode
-        topPoints = topPointModes[mode]!
-        bottomPoints = bottomPointModes[mode]!
         updateAll(startTime.toDecimalNumer())
         if player.playbackState == .Playing{
             startTimer()
@@ -1078,39 +1093,46 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
-    func createLabels(name: String, content: String) -> [UILabel]{
-        var res = [UILabel]()
+    func createLabels(name: String, content: String) -> (labels: [UIView], ylocation: CGFloat, alpha: Int){
+        var res = [UIView]()
         
-        let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 0, 0))
-
+        let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 40, 0))
+        
         chordNameLabel.text = name
         chordNameLabel.textColor = UIColor.blackColor()
         chordNameLabel.sizeToFit()
         chordNameLabel.textAlignment = NSTextAlignment.Center
+        chordNameLabel.font = UIFont.systemFontOfSize(minfont)
         res.append(chordNameLabel)
         self.base.addSubview(chordNameLabel)
+        
+        var view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
         
         if mode == fullchord {
             for i in 0...count(content)-1 {
                 //if not a integer
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
-                label.font = UIFont.systemFontOfSize(25)
+                label.font = UIFont.systemFontOfSize(CGFloat(minfont))
                 label.text = String(Array(content)[i])
                 label.sizeToFit()
                 label.textColor = UIColor.silverGray()
                 label.textAlignment = NSTextAlignment.Center
-                res.append(label)
-                self.base.addSubview(label)
+                label.center = CGPointMake(topPoints[i+1] - topPoints[1], view.frame.height / 2)
+                view.addSubview(label)
             }
+            base.addSubview(view)
+            view.center.x = base.frame.width / 2
+            res.append(view)
         }
-        return res
+        
+        return (res, 0, totalalpha)
     }
     
     //////////////////////////////////
 
     func activelabelAppend(index: Int){
         activelabels.append(createLabels(chords[index].tab.name, content: chords[index].tab.content))
-        dealWithLabelofChordName(activelabels.last!.first!)
+        dealWithLabelofChordName(activelabels.last!.labels.first! as! UILabel)
     }
 
     private func dealWithLabelofChordName(chordLabel:UILabel){
