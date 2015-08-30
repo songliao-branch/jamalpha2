@@ -23,8 +23,6 @@ class ChordBase: UIView {
         let rightTopPoint:CGFloat = CGFloat(Float(width) * (1 - margin))
         
         
-        
-        
         //calculate radius and position for the four corners
         let tempYposition = cornerRadius * height / ( sqrt( pow(height,2) + pow(width - rightTopPoint, 2)))
         let tempXposition =  cornerRadius * ( width - rightTopPoint ) / ( sqrt( pow(height,2) + pow(width - rightTopPoint, 2)))

@@ -9,6 +9,7 @@ import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    
     var theArtist:Artist!
 
     var musicViewController: MusicViewController?
@@ -23,7 +24,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         //MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
-        
+        registerMusicPlayerNotificationForSongChanged()
     }
     override func prefersStatusBarHidden() -> Bool {
         return true
@@ -36,6 +37,31 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
     }
     
+    func registerMusicPlayerNotificationForSongChanged(){
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
+    }
+
+    
+    func synced(lock: AnyObject, closure: () -> ()) {
+        objc_sync_enter(lock)
+        closure()
+        objc_sync_exit(lock)
+    }
+
+    func currentSongChanged(notification: NSNotification){
+        synced(self) {
+            let player = MusicManager.sharedInstance.player
+            if player.repeatMode == .One {
+                println("\(player.nowPlayingItem.title) is repeating")
+                return
+            }
+            
+            if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                self.artistTable.reloadData()
+            }
+        }
+    }
+
     
     func createTransitionAnimation(){
         if(animator == nil){
@@ -82,6 +108,20 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
         
         let song = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
+        
+        if MusicManager.sharedInstance.player.nowPlayingItem != nil {
+            if song == MusicManager.sharedInstance.player.nowPlayingItem {
+                
+                // TODO: change asset icon to pink
+                cell.loudspeakerImage.hidden = false
+            }
+            else {
+                cell.loudspeakerImage.hidden = true
+            }
+        } else {
+            cell.loudspeakerImage.hidden = true
+        }
+        
         let trackNumber = song.albumTrackNumber
         let title = song.title
         if trackNumber < 1 {
@@ -119,7 +159,12 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
+        
+         //reload table to show loudspeaker icon on current selected row
+        tableView.reloadData()
+        
         self.presentViewController(songVC, animated: true, completion: nil)
+        
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }

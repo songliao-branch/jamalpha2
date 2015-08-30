@@ -18,7 +18,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     @IBOutlet weak var playPauseButton: UIButton!
     
     // the previous song time
-    var firstLoadSongTime:NSTimeInterval!
+    var firstLoadSongTime: NSTimeInterval!
+    var firstloadSongTitle: String!
     
     var backgroundImageView: UIImageView!
     
@@ -36,6 +37,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // MARK: Custom views
     var base: ChordBase!
     var basesHeight: CGFloat!
+    let marginBetweenBases: CGFloat = 15
     
     //MARK: progress Container
     var progressBlock: SoundWaveView!
@@ -125,7 +127,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func viewDidLoad() {
         super.viewDidLoad()
         player = MusicManager.sharedInstance.player
-        firstLoadSongTime = self.player.nowPlayingItem.playbackDuration
+        
+        firstLoadSongTime = player.nowPlayingItem.playbackDuration
+        firstloadSongTitle = player.nowPlayingItem.title
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
@@ -308,7 +312,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //Lyric labels
         current = -1
         let sideMargin: CGFloat = 20
-
+        
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         lyricbase.alpha = 0.8
@@ -338,11 +342,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricbase.addSubview(bottomLyricLabel)
     }
     
-    
-    
+
     func setUpChordBase(){
         let marginToArtistButton: CGFloat = 20
-        let marginBetweenBases: CGFloat = 15
         let marginToProgressContainer: CGFloat = 10
         basesHeight = self.view.frame.height - topViewHeight - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
         
@@ -379,14 +381,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func currentSongChanged(notification: NSNotification){
         synced(self) {
+            
+            if self.player.repeatMode == .One {
+                println("\(self.player.nowPlayingItem.title) is repeating")
+                self.updateAll(0)
+                return
+            }
+ 
             let nowPlayingItem = self.player.nowPlayingItem
             
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
-            if self.firstLoadSongTime != nowPlayingItem.playbackDuration {
+            if self.firstloadSongTitle != nowPlayingItem.title && self.firstLoadSongTime != nowPlayingItem.playbackDuration {
                 
                 if(self.actionSheet != nil && self.actionSheet.isTwistJamActionSheetShow == true){
-                    println("self.actionSheet")
+ 
                     self.actionSheet!.dismissAnimated(true)
                 }
                 self.firstLoadSongTime = nowPlayingItem.playbackDuration
@@ -396,10 +405,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // update the progressblockWidth
                 
                 self.progressBlockViewWidth = nil
-                println("song changed and current song is \(self.player.nowPlayingItem.title)")
         
                 let nowPlayingItemDuration = nowPlayingItem.playbackDuration
-                
 
                 self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 161)
                 self.progressBlock.center.y = self.progressContainerHeight
@@ -425,6 +432,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.nowPlayingItemSpeed = 1
             self.timer.invalidate()
             self.startTimer()
+
             self.updateAll(0)
         }
     }
@@ -453,12 +461,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playerVolumeChanged(notification: NSNotification){
-        
+        println("volume changed")
     }
 
     
     func resumeSong(){
-
+        
         musicViewController!.nowView!.stop()
         if selectedFromTable {
             player.play()
@@ -713,9 +721,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         actionSheet = TwistJamActionSheet()
         actionSheet.needRunningManSlider = true
         actionSheet.songVC = self
-        //actionSheet.initWithTitle("")
         var handler:TwistJamActionSheet = TwistJamActionSheet()
-        
+
         actionSheet.addButtonWithTitle(NSString(string:""), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
             println("here")
         })
@@ -726,36 +733,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func showActionSheet(){
-//        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
-//        
-//        
-//        
-//        let addTabsAction = UIAlertAction(title: "Add your tabs", style: .Default, handler: {
-//            (alert:UIAlertAction!) -> Void in
-//            
-//            let editTabsVC = EditTabsViewController()
-//            self.presentViewController(editTabsVC, animated: true, completion: nil)
-//            //Go to edit tabs screen
-//            
-//        })
-//        
-//        let addLyricsAction = UIAlertAction(title: "Add your lyrics", style: .Default, handler: {
-//            (alert:UIAlertAction!) -> Void in
-//            //TODO: Go to edit lyrics screens
-//            
-//        })
-//        
-//        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler:nil)
-//        optionMenu.addAction(addTabsAction)
-//        optionMenu.addAction(addLyricsAction)
-//        optionMenu.addAction(cancelAction)
-//        
-//        self.presentViewController(optionMenu, animated: true, completion: nil)
-        
+
         actionSheet = TwistJamActionSheet()
-        //actionSheet.initWithTitle("")
+
         var handler:TwistJamActionSheet = TwistJamActionSheet()
-        
+    
         actionSheet.addButtonWithTitle(NSString(string:"Add your tabs"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
             let editTabsVC = EditTabsViewController()
             self.presentViewController(editTabsVC, animated: true, completion: nil)

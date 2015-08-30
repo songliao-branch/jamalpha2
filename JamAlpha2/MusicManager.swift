@@ -17,7 +17,8 @@ class MusicManager: NSObject {
     // this should never be accessed outside MusicManager
     // a current collection is always passed in from function
     // 'setPlayerQueue'
-    private var lastPlayerQueue = [MPMediaItem]()
+    var lastPlayerQueue = [MPMediaItem]()
+    var lastSelectedIndex = -1
     
     var uniqueSongs : [MPMediaItem]!
     var uniqueAlbums = [Album]()
@@ -54,10 +55,7 @@ class MusicManager: NSObject {
         self.setPlayerQueue(uniqueSongs)
     }
     
-    // used to detect if same song is selected for different queues
-    // if so, we resume playing
-    private var lastPlayingItem = 0
-    
+
     func setPlayerQueue(collection: [MPMediaItem]){
 
         if lastPlayerQueue == collection { // if we are the same queue
@@ -90,6 +88,9 @@ class MusicManager: NSObject {
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
         }
+        
+        lastSelectedIndex = selectedIndex
+        
     }
     
     // MARK: get all MPMediaItems

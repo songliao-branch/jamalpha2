@@ -14,7 +14,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     //for transition view animator
     var animator: CustomTransitionAnimation?
     var nowView: VisualizerView!
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -23,7 +23,38 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
         
         createTransitionAnimation()
+        registerMusicPlayerNotificationForSongChanged()
     }
+    
+    
+    func registerMusicPlayerNotificationForSongChanged(){
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
+
+    }
+    
+    func synced(lock: AnyObject, closure: () -> ()) {
+        objc_sync_enter(lock)
+        closure()
+        objc_sync_exit(lock)
+    }
+    
+
+    
+    func currentSongChanged(notification: NSNotification){
+        synced(self) {
+            let player = MusicManager.sharedInstance.player
+            if player.repeatMode == .One {
+                println("\(player.nowPlayingItem.title) is repeating")
+                return
+            }
+            
+            if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+
+                self.musicTable.reloadData()
+            }
+        }
+    }
+
     
     
     func createTransitionAnimation(){
@@ -64,10 +95,21 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             let song = uniqueSongs[indexPath.row]
             
+            if MusicManager.sharedInstance.player.nowPlayingItem != nil {
+                if song == MusicManager.sharedInstance.player.nowPlayingItem {
+                    
+                    // TODO: change asset icon to pink
+                    cell.loudspeakerImage.hidden = false
+                }
+                else {
+                    cell.loudspeakerImage.hidden = true
+                }
+            } else {
+                cell.loudspeakerImage.hidden = true
+            }
+            
             let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
-            
             cell.coverImage.image = image
-            
             cell.mainTitle.text = song.title
             cell.subtitle.text = song.artist
             
@@ -76,6 +118,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             let theArtist = uniqueArtists[indexPath.row]
             
             let image = theArtist.getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
+            cell.loudspeakerImage.hidden = true
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             cell.coverImage.image = image
@@ -97,6 +140,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             cell.coverImage.image = image
+            cell.loudspeakerImage.hidden = true
             
             let numberOfTracks = theAlbum.numberOfTracks
             let trackPrompt = "track".addPluralSubscript(numberOfTracks)
@@ -124,7 +168,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if  pageIndex == 0 {
+        if pageIndex == 0 {
             
             MusicManager.sharedInstance.setPlayerQueue(uniqueSongs)
             MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
@@ -135,12 +179,14 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
+            
+             //reload table to show loudspeaker icon on current selected row
+            tableView.reloadData()
             self.presentViewController(songVC, animated: true, completion: nil)
-
         }
         else if pageIndex == 1 {
 
-            let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
+            var artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
         
             artistVC.theArtist = uniqueArtists[indexPath.row]
             artistVC.musicViewController = self
@@ -150,11 +196,10 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         else if pageIndex == 2 {
             
-            let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
-      
+            var albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
+            
             albumVC.theAlbum = uniqueAlbums[indexPath.row]
             albumVC.musicViewController = self
-            
             self.showViewController(albumVC, sender: self)
             
         }
