@@ -33,8 +33,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     override func viewDidLoad() {
         super.viewDidLoad()
         player = MusicManager.sharedInstance.player
-        
-        title = "twistjam"
+        setUpLogo()
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
@@ -46,9 +45,14 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         setUpPageViewController()
         //registerMusicPlayerNotificationForSongChanged()
     }
-    
 
-
+    func setUpLogo(){
+        let logo = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSizeMake(self.view.frame.width/2, 22)))
+        logo.image = UIImage(named: "logo_bold")
+        logo.center = CGPointMake(self.view.center.x, 25) // half of navigation height
+        logo.contentMode = UIViewContentMode.ScaleAspectFit
+        self.navigationController!.navigationBar.addSubview(logo)
+    }
     
     func setUpNowView(){
         nowView.initWithNumberOfBars(4)

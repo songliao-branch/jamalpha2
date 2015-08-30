@@ -29,13 +29,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var songNameLabel: MarqueeLabel!
     var artistNameLabel: UILabel!
+    var topViewHeight: CGFloat = 50
     
     var previousButton: UIButton!
     var nextButton: UIButton!
-    
+
     // MARK: Custom views
-    var base : ChordBase!
-    var chordAndLyricBaseHeight:CGFloat!
+    var base: ChordBase!
+    var basesHeight: CGFloat!
+    let marginBetweenBases: CGFloat = 15
     
     //MARK: progress Container
     var progressBlock: SoundWaveView!
@@ -116,7 +118,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
-    let progressContainerHeight:CGFloat = 100 //TODO: Change to percentange
+    let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange
 
     override func prefersStatusBarHidden() -> Bool {
         return true
@@ -196,7 +198,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpTopButtons() {
         
-        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50 ))
+        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: topViewHeight ))
         
         topView.backgroundColor = UIColor.mainPinkColor()
         topView.alpha = 1
@@ -287,7 +289,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpMusicData(song: MPMediaItem){
-        
          if song.title == "Rolling In The Deep" {
             chords = Chord.getRollingChords()
             lyric = Lyric.getRollingLyrics()
@@ -305,15 +306,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chords = Chord.getExtremeChords()
             lyric = Lyric.getExtremeLyrics()
         }
-        
-        
     }
     
     func setUpLyricsBase(){
         //Lyric labels
         current = -1
         let sideMargin: CGFloat = 20
-        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: chordAndLyricBaseHeight * 0.4))
+        
+        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         lyricbase.alpha = 0.8
         
@@ -342,12 +342,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricbase.addSubview(bottomLyricLabel)
     }
     
-    let marginBetweenBases: CGFloat = 15
-    
+
     func setUpChordBase(){
-        let marginToArtistButton: CGFloat = 15
-        chordAndLyricBaseHeight = self.view.frame.height - CGRectGetMaxY(artistNameLabel.frame) - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases
-        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(artistNameLabel.frame) + marginToArtistButton, width: self.view.frame.width * 0.62, height: chordAndLyricBaseHeight * 0.6))
+        let marginToArtistButton: CGFloat = 20
+        let marginToProgressContainer: CGFloat = 10
+        basesHeight = self.view.frame.height - topViewHeight - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
+        
+        base = ChordBase(frame: CGRect(x: 0, y: topViewHeight + marginToArtistButton, width: self.view.frame.width * 0.62, height: basesHeight * 0.6))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.clearColor()
         base.alpha = 0.8
@@ -424,11 +425,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.backgroundImageView.center.x = self.view.center.x
                     self.backgroundImageView.image = blurredImage
        
-                    // update the totalTimeLabel
-                    var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString())
-                    self.totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
+                    self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
                 }
-                
             }
             self.speed = 1
             self.nowPlayingItemSpeed = 1
@@ -613,35 +611,38 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func setUpTimeLabels(){
-        currentTimeLabel = UILabel(frame: CGRect(x: 20, y: progressBlockContainer.frame.origin.y+20, width: 60, height: 18))
         
-        currentTimeLabel.font = UIFont.systemFontOfSize(14)
-        currentTimeLabel.text = "0:00"
-        currentTimeLabel.textAlignment = NSTextAlignment.Center
+        let labelWidth: CGFloat = 40
+        let labelHeight: CGFloat = 15
+        let labelFontSize: CGFloat = 12
+        let timeLabelOriginY = CGRectGetMaxY(progressBlockContainer.frame)-labelHeight
+        
+        let wrapper = UIView(frame: CGRect(x: 0, y: timeLabelOriginY, width: 85, height: labelHeight))
+        wrapper.center.x = self.view.center.x
+        wrapper.backgroundColor = UIColor.darkGrayColor()
+        wrapper.alpha = 0.7
+        wrapper.layer.cornerRadius = labelHeight/5
+        self.view.addSubview(wrapper)
+        
+        currentTimeLabel = UILabel(frame: CGRect(x: self.view.center.x-labelWidth, y: timeLabelOriginY , width: labelWidth, height: labelHeight))
+        currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        currentTimeLabel.text = "0:00.0"
+        currentTimeLabel.textAlignment = .Center
         currentTimeLabel.textColor = UIColor.whiteColor()
-        currentTimeLabel.alpha = 0.8
-        currentTimeLabel.backgroundColor = UIColor.grayColor()
-        currentTimeLabel.layer.cornerRadius = CGRectGetHeight(currentTimeLabel.frame) / 6
-       // currentTimeLabel.sizeToFit()
-        currentTimeLabel.clipsToBounds = true
+        
+        //make it glow
+        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
+        currentTimeLabel.layer.shadowRadius = 3.0
+        currentTimeLabel.layer.shadowOpacity = 1.0
+        currentTimeLabel.layer.shadowOffset = CGSizeZero
+        currentTimeLabel.layer.masksToBounds = false
         self.view.addSubview(currentTimeLabel)
         
-        totalTimeLabel = UILabel(frame: CGRect(x: (self.view.frame.size.width - 58), y: progressBlockContainer.frame.origin.y+20, width: 38, height: 18))
-        totalTimeLabel.textColor = UIColor.blackColor()
-        totalTimeLabel.font = UIFont.systemFontOfSize(14)
-        
-        var temptotalTime:NSString = NSString(string: TimeNumber(time: Float(player.nowPlayingItem.playbackDuration)).toDisplayString())
-        totalTimeLabel.text = temptotalTime.substringToIndex(temptotalTime.length-2)
-
-        
-        totalTimeLabel.textAlignment = NSTextAlignment.Center
-        totalTimeLabel.textColor = UIColor.blackColor()
-        totalTimeLabel.backgroundColor = UIColor.grayColor()
-        totalTimeLabel.alpha = 0.8
-        totalTimeLabel.layer.cornerRadius = CGRectGetHeight(currentTimeLabel.frame) / 6
-       // totalTimeLabel.sizeToFit()
-        totalTimeLabel.clipsToBounds = true
-        //totalTimeLabel.center.x = self.view.frame.width - totalTimeLabel.frame.width / 2 - 5
+        totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
+        totalTimeLabel.textColor = UIColor.whiteColor()
+        totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem.playbackDuration)).toDisplayString()
+        totalTimeLabel.textAlignment = .Center
         self.view.addSubview(totalTimeLabel)
         
     }
