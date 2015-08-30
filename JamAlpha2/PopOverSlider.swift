@@ -46,7 +46,7 @@ class PopOverSlider: UISlider {
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
         println("touchesEnded")
         songVC!.speed = self.value + 1
-        songVC!.nowPlayingItemSpeed = self.value + 1
+        //songVC!.nowPlayingItemSpeed = self.value + 1
         if songVC!.player.playbackState == MPMusicPlaybackState.Playing {
             songVC!.player.currentPlaybackRate = self.value + 1
             songVC!.timer.invalidate()
