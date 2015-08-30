@@ -43,6 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentVC = topViewController(rootViewController())
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
+            currentSongVC.selectedFromTable = false
             currentSongVC.resumeSong()
             println("Song VC entering forground")
         }
