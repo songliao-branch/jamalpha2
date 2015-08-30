@@ -468,6 +468,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func resumeSong(){
         
         musicViewController!.nowView!.stop()
+        // if we are pressing the now button this is false, or coming from background
         if selectedFromTable {
             player.play()
             startTimer()
@@ -476,10 +477,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 startTimer()
             }
             else if player.playbackState == MPMusicPlaybackState.Paused {
+                
                 timer.invalidate()
+                // progress bar should be lowered
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
-                self.speed = player.currentPlaybackRate
+                self.speed = 1  //restore to original speed
             }
         }
 
