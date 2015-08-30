@@ -4,7 +4,7 @@ import MediaPlayer
 let chordwithname:Int = 1
 let fullchord:Int = 0
 
-let stepPerSecond: Float = 100   //steps of chord move persecond
+let stepPerSecond: Float = 50   //steps of chord move persecond
 
 //time for chords to fall from top to bottom of chordbase
 let freefallTime:Float = 4
@@ -89,7 +89,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //corresponding playback speed
     var speed: Float = 1
     //as a recorder to write down the current rate
-    var nowPlayingItemSpeed:Float = 1
+    //var nowPlayingItemSpeed:Float = 1
     
     //Lyric
     var lyricbase: UIView!
@@ -446,7 +446,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
             self.speed = 1
-            self.nowPlayingItemSpeed = 1
+            //self.nowPlayingItemSpeed = 1
             self.timer.invalidate()
             self.startTimer()
 
@@ -748,6 +748,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.changeChordMode()
         })
         actionSheet.show()
+        timer.invalidate()
+        updateAll(Float(player.currentPlaybackTime))
+        startTimer()
     }
     
     func showActionSheet(){
@@ -764,6 +767,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         })
         actionSheet.show()
+        timer.invalidate()
+        updateAll(Float(player.currentPlaybackTime))
+        startTimer()
     }
     
     // ISSUE: when app goes to background this is not called
@@ -1042,7 +1048,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
-            player.currentPlaybackRate = nowPlayingItemSpeed
+            player.currentPlaybackRate = self.speed//nowPlayingItemSpeed
             println("play")
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
@@ -1058,7 +1064,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     
             })
         } else {
-            nowPlayingItemSpeed = player.currentPlaybackRate
+            //nowPlayingItemSpeed = player.currentPlaybackRate
             player.pause()
             musicViewController!.nowView!.stop()
             
@@ -1089,7 +1095,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //In case of receiving song changed and playback state 
         //notifications, notifications are triggered twice somehow
         if !timer.valid {
-            timer = NSTimer.scheduledTimerWithTimeInterval(0.01 / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         }
     }
     

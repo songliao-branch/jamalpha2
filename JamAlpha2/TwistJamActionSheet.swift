@@ -133,7 +133,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
                 slider.minimumValue = -0.5
                 slider.maximumValue = 0.5
                 self.updateSliderPopoverText()
-                slider.setValue(songVC.nowPlayingItemSpeed - 1, animated: false)
+                slider.setValue(songVC.speed - 1, animated: false)
                 cell.addSubview(slider)
                 cell.addSubview(slider.popOver)
                 cell.addSubview(resetButton)
@@ -149,7 +149,6 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
         
         return cell
     }
-    
     
     //////////////////////////////////
     func sliderValueChanged(sender:PopOverSlider)
@@ -170,12 +169,12 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
         self.slider.setValue(0.0, animated: true)
         if songVC!.player.playbackState == MPMusicPlaybackState.Playing {
             songVC!.player.currentPlaybackRate = 1
-            songVC!.nowPlayingItemSpeed = 1
+            //songVC!.nowPlayingItemSpeed = 1
             songVC!.timer.invalidate()
             songVC!.startTimer()
         }else{
             songVC!.player.currentPlaybackRate = 0
-            songVC!.nowPlayingItemSpeed = 1
+           // songVC!.nowPlayingItemSpeed = 1
         }
     }
     
