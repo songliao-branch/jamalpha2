@@ -74,6 +74,7 @@ class MusicManager: NSObject {
     
     func setIndexInTheQueue(selectedIndex: Int){
         // 如果单曲循环的话 切出去 再换一首歌的话 还是之前那个首歌
+        player.stop()
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
