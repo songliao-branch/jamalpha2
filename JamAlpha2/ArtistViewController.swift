@@ -21,6 +21,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         artistAllSongs = theArtist.getSongs()
+        
         //MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false

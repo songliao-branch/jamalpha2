@@ -55,16 +55,18 @@ class MusicManager: NSObject {
         self.setPlayerQueue(uniqueSongs)
     }
     
+    private var queueChanged = false
 
     func setPlayerQueue(collection: [MPMediaItem]){
 
         if lastPlayerQueue == collection { // if we are the same queue
            println("\(_TAG) same collection")
+            queueChanged = false
         } else { //if different queue, means we are getting a new collection, reset the player queue
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
             println("\(_TAG) setting a new queue")
-            
+            queueChanged = true
             //testing
             for song in collection {
                 println("\(_TAG) setting up queue of song: \(song.title)")
@@ -73,25 +75,32 @@ class MusicManager: NSObject {
     }
     
     func setIndexInTheQueue(selectedIndex: Int){
+        // player.stop()
         // 如果单曲循环的话 切出去 再换一首歌的话 还是之前那个首歌
-        player.stop()
+
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
                 println("\(_TAG)  ")
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
-            player.repeatMode = .One //set player item 还是还原为单曲循环
-        } else {  //如果是其他循环模式
+            player.repeatMode = .One
+        } else { // for other repeat mode
             
-            //如果现在播放的不是选中的
+            // if current playing song is not what we selected from the table
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
+                player.prepareToPlay()
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
+            } else {
+                if queueChanged { // if we selected the same song from a different queue this time
+                    let lastPlaybackTime = player.currentPlaybackTime
+                    player.prepareToPlay() // set current playing index to zero
+                    player.nowPlayingItem = lastPlayerQueue[selectedIndex] // this has a really short time lag
+                    player.currentPlaybackTime = lastPlaybackTime
+                }
             }
         }
-        
         lastSelectedIndex = selectedIndex
-        
     }
     
     // MARK: get all MPMediaItems
