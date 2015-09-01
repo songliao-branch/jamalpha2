@@ -253,6 +253,7 @@
 		E45F6B1A1B155F140018645D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E4942BA11B955D4000F1C048 /* SwiftyJSON.swift */,
 				E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */,
 				E45F6B1F1B15600F0018645D /* Toucan.swift */,
 			);
@@ -351,7 +352,6 @@
 		E48AE2D01B955BA30044CFDB /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				E4942BA11B955D4000F1C048 /* SwiftyJSON.swift */,
 				E48AE2D11B955BB40044CFDB /* API.swift */,
 			);
 			name = Networking;
