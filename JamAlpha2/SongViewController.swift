@@ -28,7 +28,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var viewDidFullyDisappear = true
     
-    var player:MPMusicPlayerController!
+    var player: MPMusicPlayerController!
     
     @IBOutlet weak var playPauseButton: UIButton!
     
