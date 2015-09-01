@@ -128,8 +128,8 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
             
                 slider = PopOverSlider(frame: CGRectMake(30, cell.frame.height/2-45, cell.frame.width-100, 100))
                 slider.songVC = self.songVC
-                //slider.setMinimumTrackImage(UIImage(named: "running_man"), forState: UIControlState.Normal)
-                //slider.setMaximumTrackImage(UIImage(named: "running_man"), forState: UIControlState.Normal)
+                slider.setMinimumTrackImage(UIImage(named: "sliderTexturePink"), forState: UIControlState.Normal)
+                slider.setMaximumTrackImage(UIImage(named: "sliderTextureGray"), forState: UIControlState.Normal)
                 slider.minimumValue = -0.5
                 slider.maximumValue = 0.5
                 self.updateSliderPopoverText()
