@@ -424,10 +424,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.progressBlockViewWidth = nil
         
                 let nowPlayingItemDuration = nowPlayingItem.playbackDuration
-
-                self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 161)
-                self.progressBlock.center.y = self.progressContainerHeight
-        
+                    self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                    self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 161)
+                    self.progressBlock.center.y = self.progressContainerHeight
+                
+                if self.player.playbackState == MPMusicPlaybackState.Paused{
+                    self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                    println("changeScale")
+                    //self.progressBlock!.alpha = 0.5
+                }
+                
                 // if we are NOT repeating song
                 if self.player.repeatMode != .One {
                     
@@ -447,8 +453,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             self.speed = 1
             //self.nowPlayingItemSpeed = 1
-            self.timer.invalidate()
-            self.startTimer()
+            if self.player.playbackState == MPMusicPlaybackState.Playing{
+                self.timer.invalidate()
+                self.startTimer()
+            }
+            
 
             self.updateAll(0)
         }
@@ -747,10 +756,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         actionSheet.addButtonWithTitle(NSString(string:"Change Tab Mode"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
             self.changeChordMode()
         })
-        actionSheet.show()
-        timer.invalidate()
-        updateAll(Float(player.currentPlaybackTime))
-        startTimer()
+         actionSheet.show()
+        if player.playbackState == MPMusicPlaybackState.Playing {
+            timer.invalidate()
+            updateAll(Float(player.currentPlaybackTime))
+            startTimer()
+        }
     }
     
     func showActionSheet(){
@@ -767,9 +778,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         })
         actionSheet.show()
-        timer.invalidate()
-        updateAll(Float(player.currentPlaybackTime))
-        startTimer()
+        if player.playbackState == MPMusicPlaybackState.Playing {
+            timer.invalidate()
+            updateAll(Float(player.currentPlaybackTime))
+            startTimer()
+        }
     }
     
     // ISSUE: when app goes to background this is not called

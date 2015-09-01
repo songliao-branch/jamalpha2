@@ -15,7 +15,7 @@ public extension UIImage {
     }
     
     public func applyActionSheetEffect() -> UIImage? {
-        return applyBlurWithRadius(65, tintColor: UIColor(white: 0.76, alpha: 0.53), saturationDeltaFactor: 1.8)
+        return applyBlurWithRadius(45, tintColor: UIColor(white: 0.76, alpha: 0.53), saturationDeltaFactor: 1.8)
     }
     
     public func applyDarkEffect() -> UIImage? {
