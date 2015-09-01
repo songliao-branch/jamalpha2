@@ -404,7 +404,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.updateAll(0)
                 return
             }
- 
+            
             let nowPlayingItem = self.player.nowPlayingItem
             
             // use current item's playbackduration to validate nowPlayingItem duration
