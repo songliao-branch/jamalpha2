@@ -26,9 +26,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     @IBOutlet weak var placeHolderForSub: UILabel!
     
-    override func prefersStatusBarHidden() -> Bool {
-        return true
-    }
+//    override func prefersStatusBarHidden() -> Bool {
+//        return true
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

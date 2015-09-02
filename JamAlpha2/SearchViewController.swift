@@ -6,6 +6,7 @@ import MediaPlayer
 class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
+    
     var uniqueSongs: [MPMediaItem] = [MPMediaItem]()
     var filteredSongs: [MPMediaItem] = [MPMediaItem]()
     
@@ -16,11 +17,12 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         setUpLocalSearchBar()
     }
     
+
     func setUpLocalSearchBar(){
         self.resultSearchController = UISearchController(searchResultsController: nil)
         self.resultSearchController.searchResultsUpdater = self
         
-        self.resultSearchController.dimsBackgroundDuringPresentation = true
+        self.resultSearchController.dimsBackgroundDuringPresentation = false
         self.resultSearchController.searchBar.sizeToFit()
         self.searchResultTableView.tableHeaderView = self.resultSearchController.searchBar
         
@@ -70,6 +72,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             })
         }
 
+    }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
     }
 }
 

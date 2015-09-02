@@ -8,6 +8,20 @@
 import UIKit
 import Alamofire
 
+struct SearchResult {
+    
+    var wrapperType: String!
+    var kind: String!
+    
+    var trackName: String?
+    var artistName: String!
+    var collectionName: String?
+    
+    var artworkUrl100: String!//large 100
+    var previewUrl: String!
+    
+}
+
 extension Alamofire.Request {
     public static func imageResponseSerializer() -> GenericResponseSerializer<UIImage> {
         return GenericResponseSerializer { request, response, data in
@@ -34,18 +48,18 @@ struct API {
         static let baseURLString = "https://itunes.apple.com"
         
         case Term(String)
-        case TermAttribute(String, Attribute) //search term and entity(e.g.)
+        //case TermAttribute(String, Attribute) //search term and entity(e.g.)
         var URLRequest: NSURLRequest {
             let (path: String, parameters: [String: AnyObject]) = {
                 switch self {
                     // i.e. https://itunes.apple.com/search?term=ed+sheeran
                     case .Term(let term):
-                        var params = ["term":"\(term)", "limit":"10"] //default limit is 50
+                        var params = ["term":"\(term)", "limit":"20"] //default limit is 50
                         return ("/search", params) //empty dictionary
                
-                case .TermAttribute(let term, let attribute):
-                    var params = ["term": "\(term)", "attribute": "\(attribute.rawValue)", "limit":"10"]
-                    return ("/search", params)
+//                case .TermAttribute(let term, let attribute):
+//                    var params = ["term": "\(term)", "attribute": "\(attribute.rawValue)", "limit":"10"]
+//                    return ("/search", params)
                     }
                 }()
             let URL = NSURL(string: Router.baseURLString)
