@@ -12,6 +12,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var filteredSongs: [MPMediaItem] = [MPMediaItem]()
     
     var searchResults: [SearchResult]!
+    var musicRequest: Request?
+    
     
     @IBOutlet weak var searchResultTableView: UITableView!
     override func viewDidLoad() {
@@ -21,14 +23,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         setUpLocalSearchBar()
     }
     
-
     func setUpLocalSearchBar(){
         self.resultSearchController = UISearchController(searchResultsController: nil)
         self.resultSearchController.searchResultsUpdater = self
-        
         self.resultSearchController.dimsBackgroundDuringPresentation = false
         self.resultSearchController.searchBar.sizeToFit()
-        
         self.searchResultTableView.tableHeaderView = self.resultSearchController.searchBar
         
         let searchBar = resultSearchController.searchBar
@@ -37,64 +36,124 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
        // searchBar.backgroundImage = UIImage(named: "KP_bg")
         searchBar.tintColor = UIColor.mainPinkColor()
         searchBar.placeholder = "What do you want to play?"
-        
     }
     
     func loadLocalSongs(){
         var songCollection = MPMediaQuery.songsQuery()
         uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
     }
-
+    
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 2
+    }
+    
+//    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        if section == 0 {
+//            return "Local"
+//        }
+//        return "Cloud"
+//    }
+//    
+    
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            if filteredSongs.count == 0 {
+                return 0
+            }
+            return 20
+        } else if section == 1 {
+            if searchResults.count == 0 {
+                return 0
+            }
+            return 20
+        }
+        return 0
+    }
+    
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section == 0 {
+            if filteredSongs.count == 0 {
+                return nil
+            }
+            let label = UILabel(frame: CGRectMake(0, 0, self.view.frame.width, 20))
+            label.text = "local"
+            return label
+        } else if section == 1 {
+            if searchResults.count == 0 {
+                return nil
+            }
+            let label = UILabel(frame: CGRectMake(0, 0, self.view.frame.width, 20))
+            label.text = "Cloud"
+            return label
+        }
+        return nil
+        
+    }
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if resultSearchController.active {
-            return searchResults.count
+            if section == 0 {
+                return filteredSongs.count
+            } else if section == 1 {
+              return searchResults.count
+            }
         }
         return 0
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! LocalSearchResultCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("searchresultcell", forIndexPath: indexPath) as! SearchResultCell
         
         if resultSearchController.active {
             
-            if let track = searchResults[indexPath.row].trackName {
-                cell.titleLabel.text = track
-            }
-            if let artist = searchResults[indexPath.row].artistName {
-                cell.subtitleLabel.text = artist
-            }
-            
-            if let imageURL = searchResults[indexPath.row].artworkUrl100 {
-                cell.request?.cancel()
-                cell.albumCover.image = nil
+            if indexPath.section == 0 { //local search in section 0
+                cell.titleLabel.text = filteredSongs[indexPath.row].title
+                cell.subtitleLabel.text = filteredSongs[indexPath.row].artist
+                cell.albumCover.image = filteredSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 54, height: 54))
                 
-                cell.request = Alamofire.request(.GET, imageURL).validate(contentType: ["image/*"]).responseImage() {
-                    (request, _, image, error) in
+            } else { //web search in section 1
+                if let track = searchResults[indexPath.row].trackName {
+                    cell.titleLabel.text = track
+                }
+                if let artist = searchResults[indexPath.row].artistName {
+                    cell.subtitleLabel.text = artist
+                }
+                
+                if let imageURL = searchResults[indexPath.row].artworkUrl100 {
+                    cell.request?.cancel()
+                    cell.albumCover.image = nil
                     
-                    if error == nil && image != nil {
-                        cell.albumCover.image = image
-                    } else {
-                        println("download image error \(error)")
+                    cell.request = Alamofire.request(.GET, imageURL).validate(contentType: ["image/*"]).responseImage() {
+                        (request, _, image, error) in
+                        
+                        if error == nil && image != nil {
+                            cell.albumCover.image = image
+                        } else {
+                            println("download image error \(error)")
+                        }
                     }
                 }
+            
             }
             
         }
         return cell
     }
     
+    // hide keyboard when scroll table view
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         resultSearchController.searchBar.resignFirstResponder()
     }
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        searchSong(searchController.searchBar.text)
+        filterLocalSongs(searchController.searchBar.text)
+        webSearchSong(searchController.searchBar.text)
     }
     
-    var musicRequest: Request?
-    
-    func searchSong(searchText: String) {
+
+    func webSearchSong(searchText: String) {
         musicRequest?.cancel()
+        searchResults = [SearchResult]()
+        self.searchResultTableView.reloadData()
         musicRequest = Alamofire.request(API.Router.Term(searchText)).responseJSON() {
             (_, _, data, error) in
             if error == nil {
@@ -106,9 +165,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func addDataToResults(data: JSON){
-        searchResults = [SearchResult]()
         for item in data["results"].array! {
-            
             let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
             
             if let trackName = item["trackName"].string {
@@ -126,7 +183,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if let preview = item["previewUrl"].string {
                 searchResponse.previewUrl = preview
             }
-            searchResults!.append(searchResponse)
+            searchResults.append(searchResponse)
         }
 
         dispatch_async(dispatch_get_main_queue()) {
@@ -134,12 +191,13 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
-    func filterSongs(searchText: String) {
+    func filterLocalSongs(searchText: String) {
 
         self.filteredSongs = uniqueSongs.filter({
             (song: MPMediaItem) -> Bool in
             return song.title.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumTitle.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
         })
+        self.searchResultTableView.reloadData()
         
     }
 }

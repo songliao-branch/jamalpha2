@@ -50,7 +50,7 @@
 		E4D2F1991B4CA60B00091A45 /* 彩虹.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E4D2F1981B4CA60B00091A45 /* 彩虹.mp3 */; };
 		E4D2F19B1B4CA6A800091A45 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */; };
 		E4D2F8921B5F1B8E004B90FD /* more.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E4D2F8911B5F1B8E004B90FD /* more.mp3 */; };
-		E4D2F8941B5F32BB004B90FD /* LocalSearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* LocalSearchResultCell.swift */; };
+		E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */; };
 		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
 /* End PBXBuildFile section */
 
@@ -161,7 +161,7 @@
 		E4D2F1981B4CA60B00091A45 /* 彩虹.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "彩虹.mp3"; sourceTree = "<group>"; };
 		E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		E4D2F8911B5F1B8E004B90FD /* more.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = more.mp3; sourceTree = "<group>"; };
-		E4D2F8931B5F32BB004B90FD /* LocalSearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalSearchResultCell.swift; sourceTree = "<group>"; };
+		E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
 		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -265,7 +265,7 @@
 			isa = PBXGroup;
 			children = (
 				E48877671B151E2B004785D3 /* MusicCell.swift */,
-				E4D2F8931B5F32BB004B90FD /* LocalSearchResultCell.swift */,
+				E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */,
 				E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */,
 				E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */,
 			);
@@ -550,7 +550,7 @@
 				E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */,
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
-				E4D2F8941B5F32BB004B90FD /* LocalSearchResultCell.swift in Sources */,
+				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E44359021B1947660091E926 /* Album.swift in Sources */,
 				C8F505031B91017B0077F508 /* PopOver.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,

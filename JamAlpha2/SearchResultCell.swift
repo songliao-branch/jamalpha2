@@ -9,7 +9,7 @@
 import UIKit
 import Alamofire
 
-class LocalSearchResultCell: UITableViewCell {
+class SearchResultCell: UITableViewCell {
 
     var request: Alamofire.Request?
     @IBOutlet weak var albumCover: UIImageView!
