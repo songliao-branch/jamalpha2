@@ -8,17 +8,22 @@
 import UIKit
 import Alamofire
 
-struct SearchResult {
+class SearchResult {
     
     var wrapperType: String!
     var kind: String!
     
     var trackName: String?
-    var artistName: String!
+    var artistName: String?
     var collectionName: String?
     
-    var artworkUrl100: String!//large 100
-    var previewUrl: String!
+    var artworkUrl100: String?//large 100
+    var previewUrl: String?
+    
+    init(wrapperType: String, kind: String){
+        self.wrapperType = wrapperType
+        self.kind = kind
+    }
     
 }
 
@@ -54,7 +59,7 @@ struct API {
                 switch self {
                     // i.e. https://itunes.apple.com/search?term=ed+sheeran
                     case .Term(let term):
-                        var params = ["term":"\(term)", "limit":"20"] //default limit is 50
+                        var params = ["term":"\(term)", "limit":"20", "media":"music"] //default limit is 50
                         return ("/search", params) //empty dictionary
                
 //                case .TermAttribute(let term, let attribute):
