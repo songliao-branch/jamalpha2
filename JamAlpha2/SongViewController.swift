@@ -135,15 +135,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
     let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange
-
+    
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+
         player = MusicManager.sharedInstance.player
-        
         firstLoadSongTime = player.nowPlayingItem.playbackDuration
         firstloadSongTitle = player.nowPlayingItem.title
         removeAllObserver()

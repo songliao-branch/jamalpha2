@@ -27,9 +27,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
     }
-    override func prefersStatusBarHidden() -> Bool {
-        return true
-    }
+
     
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
