@@ -24,11 +24,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     var isPageScrolling = false //prevent scrolling / button tap crash
     
-    @IBOutlet weak var placeHolderForSub: UILabel!
-    
-    override func prefersStatusBarHidden() -> Bool {
-        return true
-    }
+    var statusAndNavigationBarHeight: CGFloat = 64
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,8 +71,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         var allViewControllers = [startVC]
         self.pageViewController.setViewControllers(allViewControllers as [AnyObject], direction: .Forward, animated: true, completion: nil)
         
+        let heightOffset: CGFloat = 5 // height of table looks cut without minus 5
+        self.pageViewController.view.frame = CGRectMake(0, statusAndNavigationBarHeight+CGRectGetMaxY(musicUnderlineSelector.frame), self.view.frame.width, self.view.frame.size.height-heightOffset)
         
-        self.pageViewController.view.frame = CGRectMake(0, CGRectGetMaxY(musicUnderlineSelector.frame) + self.navigationController!.navigationBar.frame.height, self.view.frame.width, self.view.frame.size.height + 15)
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMoveToParentViewController(self)
@@ -112,11 +109,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
 
     func setupSegmentButtons() {
-        self.placeHolderForSub.hidden = true
-        
-        let heightOfPlaceHolder = self.placeHolderForSub.frame.height
-        musicTypeButtonContainer = UIView(frame: CGRectMake(0 , self.navigationController!.navigationBar.frame.height , self.view.frame.size.width,
-           heightOfPlaceHolder))
+
+        let containerHeight: CGFloat = 30
+        // 64 is status bar height(20) and navigation bar height(44)
+        musicTypeButtonContainer = UIView(frame: CGRectMake(0 , statusAndNavigationBarHeight, self.view.frame.size.width,
+           containerHeight))
+        musicTypeButtonContainer.backgroundColor = UIColor.blackColor()
         
         let numControllers = 3
         
@@ -124,9 +122,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             buttonText = ["Tracks","Artist","Album"]
         }
         
-        let buttonTracks = UIButton(frame: CGRectMake(0, 0, self.view.frame.width / 3, heightOfPlaceHolder))
-        let buttonArtist = UIButton(frame: CGRectMake(self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
-        let buttonAlbum = UIButton(frame: CGRectMake(CGFloat(2) * self.view.frame.width / 3, 0, self.view.frame.width / 3, heightOfPlaceHolder))
+        let buttonTracks = UIButton(frame: CGRectMake(0, 0, self.view.frame.width / 3, containerHeight))
+        let buttonArtist = UIButton(frame: CGRectMake(self.view.frame.width / 3, 0, self.view.frame.width / 3, containerHeight))
+        let buttonAlbum = UIButton(frame: CGRectMake(CGFloat(2) * self.view.frame.width / 3, 0, self.view.frame.width / 3, containerHeight))
         
          buttonHolder = [ buttonTracks, buttonArtist, buttonAlbum]
         
@@ -163,27 +161,19 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func tapButton(button:UIButton){
         
         if !self.isPageScrolling { //if done scrolling
-            
             let current = self.currentPageIndex
-            
             var direction:UIPageViewControllerNavigationDirection
             var indexScrollingFrom:Int
-            
             //return if pressed on current button
             if button.tag == current {
                 return
             }
-            
             self.isPageScrolling = true
-
             if button.tag > current { //swipe left to right
-    
                 direction = UIPageViewControllerNavigationDirection.Forward
-                
                 for i in current+1...button.tag {
                     var theVC = self.viewControllerAtIndex(i) as UIViewController
                     var tobeMovedViewControllers = [theVC]
-                    
                     self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
                         self.updateCurrentPageIndex(i)
                         self.changeButtonColorOnScroll()
@@ -193,11 +183,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             }
             else { //swipe right to left
                 direction = UIPageViewControllerNavigationDirection.Reverse
-
                  for i in reverse(button.tag...current-1) {
                     var theVC = self.viewControllerAtIndex(i) as UIViewController
                     var tobeMovedViewControllers = [theVC]
-                    
                     self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
                         self.updateCurrentPageIndex(i)
                         self.changeButtonColorOnScroll()

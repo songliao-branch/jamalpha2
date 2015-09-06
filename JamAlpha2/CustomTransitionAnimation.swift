@@ -36,6 +36,8 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
         return 0.5
     }
     
+    //var rectStatusBarig
+    
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
         //println("here")
         //获取containerView视图
@@ -47,9 +49,9 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             // println(self.animationType)
             let toVc:UIViewController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey)!
             //对要Present出来的视图设置初始位置
-            let  boundsRect:CGRect = UIScreen.mainScreen().bounds
+            let boundsRect:CGRect = UIScreen.mainScreen().bounds
             let finalFrame:CGRect = transitionContext.finalFrameForViewController(toVc)
-            toVc.view.frame = CGRectOffset(finalFrame, 0, boundsRect.size.height);
+            toVc.view.frame = CGRectOffset(finalFrame, 0, boundsRect.size.height-20);
             //添加Present视图
             containerView.addSubview(toVc.view)
             //UIView动画切换,在这里用Spring动画做效果
@@ -74,7 +76,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             //设置最终位置
             let boundsRect:CGRect = UIScreen.mainScreen().bounds
             let originFrame:CGRect = transitionContext.initialFrameForViewController(fromVc)
-            let finalFrame:CGRect = CGRectOffset(originFrame, 0, boundsRect.size.height);
+            let finalFrame:CGRect = CGRectOffset(originFrame, 0, boundsRect.size.height-20);
             //UIView动画切换
             let interval:NSTimeInterval = self.transitionDuration(transitionContext)
             
