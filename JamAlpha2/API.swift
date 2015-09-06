@@ -19,6 +19,7 @@ class SearchResult {
     
     var artworkUrl100: String?//large 100
     var previewUrl: String?
+    var trackViewUrl: String? // link to apple music or iTunes
     
     init(wrapperType: String, kind: String){
         self.wrapperType = wrapperType

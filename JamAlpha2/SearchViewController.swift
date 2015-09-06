@@ -183,6 +183,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if let preview = item["previewUrl"].string {
                 searchResponse.previewUrl = preview
             }
+            if let trackViewUrl = item["trackViewUrl"].string {
+                searchResponse.trackViewUrl = trackViewUrl
+            }
             searchResults.append(searchResponse)
         }
 
