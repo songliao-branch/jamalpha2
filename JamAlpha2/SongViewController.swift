@@ -44,7 +44,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var songNameLabel: MarqueeLabel!
     var artistNameLabel: UILabel!
-    var topViewHeight: CGFloat = 50
+    var topViewHeight: CGFloat = 44
+    let statusBarHeight: CGFloat = 20
     
     var previousButton: UIButton!
     var nextButton: UIButton!
@@ -136,10 +137,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let bottomViewHeight:CGFloat = 40 //this is fixed
     let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange
     
-    override func prefersStatusBarHidden() -> Bool {
-        return true
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -172,6 +169,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
     }
 
+    override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return UIStatusBarStyle.LightContent
+    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -214,16 +214,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpTopButtons() {
+        let statusBarLayer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: statusBarHeight))
+        statusBarLayer.backgroundColor = UIColor.mainPinkColor()
+        self.view.addSubview(statusBarLayer)
         
-        topView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: topViewHeight ))
-        
+        topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
         topView.backgroundColor = UIColor.mainPinkColor()
-        topView.alpha = 1
         self.view.addSubview(topView)
         
-        let buttonCenterY: CGFloat = 25
+        let buttonCenterY: CGFloat = topViewHeight/2
         pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
-        //TODO: change image source
+        
         pulldownButton.setImage(UIImage(named: "pullDown"), forState: UIControlState.Normal)
         pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -237,7 +238,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpNameAndArtistButtons(){
        
-        
         songNameLabel = MarqueeLabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 20)))
         songNameLabel.type = .Continuous
         songNameLabel.scrollDuration = 15.0
@@ -266,7 +266,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         songNameLabel.center.y = pulldownButton.center.y - 7
         
         artistNameLabel.center.x = self.view.frame.width / 2
-        artistNameLabel.center.y = CGRectGetMaxY(songNameLabel.frame) + 5
+        artistNameLabel.center.y = CGRectGetMaxY(songNameLabel.frame) + 3
         
         songNameLabel.textColor = UIColor.whiteColor()
         artistNameLabel.textColor =  UIColor.whiteColor()
@@ -361,11 +361,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
 
     func setUpChordBase(){
-        let marginToArtistButton: CGFloat = 20
+        let marginToTopView: CGFloat = 20
         let marginToProgressContainer: CGFloat = 10
-        basesHeight = self.view.frame.height - topViewHeight - marginToArtistButton - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
         
-        base = ChordBase(frame: CGRect(x: 0, y: topViewHeight + marginToArtistButton, width: self.view.frame.width * 0.62, height: basesHeight * 0.6))
+        basesHeight = self.view.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
+        
+        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.6))
         base.center.x = self.view.center.x
         base.backgroundColor = UIColor.clearColor()
         base.alpha = 0.8
@@ -800,8 +801,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.navigationBar.tintColor = UIColor.mainPinkColor()
-        self.tabBarController?.tabBar.hidden = false
         if player.playbackState == MPMusicPlaybackState.Playing {
             musicViewController!.nowView!.start()
         }
