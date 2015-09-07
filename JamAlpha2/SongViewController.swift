@@ -468,11 +468,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if playbackState == .Paused {
             timer.invalidate()
-            //musicViewController!.nowView.stop()
         }
         else if playbackState == .Playing {
             startTimer()
-           // musicViewController!.nowView.start()
         }
     }
     
@@ -496,7 +494,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //musicViewController!.nowView!.stop()
         // if we are pressing the now button this is false, or coming from background
         if selectedFromTable {
-            self.nowView.start()
+            if nowView != nil {
+                self.nowView.start()
+            }
             player.play()
             startTimer()
         }else{ // selected from now view button
@@ -504,7 +504,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 startTimer()
             }
             else if player.playbackState == MPMusicPlaybackState.Paused {
-                self.nowView.stop()
+                if nowView != nil {
+                    self.nowView.stop()
+                }
+                
                 timer.invalidate()
                 // progress bar should be lowered
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)

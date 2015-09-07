@@ -13,18 +13,30 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     var searchResults: [SearchResult]!
     var musicRequest: Request?
+    var animator: CustomTransitionAnimation!
+    
     
     @IBOutlet weak var searchResultTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+        createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         searchResults = [SearchResult]()
-        loadLocalSongs()
-        setUpLocalSearchBar()
+        setUpSearchBar()
+        
     }
     
-    func setUpLocalSearchBar(){
+
+
+    func createTransitionAnimation(){
+        if(animator == nil){
+            self.animator = CustomTransitionAnimation()
+        }
+    }
+
+    func setUpSearchBar(){
         self.resultSearchController = UISearchController(searchResultsController: nil)
         self.resultSearchController.searchResultsUpdater = self
         self.resultSearchController.dimsBackgroundDuringPresentation = false
@@ -39,11 +51,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         definesPresentationContext = true
         searchBar.tintColor = UIColor.mainPinkColor()
         searchBar.placeholder = "What do you want to play?"
-    }
-    
-    func loadLocalSongs(){
-        var songCollection = MPMediaQuery.songsQuery()
-        uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -149,6 +156,26 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
     
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 0 {
+            
+            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+            
+            songVC.selectedFromTable = true
+            
+            MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
+            MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
+            
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            
+            self.presentViewController(songVC, animated: true, completion: nil)
+            reloadMusicTable()
+        }
+        
+        tableView.deselectRowAtIndexPath(indexPath, animated: false)
+    }
     // hide keyboard when scroll table view
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         resultSearchController.searchBar.resignFirstResponder()
@@ -212,6 +239,21 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         })
         self.searchResultTableView.reloadData()
         
+    }
+    // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
+    func reloadMusicTable(){
+        for tabItemController in self.tabBarController?.viewControllers as! [UIViewController]{
+            if tabItemController.isKindOfClass(UINavigationController){
+                for childVC in tabItemController.childViewControllers as! [UIViewController] {
+                    if childVC.isKindOfClass(BaseViewController) {
+                        let baseVC = childVC as! BaseViewController
+                        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                            musicVC.musicTable.reloadData()
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

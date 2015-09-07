@@ -28,8 +28,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
     }
-    
-    
+
     func registerMusicPlayerNotificationForSongChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
         
