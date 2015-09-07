@@ -5,7 +5,7 @@
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
-        <!--Search-->
+        <!--Search View Controller-->
         <scene sceneID="hNz-n2-bh7">
             <objects>
                 <viewController id="9pv-A4-QxB" customClass="SearchViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
@@ -40,7 +40,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TrackName" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3yA-Cf-ShZ">
-                                                    <rect key="frame" x="76" y="14" width="229" height="20.5"/>
+                                                    <rect key="frame" x="76" y="14" width="229" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -72,23 +72,17 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Ar1-WT-qam" firstAttribute="bottom" secondItem="4ug-Mw-9AY" secondAttribute="top" id="BxO-1A-OmF"/>
-                            <constraint firstItem="Ar1-WT-qam" firstAttribute="top" secondItem="Ia1-K6-d13" secondAttribute="bottom" id="k7S-lE-IGU"/>
-                            <constraint firstItem="Ar1-WT-qam" firstAttribute="leading" secondItem="tsR-hK-woN" secondAttribute="leading" id="oBt-zi-XS0"/>
-                            <constraint firstAttribute="trailing" secondItem="Ar1-WT-qam" secondAttribute="trailing" id="tTl-cY-VUi"/>
+                            <constraint firstItem="Ar1-WT-qam" firstAttribute="bottom" secondItem="4ug-Mw-9AY" secondAttribute="top" id="4FN-Q6-tEl"/>
+                            <constraint firstItem="Ar1-WT-qam" firstAttribute="top" secondItem="tsR-hK-woN" secondAttribute="top" constant="20" id="Igh-9Y-BGk"/>
+                            <constraint firstItem="Ar1-WT-qam" firstAttribute="leading" secondItem="tsR-hK-woN" secondAttribute="leading" id="LVd-pX-lnc"/>
+                            <constraint firstAttribute="trailing" secondItem="Ar1-WT-qam" secondAttribute="trailing" id="Xmb-ua-hkG"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Search" image="search" selectedImage="search" id="acW-dT-cKf">
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
-                                <color key="value" red="0.94117647058823528" green="0.35686274509803922" blue="0.38039215686274508" alpha="1" colorSpace="calibratedRGB"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="image" keyPath="selectedImage" value="search"/>
-                        </userDefinedRuntimeAttributes>
-                    </tabBarItem>
+                    <navigationItem key="navigationItem" id="JcD-8O-SBX"/>
                     <connections>
                         <outlet property="searchDisplayController" destination="5A0-67-WPg" id="vh2-cL-xPI"/>
                         <outlet property="searchResultTableView" destination="Ar1-WT-qam" id="a25-km-hym"/>
+                        <outlet property="tableView" destination="Ar1-WT-qam" id="ck4-Vo-XkM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
@@ -101,7 +95,7 @@
                     </connections>
                 </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="-442" y="-643"/>
+            <point key="canvasLocation" x="90" y="-643"/>
         </scene>
         <!--JamList-->
         <scene sceneID="Gze-Ai-2T8">
@@ -510,7 +504,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="OD7-U1-wmr" kind="relationship" relationship="viewControllers" id="hg5-7d-wXz"/>
-                        <segue destination="9pv-A4-QxB" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
+                        <segue destination="WoA-2F-8w5" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
                         <segue destination="ZPh-Yv-NLo" kind="relationship" relationship="viewControllers" id="rxg-WN-v9e"/>
                         <segue destination="tM8-pp-IGs" kind="relationship" relationship="viewControllers" id="LUe-vl-Gnn"/>
                     </connections>
@@ -566,6 +560,32 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="J3t-Ft-0hM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-284" y="64"/>
+        </scene>
+        <!--Search-->
+        <scene sceneID="KIm-QS-ZYi">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="WoA-2F-8w5" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Search" image="search" selectedImage="search" id="acW-dT-cKf">
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
+                                <color key="value" red="0.94117647058823528" green="0.35686274509803922" blue="0.38039215686274508" alpha="1" colorSpace="calibratedRGB"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="image" keyPath="selectedImage" value="search"/>
+                        </userDefinedRuntimeAttributes>
+                    </tabBarItem>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="2PD-om-f4S">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="9pv-A4-QxB" kind="relationship" relationship="rootViewController" id="I1Y-Hb-01s"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lyh-6g-7on" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-442" y="-643"/>
         </scene>
     </scenes>
     <resources>

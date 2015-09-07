@@ -15,9 +15,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var musicRequest: Request?
     
     
+    @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchResultTableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.automaticallyAdjustsScrollViewInsets = false
         searchResults = [SearchResult]()
         loadLocalSongs()
         setUpLocalSearchBar()
@@ -31,11 +33,13 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         self.searchResultTableView.tableHeaderView = self.resultSearchController.searchBar
         
         let searchBar = resultSearchController.searchBar
+        navigationItem.titleView = searchBar
+        resultSearchController.hidesNavigationBarDuringPresentation = false
+        searchBar.searchBarStyle = UISearchBarStyle.Minimal
         
-        searchBar.translucent = true
-       // searchBar.backgroundImage = UIImage(named: "KP_bg")
         searchBar.tintColor = UIColor.mainPinkColor()
         searchBar.placeholder = "What do you want to play?"
+        
     }
     
     func loadLocalSongs(){
