@@ -82,7 +82,6 @@
                     <connections>
                         <outlet property="searchDisplayController" destination="5A0-67-WPg" id="vh2-cL-xPI"/>
                         <outlet property="searchResultTableView" destination="Ar1-WT-qam" id="a25-km-hym"/>
-                        <outlet property="tableView" destination="Ar1-WT-qam" id="ck4-Vo-XkM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
@@ -339,7 +338,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
-                                            <color key="backgroundColor" red="0.96463597074468088" green="0.96463597074468088" blue="0.96463597074468088" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="backgroundColor" red="0.96470588235294119" green="0.96470588235294119" blue="0.96470588235294119" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="centerY" secondItem="rS7-LP-mMW" secondAttribute="bottom" id="8rg-5c-BHE"/>
                                                 <constraint firstAttribute="trailing" secondItem="VsL-3T-nSc" secondAttribute="trailing" constant="15" id="IN9-DM-vPR"/>

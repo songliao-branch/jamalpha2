@@ -14,9 +14,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var searchResults: [SearchResult]!
     var musicRequest: Request?
     
-    
-    @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchResultTableView: UITableView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false
@@ -32,14 +31,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         self.resultSearchController.searchBar.sizeToFit()
         self.searchResultTableView.tableHeaderView = self.resultSearchController.searchBar
         
+        
         let searchBar = resultSearchController.searchBar
         navigationItem.titleView = searchBar
         resultSearchController.hidesNavigationBarDuringPresentation = false
         searchBar.searchBarStyle = UISearchBarStyle.Minimal
-        
+        definesPresentationContext = true
         searchBar.tintColor = UIColor.mainPinkColor()
         searchBar.placeholder = "What do you want to play?"
-        
     }
     
     func loadLocalSongs(){
@@ -64,31 +63,46 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if filteredSongs.count == 0 {
                 return 0
             }
-            return 20
+            return 30
         } else if section == 1 {
             if searchResults.count == 0 {
                 return 0
             }
-            return 20
+            return 30
         }
         return 0
     }
+    
     
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
             if filteredSongs.count == 0 {
                 return nil
             }
-            let label = UILabel(frame: CGRectMake(0, 0, self.view.frame.width, 20))
-            label.text = "local"
-            return label
+            
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
+            view.backgroundColor = UIColor.backGray()
+            let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
+            label.center.y = view.center.y
+            label.textColor = UIColor.mainPinkColor()
+            label.text = "My Music"
+            view.addSubview(label)
+            
+            return view
+            
         } else if section == 1 {
             if searchResults.count == 0 {
                 return nil
             }
-            let label = UILabel(frame: CGRectMake(0, 0, self.view.frame.width, 20))
-            label.text = "Cloud"
-            return label
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
+            view.backgroundColor = UIColor.backGray()
+            
+            let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
+            label.center.y = view.center.y
+            label.text = "Cloud Music"
+            label.textColor = UIColor.mainPinkColor()
+            view.addSubview(label)
+            return view
         }
         return nil
         
