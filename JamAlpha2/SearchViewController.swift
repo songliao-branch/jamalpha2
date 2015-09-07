@@ -50,14 +50,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         return 2
     }
     
-//    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if section == 0 {
-//            return "Local"
-//        }
-//        return "Cloud"
-//    }
-//    
-    
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 {
             if filteredSongs.count == 0 {

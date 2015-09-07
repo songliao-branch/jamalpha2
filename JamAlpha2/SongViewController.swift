@@ -22,7 +22,7 @@ let SingleMode: Int = 1
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
-    var musicViewController: MusicViewController?
+    var nowView: VisualizerView!
 
     var selectedFromTable = true
     
@@ -465,13 +465,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playbackStateChanged(notification: NSNotification){
         let playbackState = player.playbackState
+        
         if playbackState == .Paused {
             timer.invalidate()
-            musicViewController!.nowView.stop()
+            //musicViewController!.nowView.stop()
         }
         else if playbackState == .Playing {
             startTimer()
-            musicViewController!.nowView.start()
+           // musicViewController!.nowView.start()
         }
     }
     
@@ -489,13 +490,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playerVolumeChanged(notification: NSNotification){
         println("volume changed")
     }
-
     
     func resumeSong(){
         
-        musicViewController!.nowView!.stop()
+        //musicViewController!.nowView!.stop()
         // if we are pressing the now button this is false, or coming from background
         if selectedFromTable {
+            self.nowView.start()
             player.play()
             startTimer()
         }else{ // selected from now view button
@@ -503,7 +504,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 startTimer()
             }
             else if player.playbackState == MPMusicPlaybackState.Paused {
-                
+                self.nowView.stop()
                 timer.invalidate()
                 // progress bar should be lowered
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -802,12 +803,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewWillDisappear(animated)
         self.navigationController?.navigationBar.tintColor = UIColor.mainPinkColor()
         self.tabBarController?.tabBar.hidden = false
-        if player.playbackState == MPMusicPlaybackState.Playing {
-            musicViewController!.nowView!.start()
-        }
-        else if player.playbackState == MPMusicPlaybackState.Paused {
-            musicViewController!.nowView!.stop()
-        }
+//        if player.playbackState == MPMusicPlaybackState.Playing {
+//            musicViewController!.nowView!.start()
+//        }
+//        else if player.playbackState == MPMusicPlaybackState.Paused {
+//            musicViewController!.nowView!.stop()
+//        }
     }
     
     func calculateXPoints(){
@@ -1079,7 +1080,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
             player.pause()
-            musicViewController!.nowView!.stop()
+           // musicViewController!.nowView!.stop()
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                 println("pause1")
