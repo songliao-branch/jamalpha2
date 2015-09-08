@@ -24,6 +24,7 @@ class MusicManager: NSObject {
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
     
+    
     class var sharedInstance: MusicManager {
         struct Static {
             static var onceToken: dispatch_once_t = 0
@@ -49,6 +50,7 @@ class MusicManager: NSObject {
         
         player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
         // 暂时解决方法 App每次start就是先停下来
+        
         player.repeatMode = .All
         player.shuffleMode = .Off
         
@@ -96,6 +98,7 @@ class MusicManager: NSObject {
                     let lastPlaybackTime = player.currentPlaybackTime
                     player.prepareToPlay() // set current playing index to zero
                     player.nowPlayingItem = lastPlayerQueue[selectedIndex] // this has a really short time lag
+                    
                     player.currentPlaybackTime = lastPlaybackTime
                 }
             }

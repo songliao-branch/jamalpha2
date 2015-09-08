@@ -9,10 +9,9 @@ import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    var nowView: VisualizerView!
     
     var theArtist:Artist!
-
-    var musicViewController: MusicViewController?
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
     
@@ -153,9 +152,9 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.musicViewController = self.musicViewController
         songVC.selectedFromTable = true
         
+        songVC.nowView = self.nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         
@@ -167,4 +166,4 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
-}
+ }

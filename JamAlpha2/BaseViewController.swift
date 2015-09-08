@@ -39,9 +39,27 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         setupSegmentButtons()
         setUpSelector()//the horizontal bar that moves with button tapped
         setUpPageViewController()
-        //registerMusicPlayerNotificationForSongChanged()
+        registerMusicPlayerNotificationForPlaybackStateChanged()
     }
-
+    
+    func registerMusicPlayerNotificationForPlaybackStateChanged(){
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
+        println("registering notification in base view controller")
+    }
+    
+    func playbackStateChanged(notification: NSNotification){
+        let playbackState = player.playbackState
+        println("playbackStateChanged \(player.playbackState.rawValue)")
+        if playbackState == .Playing {
+            println("now it starts again")
+            nowView.start()
+        } else  {
+            
+            nowView.stop()
+        }
+    }
+    
+    
     func setUpLogo(){
         let logo = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSizeMake(self.view.frame.width/2, 22)))
         logo.image = UIImage(named: "logo_bold")
@@ -283,8 +301,5 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let xCoordinate:CGFloat = musicUnderlineSelector.frame.size.width *  CGFloat(self.currentPageIndex)
         musicUnderlineSelector.frame = CGRectMake(xCoordinate - xFromCenter / 3, musicUnderlineSelector.frame.origin.y, musicUnderlineSelector.frame.width, musicUnderlineSelector.frame.height)
     }
-    
-    
-    //MARK : Navigation item action
-    
+
 }
