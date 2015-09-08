@@ -13,78 +13,95 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     var searchResults: [SearchResult]!
     var musicRequest: Request?
+    var animator: CustomTransitionAnimation!
     
     
     @IBOutlet weak var searchResultTableView: UITableView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+        createTransitionAnimation()
+        self.automaticallyAdjustsScrollViewInsets = false
         searchResults = [SearchResult]()
-        loadLocalSongs()
-        setUpLocalSearchBar()
+        setUpSearchBar()
+        
     }
     
-    func setUpLocalSearchBar(){
+
+
+    func createTransitionAnimation(){
+        if(animator == nil){
+            self.animator = CustomTransitionAnimation()
+        }
+    }
+
+    func setUpSearchBar(){
         self.resultSearchController = UISearchController(searchResultsController: nil)
         self.resultSearchController.searchResultsUpdater = self
         self.resultSearchController.dimsBackgroundDuringPresentation = false
         self.resultSearchController.searchBar.sizeToFit()
         self.searchResultTableView.tableHeaderView = self.resultSearchController.searchBar
         
-        let searchBar = resultSearchController.searchBar
         
-        searchBar.translucent = true
-       // searchBar.backgroundImage = UIImage(named: "KP_bg")
+        let searchBar = resultSearchController.searchBar
+        navigationItem.titleView = searchBar
+        resultSearchController.hidesNavigationBarDuringPresentation = false
+        searchBar.searchBarStyle = UISearchBarStyle.Minimal
+        definesPresentationContext = true
         searchBar.tintColor = UIColor.mainPinkColor()
         searchBar.placeholder = "What do you want to play?"
-    }
-    
-    func loadLocalSongs(){
-        var songCollection = MPMediaQuery.songsQuery()
-        uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 2
     }
     
-//    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if section == 0 {
-//            return "Local"
-//        }
-//        return "Cloud"
-//    }
-//    
-    
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 {
             if filteredSongs.count == 0 {
                 return 0
             }
-            return 20
+            return 30
         } else if section == 1 {
             if searchResults.count == 0 {
                 return 0
             }
-            return 20
+            return 30
         }
         return 0
     }
+    
     
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
             if filteredSongs.count == 0 {
                 return nil
             }
-            let label = UILabel(frame: CGRectMake(0, 0, self.view.frame.width, 20))
-            label.text = "local"
-            return label
+            
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
+            view.backgroundColor = UIColor.backGray()
+            let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
+            label.center.y = view.center.y
+            label.textColor = UIColor.mainPinkColor()
+            label.text = "My Music"
+            view.addSubview(label)
+            
+            return view
+            
         } else if section == 1 {
             if searchResults.count == 0 {
                 return nil
             }
-            let label = UILabel(frame: CGRectMake(0, 0, self.view.frame.width, 20))
-            label.text = "Cloud"
-            return label
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
+            view.backgroundColor = UIColor.backGray()
+            
+            let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
+            label.center.y = view.center.y
+            label.text = "Cloud Music"
+            label.textColor = UIColor.mainPinkColor()
+            view.addSubview(label)
+            return view
         }
         return nil
         
@@ -139,6 +156,26 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
     
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 0 {
+            
+            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+            
+            songVC.selectedFromTable = true
+            
+            MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
+            MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
+            
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            
+            self.presentViewController(songVC, animated: true, completion: nil)
+            reloadMusicTable()
+        }
+        
+        tableView.deselectRowAtIndexPath(indexPath, animated: false)
+    }
     // hide keyboard when scroll table view
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         resultSearchController.searchBar.resignFirstResponder()
@@ -201,6 +238,22 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return song.title.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumTitle.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
         })
         self.searchResultTableView.reloadData()
+    }
+
+    // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
+    func reloadMusicTable(){
+        for tabItemController in self.tabBarController?.viewControllers as! [UIViewController]{
+            if tabItemController.isKindOfClass(UINavigationController){
+                for childVC in tabItemController.childViewControllers as! [UIViewController] {
+                    if childVC.isKindOfClass(BaseViewController) {
+                        let baseVC = childVC as! BaseViewController
+                        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                            musicVC.musicTable.reloadData()
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

@@ -5,8 +5,9 @@ import MediaPlayer
 
 class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewDataSource {
 
+    var nowView: VisualizerView!
+    
     var theAlbum:Album!
-    var musicViewController: MusicViewController?
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
     
@@ -103,10 +104,9 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.musicViewController = self.musicViewController
-        
+
         songVC.selectedFromTable = true
-        
+        songVC.nowView = nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         

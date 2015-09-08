@@ -28,11 +28,11 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
     }
-    
-    
+
     func registerMusicPlayerNotificationForSongChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
-
+        
+        
     }
     
     func synced(lock: AnyObject, closure: () -> ()) {
@@ -64,7 +64,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     func popToCurrentSong(){
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.musicViewController = self
         songVC.selectedFromTable = false
         
         songVC.transitioningDelegate = self.animator
@@ -173,12 +172,11 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
   
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-            songVC.musicViewController = self
             songVC.selectedFromTable = true
             
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
-            
+            songVC.nowView = self.nowView
              //reload table to show loudspeaker icon on current selected row
             tableView.reloadData()
             self.presentViewController(songVC, animated: true, completion: nil)
@@ -187,8 +185,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
             var artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
         
+            artistVC.nowView = self.nowView
             artistVC.theArtist = uniqueArtists[indexPath.row]
-            artistVC.musicViewController = self
             
             self.showViewController(artistVC, sender: self)
             
@@ -196,9 +194,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         else if pageIndex == 2 {
             
             var albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
-            
+            albumVC.nowView = self.nowView
             albumVC.theAlbum = uniqueAlbums[indexPath.row]
-            albumVC.musicViewController = self
             self.showViewController(albumVC, sender: self)
             
         }
