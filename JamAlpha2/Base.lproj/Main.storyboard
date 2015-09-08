@@ -464,6 +464,24 @@
             </objects>
             <point key="canvasLocation" x="1661" y="675"/>
         </scene>
+        <!--Tabs Editor View Controller-->
+        <scene sceneID="e2U-qW-Ecl">
+            <objects>
+                <viewController storyboardIdentifier="tabseditorviewcontroller" id="fl6-Ff-FGx" customClass="TabsEditorViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="tjh-j8-U3H"/>
+                        <viewControllerLayoutGuide type="bottom" id="oOc-GO-bbh"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="rGw-bU-VHK">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wLi-Wf-5LK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2059" y="675"/>
+        </scene>
         <!--Me-->
         <scene sceneID="eAN-Ol-AA5">
             <objects>

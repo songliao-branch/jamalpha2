@@ -238,8 +238,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return song.title.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumTitle.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
         })
         self.searchResultTableView.reloadData()
-        
     }
+
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(){
         for tabItemController in self.tabBarController?.viewControllers as! [UIViewController]{
@@ -255,5 +255,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
         }
     }
+
 }
 

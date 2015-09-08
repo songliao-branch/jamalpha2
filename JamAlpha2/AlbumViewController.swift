@@ -116,5 +116,5 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
-
-}
+    
+ }
