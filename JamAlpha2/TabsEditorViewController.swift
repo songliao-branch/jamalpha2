@@ -64,21 +64,20 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         // Dispose of any resources that can be recreated.
     }
     
-    //landscape screen
+  
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
+    
+    // MARK: Fix orientation to landscape
     override func supportedInterfaceOrientations() -> Int {
         return Int(UIInterfaceOrientationMask.Landscape.rawValue)
     }
     
     override func shouldAutorotate() -> Bool {
-        return false
+        return true
     }
-    override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
-        return UIInterfaceOrientation.LandscapeLeft
-    }
-    
+
     //init
     init() {
         super.init(nibName: nil, bundle: nil)
