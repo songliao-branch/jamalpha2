@@ -771,8 +771,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var handler:TwistJamActionSheet = TwistJamActionSheet()
     
         actionSheet.addButtonWithTitle(NSString(string:"Add your tabs"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-            let editTabsVC = EditTabsViewController()
-            self.presentViewController(editTabsVC, animated: true, completion: nil)
+            
+            self.player.pause()
+            
+            let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
+            
+            tabsEditorVC.theSong = self.player.nowPlayingItem
+            
+            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
         })
         actionSheet.addButtonWithTitle(NSString(string:"Add your lyrics"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
             
@@ -1189,5 +1195,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chordLabel.sizeToFit()
         }
     }
+    
+    // MARK: Fix to portrait orientation
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
+    
+    override func supportedInterfaceOrientations() -> Int {
+        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    }
+    
 }
 

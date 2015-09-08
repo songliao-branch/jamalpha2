@@ -283,8 +283,5 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let xCoordinate:CGFloat = musicUnderlineSelector.frame.size.width *  CGFloat(self.currentPageIndex)
         musicUnderlineSelector.frame = CGRectMake(xCoordinate - xFromCenter / 3, musicUnderlineSelector.frame.origin.y, musicUnderlineSelector.frame.width, musicUnderlineSelector.frame.height)
     }
-    
-    
-    //MARK : Navigation item action
-    
+
 }

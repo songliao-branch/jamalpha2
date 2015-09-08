@@ -41,8 +41,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         objc_sync_exit(lock)
     }
     
-
-    
     func currentSongChanged(notification: NSNotification){
         synced(self) {
             let player = MusicManager.sharedInstance.player
@@ -58,8 +56,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
     }
 
-    
-    
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -208,4 +204,5 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
+
 }

@@ -201,7 +201,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return song.title.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumTitle.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
         })
         self.searchResultTableView.reloadData()
-        
     }
+
 }
 
