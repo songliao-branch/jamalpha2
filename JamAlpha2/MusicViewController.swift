@@ -208,4 +208,5 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
-}
+    
+   }

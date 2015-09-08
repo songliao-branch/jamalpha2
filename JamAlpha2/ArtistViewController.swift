@@ -167,4 +167,4 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
-}
+ }
