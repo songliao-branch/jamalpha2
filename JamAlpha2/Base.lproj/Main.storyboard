@@ -3,6 +3,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Search View Controller-->
@@ -40,25 +41,35 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TrackName" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3yA-Cf-ShZ">
-                                                    <rect key="frame" x="76" y="14" width="229" height="21"/>
+                                                    <rect key="frame" x="76" y="14" width="229" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Search history term" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S5j-Lk-gXR">
+                                                    <rect key="frame" x="15" y="23.5" width="282" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="centerY" secondItem="S5j-Lk-gXR" secondAttribute="centerY" constant="1.25" id="3lc-rh-y7U"/>
                                                 <constraint firstAttribute="trailing" secondItem="H8i-UD-2ZW" secondAttribute="trailing" constant="15" id="71J-rH-9XR"/>
                                                 <constraint firstItem="3yA-Cf-ShZ" firstAttribute="leading" secondItem="SsX-8j-86w" secondAttribute="trailing" constant="15" id="Hve-jl-1RG"/>
                                                 <constraint firstAttribute="centerY" secondItem="H8i-UD-2ZW" secondAttribute="top" id="Kte-zO-DfK"/>
                                                 <constraint firstAttribute="centerY" secondItem="SsX-8j-86w" secondAttribute="centerY" id="Mki-WG-2Rw"/>
                                                 <constraint firstAttribute="centerY" secondItem="3yA-Cf-ShZ" secondAttribute="bottom" id="Nav-bh-MCr"/>
                                                 <constraint firstItem="H8i-UD-2ZW" firstAttribute="leading" secondItem="SsX-8j-86w" secondAttribute="trailing" constant="15" id="URQ-FC-5wq"/>
+                                                <constraint firstItem="S5j-Lk-gXR" firstAttribute="leading" secondItem="MSY-Ju-Lyg" secondAttribute="leading" constant="15" id="Ysc-pB-yWB"/>
                                                 <constraint firstAttribute="trailing" secondItem="3yA-Cf-ShZ" secondAttribute="trailing" constant="15" id="ajO-T0-Ksu"/>
                                                 <constraint firstItem="SsX-8j-86w" firstAttribute="leading" secondItem="MSY-Ju-Lyg" secondAttribute="leading" constant="8" id="gaJ-CO-kZl"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="S5j-Lk-gXR" secondAttribute="trailing" constant="15" id="yoX-qy-zQY"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="albumCover" destination="SsX-8j-86w" id="VYE-xW-DLC"/>
+                                            <outlet property="searchHistoryLabel" destination="S5j-Lk-gXR" id="K1S-dx-t0P"/>
                                             <outlet property="subtitleLabel" destination="H8i-UD-2ZW" id="b8R-pQ-US9"/>
                                             <outlet property="titleLabel" destination="3yA-Cf-ShZ" id="WR3-tY-xLX"/>
                                         </connections>

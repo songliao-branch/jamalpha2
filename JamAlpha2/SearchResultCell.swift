@@ -11,6 +11,9 @@ import Alamofire
 
 class SearchResultCell: UITableViewCell {
 
+    
+    @IBOutlet weak var searchHistoryLabel: UILabel!
+    
     var request: Alamofire.Request?
     @IBOutlet weak var albumCover: UIImageView!
     
