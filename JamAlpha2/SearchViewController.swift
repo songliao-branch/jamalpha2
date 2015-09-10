@@ -119,14 +119,17 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if resultSearchController.active {
             if section == 0 {
+                tableView.hidden = false
                 return filteredSongs.count
             } else if section == 1 {
+                tableView.hidden = false
               return searchResults.count
             }
-        } else if !resultSearchController.active && section == 0 {
-            println("search is inactive and we have \(searchHistoryManager.getAllHistory().count)")
+        } else if !resultSearchController.active && section == 0 && searchHistoryManager.getAllHistory().count > 0 {
+            tableView.hidden = false
             return searchHistoryManager.getAllHistory().count + 1 // 1 for clear recent searches
         }
+        tableView.hidden = true
         return 0
     }
     
