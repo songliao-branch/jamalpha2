@@ -6,10 +6,8 @@ let fullchord:Int = 0
 
 let stepPerSecond: Float = 50   //steps of chord move persecond
 
-//time for chords to fall from top to bottom of chordbase
-let freefallTime:Float = 4
 
-let minfont: CGFloat = 15
+
 
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
@@ -22,6 +20,10 @@ let SingleMode: Int = 1
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
+    //time for chords to fall from top to bottom of chordbase
+    var freefallTime:Float = 4
+    var minfont: CGFloat = 15
+    
     var nowView: VisualizerView!
 
     var selectedFromTable = true

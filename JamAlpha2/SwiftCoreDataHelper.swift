@@ -5,29 +5,29 @@ import CoreData
 
 class SwiftCoreDataHelper: NSObject {
     
-    class func directoryForDatabaseFilename()->NSString{
+    class func directoryForDatabaseFilename() -> NSString{
         return NSHomeDirectory().stringByAppendingString("/Library/Private Documents")
     }
     
     
-    class func databaseFilename()->NSString{
-        return "database.sqlite";
+    class func databaseFilename() -> NSString{
+        return "database.sqlite"
     }
     
     
-    class func managedObjectContext()->NSManagedObjectContext{
+    class func managedObjectContext() -> NSManagedObjectContext{
         
-        var error:NSError? = nil
+        var error: NSError? = nil
         
         NSFileManager.defaultManager().createDirectoryAtPath(SwiftCoreDataHelper.directoryForDatabaseFilename() as String, withIntermediateDirectories: true, attributes: nil, error: &error)
         
         let path:NSString = "\(SwiftCoreDataHelper.directoryForDatabaseFilename()) + \(SwiftCoreDataHelper.databaseFilename())"
         
-        let url:NSURL = NSURL(fileURLWithPath: path as String)!
+        let url: NSURL = NSURL(fileURLWithPath: path as String)!
         
-        let managedModel:NSManagedObjectModel = NSManagedObjectModel.mergedModelFromBundles(nil)!
+        let managedModel: NSManagedObjectModel = NSManagedObjectModel.mergedModelFromBundles(nil)!
         
-        var storeCoordinator:NSPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedModel)
+        var storeCoordinator: NSPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedModel)
         
         if !(storeCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil, error:&error ) != nil){
             if (error != nil){
@@ -53,7 +53,7 @@ class SwiftCoreDataHelper: NSObject {
         
     }
     
-    class func saveManagedObjectContext(managedObjectContext:NSManagedObjectContext)->Bool{
+    class func saveManagedObjectContext(managedObjectContext: NSManagedObjectContext)->Bool{
         if managedObjectContext.save(nil){
             return true
         }else{
@@ -62,9 +62,9 @@ class SwiftCoreDataHelper: NSObject {
     }
     
     
-    class func fetchEntities(className:NSString, withPredicate predicate:NSPredicate?, managedObjectContext:NSManagedObjectContext)->NSArray{
-        let fetchRequest:NSFetchRequest = NSFetchRequest()
-        let entetyDescription:NSEntityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)!
+    class func fetchEntities(className: NSString, withPredicate predicate: NSPredicate?, managedObjectContext: NSManagedObjectContext)->NSArray{
+        let fetchRequest: NSFetchRequest = NSFetchRequest()
+        let entetyDescription: NSEntityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)!
         
         fetchRequest.entity = entetyDescription
         if (predicate != nil){
@@ -72,7 +72,7 @@ class SwiftCoreDataHelper: NSObject {
         }
         
         fetchRequest.returnsObjectsAsFaults = false
-        let items:NSArray = managedObjectContext .executeFetchRequest(fetchRequest, error: nil)!
+        let items: NSArray = managedObjectContext .executeFetchRequest(fetchRequest, error: nil)!
         
         return items
     }

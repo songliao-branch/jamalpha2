@@ -15,11 +15,13 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var musicRequest: Request?
     var animator: CustomTransitionAnimation!
     
-    
+    var searchHistoryManager =  SearchHistoryManager()
+
     @IBOutlet weak var searchResultTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
@@ -104,8 +106,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return view
         }
         return nil
-        
     }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if resultSearchController.active {
             if section == 0 {
@@ -158,6 +160,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+     
         if indexPath.section == 0 {
             
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
@@ -175,7 +179,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         }
         
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
+        
+        searchHistoryManager.addNewHistory(resultSearchController.searchBar.text)
+        
+        for result in searchHistoryManager.getAllHistory() {
+            println("now we have \(result.term)")
+        }
     }
+    
     // hide keyboard when scroll table view
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         resultSearchController.searchBar.resignFirstResponder()

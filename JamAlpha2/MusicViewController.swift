@@ -14,10 +14,9 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     //for transition view animator
     var animator: CustomTransitionAnimation?
     var nowView: VisualizerView!
-        
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         //println(API.Router.Term("edsheeran").URLRequest.URLString)
         //println(API.Router.TermAttribute("michael jackson", Attribute.artistTerm).URLRequest.URLString)
         
