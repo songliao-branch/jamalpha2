@@ -10,9 +10,8 @@ import Foundation
 import CoreData
 
 class SearchHistoryManager: NSObject {
-
+    
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
-
 
     func addNewHistory(term: String) {
         var history: SearchHistory = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(SearchHistory), managedObjectConect: moc) as! SearchHistory
@@ -21,9 +20,8 @@ class SearchHistoryManager: NSObject {
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
-    func getAllHistory() -> [SearchHistory]{
-        
-      var results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(SearchHistory), withPredicate: nil, managedObjectContext: moc)
+    func getAllHistory() -> [SearchHistory] {
+        var results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(SearchHistory), withPredicate: nil, managedObjectContext: moc)
         
         return results as! [SearchHistory]
     }

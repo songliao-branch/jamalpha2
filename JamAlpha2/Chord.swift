@@ -419,6 +419,7 @@ class Chord: NSObject {
         stuff.append(chord76)
         stuff.append(chord77)
         stuff.append(chord78)
+        
         return stuff
     }
 }
@@ -427,5 +428,5 @@ class Chord: NSObject {
 //For example, C major is 032010
 struct Tab {
     var name:String! //Cmajor
-    var content:String! //032010
+    var content:String! //x32010
 }

@@ -2,34 +2,22 @@
 //  Song.swift
 //  JamAlpha2
 //
-//  Created by Song Liao on 8/27/15.
+//  Created by Song Liao on 9/10/15.
 //  Copyright (c) 2015 Song Liao. All rights reserved.
-
+//
 
 import Foundation
-import MediaPlayer
+import CoreData
+@objc(Song)
+class Song: NSManagedObject {
 
+    @NSManaged var title: String
+    @NSManaged var artist: String
+    @NSManaged var album: String
+    @NSManaged var playbackDuration: NSNumber
+    @NSManaged var soundwave: NSData
+    @NSManaged var lyrics: AnyObject
+    @NSManaged var tabs: AnyObject
+    @NSManaged var albumCover: NSData
 
-class Song: NSObject {
-    
-    var mediaItem: MPMediaItem!
-    
-    var title: String!
-    var artist: String!
-    var albumTitle: String!
-    var playbackDuration: NSTimeInterval!
-    
-    var soundWave: SoundWaveView!
-    var cache = NSCache()
-    
-    init(mediaItem: MPMediaItem){
-        self.mediaItem = mediaItem
-        
-        // meta data from media item
-        self.title = mediaItem.title
-        self.artist = mediaItem.artist
-        self.albumTitle = mediaItem.albumTitle
-        self.playbackDuration = mediaItem.playbackDuration
-        
-    }
 }

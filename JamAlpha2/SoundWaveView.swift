@@ -252,6 +252,15 @@ class SoundWaveView: UIView {
         return newImage
     }
     
+    // from exisitng NSData we saved in the database
+    func setWaveFormFromData(data: NSData) {
+        self.generatedNormalImage = UIImage(data: data)
+        self.normalImageView.image = generatedNormalImage
+        normalColorDirty = false
+        
+        self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
+        self.progressImageView.image = generatedProgressImage
+    }
     func generateWaveforms(){
         
         var rect:CGRect = self.bounds

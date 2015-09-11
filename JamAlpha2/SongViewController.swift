@@ -20,6 +20,7 @@ let SingleMode: Int = 1
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
+    var songManager = SongManager()
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 4
     var minfont: CGFloat = 15
@@ -141,7 +142,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         player = MusicManager.sharedInstance.player
         firstLoadSongTime = player.nowPlayingItem.playbackDuration
         firstloadSongTitle = player.nowPlayingItem.title
@@ -536,11 +537,29 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var progressBarWidth:CGFloat!
 
         progressBarWidth = CGFloat(player.nowPlayingItem.playbackDuration) * progressWidthMultiplier
+        
 
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
-        let assetURL = player.nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) as? NSURL
-        self.progressBlock.SetSoundURL(assetURL!)
+
+
+        if let soundWaveData = songManager.getSongWaveForm(player.nowPlayingItem) {
+            progressBlock.setWaveFormFromData(soundWaveData)
+            println("sound wave data found")
+        } else {
+            
+            let assetURL = player.nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) as? NSURL
+            
+            if let url = assetURL {
+                self.progressBlock.SetSoundURL(assetURL!)
+                
+                let data = UIImagePNGRepresentation(progressBlock.generatedNormalImage)
+                songManager.addNewSong(player.nowPlayingItem, soundwave: data)
+            } else {//this song is not stored offline, it doesn't have a url
+                println("off line song")
+             }
+
+        }
         
         self.progressBlockContainer.addSubview(self.progressBlock)
         
