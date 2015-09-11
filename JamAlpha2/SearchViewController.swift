@@ -15,11 +15,13 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var musicRequest: Request?
     var animator: CustomTransitionAnimation!
     
-    
+    var searchHistoryManager =  SearchHistoryManager()
+
     @IBOutlet weak var searchResultTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
@@ -72,6 +74,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         return 0
     }
     
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if resultSearchController.active {
+            return 70
+        } else if !resultSearchController.active && indexPath.section == 0 {
+            return 44
+        }
+        return 0
+    }
     
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
@@ -104,16 +114,22 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return view
         }
         return nil
-        
     }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if resultSearchController.active {
             if section == 0 {
+                tableView.hidden = false
                 return filteredSongs.count
             } else if section == 1 {
+                tableView.hidden = false
               return searchResults.count
             }
+        } else if !resultSearchController.active && section == 0 && searchHistoryManager.getAllHistory().count > 0 {
+            tableView.hidden = false
+            return searchHistoryManager.getAllHistory().count + 1 // 1 for clear recent searches
         }
+        tableView.hidden = true
         return 0
     }
     
@@ -121,7 +137,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier("searchresultcell", forIndexPath: indexPath) as! SearchResultCell
         
         if resultSearchController.active {
-            
+            cell.searchHistoryLabel.hidden = true
+            cell.titleLabel.hidden = false
+            cell.subtitleLabel.hidden = false
             if indexPath.section == 0 { //local search in section 0
                 cell.titleLabel.text = filteredSongs[indexPath.row].title
                 cell.subtitleLabel.text = filteredSongs[indexPath.row].artist
@@ -151,31 +169,64 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }
             
             }
+        } else if !resultSearchController.active && indexPath.section == 0 {//if search is inactive
+            // array of search history comes in time ascending order, we need descending order (newest on top)
+            cell.titleLabel.hidden = true
+            cell.subtitleLabel.hidden = true
+            cell.searchHistoryLabel.hidden = false
+            cell.albumCover.image = nil
             
+            if indexPath.row < searchHistoryManager.getAllHistory().count {
+                let searchHistory = searchHistoryManager.getAllHistory().reverse()[indexPath.row]
+                cell.searchHistoryLabel.text = searchHistory.term
+
+            } else {
+                cell.searchHistoryLabel.text = "Clear recent searches"
+            }
+            
+        
         }
         return cell
     }
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.section == 0 {
+        if resultSearchController.active {
             
-            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+            if indexPath.section == 0 {
+                
+                let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+                
+                songVC.selectedFromTable = true
+                
+                MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
+                MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
+                
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                
+                self.presentViewController(songVC, animated: true, completion: nil)
+                reloadMusicTable()
+            }
             
-            songVC.selectedFromTable = true
+            tableView.deselectRowAtIndexPath(indexPath, animated: false)
             
-            MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
-            MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
+            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text)
             
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
+            for result in searchHistoryManager.getAllHistory() {
+                println("now we have \(result.term)")
+            }
             
-            self.presentViewController(songVC, animated: true, completion: nil)
-            reloadMusicTable()
+        } else if !resultSearchController.active && indexPath.section == 0 {
+             // select in search history
+            if indexPath.row == searchHistoryManager.getAllHistory().count {
+                searchHistoryManager.clearHistory()
+                tableView.reloadData()
+            }
         }
-        
-        tableView.deselectRowAtIndexPath(indexPath, animated: false)
+
     }
+    
     // hide keyboard when scroll table view
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         resultSearchController.searchBar.resignFirstResponder()
