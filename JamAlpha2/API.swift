@@ -63,9 +63,6 @@ struct API {
                         var params = ["term":"\(term)", "limit":"20", "media":"music"] //default limit is 50
                         return ("/search", params) //empty dictionary
                
-//                case .TermAttribute(let term, let attribute):
-//                    var params = ["term": "\(term)", "attribute": "\(attribute.rawValue)", "limit":"10"]
-//                    return ("/search", params)
                     }
                 }()
             let URL = NSURL(string: Router.baseURLString)

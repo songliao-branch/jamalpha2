@@ -144,7 +144,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
         }
         
             cell.selectedBackgroundView = UIView()
-            cell.selectedBackgroundView.backgroundColor = self.selectedBackgroundColor
+            cell.selectedBackgroundView!.backgroundColor = self.selectedBackgroundColor
         
         
         return cell
