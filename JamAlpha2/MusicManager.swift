@@ -108,23 +108,26 @@ class MusicManager: NSObject {
     
     // MARK: get all MPMediaItems
     func loadLocalSongs(){
-        var songCollection = MPMediaQuery.songsQuery()
-        uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
+        let songCollection = MPMediaQuery.songsQuery()
+        uniqueSongs = songCollection.items!.filter {
+            song in
+            song.playbackDuration > 30
+        }
     }
     
     func loadLocalAlbums(){
         //start new albums fresh
         var collectionInAlbum = [MPMediaItem]() // a collection of each album's represenstative item
-        var albumQuery = MPMediaQuery()
+        let albumQuery = MPMediaQuery()
         albumQuery.groupingType = MPMediaGrouping.Album;
-        for album in albumQuery.collections{
-            var representativeItem = album.representativeItem as MPMediaItem
+        for album in albumQuery.collections!{
+            let representativeItem = album.representativeItem!
             
             //there is no song shorter than 30 seconds
             if representativeItem.playbackDuration < 30 { continue }
             
             collectionInAlbum.append(representativeItem)
-            var thisAlbum = Album(theItem: representativeItem)
+            let thisAlbum = Album(theItem: representativeItem)
             uniqueAlbums.append(thisAlbum)
         }
     }
@@ -133,14 +136,14 @@ class MusicManager: NSObject {
     func loadLocalArtist(){
         
         var allArtistRepresentiveSong = [MPMediaItem]() // a list of one song per artist
-        var artistQuery = MPMediaQuery()
+        let artistQuery = MPMediaQuery()
         artistQuery.groupingType = MPMediaGrouping.Artist
-        for artist in artistQuery.collections {
-            var representativeItem = artist.representativeItem as MPMediaItem
+        for artist in artistQuery.collections! {
+            let representativeItem = artist.representativeItem!
             if representativeItem.playbackDuration < 30 { continue }
             allArtistRepresentiveSong.append(representativeItem)
             
-            var artist = Artist(artist: representativeItem.artist)
+            var artist = Artist(artist: representativeItem.artist!)
             
             uniqueAlbums.sortInPlace({ album1, album2 in
                 if let album1date = album1.releasedDate, let album2date = album2.releasedDate {

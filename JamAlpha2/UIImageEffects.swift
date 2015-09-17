@@ -87,13 +87,13 @@ public extension UIImage {
             CGContextTranslateCTM(effectInContext, 0, -size.height)
             CGContextDrawImage(effectInContext, imageRect, self.CGImage)
             
-            var effectInBuffer = createEffectBuffer(effectInContext)
+            var effectInBuffer = createEffectBuffer(effectInContext!)
             
             
             UIGraphicsBeginImageContextWithOptions(size, false, screenScale)
             let effectOutContext = UIGraphicsGetCurrentContext()
             
-            var effectOutBuffer = createEffectBuffer(effectOutContext)
+            var effectOutBuffer = createEffectBuffer(effectOutContext!)
             
             
             if hasBlur {
@@ -189,9 +189,10 @@ public extension UIImage {
     func averageColor() -> UIColor {
         
         let rgba = UnsafeMutablePointer<CUnsignedChar>.alloc(4)
-        let colorSpace: CGColorSpaceRef = CGColorSpaceCreateDeviceRGB()
+        let colorSpace: CGColorSpaceRef = CGColorSpaceCreateDeviceRGB()!
         let info = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedLast.rawValue)
-        let context: CGContextRef = CGBitmapContextCreate(rgba, 1, 1, 8, 4, colorSpace, info)
+      
+        let context: CGContextRef = CGBitmapContextCreate(rgba, 1, 1, 8, 4, colorSpace, info.rawValue)!
         
         CGContextDrawImage(context, CGRectMake(0, 0, 1, 1), self.CGImage)
         
