@@ -19,7 +19,7 @@ class PopOverSlider: UISlider {
           self.popOver = popover()
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -37,14 +37,14 @@ class PopOverSlider: UISlider {
         self.updatePopOverFrame()
     }
     
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         self.updatePopOverFrame()
         self.showPopoverAnimated(true)
         super.touchesBegan(touches, withEvent: event)
     }
     
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
-        println("touchesEnded")
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("touchesEnded")
         songVC!.speed = self.value + 1
         //songVC!.nowPlayingItemSpeed = self.value + 1
         if songVC!.player.playbackState == MPMusicPlaybackState.Playing {
@@ -56,8 +56,8 @@ class PopOverSlider: UISlider {
         super.touchesEnded(touches, withEvent: event)
     }
     
-    override func touchesCancelled(touches: Set<NSObject>!, withEvent event: UIEvent!) {
-        println("touchesCancelled")
+    override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+        print("touchesCancelled")
         self.hidePopoverAnimated(true)
         super.touchesCancelled(touches, withEvent: event)
     }
@@ -75,7 +75,7 @@ class PopOverSlider: UISlider {
         }
         
         var x:CGFloat = self.frame.origin.x
-        var maxMin = (maximum + minimum) / 2.0
+        let maxMin = (maximum + minimum) / 2.0
         
         x += (((value - minimum) / (maximum - minimum)) * self.frame.size.width) - (self.popOver.frame.size.width / 2.0)
         

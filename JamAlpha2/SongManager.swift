@@ -15,7 +15,7 @@ class SongManager: NSObject {
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
     func addNewSong(item: MPMediaItem, soundwave: NSData) {
-        var song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
+        let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
         song.title = item.title
         song.artist = item.artist
         song.album = item.albumTitle

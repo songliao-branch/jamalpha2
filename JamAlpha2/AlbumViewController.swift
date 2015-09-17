@@ -47,7 +47,7 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
         synced(self) {
             let player = MusicManager.sharedInstance.player
             if player.repeatMode == .One {
-                println("\(player.nowPlayingItem.title) is repeating")
+                print("\(player.nowPlayingItem.title) is repeating")
                 return
             }
             

@@ -44,14 +44,14 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func registerMusicPlayerNotificationForPlaybackStateChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
-        println("registering notification in base view controller")
+        print("registering notification in base view controller")
     }
     
     func playbackStateChanged(notification: NSNotification){
         let playbackState = player.playbackState
-        println("playbackStateChanged \(player.playbackState.rawValue)")
+        print("playbackStateChanged \(player.playbackState.rawValue)")
         if playbackState == .Playing {
-            println("now it starts again")
+            print("now it starts again")
             nowView.start()
         } else  {
             
@@ -201,7 +201,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             }
             else { //swipe right to left
                 direction = UIPageViewControllerNavigationDirection.Reverse
-                 for i in reverse(button.tag...current-1) {
+                 for i in Array((button.tag...current-1).reverse()) {
                     var theVC = self.viewControllerAtIndex(i) as UIViewController
                     var tobeMovedViewControllers = [theVC]
                     self.pageViewController.setViewControllers(tobeMovedViewControllers as [AnyObject], direction: direction, animated: true, completion: { (Void) in
@@ -228,7 +228,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
 
     //MARK: page view controller data source
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        var vc = viewController as! MusicViewController
+        let vc = viewController as! MusicViewController
        // vc.createdNewPage = true
         var index = vc.pageIndex
 
@@ -241,7 +241,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        var vc = viewController as! MusicViewController
+        let vc = viewController as! MusicViewController
        // vc.createdNewPage = true
         var index = vc.pageIndex
 
@@ -273,7 +273,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.currentPageIndex = index
     }
     
-    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
+    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if(completed){
             
             let lastViewController = pageViewController.viewControllers.last as! MusicViewController

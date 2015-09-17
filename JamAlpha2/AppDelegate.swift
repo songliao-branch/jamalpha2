@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.timer.invalidate()
-            println("Song VC entering background")
+            print("Song VC entering background")
         }
     }
 
@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.selectedFromTable = false
             currentSongVC.resumeSong()
-            println("Song VC entering forground")
+            print("Song VC entering forground")
         }
         
     }
@@ -70,8 +70,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         if rootVC.presentedViewController!.isKindOfClass(UINavigationController) {
             let navigationController = UINavigationController(rootViewController: rootVC)
-            let lastViewController = navigationController.viewControllers.last as! UIViewController
-            return lastViewController
+            return navigationController.viewControllers.last!
+
         }
         let presentViewController = rootVC.presentedViewController
         return presentViewController!

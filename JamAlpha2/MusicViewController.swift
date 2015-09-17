@@ -44,7 +44,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         synced(self) {
             let player = MusicManager.sharedInstance.player
             if player.repeatMode == .One {
-                println("\(player.nowPlayingItem.title) is repeating")
+                print("\(player.nowPlayingItem!.title) is repeating")
                 return
             }
             
@@ -105,7 +105,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
                 cell.loudspeakerImage.hidden = true
             }
             
-            let image = song.artwork.imageWithSize(CGSize(width: 54, height: 54))
+            let image = song.artwork!.imageWithSize(CGSize(width: 54, height: 54))
             cell.coverImage.image = image
             cell.mainTitle.text = song.title
             cell.subtitle.text = song.artist
@@ -182,7 +182,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         else if pageIndex == 1 {
 
-            var artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
+            let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
         
             artistVC.nowView = self.nowView
             artistVC.theArtist = uniqueArtists[indexPath.row]
@@ -192,7 +192,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         else if pageIndex == 2 {
             
-            var albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
+            let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.nowView = self.nowView
             albumVC.theAlbum = uniqueAlbums[indexPath.row]
             self.showViewController(albumVC, sender: self)

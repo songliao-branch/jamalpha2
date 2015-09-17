@@ -91,12 +91,12 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell:UITableViewCell = tableView.dequeueReusableCellWithIdentifier(kCellIdentifier, forIndexPath: indexPath) as! UITableViewCell
-        var item:TwistJamActionSheetItem = self.items[indexPath.row] as! TwistJamActionSheet.TwistJamActionSheetItem
+        let cell:UITableViewCell = tableView.dequeueReusableCellWithIdentifier(kCellIdentifier, forIndexPath: indexPath) 
+        let item:TwistJamActionSheetItem = self.items[indexPath.row] as! TwistJamActionSheet.TwistJamActionSheetItem
         
         
-        var attributes:NSDictionary = self.buttonTextAttributes
-        var attrTitle:NSAttributedString = NSAttributedString(string: item.title as! String, attributes: attributes as [NSObject : AnyObject])
+        let attributes:NSDictionary = self.buttonTextAttributes
+        let attrTitle:NSAttributedString = NSAttributedString(string: item.title as String, attributes: attributes as [NSObject : AnyObject])
         cell.textLabel!.attributedText = attrTitle
         cell.textLabel!.textAlignment = NSTextAlignment.Center
         cell.backgroundColor = UIColor.clearColor()
@@ -163,7 +163,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func resetSlider(){
-        println("reset")
+        print("reset")
         songVC!.speed = 1
         
         self.slider.setValue(0.0, animated: true)
@@ -185,7 +185,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     //pragma mark - UITableViewDelegate
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var item:TwistJamActionSheetItem = self.items[indexPath.row] as! TwistJamActionSheetItem
+        let item:TwistJamActionSheetItem = self.items[indexPath.row] as! TwistJamActionSheetItem
         self.dismissAnimated(true, duration: self.animationDuration, completionHandler: item.handler)
     }
     
@@ -201,8 +201,8 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     
     func fadeBlursOnScrollToTop() {
         if(self.tableView!.dragging || self.tableView!.decelerating){
-            var alphaWithoutBounds:CGFloat = 1.0 - (-(self.tableView.contentInset.top + self.tableView.contentOffset.y)) / kBlurFadeRangeSize
-            var alpha:CGFloat = CGFloat(fmax(fmin(alphaWithoutBounds, 1.0), 0.0))
+            let alphaWithoutBounds:CGFloat = 1.0 - (-(self.tableView.contentInset.top + self.tableView.contentOffset.y)) / kBlurFadeRangeSize
+            let alpha:CGFloat = CGFloat(fmax(fmin(alphaWithoutBounds, 1.0), 0.0))
             self.blurredBackgroundView.alpha = alpha
             self.cancelButtonShadowView.alpha = alpha
         }
@@ -214,11 +214,11 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        var scrollVelocity:CGPoint = scrollView.panGestureRecognizer.velocityInView(self)
+        let scrollVelocity:CGPoint = scrollView.panGestureRecognizer.velocityInView(self)
         
-        var viewWasFlickedDown:Bool = scrollVelocity.y > kFlickDownMinVelocity && scrollView.contentOffset.y < -self.tableView.contentInset.top - kFlickDownHandlingOffset
+        let viewWasFlickedDown:Bool = scrollVelocity.y > kFlickDownMinVelocity && scrollView.contentOffset.y < -self.tableView.contentInset.top - kFlickDownHandlingOffset
         
-        var shouldSlideDown = scrollView.contentOffset.y < -self.tableView.contentInset.top - kAutoDismissOffset
+        let shouldSlideDown = scrollView.contentOffset.y < -self.tableView.contentInset.top - kAutoDismissOffset
         
         if viewWasFlickedDown {
              let duration:NSTimeInterval = 0.2
@@ -240,7 +240,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func addButtonWithTitle(title:NSString, image:UIImage, type:ActionSheetButtonType, handler:ActionSheetHandler){
-        var item:TwistJamActionSheetItem = TwistJamActionSheetItem()
+        let item:TwistJamActionSheetItem = TwistJamActionSheetItem()
         item.title = title
         item.image = image
         item.type = type
@@ -249,13 +249,13 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func show(){
-        var actionSheetIsVisible:Bool = self.windowNow != nil
+        let actionSheetIsVisible:Bool = self.windowNow != nil
         if actionSheetIsVisible {
             return
         }
         isTwistJamActionSheetShow = true
         self.previousKeyWindow = UIApplication.sharedApplication().keyWindow
-        var previousKeyWindowSnapshot:UIImage = self.previousKeyWindow.snapShot(CGFloat(self.items.count), buttonHeight: self.buttonHeight, cancelButtonHeight: self.cancelButtonHeight, addedHeightForRunningMan:self.addedHeightForRunningMan, needRunningManSlider:self.needRunningManSlider)
+        let previousKeyWindowSnapshot:UIImage = self.previousKeyWindow.snapShot(CGFloat(self.items.count), buttonHeight: self.buttonHeight, cancelButtonHeight: self.cancelButtonHeight, addedHeightForRunningMan:self.addedHeightForRunningMan, needRunningManSlider:self.needRunningManSlider)
         self.setUpNewWindow()
         self.setUpBlurredBackgroundWithSnapshot(previousKeyWindowSnapshot)
         self.setUpCancelButton()
@@ -285,7 +285,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
             UIView.animateWithDuration(duration, animations: {
                 self.blurredBackgroundView.frame = CGRectMake(0, self.bounds.height, self.bounds.width, self.bounds.height)
                 self.cancelButtonShadowView.alpha = 0.0
-                var slideDownMinOffset:CGFloat = CGFloat(fmin(CGRectGetHeight(self.frame)+self.tableView.contentOffset.y, CGRectGetHeight(self.frame)))
+                let slideDownMinOffset:CGFloat = CGFloat(fmin(CGRectGetHeight(self.frame)+self.tableView.contentOffset.y, CGRectGetHeight(self.frame)))
                 self.tableView.transform = CGAffineTransformMakeTranslation(0, slideDownMinOffset)
                 self.blurredBackgroundView!.alpha = 0.0
                 if(self.needRunningManSlider){
@@ -313,7 +313,7 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func setUpNewWindow(){
-        var actionSheetVC:ActionSheetViewController = ActionSheetViewController()
+        let actionSheetVC:ActionSheetViewController = ActionSheetViewController()
         actionSheetVC.itemCount = self.items.count
         actionSheetVC.cancelButtonHeight = self.cancelButtonHeight
         actionSheetVC.buttonHeight = self.buttonHeight
@@ -321,15 +321,15 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
         actionSheetVC.needRunningManSlider = self.needRunningManSlider
         
         self.windowNow = UIWindow(frame: UIScreen .mainScreen().bounds)
-        self.windowNow.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+        self.windowNow.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
         self.windowNow.opaque = false
         self.windowNow.rootViewController = actionSheetVC
         self.windowNow.makeKeyAndVisible()
     }
     
     func setUpBlurredBackgroundWithSnapshot(previousKeyWindowSnapshot:UIImage){
-        var blurredViewSnapshot = previousKeyWindowSnapshot.applyActionSheetEffect()
-        var backgroundView:UIImageView = UIImageView(image: blurredViewSnapshot)
+        let blurredViewSnapshot = previousKeyWindowSnapshot.applyActionSheetEffect()
+        let backgroundView:UIImageView = UIImageView(image: blurredViewSnapshot)
         backgroundView.frame = self.bounds
         backgroundView.alpha = 0.0
         backgroundView.transform = CGAffineTransformMakeTranslation(0, self.bounds.height)
@@ -338,8 +338,8 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func setUpCancelButton(){
-        var cancelButton = UIButton.buttonWithType(UIButtonType.System) as! UIButton
-        var attrTitle:NSAttributedString = NSAttributedString(string: self.cancelButtonTitle as! String, attributes: self.cancelButtonTextAttributes as [NSObject : AnyObject])
+        let cancelButton = UIButton(type: UIButtonType.System)
+        let attrTitle:NSAttributedString = NSAttributedString(string: self.cancelButtonTitle as String, attributes: self.cancelButtonTextAttributes as [NSObject : AnyObject])
         cancelButton.setAttributedTitle(attrTitle, forState: UIControlState.Normal)
         cancelButton.addTarget(self, action: "cancelButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
         cancelButton.frame = CGRectMake(0, CGRectGetMaxY(self.bounds)-self.cancelButtonHeight, CGRectGetWidth(self.bounds), self.cancelButtonHeight)
@@ -350,9 +350,9 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
         
         if(self.cancelButtonShadowColor == nil){
             self.cancelButton.clipsToBounds = false
-            var gradientHeight:CGFloat = CGFloat(round(self.cancelButtonHeight * kCancelButtonShadowHeightRatio))
-            var view:UIView = UIView(frame: CGRectMake(0, -gradientHeight/4, CGRectGetWidth(self.bounds), gradientHeight/2.7))
-            var gradient:CAGradientLayer = CAGradientLayer(layer: layer)
+            let gradientHeight:CGFloat = CGFloat(round(self.cancelButtonHeight * kCancelButtonShadowHeightRatio))
+            let view:UIView = UIView(frame: CGRectMake(0, -gradientHeight/4, CGRectGetWidth(self.bounds), gradientHeight/2.7))
+            let gradient:CAGradientLayer = CAGradientLayer(layer: layer)
             gradient.frame = view.bounds
             gradient.colors = [UIColor(white: 0.0, alpha: 0.0).CGColor,self.blurTintColor.colorWithAlphaComponent(0.1).CGColor]
             view.layer.insertSublayer(gradient, atIndex: 0)
@@ -362,9 +362,9 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
     }
     
     func setUpTableView(){
-        var frame:CGRect = CGRectMake(0, 0, CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds) - self.cancelButtonHeight)
+        let frame:CGRect = CGRectMake(0, 0, CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds) - self.cancelButtonHeight)
     
-        var tableView:UITableView = UITableView(frame: frame)
+        let tableView:UITableView = UITableView(frame: frame)
         self.tableView = tableView
         self.tableView.scrollEnabled = self.tableViewScrollEnabled
         tableView.backgroundColor = UIColor.clearColor()
@@ -388,16 +388,16 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
         if(self.title != nil){
             let leftRightPadding:CGFloat = 15.0
             let topBottomPadding:CGFloat = 8.0
-            var labelWidth:CGFloat = CGRectGetWidth(self.bounds)
+            let labelWidth:CGFloat = CGRectGetWidth(self.bounds)
             
-            var attrText:NSAttributedString = NSAttributedString(string: self.title as! String, attributes: self.titleTextAttributes as [NSObject : AnyObject])
+            let attrText:NSAttributedString = NSAttributedString(string: self.title as String, attributes: self.titleTextAttributes as [NSObject : AnyObject])
             
-            var label:UILabel = UILabel()
+            let label:UILabel = UILabel()
             label.numberOfLines = 0
             label.attributedText = attrText
-            var labelSize:CGSize = label.sizeThatFits(CGSizeMake(labelWidth, CGFloat(MAXFLOAT)))
+            let labelSize:CGSize = label.sizeThatFits(CGSizeMake(labelWidth, CGFloat(MAXFLOAT)))
             label.frame = CGRectMake( leftRightPadding, topBottomPadding, labelWidth, labelSize.height)
-            var headerView:UIView = UIView(frame: CGRectMake(0, 0, CGRectGetWidth(self.bounds), labelSize.height + 2 * topBottomPadding))
+            let headerView:UIView = UIView(frame: CGRectMake(0, 0, CGRectGetWidth(self.bounds), labelSize.height + 2 * topBottomPadding))
             headerView.addSubview(label)
             self.tableView.tableHeaderView = headerView
         }else{
@@ -405,9 +405,9 @@ class TwistJamActionSheet: UIView, UIAppearanceContainer, UITableViewDataSource,
         }
         
         if(self.tableView.tableHeaderView != nil && self.tableView.separatorStyle != UITableViewCellSeparatorStyle.None){
-            var separatorHeight:CGFloat = 1.0 / UIScreen.mainScreen().scale
-            var separatorFrame:CGRect = CGRectMake(0, CGRectGetHeight(self.tableView.tableHeaderView!.frame) - separatorHeight, CGRectGetWidth(self.tableView.tableHeaderView!.frame), separatorHeight)
-            var separator:UIView = UIView(frame: separatorFrame)
+            let separatorHeight:CGFloat = 1.0 / UIScreen.mainScreen().scale
+            let separatorFrame:CGRect = CGRectMake(0, CGRectGetHeight(self.tableView.tableHeaderView!.frame) - separatorHeight, CGRectGetWidth(self.tableView.tableHeaderView!.frame), separatorHeight)
+            let separator:UIView = UIView(frame: separatorFrame)
             separator.backgroundColor = self.tableView.separatorColor
             self.tableView.tableHeaderView!.addSubview(separator)
         }

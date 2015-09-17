@@ -35,11 +35,11 @@ class Album:NSObject{
         }
 
         self.artistPersistantId = representativeItem.artistPersistentID
-        var albumPredicate = MPMediaPropertyPredicate(value: albumTitle, forProperty: MPMediaItemPropertyAlbumTitle)
-        var artistPredicate = MPMediaPropertyPredicate(value:artistName, forProperty:
+        let albumPredicate = MPMediaPropertyPredicate(value: albumTitle, forProperty: MPMediaItemPropertyAlbumTitle)
+        let artistPredicate = MPMediaPropertyPredicate(value:artistName, forProperty:
             MPMediaItemPropertyArtist)
         
-        var albumAndArtistQuery = MPMediaQuery()
+        let albumAndArtistQuery = MPMediaQuery()
         
         albumAndArtistQuery.addFilterPredicate(albumPredicate)
         albumAndArtistQuery.addFilterPredicate(artistPredicate)

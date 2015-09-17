@@ -56,7 +56,7 @@ struct API {
         case Term(String)
         //case TermAttribute(String, Attribute) //search term and entity(e.g.)
         var URLRequest: NSURLRequest {
-            let (path: String, parameters: [String: AnyObject]) = {
+            let (path, parameters): (String, [String: AnyObject]) = {
                 switch self {
                     // i.e. https://itunes.apple.com/search?term=ed+sheeran
                     case .Term(let term):

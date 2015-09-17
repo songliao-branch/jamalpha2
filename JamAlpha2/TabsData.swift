@@ -125,22 +125,22 @@ class TabsData: NSObject {
     }
     
     func addDefaultData() {
-        var results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: nil, managedObjectContext: moc)
+        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: nil, managedObjectContext: moc)
         if results.count == 269 {
-            println("Database already exist")
+            print("Database already exist")
             for result in results {
                 let singleTab: ExistTabs = result as! ExistTabs
-                println("\(singleTab.index) + \(singleTab.name) + \(singleTab.content)")
+                print("\(singleTab.index) + \(singleTab.name) + \(singleTab.content)")
             }
         } else {
             removeAllFromDatabase()
-            var dict = initfingersString()
+            let dict = initfingersString()
             for var i = 1; i < 7; i++ {
                 for var j = 0; j < 25; j++ {
                     var count: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: nil, managedObjectContext: moc)
-                    var index = NSNumber(integer: i * 10000 + j * 100)
-                    var note = fretsBoard[i - 1][j]
-                    println("\(note)")
+                    let index = NSNumber(integer: i * 10000 + j * 100)
+                    let note = fretsBoard[i - 1][j]
+                    print("\(note)")
                     insertInitialTabs(index, name: note, dict: dict)
                 }
             }
@@ -148,8 +148,8 @@ class TabsData: NSObject {
     }
     
     func removeAllFromDatabase() {
-        var resultsForExistTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: nil, managedObjectContext: moc)
-        var resultsForNewTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: nil, managedObjectContext: moc)
+        let resultsForExistTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: nil, managedObjectContext: moc)
+        let resultsForNewTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: nil, managedObjectContext: moc)
         for result in resultsForExistTabs {
             let item = result as! NSManagedObject
             moc.deleteObject(item)
@@ -163,27 +163,27 @@ class TabsData: NSObject {
     
     func insertInitialTabs(index: NSNumber, name: String, dict: Dictionary<String, String>) {
         if Int(index) < 40000 {
-            var tab: ExistTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(ExistTabs), managedObjectConect: moc) as! ExistTabs
+            let tab: ExistTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(ExistTabs), managedObjectConect: moc) as! ExistTabs
             tab.name = name
-            var tempIndex = Int(index) / 100
+            let tempIndex = Int(index) / 100
             tab.index = NSNumber(integer: tempIndex)
             tab.content = ""
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         } else {
             var tabSuffix: [String] = ["", "m", "7", "m7"]
             for var i = 0; i < 4; i++ {
-                var temp = "\(Int(index) + i)"
+                let temp = "\(Int(index) + i)"
                 if dict[temp] != nil {
-                    var tab: ExistTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(ExistTabs), managedObjectConect: moc) as! ExistTabs
-                    var noteName = "\(name)\(tabSuffix[i])"
+                    let tab: ExistTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(ExistTabs), managedObjectConect: moc) as! ExistTabs
+                    let noteName = "\(name)\(tabSuffix[i])"
                     tab.name = noteName
-                    var tempIndex = Int(index) / 100
+                    let tempIndex = Int(index) / 100
                     tab.index = NSNumber(integer: tempIndex)
                     tab.content = dict[temp]!
                 } else if i == 0 {
-                    var tab: ExistTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(ExistTabs), managedObjectConect: moc) as! ExistTabs
+                    let tab: ExistTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(ExistTabs), managedObjectConect: moc) as! ExistTabs
                     tab.name = name
-                    var tempIndex = Int(index) / 100
+                    let tempIndex = Int(index) / 100
                     tab.index = NSNumber(integer: tempIndex)
                     tab.content = ""
                 }
@@ -219,7 +219,7 @@ class TabsData: NSObject {
     }
     
     func addNewTab(index: NSNumber, name: String, content: String) {
-        var tab: NewTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(NewTabs), managedObjectConect: moc) as! NewTabs
+        let tab: NewTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(NewTabs), managedObjectConect: moc) as! NewTabs
         tab.index = index
         tab.name = name
         tab.content = content
@@ -254,7 +254,7 @@ class TabsData: NSObject {
     
     func removeNewTab(index: NSNumber, name: String) {
         let predicate: NSPredicate = NSPredicate(format: "index == '\(index)'")
-        var results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: predicate, managedObjectContext: moc)
+        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: predicate, managedObjectContext: moc)
         for result in results {
             let singleTab: NewTabs = result as! NewTabs
             if singleTab.name == name {
@@ -267,10 +267,10 @@ class TabsData: NSObject {
     
     func printAllNewTab() {
         let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
-        var results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: nil, managedObjectContext: moc)
+        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: nil, managedObjectContext: moc)
         for result in results {
             let item: NewTabs = result as! NewTabs
-            println("\(item.index) + \(item.name) + \(item.content)")
+            print("\(item.index) + \(item.name) + \(item.content)")
         }
     }
 }

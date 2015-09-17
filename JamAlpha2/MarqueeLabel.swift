@@ -108,8 +108,8 @@ public class MarqueeLabel: UILabel {
     private var sublabel = UILabel()
     private var animationDuration: CGFloat = 0.0
 
-    private var homeLabelFrame: CGRect = CGRect.zeroRect
-    private var awayLabelFrame: CGRect = CGRect.zeroRect
+    private var homeLabelFrame: CGRect = CGRect.zero
+    private var awayLabelFrame: CGRect = CGRect.zero
     
 
     //
@@ -179,7 +179,7 @@ public class MarqueeLabel: UILabel {
         setup()
     }
    
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         //fatalError("init(coder:) has not been implemented")
         super.init(coder: aDecoder)
         setup()
@@ -195,7 +195,7 @@ public class MarqueeLabel: UILabel {
         // Create sublabel
         sublabel = UILabel(frame: self.bounds)
         sublabel.tag = 700
-        sublabel.layer.anchorPoint = CGPoint.zeroPoint
+        sublabel.layer.anchorPoint = CGPoint.zero
 
         // Add sublabel
         addSubview(sublabel)
@@ -286,8 +286,8 @@ public class MarqueeLabel: UILabel {
             sublabel.textAlignment = super.textAlignment
             sublabel.lineBreakMode = super.lineBreakMode
             
-            var unusedFrame = CGRect.zeroRect
-            var labelFrame = CGRect.zeroRect
+            var unusedFrame = CGRect.zero
+            var labelFrame = CGRect.zero
             
             
                 labelFrame = CGRectIntegral(CGRectMake(leadingBuffer, 0.0, bounds.size.width - leadingBuffer, bounds.size.height))
@@ -786,8 +786,8 @@ public class MarqueeLabel: UILabel {
     
     public func resetLabel() {
         returnLabelToHome()
-        homeLabelFrame = CGRect.nullRect
-        awayLabelFrame = CGRect.nullRect
+        homeLabelFrame = CGRect.null
+        awayLabelFrame = CGRect.null
     }
     
     public func shutdownLabel() {
@@ -1157,7 +1157,7 @@ extension CAMediaTimingFunction {
         }
         
         // Give up - shouldn't ever get here...I hope
-        print("MarqueeLabel: Failed to find t for Y input!")
+        print("MarqueeLabel: Failed to find t for Y input!", terminator: "")
         return t0
     }
     

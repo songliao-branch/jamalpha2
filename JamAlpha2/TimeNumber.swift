@@ -18,10 +18,10 @@ class TimeNumber {
     }
     
     init(time: Float){
-        var str = NSString(format: "%.2f", time) as String
-        var nums = split(str){$0 == "." }
-        second = nums[0].toInt()!
-        decimal = (nums.count > 1) ? nums[1].toInt()! : 0
+        let str = NSString(format: "%.2f", time) as String
+        var nums = str.characters.split{$0 == "." }.map { String($0) }
+        second = Int(nums[0])!
+        decimal = (nums.count > 1) ? Int(nums[1])! : 0
     }
     
     func isEqual(tn: TimeNumber) -> Bool{
@@ -29,7 +29,7 @@ class TimeNumber {
     }
     
     func isEqual(time: Float) -> Bool {
-        var a = Int(100*time)
+        let a = Int(100*time)
         return second == (a / 100) && second == (a % 100)
     }
     

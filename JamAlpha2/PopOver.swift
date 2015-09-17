@@ -31,7 +31,7 @@ class PopOver: UIView {
         self.addSubview(self.textLabel)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     

@@ -203,7 +203,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //create an UIImageView
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
-        println(player.nowPlayingItem.title)
+        print(player.nowPlayingItem.title)
         currentImage = player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
         
         //create blurred image
@@ -250,7 +250,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
         artistNameLabel.textAlignment = NSTextAlignment.Center
         
-        var title:String = player.nowPlayingItem.title
+        let title:String = player.nowPlayingItem.title
         let attributedString = NSMutableAttributedString(string:title)
         songNameLabel.attributedText = attributedString
         songNameLabel.textAlignment = NSTextAlignment.Center
@@ -404,7 +404,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         synced(self) {
             
             if self.player.repeatMode == .One {
-                println("\(self.player.nowPlayingItem.title) is repeating")
+                print("\(self.player.nowPlayingItem.title) is repeating")
                 self.updateAll(0)
                 return
             }
@@ -434,7 +434,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 if self.player.playbackState == MPMusicPlaybackState.Paused{
                     self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                    println("changeScale")
+                    print("changeScale")
                     //self.progressBlock!.alpha = 0.5
                 }
                 
@@ -479,7 +479,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     override func didReceiveMemoryWarning() {
-        println("memory warning")
+        print("memory warning")
         removeMusicPlayerObserver()
         player.endGeneratingPlaybackNotifications()
     }
@@ -490,7 +490,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playerVolumeChanged(notification: NSNotification){
-        println("volume changed")
+        print("volume changed")
     }
     
     func resumeSong(){
@@ -545,7 +545,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         if let soundWaveData = songManager.getSongWaveForm(player.nowPlayingItem) {
             progressBlock.setWaveFormFromData(soundWaveData)
-            println("sound wave data found")
+            print("sound wave data found")
         } else {
             
             let assetURL = player.nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) as? NSURL
@@ -556,7 +556,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let data = UIImagePNGRepresentation(progressBlock.generatedNormalImage)
                 songManager.addNewSong(player.nowPlayingItem, soundwave: data)
             } else {//this song is not stored offline, it doesn't have a url
-                println("off line song")
+                print("off line song")
              }
 
         }
@@ -575,7 +575,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func handleProgressPan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translationInView(self.view)
         for childview in recognizer.view!.subviews {
-            let child = childview as! UIView
+            let child = childview 
             self.isPanning = true
             
             var newPosition = progressChangedOrigin + translation.x
@@ -777,7 +777,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var handler:TwistJamActionSheet = TwistJamActionSheet()
 
         actionSheet.addButtonWithTitle(NSString(string:""), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-            println("here")
+            print("here")
         })
         actionSheet.addButtonWithTitle(NSString(string:"Change Tab Mode"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
             self.changeChordMode()
@@ -821,7 +821,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //stop timer,stop refreshing UIs after view is completely gone of sight
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
-        println("view will disappear")
+        print("view will disappear")
         timer.invalidate()
         viewDidFullyDisappear = true
         if player.playbackState == MPMusicPlaybackState.Playing {
@@ -862,7 +862,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topPoints.insert(top0, atIndex: 0)
         bottomPoints.insert(buttom0, atIndex: 0)
         
-        var labelExample = UILabel()
+        let labelExample = UILabel()
         labelExample.text = "1"
         labelExample.font = UIFont.systemFontOfSize(minfont * base.frame.width / widthofbasetop)
         labelExample.sizeToFit()
@@ -926,11 +926,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let yPosition = activelabel.ylocation
             let labels: [UIView] = activelabel.labels
             
-            var scale = 2 * Float(yPosition) / tan / Float(widthofbasetop) + 1
+            let scale = 2 * Float(yPosition) / tan / Float(widthofbasetop) + 1
             
             let transformsize = CGAffineTransformMakeScale(CGFloat(scale), CGFloat(scale))
             
-            var xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
+            let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
             
             if mode == FullMode {
                 labels[0].center = CGPointMake(xPosition, CGFloat(yPosition))
@@ -993,7 +993,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var end: Int = chords.count - 1
         
         while true {
-            var mid: Int = (begin + end) / 2
+            let mid: Int = (begin + end) / 2
             if startTime.isLongerThan(chords[mid].mTime) {
                 begin = mid
             } else {
@@ -1012,7 +1012,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         end = chords.count - 1
         let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
         while true {
-            var mid: Int = (begin + end) / 2
+            let mid: Int = (begin + end) / 2
             if tn.isLongerThan(chords[mid].mTime) {
                 begin = mid
             } else {
@@ -1082,7 +1082,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
             player.currentPlaybackRate = self.speed//nowPlayingItemSpeed
-            println("play")
+            print("play")
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
@@ -1102,7 +1102,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
            // musicViewController!.nowView!.stop()
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                println("pause1")
+                print("pause1")
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 //self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
@@ -1145,14 +1145,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         res.append(chordNameLabel)
         self.base.addSubview(chordNameLabel)
         
-        var view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
+        let view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
         
         if mode == fullchord {
-            for i in 0...count(content)-1 {
+            for i in 0...content.characters.count-1 {
                 //if not a integer
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
                 label.font = UIFont.systemFontOfSize(CGFloat(minfont))
-                label.text = String(Array(content)[i])
+                label.text = String(Array(content.characters)[i])
                 label.sizeToFit()
                 label.textColor = UIColor.silverGray()
                 label.textAlignment = NSTextAlignment.Center
@@ -1177,7 +1177,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     private func dealWithLabelofChordName(chordLabel:UILabel){
         //make the text glow
         chordLabel.textColor = UIColor.blackColor()
-        var color:UIColor = chordLabel.textColor
+        let color:UIColor = chordLabel.textColor
         chordLabel.layer.shadowColor = color.CGColor
         chordLabel.layer.shadowRadius = 4.0
         chordLabel.layer.shadowOpacity = 1.0
@@ -1187,7 +1187,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordLabel.alpha = 0.9
         
         //make the frame of the label fit to the text
-        var chordNSString:NSString = NSString(string: chordLabel.text!)
+        let chordNSString:NSString = NSString(string: chordLabel.text!)
         if(chordNSString.length >= 2 && chordNSString.length <= 3){
             
             let fontSize:CGFloat = 18.0
@@ -1215,8 +1215,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         return false
     }
     
-    override func supportedInterfaceOrientations() -> Int {
-        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
     
 }

@@ -177,7 +177,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             cell.albumCover.image = nil
             
             if indexPath.row < searchHistoryManager.getAllHistory().count {
-                let searchHistory = searchHistoryManager.getAllHistory().reverse()[indexPath.row]
+                let searchHistory = Array(searchHistoryManager.getAllHistory().reverse())[indexPath.row]
                 cell.searchHistoryLabel.text = searchHistory.term
 
             } else {
@@ -214,7 +214,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             searchHistoryManager.addNewHistory(resultSearchController.searchBar.text)
             
             for result in searchHistoryManager.getAllHistory() {
-                println("now we have \(result.term)")
+                print("now we have \(result.term)")
             }
             
         } else if !resultSearchController.active && indexPath.section == 0 {

@@ -39,7 +39,7 @@ class SoundWaveView: UIView {
         
     }
     
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -91,7 +91,13 @@ class SoundWaveView: UIView {
             var error:NSError?
             
             
-            var reader:AVAssetReader = AVAssetReader(asset:asset, error:&error)
+            var reader: AVAssetReader
+            do {
+                reader = try AVAssetReader(asset:asset!)
+            } catch var error1 as NSError {
+                error = error1
+                //reader = nil
+            }
             var audioTrackArray:NSArray = asset!.tracksWithMediaType(AVMediaTypeAudio)
             
             if(audioTrackArray.count != 0){
@@ -106,7 +112,7 @@ class SoundWaveView: UIView {
                     AVLinearPCMIsFloatKey:NSNumber(bool: false),
                     AVLinearPCMIsNonInterleaved:NSNumber(bool: false)]
                 
-                var output:AVAssetReaderTrackOutput = AVAssetReaderTrackOutput(track: songTrack, outputSettings: outputSettingsDict as [NSObject : AnyObject])
+                var output: AVAssetReaderTrackOutput = AVAssetReaderTrackOutput(track: songTrack, outputSettings: outputSettingsDict as! [String : AnyObject])
                 
                 reader.addOutput(output)
                 
@@ -159,13 +165,14 @@ class SoundWaveView: UIView {
                     
                     if (sampleBufferRef != nil)
                     {
-                        var blockBufferRef:CMBlockBufferRef? = CMSampleBufferGetDataBuffer(sampleBufferRef);
-                        var bufferLength:size_t = CMBlockBufferGetDataLength(blockBufferRef)
+                        var blockBufferRef:CMBlockBufferRef? = CMSampleBufferGetDataBuffer(sampleBufferRef!);
+                        var bufferLength:size_t = CMBlockBufferGetDataLength(blockBufferRef!)
                         
                         if(data.length < bufferLength){
                             data.length = bufferLength
                         }
-                        CMBlockBufferCopyDataBytes(blockBufferRef, 0, bufferLength, data.mutableBytes)
+                        CMBlockBufferCopyDataBytes(blockBufferRef!, 0, bufferLength, data.mutableBytes)
+                        
                         var samples:UnsafeMutablePointer<Int16> = UnsafeMutablePointer<Int16>(data.mutableBytes)
                         var sampleCount:Int = (Int(bufferLength) / Int(bytesPreInputSample))
                         
@@ -204,7 +211,7 @@ class SoundWaveView: UIView {
                                 
                             }
                         }
-                        CMSampleBufferInvalidate(sampleBufferRef)
+                        CMSampleBufferInvalidate(sampleBufferRef!)
                     }
                 }
                 
@@ -221,12 +228,12 @@ class SoundWaveView: UIView {
     class func generateWaveformImage(asset:AVAsset, color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
         
         
-        var ratio:CGFloat = UIScreen.mainScreen().scale
+        let ratio:CGFloat = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width * ratio, size.height * ratio), false, 1);
         
-        SoundWaveView.renderWavefromInContext(UIGraphicsGetCurrentContext(), asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+        SoundWaveView.renderWavefromInContext(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
         
-        var image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
+        let image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
         
         UIGraphicsEndImageContext();
         
@@ -235,18 +242,18 @@ class SoundWaveView: UIView {
     
     
     class func recolorizeImage(image:UIImage, color:UIColor) -> UIImage{
-        var imageRect:CGRect = CGRectMake(0, 0, image.size.width, image.size.height)
+        let imageRect:CGRect = CGRectMake(0, 0, image.size.width, image.size.height)
         UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
         
-        var context:CGContextRef = UIGraphicsGetCurrentContext()
+        let context:CGContextRef = UIGraphicsGetCurrentContext()!
         CGContextTranslateCTM(context, 0.0, image.size.height)
         CGContextScaleCTM(context, 1.0, -1.0)
         CGContextDrawImage(context, imageRect, image.CGImage)
         
         color.set()
         
-        UIRectFillUsingBlendMode(imageRect, kCGBlendModeSourceAtop)
-        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIRectFillUsingBlendMode(imageRect, CGBlendMode.SourceAtop)
+        let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
         return newImage
@@ -263,7 +270,7 @@ class SoundWaveView: UIView {
     }
     func generateWaveforms(){
         
-        var rect:CGRect = self.bounds
+        let rect:CGRect = self.bounds
        
         
         if(self.asset != nil){
@@ -283,8 +290,8 @@ class SoundWaveView: UIView {
     }
     
     func applyProgressToSubviews(){
-        var bs:CGRect = self.bounds
-        var progressWidth:CGFloat = bs.size.width * progress
+        let bs:CGRect = self.bounds
+        let progressWidth:CGFloat = bs.size.width * progress
         cropProgressView.frame = CGRectMake(0, 0, progressWidth, bs.size.height);
         cropNormalView.frame = CGRectMake(progressWidth, 0, bs.size.width - progressWidth, bs.size.height);
         normalImageView.frame = CGRectMake(-progressWidth, 0, bs.size.width, bs.size.height);
@@ -294,7 +301,7 @@ class SoundWaveView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        var bs:CGRect = self.bounds;
+        let bs:CGRect = self.bounds;
         normalImageView.frame = bs;
         progressImageView.frame = bs;
         
@@ -348,10 +355,6 @@ class SoundWaveView: UIView {
     {
         return self.progressImageView.image!
     }
-    
-    
-    
-    
-   
+
 }
 
