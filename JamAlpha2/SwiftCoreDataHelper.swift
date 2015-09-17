@@ -16,14 +16,8 @@ class SwiftCoreDataHelper: NSObject {
     
     
     class func managedObjectContext() -> NSManagedObjectContext{
-        
-        var error: NSError? = nil
-        
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtPath(SwiftCoreDataHelper.directoryForDatabaseFilename() as String, withIntermediateDirectories: true, attributes: nil)
-        } catch var error1 as NSError {
-            error = error1
-        }
+         
+        try! NSFileManager.defaultManager().createDirectoryAtPath(SwiftCoreDataHelper.directoryForDatabaseFilename() as String, withIntermediateDirectories: true, attributes: nil)
         
         let path:NSString = "\(SwiftCoreDataHelper.directoryForDatabaseFilename()) + \(SwiftCoreDataHelper.databaseFilename())"
         
