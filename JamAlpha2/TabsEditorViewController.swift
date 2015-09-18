@@ -240,7 +240,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             return
         }
         if let bundle = self.bundle {
-            let pointPressedInCanvas = gestureRecognizer.locationInView(self.view)
+            
             var nextPageRect : CGRect = self.collectionView!.bounds
             if self.layout.scrollDirection == UICollectionViewScrollDirection.Horizontal {
                 if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["left"]!) {
@@ -257,7 +257,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }
             }
             else if self.layout.scrollDirection == UICollectionViewScrollDirection.Vertical {
-                let rect = hitTestRectagles["top"]
+
                 if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["top"]!) {
                     nextPageRect.origin.y -= nextPageRect.size.height
                     if nextPageRect.origin.y < 0.0 {
@@ -608,7 +608,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             removeObjectsOnCompleteStringView()
             data.removeNewTab(index, name: name!)
             
-            self.changeRemoveButtonStatus(self.removeButton)
+            //self.changeRemoveButtonStatus(self.removeButton)
         }
     }
     
@@ -628,7 +628,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let alertController = UIAlertController(title: "Warning", message: "Cannot delete build in tabs", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
             self.presentViewController(alertController, animated: true, completion: nil)
-            self.changeRemoveButtonStatus(self.removeButton)
+            //self.changeRemoveButtonStatus(self.removeButton)
         }
     }
     
@@ -842,7 +842,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, 4 * self.trueWidth, 6 / 20 * self.trueHeight)
         self.progressBlock = SoundWaveView(frame: frame)
         let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
-        self.player = try? AVAudioPlayer(contentsOfURL: url)
+        self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.duration = self.player.duration
         self.player.volume = 1
         self.progressBlock.SetSoundURL(url)

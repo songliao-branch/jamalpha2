@@ -41,7 +41,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
         //println("here")
         //获取containerView视图
-        let containerView:UIView  = transitionContext.containerView()
+        let containerView:UIView  = transitionContext.containerView()!
         
         if (self.animationType == CCAnimationType.CCAnimationTypePresent) {
             /*弹出动画*/

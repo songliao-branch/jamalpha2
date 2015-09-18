@@ -44,8 +44,8 @@ class Album:NSObject{
         albumAndArtistQuery.addFilterPredicate(albumPredicate)
         albumAndArtistQuery.addFilterPredicate(artistPredicate)
         
-        self.songsIntheAlbum = albumAndArtistQuery.items as! [MPMediaItem]
-        
+        self.songsIntheAlbum = albumAndArtistQuery.items!
+
         //make sure there is no short song
         songsIntheAlbum.filter({song in song.playbackDuration > 30 })
       

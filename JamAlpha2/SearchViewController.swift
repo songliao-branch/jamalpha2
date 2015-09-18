@@ -3,7 +3,7 @@
 import UIKit
 import MediaPlayer
 import Alamofire
-
+import SwiftyJSON
 class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
@@ -141,10 +141,12 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             cell.titleLabel.hidden = false
             cell.subtitleLabel.hidden = false
             if indexPath.section == 0 { //local search in section 0
-                cell.titleLabel.text = filteredSongs[indexPath.row].title
-                cell.subtitleLabel.text = filteredSongs[indexPath.row].artist
-                cell.albumCover.image = filteredSongs[indexPath.row].artwork.imageWithSize(CGSize(width: 54, height: 54))
-                
+                let song = filteredSongs[indexPath.row]
+                cell.titleLabel.text = song.title!
+                cell.subtitleLabel.text = song.artist!
+                if let artwork = song.artwork {
+                    cell.albumCover.image = artwork.imageWithSize(CGSize(width: 54, height: 54))
+                }
             } else { //web search in section 1
                 if let track = searchResults[indexPath.row].trackName {
                     cell.titleLabel.text = track
@@ -157,14 +159,16 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     cell.request?.cancel()
                     cell.albumCover.image = nil
                     
+                    
+                    
                     cell.request = Alamofire.request(.GET, imageURL).validate(contentType: ["image/*"]).responseImage() {
-                        (request, _, image, error) in
+                        request, _, result in
                         
-                        if error == nil && image != nil {
-                            cell.albumCover.image = image
-                        } else {
-                            println("download image error \(error)")
+                        guard let image = result.value else {
+                            print("download image error")
+                            return
                         }
+                        cell.albumCover.image = image
                     }
                 }
             
@@ -211,7 +215,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
             
-            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text)
+            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)
             
             for result in searchHistoryManager.getAllHistory() {
                 print("now we have \(result.term)")
@@ -233,8 +237,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        filterLocalSongs(searchController.searchBar.text)
-        webSearchSong(searchController.searchBar.text)
+        filterLocalSongs(searchController.searchBar.text!)
+        webSearchSong(searchController.searchBar.text!)
     }
     
 
@@ -242,15 +246,21 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         musicRequest?.cancel()
         searchResults = [SearchResult]()
         self.searchResultTableView.reloadData()
+        
         musicRequest = Alamofire.request(API.Router.Term(searchText)).responseJSON() {
-            (_, _, data, error) in
-            if error == nil {
+            _, _, result in
+            
+            switch result {
+            case .Success(let data):
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
-                     self.addDataToResults(JSON(data!))
+                    self.addDataToResults(JSON(data))
                 }
+            case .Failure(_, let error):
+                print("Search request failed with error: \(error)")
             }
         }
     }
+    
     
     func addDataToResults(data: JSON){
         for item in data["results"].array! {
@@ -286,16 +296,16 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 
         self.filteredSongs = uniqueSongs.filter({
             (song: MPMediaItem) -> Bool in
-            return song.title.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumTitle.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
+            return song.title!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
         })
         self.searchResultTableView.reloadData()
     }
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(){
-        for tabItemController in self.tabBarController?.viewControllers as! [UIViewController]{
+        for tabItemController in (self.tabBarController?.viewControllers)! {
             if tabItemController.isKindOfClass(UINavigationController){
-                for childVC in tabItemController.childViewControllers as! [UIViewController] {
+                for childVC in tabItemController.childViewControllers {
                     if childVC.isKindOfClass(BaseViewController) {
                         let baseVC = childVC as! BaseViewController
                         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {

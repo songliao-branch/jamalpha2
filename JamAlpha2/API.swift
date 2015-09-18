@@ -31,17 +31,24 @@ class SearchResult {
 extension Alamofire.Request {
     public static func imageResponseSerializer() -> GenericResponseSerializer<UIImage> {
         return GenericResponseSerializer { request, response, data in
-            if data == nil {
-                return (nil, nil)
+            guard let validData = data else {
+                let error = Error.errorWithCode(.DataSerializationFailed, failureReason: "Data parsing failed")
+                return .Failure(data, error)
             }
-            let image = UIImage(data: data!)
-            return (image, nil)
+            
+            guard let image = UIImage(data: validData, scale: UIScreen.mainScreen().scale) else {
+                let error = Error.errorWithCode(.DataSerializationFailed, failureReason: "Image Parsing failed")
+                return .Failure(data, error)
+            }
+            
+            return .Success(image)
         }
     }
     
-    public func responseImage(completionHandler: (NSURLRequest, NSHTTPURLResponse?, UIImage?, NSError?) -> Void) -> Self {
+    public func responseImage(completionHandler: (NSURLRequest?, NSHTTPURLResponse?, Result<UIImage>) -> Void) -> Self {
         return response(responseSerializer: Request.imageResponseSerializer(), completionHandler: completionHandler)
     }
+
 }
 
 //mixTerm, genreIndex, artistTerm, composerTerm, albumTerm, ratingIndex, songTerm
@@ -55,20 +62,23 @@ struct API {
         
         case Term(String)
         //case TermAttribute(String, Attribute) //search term and entity(e.g.)
-        var URLRequest: NSURLRequest {
-            let (path, parameters): (String, [String: AnyObject]) = {
+        var URLRequest: NSMutableURLRequest {
+            
+            typealias Path = (String, [String: AnyObject])
+            
+            let thePath: Path = {
                 switch self {
                     // i.e. https://itunes.apple.com/search?term=ed+sheeran
-                    case .Term(let term):
-                        var params = ["term":"\(term)", "limit":"20", "media":"music"] //default limit is 50
-                        return ("/search", params) //empty dictionary
-               
-                    }
-                }()
+                case .Term(let term):
+                    let params = ["term":"\(term)", "limit":"20", "media":"music"] //default limit is 50
+                    return ("/search", params) //empty dictionary
+                }
+            }()
+            
             let URL = NSURL(string: Router.baseURLString)
-            let URLRequest = NSURLRequest(URL: URL!.URLByAppendingPathComponent(path))
+            let URLRequest = NSURLRequest(URL: URL!.URLByAppendingPathComponent(thePath.0))
             let encoding = Alamofire.ParameterEncoding.URL
-            return encoding.encode(URLRequest, parameters: parameters).0
+            return encoding.encode(URLRequest, parameters: thePath.1).0
         }
     }
 }
