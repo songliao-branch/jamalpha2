@@ -542,10 +542,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         progressBarWidth = CGFloat(player.nowPlayingItem!.playbackDuration) * progressWidthMultiplier
         
-
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
-
+        
         if let soundWaveData = songManager.getSongWaveForm(player.nowPlayingItem!) {
             progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
@@ -555,10 +554,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 print("sound url not available")
                 return
             }
-            
+            print("generating sound wave..")
             self.progressBlock.SetSoundURL(assetURL as! NSURL)
-            let data = UIImagePNGRepresentation(progressBlock.generatedNormalImage)
-            songManager.addNewSong(player.nowPlayingItem!, soundwave: data!)
+            let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
+            self.songManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
         }
         
         self.progressBlockContainer.addSubview(self.progressBlock)

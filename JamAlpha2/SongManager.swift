@@ -24,14 +24,16 @@ class SongManager: NSObject {
         
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
-    
+
     func getSongWaveForm(item: MPMediaItem) -> NSData? {
-    
-        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.title)') AND (artist == '\(item.artist)')")
+        // TODO: make this predicate more secure
+        // BUG: words like `Don'\t`, the \ is messing up the predicate
+        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.title!)') AND (artist == '\(item.artist!)')")
         
         let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
         if results.count == 0 {
+            print("none found in database")
             return nil
         }
         
