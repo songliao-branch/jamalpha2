@@ -16,27 +16,27 @@ class SwiftCoreDataHelper: NSObject {
     
     
     class func managedObjectContext() -> NSManagedObjectContext{
-        
-        var error: NSError? = nil
-        
-        NSFileManager.defaultManager().createDirectoryAtPath(SwiftCoreDataHelper.directoryForDatabaseFilename() as String, withIntermediateDirectories: true, attributes: nil, error: &error)
+         
+        try! NSFileManager.defaultManager().createDirectoryAtPath(SwiftCoreDataHelper.directoryForDatabaseFilename() as String, withIntermediateDirectories: true, attributes: nil)
         
         let path:NSString = "\(SwiftCoreDataHelper.directoryForDatabaseFilename()) + \(SwiftCoreDataHelper.databaseFilename())"
         
-        let url: NSURL = NSURL(fileURLWithPath: path as String)!
+        let url: NSURL = NSURL(fileURLWithPath: path as String)
         
         let managedModel: NSManagedObjectModel = NSManagedObjectModel.mergedModelFromBundles(nil)!
         
-        var storeCoordinator: NSPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedModel)
+        let storeCoordinator: NSPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedModel)
         
-        if !(storeCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil, error:&error ) != nil){
-            if (error != nil){
-                println(error!.localizedDescription)
-                abort()
-            }
+        
+        do {
+            try storeCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil)
+        } catch  {
+            print(error)
+            abort()
         }
         
-        var managedObjectContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
+        
+        let managedObjectContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
         
         managedObjectContext.persistentStoreCoordinator = storeCoordinator
         
@@ -47,16 +47,17 @@ class SwiftCoreDataHelper: NSObject {
     
     class func insertManagedObject(className:NSString, managedObjectConect:NSManagedObjectContext)->AnyObject{
         
-        let managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(className as String, inManagedObjectContext: managedObjectConect) as! NSManagedObject
+        let managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(className as String, inManagedObjectContext: managedObjectConect) 
         
         return managedObject
         
     }
     
     class func saveManagedObjectContext(managedObjectContext: NSManagedObjectContext)->Bool{
-        if managedObjectContext.save(nil){
+        do {
+            try managedObjectContext.save()
             return true
-        }else{
+        } catch _ {
             return false
         }
     }
@@ -72,7 +73,7 @@ class SwiftCoreDataHelper: NSObject {
         }
         
         fetchRequest.returnsObjectsAsFaults = false
-        let items: NSArray = managedObjectContext .executeFetchRequest(fetchRequest, error: nil)!
+        let items: NSArray = try! managedObjectContext .executeFetchRequest(fetchRequest)
         
         return items
     }

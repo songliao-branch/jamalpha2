@@ -31,7 +31,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: "handlePan:"))
     }
     
-    func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
+    func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
         //println("duration");
         return 0.5
     }
@@ -41,7 +41,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
         //println("here")
         //获取containerView视图
-        let containerView:UIView  = transitionContext.containerView()
+        let containerView:UIView  = transitionContext.containerView()!
         
         if (self.animationType == CCAnimationType.CCAnimationTypePresent) {
             /*弹出动画*/
@@ -115,7 +115,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             self.interacting = false
             //判断是否完成交互
             if tranlation.y > 200 && gesture.state != UIGestureRecognizerState.Cancelled {
-                println("finish");
+                print("finish");
                 self.interactiveTransition.finishInteractiveTransition()
             }else{
                 self.interactiveTransition.cancelInteractiveTransition()

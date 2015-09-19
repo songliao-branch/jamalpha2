@@ -117,7 +117,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var textColor:UIColor!
     
-    var actionSheet:TwistJamActionSheet!
+    //var actionSheet:TwistJamActionSheet!
     
     //background images
     var currentImage:UIImage?
@@ -144,12 +144,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewDidLoad()
         
         player = MusicManager.sharedInstance.player
-        firstLoadSongTime = player.nowPlayingItem.playbackDuration
-        firstloadSongTitle = player.nowPlayingItem.title
+        firstLoadSongTime = player.nowPlayingItem!.playbackDuration
+        firstloadSongTitle = player.nowPlayingItem!.title
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
-        setUpMusicData(player.nowPlayingItem)
+        setUpMusicData(player.nowPlayingItem!)
         setUpBackgroundImage()
         setUpTopButtons()
         
@@ -203,11 +203,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //create an UIImageView
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
-        println(player.nowPlayingItem.title)
-        currentImage = player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-        
+        print(player.nowPlayingItem!.title)
+        if let artwork = player.nowPlayingItem!.artwork {
+            currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+        }
         //create blurred image
-        var blurredImage:UIImage = currentImage!.applyLightEffect()!
+        let blurredImage:UIImage = currentImage!.applyLightEffect()!
         
         backgroundImageView.center.x = self.view.center.x
         backgroundImageView.image = blurredImage
@@ -250,12 +251,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
         artistNameLabel.textAlignment = NSTextAlignment.Center
         
-        var title:String = player.nowPlayingItem.title
+        let title:String = player.nowPlayingItem!.title!
         let attributedString = NSMutableAttributedString(string:title)
         songNameLabel.attributedText = attributedString
         songNameLabel.textAlignment = NSTextAlignment.Center
             
-        artistNameLabel.text = player.nowPlayingItem.artist
+        artistNameLabel.text = player.nowPlayingItem!.artist
         
         
         songNameLabel!.font = UIFont.systemFontOfSize(18)
@@ -404,7 +405,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         synced(self) {
             
             if self.player.repeatMode == .One {
-                println("\(self.player.nowPlayingItem.title) is repeating")
+                print("\(self.player.nowPlayingItem!.title) is repeating")
                 self.updateAll(0)
                 return
             }
@@ -413,44 +414,47 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
-            if self.firstloadSongTitle != nowPlayingItem.title && self.firstLoadSongTime != nowPlayingItem.playbackDuration {
+            if self.firstloadSongTitle != nowPlayingItem!.title && self.firstLoadSongTime != nowPlayingItem!.playbackDuration {
                 
-                if(self.actionSheet != nil && self.actionSheet.isTwistJamActionSheetShow == true){
- 
-                    self.actionSheet!.dismissAnimated(true)
-                }
-                self.firstLoadSongTime = nowPlayingItem.playbackDuration
+//                if(self.actionSheet != nil && self.actionSheet.isTwistJamActionSheetShow == true){
+// 
+//                    self.actionSheet!.dismissAnimated(true)
+//                }
+                self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
-                self.setUpMusicData(nowPlayingItem)
+                self.setUpMusicData(nowPlayingItem!)
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
                 self.progressBlockViewWidth = nil
         
-                let nowPlayingItemDuration = nowPlayingItem.playbackDuration
+                let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
                     self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
                     self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 161)
                     self.progressBlock.center.y = self.progressContainerHeight
                 
                 if self.player.playbackState == MPMusicPlaybackState.Paused{
                     self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                    println("changeScale")
+                    print("changeScale")
                     //self.progressBlock!.alpha = 0.5
                 }
                 
                 // if we are NOT repeating song
                 if self.player.repeatMode != .One {
                     
-                    self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem.title)
+                    self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
                     self.songNameLabel.textAlignment = NSTextAlignment.Center
-                    self.artistNameLabel.text = nowPlayingItem.artist
+                    self.artistNameLabel.text = nowPlayingItem!.artist
         
-                    let image = self.player.nowPlayingItem.artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-                    let blurredImage = image.applyLightEffect()!
-                    self.textColor = blurredImage.averageColor()
-            
-                    self.backgroundImageView.center.x = self.view.center.x
-                    self.backgroundImageView.image = blurredImage
+                    if let artwork = self.player.nowPlayingItem!.artwork {
+                        let image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+                        let blurredImage = image!.applyLightEffect()!
+                        self.textColor = blurredImage.averageColor()
+                        
+                        self.backgroundImageView.center.x = self.view.center.x
+                        self.backgroundImageView.image = blurredImage
+                    }
+
        
                     self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
                 }
@@ -479,7 +483,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     override func didReceiveMemoryWarning() {
-        println("memory warning")
+        print("memory warning")
         removeMusicPlayerObserver()
         player.endGeneratingPlaybackNotifications()
     }
@@ -490,7 +494,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playerVolumeChanged(notification: NSNotification){
-        println("volume changed")
+        print("volume changed")
     }
     
     func resumeSong(){
@@ -536,29 +540,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         var progressBarWidth:CGFloat!
 
-        progressBarWidth = CGFloat(player.nowPlayingItem.playbackDuration) * progressWidthMultiplier
+        progressBarWidth = CGFloat(player.nowPlayingItem!.playbackDuration) * progressWidthMultiplier
         
-
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
-
-
-        if let soundWaveData = songManager.getSongWaveForm(player.nowPlayingItem) {
+        
+        if let soundWaveData = songManager.getSongWaveForm(player.nowPlayingItem!) {
             progressBlock.setWaveFormFromData(soundWaveData)
-            println("sound wave data found")
+            print("sound wave data found")
         } else {
             
-            let assetURL = player.nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) as? NSURL
-            
-            if let url = assetURL {
-                self.progressBlock.SetSoundURL(assetURL!)
-                
-                let data = UIImagePNGRepresentation(progressBlock.generatedNormalImage)
-                songManager.addNewSong(player.nowPlayingItem, soundwave: data)
-            } else {//this song is not stored offline, it doesn't have a url
-                println("off line song")
-             }
-
+            guard let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
+                print("sound url not available")
+                return
+            }
+            print("generating sound wave..")
+            self.progressBlock.SetSoundURL(assetURL as! NSURL)
+            let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
+            self.songManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
         }
         
         self.progressBlockContainer.addSubview(self.progressBlock)
@@ -575,7 +574,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func handleProgressPan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translationInView(self.view)
         for childview in recognizer.view!.subviews {
-            let child = childview as! UIView
+            let child = childview 
             self.isPanning = true
             
             var newPosition = progressChangedOrigin + translation.x
@@ -598,7 +597,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //= from 0 ot -517
             //divide by -2: from 0 to 258
             let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(self.progressWidthMultiplier))
-            self.progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem.playbackDuration))
+            self.progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
             //258  517
             updateAll(toTime)
             
@@ -632,17 +631,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             break;
         case UIGestureRecognizerState.Changed:
             let tempNowPlayingItem = player.nowPlayingItem
-            var deltaTime = Float(translation.y)*(freefallTime/Float(base.frame.size.height))
+            let deltaTime = Float(translation.y)*(freefallTime/Float(base.frame.size.height))
             toChordTime = currentChordTime + deltaTime
             
             if toChordTime < 0 {
                 toChordTime = 0
-            } else if (toChordTime > Float(tempNowPlayingItem.playbackDuration)){
-                toChordTime = Float(tempNowPlayingItem.playbackDuration)
+            } else if (toChordTime > Float(tempNowPlayingItem!.playbackDuration)){
+                toChordTime = Float(tempNowPlayingItem!.playbackDuration)
             }
             
             //update soundwave progress
-            progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItem.playbackDuration))
+            progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItem!.playbackDuration))
             
             updateAll(toChordTime)
             
@@ -694,7 +693,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
-        totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem.playbackDuration)).toDisplayString()
+        totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
         totalTimeLabel.textAlignment = .Center
         self.view.addSubview(totalTimeLabel)
         
@@ -702,9 +701,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //from left to right: share, favoriate, shuffle, others
     func setUpBottomViewWithButtons(){
-        let edgeButtonSideMargin:CGFloat = 50
-        
-        
+
         bottomView = UIView(frame: CGRect(x: 0, y: self.view.frame.height - bottomViewHeight, width: self.view.frame.width, height: bottomViewHeight))
         bottomView.backgroundColor = UIColor.darkGrayColor()
         bottomView.alpha = 0.7
@@ -771,57 +768,54 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func showGuitarActions(){
-        actionSheet = TwistJamActionSheet()
-        actionSheet.needRunningManSlider = true
-        actionSheet.songVC = self
-        var handler:TwistJamActionSheet = TwistJamActionSheet()
-
-        actionSheet.addButtonWithTitle(NSString(string:""), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-            println("here")
-        })
-        actionSheet.addButtonWithTitle(NSString(string:"Change Tab Mode"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-            self.changeChordMode()
-        })
-         actionSheet.show()
-        if player.playbackState == MPMusicPlaybackState.Playing {
-            timer.invalidate()
-            updateAll(Float(player.currentPlaybackTime))
-            startTimer()
-        }
+//        actionSheet = TwistJamActionSheet()
+//        actionSheet.needRunningManSlider = true
+//        actionSheet.songVC = self
+//
+//        actionSheet.addButtonWithTitle(NSString(string:""), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
+//            print("here")
+//        })
+//        actionSheet.addButtonWithTitle(NSString(string:"Change Tab Mode"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
+//            self.changeChordMode()
+//        })
+//         actionSheet.show()
+//        if player.playbackState == MPMusicPlaybackState.Playing {
+//            timer.invalidate()
+//            updateAll(Float(player.currentPlaybackTime))
+//            startTimer()
+//        }
     }
     
     func showActionSheet(){
 
-        actionSheet = TwistJamActionSheet()
-
-        var handler:TwistJamActionSheet = TwistJamActionSheet()
-    
-        actionSheet.addButtonWithTitle(NSString(string:"Add your tabs"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-            
-            self.player.pause()
-            
-            let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-            
-            tabsEditorVC.theSong = self.player.nowPlayingItem
-            
-            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
-        })
-        actionSheet.addButtonWithTitle(NSString(string:"Add your lyrics"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-            
-        })
-        actionSheet.show()
-        if player.playbackState == MPMusicPlaybackState.Playing {
-            timer.invalidate()
-            updateAll(Float(player.currentPlaybackTime))
-            startTimer()
-        }
+//        actionSheet = TwistJamActionSheet()
+//
+//        actionSheet.addButtonWithTitle(NSString(string:"Add your tabs"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
+//            
+//            self.player.pause()
+//            
+//            let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
+//            
+//            tabsEditorVC.theSong = self.player.nowPlayingItem
+//            
+//            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
+//        })
+//        actionSheet.addButtonWithTitle(NSString(string:"Add your lyrics"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
+//            
+//        })
+//        actionSheet.show()
+//        if player.playbackState == MPMusicPlaybackState.Playing {
+//            timer.invalidate()
+//            updateAll(Float(player.currentPlaybackTime))
+//            startTimer()
+//        }
     }
     
     // ISSUE: when app goes to background this is not called
     //stop timer,stop refreshing UIs after view is completely gone of sight
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
-        println("view will disappear")
+        print("view will disappear")
         timer.invalidate()
         viewDidFullyDisappear = true
         if player.playbackState == MPMusicPlaybackState.Playing {
@@ -862,7 +856,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topPoints.insert(top0, atIndex: 0)
         bottomPoints.insert(buttom0, atIndex: 0)
         
-        var labelExample = UILabel()
+        let labelExample = UILabel()
         labelExample.text = "1"
         labelExample.font = UIFont.systemFontOfSize(minfont * base.frame.width / widthofbasetop)
         labelExample.sizeToFit()
@@ -926,11 +920,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let yPosition = activelabel.ylocation
             let labels: [UIView] = activelabel.labels
             
-            var scale = 2 * Float(yPosition) / tan / Float(widthofbasetop) + 1
+            let scale = 2 * Float(yPosition) / tan / Float(widthofbasetop) + 1
             
             let transformsize = CGAffineTransformMakeScale(CGFloat(scale), CGFloat(scale))
             
-            var xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
+            let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
             
             if mode == FullMode {
                 labels[0].center = CGPointMake(xPosition, CGFloat(yPosition))
@@ -952,7 +946,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func refreshProgressBlock(){
         
         if progressBlockViewWidth == nil {
-            progressBlockViewWidth = CGFloat(player.nowPlayingItem.playbackDuration)
+            progressBlockViewWidth = CGFloat(player.nowPlayingItem!.playbackDuration)
         }
         
         let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!) / self.progressBlock.frame.size.width
@@ -993,7 +987,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var end: Int = chords.count - 1
         
         while true {
-            var mid: Int = (begin + end) / 2
+            let mid: Int = (begin + end) / 2
             if startTime.isLongerThan(chords[mid].mTime) {
                 begin = mid
             } else {
@@ -1012,7 +1006,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         end = chords.count - 1
         let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
         while true {
-            var mid: Int = (begin + end) / 2
+            let mid: Int = (begin + end) / 2
             if tn.isLongerThan(chords[mid].mTime) {
                 begin = mid
             } else {
@@ -1082,7 +1076,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
             player.currentPlaybackRate = self.speed//nowPlayingItemSpeed
-            println("play")
+            print("play")
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
@@ -1102,7 +1096,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
            // musicViewController!.nowView!.stop()
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                println("pause1")
+                print("pause1")
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 //self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
@@ -1145,14 +1139,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         res.append(chordNameLabel)
         self.base.addSubview(chordNameLabel)
         
-        var view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
+        let view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
         
         if mode == fullchord {
-            for i in 0...count(content)-1 {
+            for i in 0...content.characters.count-1 {
                 //if not a integer
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
                 label.font = UIFont.systemFontOfSize(CGFloat(minfont))
-                label.text = String(Array(content)[i])
+                label.text = String(Array(content.characters)[i])
                 label.sizeToFit()
                 label.textColor = UIColor.silverGray()
                 label.textAlignment = NSTextAlignment.Center
@@ -1177,7 +1171,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     private func dealWithLabelofChordName(chordLabel:UILabel){
         //make the text glow
         chordLabel.textColor = UIColor.blackColor()
-        var color:UIColor = chordLabel.textColor
+        let color:UIColor = chordLabel.textColor
         chordLabel.layer.shadowColor = color.CGColor
         chordLabel.layer.shadowRadius = 4.0
         chordLabel.layer.shadowOpacity = 1.0
@@ -1187,7 +1181,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordLabel.alpha = 0.9
         
         //make the frame of the label fit to the text
-        var chordNSString:NSString = NSString(string: chordLabel.text!)
+        let chordNSString:NSString = NSString(string: chordLabel.text!)
         if(chordNSString.length >= 2 && chordNSString.length <= 3){
             
             let fontSize:CGFloat = 18.0
@@ -1215,8 +1209,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         return false
     }
     
-    override func supportedInterfaceOrientations() -> Int {
-        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
     
 }

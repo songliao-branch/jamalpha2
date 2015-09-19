@@ -28,7 +28,7 @@ public extension UIWindow {
             imageSize = CGSizeMake(UIScreen.mainScreen().bounds.size.height, UIScreen.mainScreen().bounds.size.width)
         }
         UIGraphicsBeginImageContextWithOptions(imageSize, false, 0)
-        var context:CGContextRef = UIGraphicsGetCurrentContext()
+        var context:CGContextRef = UIGraphicsGetCurrentContext()!
         CGContextSaveGState(context)
         CGContextTranslateCTM(context, self.center.x, self.center.y)
         CGContextConcatCTM(context, self.transform)
@@ -59,10 +59,10 @@ public extension UIWindow {
         
         
         // Draw new image in current graphics context
-        var imageRef:CGImageRef = CGImageCreateWithImageInRect(image.CGImage, croprect!);
+        var imageRef:CGImageRef = CGImageCreateWithImageInRect(image.CGImage, croprect!)!;
         
         // Create new cropped UIImage
-        var croppedImage:UIImage = UIImage(CGImage: imageRef)!
+        var croppedImage:UIImage = UIImage(CGImage: imageRef)
         
         return croppedImage
     }

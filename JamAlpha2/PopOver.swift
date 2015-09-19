@@ -31,14 +31,14 @@ class PopOver: UIView {
         self.addSubview(self.textLabel)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func drawRect(rect:CGRect){
         //// General Declarations
-        var colorSpace:CGColorSpaceRef = CGColorSpaceCreateDeviceRGB()
-        var context:CGContextRef = UIGraphicsGetCurrentContext()
+        var colorSpace:CGColorSpaceRef = CGColorSpaceCreateDeviceRGB()!
+        var context:CGContextRef = UIGraphicsGetCurrentContext()!
         
         //// Color Declarations
         var gradientColor:UIColor = UIColor(red: 0.267, green: 0.303, blue: 0.335, alpha: 1)
@@ -49,7 +49,7 @@ class PopOver: UIView {
         var gradientColors:CFArray = [gradientColor.CGColor,gradientColor2.CGColor]
         
         var gradientLocations:[CGFloat] = [0, 1]
-        var gradient:CGGradientRef = CGGradientCreateWithColors(colorSpace, gradientColors, gradientLocations)
+        var gradient:CGGradientRef = CGGradientCreateWithColors(colorSpace, gradientColors, gradientLocations)!
         
         //// Shadow Declarations
         var innerShadow:UIColor = shadowColor2
@@ -81,12 +81,13 @@ class PopOver: UIView {
         CGContextSaveGState(context)
         bezierPath.addClip()
         var bezierBounds:CGRect = bezierPath.bounds
-        CGContextDrawLinearGradient(context, gradient,
-            CGPointMake(CGRectGetMidX(bezierBounds), CGRectGetMinY(bezierBounds)),
-            CGPointMake(CGRectGetMidX(bezierBounds), CGRectGetMaxY(bezierBounds)),
-            0)
-        CGContextRestoreGState(context);
         
+//        CGContextDrawLinearGradient(context, gradient,
+//            CGPointMake(CGRectGetMidX(bezierBounds), CGRectGetMinY(bezierBounds)),
+//            CGPointMake(CGRectGetMidX(bezierBounds), CGRectGetMaxY(bezierBounds)),
+//            CGGradientDrawingOptions)
+//        CGContextRestoreGState(context);
+//        
         ////// Bezier Inner Shadow
         var bezierBorderRect:CGRect = CGRectInset(bezierPath.bounds, -innerShadowBlurRadius, -innerShadowBlurRadius)
         bezierBorderRect = CGRectOffset(bezierBorderRect, -innerShadowOffset.width, -innerShadowOffset.height);

@@ -45,7 +45,7 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-        println("\(_TAG) Initialize Player")
+        print("\(_TAG) Initialize Player")
         player = MPMusicPlayerController.systemMusicPlayer()
         
         player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
@@ -62,16 +62,16 @@ class MusicManager: NSObject {
     func setPlayerQueue(collection: [MPMediaItem]){
 
         if lastPlayerQueue == collection { // if we are the same queue
-           println("\(_TAG) same collection")
+           print("\(_TAG) same collection")
             queueChanged = false
         } else { //if different queue, means we are getting a new collection, reset the player queue
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
-            println("\(_TAG) setting a new queue")
+            print("\(_TAG) setting a new queue")
             queueChanged = true
             //testing
             for song in collection {
-                println("\(_TAG) setting up queue of song: \(song.title)")
+                print("\(_TAG) setting up queue of song: \(song.title)")
             }
         }
     }
@@ -83,7 +83,7 @@ class MusicManager: NSObject {
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
-                println("\(_TAG)  ")
+                print("\(_TAG)  ")
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
             player.repeatMode = .One
@@ -108,23 +108,26 @@ class MusicManager: NSObject {
     
     // MARK: get all MPMediaItems
     func loadLocalSongs(){
-        var songCollection = MPMediaQuery.songsQuery()
-        uniqueSongs = (songCollection.items as! [MPMediaItem]).filter({song in song.playbackDuration > 30 })
+        let songCollection = MPMediaQuery.songsQuery()
+        uniqueSongs = songCollection.items!.filter {
+            song in
+            song.playbackDuration > 30
+        }
     }
     
     func loadLocalAlbums(){
         //start new albums fresh
         var collectionInAlbum = [MPMediaItem]() // a collection of each album's represenstative item
-        var albumQuery = MPMediaQuery()
+        let albumQuery = MPMediaQuery()
         albumQuery.groupingType = MPMediaGrouping.Album;
-        for album in albumQuery.collections{
-            var representativeItem = album.representativeItem as MPMediaItem
+        for album in albumQuery.collections!{
+            let representativeItem = album.representativeItem!
             
             //there is no song shorter than 30 seconds
             if representativeItem.playbackDuration < 30 { continue }
             
             collectionInAlbum.append(representativeItem)
-            var thisAlbum = Album(theItem: representativeItem)
+            let thisAlbum = Album(theItem: representativeItem)
             uniqueAlbums.append(thisAlbum)
         }
     }
@@ -133,16 +136,16 @@ class MusicManager: NSObject {
     func loadLocalArtist(){
         
         var allArtistRepresentiveSong = [MPMediaItem]() // a list of one song per artist
-        var artistQuery = MPMediaQuery()
+        let artistQuery = MPMediaQuery()
         artistQuery.groupingType = MPMediaGrouping.Artist
-        for artist in artistQuery.collections {
-            var representativeItem = artist.representativeItem as MPMediaItem
+        for artist in artistQuery.collections! {
+            let representativeItem = artist.representativeItem!
             if representativeItem.playbackDuration < 30 { continue }
             allArtistRepresentiveSong.append(representativeItem)
             
-            var artist = Artist(artist: representativeItem.artist)
+            var artist = Artist(artist: representativeItem.artist!)
             
-            uniqueAlbums.sort({ album1, album2 in
+            uniqueAlbums.sortInPlace({ album1, album2 in
                 if let album1date = album1.releasedDate, let album2date = album2.releasedDate {
                     return album1date.isGreaterThanDate(album2date)
                 } else {

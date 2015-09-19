@@ -39,7 +39,7 @@ class SoundWaveView: UIView {
         
     }
     
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -84,18 +84,16 @@ class SoundWaveView: UIView {
     class func renderWavefromInContext(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
         
         if(asset != nil ){
-            var pixelRatio:CGFloat = UIScreen.mainScreen().scale
-            var widthInPixels:CGFloat = size.width*pixelRatio
-            var heightInPixels:CGFloat = size.height*pixelRatio
+            let pixelRatio:CGFloat = UIScreen.mainScreen().scale
+            let widthInPixels:CGFloat = size.width*pixelRatio
+            let heightInPixels:CGFloat = size.height*pixelRatio
             
-            var error:NSError?
+            let reader: AVAssetReader = try! AVAssetReader(asset: asset!)
             
-            
-            var reader:AVAssetReader = AVAssetReader(asset:asset, error:&error)
-            var audioTrackArray:NSArray = asset!.tracksWithMediaType(AVMediaTypeAudio)
+            let audioTrackArray:NSArray = asset!.tracksWithMediaType(AVMediaTypeAudio)
             
             if(audioTrackArray.count != 0){
-                var songTrack:AVAssetTrack = audioTrackArray[0] as! AVAssetTrack
+                let songTrack:AVAssetTrack = audioTrackArray[0] as! AVAssetTrack
                 
                 var outputSettingsDict:NSDictionary  = NSDictionary()
                 
@@ -106,17 +104,17 @@ class SoundWaveView: UIView {
                     AVLinearPCMIsFloatKey:NSNumber(bool: false),
                     AVLinearPCMIsNonInterleaved:NSNumber(bool: false)]
                 
-                var output:AVAssetReaderTrackOutput = AVAssetReaderTrackOutput(track: songTrack, outputSettings: outputSettingsDict as [NSObject : AnyObject])
+                let output: AVAssetReaderTrackOutput = AVAssetReaderTrackOutput(track: songTrack, outputSettings: outputSettingsDict as? [String : AnyObject])
                 
                 reader.addOutput(output)
-                
-                var channelCount:UInt32!
-                var formatDesc:NSArray = songTrack.formatDescriptions
+
+                var channelCount: UInt32!
+                let formatDesc:NSArray = songTrack.formatDescriptions
                
                 
                 for(var i:Int = 0; i < formatDesc.count; i++){
                     
-                    var item:CMAudioFormatDescriptionRef = formatDesc[i] as! CMAudioFormatDescriptionRef
+                    let item:CMAudioFormatDescriptionRef = formatDesc[i] as! CMAudioFormatDescriptionRef
                     let fmtDesc:AudioStreamBasicDescription? = CMAudioFormatDescriptionGetStreamBasicDescription(item).memory
                     
                     
@@ -133,24 +131,24 @@ class SoundWaveView: UIView {
                 CGContextSetStrokeColorWithColor(context, color.CGColor)
                 CGContextSetFillColorWithColor(context, color.CGColor)
                 
-                var bytesPreInputSample:UInt32 = 2 * channelCount
-                var totalSamples: UInt64 = UInt64(asset!.duration.value)
+                let bytesPreInputSample:UInt32 = 2 * channelCount
+                let totalSamples: UInt64 = UInt64(asset!.duration.value)
                 var samplesPerPixel:NSInteger = NSInteger(CGFloat(totalSamples)  / widthInPixels)
                 samplesPerPixel = samplesPerPixel < 1 ? 1 : samplesPerPixel
                 
                 reader.startReading()
                 
-                var halfGraphHeight:Float = Float(heightInPixels) / 2
+                let halfGraphHeight:Float = Float(heightInPixels) / 2
                 var bigSample:Double = 0
                 var bigSampleCount:NSInteger = 0
-                var data:NSMutableData = NSMutableData(length: 32768)!
+                let data:NSMutableData = NSMutableData(length: 32768)!
                 
                 var currentX:CGFloat = 0
                 //var count:Int = 0
                 
                 while (reader.status == AVAssetReaderStatus.Reading)
                 {
-                    var sampleBufferRef:CMSampleBufferRef? = output.copyNextSampleBuffer()
+                    let sampleBufferRef:CMSampleBufferRef? = output.copyNextSampleBuffer()
                     //count++;
                     
 //                    if(count == 100 ) {
@@ -159,15 +157,16 @@ class SoundWaveView: UIView {
                     
                     if (sampleBufferRef != nil)
                     {
-                        var blockBufferRef:CMBlockBufferRef? = CMSampleBufferGetDataBuffer(sampleBufferRef);
-                        var bufferLength:size_t = CMBlockBufferGetDataLength(blockBufferRef)
+                        let blockBufferRef:CMBlockBufferRef? = CMSampleBufferGetDataBuffer(sampleBufferRef!);
+                        let bufferLength:size_t = CMBlockBufferGetDataLength(blockBufferRef!)
                         
                         if(data.length < bufferLength){
                             data.length = bufferLength
                         }
-                        CMBlockBufferCopyDataBytes(blockBufferRef, 0, bufferLength, data.mutableBytes)
+                        CMBlockBufferCopyDataBytes(blockBufferRef!, 0, bufferLength, data.mutableBytes)
+                        
                         var samples:UnsafeMutablePointer<Int16> = UnsafeMutablePointer<Int16>(data.mutableBytes)
-                        var sampleCount:Int = (Int(bufferLength) / Int(bytesPreInputSample))
+                        let sampleCount:Int = (Int(bufferLength) / Int(bytesPreInputSample))
                         
                         for(var i:Int = 0; i < sampleCount; i++){
                             
@@ -193,7 +192,7 @@ class SoundWaveView: UIView {
                             bigSampleCount++
                             
                             if(bigSampleCount == 8*samplesPerPixel){
-                                var averageSample:Double = bigSample / Double(bigSampleCount)
+                                let averageSample:Double = bigSample / Double(bigSampleCount)
                                 
                                 
                                 renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*8)
@@ -204,7 +203,7 @@ class SoundWaveView: UIView {
                                 
                             }
                         }
-                        CMSampleBufferInvalidate(sampleBufferRef)
+                        CMSampleBufferInvalidate(sampleBufferRef!)
                     }
                 }
                 
@@ -221,12 +220,12 @@ class SoundWaveView: UIView {
     class func generateWaveformImage(asset:AVAsset, color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
         
         
-        var ratio:CGFloat = UIScreen.mainScreen().scale
+        let ratio:CGFloat = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width * ratio, size.height * ratio), false, 1);
         
-        SoundWaveView.renderWavefromInContext(UIGraphicsGetCurrentContext(), asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+        SoundWaveView.renderWavefromInContext(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
         
-        var image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
+        let image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
         
         UIGraphicsEndImageContext();
         
@@ -235,18 +234,18 @@ class SoundWaveView: UIView {
     
     
     class func recolorizeImage(image:UIImage, color:UIColor) -> UIImage{
-        var imageRect:CGRect = CGRectMake(0, 0, image.size.width, image.size.height)
+        let imageRect:CGRect = CGRectMake(0, 0, image.size.width, image.size.height)
         UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
         
-        var context:CGContextRef = UIGraphicsGetCurrentContext()
+        let context:CGContextRef = UIGraphicsGetCurrentContext()!
         CGContextTranslateCTM(context, 0.0, image.size.height)
         CGContextScaleCTM(context, 1.0, -1.0)
         CGContextDrawImage(context, imageRect, image.CGImage)
         
         color.set()
         
-        UIRectFillUsingBlendMode(imageRect, kCGBlendModeSourceAtop)
-        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIRectFillUsingBlendMode(imageRect, CGBlendMode.SourceAtop)
+        let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
         return newImage
@@ -263,7 +262,7 @@ class SoundWaveView: UIView {
     }
     func generateWaveforms(){
         
-        var rect:CGRect = self.bounds
+        let rect:CGRect = self.bounds
        
         
         if(self.asset != nil){
@@ -283,8 +282,8 @@ class SoundWaveView: UIView {
     }
     
     func applyProgressToSubviews(){
-        var bs:CGRect = self.bounds
-        var progressWidth:CGFloat = bs.size.width * progress
+        let bs:CGRect = self.bounds
+        let progressWidth:CGFloat = bs.size.width * progress
         cropProgressView.frame = CGRectMake(0, 0, progressWidth, bs.size.height);
         cropNormalView.frame = CGRectMake(progressWidth, 0, bs.size.width - progressWidth, bs.size.height);
         normalImageView.frame = CGRectMake(-progressWidth, 0, bs.size.width, bs.size.height);
@@ -294,7 +293,7 @@ class SoundWaveView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        var bs:CGRect = self.bounds;
+        let bs:CGRect = self.bounds;
         normalImageView.frame = bs;
         progressImageView.frame = bs;
         
@@ -348,10 +347,6 @@ class SoundWaveView: UIView {
     {
         return self.progressImageView.image!
     }
-    
-    
-    
-    
-   
+
 }
 

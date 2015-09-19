@@ -50,7 +50,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         synced(self) {
             let player = MusicManager.sharedInstance.player
             if player.repeatMode == .One {
-                println("\(player.nowPlayingItem.title) is repeating")
+                print("\(player.nowPlayingItem!.title) is repeating")
                 return
             }
             
@@ -75,7 +75,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
         
         if let date = theArtist.getAlbums()[section].releasedDate {
-            let comps = NSCalendar.currentCalendar().components(.CalendarUnitYear, fromDate: date)
+            let comps = NSCalendar.currentCalendar().components(.Year, fromDate: date)
             cell.albumYearLabel.text = "\(comps.year)"
         } else {
             cell.albumYearLabel.hidden = true
@@ -139,14 +139,14 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
     // when selecting section 2 2nd song, we iterate through all previous albums tracks
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var albumIndex = indexPath.section
+        let albumIndex = indexPath.section
         var songsInPreviousSections = 0
         if albumIndex > 0 {
             for i in 1...albumIndex {
                songsInPreviousSections += theArtist.getAlbums()[i-1].numberOfTracks
             }
         }
-        var indexToBePlayed = songsInPreviousSections + indexPath.row
+        let indexToBePlayed = songsInPreviousSections + indexPath.row
         
         MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
         MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)

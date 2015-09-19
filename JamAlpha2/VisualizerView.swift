@@ -22,10 +22,10 @@ class VisualizerView: UIView {
     {
     
         self.frame = CGRectMake(0, 0, CGFloat(kPadding*(numberOfBars+4)+(kWidth*numberOfBars)), 50);
-        var tempBarArray:NSMutableArray = NSMutableArray(capacity: numberOfBars)
+        let tempBarArray:NSMutableArray = NSMutableArray(capacity: numberOfBars)
         
         for i in 0..<numberOfBars {
-            var bar:UIImageView = UIImageView(frame: CGRectMake(CGFloat(kWidth*2+i*kWidth+i*kPadding), 5 , CGFloat(kWidth), 10))
+            let bar:UIImageView = UIImageView(frame: CGRectMake(CGFloat(kWidth*2+i*kWidth+i*kPadding), 5 , CGFloat(kWidth), 10))
             
             bar.backgroundColor = UIColor.whiteColor()
             
@@ -36,7 +36,7 @@ class VisualizerView: UIView {
         
         self.barArray = NSArray(array: tempBarArray)
     
-        var transform:CGAffineTransform = CGAffineTransformMakeRotation(CGFloat(M_PI_2*2))
+        let transform:CGAffineTransform = CGAffineTransformMakeRotation(CGFloat(M_PI_2*2))
         self.transform = transform
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "stop", name: "stopTimer", object: nil)

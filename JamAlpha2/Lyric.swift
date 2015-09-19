@@ -29,7 +29,7 @@ class Lyric: NSObject{
     
     
     class func getRainbowLyrics ()-> Lyric {
-        var lyric = Lyric()
+        let lyric = Lyric()
         
         lyric.addLine(TimeNumber(time:12.56), str: "哪里有彩虹告诉我")
         lyric.addLine(TimeNumber(time:18.80), str: "能不能把我的愿望还给我")
@@ -51,7 +51,7 @@ class Lyric: NSObject{
     }
     
     class func getRollingLyrics()-> Lyric {
-        var lyric = Lyric()
+        let lyric = Lyric()
         lyric.addLine(TimeNumber(time:5.35), str: "There's a fire starting in my heart")
         lyric.addLine(TimeNumber(time: 9.85), str: "Reaching a fever pitch, it's bringing me out the dark")
         lyric.addLine(TimeNumber(time:14.66), str: "Finally I can see you crystal clear")
@@ -70,7 +70,7 @@ class Lyric: NSObject{
     }
     
     class func getJasonMrazLyrics() -> Lyric {
-        var lyric = Lyric()
+        let lyric = Lyric()
         lyric.addLine(TimeNumber(time: 12.77), str: "Well, you done done me and you bet I felt it")
         lyric.addLine(TimeNumber(time: 16.31), str: "I tried to be chill, but you're so hot that I melted")
         lyric.addLine(TimeNumber(time: 19.70), str: "I fell right through the cracks")
@@ -88,7 +88,7 @@ class Lyric: NSObject{
     }
     
     class func getDaughters() -> Lyric {
-        var lyric = Lyric()
+        let lyric = Lyric()
         lyric.addLine(TimeNumber(time: 21.33), str: "I know a girl")
         lyric.addLine(TimeNumber(time: 25.88), str: "She puts the color inside of my world")
         lyric.addLine(TimeNumber(time: 33.35), str: "But she's just like a maze")
@@ -107,7 +107,7 @@ class Lyric: NSObject{
     }
     
     class func getExtremeLyrics()-> Lyric {
-        var lyric = Lyric()
+        let lyric = Lyric()
         
         lyric.addLine(TimeNumber(time: 22.11), str: "Saying I love you")
         lyric.addLine(TimeNumber(time: 25.96 ), str: "Is not the words I want to hear from you")
