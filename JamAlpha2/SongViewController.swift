@@ -115,6 +115,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var guitarButton:UIButton!
     var othersButton:UIButton!
     
+    var guitarActionViewController: GuitarActionViewController!
+    var actionViewHeight: CGFloat = 44 * 5 // a row height * number of rows
+    var actionDismissButton: UIButton!
+    
     var textColor:UIColor!
     
     //var actionSheet:TwistJamActionSheet!
@@ -731,6 +735,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         guitarButton.setImage((UIImage(named: "guitar_settings")), forState: UIControlState.Normal)
 
         guitarButton.addTarget(self, action: "showGuitarActions", forControlEvents: UIControlEvents.TouchUpInside)
+        addGuitarActionViewController()
+        
+       
+        actionDismissButton = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height-actionViewHeight))
+        actionDismissButton.backgroundColor = UIColor.clearColor()
+        actionDismissButton.addTarget(self, action: "dismissAction:", forControlEvents: .TouchUpInside)
+        self.view.addSubview(actionDismissButton)
+        actionDismissButton.hidden = true
+        
         othersButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         othersButton.setImage(UIImage(named: "more_options"), forState: UIControlState.Normal)
         othersButton.center.y = bottomViewHeight / 2
@@ -767,7 +780,37 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    func addGuitarActionViewController() {
+        guitarActionViewController = self.storyboard?.instantiateViewControllerWithIdentifier("guitaractionviewcontroller") as! GuitarActionViewController
+        self.addChildViewController(guitarActionViewController)
+        guitarActionViewController.view.frame = CGRectMake(0, self.view.frame.height, self.view.frame.height, self.view.frame.height/2)
+        self.view.addSubview(guitarActionViewController.view)
+        guitarActionViewController.didMoveToParentViewController(self)
+    }
+    
+    func dismissAction(button: UIButton) {
+        UIView.animateWithDuration(0.3, animations: {
+            self.guitarActionViewController.view.frame = CGRectMake(0, self.view.frame.height, self.view.frame.height, self.actionViewHeight)
+            self.actionDismissButton.backgroundColor = UIColor.clearColor()
+            
+            }, completion: {
+                completed in
+                self.actionDismissButton.hidden = true
+        })
+        
+    }
+    
     func showGuitarActions(){
+        actionDismissButton.hidden = false
+        UIView.animateWithDuration(0.3, animations: {
+            self.guitarActionViewController.view.frame = CGRectMake(0, self.view.frame.height-self.actionViewHeight, self.view.frame.width, self.actionViewHeight)
+                self.actionDismissButton.backgroundColor = UIColor.darkGrayColor()
+                self.actionDismissButton.alpha = 0.3
+            }, completion: {
+            completed in
+                
+            
+        })
 //        actionSheet = TwistJamActionSheet()
 //        actionSheet.needRunningManSlider = true
 //        actionSheet.songVC = self
