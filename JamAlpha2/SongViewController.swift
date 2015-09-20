@@ -1129,7 +1129,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomLyricLabel.text = "End~"
         }
     }
-  
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
