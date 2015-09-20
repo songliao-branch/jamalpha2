@@ -737,7 +737,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // add this layer first before adding two action views to prevent view blocking
         actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         actionDismissLayerButton.backgroundColor = UIColor.clearColor()
-        actionDismissLayerButton.addTarget(self, action: "dismissAction:", forControlEvents: .TouchUpInside)
+        actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
         self.view.addSubview(actionDismissLayerButton)
         actionDismissLayerButton.hidden = true
         
@@ -794,7 +794,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     // MARK: guitar buttons
-    func dismissAction(button: UIButton) {
+    func dismissAction() {
         UIView.animateWithDuration(0.3, animations: {
             
             if self.guitarActionView.frame.origin.y < self.view.frame.height - 10 {
@@ -856,15 +856,26 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tabsEditorVC.theSong = self.player.nowPlayingItem
         print("show action clicked")
         self.player.pause()
-        self.presentViewController(tabsEditorVC, animated: true, completion: nil)
+        self.presentViewController(tabsEditorVC, animated: true, completion: {
+            completed in
+            self.dismissAction()
+        })
     }
     
     func goToLyricsEditor() {
+        let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
+        as! LyricsTextViewController
         
+        lyricsEditor.theSong = self.player.nowPlayingItem
+        self.player.pause()
+        self.presentViewController(lyricsEditor, animated: true, completion: {
+            completed in
+            self.dismissAction()
+        })
     }
     
     func goToArtist() {
-    
+        
     }
 
     func goToAlbum() {

@@ -504,6 +504,42 @@
             </objects>
             <point key="canvasLocation" x="2059" y="675"/>
         </scene>
+        <!--Lyrics Text View Controller-->
+        <scene sceneID="F8c-mt-Qd9">
+            <objects>
+                <viewController storyboardIdentifier="lyricstextviewcontroller" id="Yc6-xh-ZrB" customClass="LyricsTextViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="6Wc-7P-j1S"/>
+                        <viewControllerLayoutGuide type="bottom" id="HWp-Fy-XFI"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="OZI-iw-65e">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ojH-Bi-cBz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2059" y="1309"/>
+        </scene>
+        <!--Lyrics Sync View Controller-->
+        <scene sceneID="1gc-YX-iw8">
+            <objects>
+                <viewController storyboardIdentifier="lyricssyncviewcontroller" id="hoq-mC-HQn" customClass="LyricsSyncViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Zfw-qQ-zyd"/>
+                        <viewControllerLayoutGuide type="bottom" id="5bO-ze-QbO"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Tdm-Ja-kcx">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1g1-iF-pFl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2449" y="1309"/>
+        </scene>
         <!--Me-->
         <scene sceneID="eAN-Ol-AA5">
             <objects>

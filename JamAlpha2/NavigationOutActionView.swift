@@ -28,28 +28,42 @@ class NavigationOutActionView: UIView {
         addTabsButton = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: rowHeight))
         addTabsButton.setTitle("Add your tabs", forState: .Normal)
         addTabsButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        addTabsButton.addTarget(self, action: "goToTabs:", forControlEvents: .TouchUpInside)
         self.addSubview(addTabsButton)
         
         addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
         addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
         addLyricsButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        addLyricsButton.addTarget(self, action: "goToLyrics:", forControlEvents: .TouchUpInside)
         self.addSubview(addLyricsButton)
         
         goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
         goToArtistButton.setTitle("Go to artist", forState: .Normal)
         goToArtistButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        goToArtistButton.addTarget(self, action: "goToArtist:", forControlEvents: .TouchUpInside)
         self.addSubview(goToArtistButton)
         
         goToAlbumButton = UIButton(frame: CGRect(x: 0, y: rowHeight*3, width: width, height: rowHeight))
         goToAlbumButton.setTitle("Go to album", forState: .Normal)
         goToAlbumButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        goToAlbumButton.addTarget(self, action: "goToAlbum:", forControlEvents: .TouchUpInside)
         self.addSubview(goToAlbumButton)
-        
-        addTabsButton.addTarget(self, action: "goToTabs:", forControlEvents: .TouchUpInside)
     }
     
     func goToTabs(button: UIButton) {
         songViewController.goToTabsEditor()
+    }
+    
+    func goToLyrics(button: UIButton) {
+        songViewController.goToLyricsEditor()
+    }
+    
+    func goToArist(button: UIButton) {
+        songViewController.goToArtist()
+    }
+    
+    func goToAlbum(button: UIButton) {
+        songViewController.goToAlbum()
     }
     
 
