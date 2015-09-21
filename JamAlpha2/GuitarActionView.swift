@@ -78,10 +78,33 @@ class GuitarActionView: UIView {
         }
         
         chordsSwitch = switchHolders[0]
+        chordsSwitch.addTarget(self, action: "chordsSwitchChanged:", forControlEvents: .ValueChanged)
+        
         tabsSwitch = switchHolders[1]
+        tabsSwitch.addTarget(self, action: "tabsSwitchChanged:", forControlEvents: .ValueChanged)
+        
         lyricsSwitch = switchHolders[2]
+        lyricsSwitch.addTarget(self, action: "lyricsSwitchChanged:", forControlEvents: .ValueChanged)
         countdownSwitch = switchHolders[3]
+        countdownSwitch.addTarget(self, action: "countDownChanged:", forControlEvents: .ValueChanged)
     }
+    
+    func chordsSwitchChanged(uiswitch: UISwitch) {
+        songViewController.chordsSwitchChanged(uiswitch)
+    }
+    
+    func tabsSwitchChanged(uiswitch: UISwitch) {
+        songViewController.tabsSwitchChanged(uiswitch)
+    }
+    
+    func lyricsSwitchChanged(uiswitch: UISwitch) {
+        songViewController.lyricsSwitchChanged(uiswitch)
+    }
+    
+    func countDownChanged(uiswitch: UISwitch) {
+        songViewController.countDownChanged(uiswitch)
+    }
+    
     
 
 }

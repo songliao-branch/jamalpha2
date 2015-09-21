@@ -832,8 +832,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 //            updateAll(Float(player.currentPlaybackTime))
 //            startTimer()
 //        }
-        
     }
+    
+
+    
     func showNavigationOutActions() {
         
         actionDismissLayerButton.hidden = false
@@ -843,6 +845,26 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.actionDismissLayerButton.alpha = 0.3
             }, completion: nil)
     }
+    
+    //MARK: functions called from guitar action views
+    func chordsSwitchChanged(uiswitch: UISwitch) {
+        print("chords switch is \(uiswitch.on)")
+    }
+    
+    func tabsSwitchChanged(uiswitch: UISwitch) {
+        
+    }
+    
+    func lyricsSwitchChanged(uiswitch: UISwitch) {
+        
+    }
+    
+    func countDownChanged(uiswitch: UISwitch) {
+        
+    }
+    
+
+    
     
     // MARK: functions used in NavigationOutView
     func goToTabsEditor() {
