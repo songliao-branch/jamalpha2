@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 import MediaPlayer
 
-class SongManager: NSObject {
+class MusicDataManager: NSObject {
 
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     

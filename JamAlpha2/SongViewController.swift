@@ -5,10 +5,6 @@ let chordwithname:Int = 1
 let fullchord:Int = 0
 
 let stepPerSecond: Float = 50   //steps of chord move persecond
-
-
-
-
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4
@@ -20,7 +16,7 @@ let SingleMode: Int = 1
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
-    var songManager = SongManager()
+    var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 4
     var minfont: CGFloat = 15
@@ -421,11 +417,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
             if self.firstloadSongTitle != nowPlayingItem!.title && self.firstLoadSongTime != nowPlayingItem!.playbackDuration {
-                
-//                if(self.actionSheet != nil && self.actionSheet.isTwistJamActionSheetShow == true){
-// 
-//                    self.actionSheet!.dismissAnimated(true)
-//                }
+
                 self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
                 self.setUpMusicData(nowPlayingItem!)
@@ -551,7 +543,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
         
-        if let soundWaveData = songManager.getSongWaveForm(player.nowPlayingItem!) {
+        if let soundWaveData = musicDataManager.getSongWaveForm(player.nowPlayingItem!) {
             progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
         } else {
@@ -563,7 +555,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             print("generating sound wave..")
             self.progressBlock.SetSoundURL(assetURL as! NSURL)
             let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
-            self.songManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
+            self.musicDataManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
         }
         
         self.progressBlockContainer.addSubview(self.progressBlock)
@@ -748,10 +740,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // NOTE: we have to call all the embedded action events from the custom views, not in this class.
         guitarActionView = GuitarActionView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: guitarActionViewHeight))
         guitarActionView.backgroundColor = UIColor.whiteColor()
+        guitarActionView.alpha = 0.9
         guitarActionView.songViewController = self
         self.view.addSubview(guitarActionView)
 
-        
         othersButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         othersButton.setImage(UIImage(named: "more_options"), forState: UIControlState.Normal)
         othersButton.center.y = bottomViewHeight / 2
@@ -759,6 +751,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         navigationOutActionView = NavigationOutActionView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: navigationOutActionViewHeight))
         navigationOutActionView.backgroundColor = UIColor.whiteColor()
+        navigationOutActionView.alpha = 0.9
         navigationOutActionView.songViewController = self
         self.view.addSubview(navigationOutActionView)
         
@@ -802,6 +795,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             if self.navigationOutActionView.frame.origin.y < self.view.frame.height - 10 {
+                print("dismiss navigation action")
                 self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.width, self.navigationOutActionViewHeight)
             }
 
@@ -838,6 +832,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 //            updateAll(Float(player.currentPlaybackTime))
 //            startTimer()
 //        }
+        
     }
     func showNavigationOutActions() {
         
@@ -856,10 +851,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tabsEditorVC.theSong = self.player.nowPlayingItem
         print("show action clicked")
         self.player.pause()
-        self.presentViewController(tabsEditorVC, animated: true, completion: {
-            completed in
-            self.dismissAction()
-        })
+        self.dismissAction()
+        self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
     func goToLyricsEditor() {
@@ -868,10 +861,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         lyricsEditor.theSong = self.player.nowPlayingItem
         self.player.pause()
-        self.presentViewController(lyricsEditor, animated: true, completion: {
-            completed in
-            self.dismissAction()
-        })
+        self.dismissAction()
+        self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }
     
     func goToArtist() {

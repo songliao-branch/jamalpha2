@@ -980,7 +980,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if self.intoEditView == true {
             self.backToMainView()
         } else {
-            self.progressBlock.hidden = true
+            print("back to song view controller")
             self.dismissViewControllerAnimated(true, completion: nil)
         }
     }

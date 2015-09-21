@@ -183,21 +183,18 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.textAlignment = NSTextAlignment.Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
-        self.lyricsTextView.text = "When your legs don't work like they used to before\nAnd I can't sweep you off of your feet\nWill your mouth still remember the taste of my love?\nWill your eyes still smile from your cheeks?\nAnd, darling, I will be loving you 'til we're 70\nAnd, baby, my heart could still fall as hard at 23\nAnd I'm thinking 'bout how people fall in love in mysterious ways\nMaybe just the touch of a hand\nWell, me - I fall in love with you every single day\nAnd I just wanna tell you I am\nSo honey now\nTake me into your loving arms\nKiss me under the light of a thousand stars\nPlace your head on my beating heart\nI'm thinking out loud\nMaybe we found love right where we are\nWhen my hair's all but gone and my memory fades\nAnd the crowds don't remember my name\nWhen my hands don't play the strings the same way (mmm...)\nI know you will still love me the same\n'Cause honey your soul could never grow old, it's evergreen\nAnd, baby, your smile's forever in my mind and memory\nI'm thinking 'bout how people fall in love in mysterious ways\nMaybe it's all part of a plan\nWell, I'll just keep on making the same mistakes\nHoping that you'll understand\nThat, baby, now\nTake me into your loving arms\nKiss me under the light of a thousand stars\nPlace your head on my beating heart\nThinking out loud\nMaybe we found love right where we are (oh ohh)\nLa la la la la la la la lo-ud\nSo, baby, now\nTake me into your loving arms\nKiss me under the light of a thousand stars\nOh, darling, place your head on my beating heart\nI'm thinking out loud\nBut maybe we found love right where we are\nOh, baby, we found love right where we are\nAnd we found love right where we are"
-
-        self.view.addSubview(self.lyricsTextView)
+        self.lyricsTextView.text = "Put lyrics here.."
         
+        self.view.addSubview(self.lyricsTextView)
     }
     
     func pressBackButton(sender: UIButton) {
-        print("back button")
-        
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     func pressDoneButton(sender: UIButton) {
         print("done button")
-        //self.lyricsReorganizedArray = ["When your legs don't work like they used to before And I can not sweep you off of your feet", "Will your mouth still remember the taste of my love?", "And I can not sweep you off of your feet", "Will your mouth still remember the taste of my love?", "Will your eyes still smile from your cheeks?", "And, darling, I will be loving you 'til we're 70", "And, baby, my heart could still fall as hard at 23", "And I'm thinking 'bout how people fall in love in mysterious ways", "Maybe just the touch of a hand", "Well, me - I fall in love with you every single day", "And I just wanna tell you I am", "So honey now", "Take me into your loving arms", "Kiss me under the light of a thousand stars", "Place your head on my beating heart", "I'm thinking out loud", "Maybe we found love right where we are", "When my hair's all but gone and my memory fades", "And the crowds don't remember my name", "When my hands don't play the strings the same way (mmm...)", "I know you will still love me the same", "'Cause honey your soul could never grow old, it's evergreen", "And, baby, your smile's forever in my mind and memory", "I'm thinking 'bout how people fall in love in mysterious ways", "Maybe it's all part of a plan", "Well, I'll just keep on making the same mistakes", "Hoping that you'll understand", "That, baby, now", "Take me into your loving arms", "Kiss me under the light of a thousand stars", "Place your head on my beating heart", "Thinking out loud", "Maybe we found love right where we are (oh ohh)", "La la la la la la la la lo-ud", "So, baby, now", "Take me into your loving arms", "Kiss me under the light of a thousand stars", "Oh, darling, place your head on my beating heart", "I'm thinking out loud", "But maybe we found love right where we are", "Oh, baby, we found love right where we are", "And we found love right where we are"]
+
         self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         

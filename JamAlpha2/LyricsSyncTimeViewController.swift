@@ -27,7 +27,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             self.timeTextStyle = [String](count: count, repeatedValue: "0.0:0.0")
         }
     }
-
+    
     var lyricsTableView: UITableView = UITableView()
     
     var lyricsFromTextView: String!

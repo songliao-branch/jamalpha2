@@ -30,7 +30,7 @@
 		E44359021B1947660091E926 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359011B1947660091E926 /* Album.swift */; };
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
 		E455E7291BA272AD00210BD6 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E7281BA272AD00210BD6 /* Song.swift */; };
-		E455E72B1BA2760300210BD6 /* SongManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E72A1BA2760300210BD6 /* SongManager.swift */; };
+		E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E72A1BA2760300210BD6 /* MusicDataManager.swift */; };
 		E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456457D1B3BB15C00276287 /* ChordBase.swift */; };
 		E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6BB71B16C1860018645D /* ArtistViewController.swift */; };
 		E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */; };
@@ -114,7 +114,7 @@
 		E44359011B1947660091E926 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		E455E7281BA272AD00210BD6 /* Song.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
-		E455E72A1BA2760300210BD6 /* SongManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongManager.swift; sourceTree = "<group>"; };
+		E455E72A1BA2760300210BD6 /* MusicDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicDataManager.swift; sourceTree = "<group>"; };
 		E456457D1B3BB15C00276287 /* ChordBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordBase.swift; sourceTree = "<group>"; };
 		E45F6BB71B16C1860018645D /* ArtistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistViewController.swift; sourceTree = "<group>"; };
 		E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTransitionAnimation.swift; sourceTree = "<group>"; };
@@ -410,7 +410,7 @@
 				E41D6CFC1BA149BF006A9993 /* Helper */,
 				E43DA1271B9FA8AB003180FB /* Models */,
 				E4CBBFF51B9E88A600473FC4 /* TabsData.swift */,
-				E455E72A1BA2760300210BD6 /* SongManager.swift */,
+				E455E72A1BA2760300210BD6 /* MusicDataManager.swift */,
 				E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */,
 				E4CBC0021B9E88BA00473FC4 /* TJDatabase.xcdatamodeld */,
 			);
@@ -605,7 +605,7 @@
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
-				E455E72B1BA2760300210BD6 /* SongManager.swift in Sources */,
+				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
 				E488E5B71BAE6BD800A94E82 /* GuitarActionView.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
