@@ -323,6 +323,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    let removeButton: UIButton = UIButton()
+    
     var statusLabel: UIImageView = UIImageView()
     func addObjectsOnMainView() {
         
@@ -337,7 +339,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         let tuningButton: UIButton = UIButton()
         let resetButton: UIButton = UIButton()
-        let removeButton: UIButton = UIButton()
+        
         let addButton: UIButton = UIButton()
         let doneButton: UIButton = UIButton()
 
@@ -608,7 +610,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             removeObjectsOnCompleteStringView()
             data.removeNewTab(index, name: name!)
             
-            //self.changeRemoveButtonStatus(self.removeButton)
+            self.changeRemoveButtonStatus(self.removeButton)
         }
     }
     
@@ -628,7 +630,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let alertController = UIAlertController(title: "Warning", message: "Cannot delete build in tabs", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
             self.presentViewController(alertController, animated: true, completion: nil)
-            //self.changeRemoveButtonStatus(self.removeButton)
+            self.changeRemoveButtonStatus(self.removeButton)
         }
     }
     
@@ -978,7 +980,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if self.intoEditView == true {
             self.backToMainView()
         } else {
-            self.progressBlock.hidden = true
+            print("back to song view controller")
             self.dismissViewControllerAnimated(true, completion: nil)
         }
     }

@@ -5,10 +5,6 @@ let chordwithname:Int = 1
 let fullchord:Int = 0
 
 let stepPerSecond: Float = 50   //steps of chord move persecond
-
-
-
-
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4
@@ -20,7 +16,7 @@ let SingleMode: Int = 1
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
 
-    var songManager = SongManager()
+    var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 4
     var minfont: CGFloat = 15
@@ -114,6 +110,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var shuffleButton:UIButton!
     var guitarButton:UIButton!
     var othersButton:UIButton!
+    var guitarActionView: GuitarActionView! // for actions used inside this class
+    // includes volume change ,speed change, show/hide chords, tabs, lyrics, countdown
+    var navigationOutActionView: NavigationOutActionView!
+    
+    var guitarActionViewHeight: CGFloat = 44 * 6 // a row height * number of rows
+    var navigationOutActionViewHeight: CGFloat = 44 * 4
+    var actionDismissLayerButton: UIButton!
     
     var textColor:UIColor!
     
@@ -163,7 +166,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         //get top and bottom points of six lines
         calculateXPoints()
-        
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
@@ -415,11 +417,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
             if self.firstloadSongTitle != nowPlayingItem!.title && self.firstLoadSongTime != nowPlayingItem!.playbackDuration {
-                
-//                if(self.actionSheet != nil && self.actionSheet.isTwistJamActionSheetShow == true){
-// 
-//                    self.actionSheet!.dismissAnimated(true)
-//                }
+
                 self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
                 self.setUpMusicData(nowPlayingItem!)
@@ -545,7 +543,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
         
-        if let soundWaveData = songManager.getSongWaveForm(player.nowPlayingItem!) {
+        if let soundWaveData = musicDataManager.getSongWaveForm(player.nowPlayingItem!) {
             progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
         } else {
@@ -557,7 +555,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             print("generating sound wave..")
             self.progressBlock.SetSoundURL(assetURL as! NSURL)
             let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
-            self.songManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
+            self.musicDataManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
         }
         
         self.progressBlockContainer.addSubview(self.progressBlock)
@@ -727,14 +725,35 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
+        
+        // add this layer first before adding two action views to prevent view blocking
+        actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        actionDismissLayerButton.backgroundColor = UIColor.clearColor()
+        actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
+        self.view.addSubview(actionDismissLayerButton)
+        actionDismissLayerButton.hidden = true
+        
         guitarButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         guitarButton.setImage((UIImage(named: "guitar_settings")), forState: UIControlState.Normal)
-
         guitarButton.addTarget(self, action: "showGuitarActions", forControlEvents: UIControlEvents.TouchUpInside)
+        
+        // NOTE: we have to call all the embedded action events from the custom views, not in this class.
+        guitarActionView = GuitarActionView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: guitarActionViewHeight))
+        guitarActionView.backgroundColor = UIColor.whiteColor()
+        guitarActionView.alpha = 0.9
+        guitarActionView.songViewController = self
+        self.view.addSubview(guitarActionView)
+
         othersButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         othersButton.setImage(UIImage(named: "more_options"), forState: UIControlState.Normal)
         othersButton.center.y = bottomViewHeight / 2
-        othersButton.addTarget(self, action: "showActionSheet", forControlEvents: UIControlEvents.TouchUpInside)
+        othersButton.addTarget(self, action: "showNavigationOutActions", forControlEvents: UIControlEvents.TouchUpInside)
+        
+        navigationOutActionView = NavigationOutActionView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: navigationOutActionViewHeight))
+        navigationOutActionView.backgroundColor = UIColor.whiteColor()
+        navigationOutActionView.alpha = 0.9
+        navigationOutActionView.songViewController = self
+        self.view.addSubview(navigationOutActionView)
         
         var bottomButtons = [favoriateButton, shuffleButton, guitarButton, othersButton]
         var orderIndex: [CGFloat] = [1, 3, 5 , 7]//1/8, 3/8, 5/8, 7/8 of the width
@@ -767,7 +786,36 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    // MARK: guitar buttons
+    func dismissAction() {
+        UIView.animateWithDuration(0.3, animations: {
+            
+            if self.guitarActionView.frame.origin.y < self.view.frame.height - 10 {
+                self.guitarActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.height, self.guitarActionViewHeight)
+            }
+            
+            if self.navigationOutActionView.frame.origin.y < self.view.frame.height - 10 {
+                print("dismiss navigation action")
+                self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.width, self.navigationOutActionViewHeight)
+            }
+
+            self.actionDismissLayerButton.backgroundColor = UIColor.clearColor()
+            
+            }, completion: {
+                completed in
+                self.actionDismissLayerButton.hidden = true
+        })
+        
+    }
+    
     func showGuitarActions(){
+        actionDismissLayerButton.hidden = false
+        UIView.animateWithDuration(0.3, animations: {
+            self.guitarActionView.frame = CGRectMake(0, self.view.frame.height-self.guitarActionViewHeight, self.view.frame.width, self.guitarActionViewHeight)
+                self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
+                self.actionDismissLayerButton.alpha = 0.3
+            }, completion: nil)
+        
 //        actionSheet = TwistJamActionSheet()
 //        actionSheet.needRunningManSlider = true
 //        actionSheet.songVC = self
@@ -784,31 +832,44 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 //            updateAll(Float(player.currentPlaybackTime))
 //            startTimer()
 //        }
+        
+    }
+    func showNavigationOutActions() {
+        
+        actionDismissLayerButton.hidden = false
+        UIView.animateWithDuration(0.3, animations: {
+            self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height-self.navigationOutActionViewHeight, self.view.frame.width, self.navigationOutActionViewHeight)
+            self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
+            self.actionDismissLayerButton.alpha = 0.3
+            }, completion: nil)
     }
     
-    func showActionSheet(){
+    // MARK: functions used in NavigationOutView
+    func goToTabsEditor() {
+        let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
+        
+        tabsEditorVC.theSong = self.player.nowPlayingItem
+        print("show action clicked")
+        self.player.pause()
+        self.dismissAction()
+        self.presentViewController(tabsEditorVC, animated: true, completion: nil)
+    }
+    
+    func goToLyricsEditor() {
+        let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
+        as! LyricsTextViewController
+        
+        lyricsEditor.theSong = self.player.nowPlayingItem
+        self.player.pause()
+        self.dismissAction()
+        self.presentViewController(lyricsEditor, animated: true, completion: nil)
+    }
+    
+    func goToArtist() {
+        
+    }
 
-//        actionSheet = TwistJamActionSheet()
-//
-//        actionSheet.addButtonWithTitle(NSString(string:"Add your tabs"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-//            
-//            self.player.pause()
-//            
-//            let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-//            
-//            tabsEditorVC.theSong = self.player.nowPlayingItem
-//            
-//            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
-//        })
-//        actionSheet.addButtonWithTitle(NSString(string:"Add your lyrics"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-//            
-//        })
-//        actionSheet.show()
-//        if player.playbackState == MPMusicPlaybackState.Playing {
-//            timer.invalidate()
-//            updateAll(Float(player.currentPlaybackTime))
-//            startTimer()
-//        }
+    func goToAlbum() {
     }
     
     // ISSUE: when app goes to background this is not called
@@ -1070,7 +1131,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomLyricLabel.text = "End~"
         }
     }
-  
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
