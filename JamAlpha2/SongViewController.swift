@@ -10,12 +10,7 @@ let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4
 let totalalpha: Int = Int((timeToDisappear - timeDisappeared) * stepPerSecond)
 
-//Mode the chords
-let FullMode: Int = 0
-let SingleMode: Int = 1
-
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
-
     var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 4
@@ -100,8 +95,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var current: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
     
-    var mode:Int = 0
-    
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
     var topView:UIView!
     var bottomView:UIView!
@@ -110,18 +103,40 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var shuffleButton:UIButton!
     var guitarButton:UIButton!
     var othersButton:UIButton!
-    var guitarActionView: GuitarActionView! // for actions used inside this class
+    
+    // Guitar actions views
+    var guitarActionView: UIView!
+    var volumeView: MPVolumeView!
+    var speedSlider: UISlider!
+    var chordsSwitch: UISwitch!
+    var tabsSwitch: UISwitch!
+    var lyricsSwitch: UISwitch!
+    var countdownSwitch: UISwitch!
+    
+    // for actions used inside this class
     // includes volume change ,speed change, show/hide chords, tabs, lyrics, countdown
-    var navigationOutActionView: NavigationOutActionView!
+    var navigationOutActionView: UIView!
+    var titles = ["Add your tabs", "Add your lyrics", "Go to artist", "Go to album"]
+    var addTabsButton: UIButton!
+    var addLyricsButton: UIButton!
+    var goToArtistButton: UIButton!
+    var goToAlbumButton: UIButton!
+    
+    // used to toggle should display chord name or tabs
+    var isChordShown = true
+    var isTabsShown = true
+    var isLyricsShown = true
+    let isChordShownKey = "isChordShown"
+    let isTabsShownKey = "isTabsShown"
+    let isLyricsShownKey = "isLyricsShown"
+    var artWorkUnblurred = false // a variable kept to restore blur image from unblurred state (when changed from everything is hidden to show chords or lyrics), to avoid unnecessary blurring
     
     var guitarActionViewHeight: CGFloat = 44 * 6 // a row height * number of rows
     var navigationOutActionViewHeight: CGFloat = 44 * 4
     var actionDismissLayerButton: UIButton!
     
     var textColor:UIColor!
-    
-    //var actionSheet:TwistJamActionSheet!
-    
+
     //background images
     var currentImage:UIImage?
     
@@ -153,10 +168,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         setUpMusicData(player.nowPlayingItem!)
-        setUpBackgroundImage()
+   
         setUpTopButtons()
-        
         setUpNameAndArtistButtons()
+        setUpBackgroundImage()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -164,6 +179,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpProgressContainer()
         setUpTimeLabels()
         setUpBottomViewWithButtons()
+        setUpActionViews()
         //get top and bottom points of six lines
         calculateXPoints()
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
@@ -187,6 +203,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             resumeSong()
+            loadDisplayMode()
             viewDidFullyDisappear = false
         }
     }
@@ -203,7 +220,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpBackgroundImage(){
         //create an UIImageView
-        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
+        let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
+        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
         //get the image from MPMediaItem
         print(player.nowPlayingItem!.title)
         if let artwork = player.nowPlayingItem!.artwork {
@@ -387,6 +405,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(base)
     }
     
+    func loadDisplayMode() {
+        // zero means never been set before, 1 means true, 2 means false
+        if NSUserDefaults.standardUserDefaults().integerForKey(isChordShownKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(isChordShownKey) == 1 {
+            isChordShown = true
+        } else {
+            isChordShown = false
+        }
+        
+        if NSUserDefaults.standardUserDefaults().integerForKey(isTabsShownKey) == 0||NSUserDefaults.standardUserDefaults().integerForKey(isTabsShownKey) == 1 {
+            isTabsShown = true
+        } else {
+            isTabsShown = false
+        }
+        
+        if NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 1 {
+            isLyricsShown = true
+        } else {
+            isLyricsShown = false
+        }
+        
+        chordsSwitch.on = isChordShown
+        tabsSwitch.on = isTabsShown
+        lyricsSwitch.on = isLyricsShown
+        toggleChordsDisplayMode()
+        toggleLyrics()
+    }
     
     func registerMediaPlayerNotification(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
@@ -714,7 +758,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         favoriateButton.sizeToFit()
         
         shuffleButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
-        
         if player.repeatMode == .All && player.shuffleMode == .Off {
              shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
         } else if player.repeatMode == .One && player.shuffleMode == .Off {
@@ -726,34 +769,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
         
-        // add this layer first before adding two action views to prevent view blocking
-        actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
-        actionDismissLayerButton.backgroundColor = UIColor.clearColor()
-        actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
-        self.view.addSubview(actionDismissLayerButton)
-        actionDismissLayerButton.hidden = true
-        
         guitarButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         guitarButton.setImage((UIImage(named: "guitar_settings")), forState: UIControlState.Normal)
         guitarButton.addTarget(self, action: "showGuitarActions", forControlEvents: UIControlEvents.TouchUpInside)
-        
-        // NOTE: we have to call all the embedded action events from the custom views, not in this class.
-        guitarActionView = GuitarActionView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: guitarActionViewHeight))
-        guitarActionView.backgroundColor = UIColor.whiteColor()
-        guitarActionView.alpha = 0.9
-        guitarActionView.songViewController = self
-        self.view.addSubview(guitarActionView)
 
+        
         othersButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         othersButton.setImage(UIImage(named: "more_options"), forState: UIControlState.Normal)
         othersButton.center.y = bottomViewHeight / 2
         othersButton.addTarget(self, action: "showNavigationOutActions", forControlEvents: UIControlEvents.TouchUpInside)
         
-        navigationOutActionView = NavigationOutActionView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: navigationOutActionViewHeight))
-        navigationOutActionView.backgroundColor = UIColor.whiteColor()
-        navigationOutActionView.alpha = 0.9
-        navigationOutActionView.songViewController = self
-        self.view.addSubview(navigationOutActionView)
+
         
         var bottomButtons = [favoriateButton, shuffleButton, guitarButton, othersButton]
         var orderIndex: [CGFloat] = [1, 3, 5 , 7]//1/8, 3/8, 5/8, 7/8 of the width
@@ -767,6 +793,106 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomButtons[i].center.y = bottomViewHeight / 2
             bottomView.addSubview(bottomButtons[i])
         }
+    }
+    
+    func setUpActionViews() {
+        // add this layer first before adding two action views to prevent view blocking
+        actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        actionDismissLayerButton.backgroundColor = UIColor.clearColor()
+        actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
+        self.view.addSubview(actionDismissLayerButton)
+        actionDismissLayerButton.hidden = true
+        
+        // NOTE: we have to call all the embedded action events from the custom views, not in this class.
+        guitarActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: guitarActionViewHeight))
+        guitarActionView.backgroundColor = UIColor.whiteColor()
+        guitarActionView.alpha = 0.9
+        self.view.addSubview(guitarActionView)
+        let width = guitarActionView.frame.width
+        
+        var rowWrappers = [UIView]()
+        let rowHeight: CGFloat = 44
+        for i in 0..<6 {
+            
+            let row = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i), width: width, height: rowHeight))
+            rowWrappers.append(row)
+            guitarActionView.addSubview(row)
+        }
+        
+        let sliderMargin: CGFloat = 35
+        
+        volumeView = MPVolumeView(frame: CGRect(x: sliderMargin, y: rowHeight/2, width: width-sliderMargin*2, height: rowHeight))
+        
+        rowWrappers[0].addSubview(volumeView)
+        
+        speedSlider = UISlider(frame: CGRect(x: sliderMargin, y: 0, width: width-sliderMargin*2, height: rowHeight))
+        speedSlider.center.y = rowHeight/2
+        rowWrappers[1].addSubview(speedSlider)
+        
+        let buttonsImageNames = ["previous", "next", "previous", "next"]
+        let names = ["Chords", "Tabs", "Lyrics", "Countdown"]
+        
+        let sideMargin = 10
+        var switchHolders = [UISwitch]()
+        
+        for i in 2..<6 {
+            let switchImage = UIImageView(frame: CGRect(x: sideMargin, y: 0, width: 35, height: 35))
+            switchImage.image = UIImage(named: buttonsImageNames[i-2])
+            switchImage.center.y = rowHeight/2
+            rowWrappers[i].addSubview(switchImage)
+            
+            let switchNameLabel = UILabel(frame: CGRect(x: CGRectGetMaxX(switchImage.frame)+10, y: 0, width: 200, height: 22))
+            switchNameLabel.text = names[i-2]
+            switchNameLabel.center.y = rowHeight/2
+            rowWrappers[i].addSubview(switchNameLabel)
+            
+            //use UISwitch default frame (51,31)
+            let actionSwitch = UISwitch(frame: CGRect(x: width-CGFloat(sideMargin)-51, y: 0, width: 51, height: 31))
+            actionSwitch.onTintColor = UIColor.mainPinkColor()
+            actionSwitch.center.y = rowHeight/2
+            rowWrappers[i].addSubview(actionSwitch)
+            switchHolders.append(actionSwitch)
+        }
+        
+        chordsSwitch = switchHolders[0]
+        chordsSwitch.addTarget(self, action: "chordsSwitchChanged:", forControlEvents: .ValueChanged)
+        
+        tabsSwitch = switchHolders[1]
+        tabsSwitch.addTarget(self, action: "tabsSwitchChanged:", forControlEvents: .ValueChanged)
+        
+        lyricsSwitch = switchHolders[2]
+        lyricsSwitch.addTarget(self, action: "lyricsSwitchChanged:", forControlEvents: .ValueChanged)
+        countdownSwitch = switchHolders[3]
+        countdownSwitch.addTarget(self, action: "countDownChanged:", forControlEvents: .ValueChanged)
+        
+        navigationOutActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: navigationOutActionViewHeight))
+        navigationOutActionView.backgroundColor = UIColor.whiteColor()
+        navigationOutActionView.alpha = 0.9
+        self.view.addSubview(navigationOutActionView)
+        
+        addTabsButton = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: rowHeight))
+        addTabsButton.setTitle("Add your tabs", forState: .Normal)
+        addTabsButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        addTabsButton.addTarget(self, action: "goToTabsEditor:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(addTabsButton)
+        
+        addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
+        addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
+        addLyricsButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        addLyricsButton.addTarget(self, action: "goToLyricsEditor:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(addLyricsButton)
+        
+        goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
+        goToArtistButton.setTitle("Go to artist", forState: .Normal)
+        goToArtistButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        goToArtistButton.addTarget(self, action: "goToArtist:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(goToArtistButton)
+        
+        goToAlbumButton = UIButton(frame: CGRect(x: 0, y: rowHeight*3, width: width, height: rowHeight))
+        goToAlbumButton.setTitle("Go to album", forState: .Normal)
+        goToAlbumButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        goToAlbumButton.addTarget(self, action: "goToAlbum:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(goToAlbumButton)
     }
     
     func toggleShuffle(button: UIButton){
@@ -832,8 +958,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 //            updateAll(Float(player.currentPlaybackTime))
 //            startTimer()
 //        }
-        
     }
+    
+
+    
     func showNavigationOutActions() {
         
         actionDismissLayerButton.hidden = false
@@ -843,9 +971,93 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.actionDismissLayerButton.alpha = 0.3
             }, completion: nil)
     }
+
+    
+    //MARK: functions called from guitar action views
+    func chordsSwitchChanged(uiswitch: UISwitch) {
+        isChordShown = uiswitch.on
+        toggleChordsDisplayMode()
+    }
+    
+    func tabsSwitchChanged(uiswitch: UISwitch) {
+        isTabsShown = uiswitch.on
+        toggleChordsDisplayMode()
+    }
+    
+    func toggleChordsDisplayMode() {
+        timer.invalidate()
+        updateAll(startTime.toDecimalNumer())
+        if player.playbackState == .Playing{
+            startTimer()
+        }
+        
+        if isChordShown {
+          NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isChordShownKey)
+        } else {
+          NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isChordShownKey)
+        }
+        
+        if isTabsShown {
+          NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isTabsShownKey)
+        } else {
+          NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isTabsShownKey)
+        }
+        if !isChordShown && !isTabsShown { //hide the chordbase if we are showing chords and tabs
+            base.hidden = true
+        } else {
+            base.hidden = false
+        }
+        unblurImageIfAllIsHidden()
+    }
+    
+    func lyricsSwitchChanged(uiswitch: UISwitch) {
+        isLyricsShown = uiswitch.on
+         toggleLyrics()
+    }
+    
+    func toggleLyrics() {
+        // show lyrics if the boolean is not hidden
+        if isLyricsShown {
+            lyricbase.hidden = false
+        } else {
+            lyricbase.hidden = true
+        }
+        // set to user defaults
+        if isLyricsShown {
+            NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isLyricsShownKey)
+        } else {
+            NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isLyricsShownKey)
+        }
+        // if the chords base and lyrics base are all hiden, do not blur the image
+        unblurImageIfAllIsHidden()
+    }
+    
+    func unblurImageIfAllIsHidden() {
+        if !isChordShown && !isTabsShown && !isLyricsShown {
+            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            self.backgroundImageView.center.x = self.view.center.x
+            self.backgroundImageView.image = image
+            artWorkUnblurred = true
+        } else if artWorkUnblurred { //if only we have unblurred it before, we blur the image
+            
+            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            let blurredImage = image!.applyLightEffect()!
+            self.backgroundImageView.center.x = self.view.center.x
+            self.backgroundImageView.image = blurredImage
+            
+            artWorkUnblurred = false
+        }
+    }
+
+    func countDownChanged(uiswitch: UISwitch) {
+        
+    }
+    
+
+    
     
     // MARK: functions used in NavigationOutView
-    func goToTabsEditor() {
+    func goToTabsEditor(button: UIButton) {
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         
         tabsEditorVC.theSong = self.player.nowPlayingItem
@@ -855,7 +1067,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
-    func goToLyricsEditor() {
+    func goToLyricsEditor(button: UIButton) {
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         
@@ -865,11 +1077,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }
     
-    func goToArtist() {
+    func goToArtist(button: UIButton) {
         
     }
 
-    func goToAlbum() {
+    func goToAlbum(button: UIButton) {
     }
     
     // ISSUE: when app goes to background this is not called
@@ -975,6 +1187,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshChordLabel(){
+        if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
+            return
+        }
+        
         // Change the location of each label
         for var i = 0; i < activelabels.count; ++i {
             let activelabel = activelabels[i]
@@ -987,21 +1203,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
             
-            if mode == FullMode {
+            if isChordShown && isTabsShown { //show both chord name and tabs
+               
                 labels[0].center = CGPointMake(xPosition, CGFloat(yPosition))
                 labels[1].center.y = CGFloat(yPosition)
                 labels[1].transform = transformsize
-            }
-            else {
+            } else if isChordShown && !isTabsShown { //show only chord name
+
                 labels[0].center = CGPointMake(base.frame.width / 2, CGFloat(yPosition))
+                
+            } else if !isChordShown && isTabsShown { // show only tabs name
+                //TODO: remove chords labels and only show tabs
             }
             
             activelabels[i].ylocation = activelabel.ylocation + movePerstep
+            
             if( activelabels[i].ylocation > maxylocation){
                 activelabels[i].ylocation = maxylocation
             }
         }
-
     }
     
     func refreshProgressBlock(){
@@ -1026,6 +1246,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // var tempcurrentTime:NSString = NSString(string: startTime.toDisplayString())
         // currentTimeLabel.text = tempcurrentTime.substringToIndex(tempcurrentTime.length-2)
         currentTimeLabel.text = startTime.toDisplayString()
+    }
+    
+    func refreshLyrics() {
+        if !isLyricsShown { // avoid unnecessary computation if lyrics is hidden
+            return
+        }
+        current = -1
+        while(current + 1 < lyric.lyric.count){
+            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
+                break
+            }
+            current++
+        }
+        
+        if current == -1{
+            topLyricLabel.text = "..."//theSong.title
+        }
+        else {
+            topLyricLabel.text = lyric.get(current).str
+        }
+        if current + 1 < lyric.lyric.count {
+            bottomLyricLabel.text = lyric.get(current+1).str
+        }
+        else {
+            bottomLyricLabel.text = "End~"
+        }
     }
     
     func updateAll(time: Float){
@@ -1109,27 +1355,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         refreshChordLabel()
         refreshProgressBlock()
         refreshTimeLabel()
+        refreshLyrics()
         //Update the content of the lyric
-        current = -1
-        while(current + 1 < lyric.lyric.count){
-            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
-                break
-            }
-            current++
-        }
-        
-        if current == -1{
-            topLyricLabel.text = "..."//theSong.title
-        }
-        else {
-            topLyricLabel.text = lyric.get(current).str
-        }
-        if current + 1 < lyric.lyric.count {
-            bottomLyricLabel.text = lyric.get(current+1).str
-        }
-        else {
-            bottomLyricLabel.text = "End~"
-        }
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
@@ -1140,7 +1367,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                //self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
                     UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
@@ -1153,8 +1379,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
             player.pause()
-           // musicViewController!.nowView!.stop()
-            
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                 print("pause1")
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -1165,15 +1389,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             })
         }
     }
-    
-    func changeChordMode() {
-        timer.invalidate()
-        mode = 1 - mode
-        updateAll(startTime.toDecimalNumer())
-        if player.playbackState == .Playing{
-            startTimer()
-        }
-    }
+
 
     func startTimer(){
         //NOTE: To prevent startTimer() to be called consecutively
@@ -1201,7 +1417,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         let view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
         
-        if mode == fullchord {
+        
+        if isChordShown && isTabsShown {
             for i in 0...content.characters.count-1 {
                 //if not a integer
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))

@@ -43,8 +43,6 @@
 		E48877681B151E2B004785D3 /* MusicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877671B151E2B004785D3 /* MusicCell.swift */; };
 		E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* SongViewController.swift */; };
 		E488776F1B152742004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E488776D1B152742004785D3 /* Main.storyboard */; };
-		E488E5B71BAE6BD800A94E82 /* GuitarActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E488E5B61BAE6BD800A94E82 /* GuitarActionView.swift */; settings = {ASSET_TAGS = (); }; };
-		E488E5BA1BAE825D00A94E82 /* NavigationOutActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E488E5B91BAE825D00A94E82 /* NavigationOutActionView.swift */; settings = {ASSET_TAGS = (); }; };
 		E48AE2D21B955BB40044CFDB /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48AE2D11B955BB40044CFDB /* API.swift */; };
 		E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49AF0961B2699C800DD3342 /* BaseViewController.swift */; };
 		E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B6362D1B854A5900F331A7 /* Colors+.swift */; };
@@ -131,8 +129,6 @@
 		E48877671B151E2B004785D3 /* MusicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
 		E48877691B1520A0004785D3 /* SongViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongViewController.swift; sourceTree = "<group>"; };
 		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		E488E5B61BAE6BD800A94E82 /* GuitarActionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuitarActionView.swift; sourceTree = "<group>"; };
-		E488E5B91BAE825D00A94E82 /* NavigationOutActionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationOutActionView.swift; sourceTree = "<group>"; };
 		E48AE2D11B955BB40044CFDB /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		E49AF0961B2699C800DD3342 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		E4B6362D1B854A5900F331A7 /* Colors+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Colors+.swift"; sourceTree = "<group>"; };
@@ -253,7 +249,6 @@
 		E456457C1B3BB14200276287 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
-				E488E5B81BAE824600A94E82 /* ActionViews */,
 				E431BA9F1B91718C00E32A0B /* MainScreenViews */,
 				E4399C391B90049600906DBD /* SoundWave */,
 				E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */,
@@ -373,15 +368,6 @@
 				E4CBC0091B9E88F100473FC4 /* TabItemControllers */,
 			);
 			name = Controllers;
-			sourceTree = "<group>";
-		};
-		E488E5B81BAE824600A94E82 /* ActionViews */ = {
-			isa = PBXGroup;
-			children = (
-				E488E5B61BAE6BD800A94E82 /* GuitarActionView.swift */,
-				E488E5B91BAE825D00A94E82 /* NavigationOutActionView.swift */,
-			);
-			name = ActionViews;
 			sourceTree = "<group>";
 		};
 		E48AE2D01B955BA30044CFDB /* Networking */ = {
@@ -587,7 +573,6 @@
 				E455E7291BA272AD00210BD6 /* Song.swift in Sources */,
 				E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */,
 				E4399C381B90048F00906DBD /* UIView+Geometry.swift in Sources */,
-				E488E5BA1BAE825D00A94E82 /* NavigationOutActionView.swift in Sources */,
 				E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */,
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
@@ -606,7 +591,6 @@
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
-				E488E5B71BAE6BD800A94E82 /* GuitarActionView.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
