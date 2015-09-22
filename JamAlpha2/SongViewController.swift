@@ -131,6 +131,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let isChordShownKey = "isChordShown"
     let isTabsShownKey = "isTabsShown"
     let isLyricsShownKey = "isLyricsShown"
+    var artWorkUnblurred = false // a variable kept to restore blur image from unblurred state (when changed from everything is hidden to show chords or lyrics), to avoid unnecessary blurring
     
     var guitarActionViewHeight: CGFloat = 44 * 6 // a row height * number of rows
     var navigationOutActionViewHeight: CGFloat = 44 * 4
@@ -169,10 +170,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         setUpMusicData(player.nowPlayingItem!)
-        setUpBackgroundImage()
+   
         setUpTopButtons()
-        
         setUpNameAndArtistButtons()
+        setUpBackgroundImage()
         //set up views from top to bottom
         setUpChordBase()
         setUpLyricsBase()
@@ -221,7 +222,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpBackgroundImage(){
         //create an UIImageView
-        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
+        let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
+        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
         //get the image from MPMediaItem
         print(player.nowPlayingItem!.title)
         if let artwork = player.nowPlayingItem!.artwork {
@@ -430,6 +432,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordsSwitch.on = isChordShown
         tabsSwitch.on = isTabsShown
         lyricsSwitch.on = isLyricsShown
+        toggleChordsDisplayMode()
+        toggleLyrics()
     }
     
     func registerMediaPlayerNotification(){
@@ -1002,17 +1006,48 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
           NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isTabsShownKey)
         }
+        unblurImageIfAllIsHidden()
     }
     
     func lyricsSwitchChanged(uiswitch: UISwitch) {
         isLyricsShown = uiswitch.on
+         toggleLyrics()
+    }
+    
+    func toggleLyrics() {
+        // show lyrics if the boolean is not hidden
+        if isLyricsShown {
+            lyricbase.hidden = false
+        } else {
+            lyricbase.hidden = true
+        }
+        // set to user defaults
         if isLyricsShown {
             NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isLyricsShownKey)
         } else {
             NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isLyricsShownKey)
         }
+        // if the chords base and lyrics base are all hiden, do not blur the image
+        unblurImageIfAllIsHidden()
     }
     
+    func unblurImageIfAllIsHidden() {
+        if !isChordShown && !isTabsShown && !isLyricsShown {
+            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            self.backgroundImageView.center.x = self.view.center.x
+            self.backgroundImageView.image = image
+            artWorkUnblurred = true
+        } else if artWorkUnblurred { //if only we have unblurred it before, we blur the image
+            
+            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            let blurredImage = image!.applyLightEffect()!
+            self.backgroundImageView.center.x = self.view.center.x
+            self.backgroundImageView.image = blurredImage
+            
+            artWorkUnblurred = false
+        }
+    }
+
     func countDownChanged(uiswitch: UISwitch) {
         
     }
@@ -1215,14 +1250,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshLyrics() {
-        print("refreshing lyrics")
-        if !isLyricsShown {
-            print("hide lyrics")
-            lyricbase.hidden = true
+        if !isLyricsShown { // avoid unnecessary computation if lyrics is hidden
             return
         }
-        lyricbase.hidden = false
-        
         current = -1
         while(current + 1 < lyric.lyric.count){
             if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
