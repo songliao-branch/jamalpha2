@@ -9,6 +9,8 @@ import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
+
     var nowView: VisualizerView!
     
     var theArtist:Artist!
@@ -161,7 +163,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.selectedFromTable = true
-        
+        songVC.musicViewController = self.musicViewController
         songVC.nowView = self.nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)

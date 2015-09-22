@@ -11,6 +11,9 @@ let timeDisappeared: Float = 0.4
 let totalalpha: Int = Int((timeToDisappear - timeDisappeared) * stepPerSecond)
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+    
+    var musicViewController: MusicViewController!
+    
     var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 4
@@ -1079,10 +1082,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func goToArtist(button: UIButton) {
-        
+        self.dismissViewControllerAnimated(false, completion: {
+            completed in
+            self.musicViewController.goToArtist(self.player.nowPlayingItem!.artist!)
+        })
     }
 
     func goToAlbum(button: UIButton) {
+        self.dismissViewControllerAnimated(false, completion: {
+            completed in
+            self.musicViewController.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
+        })
     }
     
     // ISSUE: when app goes to background this is not called
