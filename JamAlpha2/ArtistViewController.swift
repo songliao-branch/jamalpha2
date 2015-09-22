@@ -74,12 +74,20 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         cell.albumImageView.image = image
         cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
         
-        if let date = theArtist.getAlbums()[section].releasedDate {
-            let comps = NSCalendar.currentCalendar().components(.Year, fromDate: date)
-            cell.albumYearLabel.text = "\(comps.year)"
+        if theArtist.getAlbums()[section].yearReleased > 1000 { //album year exist
+            cell.albumYearLabel.hidden = false
+            cell.albumYearLabel.text = "\(theArtist.getAlbums()[section].yearReleased)"
         } else {
             cell.albumYearLabel.hidden = true
         }
+
+//        if let date = theArtist.getAlbums()[section].releasedDate {
+//            let comps = NSCalendar.currentCalendar().components(.Year, fromDate: date)
+//            cell.albumYearLabel.hidden = false
+//            cell.albumYearLabel.text = "\(comps.year)"
+//        } else {
+//            cell.albumYearLabel.hidden = true
+//        }
        
         return cell
     }
