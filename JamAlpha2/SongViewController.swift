@@ -825,24 +825,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         rowWrappers[0].addSubview(volumeView)
         
-        speedSlider = UISlider(frame: CGRect(x: sliderMargin, y: 0, width: width-sliderMargin*2, height: rowHeight))
-        speedSlider.center.y = rowHeight/2
-        rowWrappers[1].addSubview(speedSlider)
-        
         let buttonsImageNames = ["previous", "next", "previous", "next"]
         let names = ["Chords", "Tabs", "Lyrics", "Countdown"]
         
         let sideMargin = 10
         var switchHolders = [UISwitch]()
         
-        for i in 2..<6 {
+        for i in 1..<5 {
             let switchImage = UIImageView(frame: CGRect(x: sideMargin, y: 0, width: 35, height: 35))
-            switchImage.image = UIImage(named: buttonsImageNames[i-2])
+            switchImage.image = UIImage(named: buttonsImageNames[i-1])
             switchImage.center.y = rowHeight/2
             rowWrappers[i].addSubview(switchImage)
             
             let switchNameLabel = UILabel(frame: CGRect(x: CGRectGetMaxX(switchImage.frame)+10, y: 0, width: 200, height: 22))
-            switchNameLabel.text = names[i-2]
+            switchNameLabel.text = names[i-1]
             switchNameLabel.center.y = rowHeight/2
             rowWrappers[i].addSubview(switchNameLabel)
             
@@ -864,6 +860,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricsSwitch.addTarget(self, action: "lyricsSwitchChanged:", forControlEvents: .ValueChanged)
         countdownSwitch = switchHolders[3]
         countdownSwitch.addTarget(self, action: "countDownChanged:", forControlEvents: .ValueChanged)
+        
+        speedSlider = UISlider(frame: CGRect(x: sliderMargin, y: 0, width: width-sliderMargin*2, height: rowHeight))
+        speedSlider.center.y = rowHeight/2
+        rowWrappers[5].addSubview(speedSlider)
+        
         
         navigationOutActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: navigationOutActionViewHeight))
         navigationOutActionView.backgroundColor = UIColor.whiteColor()
