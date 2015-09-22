@@ -95,8 +95,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var current: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
     
-    var currentDisplayMode = 0 //NOTE: 0 for chords+tabs, 1 for chords, 2 for tabs, 3 for none
-    
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
     var topView:UIView!
     var bottomView:UIView!
@@ -420,8 +418,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             isTabsShown = false
         }
-        
-        print("lyrics shown key:\(NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey))")
         
         if NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 1 {
             isLyricsShown = true
@@ -1006,6 +1002,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
           NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isTabsShownKey)
         }
+        if !isChordShown && !isTabsShown { //hide the chordbase if we are showing chords and tabs
+            base.hidden = true
+        } else {
+            base.hidden = false
+        }
         unblurImageIfAllIsHidden()
     }
     
@@ -1186,11 +1187,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshChordLabel(){
-        if !isChordShown && !isTabsShown { //hide both
-            base.hidden = true
+        if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
             return
         }
-        base.hidden = false
         
         // Change the location of each label
         for var i = 0; i < activelabels.count; ++i {
@@ -1214,7 +1213,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 labels[0].center = CGPointMake(base.frame.width / 2, CGFloat(yPosition))
                 
             } else if !isChordShown && isTabsShown { // show only tabs name
-
+                //TODO: remove chords labels and only show tabs
             }
             
             activelabels[i].ylocation = activelabel.ylocation + movePerstep
