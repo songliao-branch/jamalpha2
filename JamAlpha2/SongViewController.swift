@@ -1172,7 +1172,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             index++
         }
-        
         if startdisappearing < start && (activelabels[0].alpha == 0 || TimeNumber(time: startTime.toDecimalNumer() + timeDisappeared).isLongerThan(chords[startdisappearing+1].mTime)) {
             for label in activelabels[0].labels{
                 label.removeFromSuperview()
@@ -1180,7 +1179,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             activelabels.removeAtIndex(0)
             startdisappearing++
         }
-        
+
         refreshChordLabel()
         refreshProgressBlock()
         refreshTimeLabel()
@@ -1204,16 +1203,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
             
             if isChordShown && isTabsShown { //show both chord name and tabs
-               
+                labels[0].hidden = false
                 labels[0].center = CGPointMake(xPosition, CGFloat(yPosition))
                 labels[1].center.y = CGFloat(yPosition)
                 labels[1].transform = transformsize
             } else if isChordShown && !isTabsShown { //show only chord name
-
+                 labels[0].hidden = false
                 labels[0].center = CGPointMake(base.frame.width / 2, CGFloat(yPosition))
-                
+            
             } else if !isChordShown && isTabsShown { // show only tabs name
                 //TODO: remove chords labels and only show tabs
+                // now it is just hidden, need to cease the compuation as well
+                labels[0].hidden = true
+                labels[1].center.y = CGFloat(yPosition)
+                labels[1].transform = transformsize
             }
             
             activelabels[i].ylocation = activelabel.ylocation + movePerstep
@@ -1418,7 +1421,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
         
         
-        if isChordShown && isTabsShown {
+        if isTabsShown {
             for i in 0...content.characters.count-1 {
                 //if not a integer
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
