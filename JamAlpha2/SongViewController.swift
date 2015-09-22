@@ -721,7 +721,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         currentTimeLabel = UILabel(frame: CGRect(x: self.view.center.x-labelWidth, y: timeLabelOriginY , width: labelWidth, height: labelHeight))
         currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         currentTimeLabel.text = "0:00.0"
-        currentTimeLabel.textAlignment = .Center
+        currentTimeLabel.textAlignment = .Left
         currentTimeLabel.textColor = UIColor.whiteColor()
         
         //make it glow
@@ -736,7 +736,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
-        totalTimeLabel.textAlignment = .Center
+        totalTimeLabel.textAlignment = .Right
         self.view.addSubview(totalTimeLabel)
         
     }
