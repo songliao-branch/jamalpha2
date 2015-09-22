@@ -127,8 +127,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // used to toggle should display chord name or tabs
     var isChordShown = true
     var isTabsShown = true
+    var isLyricsShown = true
     let isChordShownKey = "isChordShown"
     let isTabsShownKey = "isTabsShown"
+    let isLyricsShownKey = "isLyricsShown"
     
     var guitarActionViewHeight: CGFloat = 44 * 6 // a row height * number of rows
     var navigationOutActionViewHeight: CGFloat = 44 * 4
@@ -416,8 +418,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             isTabsShown = false
         }
+        
+        print("lyrics shown key:\(NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey))")
+        
+        if NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 1 {
+            isLyricsShown = true
+        } else {
+            isLyricsShown = false
+        }
+        
         chordsSwitch.on = isChordShown
         tabsSwitch.on = isTabsShown
+        lyricsSwitch.on = isLyricsShown
     }
     
     func registerMediaPlayerNotification(){
@@ -978,10 +990,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if player.playbackState == .Playing{
             startTimer()
         }
+        
+        if isChordShown {
+          NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isChordShownKey)
+        } else {
+          NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isChordShownKey)
+        }
+        
+        if isTabsShown {
+          NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isTabsShownKey)
+        } else {
+          NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isTabsShownKey)
+        }
     }
     
     func lyricsSwitchChanged(uiswitch: UISwitch) {
-        
+        isLyricsShown = uiswitch.on
+        if isLyricsShown {
+            NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isLyricsShownKey)
+        } else {
+            NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isLyricsShownKey)
+        }
     }
     
     func countDownChanged(uiswitch: UISwitch) {
@@ -1122,6 +1151,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshChordLabel(){
+        if !isChordShown && !isTabsShown { //hide both
+            base.hidden = true
+            return
+        }
+        base.hidden = false
+        
         // Change the location of each label
         for var i = 0; i < activelabels.count; ++i {
             let activelabel = activelabels[i]
@@ -1135,26 +1170,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
             
             if isChordShown && isTabsShown { //show both chord name and tabs
+               
                 labels[0].center = CGPointMake(xPosition, CGFloat(yPosition))
                 labels[1].center.y = CGFloat(yPosition)
                 labels[1].transform = transformsize
-            }
-            else if isChordShown && !isTabsShown { //show only chord name
+            } else if isChordShown && !isTabsShown { //show only chord name
+
                 labels[0].center = CGPointMake(base.frame.width / 2, CGFloat(yPosition))
                 
             } else if !isChordShown && isTabsShown { // show only tabs name
-                
-                
-            } else if !isChordShown && isTabsShown { //hide both
-                base.hidden = true
+
             }
             
             activelabels[i].ylocation = activelabel.ylocation + movePerstep
+            
             if( activelabels[i].ylocation > maxylocation){
                 activelabels[i].ylocation = maxylocation
             }
         }
-
     }
     
     func refreshProgressBlock(){
@@ -1179,6 +1212,37 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // var tempcurrentTime:NSString = NSString(string: startTime.toDisplayString())
         // currentTimeLabel.text = tempcurrentTime.substringToIndex(tempcurrentTime.length-2)
         currentTimeLabel.text = startTime.toDisplayString()
+    }
+    
+    func refreshLyrics() {
+        print("refreshing lyrics")
+        if !isLyricsShown {
+            print("hide lyrics")
+            lyricbase.hidden = true
+            return
+        }
+        lyricbase.hidden = false
+        
+        current = -1
+        while(current + 1 < lyric.lyric.count){
+            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
+                break
+            }
+            current++
+        }
+        
+        if current == -1{
+            topLyricLabel.text = "..."//theSong.title
+        }
+        else {
+            topLyricLabel.text = lyric.get(current).str
+        }
+        if current + 1 < lyric.lyric.count {
+            bottomLyricLabel.text = lyric.get(current+1).str
+        }
+        else {
+            bottomLyricLabel.text = "End~"
+        }
     }
     
     func updateAll(time: Float){
@@ -1262,27 +1326,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         refreshChordLabel()
         refreshProgressBlock()
         refreshTimeLabel()
+        refreshLyrics()
         //Update the content of the lyric
-        current = -1
-        while(current + 1 < lyric.lyric.count){
-            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
-                break
-            }
-            current++
-        }
-        
-        if current == -1{
-            topLyricLabel.text = "..."//theSong.title
-        }
-        else {
-            topLyricLabel.text = lyric.get(current).str
-        }
-        if current + 1 < lyric.lyric.count {
-            bottomLyricLabel.text = lyric.get(current+1).str
-        }
-        else {
-            bottomLyricLabel.text = "End~"
-        }
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
