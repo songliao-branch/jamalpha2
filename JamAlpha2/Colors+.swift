@@ -22,4 +22,8 @@ extension UIColor {
     class func backGray()-> UIColor {
         return UIColor(red: 246/255, green: 246/255, blue: 246/255, alpha: 1)
     }
+    
+    class func actionGray()-> UIColor {
+        return UIColor(red: 0.941, green: 0.941, blue: 0.941, alpha: 0.9)
+    }
 }
