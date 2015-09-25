@@ -883,13 +883,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         speedStepper.value = 1.0 //default
         speedStepper.addTarget(self, action: "speedStepperValueChanged:", forControlEvents: .ValueChanged)
         rowWrappers[5].addSubview(speedStepper)
-        
-//        speedSlider = UISlider(frame: CGRect(x: sliderMargin, y: 0, width: width-sliderMargin*2, height: rowHeight))
-//        speedSlider.center.y = rowHeight/2
-//        speedSlider.minimumTrackTintColor = UIColor.grayColor()
-//        speedSlider.maximumTrackTintColor = UIColor.grayColor()
-//        rowWrappers[5].addSubview(speedSlider)
-        
+
         navigationOutActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: actionViewHeight))
         navigationOutActionView.backgroundColor = UIColor.actionGray()
         self.view.addSubview(navigationOutActionView)
