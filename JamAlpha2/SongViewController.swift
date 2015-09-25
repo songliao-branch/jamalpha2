@@ -87,7 +87,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //corresponding playback speed
     var speed: Float = 1
     //as a recorder to write down the current rate
-    //var nowPlayingItemSpeed:Float = 1
+    
+    // key is the stepper value ranging from 0.7 to 1.3 in step of 0.1
+    // value is the real speed the song is playing
+    let speedMatcher = [0.7: 0.50, 0.8:0.67 ,0.9: 0.79,  1.0:1.00 ,1.1: 1.25  ,1.2 :1.50, 1.3: 2.00]
     
     //Lyric
     var lyricbase: UIView!
@@ -111,6 +114,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var guitarActionView: UIView!
     var volumeView: MPVolumeView!
     var speedStepper: UIStepper!
+    var speedLabel: UILabel!
     var chordsSwitch: UISwitch!
     var tabsSwitch: UISwitch!
     var lyricsSwitch: UISwitch!
@@ -882,8 +886,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         speedStepper.stepValue = 0.1
         speedStepper.value = 1.0 //default
         speedStepper.addTarget(self, action: "speedStepperValueChanged:", forControlEvents: .ValueChanged)
+        
+        speedLabel = UILabel(frame: CGRect(x: 20, y: 0, width: 120, height: 22))
+        speedLabel.text = "Speed: 1.0x"
+        speedLabel.textColor = UIColor.mainPinkColor()
+        speedLabel.center.y = childCenterY
+        
         rowWrappers[5].addSubview(speedStepper)
-
+        rowWrappers[5].addSubview(speedLabel)
+        
+        
+        // Add navigation out view, all actions are navigated to other viewControllers
         navigationOutActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: actionViewHeight))
         navigationOutActionView.backgroundColor = UIColor.actionGray()
         self.view.addSubview(navigationOutActionView)
@@ -1092,11 +1105,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func countDownChanged(uiswitch: UISwitch) {
         
     }
-    
+
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
-        
-        print(stepper.value)
+        timer.invalidate()
+        let roundedValue = Double(round(10*stepper.value)/10)
+        let adjustedSpeed = Float(speedMatcher[roundedValue]!)
+        self.speed = adjustedSpeed
+        self.player.currentPlaybackRate = adjustedSpeed
+        self.startTimer()
+        self.speedLabel.text = "Speed: \(adjustedSpeed)x"
+        print("stepper value:\(stepper.value) and value \(speedMatcher[roundedValue])")
     }
     
     
@@ -1425,7 +1444,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
-            player.currentPlaybackRate = self.speed//nowPlayingItemSpeed
             print("play")
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
