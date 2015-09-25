@@ -196,7 +196,7 @@ public extension UIImage {
         
         CGContextDrawImage(context, CGRectMake(0, 0, 1, 1), self.CGImage)
         
-        var num:Int = Int(rgba.advancedBy(0).memory) + Int(rgba.advancedBy(1).memory) + Int(rgba.advancedBy(2).memory)
+        let num:Int = Int(rgba.advancedBy(0).memory) + Int(rgba.advancedBy(1).memory) + Int(rgba.advancedBy(2).memory)
         if (num < 382){
             return UIColor.whiteColor()
         }
