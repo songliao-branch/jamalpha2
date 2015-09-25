@@ -64,7 +64,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     func popToCurrentSong(){
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.selectedFromTable = false
-        
+        songVC.musicViewController = self
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
@@ -175,6 +175,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
+            songVC.musicViewController = self //for goToArtist and goToAlbum from here
             songVC.nowView = self.nowView
              //reload table to show loudspeaker icon on current selected row
             tableView.reloadData()
@@ -183,7 +184,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         else if pageIndex == 1 {
 
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
-        
+            artistVC.musicViewController = self
             artistVC.nowView = self.nowView
             artistVC.theArtist = uniqueArtists[indexPath.row]
             
@@ -193,6 +194,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         else if pageIndex == 2 {
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
+            albumVC.musicViewController = self
             albumVC.nowView = self.nowView
             albumVC.theAlbum = uniqueAlbums[indexPath.row]
             self.showViewController(albumVC, sender: self)
@@ -200,5 +202,34 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
-
+    
+    // MARK: called from SongViewController action sheets
+    func goToArtist(theArtist: String) {
+        print("we want to go to \(theArtist)")
+        for artist in MusicManager.sharedInstance.uniqueArtists {
+            if theArtist == artist.artistName {
+                let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
+                artistVC.musicViewController = self
+                artistVC.nowView = self.nowView
+                artistVC.theArtist = artist
+                self.showViewController(artistVC, sender: self)
+                print("jumping to artist \(theArtist)")
+                break
+            }
+        }
+    }
+    
+    func goToAlbum(theAlbum: String) {
+        for album in MusicManager.sharedInstance.uniqueAlbums {
+            if theAlbum == album.albumTitle {
+                let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
+                albumVC.musicViewController = self
+                albumVC.nowView = self.nowView
+                albumVC.theAlbum = album
+                self.showViewController(albumVC, sender: self)
+                print("jumping to album \(theAlbum)")
+                break
+            }
+        }
+    }
 }

@@ -11,8 +11,10 @@ class Artist: NSObject {
     
     var numberOfTracks:Int = 0
     var totalRunningTime:NSTimeInterval = 0.0
+    
     private var albums = [Album]()
     private var allSongs: [MPMediaItem]!
+    
     init(artist:String){
         self.artistName = artist
     }

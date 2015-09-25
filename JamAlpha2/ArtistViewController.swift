@@ -9,6 +9,8 @@ import UIKit
 import MediaPlayer
 class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
+
     var nowView: VisualizerView!
     
     var theArtist:Artist!
@@ -74,13 +76,12 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         cell.albumImageView.image = image
         cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
         
-        if let date = theArtist.getAlbums()[section].releasedDate {
-            let comps = NSCalendar.currentCalendar().components(.Year, fromDate: date)
-            cell.albumYearLabel.text = "\(comps.year)"
+        if theArtist.getAlbums()[section].yearReleased > 1000 { //album year exist
+            cell.albumYearLabel.hidden = false
+            cell.albumYearLabel.text = "\(theArtist.getAlbums()[section].yearReleased)"
         } else {
             cell.albumYearLabel.hidden = true
         }
-       
         return cell
     }
     
@@ -153,7 +154,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.selectedFromTable = true
-        
+        songVC.musicViewController = self.musicViewController
         songVC.nowView = self.nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)

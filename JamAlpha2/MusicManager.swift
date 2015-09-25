@@ -68,10 +68,13 @@ class MusicManager: NSObject {
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
             print("\(_TAG) setting a new queue")
+            
+            print(MPMediaItemPropertyReleaseDate)
+            
             queueChanged = true
             //testing
             for song in collection {
-                print("\(_TAG) setting up queue of song: \(song.title)")
+                print("\(_TAG) setting up queue of song: \(song.title!)")
             }
         }
     }
@@ -143,14 +146,10 @@ class MusicManager: NSObject {
             if representativeItem.playbackDuration < 30 { continue }
             allArtistRepresentiveSong.append(representativeItem)
             
-            var artist = Artist(artist: representativeItem.artist!)
+            let artist = Artist(artist: representativeItem.artist!)
             
             uniqueAlbums.sortInPlace({ album1, album2 in
-                if let album1date = album1.releasedDate, let album2date = album2.releasedDate {
-                    return album1date.isGreaterThanDate(album2date)
-                } else {
-                    return false
-                }
+                return album1.yearReleased > album2.yearReleased
             })
             
             for album in uniqueAlbums {

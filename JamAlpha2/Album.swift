@@ -4,36 +4,28 @@ import MediaPlayer
 
 
 
-class Album:NSObject{
+class Album: NSObject{
     
-    var albumTitle:String = ""
-    var artistPersistantId:CUnsignedLongLong!
-    var coverImage:MPMediaItemArtwork!
-    var artistName:String = ""
-    var numberOfTracks:Int = 0
-    var totalRunningTime:NSTimeInterval = 0.0
+    var albumTitle: String = ""
+    var artistPersistantId: CUnsignedLongLong!
+    var coverImage: MPMediaItemArtwork!
+    var artistName: String = ""
+    var numberOfTracks: Int = 0
+    var totalRunningTime: NSTimeInterval = 0.0
     
-    var releasedDate: NSDate? //can be nil if user add their own songs
+    var yearReleased = 0 //can be nil if user add their own songs
     
-    let representativeItem:MPMediaItem // this value must exist, it is not an optional
+    let representativeItem: MPMediaItem // this value must exist, it is not an optional
     
-    var songsIntheAlbum:[MPMediaItem]!
+    var songsIntheAlbum: [MPMediaItem]!
     
     init(theItem: MPMediaItem){
      
         self.representativeItem = theItem
-       // println("Album represent item: \(representativeItem.title)")
-        
         self.albumTitle = representativeItem.albumTitle!
-       // println(albumTitle)
         self.artistName = representativeItem.artist!
-      //  println(artistName)
         self.coverImage = representativeItem.artwork!
         
-        if let date = representativeItem.valueForProperty(MPMediaItemPropertyReleaseDate) as? NSDate {
-            self.releasedDate = date
-        }
-
         self.artistPersistantId = representativeItem.artistPersistentID
         let albumPredicate = MPMediaPropertyPredicate(value: albumTitle, forProperty: MPMediaItemPropertyAlbumTitle)
         let artistPredicate = MPMediaPropertyPredicate(value:artistName, forProperty:
@@ -47,14 +39,22 @@ class Album:NSObject{
         self.songsIntheAlbum = albumAndArtistQuery.items!
 
         //make sure there is no short song
-        songsIntheAlbum.filter({song in song.playbackDuration > 30 })
-      
+        songsIntheAlbum = songsIntheAlbum.filter({song in song.playbackDuration > 30 })
+        
         for song in songsIntheAlbum {
             self.totalRunningTime += song.playbackDuration
         }
-        self.numberOfTracks = songsIntheAlbum.count
-
         
+        // loop through all songs in the album till we find the one with an album year
+        for song in songsIntheAlbum {
+            let year = song.valueForProperty("year") as! Int
+            self.yearReleased = year
+            if year > 1000 {
+                self.yearReleased = year
+                break
+            }
+        }
+        self.numberOfTracks = songsIntheAlbum.count
     }
     
 }
