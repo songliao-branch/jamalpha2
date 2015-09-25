@@ -183,7 +183,7 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.textAlignment = NSTextAlignment.Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
-        self.lyricsTextView.text = "Put lyrics here.."
+        self.lyricsTextView.text = "Put lyrics here..."
         
         self.view.addSubview(self.lyricsTextView)
     }
@@ -195,7 +195,7 @@ class LyricsTextViewController: UIViewController {
     func pressDoneButton(sender: UIButton) {
         print("done button")
 
-        self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
+        self.lyricsReorganizedArray = formatLyrics2(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         
         if lyricsTextView.text == "" {
@@ -271,12 +271,48 @@ class LyricsTextViewController: UIViewController {
         return result
     }
 
+    func formatLyrics2(lyric: String) -> [String]{
+        let maxCharPerLine = 100
+        let lineArray: [String] = lyric.characters.split{$0 == "\n"}.map { String($0) }
+        let letterOrnumber = NSCharacterSet.alphanumericCharacterSet()
+        var result: [String] = [String]()
+        
+        for j in 0...(lineArray.count-1) {
+            var str = lineArray[j].stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()).unicodeScalars
+            if str.count == 0{
+                continue
+            }
+            print(str)
+            if(str.count <= maxCharPerLine)
+            {
+                result.append("\(str)")
+            }
+            else{
+                var i: Int = maxCharPerLine
+                while i > 0 && i < str.count
+                {
+                    if !letterOrnumber.longCharacterIsMember(str[str.startIndex.advancedBy(i-1)].value) && Character(str[str.startIndex.advancedBy(i)]) == " "
+                    {
+                        result.append(("\(str)" as NSString).substringToIndex(i))
+                        str.removeRange(str.startIndex..<str.startIndex.advancedBy(i+1))
+                        i = maxCharPerLine
+                    }
+                    else
+                    {
+                        i--
+                    }
+                }
+            }
+        }
+        
+        return result
+    }
     
     func pressDeleteAllButton(sender: UIButton) {
         print("delete all")
         let alert = UIAlertController(title: "Warning", message: "Are you sure you want to delete all lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
-            self.lyricsTextView.text = "Here!"
+            self.lyricsTextView.text = "Put lyrics here..."
             
         }))
         alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
@@ -285,8 +321,18 @@ class LyricsTextViewController: UIViewController {
     
     func pressReorganizeButton(sender: UIButton) {
         print("reorganize")
-        self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
-        self.lyricsTextView.text = array2String(self.lyricsReorganizedArray)
+        let alert = UIAlertController(title: "Reorganize Lyrics", message: "Are you sure you want to automatically organize the lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
+            self.lyricsReorganizedArray = self.formatLyrics2(self.lyricsTextView.text)
+            self.lyricsTextView.text = self.array2String(self.lyricsReorganizedArray)
+            self.lyricsTextView.alpha = 0.1
+            UIView.animateWithDuration(0.5, animations: {
+                self.lyricsTextView.alpha = 1
+            })
+        }))
+        alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+        
     }
     
     func array2String(sender: [String]) -> String {
