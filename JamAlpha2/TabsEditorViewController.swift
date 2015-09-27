@@ -103,15 +103,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let size: CGSize = CGSizeMake(self.trueWidth, self.trueWidth)
         backgroundImage.image = theSong.artwork!.imageWithSize(size)
         
-//        var blurEffect: UIBlurEffect = UIBlurEffect()
-//        blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
-//        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-//        blurEffectView.frame = CGRectMake(0, 0, self.trueWidth, self.trueHeight)
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
 
-        
         self.data.addDefaultData()
         self.editView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 18 / 20 * self.trueHeight)
         addObjectsOnMainView()
@@ -193,25 +188,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
-        
         print(indexPath.item)
-        
         cell.imageView.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
-        
-
         for subview in cell.contentView.subviews {
             if subview.isKindOfClass(UIButton){
                 subview.removeFromSuperview()
             }
         }
-
-        
         for item in self.mainViewDataArray[indexPath.item].noteButtons {
             cell.contentView.addSubview(item)
         }
-
-        
         cell.backgroundColor = UIColor.clearColor()
         return cell
     }
@@ -306,8 +293,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 let dragPointOnCollectionView = gesture.locationInView(self.collectionView)
                 if let toIndexPath : NSIndexPath = self.collectionView?.indexPathForItemAtPoint(dragPointOnCollectionView) {
                     self.checkForDraggingAtTheEdgeAndAnimatePaging(gesture)
-                    
-                    
                     if toIndexPath.isEqual(bundle.currentIndexPath) == false {
                         moveDataItem(bundle.currentIndexPath, toIndexPath: toIndexPath)
                         self.collectionView!.moveItemAtIndexPath(bundle.currentIndexPath, toIndexPath: toIndexPath)
@@ -1201,9 +1186,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func reorganizeMainViewDataArray() {
         for item in self.mainViewDataArray {
-            let buttonWidth: CGFloat = self.trueWidth / 5 / 3
-            var buttonX2: [CGFloat] = [self.trueWidth / 5 / 2 - buttonWidth - 5, self.trueWidth / 5 / 2 + 5]
-            var buttonX3: [CGFloat] = [0, self.trueWidth / 5 / 2 - buttonWidth / 2, self.trueWidth / 5 / 2 + buttonWidth / 2]
+            let buttonWidth: CGFloat = self.trueWidth / 5 / 3 * 1.5
+            let buttonWidth2: CGFloat = self.trueWidth / 5 / 3 * 1.5
+            let buttonWidth3: CGFloat = self.trueWidth / 5 / 3 * 1
+            var buttonX2: [CGFloat] = [self.trueWidth / 5 / 2 - buttonWidth2, self.trueWidth / 5 / 2]
+            var buttonX3: [CGFloat] = [0, self.trueWidth / 5 / 2 - buttonWidth3 / 2, self.trueWidth / 5 / 2 + buttonWidth3 / 2]
             
             for var i = 4; i <= 6; i++ {
                 var tempButtonArray: [UIButton] = [UIButton]()
@@ -1212,16 +1199,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         tempButtonArray.append(button)
                     }
                 }
+                if tempButtonArray.count == 1 {
+                    print(tempButtonArray[0].titleLabel!.text)
+                    tempButtonArray[0].frame = CGRectMake(self.trueWidth / 5 / 2 - buttonWidth / 2, self.string3Position[tempButtonArray[0].tag / 100 - 4] - buttonWidth / 2, buttonWidth, buttonWidth)
+                    tempButtonArray[0].layer.cornerRadius = 0.5 * buttonWidth
+                    tempButtonArray[0].titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+                }
                 if tempButtonArray.count == 2 {
                     for var j = 0; j < tempButtonArray.count; j++ {
                         print(tempButtonArray[j].titleLabel!.text)
-                        tempButtonArray[j].frame = CGRectMake(buttonX2[j], self.string3Position[tempButtonArray[j].tag / 100 - 4] - buttonWidth / 2, buttonWidth, buttonWidth)
+                        tempButtonArray[j].frame = CGRectMake(buttonX2[j], self.string3Position[tempButtonArray[j].tag / 100 - 4] - buttonWidth2 / 2, buttonWidth2, buttonWidth2)
+                        tempButtonArray[j].layer.cornerRadius = 0.5 * buttonWidth2
                         tempButtonArray[j].titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
                     }
                 } else if tempButtonArray.count == 3 {
                     for var j = 0; j < tempButtonArray.count; j++ {
                         print(tempButtonArray[j].titleLabel!.text)
-                        tempButtonArray[j].frame = CGRectMake(buttonX3[j], self.string3Position[tempButtonArray[j].tag / 100 - 4] - buttonWidth / 2, buttonWidth, buttonWidth)
+                        tempButtonArray[j].frame = CGRectMake(buttonX3[j], self.string3Position[tempButtonArray[j].tag / 100 - 4] - buttonWidth3 / 2, buttonWidth3, buttonWidth3)
+                        tempButtonArray[j].layer.cornerRadius = 0.5 * buttonWidth3
                         tempButtonArray[j].titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
                     }
                 }
@@ -1230,18 +1225,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressPreviousButton(sender: UIButton) {
-//        if self.allTabsOnMusicLine.count > 1 {
-//            self.allTabsOnMusicLine.last?.tab.removeFromSuperview()
-//            self.allTabsOnMusicLine.removeLast()
-//            let previousTime = self.allTabsOnMusicLine.last?.time
-//            self.player.currentTime = previousTime!
-//        } else if self.allTabsOnMusicLine.count == 1 {
-//            self.allTabsOnMusicLine.last?.tab.removeFromSuperview()
-//            self.allTabsOnMusicLine.removeLast()
-//            self.player.currentTime = 0
-//        }else {
-//            self.player.currentTime = 0
-//        }
         if self.allTabsOnMusicLine.count > 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tab.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)

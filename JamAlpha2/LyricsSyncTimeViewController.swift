@@ -109,27 +109,25 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         titleView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
         self.view.addSubview(titleView)
         
-        let buttonWidth: CGFloat = 2.5 / 20 * self.viewWidth
+        let buttonWidth: CGFloat = 2.0 / 20 * self.viewWidth
         let backButton: UIButton = UIButton()
-        backButton.frame = CGRectMake(0 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
         backButton.setTitle("B", forState: UIControlState.Normal)
+        backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        backButton.layer.borderWidth = 1
         titleView.addSubview(backButton)
         
         let doneButton: UIButton = UIButton()
-        doneButton.frame = CGRectMake(17.5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        doneButton.frame = CGRectMake(17.5
+            / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
         doneButton.setTitle("D", forState: UIControlState.Normal)
+        doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        doneButton.layer.borderWidth = 1
         titleView.addSubview(doneButton)
         
-        let titleLabel: UILabel = UILabel()
-        titleLabel.frame = CGRectMake(5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, 10 / 20 * self.viewWidth, 2 / 31 * self.viewHeight)
-        titleLabel.text = "sync lyrics"
-        titleLabel.textAlignment = NSTextAlignment.Center
-        titleLabel.layer.borderWidth = 1
-        titleLabel.textColor = UIColor.whiteColor()
+        let titleLabel: UIImageView = UIImageView()
+        titleLabel.frame = CGRectMake(6.5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, 7 / 20 * self.viewWidth, 2 / 31 * self.viewHeight)
+        titleLabel.image = UIImage(named: "sync-lyrics")
         titleView.addSubview(titleLabel)
     }
     
