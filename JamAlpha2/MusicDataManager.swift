@@ -14,18 +14,19 @@ class MusicDataManager: NSObject {
 
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
-    func addNewSong(item: MPMediaItem, soundwave: NSData) {
+    func addNewSong(item: MPMediaItem, soundwaveData: NSMutableArray) {
         let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
         song.title = item.title!
         song.artist = item.artist!
         song.album = item.albumTitle!
         song.playbackDuration = Float(item.playbackDuration)
-        song.soundwave = soundwave
+       // let data = NSKeyedArchiver.archivedDataWithRootObject(soundwaveData)
+        song.soundwave = soundwaveData
         
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
 
-    func getSongWaveForm(item: MPMediaItem) -> NSData? {
+    func getSongWaveForm(item: MPMediaItem) -> NSArray? {
         // TODO: make this predicate more secure
         // BUG: words like `Don'\t`, the \ is messing up the predicate
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.title!)') AND (artist == '\(item.artist!)')")
@@ -38,7 +39,7 @@ class MusicDataManager: NSObject {
         }
         
         let song: Song = results.lastObject as! Song
-        
+      
         return song.soundwave
     }
 }
