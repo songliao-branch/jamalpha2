@@ -23,7 +23,6 @@ class MusicDataManager: NSObject {
         let data:NSData = NSKeyedArchiver.archivedDataWithRootObject(soundwaveData as AnyObject)
         song.soundwaveData = data
         song.soundwaveImage = soundwaveImage
-        
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     

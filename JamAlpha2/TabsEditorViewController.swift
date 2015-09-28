@@ -1238,18 +1238,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressPreviousButton(sender: UIButton) {
-//        if self.allTabsOnMusicLine.count > 1 {
-//            self.allTabsOnMusicLine.last?.tab.removeFromSuperview()
-//            self.allTabsOnMusicLine.removeLast()
-//            let previousTime = self.allTabsOnMusicLine.last?.time
-//            self.player.currentTime = previousTime!
-//        } else if self.allTabsOnMusicLine.count == 1 {
-//            self.allTabsOnMusicLine.last?.tab.removeFromSuperview()
-//            self.allTabsOnMusicLine.removeLast()
-//            self.player.currentTime = 0
-//        }else {
-//            self.player.currentTime = 0
-//        }
+
         if self.allTabsOnMusicLine.count > 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tab.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)

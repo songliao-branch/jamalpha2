@@ -599,39 +599,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
         
-//        progressBlock.storageForSampleBuffer = musicDataManager.getSongWaveFormData(player.nowPlayingItem!)
-//        
-//        if progressBlock.storageForSampleBuffer == nil {
-//            
-//            guard let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
-//                print("sound url not available")
-//                return
-//            }
-//            print("generating wave form")
-//            progressBlock.SetSoundURL(assetURL as! NSURL)
-//            if progressBlock.storageForSampleBuffer == nil {
-//                print("data after generation is still nil")
-//            }
-//            musicDataManager.addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.storageForSampleBuffer!, soundwaveImage: NSData)
-//                
-//                //addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.storageForSampleBuffer!, sound)
-//            
-//        } else {
-//            let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
-//            progressBlock.SetSoundURL(assetURL)
-//
-//            
-//        }
-
-        
-        
-
         if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
-            
             progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
         } else {
-            
             guard let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
                 print("sound url not available")
                 return
@@ -1024,23 +995,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
                 self.actionDismissLayerButton.alpha = 0.3
             }, completion: nil)
-        
-//        actionSheet = TwistJamActionSheet()
-//        actionSheet.needRunningManSlider = true
-//        actionSheet.songVC = self
-//
-//        actionSheet.addButtonWithTitle(NSString(string:""), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-//            print("here")
-//        })
-//        actionSheet.addButtonWithTitle(NSString(string:"Change Tab Mode"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-//            self.changeChordMode()
-//        })
-//         actionSheet.show()
-//        if player.playbackState == MPMusicPlaybackState.Playing {
-//            timer.invalidate()
-//            updateAll(Float(player.currentPlaybackTime))
-//            startTimer()
-//        }
     }
     
     func showNavigationOutActions() {
