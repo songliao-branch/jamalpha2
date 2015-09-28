@@ -96,10 +96,7 @@ class LyricsTextViewController: UIViewController {
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
-        
-        
         self.addTitleView()
-        //self.addMenuView()
         self.addLyricsTextView()
     }
     
@@ -109,41 +106,38 @@ class LyricsTextViewController: UIViewController {
         titleView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
         self.view.addSubview(titleView)
         
-        let buttonWidth: CGFloat = 2.5 / 20 * self.viewWidth
+        let buttonWidth: CGFloat = 2.0 / 20 * self.viewWidth
         let backButton: UIButton = UIButton()
-        backButton.frame = CGRectMake(0 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
         backButton.setTitle("B", forState: UIControlState.Normal)
+        backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        backButton.layer.borderWidth = 1
         titleView.addSubview(backButton)
         
         let doneButton: UIButton = UIButton()
-        doneButton.frame = CGRectMake(17.5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        doneButton.frame = CGRectMake(17.5 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
         doneButton.setTitle("D", forState: UIControlState.Normal)
+        doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        doneButton.layer.borderWidth = 1
         titleView.addSubview(doneButton)
         
-        let titleLabel: UILabel = UILabel()
-        titleLabel.frame = CGRectMake(5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, 10 / 20 * self.viewWidth, 2 / 31 * self.viewHeight)
-        titleLabel.text = "lyrics editor"
-        titleLabel.textAlignment = NSTextAlignment.Center
-        titleLabel.layer.borderWidth = 1
-        titleLabel.textColor = UIColor.whiteColor()
+        let titleLabel: UIImageView = UIImageView()
+        titleLabel.frame = CGRectMake(6.5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, 7 / 20 * self.viewWidth, 2 / 31 * self.viewHeight)
+        titleLabel.image = UIImage(named: "lyrics-editor")
         titleView.addSubview(titleLabel)
         
         let deleteAllButton: UIButton = UIButton()
-        deleteAllButton.frame = CGRectMake(2.5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        deleteAllButton.frame = CGRectMake(3 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
         deleteAllButton.setTitle("D", forState: UIControlState.Normal)
+        deleteAllButton.setImage(UIImage(named: "lyrics_delete_circle"), forState: UIControlState.Normal)
         deleteAllButton.addTarget(self, action: "pressDeleteAllButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        deleteAllButton.layer.borderWidth = 1
         titleView.addSubview(deleteAllButton)
         
         let reorganizeButton: UIButton = UIButton()
-        reorganizeButton.frame = CGRectMake(15 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        reorganizeButton.frame = CGRectMake(15 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
         reorganizeButton.setTitle("R", forState: UIControlState.Normal)
+        reorganizeButton.setImage(UIImage(named: "lyrics_reorganize_circle"), forState: UIControlState.Normal)
         reorganizeButton.addTarget(self, action: "pressReorganizeButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        reorganizeButton.layer.borderWidth = 1
         titleView.addSubview(reorganizeButton)
         
         let tapOnTitleView: UITapGestureRecognizer = UITapGestureRecognizer()
@@ -154,28 +148,6 @@ class LyricsTextViewController: UIViewController {
     func tapOnTitleView(sender: UITapGestureRecognizer) {
         self.lyricsTextView.resignFirstResponder()
     }
-    
-//    func addMenuView() {
-//        var menuView: UIView = UIView()
-//        menuView.frame = CGRectMake(0, 29 / 31 * self.viewHeight, self.viewWidth, 2 / 31 * self.viewHeight)
-//        menuView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
-//        self.view.addSubview(menuView)
-//        
-//        var deleteAllButton: UIButton = UIButton()
-//        deleteAllButton.frame = CGRectMake(2 / 20 * self.viewWidth, 0.25 / 31 * self.viewHeight, 6 / 20 * self.viewWidth, 1.5 / 31 * self.viewHeight)
-//        deleteAllButton.setTitle("Delete All", forState: UIControlState.Normal)
-//        deleteAllButton.addTarget(self, action: "pressDeleteAllButton:", forControlEvents: UIControlEvents.TouchUpInside)
-//        deleteAllButton.layer.borderWidth = 1
-//        menuView.addSubview(deleteAllButton)
-//        
-//        var reorganizeButton: UIButton = UIButton()
-//        reorganizeButton.frame = CGRectMake(12 / 20 * self.viewWidth, 0.25 / 31 * self.viewHeight, 6 / 20 * self.viewWidth, 1.5 / 31 * self.viewHeight)
-//        reorganizeButton.setTitle("Reorganize", forState: UIControlState.Normal)
-//        reorganizeButton.addTarget(self, action: "pressReorganizeButton:", forControlEvents: UIControlEvents.TouchUpInside)
-//        reorganizeButton.layer.borderWidth = 1
-//        menuView.addSubview(reorganizeButton)
-//        
-//    }
     
     func addLyricsTextView() {
         self.lyricsTextView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, 27.5 / 31 * self.viewHeight)
@@ -194,8 +166,7 @@ class LyricsTextViewController: UIViewController {
     
     func pressDoneButton(sender: UIButton) {
         print("done button")
-
-        self.lyricsReorganizedArray = formatLyrics2(self.lyricsTextView.text)
+        self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         
         if lyricsTextView.text == "" {
@@ -209,69 +180,8 @@ class LyricsTextViewController: UIViewController {
         
         self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
-    
-    func formatLyrics(lyric: String) -> [String]{
-        let maxCharPerLine = 80
-        let lineArray: [String] = lyric.characters.split{$0 == "\n"}.map { String($0) }
-        let letterOrnumber = NSCharacterSet.alphanumericCharacterSet()
-        var result: [String] = [String]()
-        for j in 0...(lineArray.count-1) {
-            if lineArray[j].characters.count == 0 {
-                continue
-            }
-            let strArray: [String] = lineArray[j].characters.split{$0 == " "}.map { String($0) }
-            var str: String = ""
-            for i in 0...(strArray.count-1) {
-                var letter = strArray[i].unicodeScalars
-                //Delete the puncuation at the start of a word
-                while letter.count > 0 && !letterOrnumber.longCharacterIsMember(letter[letter.startIndex.advancedBy(0)].value){
-                    letter.removeAtIndex(letter.startIndex.advancedBy(0))
-                }
-                if letter.count == 0{
-                    continue
-                }
-                //check whether the last char is a puncuation
-                if !letterOrnumber.longCharacterIsMember(letter[letter.startIndex.advancedBy(letter.count-1)].value) {
-                    while letter.count > 0 && !letterOrnumber.longCharacterIsMember(letter[letter.startIndex.advancedBy(letter.count-1)].value){
-                        letter.removeAtIndex(letter.startIndex.advancedBy(letter.count-1))
-                    }
-                    if letter.count > 0 {
-                        let newstr = (str.characters.count == 0) ?  "\(letter)" : (str + " \(letter)")
-                        
-                        if newstr.characters.count > maxCharPerLine{
-                            if str.characters.count > 0 {
-                                result.append(str)
-                            }
-                            result.append("\(letter)")
-                        }
-                        else {
-                            result.append(newstr)
-                        }
-                    }
-                    str = ""
-                }
-                else
-                {
-                    let newstr = (str.characters.count == 0) ?  "\(letter)" : (str + " \(letter)")
-                    if newstr.characters.count > maxCharPerLine {
-                        if str.characters.count > 0 {
-                            result.append(str)
-                        }
-                        str = "\(letter)"
-                    }
-                    else {
-                        str = newstr
-                    }
-                }
-                if i == (strArray.count-1) && str.characters.count > 0{
-                    result.append(str)
-                }
-            }
-        }
-        return result
-    }
 
-    func formatLyrics2(lyric: String) -> [String]{
+    func formatLyrics(lyric: String) -> [String]{
         let maxCharPerLine = 100
         let lineArray: [String] = lyric.characters.split{$0 == "\n"}.map { String($0) }
         let letterOrnumber = NSCharacterSet.alphanumericCharacterSet()
@@ -323,7 +233,7 @@ class LyricsTextViewController: UIViewController {
         print("reorganize")
         let alert = UIAlertController(title: "Reorganize Lyrics", message: "Are you sure you want to automatically organize the lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
-            self.lyricsReorganizedArray = self.formatLyrics2(self.lyricsTextView.text)
+            self.lyricsReorganizedArray = self.formatLyrics(self.lyricsTextView.text)
             self.lyricsTextView.text = self.array2String(self.lyricsReorganizedArray)
             self.lyricsTextView.alpha = 0.1
             UIView.animateWithDuration(0.5, animations: {
