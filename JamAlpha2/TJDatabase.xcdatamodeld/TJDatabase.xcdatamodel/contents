@@ -22,7 +22,8 @@
         <attribute name="artist" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lyrics" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="playbackDuration" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="soundwave" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="soundwaveData" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="soundwaveImage" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="tabs" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
@@ -34,7 +35,7 @@
         <element name="Lyrics" positionX="-45" positionY="63" width="128" height="60"/>
         <element name="NewTabs" positionX="-54" positionY="18" width="128" height="90"/>
         <element name="SearchHistory" positionX="-54" positionY="27" width="128" height="60"/>
-        <element name="Song" positionX="-54" positionY="27" width="128" height="165"/>
+        <element name="Song" positionX="-54" positionY="27" width="128" height="180"/>
         <element name="User" positionX="-36" positionY="81" width="128" height="60"/>
     </elements>
 </model>

@@ -599,49 +599,48 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
         
-        progressBlock.storageForSampleBuffer == musicDataManager.getSongWaveForm(player.nowPlayingItem!)
-        
-        if progressBlock.storageForSampleBuffer == nil {
-            
-            guard let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
-                print("sound url not available")
-                return
-            }
-            print("generating wave form")
-            progressBlock.SetSoundURL(assetURL as! NSURL)
-            if progressBlock.storageForSampleBuffer == nil {
-                print("data after generation is still nil")
-            }
-            musicDataManager.addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.storageForSampleBuffer!)
-            
-        } else {
-            let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
-            progressBlock.SetSoundURL(assetURL)
-
-            
-        }
-
-//        print("generating sound wave..")
-//        let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
-//        self.musicDataManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
-//
+//        progressBlock.storageForSampleBuffer = musicDataManager.getSongWaveFormData(player.nowPlayingItem!)
 //        
-//
-//        if let soundWaveData = musicDataManager.getSongWaveForm(player.nowPlayingItem!) {
-//            
-//            progressBlock.setWaveFormFromData(soundWaveData)
-//            print("sound wave data found")
-//        } else {
+//        if progressBlock.storageForSampleBuffer == nil {
 //            
 //            guard let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
 //                print("sound url not available")
 //                return
 //            }
-//            print("generating sound wave..")
-//            self.progressBlock.SetSoundURL(assetURL as! NSURL)
-//            let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
-//            self.musicDataManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
+//            print("generating wave form")
+//            progressBlock.SetSoundURL(assetURL as! NSURL)
+//            if progressBlock.storageForSampleBuffer == nil {
+//                print("data after generation is still nil")
+//            }
+//            musicDataManager.addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.storageForSampleBuffer!, soundwaveImage: NSData)
+//                
+//                //addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.storageForSampleBuffer!, sound)
+//            
+//        } else {
+//            let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
+//            progressBlock.SetSoundURL(assetURL)
+//
+//            
 //        }
+
+        
+        
+
+        if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
+            
+            progressBlock.setWaveFormFromData(soundWaveData)
+            print("sound wave data found")
+        } else {
+            
+            guard let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
+                print("sound url not available")
+                return
+            }
+            print("generating sound wave..")
+            self.progressBlock.SetSoundURL(assetURL as! NSURL)
+            let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
+            self.musicDataManager.addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.storageForSampleBuffer!, soundwaveImage: data!)
+        }
         
         self.progressBlockContainer.addSubview(self.progressBlock)
         
@@ -1156,7 +1155,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func goToTabsEditor(button: UIButton) {
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         
-        tabsEditorVC.theSong = self.player.nowPlayingItem
+        tabsEditorVC.theSong = self.player.nowPlayingItem!
         print("show action clicked")
         self.player.pause()
         self.dismissAction()

@@ -15,8 +15,9 @@ class Song: NSManagedObject {
     @NSManaged var artist: String
     @NSManaged var album: String
     @NSManaged var playbackDuration: NSNumber
-    @NSManaged var soundwave: NSMutableArray
+    @NSManaged var soundwaveData: AnyObject
     @NSManaged var lyrics: AnyObject
     @NSManaged var tabs: AnyObject
     @NSManaged var albumCover: NSData
+    @NSManaged var soundwaveImage: NSData
 }

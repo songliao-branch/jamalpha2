@@ -57,7 +57,8 @@ class SwiftCoreDataHelper: NSObject {
         do {
             try managedObjectContext.save()
             return true
-        } catch _ {
+        } catch {
+            fatalError("Cannot save in core data\(error)")
             return false
         }
     }

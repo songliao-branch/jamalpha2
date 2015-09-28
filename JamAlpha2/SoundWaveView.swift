@@ -89,6 +89,7 @@ class SoundWaveView: UIView {
         
         if(asset != nil ){
             let pixelRatio:CGFloat = UIScreen.mainScreen().scale
+            
             let widthInPixels:CGFloat = size.width*pixelRatio
             let heightInPixels:CGFloat = size.height*pixelRatio
             
@@ -145,6 +146,8 @@ class SoundWaveView: UIView {
                 let halfGraphHeight:Float = Float(heightInPixels) / 2
                 var bigSample:Double = 0
                 var bigSampleCount:NSInteger = 0
+                var bigSampleforTabAndChord:Double = 0
+                var bigSampleforTabAndChordCount:NSInteger = 0
                 let data:NSMutableData = NSMutableData(length: 32768)!
                 
                 var currentX:CGFloat = 0
@@ -160,7 +163,6 @@ class SoundWaveView: UIView {
                     
                     if (sampleBufferRef != nil)
                     {
-                        self.storageForSampleBuffer?.addObject(sampleBufferRef!)
                         let blockBufferRef:CMBlockBufferRef? = CMSampleBufferGetDataBuffer(sampleBufferRef!);
                         let bufferLength:size_t = CMBlockBufferGetDataLength(blockBufferRef!)
                         
@@ -192,14 +194,27 @@ class SoundWaveView: UIView {
                                 samples = samples.successor()
                             }
                             
+                            
+                            
                             bigSample += Double(sample)
                             bigSampleCount++
                             
-                            if(bigSampleCount == 8*samplesPerPixel){
+                            bigSampleforTabAndChord += Double(sample)
+                            bigSampleforTabAndChordCount++
+                            
+                            if(bigSampleforTabAndChordCount == 3*samplesPerPixel){
+                                let averageSample:Double = bigSampleforTabAndChord / Double(bigSampleforTabAndChordCount)
+                                
+                                self.storageForSampleBuffer?.addObject(averageSample)
+                                bigSampleforTabAndChord = 0
+                                bigSampleforTabAndChordCount = 0
+                                
+                            }
+                            
+                            if(bigSampleCount == 9*samplesPerPixel){
                                 let averageSample:Double = bigSample / Double(bigSampleCount)
                                 
-                                
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*8)
+                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*9)
                                 
                                 currentX++
                                 bigSample = 0
@@ -213,7 +228,7 @@ class SoundWaveView: UIView {
                 
                 bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
                 while(currentX < 450){
-                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*8)
+                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*9)
                     currentX++
                 }
             }
@@ -224,112 +239,81 @@ class SoundWaveView: UIView {
     
     func renderWavefromFromStorage(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
         
-        if(asset != nil ){
+       // if(asset != nil ){
             let pixelRatio:CGFloat = UIScreen.mainScreen().scale
-            let widthInPixels:CGFloat = size.width*pixelRatio
+        
+        
+        let widthInPixels:CGFloat = size.width*pixelRatio
+        print("widthInPixels=\(widthInPixels)")
+//            let widthInPixels:CGFloat = size.width*pixelRatio
             let heightInPixels:CGFloat = size.height*pixelRatio
-            
-            let audioTrackArray:NSArray = asset!.tracksWithMediaType(AVMediaTypeAudio)
-            
-            if(audioTrackArray.count != 0){
-                let songTrack:AVAssetTrack = audioTrackArray[0] as! AVAssetTrack
-                
-                var channelCount: UInt32!
-                let formatDesc:NSArray = songTrack.formatDescriptions
-                
-                
-                for(var i:Int = 0; i < formatDesc.count; i++){
-                    
-                    let item:CMAudioFormatDescriptionRef = formatDesc[i] as! CMAudioFormatDescriptionRef
-                    let fmtDesc:AudioStreamBasicDescription? = CMAudioFormatDescriptionGetStreamBasicDescription(item).memory
-                    
-                    
-                    //CMAudioFormatDescriptionGetStreamBasicDescription (item);
-                    if fmtDesc != nil
-                    {
-                        channelCount = fmtDesc!.mChannelsPerFrame
-                        
-                    }
-                }
-                
+//            
+//            let audioTrackArray:NSArray = asset!.tracksWithMediaType(AVMediaTypeAudio)
+//            
+//            if(audioTrackArray.count != 0){
+//                let songTrack:AVAssetTrack = audioTrackArray[0] as! AVAssetTrack
+//                
+//                var channelCount: UInt32!
+//                let formatDesc:NSArray = songTrack.formatDescriptions
+//                
+//                
+//                for(var i:Int = 0; i < formatDesc.count; i++){
+//                    
+//                    let item:CMAudioFormatDescriptionRef = formatDesc[i] as! CMAudioFormatDescriptionRef
+//                    let fmtDesc:AudioStreamBasicDescription? = CMAudioFormatDescriptionGetStreamBasicDescription(item).memory
+//                    
+//                    
+//                    //CMAudioFormatDescriptionGetStreamBasicDescription (item);
+//                    if fmtDesc != nil
+//                    {
+//                        channelCount = fmtDesc!.mChannelsPerFrame
+//                        
+//                    }
+//                }
+//                
                 CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
                 CGContextSetLineWidth(context, 2.5)
                 CGContextSetStrokeColorWithColor(context, color.CGColor)
                 CGContextSetFillColorWithColor(context, color.CGColor)
-                
-                let bytesPreInputSample:UInt32 = 2 * channelCount
-                let totalSamples: UInt64 = UInt64(asset!.duration.value)
-                var samplesPerPixel:NSInteger = NSInteger(CGFloat(totalSamples)  / widthInPixels)
-                samplesPerPixel = samplesPerPixel < 1 ? 1 : samplesPerPixel
-                
-                
+//
+//                let totalSamples: UInt64 = UInt64(asset!.duration.value)
+//                var samplesPerPixel:NSInteger = NSInteger(CGFloat(totalSamples)  / widthInPixels)
+//                samplesPerPixel = samplesPerPixel < 1 ? 1 : samplesPerPixel
+//                
+//                
                 let halfGraphHeight:Float = Float(heightInPixels) / 2
-                var bigSample:Double = 0
-                var bigSampleCount:NSInteger = 0
-                let data:NSMutableData = NSMutableData(length: 32768)!
-                
+//                var bigSample:Double = 0
+//                var bigSampleCount:NSInteger = 0
+//                
                 var currentX:CGFloat = 0
                 //var count:Int = 0
                 
-                for sampleBufferRef in self.storageForSampleBuffer!
+                for averageSample in self.storageForSampleBuffer!
                 {
-                        let blockBufferRef:CMBlockBufferRef? = CMSampleBufferGetDataBuffer(sampleBufferRef as! CMSampleBuffer);
-                        let bufferLength:size_t = CMBlockBufferGetDataLength(blockBufferRef!)
-                        
-                        if(data.length < bufferLength){
-                            data.length = bufferLength
-                        }
-                        CMBlockBufferCopyDataBytes(blockBufferRef!, 0, bufferLength, data.mutableBytes)
-                        
-                        var samples:UnsafeMutablePointer<Int16> = UnsafeMutablePointer<Int16>(data.mutableBytes)
-                        let sampleCount:Int = (Int(bufferLength) / Int(bytesPreInputSample))
-                        
-                        for(var i:Int = 0; i < sampleCount; i++){
-                            
-                            var sample:Float32 = Float32(samples.memory)
-                            samples = samples.successor()
-                            
-                            sample = 20.0 * log10 ((sample < 0 ? 0 - sample : sample) / 32767.0)
-                            
-                            if(sample == -Float.infinity || sample <= -50){
-                                sample = -50
-                                
-                            }else{
-                                if(sample >= 0){
-                                    sample = 0
-                                }
-                            }
-                            
-                            for(var j:Int = 1; j < Int(channelCount); j++){
-                                samples = samples.successor()
-                            }
-                            
-                            bigSample += Double(sample)
-                            bigSampleCount++
-                            
-                            if(bigSampleCount == 8*samplesPerPixel){
-                                let averageSample:Double = bigSample / Double(bigSampleCount)
-                                
-                                
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*8)
+//                            bigSample += Double(sample as! Float32)
+//                            bigSampleCount++
+//                            
+//                            if(bigSampleCount == 8*samplesPerPixel){
+//                                let averageSample:Double = bigSample / Double(bigSampleCount)
+//                                
+                    
+                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*9)
                                 
                                 currentX++
-                                bigSample = 0
-                                bigSampleCount = 0
-                                
-                            }
-                        }
-                        CMSampleBufferInvalidate(sampleBufferRef as! CMSampleBuffer)
+//                                bigSample = 0
+//                                bigSampleCount = 0
+//                                
+//                            }
                 }
                 
-                bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
-                while(currentX < 450){
-                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*8)
-                    currentX++
-                }
-                
-            }
-        }
+//                bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
+//                while(currentX < 450){
+//                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*8)
+//                    currentX++
+//                }
+        
+ //           }
+//        }
     }
 
     /*******************************************************/
