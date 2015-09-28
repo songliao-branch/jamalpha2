@@ -32,7 +32,7 @@ class SoundWaveView: UIView {
     var generatedNormalImage:UIImage!
     var generatedProgressImage:UIImage!
     
-    var storageForSampleBuffer: NSMutableArray?
+    var averageSampleBuffer: NSMutableArray?
     
     
     override init(frame: CGRect)  {
@@ -85,7 +85,7 @@ class SoundWaveView: UIView {
     }
     
      func renderWavefromInContext(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
-        storageForSampleBuffer = NSMutableArray()
+        averageSampleBuffer = NSMutableArray()
         
         if(asset != nil ){
             let pixelRatio:CGFloat = UIScreen.mainScreen().scale
@@ -151,15 +151,11 @@ class SoundWaveView: UIView {
                 let data:NSMutableData = NSMutableData(length: 32768)!
                 
                 var currentX:CGFloat = 0
-                //var count:Int = 0
-                
+
                 while (reader.status == AVAssetReaderStatus.Reading)
                 {
                     let sampleBufferRef:CMSampleBufferRef? = output.copyNextSampleBuffer()
-                    
-//                    if(count == 100 ) {
-//                        break
-//                    }
+
                     
                     if (sampleBufferRef != nil)
                     {
@@ -205,7 +201,7 @@ class SoundWaveView: UIView {
                             if(bigSampleforTabAndChordCount == 3*samplesPerPixel){
                                 let averageSample:Double = bigSampleforTabAndChord / Double(bigSampleforTabAndChordCount)
                                 
-                                self.storageForSampleBuffer?.addObject(averageSample)
+                                self.averageSampleBuffer?.addObject(averageSample)
                                 bigSampleforTabAndChord = 0
                                 bigSampleforTabAndChordCount = 0
                                 
@@ -235,85 +231,27 @@ class SoundWaveView: UIView {
         }
     }
     
-    /*******************************************************/
-    
+    // render sound wave from the NSMutableArray we saved in SongViewController
     func renderWavefromFromStorage(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
-        
-       // if(asset != nil ){
-            let pixelRatio:CGFloat = UIScreen.mainScreen().scale
-        
-        
-        let widthInPixels:CGFloat = size.width*pixelRatio
-        print("widthInPixels=\(widthInPixels)")
-//            let widthInPixels:CGFloat = size.width*pixelRatio
-            let heightInPixels:CGFloat = size.height*pixelRatio
-//            
-//            let audioTrackArray:NSArray = asset!.tracksWithMediaType(AVMediaTypeAudio)
-//            
-//            if(audioTrackArray.count != 0){
-//                let songTrack:AVAssetTrack = audioTrackArray[0] as! AVAssetTrack
-//                
-//                var channelCount: UInt32!
-//                let formatDesc:NSArray = songTrack.formatDescriptions
-//                
-//                
-//                for(var i:Int = 0; i < formatDesc.count; i++){
-//                    
-//                    let item:CMAudioFormatDescriptionRef = formatDesc[i] as! CMAudioFormatDescriptionRef
-//                    let fmtDesc:AudioStreamBasicDescription? = CMAudioFormatDescriptionGetStreamBasicDescription(item).memory
-//                    
-//                    
-//                    //CMAudioFormatDescriptionGetStreamBasicDescription (item);
-//                    if fmtDesc != nil
-//                    {
-//                        channelCount = fmtDesc!.mChannelsPerFrame
-//                        
-//                    }
-//                }
-//                
-                CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
-                CGContextSetLineWidth(context, 2.5)
-                CGContextSetStrokeColorWithColor(context, color.CGColor)
-                CGContextSetFillColorWithColor(context, color.CGColor)
-//
-//                let totalSamples: UInt64 = UInt64(asset!.duration.value)
-//                var samplesPerPixel:NSInteger = NSInteger(CGFloat(totalSamples)  / widthInPixels)
-//                samplesPerPixel = samplesPerPixel < 1 ? 1 : samplesPerPixel
-//                
-//                
-                let halfGraphHeight:Float = Float(heightInPixels) / 2
-//                var bigSample:Double = 0
-//                var bigSampleCount:NSInteger = 0
-//                
-                var currentX:CGFloat = 0
-                //var count:Int = 0
-                
-                for averageSample in self.storageForSampleBuffer!
-                {
-//                            bigSample += Double(sample as! Float32)
-//                            bigSampleCount++
-//                            
-//                            if(bigSampleCount == 8*samplesPerPixel){
-//                                let averageSample:Double = bigSample / Double(bigSampleCount)
-//                                
-                    
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*9)
-                                
-                                currentX++
-//                                bigSample = 0
-//                                bigSampleCount = 0
-//                                
-//                            }
-                }
-                
-//                bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
-//                while(currentX < 450){
-//                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*8)
-//                    currentX++
-//                }
-        
- //           }
-//        }
+        let pixelRatio:CGFloat = UIScreen.mainScreen().scale
+
+        let heightInPixels:CGFloat = size.height*pixelRatio
+    
+        CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
+        CGContextSetLineWidth(context, 2.5)
+        CGContextSetStrokeColorWithColor(context, color.CGColor)
+        CGContextSetFillColorWithColor(context, color.CGColor)
+
+        let halfGraphHeight:Float = Float(heightInPixels) / 2
+
+        var currentX:CGFloat = 0
+
+        for averageSample in self.averageSampleBuffer!
+        {
+            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*9)
+            
+            currentX++
+        }
     }
 
     /*******************************************************/
@@ -325,7 +263,7 @@ class SoundWaveView: UIView {
         let ratio:CGFloat = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width * ratio, size.height * ratio), false, 1);
         
-        if(storageForSampleBuffer == nil){
+        if(averageSampleBuffer == nil){
             self.renderWavefromInContext(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
             //store into coredata
             

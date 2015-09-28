@@ -11,7 +11,7 @@ import CoreData
 import MediaPlayer
 
 class MusicDataManager: NSObject {
-
+    
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
     func addNewSong(item: MPMediaItem, soundwaveData: NSMutableArray, soundwaveImage: NSData) {

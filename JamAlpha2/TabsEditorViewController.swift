@@ -873,7 +873,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.duration = self.player.duration
         self.player.volume = 1
         
-        progressBlock.storageForSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
+        progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
         
         self.progressBlock.SetSoundURL(url)
     }

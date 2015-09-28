@@ -33,6 +33,7 @@
 		E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E72A1BA2760300210BD6 /* MusicDataManager.swift */; };
 		E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456457D1B3BB15C00276287 /* ChordBase.swift */; };
 		E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6BB71B16C1860018645D /* ArtistViewController.swift */; };
+		E468FE411BB910DA00567D94 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E468FE401BB910DA00567D94 /* CoreDataStack.swift */; settings = {ASSET_TAGS = (); }; };
 		E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */; };
 		E48877431B151628004785D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877421B151628004785D3 /* AppDelegate.swift */; };
 		E48877451B151628004785D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* SearchViewController.swift */; };
@@ -115,6 +116,7 @@
 		E455E72A1BA2760300210BD6 /* MusicDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicDataManager.swift; sourceTree = "<group>"; };
 		E456457D1B3BB15C00276287 /* ChordBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordBase.swift; sourceTree = "<group>"; };
 		E45F6BB71B16C1860018645D /* ArtistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistViewController.swift; sourceTree = "<group>"; };
+		E468FE401BB910DA00567D94 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTransitionAnimation.swift; sourceTree = "<group>"; };
 		E488773D1B151628004785D3 /* JamAlpha2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamAlpha2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				E4CBC0011B9E88BA00473FC4 /* SwiftCoreDataHelper.swift */,
+				E468FE401BB910DA00567D94 /* CoreDataStack.swift */,
 			);
 			name = Helper;
 			sourceTree = "<group>";
@@ -579,6 +582,7 @@
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
+				E468FE411BB910DA00567D94 /* CoreDataStack.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
 				C8F505041B91017B0077F508 /* PopOverSlider.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,

@@ -168,7 +168,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         player = MusicManager.sharedInstance.player
         firstLoadSongTime = player.nowPlayingItem!.playbackDuration
         firstloadSongTitle = player.nowPlayingItem!.title
@@ -608,9 +607,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 return
             }
             print("generating sound wave..")
+            let time1 = CFAbsoluteTimeGetCurrent()
+            
             self.progressBlock.SetSoundURL(assetURL as! NSURL)
+            let time2 = CFAbsoluteTimeGetCurrent()
+            print("generating sound wave takes: \((time2 - time1)*1000) ms")
+            
             let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
-            self.musicDataManager.addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.storageForSampleBuffer!, soundwaveImage: data!)
+            
+            let startTime = CFAbsoluteTimeGetCurrent()
+          
+            self.musicDataManager.addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.averageSampleBuffer!, soundwaveImage: data!)
+
+            let endTime = CFAbsoluteTimeGetCurrent()
+            let elapsedTime = (endTime - startTime) * 1000
+            print("Saving the context took \(elapsedTime) ms")
         }
         
         self.progressBlockContainer.addSubview(self.progressBlock)
