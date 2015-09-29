@@ -168,10 +168,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+       
         player = MusicManager.sharedInstance.player
         firstLoadSongTime = player.nowPlayingItem!.playbackDuration
         firstloadSongTitle = player.nowPlayingItem!.title
+        
+        musicDataManager.initializeSongToDatabase(player.nowPlayingItem!)
+        
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
@@ -599,19 +602,30 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
         progressBlock.center.y = progressContainerHeight
         
-        if let soundWaveData = musicDataManager.getSongWaveForm(player.nowPlayingItem!) {
+        if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
             progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
         } else {
-            
             guard let assetURL = player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
                 print("sound url not available")
                 return
             }
             print("generating sound wave..")
+            let time1 = CFAbsoluteTimeGetCurrent()
+            
             self.progressBlock.SetSoundURL(assetURL as! NSURL)
+            let time2 = CFAbsoluteTimeGetCurrent()
+            print("generating sound wave takes: \((time2 - time1)*1000) ms")
+            
             let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
-            self.musicDataManager.addNewSong(self.player.nowPlayingItem!, soundwave: data!)
+            
+            let startTime = CFAbsoluteTimeGetCurrent()
+            
+            self.musicDataManager.saveSoundWave(player.nowPlayingItem!, soundwaveData: progressBlock.averageSampleBuffer!, soundwaveImage: data!)
+            
+            let endTime = CFAbsoluteTimeGetCurrent()
+            let elapsedTime = (endTime - startTime) * 1000
+            print("Saving the context took \(elapsedTime) ms")
         }
         
         self.progressBlockContainer.addSubview(self.progressBlock)
@@ -996,23 +1010,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
                 self.actionDismissLayerButton.alpha = 0.3
             }, completion: nil)
-        
-//        actionSheet = TwistJamActionSheet()
-//        actionSheet.needRunningManSlider = true
-//        actionSheet.songVC = self
-//
-//        actionSheet.addButtonWithTitle(NSString(string:""), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-//            print("here")
-//        })
-//        actionSheet.addButtonWithTitle(NSString(string:"Change Tab Mode"), image: UIImage(), type: ActionSheetButtonType.ActionSheetButtonTypeDefault, handler:{(alert:TwistJamActionSheet) -> Void in
-//            self.changeChordMode()
-//        })
-//         actionSheet.show()
-//        if player.playbackState == MPMusicPlaybackState.Playing {
-//            timer.invalidate()
-//            updateAll(Float(player.currentPlaybackTime))
-//            startTimer()
-//        }
     }
     
     func showNavigationOutActions() {
@@ -1127,7 +1124,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func goToTabsEditor(button: UIButton) {
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         
-        tabsEditorVC.theSong = self.player.nowPlayingItem
+        tabsEditorVC.theSong = self.player.nowPlayingItem!
         print("show action clicked")
         self.player.pause()
         self.dismissAction()
@@ -1307,14 +1304,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshProgressBlock(){
+
+        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / self.progressBlock.frame.size.width
         
-        if progressBlockViewWidth == nil {
-            progressBlockViewWidth = CGFloat(player.nowPlayingItem!.playbackDuration)
-        }
+        let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
         
-        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!) / self.progressBlock.frame.size.width
-        
-        let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!
         if !isPanning {
             self.progressChangedOrigin = newOriginX
             self.progressChangedPosition = newProgressPosition

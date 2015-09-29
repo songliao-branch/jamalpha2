@@ -32,6 +32,8 @@ class SoundWaveView: UIView {
     var generatedNormalImage:UIImage!
     var generatedProgressImage:UIImage!
     
+    var averageSampleBuffer: NSMutableArray?
+    
     
     override init(frame: CGRect)  {
         super.init(frame: frame)
@@ -65,11 +67,12 @@ class SoundWaveView: UIView {
         progressColorDirty = false
         
         antialiasingEnabled = false
+        
     }
     
     
     
-    class func renderPixelWaveformInContext(context:CGContextRef, halfGraphHeigh:Float, sample:Double, x:CGFloat){
+     func renderPixelWaveformInContext(context:CGContextRef, halfGraphHeigh:Float, sample:Double, x:CGFloat){
       
         var pixelHeight:Float = halfGraphHeigh * Float(( 1 - sample / Double(noiseFloor)))
         
@@ -81,10 +84,12 @@ class SoundWaveView: UIView {
         CGContextStrokePath(context)
     }
     
-    class func renderWavefromInContext(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
+     func renderWavefromInContext(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
+        averageSampleBuffer = NSMutableArray()
         
         if(asset != nil ){
             let pixelRatio:CGFloat = UIScreen.mainScreen().scale
+            
             let widthInPixels:CGFloat = size.width*pixelRatio
             let heightInPixels:CGFloat = size.height*pixelRatio
             
@@ -141,19 +146,16 @@ class SoundWaveView: UIView {
                 let halfGraphHeight:Float = Float(heightInPixels) / 2
                 var bigSample:Double = 0
                 var bigSampleCount:NSInteger = 0
+                var bigSampleforTabAndChord:Double = 0
+                var bigSampleforTabAndChordCount:NSInteger = 0
                 let data:NSMutableData = NSMutableData(length: 32768)!
                 
                 var currentX:CGFloat = 0
-                //var count:Int = 0
-                
+
                 while (reader.status == AVAssetReaderStatus.Reading)
                 {
                     let sampleBufferRef:CMSampleBufferRef? = output.copyNextSampleBuffer()
-                    //count++;
-                    
-//                    if(count == 100 ) {
-//                        break
-//                    }
+
                     
                     if (sampleBufferRef != nil)
                     {
@@ -188,14 +190,27 @@ class SoundWaveView: UIView {
                                 samples = samples.successor()
                             }
                             
+                            
+                            
                             bigSample += Double(sample)
                             bigSampleCount++
                             
-                            if(bigSampleCount == 8*samplesPerPixel){
+                            bigSampleforTabAndChord += Double(sample)
+                            bigSampleforTabAndChordCount++
+                            
+                            if(bigSampleforTabAndChordCount == 3*samplesPerPixel){
+                                let averageSample:Double = bigSampleforTabAndChord / Double(bigSampleforTabAndChordCount)
+                                
+                                self.averageSampleBuffer?.addObject(averageSample)
+                                bigSampleforTabAndChord = 0
+                                bigSampleforTabAndChordCount = 0
+                                
+                            }
+                            
+                            if(bigSampleCount == 9*samplesPerPixel){
                                 let averageSample:Double = bigSample / Double(bigSampleCount)
                                 
-                                
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*8)
+                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*9)
                                 
                                 currentX++
                                 bigSample = 0
@@ -209,21 +224,53 @@ class SoundWaveView: UIView {
                 
                 bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
                 while(currentX < 450){
-                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*8)
+                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*9)
                     currentX++
                 }
-                
             }
         }
     }
     
-    class func generateWaveformImage(asset:AVAsset, color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
+    // render sound wave from the NSMutableArray we saved in SongViewController
+    func renderWavefromFromStorage(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
+        let pixelRatio:CGFloat = UIScreen.mainScreen().scale
+
+        let heightInPixels:CGFloat = size.height*pixelRatio
+    
+        CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
+        CGContextSetLineWidth(context, 2.5)
+        CGContextSetStrokeColorWithColor(context, color.CGColor)
+        CGContextSetFillColorWithColor(context, color.CGColor)
+
+        let halfGraphHeight:Float = Float(heightInPixels) / 2
+
+        var currentX:CGFloat = 0
+
+        for averageSample in self.averageSampleBuffer!
+        {
+            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*9)
+            
+            currentX++
+        }
+    }
+
+    /*******************************************************/
+    
+    
+    func generateWaveformImage(asset:AVAsset, color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
         
         
         let ratio:CGFloat = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width * ratio, size.height * ratio), false, 1);
         
-        SoundWaveView.renderWavefromInContext(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+        if(averageSampleBuffer == nil){
+            self.renderWavefromInContext(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+            //store into coredata
+            
+            
+        }else{
+            self.renderWavefromFromStorage(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+        }
         
         let image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
         
@@ -260,6 +307,7 @@ class SoundWaveView: UIView {
         self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
         self.progressImageView.image = generatedProgressImage
     }
+    
     func generateWaveforms(){
         
         let rect:CGRect = self.bounds
@@ -267,7 +315,7 @@ class SoundWaveView: UIView {
         
         if(self.asset != nil){
             
-            self.generatedNormalImage = SoundWaveView.generateWaveformImage(self.asset, color: self.normalColor, size: CGSizeMake(rect.size.width, rect.size.height), antialiasingEnabled: self.antialiasingEnabled)
+            self.generatedNormalImage = self.generateWaveformImage(self.asset, color: self.normalColor, size: CGSizeMake(rect.size.width, rect.size.height), antialiasingEnabled: self.antialiasingEnabled)
             self.normalImageView.image = generatedNormalImage
             normalColorDirty = false
         }

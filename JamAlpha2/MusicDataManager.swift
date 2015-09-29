@@ -11,34 +11,66 @@ import CoreData
 import MediaPlayer
 
 class MusicDataManager: NSObject {
-
+    
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
-    func addNewSong(item: MPMediaItem, soundwave: NSData) {
-        let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
-        song.title = item.title!
-        song.artist = item.artist!
-        song.album = item.albumTitle!
-        song.playbackDuration = Float(item.playbackDuration)
-        song.soundwave = soundwave
+    private func findSong(item: MPMediaItem) -> Song? {
+        // TODO: other special characters might corrupt the predicate, needs to check more later
+        let title = item.title!.stringByReplacingOccurrencesOfString("'", withString: "")
+        let artist = item.artist!.stringByReplacingOccurrencesOfString("'", withString: "")
+        let album = item.albumTitle!.stringByReplacingOccurrencesOfString("'", withString: "")
+        let predicate: NSPredicate = NSPredicate(format: "(title == '\(title)') AND (artist == '\(artist)') AND (album == '\(album)')")
         
-        SwiftCoreDataHelper.saveManagedObjectContext(moc)
-    }
-
-    func getSongWaveForm(item: MPMediaItem) -> NSData? {
-        // TODO: make this predicate more secure
-        // BUG: words like `Don'\t`, the \ is messing up the predicate
-        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.title!)') AND (artist == '\(item.artist!)')")
-        
-        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
         if results.count == 0 {
-            print("none found in database")
+            print("song doesn't exist")
             return nil
+        } else {
+            print("song found in core data")
+
+            return results.lastObject! as? Song
         }
+    }
+    
+    func initializeSongToDatabase(item: MPMediaItem) {
+        // if we don't have the song in the database
+        if findSong(item) == nil {
+            let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
+            song.title = item.title!
+            song.artist = item.artist!
+            song.album = item.albumTitle!
+            song.playbackDuration = Float(item.playbackDuration)
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    func saveSoundWave(item: MPMediaItem, soundwaveData: NSMutableArray, soundwaveImage: NSData) {
         
-        let song: Song = results.lastObject as! Song
-        
-        return song.soundwave
+        if let matchedSong = findSong(item) {
+            let data:NSData = NSKeyedArchiver.archivedDataWithRootObject(soundwaveData as AnyObject)
+            matchedSong.soundwaveData = data
+            matchedSong.soundwaveImage = soundwaveImage
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+
+    func getSongWaveFormData(item: MPMediaItem) -> NSMutableArray? {
+        if let matchedSong = findSong(item) {
+            print("sound wave data found for song")
+
+            return NSKeyedUnarchiver.unarchiveObjectWithData(matchedSong.soundwaveData as! NSData) as? NSMutableArray
+        }
+        return nil
+    }
+    
+    func getSongWaveFormImage(item: MPMediaItem) -> NSData? {
+        if let matchedSong = findSong(item) {
+            print("sound wave image found for song")
+            return matchedSong.soundwaveImage
+        }
+        return nil
+
     }
 }

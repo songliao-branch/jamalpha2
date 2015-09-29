@@ -12,6 +12,8 @@ import AVFoundation
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate {
     
+    var musicDataManager = MusicDataManager()
+    
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -788,7 +790,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTime = self.player.currentTime
         let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
         self.progressBlock.setProgress(persent)
-        self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (4 * self.trueWidth), 2 / 20 * self.trueHeight, 4 * self.trueWidth, 6 / 20 * self.trueHeight)
+        self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
         let minutesC = floor(self.currentTime / 60)
         let secondsC = round(self.currentTime - minutesC * 60)
         self.currentTimeLabel.text = "\(minutesC):\(secondsC)"
@@ -861,12 +863,18 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func createSoundWave() {
         
-        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, 4 * self.trueWidth, 6 / 20 * self.trueHeight)
+        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, 6 * CGFloat(theSong.playbackDuration), 6 / 20 * self.trueHeight)
         self.progressBlock = SoundWaveView(frame: frame)
+        if(theSong == nil){
+            print("the song is empty")
+        }
         let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
         self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.duration = self.player.duration
         self.player.volume = 1
+        
+        progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
+        
         self.progressBlock.SetSoundURL(url)
     }
     
@@ -882,7 +890,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.currentTime = self.player.currentTime
             let persent = CGFloat(self.currentTime / self.duration)
             self.progressBlock.setProgress(persent)
-            self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (4 * self.trueWidth), 2 / 20 * self.trueHeight, 4 * self.trueWidth, 6 / 20 * self.trueHeight)
+            self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
             if self.player.playing == false {
                 self.timer.invalidate()
                 self.timer = NSTimer()
@@ -1225,6 +1233,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressPreviousButton(sender: UIButton) {
+
         if self.allTabsOnMusicLine.count > 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tab.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)

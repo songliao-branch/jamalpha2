@@ -28,6 +28,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
     
+    var musicDataManager = MusicDataManager()
     var lyricsTableView: UITableView = UITableView()
     
     var lyricsFromTextView: String!
@@ -254,21 +255,22 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func createSoundWave() {
-        //var songCollection = MPMediaQuery.songsQuery()
-        let frame = CGRectMake(0.5 * self.viewWidth, 27.5 / 31 * self.viewHeight, 4 * self.viewWidth, 7 / 31 * self.viewHeight)
+        
+        let frame = CGRectMake(0.5 * self.viewWidth, 27.5 / 31 * self.viewHeight, CGFloat(theSong.playbackDuration) * 2, 7 / 31 * self.viewHeight)
         self.progressBlock = SoundWaveView(frame: frame)
-        let url: NSURL = self.theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
+        let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
         self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.duration = self.player.duration
-        self.currentTime = 0
         self.player.volume = 1
-        self.progressBlock.SetSoundURL(url)
         
+        if let soundWaveData = musicDataManager.getSongWaveFormImage(theSong) {
+            progressBlock.setWaveFormFromData(soundWaveData)
+        }
         let tapOnProgress: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnProgress.addTarget(self, action: "tapOnProgressBlock:")
         self.progressBlock.addGestureRecognizer(tapOnProgress)
     }
-    
+
     var duringCountDown: Bool = false
     var countDownImageView: UIImageView = UIImageView()
     var countDownNumberImageView: UIImageView = UIImageView()
@@ -303,9 +305,9 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             self.currentTimeLabel.text = "\(minutesC):\(secondsC)"
             self.duringCountDown = false
             self.currentTime = self.player.currentTime
-            let persent = CGFloat(self.currentTime / self.duration)
-            self.progressBlock.setProgress(persent)
-            self.progressBlock.frame = CGRectMake(0.5 * self.viewWidth - persent * (4 * self.viewWidth), 27.5 / 31 * self.viewHeight, self.progressBlock.frame.width, self.progressBlock.frame.height)
+            let presentTime = CGFloat(self.currentTime / self.duration)
+            self.progressBlock.setProgress(presentTime)
+            self.progressBlock.frame = CGRectMake(0.5 * self.viewWidth - presentTime * CGFloat(self.player.duration * 2), 27.5 / 31 * self.viewHeight, self.progressBlock.frame.width, self.progressBlock.frame.height)
             if self.player.playing == false {
                 self.timer.invalidate()
                 self.timer = NSTimer()
