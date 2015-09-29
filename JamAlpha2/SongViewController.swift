@@ -1300,14 +1300,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshProgressBlock(){
+
+        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / self.progressBlock.frame.size.width
         
-        if progressBlockViewWidth == nil {
-            progressBlockViewWidth = CGFloat(player.nowPlayingItem!.playbackDuration)
-        }
+        let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
         
-        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!) / self.progressBlock.frame.size.width
-        
-        let newOriginX = self.view.frame.width / 2 - CGFloat(startTime.toDecimalNumer()) * self.progressBlock.frame.width / progressBlockViewWidth!
         if !isPanning {
             self.progressChangedOrigin = newOriginX
             self.progressChangedPosition = newProgressPosition
