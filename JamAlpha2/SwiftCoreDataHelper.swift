@@ -27,14 +27,12 @@ class SwiftCoreDataHelper: NSObject {
         
         let storeCoordinator: NSPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedModel)
         
-        
         do {
             try storeCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil)
         } catch  {
             print(error)
             abort()
         }
-        
         
         let managedObjectContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
         
@@ -66,9 +64,9 @@ class SwiftCoreDataHelper: NSObject {
     
     class func fetchEntities(className: NSString, withPredicate predicate: NSPredicate?, managedObjectContext: NSManagedObjectContext)->NSArray{
         let fetchRequest: NSFetchRequest = NSFetchRequest()
-        let entetyDescription: NSEntityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)!
+        let entityDescription: NSEntityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)!
         
-        fetchRequest.entity = entetyDescription
+        fetchRequest.entity = entityDescription
         if (predicate != nil){
             fetchRequest.predicate = predicate!
         }

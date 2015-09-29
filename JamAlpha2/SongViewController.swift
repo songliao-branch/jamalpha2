@@ -168,9 +168,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidLoad() {
         super.viewDidLoad()
+       
         player = MusicManager.sharedInstance.player
         firstLoadSongTime = player.nowPlayingItem!.playbackDuration
         firstloadSongTitle = player.nowPlayingItem!.title
+        
+        musicDataManager.initializeSongToDatabase(player.nowPlayingItem!)
+        
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
@@ -616,9 +620,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let data = UIImagePNGRepresentation(self.progressBlock.generatedNormalImage)
             
             let startTime = CFAbsoluteTimeGetCurrent()
-          
-            self.musicDataManager.addNewSong(player.nowPlayingItem!, soundwaveData: progressBlock.averageSampleBuffer!, soundwaveImage: data!)
-
+            
+            self.musicDataManager.saveSoundWave(player.nowPlayingItem!, soundwaveData: progressBlock.averageSampleBuffer!, soundwaveImage: data!)
+            
             let endTime = CFAbsoluteTimeGetCurrent()
             let elapsedTime = (endTime - startTime) * 1000
             print("Saving the context took \(elapsedTime) ms")
