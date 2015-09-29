@@ -14,9 +14,12 @@ class MusicDataManager: NSObject {
     
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
-    func findSong(item: MPMediaItem) -> Song? {
-        print("title is \(item.title!)")
-        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.title!)') AND (artist == '\(item.artist!)')")
+    private func findSong(item: MPMediaItem) -> Song? {
+        // TODO: other special characters might corrupt the predicate, needs to check more later
+        let title = item.title!.stringByReplacingOccurrencesOfString("'", withString: "")
+        let artist = item.artist!.stringByReplacingOccurrencesOfString("'", withString: "")
+        let album = item.albumTitle!.stringByReplacingOccurrencesOfString("'", withString: "")
+        let predicate: NSPredicate = NSPredicate(format: "(title == '\(title)') AND (artist == '\(artist)') AND (album == '\(album)')")
         
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
