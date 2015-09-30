@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class LyricsSyncTimeTableViewCell: UITableViewCell {
-    //var checkImageView: UIImageView = UIImageView()
+    
     var lyricsSentenceLabel: UILabel = UILabel()
     var timeView: UIView = UIView()
     var currentTimeLabel: UILabel = UILabel()

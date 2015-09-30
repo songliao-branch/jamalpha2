@@ -1,14 +1,14 @@
 import UIKit
 import MediaPlayer
 
-let chordwithname:Int = 1
-let fullchord:Int = 0
-
 let stepPerSecond: Float = 50   //steps of chord move persecond
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4
 let totalalpha: Int = Int((timeToDisappear - timeDisappeared) * stepPerSecond)
+
+let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange, used in LyricsSync
+let progressWidthMultiplier:CGFloat = 2
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
@@ -56,10 +56,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var progressBlock: SoundWaveView!
     
     var progressBlockViewWidth:CGFloat?
-    var progressChangedPosition: CGFloat!
     var progressBlockContainer:UIView!
     var progressChangedOrigin:CGFloat!
-    let progressWidthMultiplier:CGFloat = 2
     var panRecognizer:UIPanGestureRecognizer!
     var isPanning = false
     
@@ -164,8 +162,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
-    let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
        
@@ -488,8 +485,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
                 let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
                     self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
-                    self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration) * self.progressWidthMultiplier, 161)
-                    self.progressBlock.center.y = self.progressContainerHeight
+                    self.progressBlock.frame = CGRectMake(self.view.frame.width / 2, 0, CGFloat(nowPlayingItemDuration)*progressWidthMultiplier, 161)
+                    self.progressBlock.center.y = progressContainerHeight
                 
                 if self.player.playbackState == MPMusicPlaybackState.Paused{
                     self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -591,12 +588,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpProgressContainer(){
-        
         progressChangedOrigin = self.view.frame.width / 2
         progressBlockContainer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: progressContainerHeight))
-        
         progressBlockContainer.center.y = self.view.frame.height - bottomViewHeight - progressContainerHeight / 2
-        
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
         
@@ -669,7 +663,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //-self.view.frame.width /2
             //= from 0 ot -517
             //divide by -2: from 0 to 258
-            let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(self.progressWidthMultiplier))
+            let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
             self.progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
             //258  517
             updateAll(toTime)
@@ -1312,7 +1306,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if !isPanning {
             self.progressChangedOrigin = newOriginX
-            self.progressChangedPosition = newProgressPosition
             self.progressBlock.setProgress(newProgressPosition)
         }
         self.progressBlock.frame.origin.x = newOriginX

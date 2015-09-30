@@ -15,9 +15,12 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     var lyricsTextViewController: LyricsTextViewController! //used to call dismiss function on it to go back to SongViewController
     // MARK: UI elements
     var lyricsTableView: UITableView = UITableView()
+    var progressBlockContainer: UIView!
     var progressBlock: SoundWaveView!
     var currentTimeLabel: UILabel = UILabel()
     var totalTimeLabel: UILabel = UILabel()
+    
+    var progressChangedOrigin: CGFloat!
     
     struct lyricsWithTime {
         var count: Int!
@@ -58,6 +61,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
         
+        setUpSong()
         setUpHeaderView()
         setUpLyricsTableView()
         setUpProgressBlock()
@@ -76,23 +80,12 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         return UIStatusBarStyle.LightContent;
     }
     
-    func setUpLyricsTableView() {
-        let backgroundImageWidth: CGFloat = self.viewHeight - 3.5 / 31 * self.viewHeight
-        let backgroundImage: UIImageView = UIImageView()
-        backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
-        let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
-        backgroundImage.image = theSong.artwork!.imageWithSize(size)
-        let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
-        backgroundImage.image = blurredImage
-        self.view.addSubview(backgroundImage)
-        
-        self.lyricsTableView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, 24 / 31 * self.viewHeight)
-        self.lyricsTableView.delegate = self
-        self.lyricsTableView.dataSource = self
-        self.lyricsTableView.registerClass(LyricsSyncTimeTableViewCell.self, forCellReuseIdentifier: "cell")
-        self.lyricsTableView.backgroundColor = UIColor.clearColor()
-        
-        self.view.addSubview(self.lyricsTableView)
+    // MARK: set up views
+    func setUpSong() {
+        let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
+        self.player = try! AVAudioPlayer(contentsOfURL: url)
+        self.duration = self.player.duration
+        self.player.volume = 1
     }
     
     func setUpHeaderView() {
@@ -123,25 +116,46 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         titleView.addSubview(titleLabel)
     }
     
-
-    func setUpProgressBlock() {
+    func setUpLyricsTableView() {
+        let backgroundImageWidth: CGFloat = self.viewHeight - 3.5 / 31 * self.viewHeight
+        let backgroundImage: UIImageView = UIImageView()
+        backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
+        let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
+        backgroundImage.image = theSong.artwork!.imageWithSize(size)
+        let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
+        backgroundImage.image = blurredImage
+        self.view.addSubview(backgroundImage)
         
-        let frame = CGRectMake(0.5 * self.viewWidth, 27.5 / 31 * self.viewHeight, CGFloat(theSong.playbackDuration) * 2, 7 / 31 * self.viewHeight)
-        self.progressBlock = SoundWaveView(frame: frame)
-        let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
-        self.player = try! AVAudioPlayer(contentsOfURL: url)
-        self.duration = self.player.duration
-        self.player.volume = 1
+        self.lyricsTableView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, 24 / 31 * self.viewHeight)
+        self.lyricsTableView.delegate = self
+        self.lyricsTableView.dataSource = self
+        self.lyricsTableView.registerClass(LyricsSyncTimeTableViewCell.self, forCellReuseIdentifier: "lyricsSyncCell")
+        self.lyricsTableView.backgroundColor = UIColor.clearColor()
+        
+        self.view.addSubview(self.lyricsTableView)
+    }
+    
+    func setUpProgressBlock() {
+        progressChangedOrigin = self.view.center.x
+        
+        progressBlockContainer = UIView(frame: CGRect(x: 0, y: viewHeight-progressContainerHeight, width: self.view.frame.width, height: progressContainerHeight))
+        progressBlockContainer.backgroundColor = UIColor.clearColor()
+        self.view.addSubview(progressBlockContainer)
+
+        self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.playbackDuration) * 2, 161))
         
         if let soundWaveData = musicDataManager.getSongWaveFormImage(theSong) {
             progressBlock.setWaveFormFromData(soundWaveData)
         }
-        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapGesture.addTarget(self, action: "playPause:")
+        
         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
         self.progressBlock!.alpha = 0.5
-        self.progressBlock.addGestureRecognizer(tapGesture)
-        self.view.addSubview(self.progressBlock)
+        progressBlockContainer.addSubview(self.progressBlock)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        let panGesture = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
+        progressBlockContainer.addGestureRecognizer(tapGesture)
+        progressBlockContainer.addGestureRecognizer(panGesture)
     }
     
     func setUpTimeLabels(){
@@ -180,12 +194,13 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         self.view.addSubview(totalTimeLabel)
     }
     
+    // MARK: Table view methods
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 4 / 31 * self.viewHeight
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: LyricsSyncTimeTableViewCell = self.lyricsTableView.dequeueReusableCellWithIdentifier("cell") as! LyricsSyncTimeTableViewCell
+        let cell: LyricsSyncTimeTableViewCell = self.lyricsTableView.dequeueReusableCellWithIdentifier("lyricsSyncCell") as! LyricsSyncTimeTableViewCell
         
         cell.initialTableViewCell(self.viewWidth, viewHeight: self.viewHeight)
         cell.backgroundColor = UIColor.clearColor()
@@ -283,6 +298,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     var countDownNumberImageView: UIImageView = UIImageView()
     var countDownNumber: Float = Float()
     
+    // MARK: UIGestures
     func playPause(sender: UITapGestureRecognizer) {
         if self.player.playing == false && self.duringCountDown == false {
             self.duringCountDown = true
@@ -294,7 +310,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             self.countDownImageView.addSubview(countDownNumberImageView)
             self.view.addSubview(countDownImageView)
             self.currentTime = player.currentTime
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            startTimer()
             NSRunLoop.mainRunLoop().addTimer(self.timer, forMode: NSRunLoopCommonModes)
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
@@ -313,22 +329,65 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
                 }, completion: nil)
             self.player.pause()
             self.timer.invalidate()
-            self.timer = NSTimer()
             self.countDownNumber = 0
+        }
+    }
+    
+    func startTimer() {
+        if !timer.valid {
+            timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        }
+    }
+    
+    var isPanning = false
+    
+    func handleProgressPan(recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translationInView(self.view)
+        for childview in recognizer.view!.subviews {
+            let child = childview
+            self.isPanning = true
+            
+            var newPosition = progressChangedOrigin + translation.x
+            
+            // leftmost point of inner bar cannot be more than half of the view
+            if newPosition > self.view.frame.width / 2 {
+                newPosition = self.view.frame.width / 2
+            }
+            
+            // the end of inner bar cannot be smaller left half of view
+            if newPosition + child.frame.width < self.view.frame.width / 2 {
+                newPosition = self.view.frame.width / 2 - child.frame.width
+            }
+            
+            //update all chords, lyrics
+            timer.invalidate()
+            let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
+            self.progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.duration))
+            
+            refreshTimeLabel(NSTimeInterval(toTime))
+            refreshProgressBlock(NSTimeInterval(toTime))
+
+            //when finger is lifted
+            if recognizer.state == UIGestureRecognizerState.Ended {
+                progressChangedOrigin = newPosition
+                isPanning = false
+                
+                player.currentTime = NSTimeInterval(toTime)
+                if player.playing {
+                    startTimer()
+                }
+            }
         }
     }
     
     func update() {
         if self.countDownNumber > 3.0 {
-            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
-            self.duringCountDown = false
-            self.currentTime = self.player.currentTime
-            let presentTime = CGFloat(self.currentTime / self.duration)
-            self.progressBlock.setProgress(presentTime)
-            self.progressBlock.frame = CGRectMake(0.5 * self.viewWidth - presentTime * CGFloat(self.player.duration * 2), 27.5 / 31 * self.viewHeight, self.progressBlock.frame.width, self.progressBlock.frame.height)
+            let currentTime = self.player.currentTime
+            refreshTimeLabel(currentTime)
+            refreshProgressBlock(currentTime)
+
             if self.player.playing == false {
                 self.timer.invalidate()
-                self.timer = NSTimer()
             }
         } else if self.countDownNumber <= 0.9 {
             self.countDownNumber = self.countDownNumber + 0.1
@@ -344,7 +403,20 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             self.countDownNumber++
             self.player.play()
         }
+    }
+    
+    func refreshProgressBlock(time: NSTimeInterval){
+        let newProgressPosition = (CGFloat(time) * progressWidthMultiplier) / self.progressBlock.frame.size.width
+        let newOriginX = self.view.center.x - CGFloat(time) * progressWidthMultiplier
         
+        if !isPanning {
+            self.progressChangedOrigin = newOriginX
+            self.progressBlock.setProgress(newProgressPosition)
+        }
+        self.progressBlock.frame.origin.x = newOriginX
     }
 
+    func refreshTimeLabel(time: NSTimeInterval) {
+        self.currentTimeLabel.text = TimeNumber(time: Float(time)).toDisplayString()
+    }
 }
