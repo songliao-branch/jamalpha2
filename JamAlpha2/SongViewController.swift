@@ -838,8 +838,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             rowWrappers.append(row)
             if i < 5 { // give a separator at the the bottom of each row except last line
                 let line = UIView(frame: CGRect(x: 0, y: rowHeight-1, width: width, height: 1))
-                line.backgroundColor = UIColor.grayColor()
-                line.alpha = 0.5
+                line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
                 row.addSubview(line)
             }
             guitarActionView.addSubview(row)
@@ -856,25 +855,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 slider.minimumTrackTintColor = UIColor.mainPinkColor()
             }
         }
-        let buttonsImageNames = ["previous", "next", "previous", "next"]
         let names = ["Chords", "Tabs", "Lyrics", "Countdown"]
         
-        let sideMargin = 10
+        let sideMargin: CGFloat = 15
         var switchHolders = [UISwitch]()
         
         for i in 1..<5 {
-            let switchImage = UIImageView(frame: CGRect(x: sideMargin, y: 0, width: 35, height: 35))
-            switchImage.image = UIImage(named: buttonsImageNames[i-1])
-            switchImage.center.y = childCenterY
-            rowWrappers[i].addSubview(switchImage)
-            
-            let switchNameLabel = UILabel(frame: CGRect(x: CGRectGetMaxX(switchImage.frame)+10, y: 0, width: 200, height: 22))
+
+            let switchNameLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 200, height: 22))
             switchNameLabel.text = names[i-1]
+            switchNameLabel.textColor = UIColor.mainPinkColor()
             switchNameLabel.center.y = childCenterY
             rowWrappers[i].addSubview(switchNameLabel)
             
             //use UISwitch default frame (51,31)
             let actionSwitch = UISwitch(frame: CGRect(x: width-CGFloat(sideMargin)-51, y: 0, width: 51, height: 31))
+            
+            actionSwitch.tintColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             actionSwitch.onTintColor = UIColor.mainPinkColor()
             actionSwitch.center.y = childCenterY
             rowWrappers[i].addSubview(actionSwitch)
@@ -892,8 +889,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         countdownSwitch = switchHolders[3]
         countdownSwitch.addTarget(self, action: "countDownChanged:", forControlEvents: .ValueChanged)
         
-        speedStepper = UIStepper(frame: CGRect(x: 0, y: 0, width: 94, height: 29))
-        speedStepper.center = CGPoint(x: width/2, y: childCenterY)
+        speedStepper = UIStepper(frame: CGRect(x: self.view.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
+        speedStepper.center.y = childCenterY
         speedStepper.tintColor = UIColor.mainPinkColor()
         speedStepper.minimumValue = 0.7 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
         speedStepper.maximumValue = 1.3
@@ -901,14 +898,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         speedStepper.value = 1.0 //default
         speedStepper.addTarget(self, action: "speedStepperValueChanged:", forControlEvents: .ValueChanged)
         
-        speedLabel = UILabel(frame: CGRect(x: 20, y: 0, width: 120, height: 22))
+        speedLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 120, height: 22))
         speedLabel.text = "Speed: 1.0x"
         speedLabel.textColor = UIColor.mainPinkColor()
         speedLabel.center.y = childCenterY
         
         rowWrappers[5].addSubview(speedStepper)
         rowWrappers[5].addSubview(speedLabel)
-        
         
         // Add navigation out view, all actions are navigated to other viewControllers
         navigationOutActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: actionViewHeight))
@@ -959,7 +955,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         for i in 0..<5 {
             // draw gray separator between buttons
             let line = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i+1)-1, width: width, height: 1))
-            line.backgroundColor = UIColor.grayColor()
+            line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             navigationOutActionView.addSubview(line)
         }
     }

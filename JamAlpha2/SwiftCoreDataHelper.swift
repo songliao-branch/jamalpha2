@@ -52,12 +52,14 @@ class SwiftCoreDataHelper: NSObject {
     }
     
     class func saveManagedObjectContext(managedObjectContext: NSManagedObjectContext)->Bool{
+        guard managedObjectContext.hasChanges else {
+            return false
+        }
         do {
             try managedObjectContext.save()
             return true
         } catch {
             fatalError("Cannot save in core data\(error)")
-            return false
         }
     }
     
