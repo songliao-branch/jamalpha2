@@ -26,8 +26,4 @@ extension UIColor {
     class func actionGray()-> UIColor {
         return UIColor(red: 0.941, green: 0.941, blue: 0.941, alpha: 0.9)
     }
-    // for action view separator, switch tint color
-    class func halfGray() -> UIColor {
-        return UIColor(white: 0.5, alpha: 0.5)
-    }
 }

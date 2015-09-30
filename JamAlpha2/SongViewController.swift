@@ -838,7 +838,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             rowWrappers.append(row)
             if i < 5 { // give a separator at the the bottom of each row except last line
                 let line = UIView(frame: CGRect(x: 0, y: rowHeight-1, width: width, height: 1))
-                line.backgroundColor = UIColor.halfGray()
+                line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
                 row.addSubview(line)
             }
             guitarActionView.addSubview(row)
@@ -871,7 +871,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //use UISwitch default frame (51,31)
             let actionSwitch = UISwitch(frame: CGRect(x: width-CGFloat(sideMargin)-51, y: 0, width: 51, height: 31))
             
-            actionSwitch.tintColor = UIColor.halfGray()
+            actionSwitch.tintColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             actionSwitch.onTintColor = UIColor.mainPinkColor()
             actionSwitch.center.y = childCenterY
             rowWrappers[i].addSubview(actionSwitch)
@@ -955,7 +955,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         for i in 0..<5 {
             // draw gray separator between buttons
             let line = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i+1)-1, width: width, height: 1))
-            line.backgroundColor = UIColor.halfGray()
+            line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             navigationOutActionView.addSubview(line)
         }
     }
