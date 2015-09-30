@@ -282,8 +282,8 @@
 			children = (
 				E48877691B1520A0004785D3 /* SongViewController.swift */,
 				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
-				E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */,
 				E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */,
+				E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */,
 			);
 			name = SongViewController;
 			sourceTree = "<group>";

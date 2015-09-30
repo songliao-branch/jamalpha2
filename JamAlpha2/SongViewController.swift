@@ -174,12 +174,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         firstloadSongTitle = player.nowPlayingItem!.title
         
         musicDataManager.initializeSongToDatabase(player.nowPlayingItem!)
-        
+    
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         setUpMusicData(player.nowPlayingItem!)
-   
         setUpTopButtons()
         setUpNameAndArtistButtons()
         setUpBackgroundImage()
@@ -214,7 +213,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             resumeSong()
-            setUpMusicData(player.nowPlayingItem!)
             loadDisplayMode()
             viewDidFullyDisappear = false
         }
@@ -361,6 +359,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         let lyricsFromCoreData = musicDataManager.getLyrics(player.nowPlayingItem!)
+        
         if lyricsFromCoreData.count > 0 {
             self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
         }
@@ -1139,7 +1138,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func goToLyricsEditor(button: UIButton) {
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
-        
+        lyricsEditor.songViewController = self
         lyricsEditor.theSong = self.player.nowPlayingItem
         self.player.pause()
         self.dismissAction()
@@ -1440,7 +1439,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
-            print("play")
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
@@ -1448,22 +1446,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: { finished in
                     UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
                         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
-                        }, completion: {
-                            finished in self.progressBlockContainer.addGestureRecognizer(self.tapRecognizer)
-                    })
+                        }, completion: nil)
                     
             })
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
             player.pause()
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                print("pause1")
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                //self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
-                }, completion: { finished in self.progressBlockContainer.addGestureRecognizer(self.tapRecognizer)
-                    
-            })
+                }, completion: nil)
         }
     }
 

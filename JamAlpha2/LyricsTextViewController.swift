@@ -10,7 +10,8 @@ import UIKit
 import MediaPlayer
 
 class LyricsTextViewController: UIViewController {
-
+    
+    var songViewController: SongViewController! //used to parse synced lyrics from LyricsSyncViewController
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
@@ -169,6 +170,7 @@ class LyricsTextViewController: UIViewController {
         self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         
+        lyricsSyncViewController.lyricsTextViewController = self
         if lyricsTextView.text == "" {
             lyricsSyncViewController.lyricsFromTextView = "You don't have any lyrics"
         }else {

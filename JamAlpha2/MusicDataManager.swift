@@ -98,6 +98,7 @@ class MusicDataManager: NSObject {
 
     func getLyrics(item: MPMediaItem) -> [(String, NSTimeInterval)] {
         if let matchedSong = findSong(item) {
+            print("has \(matchedSong.lyricsSets.count) set of lyrics")
             if matchedSong.lyricsSets.count > 0 {
                 var results = [(String, NSTimeInterval)]()
                 let theSet = matchedSong.lyricsSets.allObjects.last as! LyricsSet
@@ -105,7 +106,7 @@ class MusicDataManager: NSObject {
                 let times = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.times as! NSData) as! [NSTimeInterval]
                 
                 for i in 0..<lyrics.count {
-                    results.append((lyrics[i],times[i]))
+                    results.append((lyrics[i], times[i]))
                 }
                 return results
             }
