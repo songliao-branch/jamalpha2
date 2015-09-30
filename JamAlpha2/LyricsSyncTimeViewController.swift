@@ -11,7 +11,7 @@ import MediaPlayer
 import AVFoundation
 
 class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
+
     struct lyricsWithTime {
         var count: Int!
         var lyrics: [String]!
@@ -53,17 +53,11 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
         addObjectsOnMainView()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
@@ -248,10 +242,11 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     func pressBackButton(sender: AnyObject) {
         self.player.stop()
         self.dismissViewControllerAnimated(true, completion: nil)
+        musicDataManager.getLyrics(theSong)
     }
     
     func pressDoneButton(sender: UIButton) {
-        
+        musicDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: addedLyricsWithTime.time)
     }
     
     func createSoundWave() {

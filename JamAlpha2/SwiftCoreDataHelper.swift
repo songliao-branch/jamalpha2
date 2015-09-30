@@ -28,7 +28,8 @@ class SwiftCoreDataHelper: NSObject {
         let storeCoordinator: NSPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedModel)
         
         do {
-            try storeCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil)
+            try storeCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options:  [NSMigratePersistentStoresAutomaticallyOption: true,
+                NSInferMappingModelAutomaticallyOption: true])
         } catch  {
             print(error)
             abort()

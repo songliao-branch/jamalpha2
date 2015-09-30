@@ -13,9 +13,6 @@
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
-		C8F505031B91017B0077F508 /* PopOver.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F505011B91017B0077F508 /* PopOver.swift */; };
-		C8F505041B91017B0077F508 /* PopOverSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F505021B91017B0077F508 /* PopOverSlider.swift */; };
-		C8F505061B9101880077F508 /* TwistJamActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F505051B9101880077F508 /* TwistJamActionSheet.swift */; };
 		C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F505071B9101920077F508 /* UIWindowEffects.swift */; };
 		E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */; };
 		E42DF9331BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */; settings = {ASSET_TAGS = (); }; };
@@ -28,6 +25,7 @@
 		E43DA1291B9FDCE1003180FB /* SearchHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DA1281B9FDCE1003180FB /* SearchHistory.swift */; };
 		E44358FE1B19471B0091E926 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44358FD1B19471B0091E926 /* Artist.swift */; };
 		E44359021B1947660091E926 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359011B1947660091E926 /* Album.swift */; };
+		E443B91B1BBBA2F20074A4E1 /* LyricsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */; settings = {ASSET_TAGS = (); }; };
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
 		E455E7291BA272AD00210BD6 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E7281BA272AD00210BD6 /* Song.swift */; };
 		E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E72A1BA2760300210BD6 /* MusicDataManager.swift */; };
@@ -95,9 +93,6 @@
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
-		C8F505011B91017B0077F508 /* PopOver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopOver.swift; sourceTree = "<group>"; };
-		C8F505021B91017B0077F508 /* PopOverSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopOverSlider.swift; sourceTree = "<group>"; };
-		C8F505051B9101880077F508 /* TwistJamActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwistJamActionSheet.swift; sourceTree = "<group>"; };
 		C8F505071B9101920077F508 /* UIWindowEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIWindowEffects.swift; sourceTree = "<group>"; };
 		E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchHistoryManager.swift; sourceTree = "<group>"; };
 		E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSyncTimeTableViewCell.swift; sourceTree = "<group>"; };
@@ -110,6 +105,7 @@
 		E43DA1281B9FDCE1003180FB /* SearchHistory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchHistory.swift; sourceTree = "<group>"; };
 		E44358FD1B19471B0091E926 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		E44359011B1947660091E926 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
+		E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSet.swift; sourceTree = "<group>"; };
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		E455E7281BA272AD00210BD6 /* Song.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
 		E455E72A1BA2760300210BD6 /* MusicDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicDataManager.swift; sourceTree = "<group>"; };
@@ -207,7 +203,6 @@
 		E431BA9F1B91718C00E32A0B /* MainScreenViews */ = {
 			isa = PBXGroup;
 			children = (
-				C8F505051B9101880077F508 /* TwistJamActionSheet.swift */,
 				E456457D1B3BB15C00276287 /* ChordBase.swift */,
 			);
 			name = MainScreenViews;
@@ -226,6 +221,7 @@
 			isa = PBXGroup;
 			children = (
 				E455E7281BA272AD00210BD6 /* Song.swift */,
+				E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */,
 				E4CBBFF71B9E88A600473FC4 /* ExistTabs.swift */,
 				E4CBBFF81B9E88A600473FC4 /* NewTabs.swift */,
 				E43DA1281B9FDCE1003180FB /* SearchHistory.swift */,
@@ -254,8 +250,6 @@
 				E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */,
 				C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */,
 				C82A4E961B81B668008B6AFC /* VisualizerView.swift */,
-				C8F505011B91017B0077F508 /* PopOver.swift */,
-				C8F505021B91017B0077F508 /* PopOverSlider.swift */,
 			);
 			name = CustomViews;
 			sourceTree = "<group>";
@@ -573,6 +567,7 @@
 				E455E7291BA272AD00210BD6 /* Song.swift in Sources */,
 				E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */,
 				E4399C381B90048F00906DBD /* UIView+Geometry.swift in Sources */,
+				E443B91B1BBBA2F20074A4E1 /* LyricsSet.swift in Sources */,
 				E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */,
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
@@ -580,7 +575,6 @@
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
-				C8F505041B91017B0077F508 /* PopOverSlider.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
 				E42DF9331BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift in Sources */,
 				E44358FE1B19471B0091E926 /* Artist.swift in Sources */,
@@ -597,7 +591,6 @@
 				E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */,
 				C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */,
 				84DA61A41B4E211100979A42 /* Lyric.swift in Sources */,
-				C8F505061B9101880077F508 /* TwistJamActionSheet.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */,
 				E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */,
@@ -607,7 +600,6 @@
 				E4CBBFF91B9E88A600473FC4 /* TabsData.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E44359021B1947660091E926 /* Album.swift in Sources */,
-				C8F505031B91017B0077F508 /* PopOver.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
 				E4CBBFFB1B9E88A600473FC4 /* ExistTabs.swift in Sources */,
 				E4CBBFFC1B9E88A600473FC4 /* NewTabs.swift in Sources */,
