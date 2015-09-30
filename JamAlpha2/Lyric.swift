@@ -8,6 +8,11 @@
 
 import Foundation
 
+struct Line {
+    var time: TimeNumber
+    var str: String
+}
+
 class Lyric: NSObject{
     var lyric: [Line]
     
@@ -27,6 +32,14 @@ class Lyric: NSObject{
         return lyric
     }
     
+    // convert lyrics saved from database to the ones we can apply at SongViewController
+    init(lyricsTimesTuple: [(String, NSTimeInterval)] ) {
+        lyric = [Line]()
+        super.init()
+        for content in lyricsTimesTuple {
+            self.addLine(TimeNumber(time: Float(content.1)), str: content.0)
+        }
+    }
     
     class func getRainbowLyrics ()-> Lyric {
         let lyric = Lyric()
@@ -145,9 +158,4 @@ class Lyric: NSObject{
         lyric.addLine(TimeNumber(time: 237.88), str: "Just by saying I love you")
         return lyric
     }
-}
-
-struct  Line {
-    var time: TimeNumber
-    var str: String
 }

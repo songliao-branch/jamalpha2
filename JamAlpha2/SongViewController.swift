@@ -214,6 +214,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             resumeSong()
+            setUpMusicData(player.nowPlayingItem!)
             loadDisplayMode()
             viewDidFullyDisappear = false
         }
@@ -357,6 +358,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
          } else { // use more than words for everything else for now
             chords = Chord.getExtremeChords()
             lyric = Lyric.getExtremeLyrics()
+        }
+        
+        let lyricsFromCoreData = musicDataManager.getLyrics(player.nowPlayingItem!)
+        if lyricsFromCoreData.count > 0 {
+            self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
         }
     }
     
