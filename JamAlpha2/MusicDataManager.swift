@@ -10,15 +10,21 @@ import Foundation
 import CoreData
 import MediaPlayer
 
+extension String {
+    func replaceApostrophe() -> String {
+        return self.stringByReplacingOccurrencesOfString("'", withString: "\\'")
+    }
+}
+
 class MusicDataManager: NSObject {
     
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
     private func findSong(item: MPMediaItem) -> Song? {
         // TODO: other special characters might corrupt the predicate, needs to check more later
-        let title = item.title!.stringByReplacingOccurrencesOfString("'", withString: "")
-        let artist = item.artist!.stringByReplacingOccurrencesOfString("'", withString: "")
-        let album = item.albumTitle!.stringByReplacingOccurrencesOfString("'", withString: "")
+        let title = item.title!.replaceApostrophe()
+        let artist = item.artist!.replaceApostrophe()
+        let album = item.albumTitle!.replaceApostrophe()
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(title)') AND (artist == '\(artist)') AND (album == '\(album)')")
         
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
