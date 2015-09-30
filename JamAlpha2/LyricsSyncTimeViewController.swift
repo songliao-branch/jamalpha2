@@ -23,15 +23,13 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         var count: Int!
         var lyrics: [String]!
         var time: [NSTimeInterval]!
-        var timeTextStyle: [String]!
-        var addedTime: [Bool]!
+        var timeAdded: [Bool]!
         
         init(count: Int) {
             self.count = count
             self.lyrics = [String](count: count, repeatedValue: "")
             self.time = [NSTimeInterval](count: count, repeatedValue: 0)
-            self.addedTime = [Bool](count: count, repeatedValue: false)
-            self.timeTextStyle = [String](count: count, repeatedValue: "0.0:0.0")
+            self.timeAdded = [Bool](count: count, repeatedValue: false)
         }
     }
     
@@ -181,11 +179,11 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         totalTimeLabel.textAlignment = .Right
         self.view.addSubview(totalTimeLabel)
     }
-
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 4 / 31 * self.viewHeight
     }
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: LyricsSyncTimeTableViewCell = self.lyricsTableView.dequeueReusableCellWithIdentifier("cell") as! LyricsSyncTimeTableViewCell
         
@@ -195,14 +193,16 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         cell.lyricsSentenceLabel.textColor = UIColor.whiteColor()
         cell.currentTimeLabel.textColor = UIColor.whiteColor()
         
-        if self.addedLyricsWithTime.addedTime[indexPath.item] == true {
+        if self.addedLyricsWithTime.timeAdded[indexPath.item] == true {
+            cell.currentTimeLabel.text = TimeNumber(time: Float(addedLyricsWithTime.time[indexPath.item])).toDisplayString()
             cell.timeView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
         } else {
+            cell.currentTimeLabel.text = "0:00.0"
             cell.timeView.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
         }
         
         cell.lyricsSentenceLabel.text = self.lyricsOrganizedArray[indexPath.item]
-        cell.currentTimeLabel.text = self.addedLyricsWithTime.timeTextStyle[indexPath.item]
+        
         
         return cell
     }
@@ -215,15 +215,12 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         print("You selected \(lyricsOrganizedArray[indexPath.item])")
-        if indexPath.row == 0 || addedLyricsWithTime.addedTime[indexPath.item - 1] == true {
-            if self.addedLyricsWithTime.addedTime[indexPath.item] == false {
+        if indexPath.row == 0 || addedLyricsWithTime.timeAdded[indexPath.item - 1] == true {
+            if self.addedLyricsWithTime.timeAdded[indexPath.item] == false {
                 let time = self.currentTime
                 self.addedLyricsWithTime.time[indexPath.item] = time
                 self.addedLyricsWithTime.lyrics[indexPath.item] = lyricsOrganizedArray[indexPath.item]
-                self.addedLyricsWithTime.addedTime[indexPath.item] = true
-                let minutesC = floor(self.currentTime / 60)
-                let secondsC = round(self.currentTime - minutesC * 60)
-                self.addedLyricsWithTime.timeTextStyle[indexPath.item] = "\(minutesC):\(secondsC)"
+                self.addedLyricsWithTime.timeAdded[indexPath.item] = true
                 lyricsTableView.reloadData()
             }else {
                 player.currentTime = self.addedLyricsWithTime.time[indexPath.item]
@@ -239,13 +236,13 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == UITableViewCellEditingStyle.Delete && self.addedLyricsWithTime.addedTime[indexPath.item] == true {
+        if editingStyle == UITableViewCellEditingStyle.Delete && self.addedLyricsWithTime.timeAdded[indexPath.item] {
             // handle delete (by removing the data from your array and updating the tableview)
             var index = indexPath.row
-            while self.addedLyricsWithTime.addedTime[index] == true{
+            while self.addedLyricsWithTime.timeAdded[index] {
                 self.addedLyricsWithTime.time[index] = 0
-                self.addedLyricsWithTime.timeTextStyle[index] = "0.0:0.0"
-                self.addedLyricsWithTime.addedTime[index] = false
+                //self.addedLyricsWithTime.timeTextStyle[index] = "0.0:0.0"
+                self.addedLyricsWithTime.timeAdded[index] = false
                 index++
                 if index == self.addedLyricsWithTime.lyrics.count {
                     break
