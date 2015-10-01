@@ -118,6 +118,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var lyricsSwitch: UISwitch!
     var countdownSwitch: UISwitch!
     
+//    var countDownBackground: UIImageView!
+//    var countDownNumberImageView = UIImageView()
+//    var timeToStartUpdate = 30
+    var countdownRemoved = false // a boolean flag that only allow removing countdown to run once
     // for actions used inside this class
     // includes volume change ,speed change, show/hide chords, tabs, lyrics, countdown
     var navigationOutActionView: UIView!
@@ -136,6 +140,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let isTabsShownKey = "isTabsShown"
     let isLyricsShownKey = "isLyricsShown"
     var artWorkUnblurred = false // a variable kept to restore blur image from unblurred state (when changed from everything is hidden to show chords or lyrics), to avoid unnecessary blurring
+    var countdownOn = false
+    var countdownOnKey = "countdownOn"
     
     var actionViewHeight: CGFloat = 44 * 6 + 5// a row height * number of rows + 5 lines of separator of height 1
     //var navigationOutActionViewHeight: CGFloat = 44 * 4 + 4 //4 rows of height + 4 lines
@@ -438,9 +444,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             isLyricsShown = false
         }
         
+        // if countdown has never been set before, default is false
+        if NSUserDefaults.standardUserDefaults().integerForKey(countdownOnKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(countdownOnKey) == 2 {
+            countdownOn = false
+        } else {
+            countdownOn = true
+        }
+        
         chordsSwitch.on = isChordShown
         tabsSwitch.on = isTabsShown
         lyricsSwitch.on = isLyricsShown
+        countdownSwitch.on = countdownOn
+        
         toggleChordsDisplayMode()
         toggleLyrics()
     }
@@ -1095,6 +1110,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func countDownChanged(uiswitch: UISwitch) {
+        countdownOn = uiswitch.on
+        if countdownOn {
+            
+            
+            
+            NSUserDefaults.standardUserDefaults().setInteger(1, forKey: countdownOnKey)
+        } else {
+            NSUserDefaults.standardUserDefaults().setInteger(2, forKey: countdownOnKey)
+        }
         
     }
 

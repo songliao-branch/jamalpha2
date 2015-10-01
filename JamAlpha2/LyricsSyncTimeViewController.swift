@@ -16,7 +16,10 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     // MARK: UI elements
     var lyricsTableView: UITableView = UITableView()
     var progressBlockContainer: UIView!
+    
     var progressBlock: SoundWaveView!
+    var tapGesture: UITapGestureRecognizer!
+    var panGesture: UIPanGestureRecognizer!
     var currentTimeLabel: UILabel = UILabel()
     var totalTimeLabel: UILabel = UILabel()
     
@@ -55,10 +58,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     var updateTimer = NSTimer()
     let updateInterval: NSTimeInterval = 0.1
     
-    //var duringCountDown: Bool = false
-    var countDownImageView  = UIImageView()
-    var countDownNumberImageView = UIImageView()
-    // var countDownNumber: Float = Float()
+    var countdownView: CountdownView!
     var timeToStartUpdate = 30 //
     // MARK: UIGestures
     var addedLyricsWithTime: lyricsWithTime!
@@ -74,6 +74,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         setUpLyricsTableView()
         setUpProgressBlock()
         setUpTimeLabels()
+        setUpCountdownView()
     }
 
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
@@ -142,9 +143,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         
         self.view.addSubview(self.lyricsTableView)
     }
-    
-    var tapGesture: UITapGestureRecognizer!
-    var panGesture: UIPanGestureRecognizer!
+
     func setUpProgressBlock() {
         progressChangedOrigin = self.view.center.x
         
@@ -166,6 +165,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         panGesture = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
         progressBlockContainer.addGestureRecognizer(tapGesture)
         progressBlockContainer.addGestureRecognizer(panGesture)
+        
     }
     
     func setUpTimeLabels(){
@@ -202,6 +202,14 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
         totalTimeLabel.textAlignment = .Right
         self.view.addSubview(totalTimeLabel)
+    }
+    
+    func setUpCountdownView() {
+        countdownView = CountdownView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
+        countdownView.center = self.view.center
+        countdownView.backgroundColor = UIColor.clearColor()
+        countdownView.hidden = true
+        self.view.addSubview(countdownView)
     }
     
     // MARK: Table view methods
@@ -301,28 +309,20 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
         musicDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: addedLyricsWithTime.time)
     }
-
-
     
     func playPause(sender: UITapGestureRecognizer) {
         if !self.player.playing {
             // start playing
-            let imageWidth: CGFloat = 5 / 20 * self.viewHeight
-            self.countDownImageView.frame = CGRectMake(0.5 * self.viewWidth - imageWidth / 2, 0.5 * self.viewHeight - imageWidth / 2, imageWidth, imageWidth)
-            self.countDownImageView.image = UIImage(named: "countdown-timer")
-            self.countDownNumberImageView.frame = CGRectMake(0, 0, imageWidth, imageWidth)
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-3")
-            self.countDownImageView.addSubview(countDownNumberImageView)
-            self.view.addSubview(countDownImageView)
             self.progressBlockContainer.removeGestureRecognizer(tapGesture)
             self.progressBlockContainer.removeGestureRecognizer(panGesture)
+            timeToStartUpdate = 30 // reset
             startUpdateTimer()
 
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+            UIView.animateWithDuration(2.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
                 self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
-                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
+                    UIView.animateWithDuration(1.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
                         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                         }, completion: nil)
                     
@@ -334,8 +334,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
                 }, completion: nil)
             self.player.pause()
             self.updateTimer.invalidate()
-            timeToStartUpdate = 30
-            
+           
         }
     }
 
@@ -387,27 +386,26 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     func update() {
-
         if timeToStartUpdate > 0 { //still countdown
             timeToStartUpdate-=1
+            countdownView.hidden = false
             let tenthDigit: Int = timeToStartUpdate/10
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-\(tenthDigit+1)")
-           
+            countdownView.setNumber(tenthDigit+1)
         } else {
-            self.progressBlockContainer.addGestureRecognizer(tapGesture)
-            self.progressBlockContainer.addGestureRecognizer(panGesture)
-            self.countDownImageView.removeFromSuperview()
-            self.countDownNumberImageView.removeFromSuperview()
             
-            // TODO: This is constantly called, maybe use a flag??
-            player.play()
+            if !countdownView.hidden {
+                self.progressBlockContainer.addGestureRecognizer(tapGesture)
+                self.progressBlockContainer.addGestureRecognizer(panGesture)
+                countdownView.hidden = true
+                player.play()
+            }
+            
             let currentTime = self.player.currentTime
-            
             refreshProgressBlock(currentTime)
             refreshTimeLabel(currentTime)
         }
     }
-    
+  
     func refreshProgressBlock(time: NSTimeInterval){
         let newProgressPosition = (CGFloat(time) * progressWidthMultiplier) / self.progressBlock.frame.size.width
         let newOriginX = self.view.center.x - CGFloat(time) * progressWidthMultiplier
