@@ -54,9 +54,7 @@
 		E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */; };
 		E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0011B9E88BA00473FC4 /* SwiftCoreDataHelper.swift */; };
 		E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0021B9E88BA00473FC4 /* TJDatabase.xcdatamodeld */; };
-		E4D2F1991B4CA60B00091A45 /* 彩虹.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E4D2F1981B4CA60B00091A45 /* 彩虹.mp3 */; };
 		E4D2F19B1B4CA6A800091A45 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */; };
-		E4D2F8921B5F1B8E004B90FD /* more.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E4D2F8911B5F1B8E004B90FD /* more.mp3 */; };
 		E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */; };
 		E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */; settings = {ASSET_TAGS = (); }; };
 		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
@@ -139,9 +137,7 @@
 		E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorViewController.swift; sourceTree = "<group>"; };
 		E4CBC0011B9E88BA00473FC4 /* SwiftCoreDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftCoreDataHelper.swift; sourceTree = "<group>"; };
 		E4CBC0031B9E88BA00473FC4 /* TJDatabase.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TJDatabase.xcdatamodel; sourceTree = "<group>"; };
-		E4D2F1981B4CA60B00091A45 /* 彩虹.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "彩虹.mp3"; sourceTree = "<group>"; };
 		E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		E4D2F8911B5F1B8E004B90FD /* more.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = more.mp3; sourceTree = "<group>"; };
 		E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
 		E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownView.swift; sourceTree = "<group>"; };
 		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
@@ -323,8 +319,6 @@
 				E48877641B151A58004785D3 /* Controllers */,
 				E48877421B151628004785D3 /* AppDelegate.swift */,
 				E488774B1B151628004785D3 /* Images.xcassets */,
-				E4D2F1981B4CA60B00091A45 /* 彩虹.mp3 */,
-				E4D2F8911B5F1B8E004B90FD /* more.mp3 */,
 				E488776D1B152742004785D3 /* Main.storyboard */,
 				E488774D1B151628004785D3 /* LaunchScreen.xib */,
 				E48877401B151628004785D3 /* Supporting Files */,
@@ -497,9 +491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
-				E4D2F8921B5F1B8E004B90FD /* more.mp3 in Resources */,
 				E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */,
-				E4D2F1991B4CA60B00091A45 /* 彩虹.mp3 in Resources */,
 				E488774C1B151628004785D3 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

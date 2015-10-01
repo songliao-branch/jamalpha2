@@ -341,6 +341,9 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     func startUpdateTimer() {
         if !updateTimer.valid {
             updateTimer = NSTimer.scheduledTimerWithTimeInterval(updateInterval, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            
+            // make sure the timer is not interfered by scrollview scrolling
+            NSRunLoop.mainRunLoop().addTimer(updateTimer, forMode: NSRunLoopCommonModes)
         }
     }
     
@@ -393,7 +396,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             countdownView.setNumber(tenthDigit+1)
         } else {
             
-            if !countdownView.hidden {
+            if !countdownView.hidden { //make sure this runs only once
                 self.progressBlockContainer.addGestureRecognizer(tapGesture)
                 self.progressBlockContainer.addGestureRecognizer(panGesture)
                 countdownView.hidden = true
