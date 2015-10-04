@@ -10,7 +10,9 @@ import UIKit
 
 @IBDesignable
 class CountdownView: UIView {
-
+    
+    var numberLabel: UILabel?
+    
     override func drawRect(rect: CGRect) {
         // paint code
         let context = UIGraphicsGetCurrentContext()
@@ -38,18 +40,19 @@ class CountdownView: UIView {
         
         //add label
         numberLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 35, height: 35)))
-        numberLabel.textColor = UIColor.whiteColor()
-        numberLabel.font = UIFont.systemFontOfSize(35)
-        numberLabel.sizeToFit()
-        numberLabel.center = CGPoint(x: rect.width/2, y: rect.height/2)
-        self.addSubview(numberLabel)
+        numberLabel!.textColor = UIColor.whiteColor()
+        numberLabel!.font = UIFont.systemFontOfSize(35)
+        numberLabel!.sizeToFit()
+        numberLabel!.center = CGPoint(x: rect.width/2, y: rect.height/2)
+        self.addSubview(numberLabel!)
+        print("count down label added")
     }
-    
-    var numberLabel: UILabel!
-    
+
     func setNumber(number: Int) {
-        numberLabel.text = String(number)
-        numberLabel.sizeToFit()
-        numberLabel.center = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+        if let label = numberLabel {
+            label.text = String(number)
+            label.sizeToFit()
+            label.center = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+        }
     }
 }

@@ -72,8 +72,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     
+
     //time
     var timer: NSTimer = NSTimer()
+    var updateInterval: NSTimeInterval = 0 //used to calculate count down reduce
     var currentChordTime:Float = 0
     var toChordTime:Float = 0
     
@@ -117,11 +119,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var tabsSwitch: UISwitch!
     var lyricsSwitch: UISwitch!
     var countdownSwitch: UISwitch!
-    
-//    var countDownBackground: UIImageView!
-//    var countDownNumberImageView = UIImageView()
-//    var timeToStartUpdate = 30
-    var countdownRemoved = false // a boolean flag that only allow removing countdown to run once
+    var countdownView: CountdownView!
+    var countdownTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     // for actions used inside this class
     // includes volume change ,speed change, show/hide chords, tabs, lyrics, countdown
     var navigationOutActionView: UIView!
@@ -536,7 +535,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.startTimer()
             }
             
-
             self.updateAll(0)
         }
     }
@@ -902,6 +900,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricsSwitch.addTarget(self, action: "lyricsSwitchChanged:", forControlEvents: .ValueChanged)
         countdownSwitch = switchHolders[3]
         countdownSwitch.addTarget(self, action: "countDownChanged:", forControlEvents: .ValueChanged)
+        countdownView = CountdownView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
+        countdownView.center = self.view.center
+        countdownView.backgroundColor = UIColor.clearColor()
+        countdownView.hidden = true
+        self.view.addSubview(countdownView)
+        
+        print("count down view is set up")
+        countdownView.setNumber(5)
         
         speedStepper = UIStepper(frame: CGRect(x: self.view.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
         speedStepper.center.y = childCenterY
@@ -1112,9 +1118,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func countDownChanged(uiswitch: UISwitch) {
         countdownOn = uiswitch.on
         if countdownOn {
-            
-            
-            
             NSUserDefaults.standardUserDefaults().setInteger(1, forKey: countdownOnKey)
         } else {
             NSUserDefaults.standardUserDefaults().setInteger(2, forKey: countdownOnKey)
@@ -1234,7 +1237,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
-    func update(){
+
+    func refreshChordLabel(){
+        if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
+            return
+        }
+        
         startTime.addTime(Int(100 / stepPerSecond))
         
         if activelabels.count > 0 && start+1 < chords.count && (TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].mTime)
@@ -1249,15 +1257,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.activelabelAppend(end)
         }
         
-        if current + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(current+1).time) {
-            current++
-            topLyricLabel.text = lyric.get(current).str
-            
-            if current + 1 < lyric.lyric.count {
-                bottomLyricLabel.text = lyric.get(current+1).str
-            }
-        }
-        
         var index: Int = 0
         while index < start - startdisappearing {
             let currentalpha: CGFloat = CGFloat(Float(activelabels[index].alpha) / Float(totalalpha))
@@ -1267,22 +1266,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             index++
         }
+        
+        //remove chords at the bottom?
         if startdisappearing < start && (activelabels[0].alpha == 0 || TimeNumber(time: startTime.toDecimalNumer() + timeDisappeared).isLongerThan(chords[startdisappearing+1].mTime)) {
             for label in activelabels[0].labels{
                 label.removeFromSuperview()
             }
             activelabels.removeAtIndex(0)
             startdisappearing++
-        }
-
-        refreshChordLabel()
-        refreshProgressBlock()
-        refreshTimeLabel()
-    }
-    
-    func refreshChordLabel(){
-        if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
-            return
         }
         
         // Change the location of each label
@@ -1337,8 +1328,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func refreshTimeLabel(){
         // update current time label
-        // var tempcurrentTime:NSString = NSString(string: startTime.toDisplayString())
-        // currentTimeLabel.text = tempcurrentTime.substringToIndex(tempcurrentTime.length-2)
         currentTimeLabel.text = startTime.toDisplayString()
     }
     
@@ -1346,6 +1335,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if !isLyricsShown { // avoid unnecessary computation if lyrics is hidden
             return
         }
+        
+        if current + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(current+1).time) {
+            current++
+            topLyricLabel.text = lyric.get(current).str
+            
+            if current + 1 < lyric.lyric.count {
+                bottomLyricLabel.text = lyric.get(current+1).str
+            }
+        }
+        
         current = -1
         while(current + 1 < lyric.lyric.count){
             if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
@@ -1355,7 +1354,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if current == -1{
-            topLyricLabel.text = "..."//theSong.title
+            topLyricLabel.text = "..."
         }
         else {
             topLyricLabel.text = lyric.get(current).str
@@ -1364,7 +1363,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomLyricLabel.text = lyric.get(current+1).str
         }
         else {
-            bottomLyricLabel.text = "End~"
+            bottomLyricLabel.text = "--"
         }
     }
     
@@ -1446,28 +1445,34 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         
-        refreshChordLabel()
-        refreshProgressBlock()
-        refreshTimeLabel()
-        refreshLyrics()
+        update()
         //Update the content of the lyric
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
-            player.play()
             
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+            var animationTime = [0.3, 0.15]
+            if countdownOn {
+                animationTime = [2, 1]
+            } else {
+                player.play() //start playing immediately
+            }
+            
+            UIView.animateWithDuration(animationTime[0], delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
                 self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
-                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
+                   
+                    UIView.animateWithDuration(animationTime[1], delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
                         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                         }, completion: nil)
                     
             })
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
+            countdownTime.second = 0
+            countdownTime.decimal = 0
             player.pause()
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -1476,7 +1481,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
 
-
     func startTimer(){
         //NOTE: To prevent startTimer() to be called consecutively
         //which would double the update speed. We only
@@ -1484,9 +1488,46 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //In case of receiving song changed and playback state 
         //notifications, notifications are triggered twice somehow
         if !timer.valid {
-            timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            // make sure the timer is not interfered by scrollview scrolling
+            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
         }
     }
+    
+    func update(){
+        if countdownOn { // if countdown is on AND countdown view is set up, (it is not set up right after song comes in)
+            
+            countdownTime.addTime(Int(100 / stepPerSecond))
+            countdownView.hidden = false
+            
+            print("countdownTime: \(countdownTime.second)")
+
+            if countdownTime.second < 3 {
+                countdownView.hidden = false
+                countdownView.setNumber(3-countdownTime.second)
+
+            } else {
+                
+                if !countdownView.hidden { //make sure this runs only once
+                    countdownView.hidden = true
+                    player.play()
+                }
+                
+                refreshChordLabel()
+                refreshLyrics()
+                refreshProgressBlock()
+                refreshTimeLabel()
+            }
+
+        } else {
+            
+            refreshChordLabel()
+            refreshLyrics()
+            refreshProgressBlock()
+            refreshTimeLabel()
+        }
+    }
+    
     
     func createLabels(name: String, content: String) -> (labels: [UIView], ylocation: CGFloat, alpha: Int){
         var res = [UIView]()
