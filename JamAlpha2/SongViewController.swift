@@ -224,11 +224,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.registerMediaPlayerNotification()
     }
     
-    func setUpRainbowData(){
-        chords = Chord.getRainbowChords()
-        lyric = Lyric.getRainbowLyrics()
-    }
-    
     func setUpBackgroundImage(){
         //create an UIImageView
         let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)

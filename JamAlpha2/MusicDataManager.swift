@@ -83,7 +83,11 @@ class MusicDataManager: NSObject {
     
     // MARK: save, retrieve lyrics
     func saveLyrics(item: MPMediaItem, lyrics: [String], times: [NSTimeInterval]) {
+        
         if let matchedSong = findSong(item) {
+            // TODO: find a better way managing user's lyrics, now just clear existing lyrics
+            matchedSong.lyricsSets = NSSet()
+
             let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
             
             let lyricsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(lyrics as AnyObject)
@@ -95,7 +99,7 @@ class MusicDataManager: NSObject {
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
-
+    
     func getLyrics(item: MPMediaItem) -> [(String, NSTimeInterval)] {
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.lyricsSets.count) set of lyrics")
