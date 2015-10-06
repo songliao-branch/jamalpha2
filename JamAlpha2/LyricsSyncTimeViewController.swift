@@ -10,6 +10,20 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
+struct lyricsWithTime {
+    var count: Int!
+    var lyrics: [String]!
+    var time: [NSTimeInterval]!
+    var timeAdded: [Bool]!
+    
+    init(count: Int) {
+        self.count = count
+        self.lyrics = [String](count: count, repeatedValue: "")
+        self.time = [NSTimeInterval](count: count, repeatedValue: 0)
+        self.timeAdded = [Bool](count: count, repeatedValue: false)
+    }
+}
+
 class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var lyricsTextViewController: LyricsTextViewController! //used to call dismiss function on it to go back to SongViewController
@@ -25,21 +39,6 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     
     var progressChangedOrigin: CGFloat!
     
-
-    struct lyricsWithTime {
-        var count: Int!
-        var lyrics: [String]!
-        var time: [NSTimeInterval]!
-        var timeAdded: [Bool]!
-        
-        init(count: Int) {
-            self.count = count
-            self.lyrics = [String](count: count, repeatedValue: "")
-            self.time = [NSTimeInterval](count: count, repeatedValue: 0)
-            self.timeAdded = [Bool](count: count, repeatedValue: false)
-        }
-    }
-    
     var musicDataManager = MusicDataManager()
 
     var lyricsFromTextView: String!
@@ -51,10 +50,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     
     var lyricsOrganizedArray: [String]!
 
-    var currentTime = NSTimeInterval()
     var player = AVAudioPlayer()
-    var duration = NSTimeInterval()
-    
     var updateTimer = NSTimer()
     let updateInterval: NSTimeInterval = 0.1
     
@@ -93,7 +89,6 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     func setUpSong() {
         let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
         self.player = try! AVAudioPlayer(contentsOfURL: url)
-        self.duration = self.player.duration
         self.player.volume = 1
     }
     
@@ -226,17 +221,15 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         cell.lyricsSentenceLabel.textColor = UIColor.whiteColor()
         cell.currentTimeLabel.textColor = UIColor.whiteColor()
         
-        if self.addedLyricsWithTime.timeAdded[indexPath.item] == true {
+        if self.addedLyricsWithTime.timeAdded[indexPath.item] {
             cell.currentTimeLabel.text = TimeNumber(time: Float(addedLyricsWithTime.time[indexPath.item])).toDisplayString()
-            cell.timeView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+            cell.timeView.backgroundColor = UIColor.mainPinkColor()
         } else {
             cell.currentTimeLabel.text = "0:00.0"
             cell.timeView.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
         }
         
         cell.lyricsSentenceLabel.text = self.lyricsOrganizedArray[indexPath.item]
-        
-        
         return cell
     }
     
@@ -247,21 +240,22 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     var currentSelectIndex: Int = 0
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        print("You selected \(lyricsOrganizedArray[indexPath.item])")
+        
         if indexPath.row == 0 || addedLyricsWithTime.timeAdded[indexPath.item - 1] == true {
             if self.addedLyricsWithTime.timeAdded[indexPath.item] == false {
-                let time = self.currentTime
-                self.addedLyricsWithTime.time[indexPath.item] = time
+                
+                self.addedLyricsWithTime.time[indexPath.item] = player.currentTime
                 self.addedLyricsWithTime.lyrics[indexPath.item] = lyricsOrganizedArray[indexPath.item]
                 self.addedLyricsWithTime.timeAdded[indexPath.item] = true
                 lyricsTableView.reloadData()
             }else {
                 player.currentTime = self.addedLyricsWithTime.time[indexPath.item]
-                self.currentTime = player.currentTime
+              //  self.currentTime = player.currentTime
             }
         } else {
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
+    
     }
     
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -283,11 +277,11 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             }
             lyricsTableView.reloadData()
             if indexPath.row == 0 {
-                player.currentTime = NSTimeInterval(0)
-                self.currentTime = 0
+                player.currentTime = 0
+              //  self.currentTime = 0
             } else {
                 player.currentTime = self.addedLyricsWithTime.time[indexPath.item - 1]
-                self.currentTime = player.currentTime
+               // self.currentTime = player.currentTime
             }
         }
     }
@@ -403,9 +397,8 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
                 player.play()
             }
             
-            let currentTime = self.player.currentTime
-            refreshProgressBlock(currentTime)
-            refreshTimeLabel(currentTime)
+            refreshProgressBlock(player.currentTime)
+            refreshTimeLabel(player.currentTime)
         }
     }
   
