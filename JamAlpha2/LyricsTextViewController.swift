@@ -156,7 +156,19 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.textAlignment = NSTextAlignment.Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
-        self.lyricsTextView.text = "Put lyrics here..."
+        let musicDataManager = MusicDataManager()
+        
+        let lyricsTimes = musicDataManager.getLyrics(theSong)
+        if lyricsTimes.count > 0 {
+            var lyricsToDisplay = ""
+            for line in lyricsTimes {
+                lyricsToDisplay+="\(line.0)\n"
+            }
+            self.lyricsTextView.text = lyricsToDisplay
+        } else {
+            self.lyricsTextView.text = "Put your lyrics here"
+        }
+        
         
         self.view.addSubview(self.lyricsTextView)
     }
