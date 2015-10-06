@@ -119,8 +119,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var tabsSwitch: UISwitch!
     var lyricsSwitch: UISwitch!
     var countdownSwitch: UISwitch!
-    var countdownView: CountdownView!
-    var countdownTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
+
     // for actions used inside this class
     // includes volume change ,speed change, show/hide chords, tabs, lyrics, countdown
     var navigationOutActionView: UIView!
@@ -648,7 +647,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlockContainer.addGestureRecognizer(panRecognizer)
         tapRecognizer = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
         progressBlockContainer.addGestureRecognizer(tapRecognizer)
-        
     }
     
     func handleProgressPan(recognizer: UIPanGestureRecognizer) {
@@ -900,14 +898,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricsSwitch.addTarget(self, action: "lyricsSwitchChanged:", forControlEvents: .ValueChanged)
         countdownSwitch = switchHolders[3]
         countdownSwitch.addTarget(self, action: "countDownChanged:", forControlEvents: .ValueChanged)
-        countdownView = CountdownView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
-        countdownView.center = self.view.center
-        countdownView.backgroundColor = UIColor.clearColor()
-        countdownView.hidden = true
-        self.view.addSubview(countdownView)
-        
-        print("count down view is set up")
-        countdownView.setNumber(5)
         
         speedStepper = UIStepper(frame: CGRect(x: self.view.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
         speedStepper.center.y = childCenterY
@@ -1451,28 +1441,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
-            
-            var animationTime = [0.3, 0.15]
-            if countdownOn {
-                animationTime = [2, 1]
-            } else {
-                player.play() //start playing immediately
-            }
-            
-            UIView.animateWithDuration(animationTime[0], delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+            player.play()
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
                 self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
                    
-                    UIView.animateWithDuration(animationTime[1], delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
+                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
                         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                         }, completion: nil)
                     
             })
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
-            countdownTime.second = 0
-            countdownTime.decimal = 0
             player.pause()
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -1495,37 +1476,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func update(){
-        if countdownOn { // if countdown is on AND countdown view is set up, (it is not set up right after song comes in)
-            
-            countdownTime.addTime(Int(100 / stepPerSecond))
-            countdownView.hidden = false
-            
-            print("countdownTime: \(countdownTime.second)")
-
-            if countdownTime.second < 3 {
-                countdownView.hidden = false
-                countdownView.setNumber(3-countdownTime.second)
-
-            } else {
-                
-                if !countdownView.hidden { //make sure this runs only once
-                    countdownView.hidden = true
-                    player.play()
-                }
-                
-                refreshChordLabel()
-                refreshLyrics()
-                refreshProgressBlock()
-                refreshTimeLabel()
-            }
-
-        } else {
-            
-            refreshChordLabel()
-            refreshLyrics()
-            refreshProgressBlock()
-            refreshTimeLabel()
-        }
+        refreshChordLabel()
+        refreshLyrics()
+        refreshProgressBlock()
+        refreshTimeLabel()
     }
     
     
