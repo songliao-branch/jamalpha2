@@ -1228,8 +1228,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         
-        startTime.addTime(Int(100 / stepPerSecond))
-        
         if activelabels.count > 0 && start+1 < chords.count && (TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].mTime)
         {
             activelabels[start-startdisappearing].alpha--
@@ -1471,6 +1469,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func update(){
+        startTime.addTime(Int(100 / stepPerSecond))
         refreshChordLabel()
         refreshLyrics()
         refreshProgressBlock()
