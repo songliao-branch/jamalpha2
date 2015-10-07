@@ -34,7 +34,7 @@ class MusicDataManager: NSObject {
             return nil
         } else {
             print("song found in core data")
-
+            
             return results.lastObject! as? Song
         }
     }

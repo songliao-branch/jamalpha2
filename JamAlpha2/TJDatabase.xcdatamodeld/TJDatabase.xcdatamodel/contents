@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="8195" systemVersion="14F27" minimumToolsVersion="Xcode 4.3">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="8195" systemVersion="15A284" minimumToolsVersion="Xcode 4.3">
     <entity name="ExistTabs" representedClassName="ExistTabs" syncable="YES">
         <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="index" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
@@ -27,12 +27,25 @@
         <attribute name="soundwaveImage" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="lyricsSets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LyricsSet" inverseName="song" inverseEntity="LyricsSet" syncable="YES"/>
+        <relationship name="tabsSets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TabsSet" inverseName="song" inverseEntity="TabsSet" syncable="YES"/>
+    </entity>
+    <entity name="Tabs" representedClassName="Tabs" syncable="YES">
+        <attribute name="content" attributeType="String" syncable="YES"/>
+        <attribute name="index" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="isOriginal" attributeType="Boolean" syncable="YES"/>
+        <attribute name="name" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="TabsSet" syncable="YES">
+        <attribute name="times" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <relationship name="song" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="tabsSets" inverseEntity="Song" syncable="YES"/>
     </entity>
     <elements>
         <element name="ExistTabs" positionX="-63" positionY="-18" width="128" height="90"/>
+        <element name="LyricsSet" positionX="-27" positionY="81" width="128" height="90"/>
         <element name="NewTabs" positionX="-54" positionY="18" width="128" height="90"/>
         <element name="SearchHistory" positionX="-54" positionY="27" width="128" height="60"/>
-        <element name="Song" positionX="-54" positionY="27" width="128" height="165"/>
-        <element name="LyricsSet" positionX="-27" positionY="81" width="128" height="90"/>
+        <element name="Song" positionX="-54" positionY="27" width="128" height="180"/>
+        <element name="TabsSet" positionX="-45" positionY="72" width="128" height="75"/>
+        <element name="Tabs" positionX="-36" positionY="90" width="128" height="105"/>
     </elements>
 </model>

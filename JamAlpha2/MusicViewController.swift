@@ -17,9 +17,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        //println(API.Router.Term("edsheeran").URLRequest.URLString)
-        //println(API.Router.TermAttribute("michael jackson", Attribute.artistTerm).URLRequest.URLString)
-        
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
