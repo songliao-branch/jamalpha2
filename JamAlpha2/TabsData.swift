@@ -32,7 +32,6 @@ class TabsData: NSObject {
         //5th string
         for var i = 0; i < 4; i++ {
             for var j = 0; j < 23; j++ {
-                var t: String = String()
                 if i == 0 {
                     if j == 3 {
                         fingersString["50300"] = "xx0302000100"

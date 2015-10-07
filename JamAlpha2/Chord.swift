@@ -118,9 +118,7 @@ class Chord: NSObject {
         let Am = Tab(name: "Am", content:" 02210")
         let AmG = Tab(name: "Am/G", content: "302210")
         let F = Tab(name: "F", content: "133211")
-        let Gsus4 = Tab(name: "Gsus4", content:"320013")
-        
-        
+
         //intro
         let chord1 = Chord(tab: C, time: TimeNumber(time: 0.33))
         let chord2 = Chord(tab: Dm7, time: TimeNumber(time:1.97))
@@ -142,9 +140,7 @@ class Chord: NSObject {
         let chord15 = Chord(tab: AmG, time: TimeNumber(time:34.2))
         let chord16 = Chord(tab: F, time: TimeNumber(time:40.1))
         let chord17 = Chord(tab: G, time: TimeNumber(time:45.1))
-        var chord18 = Chord(tab: Dm7, time: TimeNumber(time:48.1))
-        var chord19 = Chord(tab: Gsus4, time: TimeNumber(time:55.0))
-        
+
         chords.append(chord1)
         chords.append(chord2)
         chords.append(chord3)

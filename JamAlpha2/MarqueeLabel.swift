@@ -286,7 +286,6 @@ public class MarqueeLabel: UILabel {
             sublabel.textAlignment = super.textAlignment
             sublabel.lineBreakMode = super.lineBreakMode
             
-            var unusedFrame = CGRect.zero
             var labelFrame = CGRect.zero
             
             

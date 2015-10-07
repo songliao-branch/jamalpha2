@@ -10,7 +10,8 @@ import UIKit
 import MediaPlayer
 
 class LyricsTextViewController: UIViewController {
-
+    
+    var songViewController: SongViewController! //used to parse synced lyrics from LyricsSyncViewController
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
@@ -155,7 +156,19 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.textAlignment = NSTextAlignment.Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
-        self.lyricsTextView.text = "Put lyrics here..."
+        let musicDataManager = MusicDataManager()
+        
+        let lyricsTimes = musicDataManager.getLyrics(theSong)
+        if lyricsTimes.count > 0 {
+            var lyricsToDisplay = ""
+            for line in lyricsTimes {
+                lyricsToDisplay+="\(line.0)\n"
+            }
+            self.lyricsTextView.text = lyricsToDisplay
+        } else {
+            self.lyricsTextView.text = "Put your lyrics here"
+        }
+        
         
         self.view.addSubview(self.lyricsTextView)
     }
@@ -169,6 +182,7 @@ class LyricsTextViewController: UIViewController {
         self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         
+        lyricsSyncViewController.lyricsTextViewController = self
         if lyricsTextView.text == "" {
             lyricsSyncViewController.lyricsFromTextView = "You don't have any lyrics"
         }else {
