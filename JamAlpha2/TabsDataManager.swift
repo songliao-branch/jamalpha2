@@ -160,6 +160,7 @@ class TabsDataManager: NSObject {
 //        }
     }
     
+    
 //    func removeAllFromDatabase() {
 //        let resultsForExistTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: nil, managedObjectContext: moc)
 //        let resultsForNewTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: nil, managedObjectContext: moc)

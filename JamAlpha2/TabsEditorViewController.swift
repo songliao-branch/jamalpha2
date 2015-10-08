@@ -89,7 +89,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         createSoundWave()
         
         self.tabsDataManager.addDefaultData()
-        initializeTabsFromDatabase()
+        reloadTabsData()
         self.editView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 18 / 20 * self.trueHeight)
         addObjectsOnMainView()
         addObjectsOnEditView()
@@ -102,7 +102,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.initialMainViewDataArray()
     }
     
-    func initializeTabsFromDatabase(){
+    func reloadTabsData(){
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         do {
             if let results = try SwiftCoreDataHelper.managedObjectContext().executeFetchRequest(fetchRequest) as? [Tabs] {
@@ -550,14 +550,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let buttonHeight: CGFloat = 2 / 20 * self.trueHeight
         let buttonWidth: CGFloat = 3 / 20 * self.trueHeight
         var count = 0
-        for var i = 0; i < tabsD.count; i++ {
-            if dict[i].objectForKey("content") as! String != "" {
+        var tabsSetsOnCurrentIndex = tabsDataManager.getTabsSets(index)
+        for var i = 0; i < tabsSetsOnCurrentIndex.count; i++ {
+            if tabsSetsOnCurrentIndex[i].content != "" {
                 let specificButton: UIButton = UIButton()
                 specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
                 specificButton.layer.borderWidth = 1
                 specificButton.layer.cornerRadius = 4
                 specificButton.addTarget(self, action: "pressExistSpecificButton:", forControlEvents: UIControlEvents.TouchUpInside)
-                specificButton.setTitle(dict[i].objectForKey("name") as? String, forState: UIControlState.Normal)
+                specificButton.setTitle(tabsSetsOnCurrentIndex[i].name, forState: UIControlState.Normal)
                 specificButton.alpha = 0
                 specificButton.tag = sender
                 self.specificTabsScrollView.addSubview(specificButton)
@@ -637,7 +638,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.changeRemoveButtonStatus(self.removeButton)
         }
     }
-
+    
     func createFingerPoint(sender: Int, name: String, newTabs: Bool) {
         let index = NSNumber(integer: sender)
         var dict: NSDictionary = NSDictionary()
@@ -1132,7 +1133,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                                 }
                             }
                         }
-                        self.data.addNewTab(index, name: name, content: content)
+                        
+                        self.tabsDataManager.addNewTabs(index, name: name, content: content)
+                        reloadTabsData()
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
                         print("successfully add to database")
                         addSuccessed = true
