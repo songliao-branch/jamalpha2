@@ -7,6 +7,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     private var uniqueArtists = [Artist]()
     private var uniqueAlbums = [Album]()
     
+    private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
+    
     var pageIndex = 0
     
     @IBOutlet weak var musicTable: UITableView!
@@ -24,14 +26,53 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
         
+        sortSongsByFirstCharacter()
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
+        UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
     }
+    
+    func sortSongsByFirstCharacter() {
+        songsByFirstAlphabet = [(String, [MPMediaItem])]()
+        
+        // we use a temporary dictionary to inject values (songs) to each key (alphabet)
+        var songsDictionary = [String: [MPMediaItem]]()
+        
+        for song in uniqueSongs {
+            var firstAlphabet = song.title![0..<1]
+            
+            let characters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+            var isLetter = false
+            for character in characters {
+                if firstAlphabet.lowercaseString == character {
+                    isLetter = true
+                    break
+                }
+            }
+            if !isLetter {
+                firstAlphabet = "#"
+            } else {
+                firstAlphabet = firstAlphabet.uppercaseString
+            }
+            if songsDictionary[firstAlphabet] == nil {
+                songsDictionary[firstAlphabet] = []
+            }
+            songsDictionary[firstAlphabet]?.append(song)
+        }
 
+        songsByFirstAlphabet = songsDictionary.sort {
+            (left, right) in
+            if left.0 == "#" { //put # at last
+                return false
+            } else if right.0 == "#" {
+                return true
+            }
+            return left.0 < right.0
+        }
+    }
+    
     func registerMusicPlayerNotificationForSongChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
-        
-        
     }
     
     func synced(lock: AnyObject, closure: () -> ()) {
@@ -69,11 +110,43 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
     }
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        if pageIndex == 0  {
+            return songsByFirstAlphabet.count
+        }
+        else if pageIndex == 1 {
+            return 1
+        }
+        else
+        {
+            return 1
+        }
+    }
     
-
+    func sectionIndexTitlesForTableView(tableView: UITableView) -> [String]? {
+        if pageIndex == 0 {
+            var titles = [String]()
+            for (firstAlphabet, _) in songsByFirstAlphabet {
+                titles.append(firstAlphabet)
+            }
+            return titles
+        }
+        return nil
+    }
+    func tableView(tableView: UITableView, sectionForSectionIndexTitle title: String, atIndex index: Int) -> Int {
+        if pageIndex == 0 {
+            for i in 0..<songsByFirstAlphabet.count {
+                if title == songsByFirstAlphabet[i].0 {
+                    return i
+                }
+            }
+        }
+        return 0
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
-                return uniqueSongs.count
+            return songsByFirstAlphabet[section].1.count
         }
         else if pageIndex == 1 {
             return uniqueArtists.count
@@ -90,8 +163,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
         if pageIndex == 0 {
             
-            let song = uniqueSongs[indexPath.row]
-            
+            //let song = uniqueSongs[indexPath.row]
+            let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             if MusicManager.sharedInstance.player.nowPlayingItem != nil {
                 if song == MusicManager.sharedInstance.player.nowPlayingItem {
                     
@@ -167,9 +240,23 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if pageIndex == 0 {
             
-            MusicManager.sharedInstance.setPlayerQueue(uniqueSongs)
-            MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
-  
+            var allSongsSorted = [MPMediaItem]()
+            for songSectionByAlphabet in songsByFirstAlphabet {
+                for song in songSectionByAlphabet.1 {
+                    allSongsSorted.append(song)
+                }
+            }
+            MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
+            let sectionIndex = indexPath.section
+            var songsInPreviousSections = 0
+            if sectionIndex > 0 {
+                for i in 1...sectionIndex {
+                    songsInPreviousSections += songsByFirstAlphabet[i-1].1.count
+                }
+            }
+            let indexToBePlayed = songsInPreviousSections + indexPath.row
+            MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             songVC.selectedFromTable = true
             

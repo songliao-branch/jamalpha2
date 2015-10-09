@@ -866,7 +866,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var switchHolders = [UISwitch]()
         
         for i in 1..<5 {
-
             let switchNameLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 200, height: 22))
             switchNameLabel.text = names[i-1]
             switchNameLabel.textColor = UIColor.mainPinkColor()
