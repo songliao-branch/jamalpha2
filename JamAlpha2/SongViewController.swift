@@ -278,7 +278,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let tuningLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 15))
             tuningLabel.textColor = UIColor.whiteColor()
             tuningLabel.text = tuningToShow[i-1]
-            tuningLabel.font = UIFont.systemFontOfSize(minfont-2)
+            tuningLabel.font = UIFont.systemFontOfSize(minfont-5)
             tuningLabel.textAlignment = .Center
             tuningLabel.sizeToFit()
             tuningLabel.center = CGPoint(x: topPoints[i]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
@@ -290,33 +290,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func tuningPressed(button: UIButton) {
         print("tuning pressed")
-        let heightAjustment = self.chordBase.frame.height/20
+        
         if tuningLabels[0].hidden {
-            UIView.animateWithDuration(0.3, animations: {
-                self.chordBase.frame = CGRect(x: 0, y: CGRectGetMaxY(self.topView.frame)+20+heightAjustment, width: self.view.frame.width*0.62, height: self.basesHeight*0.55-heightAjustment)
-                self.chordBase.center.x = self.view.center.x
-                }, completion: {
-                    completed in
-                    self.calculateXPoints()
-                    for i in 0..<self.tuningLabels.count {
-                        
-                        self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y: self.chordBase.frame.origin.y-10)
-                        self.tuningLabels[i].hidden = false
-                    }
-            })
+            for label in tuningLabels {
+                label.hidden = false
+            }
         } else {
             
             for label in tuningLabels {
                 label.hidden = true
             }
-            UIView.animateWithDuration(0.3, animations: {
-                self.chordBase.frame = CGRect(x: 0, y: CGRectGetMaxY(self.topView.frame)+20, width: self.view.frame.width*0.62, height: self.basesHeight*0.55)
-                self.chordBase.center.x = self.view.center.x
-            },completion: {
-                completed in
-                self.calculateXPoints()
-            })
-            
         }
     }
     func setUpNameAndArtistButtons(){
