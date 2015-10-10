@@ -48,7 +48,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var nextButton: UIButton!
 
     // MARK: Custom views
-    var base: ChordBase!
+    var chordBase: ChordBase!
     var basesHeight: CGFloat!
     let marginBetweenBases: CGFloat = 15
     
@@ -309,12 +309,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     
     func setUpControlButtons(){
-        previousButton = UIButton(frame: CGRect(x: 0, y: base.frame.origin.y, width: buttonDimension, height: buttonDimension))
+        previousButton = UIButton(frame: CGRect(x: 0, y: chordBase.frame.origin.y, width: buttonDimension, height: buttonDimension))
         previousButton.setImage(UIImage(named: "previous"), forState: .Normal)
         previousButton.addTarget(self, action: "previousPressed:", forControlEvents: .TouchUpInside)
         previousButton.contentHorizontalAlignment = .Left
         
-        nextButton = UIButton(frame: CGRect(x: 0, y: base.frame.origin.y, width: buttonDimension, height: buttonDimension))
+        nextButton = UIButton(frame: CGRect(x: 0, y: chordBase.frame.origin.y, width: buttonDimension, height: buttonDimension))
         nextButton.setImage(UIImage(named: "next"), forState: .Normal)
         nextButton.addTarget(self, action: "nextPressed:", forControlEvents: .TouchUpInside)
         nextButton.frame.origin.x = self.view.frame.width - nextButton.frame.width
@@ -366,7 +366,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         current = -1
         let sideMargin: CGFloat = 20
         
-        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(base.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
+        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         lyricbase.alpha = 0.8
         
@@ -402,19 +402,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         basesHeight = self.view.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
         
-        base = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
-        base.center.x = self.view.center.x
-        base.backgroundColor = UIColor.clearColor()
-        base.alpha = 0.8
+        chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
+        chordBase.center.x = self.view.center.x
+        chordBase.backgroundColor = UIColor.clearColor()
+        chordBase.alpha = 0.8
         
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
         panRecognizer.delaysTouchesEnded = true
         
         panRecognizer.delegate = self
-        base.addGestureRecognizer(panRecognizer)
+        chordBase.addGestureRecognizer(panRecognizer)
         
         
-        self.view.addSubview(base)
+        self.view.addSubview(chordBase)
     }
     
     func loadDisplayMode() {
@@ -704,7 +704,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             break;
         case UIGestureRecognizerState.Changed:
             let tempNowPlayingItem = player.nowPlayingItem
-            let deltaTime = Float(translation.y)*(freefallTime/Float(base.frame.size.height))
+            let deltaTime = Float(translation.y)*(freefallTime/Float(chordBase.frame.size.height))
             toChordTime = currentChordTime + deltaTime
             
             if toChordTime < 0 {
@@ -1047,9 +1047,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
           NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isTabsShownKey)
         }
         if !isChordShown && !isTabsShown { //hide the chordbase if we are showing chords and tabs
-            base.hidden = true
+            chordBase.hidden = true
         } else {
-            base.hidden = false
+            chordBase.hidden = false
         }
         unblurImageIfAllIsHidden()
     }
@@ -1174,7 +1174,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func calculateXPoints(){
-        let width = base.frame.width
+        let width = chordBase.frame.width
         
         let margin:Float = 0.25
         let initialPoint:CGFloat = CGFloat(Float(width) * margin)
@@ -1183,7 +1183,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let scale: CGFloat = 1 / 12
         let topWidth = rightTopPoint - initialPoint
         widthofbasetop = topWidth
-        tan = Float(base.frame.height) / Float(initialPoint)
+        tan = Float(chordBase.frame.height) / Float(initialPoint)
         let topLeft = initialPoint + topWidth * scale
         
         topPoints = [CGFloat](count: 6, repeatedValue: 0)
@@ -1199,7 +1199,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         //add things
-        let top0: CGFloat = CGFloat(margin * Float(base.frame.width) - 25)
+        let top0: CGFloat = CGFloat(margin * Float(chordBase.frame.width) - 25)
         let buttom0: CGFloat = CGFloat(-25)
         
         topPoints.insert(top0, atIndex: 0)
@@ -1207,11 +1207,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         let labelExample = UILabel()
         labelExample.text = "1"
-        labelExample.font = UIFont.systemFontOfSize(minfont * base.frame.width / widthofbasetop)
+        labelExample.font = UIFont.systemFontOfSize(minfont * chordBase.frame.width / widthofbasetop)
         labelExample.sizeToFit()
         let lenGoup = labelExample.frame.width / 2;
         
-        maxylocation = base.frame.height - lenGoup - base.frame.height / 40
+        maxylocation = chordBase.frame.height - lenGoup - chordBase.frame.height / 40
     }
     
     
@@ -1262,7 +1262,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             let transformsize = CGAffineTransformMakeScale(CGFloat(scale), CGFloat(scale))
             
-            let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
+            let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / chordBase.frame.height
             
             if isChordShown && isTabsShown { //show both chord name and tabs
                 labels[0].hidden = false
@@ -1271,7 +1271,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 labels[1].transform = transformsize
             } else if isChordShown && !isTabsShown { //show only chord name
                  labels[0].hidden = false
-                labels[0].center = CGPointMake(base.frame.width / 2, CGFloat(yPosition))
+                labels[0].center = CGPointMake(chordBase.frame.width / 2, CGFloat(yPosition))
             
             } else if !isChordShown && isTabsShown { // show only tabs name
                 //TODO: remove chords labels and only show tabs
@@ -1480,7 +1480,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordNameLabel.textAlignment = NSTextAlignment.Center
         chordNameLabel.font = UIFont.systemFontOfSize(minfont)
         res.append(chordNameLabel)
-        self.base.addSubview(chordNameLabel)
+        self.chordBase.addSubview(chordNameLabel)
         
         let view = UIView(frame: CGRectMake(0, 0, CGFloat(topPoints[6] - topPoints[1]), CGFloat(minfont)))
         
@@ -1497,8 +1497,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 label.center = CGPointMake(topPoints[i+1] - topPoints[1], view.frame.height / 2)
                 view.addSubview(label)
             }
-            base.addSubview(view)
-            view.center.x = base.frame.width / 2
+            chordBase.addSubview(view)
+            view.center.x = chordBase.frame.width / 2
             res.append(view)
         }
         
