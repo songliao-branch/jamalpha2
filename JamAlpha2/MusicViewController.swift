@@ -7,6 +7,10 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     private var uniqueArtists = [Artist]()
     private var uniqueAlbums = [Album]()
     
+    private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
+    private var artistsByFirstAlphabet = [(String, [Artist])]()
+    private var albumsByFirstAlphabet = [(String, [Album])]()
+    
     var pageIndex = 0
     
     @IBOutlet weak var musicTable: UITableView!
@@ -17,21 +21,21 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        //println(API.Router.Term("edsheeran").URLRequest.URLString)
-        //println(API.Router.TermAttribute("michael jackson", Attribute.artistTerm).URLRequest.URLString)
-        
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
         
+        songsByFirstAlphabet = sort(uniqueSongs)
+        artistsByFirstAlphabet = sort(uniqueArtists)
+        albumsByFirstAlphabet = sort(uniqueAlbums)
+        
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
+        UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
     }
 
     func registerMusicPlayerNotificationForSongChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
-        
-        
     }
     
     func synced(lock: AnyObject, closure: () -> ()) {
@@ -49,7 +53,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             }
             
             if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-
                 self.musicTable.reloadData()
             }
         }
@@ -69,18 +72,73 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
     }
-    
-
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         if pageIndex == 0  {
-                return uniqueSongs.count
+            return songsByFirstAlphabet.count
         }
         else if pageIndex == 1 {
-            return uniqueArtists.count
+            return artistsByFirstAlphabet.count
+        }
+        else {
+            return albumsByFirstAlphabet.count
+        }
+    }
+    
+    // populate the index titles on the right side of screen
+    func sectionIndexTitlesForTableView(tableView: UITableView) -> [String]? {
+        var titles = [String]()
+        if pageIndex == 0 {
+            for (firstAlphabet, _) in songsByFirstAlphabet {
+                titles.append(firstAlphabet)
+            }
+            return titles
+        } else if pageIndex == 1 {
+            for (firstAlphabet, _) in artistsByFirstAlphabet {
+                titles.append(firstAlphabet)
+            }
+            return titles
+        } else {
+            for (firstAlphabet, _) in albumsByFirstAlphabet {
+                titles.append(firstAlphabet)
+            }
+            return titles
+        }
+    }
+    
+    // scroll to the current section
+    func tableView(tableView: UITableView, sectionForSectionIndexTitle title: String, atIndex index: Int) -> Int {
+        if pageIndex == 0 {
+            for i in 0..<songsByFirstAlphabet.count {
+                if title == songsByFirstAlphabet[i].0 {
+                    return i
+                }
+            }
+        } else if pageIndex == 1 {
+            for i in 0..<artistsByFirstAlphabet.count {
+                if title == artistsByFirstAlphabet[i].0 {
+                    return i
+                }
+            }
+        } else {
+            for i in 0..<albumsByFirstAlphabet.count {
+                if title == albumsByFirstAlphabet[i].0 {
+                    return i
+                }
+            }
+        }
+        return 0
+    }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if pageIndex == 0  {
+            return songsByFirstAlphabet[section].1.count
+        }
+        else if pageIndex == 1 {
+            return artistsByFirstAlphabet[section].1.count
         }
         else
         {
-            return uniqueAlbums.count
+            return albumsByFirstAlphabet[section].1.count
         }
     }
    
@@ -90,8 +148,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
 
         if pageIndex == 0 {
             
-            let song = uniqueSongs[indexPath.row]
-            
+            let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             if MusicManager.sharedInstance.player.nowPlayingItem != nil {
                 if song == MusicManager.sharedInstance.player.nowPlayingItem {
                     
@@ -112,8 +169,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             
         } else if pageIndex == 1  {
             
-            let theArtist = uniqueArtists[indexPath.row]
-            
+            let theArtist = artistsByFirstAlphabet[indexPath.section].1[indexPath.row]
             let image = theArtist.getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
             cell.loudspeakerImage.hidden = true
             cell.imageWidth.constant = 80
@@ -130,9 +186,8 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             cell.subtitle.text = "\(numberOfTracks) \(albumPrompt), \(numberOfTracks) \(trackPrompt)"
             
         } else if pageIndex == 2 {
-            
-            let theAlbum = uniqueAlbums[indexPath.row]
-            
+
+            let theAlbum = albumsByFirstAlphabet[indexPath.section].1[indexPath.row]
             let image = theAlbum.coverImage.imageWithSize(CGSize(width: 80, height: 80))
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
@@ -163,13 +218,16 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         //will never get here
         return 0
     }
-    
+   
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if pageIndex == 0 {
+            let allSongsSorted = getAllSortedItems(songsByFirstAlphabet)
 
-            MusicManager.sharedInstance.setPlayerQueue(uniqueSongs)
-            MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
-  
+            MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
+
+            let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
+            MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             songVC.selectedFromTable = true
             
@@ -183,20 +241,26 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
         }
         else if pageIndex == 1 {
 
+            let allArtistsSorted = getAllSortedItems(artistsByFirstAlphabet)
+            let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
             artistVC.nowView = self.nowView
-            artistVC.theArtist = uniqueArtists[indexPath.row]
+            artistVC.theArtist = allArtistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
             
         }
         else if pageIndex == 2 {
             
+            let allAlbumsSorted = getAllSortedItems(albumsByFirstAlphabet)
+            let indexToBePlayed = findIndexToBePlayed(albumsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
+            
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.musicViewController = self
             albumVC.nowView = self.nowView
-            albumVC.theAlbum = uniqueAlbums[indexPath.row]
+            albumVC.theAlbum = allAlbumsSorted[indexToBePlayed]
+            
             self.showViewController(albumVC, sender: self)
             
         }
@@ -232,4 +296,68 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
             }
         }
     }
+    
+    
+    // MARK: functions using generics to sort the array into sections sorted by first alphabet
+    let characters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+    
+    func sort<T: Sortable >(collection: [T]) -> [(String,[T])] {
+        var itemsDictionary = [String: [T]]()
+        for item in collection {
+            var firstAlphabet = item.getSortableName()[0..<1] //get first letter
+            var isLetter = false
+            //We put every non-alphabet items into a section called "#"
+            for character in characters {
+                if firstAlphabet.lowercaseString == character {
+                    isLetter = true
+                    break
+                }
+            }
+            if !isLetter {
+                firstAlphabet = "#"
+            } else {
+                firstAlphabet = firstAlphabet.uppercaseString
+            }
+            
+            if itemsDictionary[firstAlphabet] == nil {
+                itemsDictionary[firstAlphabet] = []
+            }
+            itemsDictionary[firstAlphabet]?.append(item)
+        }
+        return itemsDictionary.sort{
+            (left, right) in
+            if left.0 == "#" { //put # at last
+                return false
+            } else if right.0 == "#" {
+                return true
+            }
+            return left.0 < right.0
+        }
+    }
+    
+    // Used in didSelectForRow
+    // return sorted items in a single array
+    func getAllSortedItems<T: Sortable> (collectionTuples: [(String, [T])]) -> [T] {
+        var allItemsSorted = [T]()
+        for itemSectionByAlphabet in collectionTuples {
+            for item in itemSectionByAlphabet.1 {
+                allItemsSorted.append(item)
+            }
+        }
+        return allItemsSorted
+    }
+    
+    // For songs, because we need to use the whole collection for the player queue instead an alphabet section, 
+    // but indexPath.section and indexPath.row is only return the index of the alphabet section, so to find the
+    // actual index in the entire collection, we need to iterate items in previous sections and aggregate together
+    func findIndexToBePlayed<T: Sortable> (collectionTuples: [(String, [T])], section: Int, currentRow: Int) -> Int{
+        var itemsInPreviousSections = 0
+        if section > 0 {
+            for i in 1...section {
+                itemsInPreviousSections += collectionTuples[i-1].1.count
+            }
+        }
+        return itemsInPreviousSections + currentRow
+    }
+
 }
