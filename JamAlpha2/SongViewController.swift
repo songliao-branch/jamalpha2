@@ -1051,6 +1051,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             base.hidden = false
         }
+        
+        startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+        updateAll(startTime.toDecimalNumer())
+        
         unblurImageIfAllIsHidden()
     }
     
