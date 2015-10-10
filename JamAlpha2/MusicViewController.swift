@@ -221,7 +221,6 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if pageIndex == 0 {
-
             let allSongsSorted = getAllSortedItems(songsByFirstAlphabet)
 
             MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
