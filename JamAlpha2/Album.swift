@@ -4,7 +4,7 @@ import MediaPlayer
 
 
 
-class Album: NSObject{
+class Album: NSObject, Sortable{
     
     var albumTitle: String = ""
     var artistPersistantId: CUnsignedLongLong!
@@ -57,4 +57,8 @@ class Album: NSObject{
         self.numberOfTracks = songsIntheAlbum.count
     }
     
+    //Sortable protocol method used in MusicViewController to sort albums into sections by first alphabet
+    func getSortableName() -> String {
+        return self.albumTitle
+    }
 }

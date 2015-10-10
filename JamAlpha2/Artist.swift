@@ -5,7 +5,18 @@
 import Foundation
 import MediaPlayer
 
-class Artist: NSObject {
+//Sortable protocol method used in MusicViewController to sort artist into sections by first alphabet
+protocol Sortable {
+    func getSortableName()-> String
+}
+
+extension MPMediaItem: Sortable {
+    func getSortableName() -> String {
+        return self.title!
+    }
+}
+
+class Artist: NSObject, Sortable {
     
     var artistName:String
     
@@ -37,5 +48,9 @@ class Artist: NSObject {
             }
         }
         return allSongs
+    }
+   
+    func getSortableName() -> String {
+        return artistName
     }
 }
