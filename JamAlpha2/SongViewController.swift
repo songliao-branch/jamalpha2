@@ -213,8 +213,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
-            resumeSong()
             loadDisplayMode()
+            resumeSong()
             viewDidFullyDisappear = false
         }
     }
@@ -571,9 +571,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // until the player.currentPlaybacktime is set, as move the progress block would 
             // restore the normal volume
             player.currentPlaybackTime = player.currentPlaybackTime
+            startTime = TimeNumber(time: Float(player.currentPlaybackTime))
             player.play()
             startTimer()
-        }else{ // selected from now view button
+        } else { // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
             }
@@ -1036,12 +1037,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func toggleChordsDisplayMode() {
-        timer.invalidate()
-        updateAll(startTime.toDecimalNumer())
-        if player.playbackState == .Playing{
-            startTimer()
-        }
-        
         if isChordShown {
           NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isChordShownKey)
         } else {
@@ -1454,7 +1449,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: nil)
         }
     }
-
+    
     func startTimer(){
         //NOTE: To prevent startTimer() to be called consecutively
         //which would double the update speed. We only
@@ -1464,7 +1459,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if !timer.valid {
             timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
-            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
         }
     }
     
