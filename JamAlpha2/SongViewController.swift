@@ -571,7 +571,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // until the player.currentPlaybacktime is set, as move the progress block would 
             // restore the normal volume
             player.currentPlaybackTime = player.currentPlaybackTime
-            startTime = TimeNumber(time: Float(player.currentPlaybackTime))
             player.play()
             startTimer()
         } else { // selected from now view button
