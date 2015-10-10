@@ -166,7 +166,7 @@ class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDe
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if pageIndex == 0 {
-            
+
             MusicManager.sharedInstance.setPlayerQueue(uniqueSongs)
             MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
   
