@@ -139,52 +139,10 @@ class TabsDataManager: NSObject {
         } else {
             print("Original tabs already in place")
         }
-        
-//        if results.count == 269 {
-//            print("Database already exist")
-//            for result in results {
-//                let singleTab: Tabs = result as! Tabs
-//                print("\(singleTab.index) + \(singleTab.name) + \(singleTab.content)")
-//            }
-//        } else {
-//            removeAllFromDatabase()
-//            let dict = initfingersString()
-//            for var i = 1; i < 7; i++ {
-//                for var j = 0; j < 25; j++ {
-//                    let index = NSNumber(integer: i * 10000 + j * 100)
-//                    let note = fretsBoard[i - 1][j]
-//                    print("\(note)")
-//                    insertInitialTabs(index, name: note, dict: dict)
-//                }
-//            }
-//        }
     }
     
     
-//    func removeAllFromDatabase() {
-//        let resultsForExistTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: nil, managedObjectContext: moc)
-//        let resultsForNewTabs: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: nil, managedObjectContext: moc)
-//        for result in resultsForExistTabs {
-//            let item = result as! NSManagedObject
-//            moc.deleteObject(item)
-//        }
-//        for result in resultsForNewTabs {
-//            let item = result as! NSManagedObject
-//            moc.deleteObject(item)
-//        }
-//        SwiftCoreDataHelper.saveManagedObjectContext(moc)
-//    }
-    
     func insertInitialTabs(index: NSNumber, name: String, dict: Dictionary<String, String>) {
-//        if Int(index) < 40000 {
-//            let tab: Tabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Tabs), managedObjectConect: moc) as! Tabs
-//            tab.name = name
-//            let tempIndex = Int(index) / 100
-//            tab.index = NSNumber(integer: tempIndex)
-//            tab.content = ""
-//            tab.isOriginal = true
-//            SwiftCoreDataHelper.saveManagedObjectContext(moc)
-//        } else {
     var tabSuffix: [String] = ["", "m", "7", "m7"]
 
     for var i = 0; i < 4; i++ {
@@ -200,15 +158,6 @@ class TabsDataManager: NSObject {
         }
     }
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
-
-//        else if i == 0 {
-//            let tab: ExistTabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(ExistTabs), managedObjectConect: moc) as! ExistTabs
-//            tab.name = name
-//            let tempIndex = Int(index) / 100
-//            tab.index = NSNumber(integer: tempIndex)
-//            tab.content = ""
-//        }
-//  }
     }
     
     // get all tabs give a fret positino
@@ -226,31 +175,6 @@ class TabsDataManager: NSObject {
         return [Tabs]()
     }
 
-//    func getExistTab(index: NSNumber) -> [NSDictionary] {
-//        let predicate: NSPredicate = NSPredicate(format: "index == '\(index)'")
-//        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: predicate, managedObjectContext: moc)
-//        var tabDict: [NSDictionary] = [NSDictionary]()
-//        for result in results {
-//            let singleTab: ExistTabs = result as! ExistTabs
-//            if singleTab.index == index {
-//                tabDict.append(["index": singleTab.index, "name": singleTab.name, "content": singleTab.content])
-//            }
-//        }
-//        return tabDict
-//    }
-//    
-//    func getExistTabWithName(index: NSNumber, name: String) -> NSDictionary {
-//        let predicate: NSPredicate = NSPredicate(format: "index == '\(index)'")
-//        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(ExistTabs), withPredicate: predicate, managedObjectContext: moc)
-//        var tabDict: NSDictionary = NSDictionary()
-//        for result in results {
-//            let singleTab: ExistTabs = result as! ExistTabs
-//            if singleTab.index == index && singleTab.name == name {
-//                tabDict = ["index": singleTab.index, "name": singleTab.name, "content": singleTab.content]
-//            }
-//        }
-//        return tabDict
-//    }
     
     func addNewTabs(index: NSNumber, name: String, content: String) {
         let tabs: Tabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Tabs), managedObjectConect: moc) as! Tabs
@@ -261,32 +185,7 @@ class TabsDataManager: NSObject {
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
-//    func getNewTab(index: NSNumber) -> [NSDictionary] {
-//        let predicate: NSPredicate = NSPredicate(format: "index == '\(index)'")
-//        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: predicate, managedObjectContext: moc)
-//        var tabDict: [NSDictionary] = [NSDictionary]()
-//        for result in results {
-//            let singleTab: NewTabs = result as! NewTabs
-//            if singleTab.index == index {
-//                tabDict.append(["index": singleTab.index, "name": singleTab.name, "content": singleTab.content])
-//            }
-//        }
-//        return tabDict
-//    }
-//    
-//    func getNewTabWithName(index: NSNumber, name: String) -> NSDictionary {
-//        let predicate: NSPredicate = NSPredicate(format: "index == '\(index)'")
-//        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: predicate, managedObjectContext: moc)
-//        var tabDict: NSDictionary = NSDictionary()
-//        for result in results {
-//            let singleTab: NewTabs = result as! NewTabs
-//            if singleTab.index == index && singleTab.name == name {
-//                tabDict = ["index": singleTab.index, "name": singleTab.name, "content": singleTab.content]
-//            }
-//        }
-//        return tabDict
-//    }
-//    
+
     func removeTabs(tabs: Tabs) {
         if tabs.isOriginal {
             print("cannot remove original tabs")
@@ -294,19 +193,7 @@ class TabsDataManager: NSObject {
         }
         SwiftCoreDataHelper.managedObjectContext().deleteObject(tabs)
     }
-    
-//    func removeNewTab(index: NSNumber, name: String) {
-//        let predicate: NSPredicate = NSPredicate(format: "index == '\(index)'")
-//        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: predicate, managedObjectContext: moc)
-//        for result in results {
-//            let singleTab: NewTabs = result as! NewTabs
-//            if singleTab.name == name {
-//                let item = singleTab as NSManagedObject
-//                moc.deleteObject(item)
-//            }
-//        }
-//        SwiftCoreDataHelper.saveManagedObjectContext(moc)
-//    }
+
     func printAllNewTabs() {
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "isOriginal == false")//needs to verify this works
@@ -320,15 +207,5 @@ class TabsDataManager: NSObject {
             fatalError("There was an error fetching all new tabs")
         }
     }
-    
-//    
-//    
-//    func printAllNewTab() {
-//        let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
-//        let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(NewTabs), withPredicate: nil, managedObjectContext: moc)
-//        for result in results {
-//            let item: NewTabs = result as! NewTabs
-//            print("\(item.index) + \(item.name) + \(item.content)")
-//        }
-//    }
+
 }
