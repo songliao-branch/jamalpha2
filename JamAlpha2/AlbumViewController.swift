@@ -13,6 +13,7 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     var songsInTheAlbum: [MPMediaItem]!
     
     @IBOutlet weak var albumTable: UITableView!
+    
 
     
     override func viewDidLoad()

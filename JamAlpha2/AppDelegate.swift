@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Universal setting
         UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+                
         return true
     }
 
