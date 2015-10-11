@@ -38,6 +38,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var buttonDimension: CGFloat = 50
     var pulldownButton:UIButton!
     var tuningButton:UIButton!
+    var tuningLabels = [UILabel]() //6 labels for each string
+    var capoLabel: UILabel!
+    var capoCircleView: UIView!
     
     var songNameLabel: MarqueeLabel!
     var artistNameLabel: UILabel!
@@ -185,6 +188,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBackgroundImage()
         //set up views from top to bottom
         setUpChordBase()
+        setUpTuningLabels()
         setUpLyricsBase()
         setUpControlButtons()
         setUpProgressContainer()
@@ -192,8 +196,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         setUpActionViews()
         //get top and bottom points of six lines
-        calculateXPoints()
-        setUpTuningLabels()
+        setTuning("E-B-G-D-A-E") // placeholder
+        setCapo(1)
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
@@ -266,21 +270,54 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
         tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         topView.addSubview(tuningButton)
-    }
     
-    var tuningLabels = [UILabel]()
-    func setUpTuningLabels() {
- 
-        let tuning = "E-B-G-D-A-E"//Each note MUST BE separated by a "-"
+        let capoCircleDimension: CGFloat = 16
+        capoCircleView = UIView(frame: CGRect(x: 0, y: 0, width: capoCircleDimension, height: capoCircleDimension))
+        capoCircleView.backgroundColor = UIColor.whiteColor()
+        capoCircleView.layer.cornerRadius = capoCircleView.frame.height/2
+        capoCircleView.center = CGPoint(x: tuningButton.center.x+capoCircleDimension/2, y: tuningButton.center.y+capoCircleDimension/2)
+        capoCircleView.hidden = true
+        self.view.addSubview(capoCircleView)
+        
+        capoLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 12, height: 12))
+        capoLabel.font = UIFont.systemFontOfSize(12)
+        capoLabel.textColor = UIColor.mainPinkColor()
+        capoLabel.hidden = true
+        self.view.addSubview(capoLabel)
+    }
+
+    func setTuning(tuning: String) {
         let tuningArray = tuning.characters.split{$0 == "-"}.map(String.init)
         let tuningToShow = Array(tuningArray.reverse())
+        for i in 0..<tuningLabels.count {
+            tuningLabels[i].text = tuningToShow[i]
+            tuningLabels[i].sizeToFit()
+            tuningLabels[i].center = CGPoint(x: topPoints[i+1]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
+            
+        }
+    }
+    
+    func setCapo(capo: Int) {
+        capoLabel.text = String(capo)
+        capoLabel.sizeToFit()
+        capoLabel.center = capoCircleView.center
+        
+        if capo < 1 {
+            capoCircleView.hidden = true
+            capoLabel.hidden = true
+        } else {
+            capoCircleView.hidden = false
+            capoLabel.hidden = false
+        }
+    }
+
+    
+    func setUpTuningLabels() {
         for i in 1..<topPoints.count{
             let tuningLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 15))
             tuningLabel.textColor = UIColor.whiteColor()
-            tuningLabel.text = tuningToShow[i-1]
             tuningLabel.font = UIFont.systemFontOfSize(minfont-5)
             tuningLabel.textAlignment = .Center
-            tuningLabel.sizeToFit()
             tuningLabel.center = CGPoint(x: topPoints[i]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
             tuningLabel.hidden = true
             self.view.addSubview(tuningLabel)
@@ -289,8 +326,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func tuningPressed(button: UIButton) {
-        print("tuning pressed")
-        
         if tuningLabels[0].hidden {
             for label in tuningLabels {
                 label.hidden = false
@@ -449,8 +484,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         panRecognizer.delegate = self
         chordBase.addGestureRecognizer(panRecognizer)
         
-        
         self.view.addSubview(chordBase)
+        calculateXPoints()
     }
     
     func loadDisplayMode() {
@@ -506,7 +541,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func currentSongChanged(notification: NSNotification){
         synced(self) {
-            
+            for label in self.tuningLabels {
+                label.hidden = true
+            }
             if self.player.repeatMode == .One {
                 print("\(self.player.nowPlayingItem!.title) is repeating")
                 self.updateAll(0)
