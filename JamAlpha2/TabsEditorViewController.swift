@@ -536,7 +536,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             fingerButton.addTarget(self, action: "pressEditFingerButton:", forControlEvents: UIControlEvents.TouchUpInside)
             fingerButton.accessibilityIdentifier = "grayButton"
             self.fingerPoint.append(fingerButton)
-            if i != self.currentNoteButton.tag / 100 - 1 {
+            if i < self.currentNoteButton.tag / 100 - 1 {
                 self.completeStringView.addSubview(fingerButton)
                 
             }
@@ -649,7 +649,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             UIView.animateWithDuration(0.5, animations: {
                 fingerButton.alpha = 1
             })
-            if i / 2 != stringNumber - 1 {
+            if i / 2 < stringNumber - 1 {
                 self.completeStringView.addSubview(fingerButton)
             }
         }
@@ -684,6 +684,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         })
         self.fingerPoint.removeAll(keepCapacity: false)
         self.addNewTab = false
+        self.removeAvaliable = false
     }
     
     func removeObjectsOnCompleteStringView() {
@@ -938,17 +939,42 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if self.removeAvaliable == false {
             self.removeAvaliable = true
             self.statusLabel.image = UIImage(named: "deleteTab")
+            for item in self.specificTabsScrollView.subviews {
+                if item.isMemberOfClass(UIButton) {
+                    let tempItem: UIButton = item as! UIButton
+                    tempItem.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
+                }
+            }
+            for item in self.mainViewDataArray {
+                for item2 in item.noteButtonsWithTab {
+                    item2.noteButton.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
+                }
+            }
+            self.currentNoteButton.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
+            self.collectionView.reloadData()
         } else {
             self.removeAvaliable = false
             self.statusLabel.image = UIImage(named: "tabEditor")
+            for item in self.specificTabsScrollView.subviews {
+                if item.isMemberOfClass(UIButton) {
+                    let tempItem: UIButton = item as! UIButton
+                    tempItem.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+                }
+            }
+            for item in self.mainViewDataArray {
+                for item2 in item.noteButtonsWithTab {
+                    item2.noteButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+                }
+            }
+            self.currentNoteButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+            self.collectionView.reloadData()
         }
     }
     
     struct tabOnMusicLine {
         var tabView: UIView = UIView()
         var time: NSTimeInterval = NSTimeInterval()
-//        var tabIndex: Int = Int()
-//        var tabName: String = String()
+
         var tab: NormalTabs = NormalTabs()
     }
     var allTabsOnMusicLine: [tabOnMusicLine] = [tabOnMusicLine]()
@@ -1102,7 +1128,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.presentViewController(alertController, animated: true, completion: nil)
                         addSuccessed = false
                     } else {
-                        for var i = 5; i >= 0; i-- {
+                        for var i = 0; i < 6; i++ {
                             if self.fingerPoint[i].accessibilityIdentifier == "blackX" {
                                 content = content + "xx"
                             } else {
@@ -1117,6 +1143,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
                         print("successfully add to database")
                         addSuccessed = true
+                        self.addSpecificFingerPoint = true
                         self.backToMainView()
                     }
                 }

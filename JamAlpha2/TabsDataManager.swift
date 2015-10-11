@@ -204,6 +204,7 @@ class TabsDataManager: NSObject {
             return
         }
         SwiftCoreDataHelper.managedObjectContext().deleteObject(tabs)
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
 
     func printAllNewTabs() {
