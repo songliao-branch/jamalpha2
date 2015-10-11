@@ -161,18 +161,30 @@ class TabsDataManager: NSObject {
     }
     
     // get all tabs give a fret positino
-    func getTabsSets(index: NSNumber) -> [Tabs] {
+    func getTabsSets(index: NSNumber) -> [NormalTabs] {
 
+        var tempTabSet: [NormalTabs] = [NormalTabs]()
+        
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "index == '\(index)'")
         do {
             if let results = try SwiftCoreDataHelper.managedObjectContext().executeFetchRequest(fetchRequest) as? [Tabs] {
-                return results
-            }
+                for item in results {
+                    let tempItem: Tabs = item as Tabs
+                    let tempTab: NormalTabs = NormalTabs()
+                    tempTab.name = tempItem.name
+                    tempTab.index = tempItem.index
+                    tempTab.content = tempItem.content
+                    tempTab.isOriginal = tempItem.isOriginal
+                    tempTab.tabs = tempItem
+                    tempTabSet.append(tempTab)
+                }
+                    return tempTabSet
+                }
         } catch {
             fatalError("There was an error fetching tabs on the index \(index)")
         }
-        return [Tabs]()
+        return [NormalTabs]()
     }
 
     

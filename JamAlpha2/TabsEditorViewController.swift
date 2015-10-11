@@ -439,7 +439,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var addNewTab: Bool = false
     var currentNoteButton: UIButton = UIButton()
     var noteButtonOnCompeteScrollView: UIButton = UIButton()
-    var tabsSetsOnIndex: [Tabs] = [Tabs]()
+    var specificTabSets: [NormalTabs] = [NormalTabs]()
     
     func singleTapOnString6View(sender: UITapGestureRecognizer) {
         var indexFret: Int = Int()
@@ -549,22 +549,23 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func addSpecificTabButton(sender: Int) {
         let index: NSNumber = NSNumber(integer: sender)
-        self.tabsSetsOnIndex = [Tabs]()
-        self.tabsSetsOnIndex = self.data.getTabsSets(index)
-
-        print("\(self.tabsSetsOnIndex.count)")
+        
+        self.specificTabSets = self.data.getTabsSets(index)
+        
+        print("\(self.specificTabSets.count)")
         
         let buttonHeight: CGFloat = 2 / 20 * self.trueHeight
         let buttonWidth: CGFloat = 3 / 20 * self.trueHeight
-        for var i = 0; i < self.tabsSetsOnIndex.count; i++ {
-            if self.tabsSetsOnIndex[i].content != "" {
-                print("\(self.tabsSetsOnIndex[i].name) + \(self.tabsSetsOnIndex[i].index) + \(self.tabsSetsOnIndex[i].content)")
+        
+        for var i = 0; i < self.specificTabSets.count; i++ {
+            if self.specificTabSets[i].content != "" {
+                print("\(self.specificTabSets[i].name) + \(self.specificTabSets[i].index) + \(self.specificTabSets[i].content)")
                 let specificButton: UIButton = UIButton()
                 specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
                 specificButton.layer.borderWidth = 1
                 specificButton.layer.cornerRadius = 4
                 specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
-                specificButton.setTitle(self.tabsSetsOnIndex[i].name, forState: UIControlState.Normal)
+                specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
                 
                 specificButton.tag = i
                 self.specificTabsScrollView.addSubview(specificButton)
@@ -577,10 +578,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     var fingerPoint: [UIButton] = [UIButton]()
     var addSpecificFingerPoint: Bool = false
-    var currentSelectedSpecificTab: Tabs!
+    var currentSelectedSpecificTab: NormalTabs!
     
     func pressSpecificTabButton(sender: UIButton) {
-        self.currentSelectedSpecificTab = self.tabsSetsOnIndex[sender.tag]
+        self.currentSelectedSpecificTab = self.specificTabSets[sender.tag]
+        self.tabNameTextField.text = self.currentSelectedSpecificTab.name
         if self.removeAvaliable == false {
             let index = sender.tag
             self.tabFingerPointChanged = false
@@ -600,8 +602,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             } else {
                 sender.removeFromSuperview()
                 removeObjectsOnCompleteStringView()
-                data.removeTabs(self.currentSelectedSpecificTab)
-                self.tabsSetsOnIndex.removeAtIndex(sender.tag)
+                data.removeTabs(self.currentSelectedSpecificTab.tabs)
+                self.tabNameTextField.text = ""
+                self.specificTabSets.removeAtIndex(sender.tag)
                 self.changeRemoveButtonStatus(self.removeButton)
             }
         }
@@ -609,16 +612,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     
     func createFingerPoint(sender: Int) {
-        print("\(self.tabsSetsOnIndex.count)")
+        print("\(self.specificTabSets.count)")
         
-        for var i = 0; i < self.tabsSetsOnIndex.count; i++ {
-            print("\(self.tabsSetsOnIndex[i].name) + \(self.tabsSetsOnIndex[i].index) + \(self.tabsSetsOnIndex[i].content)")
-        }
-        
-        let content = self.tabsSetsOnIndex[sender].content
+        let content = self.specificTabSets[sender].content
         let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
         var buttonX = fretPosition[1] - buttonWidth / 2
         var buttonY = string6Position[5] - buttonWidth / 2
+        
         for var i = 11; i >= 0; i = i - 2 {
             let startIndex = content.startIndex.advancedBy(11 - i)
             let endIndex = content.startIndex.advancedBy(11 - i + 2)
@@ -640,7 +640,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 fingerButton.accessibilityIdentifier = "grayButton"
             }
             fingerButton.addTarget(self, action: "pressEditFingerButton:", forControlEvents: UIControlEvents.TouchUpInside)
-            let stringNumber = sender / 100
+            let stringNumber = Int(self.specificTabSets[sender].index) / 100
             fingerButton.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
             fingerButton.setImage(image, forState: UIControlState.Normal)
             fingerButton.alpha = 0
@@ -887,7 +887,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     class noteButtonWithTab {
         var noteButton: UIButton = UIButton()
-        var tab: Tabs = Tabs()
+        var tab: NormalTabs = NormalTabs()
     }
     
     var mainViewDataArray: [mainViewData] = [mainViewData]()
@@ -949,11 +949,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         var time: NSTimeInterval = NSTimeInterval()
 //        var tabIndex: Int = Int()
 //        var tabName: String = String()
-        var tab: Tabs = Tabs()
+        var tab: NormalTabs = NormalTabs()
     }
     var allTabsOnMusicLine: [tabOnMusicLine] = [tabOnMusicLine]()
     
-    func setMainViewTabPosition(sender: Int, tab: Tabs) -> CGRect {
+    func setMainViewTabPosition(sender: Int, tab: NormalTabs) -> CGRect {
         let labelHeight = self.progressBlock.frame.height / 2 / 4
         let width = self.trueWidth / 20
         var frame: CGRect = CGRect()
@@ -1011,7 +1011,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.allTabsOnMusicLine.append(tempStruct)
             self.progressBlock.addSubview(tempView)
         } else {
-            let fretNumber = sender.tag - sender.tag / 100 * 100
+            let fretNumber = Int(noteButtonWithTabArray[sender.tag].tab.index) - Int(noteButtonWithTabArray[sender.tag].tab.index) / 100 * 100
             for var i = 0; i < self.mainViewDataArray.count; i++ {
                 if self.mainViewDataArray[i].fretNumber == fretNumber {
                     for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
@@ -1090,8 +1090,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func pressDoneButton(sender: UIButton) {
         if self.intoEditView == true {
             if self.addNewTab == true {
-                var addSuccessed: Bool = false
+                var addSuccessed: Bool = true
                 if self.tabFingerPointChanged == true {
+                    print("\(currentSelectedSpecificTab.name)")
                     let index = self.currentSelectedSpecificTab.index
                     let name: String = self.tabNameTextField.text!
                     var content: String = String()
@@ -1099,7 +1100,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         let alertController = UIAlertController(title: "Warning", message: "Please input a  valid tab name (without space)", preferredStyle: UIAlertControllerStyle.Alert)
                         alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
                         self.presentViewController(alertController, animated: true, completion: nil)
-
+                        addSuccessed = false
                     } else {
                         for var i = 5; i >= 0; i-- {
                             if self.fingerPoint[i].accessibilityIdentifier == "blackX" {
@@ -1120,7 +1121,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 }
 
-                if addSuccessed == true || self.addSpecificFingerPoint == true {
+                if addSuccessed == true && self.addSpecificFingerPoint == true {
                     var addNew: Bool = true
                     let fretNumber = Int(self.currentSelectedSpecificTab.index) - Int(self.currentSelectedSpecificTab.index) / 100 * 100
                     for var i = 0; i < self.mainViewDataArray.count; i++ {
@@ -1154,10 +1155,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         tempButton.layer.cornerRadius = 0.5 * buttonWidth
                         tempButton.frame = CGRectMake(fretPosition, stringPosition, buttonWidth, buttonWidth)
                         
-                        let tempTab: Tabs = Tabs()
+                        let tempTab: NormalTabs = NormalTabs()
                         tempTab.index = self.currentSelectedSpecificTab.index
                         tempTab.name = self.currentSelectedSpecificTab.name
                         tempTab.content = self.currentSelectedSpecificTab.content
+                        tempTab.isOriginal = self.currentSelectedSpecificTab.isOriginal
                         
                         let tempNoteButtonWithTab: noteButtonWithTab = noteButtonWithTab()
                         tempNoteButtonWithTab.noteButton = tempButton
@@ -1183,7 +1185,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    func compareTabs(tab1: Tabs, tab2: Tabs) -> Bool {
+    func compareTabs(tab1: NormalTabs, tab2: NormalTabs) -> Bool {
         if tab1.index == tab2.index && tab1.name == tab2.name && tab1.content == tab2.content {
             return true
         } else {
@@ -1200,31 +1202,31 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             var buttonX3: [CGFloat] = [0, self.trueWidth / 5 / 2 - buttonWidth3 / 2, self.trueWidth / 5 / 2 + buttonWidth3 / 2]
             
             for var i = 4; i <= 6; i++ {
-                var tempButtonArray: [UIButton] = [UIButton]()
+                var tempButtonArray: [noteButtonWithTab] = [noteButtonWithTab]()
                 for buttonWithTab in item.noteButtonsWithTab {
                     if Int(buttonWithTab.tab.index) / 100 == i {
-                        tempButtonArray.append(buttonWithTab.noteButton)
+                        tempButtonArray.append(buttonWithTab)
                     }
                 }
                 if tempButtonArray.count == 1 {
-                    print(tempButtonArray[0].titleLabel!.text)
-                    tempButtonArray[0].frame = CGRectMake(self.trueWidth / 5 / 2 - buttonWidth / 2, self.string3Position[tempButtonArray[0].tag / 100 - 4] - buttonWidth / 2, buttonWidth, buttonWidth)
-                    tempButtonArray[0].layer.cornerRadius = 0.5 * buttonWidth
-                    tempButtonArray[0].titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+                    print(tempButtonArray[0].noteButton.titleLabel!.text)
+                    tempButtonArray[0].noteButton.frame = CGRectMake(self.trueWidth / 5 / 2 - buttonWidth / 2, self.string3Position[Int(tempButtonArray[0].tab.index) / 100 - 4] - buttonWidth / 2, buttonWidth, buttonWidth)
+                    tempButtonArray[0].noteButton.layer.cornerRadius = 0.5 * buttonWidth
+                    tempButtonArray[0].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
                 }
                 if tempButtonArray.count == 2 {
                     for var j = 0; j < tempButtonArray.count; j++ {
-                        print(tempButtonArray[j].titleLabel!.text)
-                        tempButtonArray[j].frame = CGRectMake(buttonX2[j], self.string3Position[tempButtonArray[j].tag / 100 - 4] - buttonWidth2 / 2, buttonWidth2, buttonWidth2)
-                        tempButtonArray[j].layer.cornerRadius = 0.5 * buttonWidth2
-                        tempButtonArray[j].titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+                        print(tempButtonArray[j].noteButton.titleLabel!.text)
+                        tempButtonArray[j].noteButton.frame = CGRectMake(buttonX2[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth2 / 2, buttonWidth2, buttonWidth2)
+                        tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth2
+                        tempButtonArray[j].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
                     }
                 } else if tempButtonArray.count == 3 {
                     for var j = 0; j < tempButtonArray.count; j++ {
-                        print(tempButtonArray[j].titleLabel!.text)
-                        tempButtonArray[j].frame = CGRectMake(buttonX3[j], self.string3Position[tempButtonArray[j].tag / 100 - 4] - buttonWidth3 / 2, buttonWidth3, buttonWidth3)
-                        tempButtonArray[j].layer.cornerRadius = 0.5 * buttonWidth3
-                        tempButtonArray[j].titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+                        print(tempButtonArray[j].noteButton.titleLabel!.text)
+                        tempButtonArray[j].noteButton.frame = CGRectMake(buttonX3[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth3 / 2, buttonWidth3, buttonWidth3)
+                        tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth3
+                        tempButtonArray[j].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
                     }
                 }
             }
