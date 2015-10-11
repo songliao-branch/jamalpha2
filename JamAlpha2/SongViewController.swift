@@ -39,8 +39,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var pulldownButton:UIButton!
     var tuningButton:UIButton!
     var tuningLabels = [UILabel]() //6 labels for each string
-    var capoLabel: UILabel!
-    var capoCircleView: UIView!
+    var capoButton: UIButton!
     
     var songNameLabel: MarqueeLabel!
     var artistNameLabel: UILabel!
@@ -270,20 +269,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
         tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         topView.addSubview(tuningButton)
-    
-        let capoCircleDimension: CGFloat = 16
-        capoCircleView = UIView(frame: CGRect(x: 0, y: 0, width: capoCircleDimension, height: capoCircleDimension))
-        capoCircleView.backgroundColor = UIColor.whiteColor()
-        capoCircleView.layer.cornerRadius = capoCircleView.frame.height/2
-        capoCircleView.center = CGPoint(x: tuningButton.center.x+capoCircleDimension/2, y: tuningButton.center.y+capoCircleDimension/2)
-        capoCircleView.hidden = true
-        self.view.addSubview(capoCircleView)
         
-        capoLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 12, height: 12))
-        capoLabel.font = UIFont.systemFontOfSize(12)
-        capoLabel.textColor = UIColor.mainPinkColor()
-        capoLabel.hidden = true
-        self.view.addSubview(capoLabel)
+        let capoCircleDimension: CGFloat = 16
+        capoButton = UIButton(frame: CGRect(x: 0, y: 0, width: capoCircleDimension, height: capoCircleDimension))
+        capoButton.backgroundColor = UIColor.whiteColor()
+        capoButton.layer.cornerRadius = capoButton.frame.height/2
+        capoButton.center = CGPoint(x: tuningButton.center.x+capoCircleDimension/2, y: tuningButton.center.y+capoCircleDimension/2)
+        capoButton.hidden = true
+        //its touch event is same as tuningButton because this view blocks part of tuning button,
+        //so I set the same touch event
+        capoButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
+        capoButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
+        self.view.addSubview(capoButton)
     }
 
     func setTuning(tuning: String) {
@@ -293,22 +291,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             tuningLabels[i].text = tuningToShow[i]
             tuningLabels[i].sizeToFit()
             tuningLabels[i].center = CGPoint(x: topPoints[i+1]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
-            
         }
     }
     
     func setCapo(capo: Int) {
-        capoLabel.text = String(capo)
-        capoLabel.sizeToFit()
-        capoLabel.center = capoCircleView.center
-        
         if capo < 1 {
-            capoCircleView.hidden = true
-            capoLabel.hidden = true
-        } else {
-            capoCircleView.hidden = false
-            capoLabel.hidden = false
+            capoButton.hidden = true
+            return
         }
+        capoButton.hidden = false
+        capoButton.setTitle(String(capo), forState: .Normal)
+        capoButton.titleLabel?.sizeToFit()
     }
 
     
