@@ -12,6 +12,7 @@ import AVFoundation
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate {
     
+    // Musci Data Manager
     var musicDataManager = MusicDataManager()
     
     // collection view
@@ -22,7 +23,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var hitTestRectagles = [String:CGRect]()
     var animating : Bool = false
     
-    
+    // move collection view cell bundle and view
     struct Bundle {
         var offset : CGPoint = CGPointZero
         var sourceCell : UICollectionViewCell
@@ -30,9 +31,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         var currentIndexPath : NSIndexPath
         var canvas : UIView
     }
-    
     var bundle : Bundle?
     var fretBoardView: UIView = UIView()
+    
     // music section
     var progressBlock: SoundWaveView!
     var theSong: MPMediaItem!
@@ -40,7 +41,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var player: AVAudioPlayer = AVAudioPlayer()
     var duration: NSTimeInterval = NSTimeInterval()
     var musicControlView: UIView = UIView()
-    
     
     // screen height and width
     var trueWidth: CGFloat = CGFloat()
@@ -57,15 +57,67 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var string6Position: [CGFloat] = [CGFloat]()
     var fretPosition: [CGFloat] = [CGFloat]()
     
-    // core data
+    // core data functions
     var data: TabsDataManager = TabsDataManager()
+    
+    // objects on view which need to be changed in different places
+    var removeButton: UIButton = UIButton()
+    var statusLabel: UIImageView = UIImageView()
+    var completeImageView: UIImageView = UIImageView()
+    var noteButtonOnCompeteScrollView: UIButton = UIButton()
+    var buttonOnSpecificScrollView: [UIButton] = [UIButton]()
+    var fingerPoint: [UIButton] = [UIButton]()
+    var currentNoteButton: UIButton = UIButton()
+    var currentTimeLabel: UILabel = UILabel()
+    var totalTimeLabel: UILabel = UILabel()
+    var countDownImageView: UIImageView = UIImageView()
+    var countDownNumberImageView: UIImageView = UIImageView()
+    var string6View: [UIView] = [UIView]()
+    var currentTabViewIndex: Int = Int()
+    
+    // timer
+    var timer = NSTimer()
+    
+    // data array
+    var specificTabSets: [NormalTabs] = [NormalTabs]()
+    var currentSelectedSpecificTab: NormalTabs!
+    var countDownNumber: Float = 0
+    
+    // Mark: Main view data array structure
+    class mainViewData {
+        var fretNumber: Int = Int()
+        var noteButtonsWithTab: [noteButtonWithTab] = [noteButtonWithTab]()
+    }
+    class noteButtonWithTab {
+        var noteButton: UIButton = UIButton()
+        var tab: NormalTabs = NormalTabs()
+    }
+    var mainViewDataArray: [mainViewData] = [mainViewData]()
+    
+    // Mark: After edited the tabs, all useful information are stored in this array: allTabsOnMusicLine, which includ the time and tab information
+    struct tabOnMusicLine {
+        var tabView: UIView = UIView()
+        var time: NSTimeInterval = NSTimeInterval()
+        var tab: NormalTabs = NormalTabs()
+    }
+    var allTabsOnMusicLine: [tabOnMusicLine] = [tabOnMusicLine]()
+    
+    // Mark: store the tabs with adding orders
+    var noteButtonWithTabArray: [noteButtonWithTab] = [noteButtonWithTab]()
+    
+    // status variables
+    var addNewTab: Bool = false
+    var tabFingerPointChanged: Bool = false
+    var addSpecificFingerPoint: Bool = false
+    var removeAvaliable: Bool = false
+    var intoEditView: Bool = false
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-  
+    // Hide the status bar
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
@@ -87,9 +139,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         super.init(coder: coder)
     }
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        // get the correct screen height and width
         if self.view.frame.height > self.view.frame.width {
             trueWidth = self.view.frame.height
             trueHeight = self.view.frame.width
@@ -97,8 +151,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             trueWidth = self.view.frame.width
             trueHeight = self.view.frame.height
         }
-        createSoundWave()
         
+        // create the sound wave
+        self.createSoundWave()
+        
+        // add the background image with blur
         let backgroundImage: UIImageView = UIImageView()
         backgroundImage.frame = CGRectMake(0, 0, self.trueWidth, self.trueWidth)
         let size: CGSize = CGSizeMake(self.trueWidth, self.trueWidth)
@@ -108,19 +165,28 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
 
+        // add the default tab data into coredata if it doesn't exist
         self.data.addDefaultData()
-        self.editView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 18 / 20 * self.trueHeight)
-        addObjectsOnMainView()
-        addObjectsOnEditView()
-        createStringAndFretPosition()
-        addMusicControlView()
         
+        // initial the edit view
+        self.editView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 18 / 20 * self.trueHeight)
+        
+        // add objects on main view and edit view
+        self.addObjectsOnMainView()
+        self.addObjectsOnEditView()
+        self.createStringAndFretPosition()
+        self.addMusicControlView()
+        
+        // initial collection view
         self.initCollectionView()
-        collectionView.dataSource = self
-        collectionView.delegate = self
+        self.collectionView.dataSource = self
+        self.collectionView.delegate = self
+        
+        // initial main view tab data array
         self.initialMainViewDataArray()
     }
     
+    // MARK: Main view data array, to store the tabs added on main view.
     func initialMainViewDataArray() {
         for var i = 0; i < 25; i++ {
             let temp: mainViewData = mainViewData()
@@ -131,6 +197,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    // MARK: collection view functions, include required functions and move cell functions
     func initCollectionView() {
         for var i = 0; i < 25; i++ {
             fretsNumber.append(i)
@@ -309,13 +376,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
         }
     }
-    
-    let removeButton: UIButton = UIButton()
-    
-    var statusLabel: UIImageView = UIImageView()
 
     func addObjectsOnMainView() {
-        
         // views
         let menuView: UIView = UIView()
         let musicView: UIView = UIView()
@@ -394,8 +456,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.addSubview(self.progressBlock)
     }
     
-    var completeImageView: UIImageView = UIImageView()
-    
     func addObjectsOnEditView() {
         self.specificTabsScrollView.frame = CGRectMake(0.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 20 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
         self.specificTabsScrollView.contentSize = CGSizeMake(self.trueWidth, 2.5 / 20 * self.trueHeight)
@@ -412,8 +472,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.completeStringView.contentSize = CGSizeMake(4 * self.trueWidth + self.trueWidth / 6, 15 / 20 * self.trueHeight)
         self.completeStringView.backgroundColor = UIColor.clearColor()
         
-        completeImageView.frame = CGRectMake(0, 0, 4 * self.trueWidth + self.trueWidth / 6, 15 / 20 * self.trueHeight)
-        completeImageView.image = UIImage(named: "6-strings-new-with-numbers")
+        self.completeImageView.frame = CGRectMake(0, 0, 4 * self.trueWidth + self.trueWidth / 6, 15 / 20 * self.trueHeight)
+        self.completeImageView.image = UIImage(named: "6-strings-new-with-numbers")
         self.completeStringView.addSubview(completeImageView)
         self.editView.addSubview(completeStringView)
         
@@ -426,21 +486,18 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
         self.editView.addGestureRecognizer(tapOnEditView)
         
-        addString6View()
+        self.addString6View()
         
         self.specificTabsScrollView.alpha = 0
         self.tabNameTextField.alpha = 0
     }
     
+    // hide the keyboard
     func tapOnEditView(sender: UITapGestureRecognizer) {
         self.tabNameTextField.resignFirstResponder()
     }
     
-    var addNewTab: Bool = false
-    var currentNoteButton: UIButton = UIButton()
-    var noteButtonOnCompeteScrollView: UIButton = UIButton()
-    var specificTabSets: [NormalTabs] = [NormalTabs]()
-    
+    // choose the base note, move finger point
     func singleTapOnString6View(sender: UITapGestureRecognizer) {
         var indexFret: Int = Int()
         var indexString: Int = Int()
@@ -476,8 +533,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     UIView.animateWithDuration(0.5, animations: {
                         noteButton.alpha = 1
                     })
-                    //let existTabCount = self.addExistSpecificTabButton(noteButton.tag)
-                    //self.addNewSpecificTabButton(noteButton.tag, count: existTabCount)
                     self.addSpecificTabButton(noteButton.tag)
                     self.createEditFingerPoint()
                 }
@@ -500,8 +555,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
         }
     }
-    var tabFingerPointChanged: Bool = false
     
+    // move finger point when tap on 6 string view
     func moveFingerPoint(indexFret: Int, indexString: Int) {
         print("move finger point")
         let noteString = self.currentNoteButton.tag / 100 - 1
@@ -519,6 +574,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    // create 6 finger point for new tabs
     func createEditFingerPoint() {
         self.tabFingerPointChanged = true
         for item in self.fingerPoint {
@@ -544,42 +600,28 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    var buttonOnSpecificScrollView: [UIButton] = [UIButton]()
-    
-    
+    // add tabs on specific scrol view
     func addSpecificTabButton(sender: Int) {
         let index: NSNumber = NSNumber(integer: sender)
-        
         self.specificTabSets = self.data.getTabsSets(index)
-        
-        print("\(self.specificTabSets.count)")
-        
         let buttonHeight: CGFloat = 2 / 20 * self.trueHeight
         let buttonWidth: CGFloat = 3 / 20 * self.trueHeight
-        
         for var i = 0; i < self.specificTabSets.count; i++ {
             if self.specificTabSets[i].content != "" {
-                print("\(self.specificTabSets[i].name) + \(self.specificTabSets[i].index) + \(self.specificTabSets[i].content)")
                 let specificButton: UIButton = UIButton()
                 specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
                 specificButton.layer.borderWidth = 1
                 specificButton.layer.cornerRadius = 4
                 specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
                 specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
-                
                 specificButton.tag = i
                 self.specificTabsScrollView.addSubview(specificButton)
                 self.buttonOnSpecificScrollView.append(specificButton)
             }
         }
-        
     }
     
-    
-    var fingerPoint: [UIButton] = [UIButton]()
-    var addSpecificFingerPoint: Bool = false
-    var currentSelectedSpecificTab: NormalTabs!
-    
+    // choose specific tabs, and generate the finger point for this tab
     func pressSpecificTabButton(sender: UIButton) {
         self.currentSelectedSpecificTab = self.specificTabSets[sender.tag]
         self.tabNameTextField.text = self.currentSelectedSpecificTab.name
@@ -610,15 +652,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    
+    // create finger point for specific tabs
     func createFingerPoint(sender: Int) {
-        print("\(self.specificTabSets.count)")
-        
         let content = self.specificTabSets[sender].content
         let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
         var buttonX = fretPosition[1] - buttonWidth / 2
         var buttonY = string6Position[5] - buttonWidth / 2
-        
         for var i = 11; i >= 0; i = i - 2 {
             let startIndex = content.startIndex.advancedBy(11 - i)
             let endIndex = content.startIndex.advancedBy(11 - i + 2)
@@ -655,6 +694,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    // change the finger point status from gray button to black X
     func pressEditFingerButton(sender: UIButton) {
         self.tabFingerPointChanged = true
         if sender.accessibilityIdentifier == "blackX" {
@@ -666,6 +706,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    // press base note button to cancel it or delete it
     func pressNoteButton(sender: UIButton) {
         let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
         dispatch_after(delayTime, dispatch_get_main_queue()) {
@@ -687,6 +728,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.removeAvaliable = false
     }
     
+    // remove all oebjects on 6 string View
     func removeObjectsOnCompleteStringView() {
         self.currentNoteButton.removeFromSuperview()
         for item in self.fingerPoint {
@@ -694,15 +736,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    // remove all objects on specific tab scroll view
     func removeObjectsOnSpecificTabsScrollView() {
         for item in self.specificTabsScrollView.subviews {
             item.removeFromSuperview()
         }
     }
     
-    var currentTimeLabel: UILabel = UILabel()
-    var totalTimeLabel: UILabel = UILabel()
-    
+    // music control view, include progressblock, timelabel, previous button, pan gesture, update, count down
     func addMusicControlView() {
         let previousButton: UIButton = UIButton()
         previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 3 / 20 * self.trueHeight, 2.5 / 31 * self.trueWidth, 2.5 / 31 * trueWidth)
@@ -749,6 +790,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
     }
     
+    // pan on music control view to change music time and progressblock time
     func panOnMusicControlView(sender: UIPanGestureRecognizer) {
         self.view.bringSubviewToFront(sender.view!)
         let translation = sender.translationInView(self.view)
@@ -763,13 +805,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let minutesC = floor(self.currentTime / 60)
         let secondsC = round(self.currentTime - minutesC * 60)
         self.currentTimeLabel.text = "\(minutesC):\(secondsC)"
+        // find the current tab according to the current time and make the current tab view to yellow
         self.findCurrentTabView()
     }
     
-    var countDownImageView: UIImageView = UIImageView()
-    var countDownNumberImageView: UIImageView = UIImageView()
-    var timer = NSTimer()
-    
+    // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer) {
         if self.player.playing == false {
             let imageWidth: CGFloat = 5 / 20 * self.trueHeight
@@ -790,6 +830,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    // string and fret position
     func createStringAndFretPosition() {
         let string6Height: CGFloat = 7 / 60 * self.trueHeight
         for var i = 0; i < 6; i++ {
@@ -813,8 +854,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    var string6View: [UIView] = [UIView]()
-    
     func addString6View() {
         let string6Height: CGFloat = 7 / 60 * self.trueHeight
         for var i = 0; i < 6; i++ {
@@ -826,12 +865,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tempStringView.backgroundColor = UIColor.clearColor()
             }
             self.completeStringView.addSubview(tempStringView)
-            string6View.append(tempStringView)
+            self.string6View.append(tempStringView)
         }
     }
     
     func createSoundWave() {
-        
         let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, 6 * CGFloat(theSong.playbackDuration), 6 / 20 * self.trueHeight)
         self.progressBlock = SoundWaveView(frame: frame)
         if(theSong == nil){
@@ -841,13 +879,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.duration = self.player.duration
         self.player.volume = 1
-        
         progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
-        
         self.progressBlock.SetSoundURL(url)
     }
-    
-    var countDownNumber: Float = 0
     
     func update() {
         if self.countDownNumber > 3.0 {
@@ -880,18 +914,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         
     }
-    
-    class mainViewData {
-        var fretNumber: Int = Int()
-        var noteButtonsWithTab: [noteButtonWithTab] = [noteButtonWithTab]()
-    }
-    
-    class noteButtonWithTab {
-        var noteButton: UIButton = UIButton()
-        var tab: NormalTabs = NormalTabs()
-    }
-    
-    var mainViewDataArray: [mainViewData] = [mainViewData]()
     
     func moveDataItem(fromIndexPath : NSIndexPath, toIndexPath: NSIndexPath) {
         print("move data item")
@@ -934,7 +956,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    var removeAvaliable: Bool = false
+    // change remove button when tap on it to show the remove status
     func changeRemoveButtonStatus(sender: UIButton) {
         if self.removeAvaliable == false {
             self.removeAvaliable = true
@@ -971,14 +993,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    struct tabOnMusicLine {
-        var tabView: UIView = UIView()
-        var time: NSTimeInterval = NSTimeInterval()
-
-        var tab: NormalTabs = NormalTabs()
-    }
-    var allTabsOnMusicLine: [tabOnMusicLine] = [tabOnMusicLine]()
-    
+    // correctly put the tabs on music line
     func setMainViewTabPosition(sender: Int, tab: NormalTabs) -> CGRect {
         let labelHeight = self.progressBlock.frame.height / 2 / 4
         let width = self.trueWidth / 20
@@ -998,7 +1013,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         return frame
     }
 
-    
+    // caluclate the tab on music line without repeat
     func numberOfUnrepeatedTabOnMainView() -> Int{
         var set = [String: Int]()
         for tab in self.allTabsOnMusicLine {
@@ -1012,6 +1027,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         return set.count
     }
     
+    // press the note button to add the tab in music line
     func pressMainViewNoteButton(sender: UIButton) {
         if self.removeAvaliable == false {
             let tempView: UIView = UIView()
@@ -1056,8 +1072,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    var intoEditView: Bool = false
-    
+    //Mark: press the button on the top functions
+    // back to the main view or back to root view
     func pressBackButton(sender: UIButton) {
         if self.intoEditView == true {
             self.backToMainView()
@@ -1067,8 +1083,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    func pressTuningButton(sender: UIButton) {}
-
+    func pressTuningButton(sender: UIButton) {
+        print("press tuning button")
+    }
+    
     func pressResetButton(sender: UIButton) {
         let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to reset all tabs?", preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
@@ -1110,8 +1128,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.completeStringView.frame = CGRectMake(0, 3 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
         })
     }
-    
-    var noteButtonWithTabArray: [noteButtonWithTab] = [noteButtonWithTab]()
     
     func pressDoneButton(sender: UIButton) {
         if self.intoEditView == true {
@@ -1208,10 +1224,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
             }
         } else {
-            //back to play sonng page
+            // Mark: back to play sonng page
         }
     }
     
+    // compare the tab whether equals
     func compareTabs(tab1: NormalTabs, tab2: NormalTabs) -> Bool {
         if tab1.index == tab2.index && tab1.name == tab2.name && tab1.content == tab2.content {
             return true
@@ -1220,6 +1237,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    // organize the note button position and size accroding the the numbers.
     func reorganizeMainViewDataArray() {
         for item in self.mainViewDataArray {
             let buttonWidth: CGFloat = self.trueWidth / 5 / 3 * 1.5
@@ -1261,7 +1279,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressPreviousButton(sender: UIButton) {
-
         if self.allTabsOnMusicLine.count > 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
@@ -1281,8 +1298,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    var currentTabViewIndex: Int = Int()
     
+    // find the current tab according to the current music time
     func findCurrentTabView() {
         for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
             self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)

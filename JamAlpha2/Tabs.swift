@@ -11,7 +11,6 @@ import CoreData
 
 @objc(Tabs)
 class Tabs: NSManagedObject {
-    
     @NSManaged var index: NSNumber
     @NSManaged var name: String
     @NSManaged var content: String
