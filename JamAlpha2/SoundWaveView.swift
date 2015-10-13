@@ -210,7 +210,7 @@ class SoundWaveView: UIView {
                             if(bigSampleCount == 9*samplesPerPixel){
                                 let averageSample:Double = bigSample / Double(bigSampleCount)
                                 
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*9)
+                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*9+1.5)
                                 
                                 currentX++
                                 bigSample = 0
@@ -248,7 +248,7 @@ class SoundWaveView: UIView {
 
         for averageSample in self.averageSampleBuffer!
         {
-            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*9)
+            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*9+1.5)
             
             currentX++
         }

@@ -19,6 +19,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet weak var artistTable: UITableView!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         artistAllSongs = theArtist.getSongs()
