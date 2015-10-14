@@ -604,6 +604,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // add tabs on specific scrol view
     func addSpecificTabButton(sender: Int) {
         let index: NSNumber = NSNumber(integer: sender)
+        self.specificTabSets.removeAll()
         self.specificTabSets = self.data.getTabsSets(index)
         let buttonHeight: CGFloat = 2 / 20 * self.trueHeight
         let buttonWidth: CGFloat = 3 / 20 * self.trueHeight
@@ -647,7 +648,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 removeObjectsOnCompleteStringView()
                 data.removeTabs(self.currentSelectedSpecificTab.tabs)
                 self.tabNameTextField.text = ""
-                self.specificTabSets.removeAtIndex(sender.tag)
+               
                 self.changeRemoveButtonStatus(self.removeButton)
             }
         }
@@ -948,7 +949,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.addNewTab = false
         self.intoEditView = false
         self.tabFingerPointChanged = false
-        self.addSpecificFingerPoint = false
+        self.currentNoteButton = UIButton()
+        self.currentTabViewIndex = Int()
         self.removeObjectsOnCompleteStringView()
         self.removeObjectsOnSpecificTabsScrollView()
         let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
@@ -1117,6 +1119,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func pressAddButton(sender: UIButton) {
         self.view.addSubview(self.editView)
+        self.addSpecificFingerPoint = false
         self.musicControlView.alpha = 0
         self.progressBlock.alpha = 0
         self.collectionView.alpha = 0
@@ -1135,8 +1138,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if self.addNewTab == true {
                 var addSuccessed: Bool = true
                 if self.tabFingerPointChanged == true {
-                    print("\(currentSelectedSpecificTab.name)")
-                    let index = self.currentSelectedSpecificTab.index
+                    print("\(self.currentNoteButton.titleLabel?.text)")
+                    let index = self.currentNoteButton.tag
                     let name: String = self.tabNameTextField.text!
                     var content: String = String()
                     if name == "" || name.containsString(" ") {
@@ -1158,6 +1161,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         }
                         self.data.addNewTabs(index, name: name, content: content)
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
+                        self.specificTabSets = self.data.getTabsSets(index)
+                        self.currentSelectedSpecificTab = self.specificTabSets[self.specificTabSets.count - 1]
                         print("successfully add to database")
                         addSuccessed = true
                         self.addSpecificFingerPoint = true
@@ -1167,11 +1172,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
                 if addSuccessed == true && self.addSpecificFingerPoint == true {
                     var addNew: Bool = true
+                    if let temp = self.currentSelectedSpecificTab {
+                    
                     let fretNumber = Int(self.currentSelectedSpecificTab.index) - Int(self.currentSelectedSpecificTab.index) / 100 * 100
                     for var i = 0; i < self.mainViewDataArray.count; i++ {
                         if self.mainViewDataArray[i].fretNumber == fretNumber {
                             for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
-                                
+//                                if self.mainViewDataArray[i].noteButtonsWithTab[j].tab.tabs == self.currentSelectedSpecificTab {
                                 if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.currentSelectedSpecificTab) {
                                     let alertController = UIAlertController(title: "Warning", message: "This tab already exist on Main View", preferredStyle: UIAlertControllerStyle.Alert)
                                     alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: { action in
@@ -1185,6 +1192,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             }
                         }
                     }
+                    }
                     
                     if addNew == true {
                         let tempButton: UIButton = UIButton()
@@ -1192,7 +1200,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         let buttonWidth = self.trueWidth / 5 / 3
                         let stringPosition = self.string3Position[buttonY - 3] - buttonWidth / 2
                         let fretPosition = self.trueWidth / 5 / 2 - buttonWidth / 2
-                        tempButton.setTitle(self.currentNoteButton.titleLabel!.text, forState: UIControlState.Normal)
+                        tempButton.setTitle(self.currentSelectedSpecificTab.name, forState: UIControlState.Normal)
                         tempButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
                         tempButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
                         tempButton.addTarget(self, action: "pressMainViewNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -1236,9 +1244,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 
                 print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
             }
-            musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes)
+            self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes)
             self.dismissViewControllerAnimated(true, completion: nil)
         }
+        self.currentSelectedSpecificTab = nil
     }
     
     // compare the tab whether equals

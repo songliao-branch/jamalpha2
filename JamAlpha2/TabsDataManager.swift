@@ -162,9 +162,7 @@ class TabsDataManager: NSObject {
     
     // get all tabs give a fret positino
     func getTabsSets(index: NSNumber) -> [NormalTabs] {
-
         var tempTabSet: [NormalTabs] = [NormalTabs]()
-        
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "index == '\(index)'")
         do {
@@ -203,7 +201,23 @@ class TabsDataManager: NSObject {
             print("cannot remove original tabs")
             return
         }
-        SwiftCoreDataHelper.managedObjectContext().deleteObject(tabs)
+//        let fetchRequest = NSFetchRequest(entityName: "Tabs")
+//        fetchRequest.predicate = NSPredicate(format: "index == '\(tabs.index)'")
+//        do {
+//            if let results = try SwiftCoreDataHelper.managedObjectContext().executeFetchRequest(fetchRequest) as? [Tabs] {
+//                for item in results {
+//                    let tempItem: Tabs = item as Tabs
+//                    if tempItem.name == tabs.name && tempItem.content == tabs.content {
+//                        let singleTab = item as NSManagedObject
+//                        SwiftCoreDataHelper.managedObjectContext().deleteObject(singleTab)
+//                    }
+//                }
+//            }
+//        } catch {
+//            fatalError("There was an error fetching tabs on the index \(tabs.index)")
+//        }
+        let singleTab = tabs as NSManagedObject
+        SwiftCoreDataHelper.managedObjectContext().deleteObject(singleTab)
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
 
