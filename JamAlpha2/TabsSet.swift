@@ -1,17 +1,18 @@
 //
-//  LyricsSet.swift
+//  TabsSet.swift
 //  JamAlpha2
 //
-//  Created by Song Liao on 9/29/15.
+//  Created by Song Liao on 10/12/15.
 //  Copyright © 2015 Song Liao. All rights reserved.
 //
 
 import Foundation
 import CoreData
 
-@objc(LyricsSet)
-class LyricsSet: NSManagedObject {
+@objc(TabsSet)
+class TabsSet: NSManagedObject {
     @NSManaged var song: Song
-    @NSManaged var lyrics: AnyObject
+    @NSManaged var chords: AnyObject
+    @NSManaged var tabs: AnyObject
     @NSManaged var times: AnyObject
 }

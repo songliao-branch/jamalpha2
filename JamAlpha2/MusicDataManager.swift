@@ -117,4 +117,63 @@ class MusicDataManager: NSObject {
         }
         return [(String, NSTimeInterval)]()
     }
+    
+    //Tabs, TODO: need to store tuning, capo number
+    func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval]) {
+        
+        if let matchedSong = findSong(item) {
+            // TODO: find a better way managing user's lyrics, now just clear existing lyrics
+            matchedSong.tabsSets = NSSet()
+            
+            let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
+            
+            let chordsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(chords as AnyObject)
+            let tabsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tabs as AnyObject)
+            let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
+            tabsSet.chords = chordsData
+            tabsSet.tabs = tabsData
+            tabsSet.times = timesData
+            tabsSet.song = matchedSong
+            print("just saved tabs")
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    func getTabs(item: MPMediaItem) -> [Chord]{
+        
+        if let matchedSong = findSong(item) {
+            print("has \(matchedSong.tabsSets.count) set of tabs")
+            if matchedSong.tabsSets.count > 0 {
+                let theSet = matchedSong.tabsSets.allObjects.last as! TabsSet
+                
+                let chords = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.chords as! NSData) as! [String]
+                let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.tabs as! NSData) as! [String]
+                
+                let times = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.times as! NSData) as! [NSTimeInterval]
+                
+                var chordsToBeUsed = [Chord]()
+                
+                for i in 0..<chords.count {
+                    let singleChord = Tab(name: chords[i], content: tabs[i])
+                    let timedChord = Chord(tab: singleChord, time: TimeNumber(time: Float(times[i])))
+                    chordsToBeUsed.append(timedChord)
+                }
+  
+                return chordsToBeUsed
+            }
+        }
+        return [Chord]()
+    }
+    
+    // var chords = [Chord]()
+//    let G = Tab(name:"G",content:"030200000300")
+//    let D = Tab(name:"D",content:"xxxx00020302")
+//    let Em =    Tab(name: "Em", content: "000202000000")
+//    let C = Tab(name:"C",content:"xx0302000100")
+//    
+//    chords.append(Chord(tab: G, time: TimeNumber(time: 1.00)))
+//    chords.append(Chord(tab: D, time: TimeNumber(time: 3.88)))
+//    chords.append(Chord(tab: Em, time: TimeNumber(time: 6.99)))
+//    chords.append(Chord(tab: C, time: TimeNumber(time: 10.11)))
+    
 }

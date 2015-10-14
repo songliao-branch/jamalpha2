@@ -1,22 +1,45 @@
 import Foundation
 
+//Tab represents full six numbers on a guitar board
+//For example, C major is 032010
+struct Tab {
+    var name:String! //Cmajor
+    //var content: String! //xx0302000100, 12 characters, as in x32010
+    var fretPositions: [String]! //to be used in SongViewController
+    init(name: String, content: String) {
+        self.name = name
+        self.fretPositions = [String]()
+        for var i = 11; i >= 0; i = i - 2 {
+            let startIndex = content.startIndex.advancedBy(11 - i)
+            let endIndex = content.startIndex.advancedBy(11 - i + 2)
+            let charAtIndex = content[Range(start: startIndex, end: endIndex)]
+            if let number = Int(charAtIndex)  {
+                 fretPositions.append(String(number))
+            } else if charAtIndex == "xx" {
+                fretPositions.append("x")
+            } else {
+                fretPositions.append(" ")
+            }
+        }
+    }
+}
 //Chord is timed..
 class Chord: NSObject {
     
-    var mTime: TimeNumber
+    var time: TimeNumber
     var tab: Tab!
 
     init(tab:Tab, time: TimeNumber){
         self.tab = tab
-        self.mTime = time
+        self.time = time
     }
     
     class func getJasonMrazChords()-> [Chord]{
         var chords = [Chord]()
-        let G = Tab(name:"G",content:"320030")
-        let D = Tab(name:"D",content:"xx0232")
-        let Em =    Tab(name: "Em", content: "022000")
-        let C = Tab(name:"C",content:"x32010")
+        let G = Tab(name:"G",content:"030200000300")
+        let D = Tab(name:"D",content:"xxxx00020302")
+        let Em =    Tab(name: "Em", content: "000202000000")
+        let C = Tab(name:"C",content:"xx0302000100")
         
         chords.append(Chord(tab: G, time: TimeNumber(time: 1.00)))
         chords.append(Chord(tab: D, time: TimeNumber(time: 3.88)))
@@ -110,14 +133,14 @@ class Chord: NSObject {
     class func getRainbowChords() -> [Chord]{
         var chords = [Chord]()
         
-        let C = Tab(name:"C",content:" 32010")
-        let Dm7 = Tab(name:"Dm7",content:"  0211")
-        let Am7 = Tab(name:"Am7",content:" 02013")
-        let G = Tab(name:"G",content:"3 0030")
-        let E = Tab(name: "E", content: "022100")
-        let Am = Tab(name: "Am", content:" 02210")
-        let AmG = Tab(name: "Am/G", content: "302210")
-        let F = Tab(name: "F", content: "133211")
+        let C = Tab(name:"C",content:"--0302000100")
+    let Dm7 = Tab(name:"Dm7",content:"----00020101")
+    let Am7 = Tab(name:"Am7",content:"--0002000103")
+        let G = Tab(name:"G",content:"03xx00000300")
+     let E = Tab(name: "E", content: "000202010000")
+    let Am = Tab(name: "Am", content:"--0002020100")
+let AmG = Tab(name: "Am/G", content: "030002020100")
+     let F = Tab(name: "F", content: "010303020101")
 
         //intro
         let chord1 = Chord(tab: C, time: TimeNumber(time: 0.33))
@@ -169,9 +192,9 @@ class Chord: NSObject {
     // standard tuning, 3rd capo
     class func getRollingChords ()-> [Chord]{ //capo 3
         var stuff = [Chord]()
-        let Am7 = Tab(name: "Am7",content:"x02013")
-        let Em =    Tab(name: "Em", content: "022000")
-        let G =     Tab(name: "G",content:"320003")
+        let Am7 = Tab(name: "Am7",content:"xx0002000103")
+     let Em =    Tab(name: "Em", content: "000202000000")
+        let G =     Tab(name: "G",content:"030200000003")
         
         let chord1 = Chord(tab: Am7, time: TimeNumber(time: 1.11))
         let chord2 = Chord(tab: Em, time: TimeNumber(time:7.98))
@@ -213,24 +236,22 @@ class Chord: NSObject {
     class func getExtremeChords() -> [Chord] {
         var stuff = [Chord]()
         
-        let G =     Tab(name: "G",content:"320033")
-        let GB =    Tab(name: "G/B", content: "-20033")
-        let Csus9 = Tab(name: "Csus9", content: "-32033")
-        let Am7 =   Tab(name: "Am7",content:"-02013")
-        let C =     Tab(name: "C",content:"-32010")
-        let D =     Tab(name: "D", content: "--0232")
-        let Dsus4 = Tab(name: "Dsus4", content: "--0233")
+               let G = Tab(name: "G",content:"030200000303")
+       let GB =    Tab(name: "G/B", content: "--0200000303")
+     let Csus9 = Tab(name: "Csus9", content: "--0302000303")
+         let Am7 =   Tab(name: "Am7",content:"--0002000103")
+           let C =     Tab(name: "C",content:"--0302000100")
+         let D =     Tab(name: "D", content: "----00020302")
+     let Dsus4 = Tab(name: "Dsus4", content: "----00020303")
         
-        let Am =    Tab(name: "Am", content: "-02210")
-        let Em =    Tab(name: "Em", content: "022000")
-        let D7 =    Tab(name: "D7", content: "--0212")
-        let DFSharp = Tab(name: "D/F#", content: "2-0232")
-        let G7  = Tab(name: "G7", content: "320001")
-        let Cm = Tab(name: "Cm", content: "-35543")
-        var Em9 = Tab(name: "Em9", content: "022030")
-        
-        
-        let Bm = Tab(name: "Bm", content: "-24432")
+        let Am =    Tab(name: "Am", content: "--0002020100")
+        let Em =    Tab(name: "Em", content: "000202000000")
+        let D7 =    Tab(name: "D7", content: "----00020102")
+    let DFSharp = Tab(name: "D/F#", content: "02--00020302")
+          let G7  = Tab(name: "G7", content: "030200000001")
+           let Cm = Tab(name: "Cm", content: "--0305050403")
+ 
+           let Bm = Tab(name: "Bm", content: "--0204040302")
         
         //intro
         let chord1 = Chord(tab: G, time: TimeNumber(time: 0.21))
@@ -420,9 +441,4 @@ class Chord: NSObject {
     }
 }
 
-//Tab represents full six numbers on a guitar board
-//For example, C major is 032010
-struct Tab {
-    var name:String! //Cmajor
-    var content:String! //x32010
-}
+

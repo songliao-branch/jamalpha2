@@ -180,7 +180,7 @@ class TabsDataManager: NSObject {
                     tempTabSet.append(tempTab)
                 }
                     return tempTabSet
-                }
+            }
         } catch {
             fatalError("There was an error fetching tabs on the index \(index)")
         }

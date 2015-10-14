@@ -14,7 +14,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // Musci Data Manager
     var musicDataManager = MusicDataManager()
-    
+    //TODO: use a better way in SongViewController, not in here
+    var songViewController: SongViewController! //used to inject timed tabs 
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -1224,7 +1225,19 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
             }
         } else {
-            // Mark: back to play sonng page
+            var allChords = [String]()
+            var allTabs = [String]()
+            var allTimes = [NSTimeInterval]()
+
+            for oneline in allTabsOnMusicLine {
+                allChords.append(oneline.tab.name)
+                allTabs.append(oneline.tab.content)
+                allTimes.append(oneline.time)
+                
+                print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
+            }
+            musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes)
+            self.dismissViewControllerAnimated(true, completion: nil)
         }
     }
     
