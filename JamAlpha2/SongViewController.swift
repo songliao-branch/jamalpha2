@@ -100,7 +100,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var topLyricLabel: UILabel = UILabel()
     var bottomLyricLabel: UILabel = UILabel()
     
-    var current: Int = 0    //current line of lyric
+    var currentLyricsIndex: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
     
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
@@ -430,7 +430,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpLyricsBase(){
         //Lyric labels
-        current = -1
+        currentLyricsIndex = -1
         let sideMargin: CGFloat = 20
         
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
@@ -1290,6 +1290,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
 
     func refreshChordLabel(){
+    
         if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
             return
         }
@@ -1385,31 +1386,31 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         
-        if current + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(current+1).time) {
-            current++
-            topLyricLabel.text = lyric.get(current).str
+        if currentLyricsIndex + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(currentLyricsIndex+1).time) {
+            currentLyricsIndex++
+            topLyricLabel.text = lyric.get(currentLyricsIndex).str
             
-            if current + 1 < lyric.lyric.count {
-                bottomLyricLabel.text = lyric.get(current+1).str
+            if currentLyricsIndex + 1 < lyric.lyric.count {
+                bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
             }
         }
         
-        current = -1
-        while(current + 1 < lyric.lyric.count){
-            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
+        currentLyricsIndex = -1
+        while(currentLyricsIndex + 1 < lyric.lyric.count){
+            if lyric.get(currentLyricsIndex + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
                 break
             }
-            current++
+            currentLyricsIndex++
         }
         
-        if current == -1{
+        if currentLyricsIndex == -1{
             topLyricLabel.text = "..."
         }
         else {
-            topLyricLabel.text = lyric.get(current).str
+            topLyricLabel.text = lyric.get(currentLyricsIndex).str
         }
-        if current + 1 < lyric.lyric.count {
-            bottomLyricLabel.text = lyric.get(current+1).str
+        if currentLyricsIndex + 1 < lyric.lyric.count {
+            bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
         }
         else {
             bottomLyricLabel.text = "--"
