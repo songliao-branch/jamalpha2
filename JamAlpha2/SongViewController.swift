@@ -218,8 +218,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             loadDisplayMode()
-            resumeSong()
             setUpMusicData(player.nowPlayingItem!)
+            resumeSong()
             viewDidFullyDisappear = false
         }
     }
@@ -418,8 +418,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         let tabsFromCoreData = musicDataManager.getTabs(player.nowPlayingItem!)
         if tabsFromCoreData.count > 0 {
-            self.chords = tabsFromCoreData
+            print("chords length: \(tabsFromCoreData.count)")
+            if tabsFromCoreData.count > 2 {
+                self.chords = tabsFromCoreData
+            } else {
+                self.chords = Chord.getRainbowChords()
+            }
         }
+        
 
         let lyricsFromCoreData = musicDataManager.getLyrics(player.nowPlayingItem!)
         
