@@ -1215,9 +1215,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToTabsEditor(button: UIButton) {
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-        tabsEditorVC.songViewController = self
         tabsEditorVC.theSong = self.player.nowPlayingItem!
-        print("show action clicked")
         self.player.pause()
         self.dismissAction()
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)

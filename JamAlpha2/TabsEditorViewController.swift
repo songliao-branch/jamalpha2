@@ -14,8 +14,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // Musci Data Manager
     var musicDataManager = MusicDataManager()
-    //TODO: use a better way in SongViewController, not in here
-    var songViewController: SongViewController! //used to inject timed tabs 
+
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -627,7 +626,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 removeObjectsOnCompleteStringView()
                 data.removeTabs(self.currentSelectedSpecificTab.tabs)
                 self.tabNameTextField.text = ""
-               
                 self.changeRemoveButtonStatus(self.removeButton)
             }
         }
@@ -734,9 +732,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
-
-        self.musicControlView.addSubview(self.currentTimeLabel)
-        self.musicControlView.addSubview(self.totalTimeLabel)
         
         let musicSingleTapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
         musicSingleTapRecognizer.numberOfTapsRequired = 1
@@ -755,12 +750,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let wrapperHeight: CGFloat = 12
         let labelFontSize: CGFloat = 10
         let wrapperWidth: CGFloat = 80
-        let wrapper = UIView(frame: CGRect(x: 0, y:  2 / 20 * self.trueHeight+progressBlock.frame.height/2-wrapperHeight, width: wrapperWidth, height: wrapperHeight))
+        let wrapper = UIView(frame: CGRect(x: 0, y: progressBlock.frame.height/2-wrapperHeight, width: wrapperWidth, height: wrapperHeight))
         wrapper.center.x = trueWidth/2
         wrapper.backgroundColor = UIColor.darkGrayColor()
         wrapper.alpha = 0.7
         wrapper.layer.cornerRadius = wrapperHeight/5
-        self.view.addSubview(wrapper)
+        musicControlView.addSubview(wrapper)
         
         currentTimeLabel = UILabel(frame: CGRect(x: 0, y: 0, width: labelWidth, height: labelFontSize))
         currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
@@ -776,7 +771,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         currentTimeLabel.layer.shadowOpacity = 1.0
         currentTimeLabel.layer.shadowOffset = CGSizeZero
         currentTimeLabel.layer.masksToBounds = false
-        self.view.addSubview(currentTimeLabel)
+        musicControlView.addSubview(currentTimeLabel)
         
         totalTimeLabel = UILabel(frame: CGRect(x: 0, y:0, width: labelWidth, height: labelFontSize))
         totalTimeLabel.textColor = UIColor.whiteColor()
@@ -785,7 +780,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
         totalTimeLabel.sizeToFit()
         totalTimeLabel.center = CGPoint(x: wrapper.center.x+totalTimeLabel.frame.width/2+2, y: wrapper.center.y)
-        self.view.addSubview(totalTimeLabel)
+        musicControlView.addSubview(totalTimeLabel)
     }
     
     // pan on music control view to change music time and progressblock time
