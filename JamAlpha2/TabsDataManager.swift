@@ -166,8 +166,9 @@ class TabsDataManager: NSObject {
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "index == '\(index)'")
         do {
-            if let results = try SwiftCoreDataHelper.managedObjectContext().executeFetchRequest(fetchRequest) as? [Tabs] {
+            if let results = try moc.executeFetchRequest(fetchRequest) as? [Tabs] {
                 for item in results {
+                    
                     let tempItem: Tabs = item as Tabs
                     let tempTab: NormalTabs = NormalTabs()
                     tempTab.name = tempItem.name
@@ -187,13 +188,14 @@ class TabsDataManager: NSObject {
     }
 
     
-    func addNewTabs(index: NSNumber, name: String, content: String) {
+    func addNewTabs(index: NSNumber, name: String, content: String) -> Tabs {
         let tabs: Tabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Tabs), managedObjectConect: moc) as! Tabs
         tabs.index = index
         tabs.name = name
         tabs.content = content
         tabs.isOriginal = false
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        return tabs
     }
     
 
@@ -202,23 +204,7 @@ class TabsDataManager: NSObject {
             print("cannot remove original tabs")
             return
         }
-//        let fetchRequest = NSFetchRequest(entityName: "Tabs")
-//        fetchRequest.predicate = NSPredicate(format: "index == '\(tabs.index)'")
-//        do {
-//            if let results = try SwiftCoreDataHelper.managedObjectContext().executeFetchRequest(fetchRequest) as? [Tabs] {
-//                for item in results {
-//                    let tempItem: Tabs = item as Tabs
-//                    if tempItem.name == tabs.name && tempItem.content == tabs.content {
-//                        let singleTab = item as NSManagedObject
-//                        SwiftCoreDataHelper.managedObjectContext().deleteObject(singleTab)
-//                    }
-//                }
-//            }
-//        } catch {
-//            fatalError("There was an error fetching tabs on the index \(tabs.index)")
-//        }
-        let singleTab = tabs as NSManagedObject
-        SwiftCoreDataHelper.managedObjectContext().deleteObject(singleTab)
+        moc.deleteObject(tabs)
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
 
@@ -226,7 +212,7 @@ class TabsDataManager: NSObject {
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "isOriginal == false")//needs to verify this works
         do {
-            if let results = try SwiftCoreDataHelper.managedObjectContext().executeFetchRequest(fetchRequest) as? [Tabs] {
+            if let results = try moc.executeFetchRequest(fetchRequest) as? [Tabs] {
                 for result in results {
                     print("\(result.index) + \(result.name) + \(result.content)")
                 }
