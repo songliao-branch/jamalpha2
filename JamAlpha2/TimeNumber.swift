@@ -56,7 +56,7 @@ class TimeNumber {
     //1:12.23
     func toDisplayString() -> String {
         var result: String = ""
-        if second > 60 {
+        if second >= 60 {
             result += "\(second/60):"
         }
         else{
