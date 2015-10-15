@@ -751,12 +751,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func setUpTimeLabels() {
-        
         let labelWidth: CGFloat = 40
-        let wrapperHeight: CGFloat = 13
-        let labelFontSize: CGFloat = 12
-        
-        let wrapper = UIView(frame: CGRect(x: 0, y:  2 / 20 * self.trueHeight+progressBlock.frame.height/2-wrapperHeight, width: 85, height: wrapperHeight))
+        let wrapperHeight: CGFloat = 12
+        let labelFontSize: CGFloat = 10
+        let wrapperWidth: CGFloat = 80
+        let wrapper = UIView(frame: CGRect(x: 0, y:  2 / 20 * self.trueHeight+progressBlock.frame.height/2-wrapperHeight, width: wrapperWidth, height: wrapperHeight))
         wrapper.center.x = trueWidth/2
         wrapper.backgroundColor = UIColor.darkGrayColor()
         wrapper.alpha = 0.7
@@ -765,26 +764,28 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         currentTimeLabel = UILabel(frame: CGRect(x: 0, y: 0, width: labelWidth, height: labelFontSize))
         currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
-        currentTimeLabel.center.y = wrapperHeight/2
         currentTimeLabel.text = "0:00.0"
-        currentTimeLabel.textAlignment = .Left
-        currentTimeLabel.textColor = UIColor.whiteColor()
+        currentTimeLabel.sizeToFit()
         
+        currentTimeLabel.center = CGPoint(x: wrapper.center.x-currentTimeLabel.frame.width/2-2, y: wrapper.center.y)
+        currentTimeLabel.textColor = UIColor.whiteColor()
+        //i'm not wrapper i'm a singer with a cash flow-> ed sheeran :)
         //make it glow
         currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
         currentTimeLabel.layer.shadowRadius = 3.0
         currentTimeLabel.layer.shadowOpacity = 1.0
         currentTimeLabel.layer.shadowOffset = CGSizeZero
         currentTimeLabel.layer.masksToBounds = false
-        wrapper.addSubview(currentTimeLabel)
+        self.view.addSubview(currentTimeLabel)
         
-        totalTimeLabel = UILabel(frame: CGRect(x: wrapper.width/2, y:0, width: labelWidth, height: labelFontSize))
+        totalTimeLabel = UILabel(frame: CGRect(x: 0, y:0, width: labelWidth, height: labelFontSize))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
-        totalTimeLabel.center.y = wrapperHeight/2
+        totalTimeLabel.center.y = wrapper.center.y
         totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
-        totalTimeLabel.textAlignment = .Right
-        wrapper.addSubview(totalTimeLabel)
+        totalTimeLabel.sizeToFit()
+        totalTimeLabel.center = CGPoint(x: wrapper.center.x+totalTimeLabel.frame.width/2+2, y: wrapper.center.y)
+        self.view.addSubview(totalTimeLabel)
     }
     
     // pan on music control view to change music time and progressblock time
