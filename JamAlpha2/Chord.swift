@@ -65,12 +65,12 @@ class Chord: NSObject {
     
     class func getDaughters() -> [Chord] {
         var chords = [Chord]()
-        let chord1 = Tab(name:"",content:"707700")
-        let chord2 = Tab(name:"",content:"075700")
-        let chord3 = Tab(name: "", content: "505700")
-        let chord4 = Tab(name:"",content:"054700")
+        let chord1 = Tab(name:"",content:"070007070000")
+        let chord2 = Tab(name:"",content:"000705070000")
+     let chord3 = Tab(name: "", content: "050005070000")
+        let chord4 = Tab(name:"",content:"000504070000")
         
-        let chord5 = Tab(name: "", content: "076700")
+     let chord5 = Tab(name: "", content: "000706070000")
         chords.append(Chord(tab: chord1, time: TimeNumber(time: 0.22)))
         chords.append(Chord(tab: chord2, time: TimeNumber(time: 3.10)))
         chords.append(Chord(tab: chord3, time: TimeNumber(time: 6.39)))
