@@ -14,8 +14,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // Musci Data Manager
     var musicDataManager = MusicDataManager()
-    //TODO: use a better way in SongViewController, not in here
-    var songViewController: SongViewController! //used to inject timed tabs 
+
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -113,11 +112,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var removeAvaliable: Bool = false
     var intoEditView: Bool = false
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     // Hide the status bar
     override func prefersStatusBarHidden() -> Bool {
         return true
@@ -131,15 +125,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     override func shouldAutorotate() -> Bool {
         return true
     }
-
-    //init
-    init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -152,7 +137,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             trueWidth = self.view.frame.width
             trueHeight = self.view.frame.height
         }
-        
         // create the sound wave
         self.createSoundWave()
         
@@ -177,7 +161,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.addObjectsOnEditView()
         self.createStringAndFretPosition()
         self.addMusicControlView()
-        
+        self.setUpTimeLabels()
         // initial collection view
         self.initCollectionView()
         self.collectionView.dataSource = self
@@ -383,8 +367,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let menuView: UIView = UIView()
         let musicView: UIView = UIView()
 
-        let blueLine: UIView = UIView()
-
         // buttons
         let backButton: UIButton = UIButton()
 
@@ -445,10 +427,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         doneButton.setImage(UIImage(named: "icon-done"), forState: UIControlState.Normal)
         menuView.addSubview(doneButton)
-        
-        blueLine.frame = CGRectMake(self.trueWidth / 2, 0.5 / 20 * self.trueHeight, 2, 5.5 / 20 * self.trueHeight)
-        blueLine.backgroundColor = UIColor.blackColor()
-        self.musicControlView.addSubview(blueLine)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
@@ -648,7 +626,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 removeObjectsOnCompleteStringView()
                 data.removeTabs(self.currentSelectedSpecificTab.tabs)
                 self.tabNameTextField.text = ""
-               
                 self.changeRemoveButtonStatus(self.removeButton)
             }
         }
@@ -756,30 +733,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
         
-        self.currentTimeLabel.frame = CGRectMake(0.5 * self.trueWidth - 2 / 31 * self.trueWidth, 2 / 20 * self.trueHeight, 2 / 31 * self.trueWidth, 1 / 20 * self.trueHeight)
-        self.totalTimeLabel.frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, 2 / 31 * self.trueWidth, 1 / 20 * self.trueHeight)
-        
-        self.currentTimeLabel.layer.cornerRadius = 2
-        self.totalTimeLabel.layer.cornerRadius = 2
-        
-        self.currentTimeLabel.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
-        self.totalTimeLabel.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
-        
-        self.currentTimeLabel.textAlignment = NSTextAlignment.Center
-        self.totalTimeLabel.textAlignment = NSTextAlignment.Center
-        
-        let minutesD = floor(self.duration / 60)
-        let secondsD = round(self.duration - minutesD * 60)
-        
-        self.currentTimeLabel.text = "00:00"
-        self.totalTimeLabel.text = "\(minutesD):\(secondsD)"
-        
-        self.currentTimeLabel.font = UIFont.systemFontOfSize(10)
-        self.totalTimeLabel.font = UIFont.systemFontOfSize(10)
-        
-        self.musicControlView.addSubview(self.currentTimeLabel)
-        self.musicControlView.addSubview(self.totalTimeLabel)
-        
         let musicSingleTapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
         musicSingleTapRecognizer.numberOfTapsRequired = 1
         musicSingleTapRecognizer.numberOfTouchesRequired = 1
@@ -790,6 +743,44 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         musicPanRecognizer.minimumNumberOfTouches = 1
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
         
+    }
+    
+    func setUpTimeLabels() {
+        let labelWidth: CGFloat = 40
+        let wrapperHeight: CGFloat = 12
+        let labelFontSize: CGFloat = 10
+        let wrapperWidth: CGFloat = 80
+        let wrapper = UIView(frame: CGRect(x: 0, y: progressBlock.frame.height/2-wrapperHeight, width: wrapperWidth, height: wrapperHeight))
+        wrapper.center.x = trueWidth/2
+        wrapper.backgroundColor = UIColor.darkGrayColor()
+        wrapper.alpha = 0.7
+        wrapper.layer.cornerRadius = wrapperHeight/5
+        musicControlView.addSubview(wrapper)
+        
+        currentTimeLabel = UILabel(frame: CGRect(x: 0, y: 0, width: labelWidth, height: labelFontSize))
+        currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        currentTimeLabel.text = "0:00.0"
+        currentTimeLabel.sizeToFit()
+        
+        currentTimeLabel.center = CGPoint(x: wrapper.center.x-currentTimeLabel.frame.width/2-2, y: wrapper.center.y)
+        currentTimeLabel.textColor = UIColor.whiteColor()
+        //i'm not wrapper i'm a singer with a cash flow-> ed sheeran :)
+        //make it glow
+        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
+        currentTimeLabel.layer.shadowRadius = 3.0
+        currentTimeLabel.layer.shadowOpacity = 1.0
+        currentTimeLabel.layer.shadowOffset = CGSizeZero
+        currentTimeLabel.layer.masksToBounds = false
+        musicControlView.addSubview(currentTimeLabel)
+        
+        totalTimeLabel = UILabel(frame: CGRect(x: 0, y:0, width: labelWidth, height: labelFontSize))
+        totalTimeLabel.textColor = UIColor.whiteColor()
+        totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        totalTimeLabel.center.y = wrapper.center.y
+        totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
+        totalTimeLabel.sizeToFit()
+        totalTimeLabel.center = CGPoint(x: wrapper.center.x+totalTimeLabel.frame.width/2+2, y: wrapper.center.y)
+        musicControlView.addSubview(totalTimeLabel)
     }
     
     // pan on music control view to change music time and progressblock time
@@ -804,9 +795,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
         self.progressBlock.setProgress(persent)
         self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
-        let minutesC = floor(self.currentTime / 60)
-        let secondsC = round(self.currentTime - minutesC * 60)
-        self.currentTimeLabel.text = "\(minutesC):\(secondsC)"
+
+        self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
         // find the current tab according to the current time and make the current tab view to yellow
         self.findCurrentTabView()
     }
@@ -888,9 +878,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func update() {
         if self.countDownNumber > 3.0 {
             self.findCurrentTabView()
-            let minutesC = floor(self.currentTime / 60)
-            let secondsC = round(self.currentTime - minutesC * 60)
-            self.currentTimeLabel.text = "\(minutesC):\(secondsC)"// | \(minutesD):\(secondsD)"
+            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
 
             self.currentTime = self.player.currentTime
             let persent = CGFloat(self.currentTime / self.duration)
