@@ -165,15 +165,4 @@ class MusicDataManager: NSObject {
         return [Chord]()
     }
     
-    // var chords = [Chord]()
-//    let G = Tab(name:"G",content:"030200000300")
-//    let D = Tab(name:"D",content:"xxxx00020302")
-//    let Em =    Tab(name: "Em", content: "000202000000")
-//    let C = Tab(name:"C",content:"xx0302000100")
-//    
-//    chords.append(Chord(tab: G, time: TimeNumber(time: 1.00)))
-//    chords.append(Chord(tab: D, time: TimeNumber(time: 3.88)))
-//    chords.append(Chord(tab: Em, time: TimeNumber(time: 6.99)))
-//    chords.append(Chord(tab: C, time: TimeNumber(time: 10.11)))
-    
 }
