@@ -559,6 +559,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // create 6 finger point for new tabs
     func createEditFingerPoint(sender: Int) {
         self.tabFingerPointChanged = true
+        let stringNumber = sender / 100
+        let fretNumber = sender - stringNumber * 100
         for item in self.fingerPoint {
             item.removeFromSuperview()
         }
@@ -568,14 +570,20 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
             var buttonX = (fretPosition[0] + fretPosition[1]) / 2 - buttonWidth / 2
             let buttonY = string6Position[i] - buttonWidth / 2
-            if i == sender {
-                buttonX = (fretPosition[sender] + fretPosition[sender + 1]) / 2 - buttonWidth / 2
+            fingerButton.tag = 0
+            if i + 1 == stringNumber {
+                buttonX = (fretPosition[fretNumber] + fretPosition[fretNumber + 1]) / 2 - buttonWidth / 2
+                fingerButton.tag = fretNumber
             }
             fingerButton.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
             fingerButton.layer.cornerRadius = 0.5 * buttonWidth
             fingerButton.setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
             fingerButton.addTarget(self, action: "pressEditFingerButton:", forControlEvents: UIControlEvents.TouchUpInside)
-            fingerButton.accessibilityIdentifier = "grayButton"
+            if i + 1 > stringNumber {
+                fingerButton.accessibilityIdentifier = "blackX"
+            } else {
+                fingerButton.accessibilityIdentifier = "grayButton"
+            }
             self.fingerPoint.append(fingerButton)
             if i < self.currentNoteButton.tag / 100 - 1 {
                 self.completeStringView.addSubview(fingerButton)
@@ -634,7 +642,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.changeRemoveButtonStatus(self.removeButton)
             } else {
                 sender.removeFromSuperview()
-                removeObjectsOnCompleteStringView()
+                self.removeObjectsOnCompleteStringView()
+                self.removeObjectsOnSpecificTabsScrollView()
+                self.addNewTab = false
+                self.removeAvaliable = false
                 data.removeTabs(self.currentSelectedSpecificTab.tabs)
                 self.tabNameTextField.text = ""
                 self.changeRemoveButtonStatus(self.removeButton)
