@@ -179,7 +179,7 @@ class TabsDataManager: NSObject {
                     tempTab.tabs = tempItem
                     tempTabSet.append(tempTab)
                 }
-                    return tempTabSet
+                return sortTabsSets(tempTabSet)
             }
         } catch {
             fatalError("There was an error fetching tabs on the index \(index)")
@@ -221,5 +221,40 @@ class TabsDataManager: NSObject {
             fatalError("There was an error fetching all new tabs")
         }
     }
+    
+    //Sort tab sets given on a index to the order of major, minor, m7, 7, and user added ones
+    func sortTabsSets(tabsSets: [NormalTabs]) -> [NormalTabs] {
+        return tabsSets.sort{
+            (left, right) in
+            if !left.isOriginal { // put all non-original last unsorted, maybe later by uses frequency
+                return false
+            } else if !right.isOriginal {
+                return true
+            }
+            // everything now on are original chords
+            if left.name.characters.count == 1 { // put major chord first
+                return true
+            } else if right.name.characters.count == 1 {
+                return false
+            }
+            
+            //put minor chords second
+            let lastLeftCharacter = Array(left.name.characters)[left.name.characters.count-1]
+            let lastRightCharacter = Array(right.name.characters)[right.name.characters.count-1]
+            if lastLeftCharacter == "m" {
+                return true
+            } else if lastRightCharacter == "m" {
+                return false
+            }
+            //put minor 7 at 3rd place
+            if left.name.characters.count == 3 { //then we put m7 chord at last of original
+                return true
+            } else if right.name.characters.count == 3 {
+                return false
+            }
+            //put 7 chord at last of the 4
+            return false
+        }
 
+    }
 }
