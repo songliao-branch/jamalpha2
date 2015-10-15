@@ -607,9 +607,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if playbackState == .Paused {
             timer.invalidate()
+            
+            //fade down the soundwave
+            UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                self.progressBlock!.alpha = 0.5
+                }, completion: nil)
+            
         }
         else if playbackState == .Playing {
             startTimer()
+            
+            //bring up the soundwave, give it a little jump animation
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+                self.progressBlock!.alpha = 1.0
+                }, completion: { finished in
+                    
+                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
+                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                        }, completion: nil)
+                    
+            })
         }
     }
     
@@ -1502,23 +1521,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                self.progressBlock!.alpha = 1.0
-                }, completion: { finished in
-                   
-                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
-                        }, completion: nil)
-                    
-            })
+            
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
             player.pause()
-            UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                self.progressBlock!.alpha = 0.5
-                }, completion: nil)
         }
     }
     
