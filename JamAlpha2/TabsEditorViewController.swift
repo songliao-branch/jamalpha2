@@ -446,6 +446,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.tabNameTextField.frame = CGRectMake(23.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 7 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
         self.tabNameTextField.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
         self.tabNameTextField.layer.cornerRadius = 3
+        self.tabNameTextField.autocorrectionType = UITextAutocorrectionType.No
         self.editView.addSubview(tabNameTextField)
         
         self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
@@ -1164,6 +1165,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
                         //self.specificTabSets = self.data.getTabsSets(index)
                         //self.currentSelectedSpecificTab = self.specificTabSets[self.specificTabSets.count - 1]
+                        self.currentSelectedSpecificTab = NormalTabs()
                         self.currentSelectedSpecificTab.tabs = tempTabs
                         self.currentSelectedSpecificTab.index = index
                         self.currentSelectedSpecificTab.name = name
