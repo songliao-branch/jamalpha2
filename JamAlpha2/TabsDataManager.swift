@@ -171,6 +171,7 @@ class TabsDataManager: NSObject {
                     let tempItem: Tabs = item as Tabs
                     let tempTab: NormalTabs = NormalTabs()
                     tempTab.name = tempItem.name
+                    print("\(tempItem.index)")
                     tempTab.index = tempItem.index
                     tempTab.content = tempItem.content
                     tempTab.isOriginal = tempItem.isOriginal
