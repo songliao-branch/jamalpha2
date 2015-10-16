@@ -187,7 +187,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var defaultTunings =  ["E","B","G","D","A","E"]
     var stepDownButtons = [UIButton]()
     var stepUpButtons = [UIButton]()
-    var tuningLabels = [UILabel]()
+    var tuningValueLabels = [UILabel]()
     var tunings = [Tuning]()
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
     func setUpTuningControlMenu() {
@@ -270,7 +270,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             tuningValueLabel.center = CGPoint(x: speedStepper.center.x, y: stringIndicatorLabel.center.y)
             tuningValueLabel.textAlignment = .Center
             tuningMenu.addSubview(tuningValueLabel)
-            tuningLabels.append(tuningValueLabel)
+            tuningValueLabels.append(tuningValueLabel)
             
             let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: buttonDimension, height: buttonDimension))
             stepUpButton.setImage(UIImage(named: "up_arrow"), forState: .Normal)
@@ -302,20 +302,20 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func stepUpPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
         currentNote.stepUp()
-        tuningLabels[button.tag].text = currentNote.toDisplayString()
-        let center = tuningLabels[button.tag].center
-        tuningLabels[button.tag].sizeToFit()
-        tuningLabels[button.tag].center = center
+        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+        let center = tuningValueLabels[button.tag].center
+        tuningValueLabels[button.tag].sizeToFit()
+        tuningValueLabels[button.tag].center = center
     }
     
     func stepDownPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
         currentNote.stepDown()
-        tuningLabels[button.tag].text = currentNote.toDisplayString()
-        let center = tuningLabels[button.tag].center
+        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+        let center = tuningValueLabels[button.tag].center
 
-        tuningLabels[button.tag].sizeToFit()
-         tuningLabels[button.tag].center = center
+        tuningValueLabels[button.tag].sizeToFit()
+         tuningValueLabels[button.tag].center = center
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
@@ -1430,7 +1430,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 
                 print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
             }
-            self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes)
+            
+            var tuningOfTheSong = ""
+            for label in tuningValueLabels {
+                tuningOfTheSong += "\(label.text!)-"
+            }
+            self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
             self.dismissViewControllerAnimated(true, completion: nil)
         }
         self.currentSelectedSpecificTab = nil

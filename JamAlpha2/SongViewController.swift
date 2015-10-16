@@ -74,7 +74,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     
-
+    //tuning of capo 
+    var tuningOfTheTabsSet = "E-B-G-D-A-E"//stanard tuning default, from high E - to low E
+    // when it 's presented in the view, it's reversed
+    var capoOfTheTabsSet = 0
+    
     //time
     var timer: NSTimer = NSTimer()
     var updateInterval: NSTimeInterval = 0 //used to calculate count down reduce
@@ -194,9 +198,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpTimeLabels()
         setUpBottomViewWithButtons()
         setUpActionViews()
-        //get top and bottom points of six lines
-        setTuning("E-B-G-D-A-E") // placeholder
-        setCapo(1)
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
@@ -219,6 +220,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //println("resume song when Fully Disapper")
             loadDisplayMode()
             setUpMusicData(player.nowPlayingItem!)
+            setTuning(self.tuningOfTheTabsSet)
+            setCapo(self.capoOfTheTabsSet)
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -416,11 +419,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             lyric = Lyric.getExtremeLyrics()
         }
         
+        //return a tuple of ([Chord],tuning, capo)
         let tabsFromCoreData = musicDataManager.getTabs(player.nowPlayingItem!)
-        if tabsFromCoreData.count > 0 {
-            print("chords length: \(tabsFromCoreData.count)")
-            if tabsFromCoreData.count > 2 {
-                self.chords = tabsFromCoreData
+        if tabsFromCoreData.0.count > 0 {
+            print("chords length: \(tabsFromCoreData.0.count)")
+            if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
+                self.chords = tabsFromCoreData.0
+                self.tuningOfTheTabsSet = tabsFromCoreData.1
+                self.capoOfTheTabsSet = tabsFromCoreData.2
             } else {
                 self.chords = Chord.getRainbowChords()
             }
