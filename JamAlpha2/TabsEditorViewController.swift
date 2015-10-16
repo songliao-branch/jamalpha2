@@ -167,9 +167,87 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.initCollectionView()
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
-        
+        setUpTuningControlMenu()
         // initial main view tab data array
         self.initialMainViewDataArray()
+    }
+    
+    var tuningMenu: UIView!
+    var actionDismissLayerButton: UIButton!
+   
+    var speedStepper: UIStepper!
+   // var actionLabels: [UILabel]!
+    
+    // capo and 6 string
+    var defaultTuningSettings = ["0", "E","B","G","D","A","E"]
+    var stepDownButtons = [UIButton]()
+    var stepUpButtons = [UIButton]()
+    var capoAndTuningLabels = [UILabel]()
+    
+    // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
+    func setUpTuningControlMenu() {
+        actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
+        actionDismissLayerButton.backgroundColor = UIColor.clearColor()
+        actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
+        self.view.addSubview(actionDismissLayerButton)
+        actionDismissLayerButton.hidden = true
+        
+        tuningMenu = UIView(frame: CGRect(x: -trueWidth/3, y: 0, width: trueWidth/3, height: trueHeight))
+        tuningMenu.backgroundColor = UIColor.actionGray()
+        self.view.addSubview(tuningMenu)
+        
+        //draw 7 lines to give rooms for eight rows
+        let rowHeight = trueHeight/8
+        for i in 0..<7 {
+            let separator = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i+1), width: tuningMenu.frame.width, height: 1))
+            separator.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+            tuningMenu.addSubview(separator)
+        }
+        
+         var actionTexts = ["Speed: 1.0x", "Capo:", "1st:", "2nd:", "3rd:", "4th:", "5th:", "6th:"]
+        //add 8 labels, speed label, capo label and six labels for each string
+        for i in 0..<8 {
+            let label = UILabel(frame: CGRect(x: 10, y: 0, width: 100, height: 25))
+            label.textColor = UIColor.mainPinkColor()
+            label.text = actionTexts[i]
+            label.sizeToFit()
+            label.center.y = rowHeight/2 + rowHeight * CGFloat(i)
+            tuningMenu.addSubview(label)
+        }
+        
+        let sideMargin: CGFloat = 10
+        speedStepper = UIStepper(frame: CGRect(x: tuningMenu.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
+        speedStepper.center.y = rowHeight/2
+        speedStepper.tintColor = UIColor.mainPinkColor()
+        speedStepper.minimumValue = 0.7 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
+        speedStepper.maximumValue = 1.3
+        speedStepper.stepValue = 0.1
+        speedStepper.value = 1.0 //default
+        tuningMenu.addSubview(speedStepper)
+        
+        let buttonDimension: CGFloat = 30
+        for i in 0..<7 {
+            
+            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 30))
+            label.text = defaultTuningSettings[i]
+            label.textColor = UIColor.mainPinkColor()
+            label.sizeToFit()
+            label.center = CGPoint(x: speedStepper.center.x, y: rowHeight/2 + rowHeight * CGFloat(i+1))
+            tuningMenu.addSubview(label)
+            capoAndTuningLabels.append(label)
+            
+            let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: buttonDimension, height: buttonDimension))
+            stepUpButton.setImage(UIImage(named: "up_arrow"), forState: .Normal)
+            stepUpButton.center = CGPoint(x: label.center.x + buttonDimension, y: label.center.y)
+            tuningMenu.addSubview(stepUpButton)
+            stepUpButtons.append(stepUpButton)
+
+            let stepDownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
+            stepDownButton.setImage(UIImage(named: "down_arrow"), forState: .Normal)
+            stepDownButton.center = CGPoint(x: label.center.x - buttonDimension, y: label.center.y)
+            tuningMenu.addSubview(stepDownButton)
+            stepDownButtons.append(stepDownButton)
+        }
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
@@ -1099,8 +1177,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    func dismissAction() {
+        UIView.animateWithDuration(0.3, animations: {
+            self.tuningMenu.frame = CGRect(x: -self.tuningMenu.frame.width, y: 0, width: self.tuningMenu.frame.width, height: self.tuningMenu.frame.height)
+            
+            }, completion:
+            {
+                completed in
+                self.actionDismissLayerButton.hidden = true
+            }
+        )
+    }
     func pressTuningButton(sender: UIButton) {
         print("press tuning button")
+        self.actionDismissLayerButton.hidden = false
+        UIView.animateWithDuration(0.3, animations: {
+            self.tuningMenu.frame = CGRect(x: 0, y: 0, width: self.tuningMenu.frame.width, height: self.trueHeight)
+            self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
+            self.actionDismissLayerButton.alpha = 0.3
+        })
     }
     
     func pressResetButton(sender: UIButton) {
@@ -1367,5 +1462,32 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    
+    //MARK: to find tuning in half step down or half step up, used in TuningView
+    var notes = ["A","Bb","B","C","C#","D","Eb","E","F","F#","G","G#"]
+    func getHalfStepUpNote(currentNote: String) -> String {
+        for i in 0..<notes.count {
+            if currentNote == notes[i] {
+                if i == notes.count-1 {
+                    return notes[0]
+                }
+                return notes[i+1]
+            }
+        }
+        return ""//should not reach here
+    }
+    
+    func getHalfStepDownNote(currentNote: String) -> String {
+        for i in 0..<notes.count {
+            if currentNote == notes[i] {
+                if i == 0 {
+                    return notes[notes.count-1]
+                }
+                return notes[i-1]
+            }
+        }
+        return ""
+    }
+
 }
 
