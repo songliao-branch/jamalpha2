@@ -1140,9 +1140,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func pressAddButton(sender: UIButton) {
         self.view.addSubview(self.editView)
+        
         self.player.pause()
         self.timer.invalidate()
         self.timer = NSTimer()
+        self.countDownNumber = 0
+        
         self.addSpecificFingerPoint = false
         self.musicControlView.alpha = 0
         self.progressBlock.alpha = 0
