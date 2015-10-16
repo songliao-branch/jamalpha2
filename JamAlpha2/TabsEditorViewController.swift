@@ -755,6 +755,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
                 specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
                 specificButton.tag = i
+                specificButton.alpha = 0.1
                 if self.specificTabSets[i].isOriginal == true {
                     specificButton.accessibilityIdentifier = "isOriginal"
                 } else {
@@ -764,6 +765,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.buttonOnSpecificScrollView.append(specificButton)
             }
         }
+        UIView.animateWithDuration(0.2, animations: {
+            for item in self.specificTabsScrollView.subviews {
+                if item.isMemberOfClass(UIButton) {
+                    item.alpha = 1
+                }
+            }
+        })
     }
     
     // choose specific tabs, and generate the finger point for this tab
@@ -787,14 +795,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.presentViewController(alertController, animated: true, completion: nil)
                 self.changeRemoveButtonStatus(self.removeButton)
             } else {
-                sender.removeFromSuperview()
-                self.removeObjectsOnCompleteStringView()
+
+                //sender.removeFromSuperview()
+                //self.removeObjectsOnCompleteStringView()
                 self.removeObjectsOnSpecificTabsScrollView()
-                self.addNewTab = false
-                self.removeAvaliable = false
                 data.removeTabs(self.currentSelectedSpecificTab.tabs)
-                self.tabNameTextField.text = ""
+                self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
                 self.changeRemoveButtonStatus(self.removeButton)
+                self.addSpecificTabButton(self.currentNoteButton.tag)
             }
         }
     }
@@ -1301,6 +1309,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func pressAddButton(sender: UIButton) {
         self.view.addSubview(self.editView)
+        
+        self.player.pause()
+        self.timer.invalidate()
+        self.timer = NSTimer()
+        self.countDownNumber = 0
+        
         self.addSpecificFingerPoint = false
         self.musicControlView.alpha = 0
         self.progressBlock.alpha = 0
@@ -1343,8 +1357,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         }
                         let tempTabs: Tabs = self.data.addNewTabs(index, name: name, content: content)
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
-                        //self.specificTabSets = self.data.getTabsSets(index)
-                        //self.currentSelectedSpecificTab = self.specificTabSets[self.specificTabSets.count - 1]
                         self.currentSelectedSpecificTab = NormalTabs()
                         self.currentSelectedSpecificTab.tabs = tempTabs
                         self.currentSelectedSpecificTab.index = index
@@ -1419,6 +1431,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
             }
         } else {
+            self.player.stop()
+            self.timer.invalidate()
+            self.timer = NSTimer()
+            self.currentTime = 0
             var allChords = [String]()
             var allTabs = [String]()
             var allTimes = [NSTimeInterval]()
