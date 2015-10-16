@@ -179,11 +179,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
    // var actionLabels: [UILabel]!
     
     // capo and 6 string
-    var defaultTuningSettings = ["0", "E","B","G","D","A","E"]
+    var defaultTunings =  ["E","B","G","D","A","E"]
     var stepDownButtons = [UIButton]()
     var stepUpButtons = [UIButton]()
-    var capoAndTuningLabels = [UILabel]()
-    
+    var tuningLabels = [UILabel]()
+    var tunings = [Tuning]()
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
     func setUpTuningControlMenu() {
         actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
@@ -226,16 +226,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tuningMenu.addSubview(speedStepper)
         
         let buttonDimension: CGFloat = 30
-        for i in 0..<7 {
+        
+        //add tunings labels and buttons
+        for i in 0..<6 {
             
             let label = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
-            label.text = defaultTuningSettings[i]
+
+            let originalTuning = Tuning(originalNote: defaultTunings[i])
+            tunings.append(originalTuning)
+            
+            label.text = defaultTunings[i]
             label.textColor = UIColor.mainPinkColor()
             //label.sizeToFit()
             label.center = CGPoint(x: speedStepper.center.x, y: rowHeight/2 + rowHeight * CGFloat(i+1))
             label.textAlignment = .Center
             tuningMenu.addSubview(label)
-            capoAndTuningLabels.append(label)
+            tuningLabels.append(label)
             
             let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: buttonDimension, height: buttonDimension))
             stepUpButton.setImage(UIImage(named: "up_arrow"), forState: .Normal)
@@ -256,22 +262,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func stepUpPressed(button: UIButton) {
-        if button.tag == 0 {
-            
-
-        } else {
-            let currentNote = capoAndTuningLabels[button.tag].text
-            capoAndTuningLabels[button.tag].text = getHalfStepUpNote(currentNote!)
-        }
+        let currentNote = tunings[button.tag]
+        currentNote.stepUp()
+        tuningLabels[button.tag].text = currentNote.toDisplayString()
+        tuningLabels[button.tag].sizeToFit()
     }
     
     func stepDownPressed(button: UIButton) {
-        if button.tag == 0 {
-
-        } else {
-            let currentNote = capoAndTuningLabels[button.tag].text
-            capoAndTuningLabels[button.tag].text = getHalfStepDownNote(currentNote!)
-        }
+        let currentNote = tunings[button.tag]
+        currentNote.stepDown()
+        tuningLabels[button.tag].text = currentNote.toDisplayString()
+        tuningLabels[button.tag].sizeToFit()
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
@@ -1486,32 +1487,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    
-    //MARK: to find tuning in half step down or half step up, used in TuningView
-    var notes = ["A","Bb","B","C","C#","D","Eb","E","F","F#","G","G#"]
-    func getHalfStepUpNote(currentNote: String) -> String {
-        for i in 0..<notes.count {
-            if currentNote == notes[i] {
-                if i == notes.count-1 {
-                    return notes[0]
-                }
-                return notes[i+1]
-            }
-        }
-        return ""//should not reach here
-    }
-    
-    func getHalfStepDownNote(currentNote: String) -> String {
-        for i in 0..<notes.count {
-            if currentNote == notes[i] {
-                if i == 0 {
-                    return notes[notes.count-1]
-                }
-                return notes[i-1]
-            }
-        }
-        return ""
-    }
 
 }
 
