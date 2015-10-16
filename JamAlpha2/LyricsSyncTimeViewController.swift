@@ -311,7 +311,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             self.progressBlockContainer.removeGestureRecognizer(panGesture)
             timeToStartUpdate = 30 // reset
             startUpdateTimer()
-
+            
             UIView.animateWithDuration(2.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
                 self.progressBlock!.alpha = 1.0

@@ -70,8 +70,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentNoteButton: UIButton = UIButton()
     var currentTimeLabel: UILabel = UILabel()
     var totalTimeLabel: UILabel = UILabel()
-    var countDownImageView: UIImageView = UIImageView()
-    var countDownNumberImageView: UIImageView = UIImageView()
+//    var countDownImageView: UIImageView = UIImageView()
+//    var countDownNumberImageView: UIImageView = UIImageView()
     var string6View: [UIView] = [UIView]()
     var currentTabViewIndex: Int = Int()
     var currentBaseButton: UIButton = UIButton()
@@ -976,24 +976,43 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.findCurrentTabView()
     }
     
+    func startTimer() {
+        if !timer.valid {
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        }
+    }
+    
+    var countdownTimer = NSTimer()
+    
+    var countDownStartSecond = 0
+    
+    func startCountdown() {
+        countDownStartSecond++
+        print("count down second \(countDownStartSecond)")
+        if countDownStartSecond >= 3 {
+            countdownTimer.invalidate()
+            countDownStartSecond = 0
+            player.play()
+            startTimer()
+            self.currentTime = player.currentTime
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        }
+    }
+
+
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer) {
-        if self.player.playing == false {
-            let imageWidth: CGFloat = 5 / 20 * self.trueHeight
-            self.countDownImageView.frame = CGRectMake(0.5 * self.trueWidth - imageWidth / 2, 0.5 / 20 * self.trueHeight, imageWidth, imageWidth)
-            self.countDownImageView.image = UIImage(named: "countdown-timer")
-            self.countDownNumberImageView.frame = CGRectMake(0, 0, imageWidth, imageWidth)
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-3")
-            self.countDownImageView.addSubview(countDownNumberImageView)
-            self.musicControlView.addSubview(countDownImageView)
-            self.currentTime = player.currentTime
-            
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        if player.playing {
+            //pause music and stop timer
+            player.pause()
+            timer.invalidate()
+        
         } else {
-            self.player.pause()
-            self.timer.invalidate()
-            self.timer = NSTimer()
-            self.countDownNumber = 0
+            //start playing again
+           
+            //start counting down 3 seconds
+            countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
+            NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
         }
     }
     
@@ -1053,32 +1072,44 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func update() {
-        if self.countDownNumber > 3.0 {
-            self.findCurrentTabView()
-            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
-
-            self.currentTime = self.player.currentTime
-            let persent = CGFloat(self.currentTime / self.duration)
-            self.progressBlock.setProgress(persent)
-            self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
-            if self.player.playing == false {
-                self.timer.invalidate()
-                self.timer = NSTimer()
-            }
-        } else if self.countDownNumber <= 0.9 {
-            self.countDownNumber = self.countDownNumber + 0.1
-        } else if self.countDownNumber > 0.9 && self.countDownNumber <= 1.9 {
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-2")
-            self.countDownNumber = self.countDownNumber + 0.1
-        } else if self.countDownNumber > 1.9 && self.countDownNumber <= 2.9 {
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-1")
-            self.countDownNumber = self.countDownNumber + 0.1
-        } else if self.countDownNumber > 2.9 && self.countDownNumber <= 3.0 {
-            self.countDownImageView.removeFromSuperview()
-            self.countDownNumberImageView.removeFromSuperview()
-            self.countDownNumber++
-            self.player.play()
-        }
+        
+        self.currentTime = self.player.currentTime
+        
+        //refresh current time label
+        self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+        
+        //refresh progress block
+        let presentPosition = CGFloat(self.currentTime / self.duration)
+        self.progressBlock.setProgress(presentPosition)
+        self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
+        
+//        
+//        if self.countDownNumber > 3.0 {
+//            self.findCurrentTabView()
+//            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+//
+//            self.currentTime = self.player.currentTime
+//            let persent = CGFloat(self.currentTime / self.duration)
+//            self.progressBlock.setProgress(persent)
+//            self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
+//            if self.player.playing == false {
+//                self.timer.invalidate()
+//                self.timer = NSTimer()
+//            }
+//        } else if self.countDownNumber <= 0.9 {
+//            self.countDownNumber = self.countDownNumber + 0.1
+//        } else if self.countDownNumber > 0.9 && self.countDownNumber <= 1.9 {
+//            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-2")
+//            self.countDownNumber = self.countDownNumber + 0.1
+//        } else if self.countDownNumber > 1.9 && self.countDownNumber <= 2.9 {
+//            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-1")
+//            self.countDownNumber = self.countDownNumber + 0.1
+//        } else if self.countDownNumber > 2.9 && self.countDownNumber <= 3.0 {
+//            self.countDownImageView.removeFromSuperview()
+//            self.countDownNumberImageView.removeFromSuperview()
+//            self.countDownNumber++
+//            self.player.play()
+//        }
         
     }
     
