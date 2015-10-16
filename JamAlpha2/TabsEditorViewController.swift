@@ -35,6 +35,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var fretBoardView: UIView = UIView()
     
     // music section
+    let tabsEditorProgressWidthMultiplier: CGFloat = 6
     var progressBlock: SoundWaveView!
     var theSong: MPMediaItem!
     var currentTime: NSTimeInterval = NSTimeInterval()
@@ -93,6 +94,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var stepUpButtons = [UIButton]()
     var tuningValueLabels = [UILabel]()
     var tunings = [Tuning]()
+    
+    
+    // count down section
+    
+    var countdownTimer = NSTimer()
+    var countDownStartSecond = 0 //will increments to 3
+    var countdownView: CountdownView!
     
     // data array
     var specificTabSets: [NormalTabs] = [NormalTabs]()
@@ -178,11 +186,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.createStringAndFretPosition()
         self.addMusicControlView()
         self.setUpTimeLabels()
+        self.setUpCountdownView()
+
         // initial collection view
         self.initCollectionView()
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
         setUpTuningControlMenu()
+
         // initial main view tab data array
         self.initialMainViewDataArray()
     }
@@ -909,15 +920,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.addSubview(musicControlView)
         
         let musicSingleTapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
-        musicSingleTapRecognizer.numberOfTapsRequired = 1
-        musicSingleTapRecognizer.numberOfTouchesRequired = 1
         self.musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
         
         let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
-        musicPanRecognizer.maximumNumberOfTouches = 1
-        musicPanRecognizer.minimumNumberOfTouches = 1
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
-        
     }
     
     func setUpTimeLabels() {
@@ -958,9 +964,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         musicControlView.addSubview(totalTimeLabel)
     }
     
+    func setUpCountdownView() {
+        countdownView = CountdownView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
+        countdownView.center = self.musicControlView.center
+        countdownView.backgroundColor = UIColor.clearColor()
+        countdownView.hidden = true
+        self.view.addSubview(countdownView)
+    }
+    
     // pan on music control view to change music time and progressblock time
     func panOnMusicControlView(sender: UIPanGestureRecognizer) {
-        self.view.bringSubviewToFront(sender.view!)
+        
         let translation = sender.translationInView(self.view)
         sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
         sender.setTranslation(CGPointZero, inView: self.view)
@@ -974,6 +988,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
         // find the current tab according to the current time and make the current tab view to yellow
         self.findCurrentTabView()
+        
     }
     
     func startTimer() {
@@ -981,16 +996,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         }
     }
-    
-    var countdownTimer = NSTimer()
-    
-    var countDownStartSecond = 0
-    
+
     func startCountdown() {
         countDownStartSecond++
-        print("count down second \(countDownStartSecond)")
+        countdownView.setNumber(countDownStartSecond+1)
+        print("count down second \(countDownStartSecond+1)")
         if countDownStartSecond >= 3 {
+            
             countdownTimer.invalidate()
+            countdownView.hidden = true
             countDownStartSecond = 0
             player.play()
             startTimer()
@@ -1008,9 +1022,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer.invalidate()
         
         } else {
-            //start playing again
-           
             //start counting down 3 seconds
+            countdownView.hidden = false
+            countdownView.setNumber(1)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
         }
@@ -1055,8 +1069,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+
     func createSoundWave() {
-        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, 6 * CGFloat(theSong.playbackDuration), 6 / 20 * self.trueHeight)
+        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.playbackDuration), 6 / 20 * self.trueHeight)
         self.progressBlock = SoundWaveView(frame: frame)
         if(theSong == nil){
             print("the song is empty")
@@ -1082,35 +1097,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let presentPosition = CGFloat(self.currentTime / self.duration)
         self.progressBlock.setProgress(presentPosition)
         self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
-        
-//        
-//        if self.countDownNumber > 3.0 {
-//            self.findCurrentTabView()
-//            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
-//
-//            self.currentTime = self.player.currentTime
-//            let persent = CGFloat(self.currentTime / self.duration)
-//            self.progressBlock.setProgress(persent)
-//            self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
-//            if self.player.playing == false {
-//                self.timer.invalidate()
-//                self.timer = NSTimer()
-//            }
-//        } else if self.countDownNumber <= 0.9 {
-//            self.countDownNumber = self.countDownNumber + 0.1
-//        } else if self.countDownNumber > 0.9 && self.countDownNumber <= 1.9 {
-//            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-2")
-//            self.countDownNumber = self.countDownNumber + 0.1
-//        } else if self.countDownNumber > 1.9 && self.countDownNumber <= 2.9 {
-//            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-1")
-//            self.countDownNumber = self.countDownNumber + 0.1
-//        } else if self.countDownNumber > 2.9 && self.countDownNumber <= 3.0 {
-//            self.countDownImageView.removeFromSuperview()
-//            self.countDownNumberImageView.removeFromSuperview()
-//            self.countDownNumber++
-//            self.player.play()
-//        }
-        
     }
     
     func moveDataItem(fromIndexPath : NSIndexPath, toIndexPath: NSIndexPath) {

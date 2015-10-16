@@ -440,6 +440,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
                 self.chords = tabsFromCoreData.0
                 self.tuningOfTheTabsSet = tabsFromCoreData.1
+                print("tuning from data: \(tabsFromCoreData.1) capo: \(tabsFromCoreData.2)")
                 self.capoOfTheTabsSet = tabsFromCoreData.2
             } else {
                 self.chords = Chord.getRainbowChords()
