@@ -219,9 +219,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             loadDisplayMode()
-            setUpMusicData(player.nowPlayingItem!)
-            setTuning(self.tuningOfTheTabsSet)
-            setCapo(self.capoOfTheTabsSet)
+            updateMusicData(player.nowPlayingItem!)
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -288,7 +286,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(capoButton)
     }
 
-    func setTuning(tuning: String) {
+    func updateTuning(tuning: String) {
+        print("current tuning is \(tuning)")
         let tuningArray = tuning.characters.split{$0 == "-"}.map(String.init)
         let tuningToShow = Array(tuningArray.reverse())
         for i in 0..<tuningLabels.count {
@@ -298,7 +297,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
-    func setCapo(capo: Int) {
+    func updateCapo(capo: Int) {
         if capo < 1 {
             capoButton.hidden = true
             return
@@ -403,6 +402,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+    func updateMusicData(song: MPMediaItem) {
+        self.setUpMusicData(song)
+        //TODO: because before add the tuning to the data some songs don't have tuning
+        // so temporary we add default tuing and capo
+        if self.tuningOfTheTabsSet == "" {
+            tuningOfTheTabsSet = "E-B-G-D-A-E"
+            capoOfTheTabsSet = 0
+        }
+        self.updateTuning(self.tuningOfTheTabsSet)
+        self.updateCapo(self.capoOfTheTabsSet)
+    }
+    
     func setUpMusicData(song: MPMediaItem){
          if song.title == "Rolling In The Deep" {
             chords = Chord.getRollingChords()
@@ -418,6 +429,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chords = Chord.getExtremeChords()
             lyric = Lyric.getExtremeLyrics()
         }
+        
+        self.tuningOfTheTabsSet = "E-B-G-D-A-E"
+        self.capoOfTheTabsSet = 0
         
         //return a tuple of ([Chord],tuning, capo)
         let tabsFromCoreData = musicDataManager.getTabs(player.nowPlayingItem!)
@@ -566,7 +580,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
                 self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
-                self.setUpMusicData(nowPlayingItem!)
+                self.updateMusicData(nowPlayingItem!)
+                
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
