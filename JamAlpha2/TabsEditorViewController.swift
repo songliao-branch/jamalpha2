@@ -238,7 +238,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             label.text = defaultTunings[i]
             label.textColor = UIColor.mainPinkColor()
             //label.sizeToFit()
-            label.center = CGPoint(x: speedStepper.center.x, y: rowHeight/2 + rowHeight * CGFloat(i+1))
+            label.center = CGPoint(x: speedStepper.center.x, y: rowHeight*3/2 + rowHeight * CGFloat(i+1))
             label.textAlignment = .Center
             tuningMenu.addSubview(label)
             tuningLabels.append(label)
@@ -265,14 +265,19 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let currentNote = tunings[button.tag]
         currentNote.stepUp()
         tuningLabels[button.tag].text = currentNote.toDisplayString()
+        let center = tuningLabels[button.tag].center
         tuningLabels[button.tag].sizeToFit()
+        tuningLabels[button.tag].center = center
     }
     
     func stepDownPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
         currentNote.stepDown()
         tuningLabels[button.tag].text = currentNote.toDisplayString()
+        let center = tuningLabels[button.tag].center
+
         tuningLabels[button.tag].sizeToFit()
+         tuningLabels[button.tag].center = center
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
