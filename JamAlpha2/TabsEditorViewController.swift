@@ -228,25 +228,49 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let buttonDimension: CGFloat = 30
         for i in 0..<7 {
             
-            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 30))
+            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
             label.text = defaultTuningSettings[i]
             label.textColor = UIColor.mainPinkColor()
-            label.sizeToFit()
+            //label.sizeToFit()
             label.center = CGPoint(x: speedStepper.center.x, y: rowHeight/2 + rowHeight * CGFloat(i+1))
+            label.textAlignment = .Center
             tuningMenu.addSubview(label)
             capoAndTuningLabels.append(label)
             
             let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: buttonDimension, height: buttonDimension))
             stepUpButton.setImage(UIImage(named: "up_arrow"), forState: .Normal)
+            stepUpButton.tag = i
+            stepUpButton.addTarget(self, action: "stepUpPressed:", forControlEvents: .TouchUpInside)
             stepUpButton.center = CGPoint(x: label.center.x + buttonDimension, y: label.center.y)
             tuningMenu.addSubview(stepUpButton)
             stepUpButtons.append(stepUpButton)
 
             let stepDownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
+            stepDownButton.tag = i
+            stepDownButton.addTarget(self, action: "stepDownPressed:", forControlEvents: .TouchUpInside)
             stepDownButton.setImage(UIImage(named: "down_arrow"), forState: .Normal)
             stepDownButton.center = CGPoint(x: label.center.x - buttonDimension, y: label.center.y)
             tuningMenu.addSubview(stepDownButton)
             stepDownButtons.append(stepDownButton)
+        }
+    }
+    
+    func stepUpPressed(button: UIButton) {
+        if button.tag == 0 {
+            
+
+        } else {
+            let currentNote = capoAndTuningLabels[button.tag].text
+            capoAndTuningLabels[button.tag].text = getHalfStepUpNote(currentNote!)
+        }
+    }
+    
+    func stepDownPressed(button: UIButton) {
+        if button.tag == 0 {
+
+        } else {
+            let currentNote = capoAndTuningLabels[button.tag].text
+            capoAndTuningLabels[button.tag].text = getHalfStepDownNote(currentNote!)
         }
     }
     
