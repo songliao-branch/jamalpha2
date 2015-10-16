@@ -222,7 +222,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         speedStepper = UIStepper(frame: CGRect(x: tuningMenu.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
         speedStepper.center.y = rowHeight/2
         speedStepper.tintColor = UIColor.mainPinkColor()
-        speedStepper.minimumValue = 0.5 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
+        speedStepper.minimumValue = 0.2 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
         speedStepper.maximumValue = 2.0
         speedStepper.stepValue = 0.1
         speedStepper.value = 1.0 //default
@@ -291,14 +291,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func speedStepperValueChanged(stepper: UIStepper) {
-//        timer.invalidate()
-//        let roundedValue = Double(round(10*stepper.value)/10)
-//        let adjustedSpeed = Float(speedMatcher[roundedValue]!)
-//        self.speed = adjustedSpeed
-//        self.player.currentPlaybackRate = adjustedSpeed
-//        self.startTimer()
-//        self.speedLabel.text = "Speed: \(adjustedSpeed)x"
-//        print("stepper value:\(stepper.value) and value \(speedMatcher[roundedValue])")
+        self.speedLabel.text = "Speed: \(stepper.value)x"
+        self.player.rate = Float(stepper.value)
     }
     
     func capoStepperValueChanged(stepper: UIStepper) {
@@ -1045,6 +1039,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
         self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.duration = self.player.duration
+        self.player.enableRate = true
+        self.player.rate = 1.0
         self.player.volume = 1
         progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
         self.progressBlock.SetSoundURL(url)
