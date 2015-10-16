@@ -100,7 +100,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var topLyricLabel: UILabel = UILabel()
     var bottomLyricLabel: UILabel = UILabel()
     
-    var current: Int = 0    //current line of lyric
+    var currentLyricsIndex: Int = 0    //current line of lyric
     var lyric: Lyric = Lyric()
     
     //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
@@ -218,6 +218,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             loadDisplayMode()
+            setUpMusicData(player.nowPlayingItem!)
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -403,10 +404,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
          if song.title == "Rolling In The Deep" {
             chords = Chord.getRollingChords()
             lyric = Lyric.getRollingLyrics()
-        } else if song.title == "彩虹" {
-            chords = Chord.getRainbowChords()
-            lyric = Lyric.getRainbowLyrics()
-         } else if song.title == "I'm Yours"{
+        } else if song.title == "I'm Yours"{
             chords = Chord.getJasonMrazChords()
             lyric = Lyric.getJasonMrazLyrics()
          }else if song.title == "Daughters" {
@@ -418,6 +416,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             lyric = Lyric.getExtremeLyrics()
         }
         
+        let tabsFromCoreData = musicDataManager.getTabs(player.nowPlayingItem!)
+        if tabsFromCoreData.count > 0 {
+            print("chords length: \(tabsFromCoreData.count)")
+            if tabsFromCoreData.count > 2 {
+                self.chords = tabsFromCoreData
+            } else {
+                self.chords = Chord.getRainbowChords()
+            }
+        }
+        
+
         let lyricsFromCoreData = musicDataManager.getLyrics(player.nowPlayingItem!)
         
         if lyricsFromCoreData.count > 0 {
@@ -427,7 +436,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpLyricsBase(){
         //Lyric labels
-        current = -1
+        currentLyricsIndex = -1
         let sideMargin: CGFloat = 20
         
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
@@ -604,9 +613,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if playbackState == .Paused {
             timer.invalidate()
+            
+            //fade down the soundwave
+            UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                self.progressBlock!.alpha = 0.5
+                }, completion: nil)
+            
         }
         else if playbackState == .Playing {
             startTimer()
+            
+            //bring up the soundwave, give it a little jump animation
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+                self.progressBlock!.alpha = 1.0
+                }, completion: { finished in
+                    
+                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
+                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                        }, completion: nil)
+                    
+            })
         }
     }
     
@@ -1193,9 +1221,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToTabsEditor(button: UIButton) {
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-        
         tabsEditorVC.theSong = self.player.nowPlayingItem!
-        print("show action clicked")
         self.player.pause()
         self.dismissAction()
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
@@ -1287,11 +1313,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
 
     func refreshChordLabel(){
+    
         if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
             return
         }
         
-        if activelabels.count > 0 && start+1 < chords.count && (TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].mTime)
+        if activelabels.count > 0 && start+1 < chords.count && (TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].time)
         {
             activelabels[start-startdisappearing].alpha--
             start++
@@ -1299,7 +1326,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         // Add new chord
         let end = start + activelabels.count
-        if end < chords.count && (TimeNumber(time: freefallTime + startTime.toDecimalNumer())).isLongerThan(chords[end].mTime) {
+        if end < chords.count && (TimeNumber(time: freefallTime + startTime.toDecimalNumer())).isLongerThan(chords[end].time) {
             self.activelabelAppend(end)
         }
         
@@ -1314,7 +1341,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         //remove chords at the bottom?
-        if startdisappearing < start && (activelabels[0].alpha == 0 || TimeNumber(time: startTime.toDecimalNumer() + timeDisappeared).isLongerThan(chords[startdisappearing+1].mTime)) {
+        if startdisappearing < start && (activelabels[0].alpha == 0 || TimeNumber(time: startTime.toDecimalNumer() + timeDisappeared).isLongerThan(chords[startdisappearing+1].time)) {
             for label in activelabels[0].labels{
                 label.removeFromSuperview()
             }
@@ -1382,31 +1409,31 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         
-        if current + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(current+1).time) {
-            current++
-            topLyricLabel.text = lyric.get(current).str
+        if currentLyricsIndex + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(currentLyricsIndex+1).time) {
+            currentLyricsIndex++
+            topLyricLabel.text = lyric.get(currentLyricsIndex).str
             
-            if current + 1 < lyric.lyric.count {
-                bottomLyricLabel.text = lyric.get(current+1).str
+            if currentLyricsIndex + 1 < lyric.lyric.count {
+                bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
             }
         }
         
-        current = -1
-        while(current + 1 < lyric.lyric.count){
-            if lyric.get(current + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
+        currentLyricsIndex = -1
+        while(currentLyricsIndex + 1 < lyric.lyric.count){
+            if lyric.get(currentLyricsIndex + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
                 break
             }
-            current++
+            currentLyricsIndex++
         }
         
-        if current == -1{
+        if currentLyricsIndex == -1{
             topLyricLabel.text = "..."
         }
         else {
-            topLyricLabel.text = lyric.get(current).str
+            topLyricLabel.text = lyric.get(currentLyricsIndex).str
         }
-        if current + 1 < lyric.lyric.count {
-            bottomLyricLabel.text = lyric.get(current+1).str
+        if currentLyricsIndex + 1 < lyric.lyric.count {
+            bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
         }
         else {
             bottomLyricLabel.text = "--"
@@ -1434,14 +1461,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         while true {
             let mid: Int = (begin + end) / 2
-            if startTime.isLongerThan(chords[mid].mTime) {
+            if startTime.isLongerThan(chords[mid].time) {
                 begin = mid
             } else {
                 end = mid
             }
             if begin == (end - 1) {
                 start = begin
-                if startTime.isLongerThan(chords[end].mTime) {
+                if startTime.isLongerThan(chords[end].time) {
                     start = end
                 }
                 break
@@ -1453,14 +1480,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
         while true {
             let mid: Int = (begin + end) / 2
-            if tn.isLongerThan(chords[mid].mTime) {
+            if tn.isLongerThan(chords[mid].time) {
                 begin = mid
             } else {
                 end = mid
             }
             if begin == (end - 1) {
                 last = begin
-                if tn.isLongerThan( chords[end].mTime ) {
+                if tn.isLongerThan( chords[end].time ) {
                     last = end
                 }
                 break
@@ -1472,7 +1499,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if start < last {
-            if startTime.isLongerThan(chords[start].mTime) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].mTime) {
+            if startTime.isLongerThan(chords[start].time) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].time) {
                 self.start++
             }
             
@@ -1485,7 +1512,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //set the location of labels
         for var i = 0; i < activelabels.count; i++ {
-            activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].mTime.toDecimalNumer()) * stepPerSecond)
+            activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].time.toDecimalNumer()) * stepPerSecond)
             if activelabels[i].ylocation > maxylocation {
                 activelabels[i].ylocation = maxylocation
             }
@@ -1498,23 +1525,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
             player.play()
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                self.progressBlock!.alpha = 1.0
-                }, completion: { finished in
-                   
-                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
-                        }, completion: nil)
-                    
-            })
+            
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
             player.pause()
-            UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                self.progressBlock!.alpha = 0.5
-                }, completion: nil)
         }
     }
     
@@ -1539,7 +1553,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
-    func createLabels(name: String, content: String) -> (labels: [UIView], ylocation: CGFloat, alpha: Int){
+    func createLabels(name: String, fretPositions: [String]) -> (labels: [UIView], ylocation: CGFloat, alpha: Int){
         var res = [UIView]()
         
         let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 40, 0))
@@ -1556,11 +1570,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         
         if isTabsShown {
-            for i in 0...content.characters.count-1 {
-                //if not a integer
+            for i in 0..<fretPositions.count {
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
                 label.font = UIFont.systemFontOfSize(CGFloat(minfont))
-                label.text = String(Array(content.characters)[i])
+                label.text = fretPositions[i]
                 label.sizeToFit()
                 label.textColor = UIColor.silverGray()
                 label.textAlignment = NSTextAlignment.Center
@@ -1578,7 +1591,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //////////////////////////////////
 
     func activelabelAppend(index: Int){
-        activelabels.append(createLabels(chords[index].tab.name, content: chords[index].tab.content))
+        activelabels.append(createLabels(chords[index].tab.name, fretPositions: chords[index].tab.fretPositions))
         dealWithLabelofChordName(activelabels.last!.labels.first! as! UILabel)
     }
 

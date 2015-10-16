@@ -34,7 +34,7 @@ class MusicDataManager: NSObject {
             return nil
         } else {
             print("song found in core data")
-
+            
             return results.lastObject! as? Song
         }
     }
@@ -117,4 +117,52 @@ class MusicDataManager: NSObject {
         }
         return [(String, NSTimeInterval)]()
     }
+    
+    //Tabs, TODO: need to store tuning, capo number
+    func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval]) {
+        
+        if let matchedSong = findSong(item) {
+            // TODO: find a better way managing user's lyrics, now just clear existing lyrics
+            matchedSong.tabsSets = NSSet()
+            
+            let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
+            
+            let chordsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(chords as AnyObject)
+            let tabsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tabs as AnyObject)
+            let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
+            tabsSet.chords = chordsData
+            tabsSet.tabs = tabsData
+            tabsSet.times = timesData
+            tabsSet.song = matchedSong
+            print("just saved tabs")
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    func getTabs(item: MPMediaItem) -> [Chord]{
+        
+        if let matchedSong = findSong(item) {
+            print("has \(matchedSong.tabsSets.count) set of tabs")
+            if matchedSong.tabsSets.count > 0 {
+                let theSet = matchedSong.tabsSets.allObjects.last as! TabsSet
+                
+                let chords = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.chords as! NSData) as! [String]
+                let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.tabs as! NSData) as! [String]
+                
+                let times = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.times as! NSData) as! [NSTimeInterval]
+                
+                var chordsToBeUsed = [Chord]()
+                
+                for i in 0..<chords.count {
+                    let singleChord = Tab(name: chords[i], content: tabs[i])
+                    let timedChord = Chord(tab: singleChord, time: TimeNumber(time: Float(times[i])))
+                    chordsToBeUsed.append(timedChord)
+                }
+  
+                return chordsToBeUsed
+            }
+        }
+        return [Chord]()
+    }
+    
 }

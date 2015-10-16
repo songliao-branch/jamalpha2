@@ -11,6 +11,7 @@
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
+		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; settings = {ASSET_TAGS = (); }; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -33,6 +34,7 @@
 		E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456457D1B3BB15C00276287 /* ChordBase.swift */; };
 		E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6BB71B16C1860018645D /* ArtistViewController.swift */; };
 		E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */; };
+		E46F39E51BCCB816004B36EB /* TabsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46F39E41BCCB816004B36EB /* TabsSet.swift */; settings = {ASSET_TAGS = (); }; };
 		E48877431B151628004785D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877421B151628004785D3 /* AppDelegate.swift */; };
 		E48877451B151628004785D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* SearchViewController.swift */; };
 		E48877471B151628004785D3 /* MusicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877461B151628004785D3 /* MusicViewController.swift */; };
@@ -48,10 +50,8 @@
 		E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */; };
 		E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */; };
 		E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */; };
-		E4CBBFF91B9E88A600473FC4 /* TabsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF51B9E88A600473FC4 /* TabsData.swift */; };
+		E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */; };
 		E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF61B9E88A600473FC4 /* FretCell.swift */; };
-		E4CBBFFB1B9E88A600473FC4 /* ExistTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF71B9E88A600473FC4 /* ExistTabs.swift */; };
-		E4CBBFFC1B9E88A600473FC4 /* NewTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF81B9E88A600473FC4 /* NewTabs.swift */; };
 		E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */; };
 		E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0011B9E88BA00473FC4 /* SwiftCoreDataHelper.swift */; };
 		E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0021B9E88BA00473FC4 /* TJDatabase.xcdatamodeld */; };
@@ -59,6 +59,7 @@
 		E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */; };
 		E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */; settings = {ASSET_TAGS = (); }; };
 		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
+		E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 		5491F35DF2FB90338EBDC0CC /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		842DB0241B55EA8B00B4E165 /* TimeNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeNumber.swift; sourceTree = "<group>"; };
 		84DA61A31B4E211100979A42 /* Lyric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lyric.swift; sourceTree = "<group>"; };
+		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 		E456457D1B3BB15C00276287 /* ChordBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordBase.swift; sourceTree = "<group>"; };
 		E45F6BB71B16C1860018645D /* ArtistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistViewController.swift; sourceTree = "<group>"; };
 		E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTransitionAnimation.swift; sourceTree = "<group>"; };
+		E46F39E41BCCB816004B36EB /* TabsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsSet.swift; sourceTree = "<group>"; };
 		E488773D1B151628004785D3 /* JamAlpha2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamAlpha2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E48877421B151628004785D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -132,10 +135,8 @@
 		E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumSectionCell.swift; sourceTree = "<group>"; };
 		E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumTrackCell.swift; sourceTree = "<group>"; };
 		E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+comparison.swift"; sourceTree = "<group>"; };
-		E4CBBFF51B9E88A600473FC4 /* TabsData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsData.swift; sourceTree = "<group>"; };
+		E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsDataManager.swift; sourceTree = "<group>"; };
 		E4CBBFF61B9E88A600473FC4 /* FretCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FretCell.swift; sourceTree = "<group>"; };
-		E4CBBFF71B9E88A600473FC4 /* ExistTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistTabs.swift; sourceTree = "<group>"; };
-		E4CBBFF81B9E88A600473FC4 /* NewTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewTabs.swift; sourceTree = "<group>"; };
 		E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorViewController.swift; sourceTree = "<group>"; };
 		E4CBC0011B9E88BA00473FC4 /* SwiftCoreDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftCoreDataHelper.swift; sourceTree = "<group>"; };
 		E4CBC0031B9E88BA00473FC4 /* TJDatabase.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TJDatabase.xcdatamodel; sourceTree = "<group>"; };
@@ -143,6 +144,7 @@
 		E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
 		E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownView.swift; sourceTree = "<group>"; };
 		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
+		E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -222,9 +224,10 @@
 			children = (
 				E455E7281BA272AD00210BD6 /* Song.swift */,
 				E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */,
-				E4CBBFF71B9E88A600473FC4 /* ExistTabs.swift */,
-				E4CBBFF81B9E88A600473FC4 /* NewTabs.swift */,
 				E43DA1281B9FDCE1003180FB /* SearchHistory.swift */,
+				E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */,
+				BFC080D41BCAED9D009CD755 /* NormalTab.swift */,
+				E46F39E41BCCB816004B36EB /* TabsSet.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -388,7 +391,7 @@
 			children = (
 				E41D6CFC1BA149BF006A9993 /* Helper */,
 				E43DA1271B9FA8AB003180FB /* Models */,
-				E4CBBFF51B9E88A600473FC4 /* TabsData.swift */,
+				E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */,
 				E455E72A1BA2760300210BD6 /* MusicDataManager.swift */,
 				E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */,
 				E4CBC0021B9E88BA00473FC4 /* TJDatabase.xcdatamodeld */,
@@ -566,6 +569,7 @@
 				E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */,
 				E4399C381B90048F00906DBD /* UIView+Geometry.swift in Sources */,
 				E443B91B1BBBA2F20074A4E1 /* LyricsSet.swift in Sources */,
+				E46F39E51BCCB816004B36EB /* TabsSet.swift in Sources */,
 				1045413F1BCAFBB300A4590B /* TabBarController.swift in Sources */,
 				E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */,
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
@@ -583,9 +587,11 @@
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
+				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
+				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
 				E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */,
 				C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */,
@@ -596,13 +602,11 @@
 				E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */,
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
-				E4CBBFF91B9E88A600473FC4 /* TabsData.swift in Sources */,
+				E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */,
 				E44359021B1947660091E926 /* Album.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
-				E4CBBFFB1B9E88A600473FC4 /* ExistTabs.swift in Sources */,
-				E4CBBFFC1B9E88A600473FC4 /* NewTabs.swift in Sources */,
 				E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */,
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
 				E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */,
