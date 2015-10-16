@@ -75,8 +75,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     
     //tuning of capo 
-    var tuningOfTheTabsSet = "E-B-G-D-A-E"//stanard tuning default, from high E - to low E
-    // when it 's presented in the view, it's reversed
+    var tuningOfTheTabsSet = "E-B-G-D-A-E"//standard tuning, from high E to low E
+    // we reverse the order when present above the chordBase
     var capoOfTheTabsSet = 0
     
     //time

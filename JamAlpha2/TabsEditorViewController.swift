@@ -79,6 +79,21 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // timer
     var timer = NSTimer()
     
+    var tuningMenu: UIView!
+    var actionDismissLayerButton: UIButton!
+    
+    var speedLabel: UILabel!
+    var speedStepper: UIStepper!
+    
+    var capoLabel: UILabel!
+    var capoStepper: UIStepper!
+    // capo and 6 string
+    var defaultTunings =  ["E","B","G","D","A","E"]
+    var stepDownButtons = [UIButton]()
+    var stepUpButtons = [UIButton]()
+    var tuningValueLabels = [UILabel]()
+    var tunings = [Tuning]()
+    
     // data array
     var specificTabSets: [NormalTabs] = [NormalTabs]()
     var currentSelectedSpecificTab: NormalTabs!
@@ -171,24 +186,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         // initial main view tab data array
         self.initialMainViewDataArray()
     }
-    
-    var tuningMenu: UIView!
-    var actionDismissLayerButton: UIButton!
-   
-    var speedLabel: UILabel!
-    var speedStepper: UIStepper!
-    
-    var capoLabel: UILabel!
-    var capoStepper: UIStepper!
-    
-   // var actionLabels: [UILabel]!
-    
-    // capo and 6 string
-    var defaultTunings =  ["E","B","G","D","A","E"]
-    var stepDownButtons = [UIButton]()
-    var stepUpButtons = [UIButton]()
-    var tuningValueLabels = [UILabel]()
-    var tunings = [Tuning]()
+
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
     func setUpTuningControlMenu() {
         // a gray button covers the entire background behind tuning menu, is to dismiss the tuning menus
