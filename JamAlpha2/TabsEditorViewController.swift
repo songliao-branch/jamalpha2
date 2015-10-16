@@ -175,7 +175,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var tuningMenu: UIView!
     var actionDismissLayerButton: UIButton!
    
+    var speedLabel: UILabel!
     var speedStepper: UIStepper!
+    
+    var capoLabel: UILabel!
+    var capoStepper: UIStepper!
+    
    // var actionLabels: [UILabel]!
     
     // capo and 6 string
@@ -186,6 +191,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var tunings = [Tuning]()
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
     func setUpTuningControlMenu() {
+        // a gray button covers the entire background behind tuning menu, is to dismiss the tuning menus
         actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
         actionDismissLayerButton.backgroundColor = UIColor.clearColor()
         actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
@@ -204,50 +210,73 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             tuningMenu.addSubview(separator)
         }
         
-         var actionTexts = ["Speed: 1.0x", "Capo:", "1st:", "2nd:", "3rd:", "4th:", "5th:", "6th:"]
-        //add 8 labels, speed label, capo label and six labels for each string
-        for i in 0..<8 {
-            let label = UILabel(frame: CGRect(x: 10, y: 0, width: 100, height: 25))
-            label.textColor = UIColor.mainPinkColor()
-            label.text = actionTexts[i]
-            label.sizeToFit()
-            label.center.y = rowHeight/2 + rowHeight * CGFloat(i)
-            tuningMenu.addSubview(label)
-        }
-        
         let sideMargin: CGFloat = 10
+        
+        //SECTION: add speed label, stepper
+        speedLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 100, height: 25))
+        speedLabel.textColor = UIColor.mainPinkColor()
+        speedLabel.text = "Speed: 1.0x"
+        speedLabel.center.y = rowHeight/2
+        tuningMenu.addSubview(speedLabel)
+
         speedStepper = UIStepper(frame: CGRect(x: tuningMenu.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
         speedStepper.center.y = rowHeight/2
         speedStepper.tintColor = UIColor.mainPinkColor()
-        speedStepper.minimumValue = 0.7 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
-        speedStepper.maximumValue = 1.3
+        speedStepper.minimumValue = 0.5 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
+        speedStepper.maximumValue = 2.0
         speedStepper.stepValue = 0.1
         speedStepper.value = 1.0 //default
+        speedStepper.addTarget(self, action: "speedStepperValueChanged:", forControlEvents: .ValueChanged)
         tuningMenu.addSubview(speedStepper)
+        
+        
+        //SECTION: add capo label, stepper
+        capoLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 100, height: 25))
+        capoLabel.textColor = UIColor.mainPinkColor()
+        capoLabel.text = "Capo: 0"
+        capoLabel.center.y = rowHeight*3/2
+        tuningMenu.addSubview(capoLabel)
+        
+        capoStepper = UIStepper(frame: CGRect(x: 0, y: 0, width: 94, height: 29))
+        capoStepper.center = CGPoint(x: speedStepper.center.x, y: speedStepper.center.y+rowHeight)
+        capoStepper.tintColor = UIColor.mainPinkColor()
+        capoStepper.minimumValue = 0
+        capoStepper.maximumValue = 12
+        capoStepper.stepValue = 1
+        capoStepper.value = 0 //default
+        capoStepper.addTarget(self, action: "capoStepperValueChanged:", forControlEvents: .ValueChanged)
+        tuningMenu.addSubview(capoStepper)
         
         let buttonDimension: CGFloat = 30
         
+        //SECTION: Tunings
+        var tuningTexts = ["1st:", "2nd:", "3rd:", "4th:", "5th:", "6th:"]
         //add tunings labels and buttons
         for i in 0..<6 {
+            let stringIndicatorLabel = UILabel(frame: CGRect(x: 10, y: 0, width: 100, height: 25))
+            stringIndicatorLabel.textColor = UIColor.mainPinkColor()
+            stringIndicatorLabel.text = tuningTexts[i]
+            stringIndicatorLabel.sizeToFit()
+            stringIndicatorLabel.center.y = rowHeight/2 + rowHeight * CGFloat(i+2)
+            tuningMenu.addSubview(stringIndicatorLabel)
             
-            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
-
+            //initialize tuning with our custom class Tuning
             let originalTuning = Tuning(originalNote: defaultTunings[i])
             tunings.append(originalTuning)
             
-            label.text = defaultTunings[i]
-            label.textColor = UIColor.mainPinkColor()
-            //label.sizeToFit()
-            label.center = CGPoint(x: speedStepper.center.x, y: rowHeight*3/2 + rowHeight * CGFloat(i+1))
-            label.textAlignment = .Center
-            tuningMenu.addSubview(label)
-            tuningLabels.append(label)
+            let tuningValueLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
+            tuningValueLabel.text = defaultTunings[i]
+            tuningValueLabel.textColor = UIColor.mainPinkColor()
+            tuningValueLabel.center = CGPoint(x: speedStepper.center.x, y: stringIndicatorLabel.center.y)
+            tuningValueLabel.textAlignment = .Center
+            tuningMenu.addSubview(tuningValueLabel)
+            tuningLabels.append(tuningValueLabel)
             
             let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: buttonDimension, height: buttonDimension))
             stepUpButton.setImage(UIImage(named: "up_arrow"), forState: .Normal)
             stepUpButton.tag = i
             stepUpButton.addTarget(self, action: "stepUpPressed:", forControlEvents: .TouchUpInside)
-            stepUpButton.center = CGPoint(x: label.center.x + buttonDimension, y: label.center.y)
+            stepUpButton.center = CGPoint(x: tuningValueLabel.center.x + buttonDimension, y: tuningValueLabel.center.y)
             tuningMenu.addSubview(stepUpButton)
             stepUpButtons.append(stepUpButton)
 
@@ -255,10 +284,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             stepDownButton.tag = i
             stepDownButton.addTarget(self, action: "stepDownPressed:", forControlEvents: .TouchUpInside)
             stepDownButton.setImage(UIImage(named: "down_arrow"), forState: .Normal)
-            stepDownButton.center = CGPoint(x: label.center.x - buttonDimension, y: label.center.y)
+            stepDownButton.center = CGPoint(x: tuningValueLabel.center.x - buttonDimension, y: tuningValueLabel.center.y)
             tuningMenu.addSubview(stepDownButton)
             stepDownButtons.append(stepDownButton)
         }
+    }
+    
+    func speedStepperValueChanged(stepper: UIStepper) {
+//        timer.invalidate()
+//        let roundedValue = Double(round(10*stepper.value)/10)
+//        let adjustedSpeed = Float(speedMatcher[roundedValue]!)
+//        self.speed = adjustedSpeed
+//        self.player.currentPlaybackRate = adjustedSpeed
+//        self.startTimer()
+//        self.speedLabel.text = "Speed: \(adjustedSpeed)x"
+//        print("stepper value:\(stepper.value) and value \(speedMatcher[roundedValue])")
+    }
+    
+    func capoStepperValueChanged(stepper: UIStepper) {
+        capoLabel.text = "Capo: \(Int(stepper.value))"
     }
     
     func stepUpPressed(button: UIButton) {
@@ -1203,6 +1247,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.backToMainView()
         } else {
             print("back to song view controller")
+            
+            //hide these two views first because they still appear until this viewcontroller is fully dismissed
+            tuningMenu.hidden = true
+            musicControlView.hidden = true
             self.dismissViewControllerAnimated(true, completion: nil)
         }
     }
