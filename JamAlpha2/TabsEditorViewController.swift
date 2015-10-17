@@ -931,7 +931,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let wrapperHeight: CGFloat = 12
         let labelFontSize: CGFloat = 10
         let wrapperWidth: CGFloat = 80
-        let wrapper = UIView(frame: CGRect(x: 0, y: progressBlock.frame.height/2-wrapperHeight, width: wrapperWidth, height: wrapperHeight))
+        let wrapper = UIView(frame: CGRect(x: 0, y: musicControlView.frame.height/2-wrapperHeight, width: wrapperWidth, height: wrapperHeight))
         wrapper.center.x = trueWidth/2
         wrapper.backgroundColor = UIColor.darkGrayColor()
         wrapper.alpha = 0.7
@@ -983,7 +983,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTime = self.player.currentTime
         let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
         self.progressBlock.setProgress(persent)
-        self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6))
 
         self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
         // find the current tab according to the current time and make the current tab view to yellow
@@ -1017,11 +1017,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer) {
         if player.playing {
+            
+            //animate down progress block
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                self.progressBlock!.alpha = 0.5
+                }, completion: nil)
+            
             //pause music and stop timer
             player.pause()
             timer.invalidate()
         
         } else {
+            
+            //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
+            UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                self.progressBlock!.alpha = 1.0
+            }, completion: nil)
+            
             //start counting down 3 seconds
             countdownView.hidden = false
             countdownView.setNumber(1)
@@ -1084,6 +1098,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.player.volume = 1
         progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
         self.progressBlock.SetSoundURL(url)
+        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+        self.progressBlock!.alpha = 0.5
+
     }
     
     func update() {
@@ -1096,7 +1113,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         //refresh progress block
         let presentPosition = CGFloat(self.currentTime / self.duration)
         self.progressBlock.setProgress(presentPosition)
-        self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
+        
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration * 6))
+
     }
     
     func moveDataItem(fromIndexPath : NSIndexPath, toIndexPath: NSIndexPath) {
