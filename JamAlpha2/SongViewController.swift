@@ -1,7 +1,7 @@
 import UIKit
 import MediaPlayer
 
-let stepPerSecond: Float = 50   //steps of chord move persecond
+let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4
@@ -69,7 +69,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var chords = [Chord]()
     var start: Int = 0
     var startdisappearing: Int = 0
-    var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
+    var activelabels:[(labels: [UIView], ylocation: Int, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     
 
@@ -156,6 +156,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //The labels move distance of each step in the base UIView
     var movePerstep: CGFloat = 0
+    var ylocations = [CGFloat]()
+    var xlocations = [CGFloat]()
     
     //the max y location of labels in the base view
     var maxylocation: CGFloat = 0
@@ -193,8 +195,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpActionViews()
         //get top and bottom points of six lines
         calculateXPoints()
-        movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
+        preLoadAllLocationsForLabels()
     }
+    
+   
     
     func removeAllObserver(){
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
@@ -1218,6 +1222,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         maxylocation = base.frame.height - lenGoup - base.frame.height / 40
     }
     
+    func preLoadAllLocationsForLabels () {
+        movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
+        //calculate the locations of everything in chordbase
+        var y: CGFloat = 0
+        while(y <= maxylocation){
+            ylocations.append(y)
+            xlocations.append(topPoints[0] - y * (topPoints[0] - bottomPoints[0]) / base.frame.height)
+            y += movePerstep
+        }
+    }
     
 
     func refreshChordLabel(){
@@ -1259,19 +1273,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // Change the location of each label
         for var i = 0; i < activelabels.count; ++i {
             let activelabel = activelabels[i]
-            let yPosition = activelabel.ylocation
+            let yPosition = ylocations[activelabel.ylocation]
             let labels: [UIView] = activelabel.labels
             
             let scale = 2 * Float(yPosition) / tan / Float(widthofbasetop) + 1
             
             let transformsize = CGAffineTransformMakeScale(CGFloat(scale), CGFloat(scale))
             
-            let xPosition = topPoints[0] - yPosition * (topPoints[0] - bottomPoints[0]) / base.frame.height
+            let xPosition = xlocations[activelabel.ylocation]
             
             if isChordShown && isTabsShown { //show both chord name and tabs
                 labels[0].hidden = false
                 labels[0].center = CGPointMake(xPosition, CGFloat(yPosition))
-                labels[1].center.y = CGFloat(yPosition)
+                labels[1].center.y = yPosition
                 labels[1].transform = transformsize
             } else if isChordShown && !isTabsShown { //show only chord name
                  labels[0].hidden = false
@@ -1281,14 +1295,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 //TODO: remove chords labels and only show tabs
                 // now it is just hidden, need to cease the compuation as well
                 labels[0].hidden = true
-                labels[1].center.y = CGFloat(yPosition)
+                labels[1].center.y = yPosition
                 labels[1].transform = transformsize
             }
             
-            activelabels[i].ylocation = activelabel.ylocation + movePerstep
+            activelabels[i].ylocation = activelabel.ylocation + 1
             
-            if( activelabels[i].ylocation > maxylocation){
-                activelabels[i].ylocation = maxylocation
+            if( activelabels[i].ylocation >= ylocations.count){
+                activelabels[i].ylocation = ylocations.count - 1
             }
         }
     }
@@ -1419,9 +1433,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //set the location of labels
         for var i = 0; i < activelabels.count; i++ {
-            activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].mTime.toDecimalNumer()) * stepPerSecond)
-            if activelabels[i].ylocation > maxylocation {
-                activelabels[i].ylocation = maxylocation
+            activelabels[i].ylocation = Int((startTime.toDecimalNumer() + freefallTime - chords[start+i].mTime.toDecimalNumer()) * stepPerSecond)
+            if activelabels[i].ylocation >= ylocations.count {
+                activelabels[i].ylocation = ylocations.count - 1
             }
         }
         
@@ -1473,7 +1487,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
-    func createLabels(name: String, content: String) -> (labels: [UIView], ylocation: CGFloat, alpha: Int){
+    func createLabels(name: String, content: String) -> (labels: [UIView], ylocation: Int, alpha: Int){
         var res = [UIView]()
         
         let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 40, 0))

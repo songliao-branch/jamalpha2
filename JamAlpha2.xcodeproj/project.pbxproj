@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1045413F1BCAFBB300A4590B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1045413E1BCAFBB300A4590B /* TabBarController.swift */; settings = {ASSET_TAGS = (); }; };
-		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
