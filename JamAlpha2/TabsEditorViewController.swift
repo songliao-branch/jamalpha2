@@ -999,7 +999,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func startCountdown() {
         countDownStartSecond++
         countdownView.setNumber(countDownStartSecond+1)
-        print("count down second \(countDownStartSecond+1)")
+
         if countDownStartSecond >= 3 {
             musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
             countdownTimer.invalidate()
