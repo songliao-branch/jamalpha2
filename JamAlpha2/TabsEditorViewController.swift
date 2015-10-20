@@ -1020,7 +1020,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             //animate down progress block
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
                 }, completion: nil)
             
@@ -1032,7 +1031,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
             UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 self.progressBlock!.alpha = 1.0
             }, completion: nil)
             
@@ -1098,7 +1096,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.player.volume = 1
         progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
         self.progressBlock.SetSoundURL(url)
-        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
         self.progressBlock!.alpha = 0.5
 
     }
