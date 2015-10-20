@@ -1,7 +1,7 @@
 import UIKit
 import MediaPlayer
 
-let stepPerSecond: Float = 50   //steps of chord move persecond
+let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4

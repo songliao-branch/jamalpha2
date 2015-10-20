@@ -43,6 +43,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var duration: NSTimeInterval = NSTimeInterval()
     var musicControlView: UIView = UIView()
     
+    var musicSingleTapRecognizer: UITapGestureRecognizer!
     // screen height and width
     var trueWidth: CGFloat = CGFloat()
     var trueHeight: CGFloat = CGFloat()
@@ -614,8 +615,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.editView.addSubview(completeStringView)
         
         let singleTapOnString6View: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnString6View:")
-        singleTapOnString6View.numberOfTapsRequired = 1
-        singleTapOnString6View.numberOfTouchesRequired = 1
         self.completeStringView.addGestureRecognizer(singleTapOnString6View)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
@@ -919,7 +918,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
         
-        let musicSingleTapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
+        musicSingleTapRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
         self.musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
         
         let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
@@ -1002,7 +1001,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         countdownView.setNumber(countDownStartSecond+1)
         print("count down second \(countDownStartSecond+1)")
         if countDownStartSecond >= 3 {
-            
+            musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 0
@@ -1035,6 +1034,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }, completion: nil)
             
             //start counting down 3 seconds
+            //disable tap gesture that inadvertly starts timer
+            musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
             countdownView.hidden = false
             countdownView.setNumber(1)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
