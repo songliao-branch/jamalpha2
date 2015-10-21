@@ -208,12 +208,12 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="loudspeaker" translatesAutoresizingMaskIntoConstraints="NO" id="l6i-W8-1hA">
-                                                    <rect key="frame" x="275" y="20" width="30" height="30"/>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="speaker" translatesAutoresizingMaskIntoConstraints="NO" id="l6i-W8-1hA">
+                                                    <rect key="frame" x="287" y="26" width="18" height="18"/>
                                                     <animations/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="30" id="D5H-D7-pwL"/>
-                                                        <constraint firstAttribute="height" constant="30" id="aJT-Qk-WGn"/>
+                                                        <constraint firstAttribute="width" constant="18" id="D5H-D7-pwL"/>
+                                                        <constraint firstAttribute="height" constant="18" id="aJT-Qk-WGn"/>
                                                     </constraints>
                                                 </imageView>
                                             </subviews>
@@ -327,12 +327,12 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="loudspeaker" translatesAutoresizingMaskIntoConstraints="NO" id="nYo-w0-5cJ">
-                                                    <rect key="frame" x="275" y="7" width="30" height="30"/>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="speaker" translatesAutoresizingMaskIntoConstraints="NO" id="nYo-w0-5cJ">
+                                                    <rect key="frame" x="285" y="12" width="20" height="20"/>
                                                     <animations/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="30" id="H18-XK-vuG"/>
-                                                        <constraint firstAttribute="height" constant="30" id="wPq-4W-pFR"/>
+                                                        <constraint firstAttribute="width" constant="20" id="H18-XK-vuG"/>
+                                                        <constraint firstAttribute="height" constant="20" id="wPq-4W-pFR"/>
                                                     </constraints>
                                                 </imageView>
                                             </subviews>
@@ -471,12 +471,12 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="loudspeaker" translatesAutoresizingMaskIntoConstraints="NO" id="Thk-el-uwo">
-                                                    <rect key="frame" x="275" y="7" width="30" height="30"/>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="speaker" translatesAutoresizingMaskIntoConstraints="NO" id="Thk-el-uwo">
+                                                    <rect key="frame" x="287" y="13" width="18" height="18"/>
                                                     <animations/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="30" id="b9p-aQ-ZYG"/>
-                                                        <constraint firstAttribute="height" constant="30" id="otY-mc-HzG"/>
+                                                        <constraint firstAttribute="width" constant="18" id="b9p-aQ-ZYG"/>
+                                                        <constraint firstAttribute="height" constant="18" id="otY-mc-HzG"/>
                                                     </constraints>
                                                 </imageView>
                                             </subviews>
@@ -716,9 +716,9 @@
     <resources>
         <image name="jamlist" width="193" height="244"/>
         <image name="list" width="20" height="25"/>
-        <image name="loudspeaker" width="110" height="103"/>
         <image name="me" width="20" height="25"/>
         <image name="music" width="25" height="25"/>
         <image name="search" width="23" height="25"/>
+        <image name="speaker" width="24" height="19"/>
     </resources>
 </document>
