@@ -3,7 +3,9 @@
 import UIKit
 import MediaPlayer
 import Alamofire
+import Haneke
 import SwiftyJSON
+
 class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
@@ -156,20 +158,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }
                 
                 if let imageURL = searchResults[indexPath.row].artworkUrl100 {
-                    cell.request?.cancel()
                     cell.albumCover.image = nil
-                    
-                    
-                    
-                    cell.request = Alamofire.request(.GET, imageURL).validate(contentType: ["image/*"]).responseImage() {
-                        request, _, result in
-                        
-                        guard let image = result.value else {
-                            print("download image error")
-                            return
-                        }
-                        cell.albumCover.image = image
-                    }
+                    cell.albumCover.hnk_setImageFromURL(NSURL(string: imageURL)!)
                 }
             
             }
@@ -262,7 +252,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    func addDataToResults(data: JSON){
+    func addDataToResults(data: SwiftyJSON.JSON){
         for item in data["results"].array! {
             let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
             

@@ -25,30 +25,6 @@ class SearchResult {
         self.wrapperType = wrapperType
         self.kind = kind
     }
-    
-}
-
-extension Alamofire.Request {
-    public static func imageResponseSerializer() -> GenericResponseSerializer<UIImage> {
-        return GenericResponseSerializer { request, response, data in
-            guard let validData = data else {
-                let error = Error.errorWithCode(.DataSerializationFailed, failureReason: "Data parsing failed")
-                return .Failure(data, error)
-            }
-            
-            guard let image = UIImage(data: validData, scale: UIScreen.mainScreen().scale) else {
-                let error = Error.errorWithCode(.DataSerializationFailed, failureReason: "Image Parsing failed")
-                return .Failure(data, error)
-            }
-            
-            return .Success(image)
-        }
-    }
-    
-    public func responseImage(completionHandler: (NSURLRequest?, NSHTTPURLResponse?, Result<UIImage>) -> Void) -> Self {
-        return response(responseSerializer: Request.imageResponseSerializer(), completionHandler: completionHandler)
-    }
-
 }
 
 //mixTerm, genreIndex, artistTerm, composerTerm, albumTerm, ratingIndex, songTerm
