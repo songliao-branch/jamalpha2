@@ -1,7 +1,7 @@
 import UIKit
 import MediaPlayer
 
-let stepPerSecond: Float = 50   //steps of chord move persecond
+let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4
@@ -54,6 +54,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var basesHeight: CGFloat!
     let marginBetweenBases: CGFloat = 15
     
+    var chordBaseTapGesture: UITapGestureRecognizer!
     //MARK: progress Container
     var progressBlock: SoundWaveView!
     
@@ -63,7 +64,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var panRecognizer:UIPanGestureRecognizer!
     var isPanning = false
     
-    var tapRecognizer: UITapGestureRecognizer!
+    var progressContainerTapGesture: UITapGestureRecognizer!
 
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
@@ -115,6 +116,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var shuffleButton:UIButton!
     var guitarButton:UIButton!
     var othersButton:UIButton!
+    
+    
+    // count down section
+    var countdownTimer = NSTimer()
+    var countDownStartSecond = 0 //will increments to 3
+    var countdownView: CountdownView!
     
     // Guitar actions views
     var guitarActionView: UIView!
@@ -198,6 +205,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpTimeLabels()
         setUpBottomViewWithButtons()
         setUpActionViews()
+        setUpCountdownView()
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
@@ -508,6 +516,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBase.addGestureRecognizer(panRecognizer)
         
         self.view.addSubview(chordBase)
+        
+        //add tap gesture to chordbase too
+        chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        chordBase.addGestureRecognizer(chordBaseTapGesture)
+        
         calculateXPoints()
     }
     
@@ -756,8 +769,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
         panRecognizer.delegate = self
         progressBlockContainer.addGestureRecognizer(panRecognizer)
-        tapRecognizer = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
-        progressBlockContainer.addGestureRecognizer(tapRecognizer)
+        
+        progressContainerTapGesture = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
+        progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
     }
     
     func handleProgressPan(recognizer: UIPanGestureRecognizer) {
@@ -1222,6 +1236,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
     }
+    
+    func setUpCountdownView() {
+        countdownView = CountdownView(frame: CGRect(x: 0, y: CGRectGetMaxY(chordBase.frame)-35, width: 70, height: 70))
+        countdownView.center.x = self.view.center.x
+        countdownView.backgroundColor = UIColor.clearColor()
+        countdownView.hidden = true
+        self.view.addSubview(countdownView)
+    }
+    
+    func startCountdown() {
+        countDownStartSecond++
+        countdownView.setNumber(countDownStartSecond+1)
+
+        if countDownStartSecond >= 3 {
+            //add tap gesture back
+            chordBase.addGestureRecognizer(chordBaseTapGesture)
+            progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
+            
+            countdownTimer.invalidate()
+            countdownView.hidden = true
+            countDownStartSecond = 0
+            player.play()
+        }
+
+    }
+    
 
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
@@ -1546,7 +1586,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
-            player.play()
+            if countdownOn {
+                //temporarily disable tap gesture to avoid accidental start count down again
+                chordBase.removeGestureRecognizer(chordBaseTapGesture)
+                progressBlockContainer.removeGestureRecognizer(progressContainerTapGesture)
+                
+                countdownView.hidden = false
+                countdownView.setNumber(1)
+                countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
+                NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
+                
+            } else {
+                player.play()
+            }
             
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
