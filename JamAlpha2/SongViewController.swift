@@ -1665,7 +1665,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //////////////////////////////////
 
     func activelabelAppend(index: Int){
-        activelabels.append(createLabels(chords[index].tab.name, fretPositions: chords[index].tab.fretPositions))
+        activelabels.append(createLabels(chords[index].tab.name, fretPositions: chords[index].tab.contentArray))
         dealWithLabelofChordName(activelabels.last!.labels.first! as! UILabel)
     }
 

@@ -4,21 +4,22 @@ import Foundation
 //For example, C major is 032010
 struct Tab {
     var name:String! //Cmajor
-    //var content: String! //xx0302000100, 12 characters, as in x32010
-    var fretPositions: [String]! //to be used in SongViewController
+    var content: String! //xx0302000100, 12 characters, as in x32010
+    var contentArray: [String]! //to be used in SongViewController
     init(name: String, content: String) {
         self.name = name
-        self.fretPositions = [String]()
+        self.content = content
+        self.contentArray = [String]()
         for var i = 11; i >= 0; i = i - 2 {
             let startIndex = content.startIndex.advancedBy(11 - i)
             let endIndex = content.startIndex.advancedBy(11 - i + 2)
             let charAtIndex = content[Range(start: startIndex, end: endIndex)]
             if let number = Int(charAtIndex)  {
-                 fretPositions.append(String(number))
+                 contentArray.append(String(number))
             } else if charAtIndex == "xx" {
-                fretPositions.append("x")
+                contentArray.append("x")
             } else {
-                fretPositions.append(" ")
+                contentArray.append(" ")
             }
         }
     }
