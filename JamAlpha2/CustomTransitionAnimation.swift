@@ -117,6 +117,8 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             if tranlation.y > 200 && gesture.state != UIGestureRecognizerState.Cancelled {
                 print("finish");
                 self.interactiveTransition.finishInteractiveTransition()
+                print("here:"+"\(presentingVC)")
+                presentingVC.dismissViewControllerAnimated(true, completion: nil)
             }else{
                 self.interactiveTransition.cancelInteractiveTransition()
             }
