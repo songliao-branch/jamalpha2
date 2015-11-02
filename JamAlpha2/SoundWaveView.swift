@@ -201,7 +201,7 @@ class SoundWaveView: UIView {
                             if(bigSampleforTabAndChordCount == 3*samplesPerPixel){
                                 let averageSample:Double = bigSampleforTabAndChord / Double(bigSampleforTabAndChordCount)
                                 
-                                self.averageSampleBuffer?.addObject(averageSample)
+                                self.averageSampleBuffer!.addObject(averageSample)
                                 bigSampleforTabAndChord = 0
                                 bigSampleforTabAndChordCount = 0
                                 
