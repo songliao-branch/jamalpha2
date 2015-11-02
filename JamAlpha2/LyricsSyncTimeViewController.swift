@@ -10,7 +10,7 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
-struct lyricsWithTime {
+class lyricsWithTime {
     var count: Int!
     var lyrics: [String]!
     var time: [NSTimeInterval]!
@@ -21,6 +21,12 @@ struct lyricsWithTime {
         self.lyrics = [String](count: count, repeatedValue: "")
         self.time = [NSTimeInterval](count: count, repeatedValue: 0)
         self.timeAdded = [Bool](count: count, repeatedValue: false)
+    }
+    func addExistLyrics(count: Int, lyrics: [String], time: [NSTimeInterval], timeAdded: [Bool]) {
+        self.count = count
+        self.lyrics = lyrics
+        self.time = time
+        self.timeAdded = timeAdded
     }
 }
 
@@ -67,7 +73,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
         self.addedLyricsWithTime = lyricsWithTime(count: self.lyricsOrganizedArray.count)
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
-        
+        self.addLyricsToEditorView(theSong)
         setUpSong()
         setUpHeaderView()
         setUpLyricsTableView()
@@ -422,5 +428,25 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
 
     func refreshTimeLabel(time: NSTimeInterval) {
         self.currentTimeLabel.text = TimeNumber(time: Float(time)).toDisplayString()
+    }
+}
+
+// read the exsit song's lyrics from coredata
+extension LyricsSyncViewController {
+    
+    func addLyricsToEditorView(sender: MPMediaItem) {
+        let lyricsWithTime = musicDataManager.getLyrics(sender)
+        let count = lyricsWithTime.count
+        if count > 0 {
+            var lyrics: [String] = [String]()
+            var time: [NSTimeInterval] = [NSTimeInterval]()
+            var timeAdded: [Bool] = [Bool]()
+            for item in lyricsWithTime {
+                lyrics.append(item.0)
+                time.append(item.1)
+                timeAdded.append(true)
+            }
+            self.addedLyricsWithTime.addExistLyrics(count, lyrics: lyrics, time: time, timeAdded: timeAdded)
+        }
     }
 }
