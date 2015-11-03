@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1045413F1BCAFBB300A4590B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1045413E1BCAFBB300A4590B /* TabBarController.swift */; };
+		10CA20901BE7C6340040724C /* Constent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CA208F1BE7C6340040724C /* Constent.swift */; };
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
@@ -89,6 +90,7 @@
 
 /* Begin PBXFileReference section */
 		1045413E1BCAFBB300A4590B /* TabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		10CA208F1BE7C6340040724C /* Constent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constent.swift; sourceTree = "<group>"; };
 		1E225B71031C3EA2120F8192 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A63591A1C3B0728C38D7319 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		5491F35DF2FB90338EBDC0CC /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -171,6 +173,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10CA20911BE7C75F0040724C /* GlobalConstent */ = {
+			isa = PBXGroup;
+			children = (
+				10CA208F1BE7C6340040724C /* Constent.swift */,
+			);
+			name = GlobalConstent;
+			sourceTree = "<group>";
+		};
 		377BBF0A419DDADF3605E109 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -321,6 +331,7 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
+				10CA20911BE7C75F0040724C /* GlobalConstent */,
 				E4CBC0081B9E88D900473FC4 /* CoreData */,
 				E48AE2D01B955BA30044CFDB /* Networking */,
 				E4B6362F1B854A6A00F331A7 /* Extensions */,
@@ -601,6 +612,7 @@
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
 				E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */,
 				C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */,
+				10CA20901BE7C6340040724C /* Constent.swift in Sources */,
 				84DA61A41B4E211100979A42 /* Lyric.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */,

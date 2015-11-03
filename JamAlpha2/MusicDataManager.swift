@@ -33,7 +33,7 @@ class MusicDataManager: NSObject {
             print("song doesn't exist")
             return nil
         } else {
-            print("song found in core data")
+            print("song found in core data \(self.classForCoder)")
             
             return results.lastObject! as? Song
         }

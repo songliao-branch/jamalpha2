@@ -322,8 +322,8 @@ class SoundWaveView: UIView {
         
         
         
-        self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
-        self.progressImageView.image = generatedProgressImage
+//        self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
+//        self.progressImageView.image = generatedProgressImage
 
         
         

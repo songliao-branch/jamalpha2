@@ -262,6 +262,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="musicTable" destination="g8z-6F-BP3" id="RcM-N6-y6J"/>
+                        <outlet property="tableView" destination="g8z-6F-BP3" id="hyz-0s-Trd"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Nw-L8-lE0" sceneMemberID="firstResponder"/>

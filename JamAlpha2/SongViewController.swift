@@ -14,10 +14,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var musicViewController: MusicViewController!
     
+    private var rwLock = pthread_rwlock_t()
+    
     //for nsoperation
-    var queue:NSOperationQueue = NSOperationQueue()
-    var operationCache = [NSURL:NSBlockOperation]()
-    //var nowPlayingItemCache = [NSBlockOperation:MPMediaItem]()
     var isGenerated:Bool = false
     
     var musicDataManager = MusicDataManager()
@@ -61,7 +60,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let marginBetweenBases: CGFloat = 15
     
     //MARK: progress Container
-    var progressBlock: SoundWaveView!
+    //var progressBlock: SoundWaveView!
     
     var progressBlockViewWidth:CGFloat?
     var progressBlockContainer:UIView!
@@ -177,6 +176,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        pthread_rwlock_init(&rwLock, nil)
        
         player = MusicManager.sharedInstance.player
         firstLoadSongTime = player.nowPlayingItem!.playbackDuration
@@ -204,6 +204,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setTuning("E-B-G-D-A-E") // placeholder
         setCapo(1)
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
+    }
+    
+    deinit{
+        pthread_rwlock_destroy(&rwLock)
     }
     
     func removeAllObserver(){
@@ -545,14 +549,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         player.beginGeneratingPlaybackNotifications()
     }
     
-    func synced(lock: AnyObject, closure: () -> ()) {
-        objc_sync_enter(lock)
-        closure()
-        objc_sync_exit(lock)
-    }
+//    func synced(lock: AnyObject, closure: () -> ()) {
+//        objc_sync_enter(lock)
+//        closure()
+//        objc_sync_exit(lock)
+//    }
     
     func currentSongChanged(notification: NSNotification){
-        synced(self) {
+        pthread_rwlock_wrlock(&self.rwLock)
             for label in self.tuningLabels {
                 label.hidden = true
             }
@@ -580,31 +584,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
                 //////////////////////////////
                 //remove from superView
-                if(self.progressBlock != nil ){
-                    self.progressBlock.removeFromSuperview()
+                if(KGLOBAL_progressBlock != nil ){
+                    KGLOBAL_progressBlock.removeFromSuperview()
                 }
                 
                 // get a new progressBlock
                 var progressBarWidth:CGFloat!
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
-                self.progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
-                self.progressBlock.center.y = progressContainerHeight
-                self.progressBlockContainer.addSubview(self.progressBlock)
+                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+                KGLOBAL_progressBlock.center.y = progressContainerHeight
+                self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
                 if let soundWaveData = self.musicDataManager.getSongWaveFormImage(nowPlayingItem!) {
-                    self.progressBlock.setWaveFormFromData(soundWaveData)
-                     self.progressBlockContainer.addSubview(self.progressBlock)
+                    KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+                     self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                     print("sound wave data found")
+                    KGLOBAL_init_queue.suspended = false
                 } else {
                     self.generateSoundWave(nowPlayingItem!)
                 }
  
                 ////////////////////////////
                 
-                    self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                    KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 
                 if self.player.playbackState == MPMusicPlaybackState.Paused{
-                    self.progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                    KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     print("changeScale")
                     //self.progressBlock!.alpha = 0.5
                 }
@@ -637,7 +642,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             self.updateAll(0)
-        }
+        pthread_rwlock_unlock(&self.rwLock)
     }
     
     func playbackStateChanged(notification: NSNotification){
@@ -648,8 +653,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             //fade down the soundwave
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                self.progressBlock!.alpha = 0.5
+                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                KGLOBAL_progressBlock!.alpha = 0.5
                 }, completion: nil)
             
         }
@@ -658,12 +663,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             //bring up the soundwave, give it a little jump animation
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                self.progressBlock!.alpha = 1.0
+                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+                KGLOBAL_progressBlock!.alpha = 1.0
                 }, completion: { finished in
                     
                     UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                        KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                         }, completion: nil)
                     
             })
@@ -710,8 +715,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 timer.invalidate()
                 // progress bar should be lowered
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                self.progressBlock!.alpha = 0.5
+                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                KGLOBAL_progressBlock!.alpha = 0.5
                 self.speed = 1  //restore to original speed
             }
         }
@@ -731,14 +736,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         progressBarWidth = CGFloat(player.nowPlayingItem!.playbackDuration) * progressWidthMultiplier
         
-        progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
-        progressBlock.center.y = progressContainerHeight
-        self.progressBlockContainer.addSubview(self.progressBlock)
+        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+        KGLOBAL_progressBlock.center.y = progressContainerHeight
+        self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
         //if there is soundwave in the coredata then we load the image in viewdidload
         if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
-            progressBlock.setWaveFormFromData(soundWaveData)
+            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
+            KGLOBAL_init_queue.suspended = false
             isGenerated = true
         }else{
             //if didn't find it then we will generate then waveform later, in the viewdidappear method
@@ -755,49 +761,50 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     // to generate sound wave in a nsoperation thread
     func generateSoundWave(nowPlayingItem:MPMediaItem){
-        // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-        let tempNowPlayingItem = nowPlayingItem
-        let tempProgressBlock = progressBlock
-        let tempMusicDataManager = self.musicDataManager
-        
-        guard let assetURL = self.player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
-            print("sound url not available")
-            return
-        }
-        
-        var op:NSBlockOperation?
-        op = self.operationCache[assetURL as! NSURL]
-        if(op == nil){
-            op = NSBlockOperation(block: {
-                
-                print("generating sound wave..")
-                let time1 = CFAbsoluteTimeGetCurrent()
-                tempProgressBlock.SetSoundURL(assetURL as! NSURL)
-                let time2 = CFAbsoluteTimeGetCurrent()
-                print("generating sound wave takes: \((time2 - time1)*1000) ms")
-                
-                let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                
-                let startTime = CFAbsoluteTimeGetCurrent()
-                
-                tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                
-                let endTime = CFAbsoluteTimeGetCurrent()
-                let elapsedTime = (endTime - startTime) * 1000
-                print("Saving the context took \(elapsedTime) ms")
-                
-                self.operationCache.removeValueForKey(assetURL as! NSURL)
-                if(tempNowPlayingItem == self.player.nowPlayingItem){
-                    NSOperationQueue.mainQueue().addOperationWithBlock({
-                        if let soundWaveData = tempMusicDataManager.getSongWaveFormImage(tempNowPlayingItem) {
-                            tempProgressBlock.setWaveFormFromData(soundWaveData)
+        dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+            guard let assetURL = self.player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
+                print("sound url not available")
+                return
+            }
+            
+            var op:NSBlockOperation?
+            op = KGLOBAL_operationCache[assetURL as! NSURL]
+            if(op == nil){
+                // have to use the temp value to do the nsoperation, cannot use (self.) do that.
+                let tempNowPlayingItem = nowPlayingItem
+                let tempProgressBlock = KGLOBAL_progressBlock
+                let tempMusicDataManager = self.musicDataManager
+                op = NSBlockOperation(block: {
+                    
+                    print("generating sound wave..")
+                    let time1 = CFAbsoluteTimeGetCurrent()
+                    tempProgressBlock.SetSoundURL(assetURL as! NSURL)
+                    let time2 = CFAbsoluteTimeGetCurrent()
+                    print("generating sound wave takes: \((time2 - time1)*1000) ms")
+                    
+                    let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                    
+                    let startTime = CFAbsoluteTimeGetCurrent()
+                    
+                    tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                    
+                    let endTime = CFAbsoluteTimeGetCurrent()
+                    let elapsedTime = (endTime - startTime) * 1000
+                    print("Saving the context took \(elapsedTime) ms")
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        KGLOBAL_operationCache.removeValueForKey(assetURL as! NSURL)
+                        if(tempNowPlayingItem == self.player.nowPlayingItem){
+                            NSOperationQueue.mainQueue().addOperationWithBlock({
+                                KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                KGLOBAL_init_queue.suspended = false
+                            })
                         }
-                        
-                    })
-                }
-            })
-            self.operationCache[assetURL as! NSURL] = op
-            self.queue.addOperation(op!)
+                    }
+                })
+                KGLOBAL_operationCache[assetURL as! NSURL] = op
+                KGLOBAL_queue.addOperation(op!)
+            }
         }
     }
     
@@ -827,7 +834,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //= from 0 ot -517
             //divide by -2: from 0 to 258
             let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
-            self.progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
+            KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
             //258  517
             updateAll(toTime)
             
@@ -871,7 +878,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             //update soundwave progress
-            progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItem!.playbackDuration))
+            KGLOBAL_progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItem!.playbackDuration))
             
             updateAll(toChordTime)
             
@@ -1456,15 +1463,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func refreshProgressBlock(){
 
-        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / self.progressBlock.frame.size.width
+        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
         
         let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
         
         if !isPanning {
             self.progressChangedOrigin = newOriginX
-            self.progressBlock.setProgress(newProgressPosition)
+            KGLOBAL_progressBlock.setProgress(newProgressPosition)
         }
-        self.progressBlock.frame.origin.x = newOriginX
+        KGLOBAL_progressBlock.frame.origin.x = newOriginX
     }
     
     func refreshTimeLabel(){
