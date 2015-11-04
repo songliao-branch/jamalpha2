@@ -32,8 +32,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-
-
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -58,21 +56,19 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         resultSearchController.hidesNavigationBarDuringPresentation = false
         searchBar.searchBarStyle = UISearchBarStyle.Minimal
         definesPresentationContext = true
-        searchBar.tintColor = UIColor.whiteColor()
-       
+        
+        
         if let searchTextField = searchBar.valueForKey("searchField") as? UITextField {
             
             searchTextField.textAlignment = NSTextAlignment.Left
-            searchTextField.tintColor = UIColor.grayColor()
+            searchTextField.tintColor = UIColor.mainPinkColor()
             
             for view in searchTextField.subviews {
+                //set inner text area background to white
                 view.layer.backgroundColor = UIColor.whiteColor().CGColor
                 view.layer.cornerRadius = 5
-                view.subviews[1].tintColor = UIColor.redColor()
             }
         }
-        
-        
         
         searchBar.placeholder = "What do you want to play?"
     }
