@@ -1,11 +1,11 @@
 PODS:
   - Alamofire (2.0.2)
-  - Haneke (1.0.1)
+  - HanekeSwift (0.10.0)
   - SwiftyJSON (2.3.0)
 
 DEPENDENCIES:
   - Alamofire (~> 2.0)
-  - Haneke (~> 1.0)
+  - HanekeSwift
   - SwiftyJSON (from `https://github.com/SwiftyJSON/SwiftyJSON.git`)
 
 EXTERNAL SOURCES:
@@ -19,7 +19,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: 8edbab00802a752bb5240cc2abe70e7e881488ad
-  Haneke: d60be8b96b228633b24708dd153169d6849d6f78
+  HanekeSwift: d6f5bdf9dbdbbc09d59623b2c1d533e46463dd4d
   SwiftyJSON: cacfe0373d584585716bd1d43202c24cc66afd65
 
 COCOAPODS: 0.39.0
