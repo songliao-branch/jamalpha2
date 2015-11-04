@@ -14,7 +14,7 @@ enum CCAnimationType: Int {
 }
 
 class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning, UIViewControllerTransitioningDelegate  {
-    var  presentingVC:SongViewController = SongViewController()
+    var  presentingVC:SongViewController = SongViewController.sharedInstance
     
     var  animationType:CCAnimationType!
     var  interacting:Bool!
@@ -22,9 +22,8 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
     
     var reverse: Bool = true
     
-    func attachToViewController(viewController: SongViewController) {
-        self.presentingVC = viewController
-        setupGestureRecognizer(viewController.view)
+    func attachToViewController() {
+        setupGestureRecognizer(presentingVC.view)
     }
     
     private func setupGestureRecognizer(view: UIView) {

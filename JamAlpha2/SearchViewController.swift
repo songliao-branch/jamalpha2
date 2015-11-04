@@ -15,9 +15,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     var searchResults: [SearchResult]!
     var musicRequest: Request?
-    var animator: CustomTransitionAnimation?
     
     var searchHistoryManager =  SearchHistoryManager()
+    
+    private var isReloadTable:Bool = false
 
     @IBOutlet weak var searchResultTableView: UITableView!
     
@@ -25,18 +26,12 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         super.viewDidLoad()
         
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
-        createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         searchResults = [SearchResult]()
         setUpSearchBar()
         
     }
     
-    func createTransitionAnimation(){
-        if(animator == nil){
-            self.animator = CustomTransitionAnimation()
-        }
-    }
 
     func setUpSearchBar(){
         self.resultSearchController = UISearchController(searchResultsController: nil)
@@ -205,17 +200,17 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             if indexPath.section == 0 {
                 
-                let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
-                songVC.selectedFromTable = true
                 
                 MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
                 MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
                 
-                songVC.transitioningDelegate = self.animator
-                self.animator!.attachToViewController(songVC)
-                reloadMusicTable()
-                self.presentViewController(songVC, animated: true, completion: nil)
+                SongViewController.sharedInstance.reloadSongVC(selectedFromTable: true)
+                
+                //reload table to show loudspeaker icon on current selected row
+                self.isReloadTable = true
+                
+                self.presentViewController(SongViewController.sharedInstance, animated: true, completion: nil)
                 
             }
             
@@ -306,6 +301,15 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         })
         self.searchResultTableView.reloadData()
     }
+    
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if(isReloadTable){
+            self.reloadMusicTable()
+            isReloadTable = false
+        }
+    }
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(){
@@ -314,7 +318,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 for childVC in tabItemController.childViewControllers {
                     if childVC.isKindOfClass(BaseViewController) {
                         let baseVC = childVC as! BaseViewController
-                        baseVC.nowView.start()
                         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                             musicVC.musicTable.reloadData()
                         }

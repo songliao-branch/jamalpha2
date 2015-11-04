@@ -18,7 +18,7 @@ var KGLOBAL_init_operationCache = [NSURL:NSBlockOperation]()
 var KGLOBAL_progressBlock: SoundWaveView!
 
 // value is a BOOL
-var KEY_isSoundWaveFormInBackgroundGenerated:Bool = false
+var KEY_isSoundWaveFormInBackgroundChecked:Bool = false
 
 let SCREEN_WIDTH = UIScreen.mainScreen().bounds.size.width
 let SCREEN_HEIGHT = UIScreen.mainScreen().bounds.size.height

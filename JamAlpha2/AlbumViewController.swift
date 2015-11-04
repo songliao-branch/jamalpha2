@@ -5,12 +5,10 @@ import MediaPlayer
 
 class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UITableViewDataSource{
 
-    var musicViewController: MusicViewController! // for songviewcontroller to go to artist or album from musicviewcontroller
-    var nowView: VisualizerView!
     
     var theAlbum:Album!
-    var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
+    private var isReloadTable:Bool = false
     
     @IBOutlet weak var albumTable: UITableView!
     
@@ -21,7 +19,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         super.viewDidLoad()
         songsInTheAlbum = [MPMediaItem]()
         songsInTheAlbum = theAlbum.songsIntheAlbum
-        self.createTransitionAnimation()
 
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
@@ -59,11 +56,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         }
     }
 
-    func createTransitionAnimation(){
-        if(animator == nil){
-            self.animator = CustomTransitionAnimation()
-        }
-    }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return theAlbum.numberOfTracks
@@ -106,20 +98,23 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
        
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
         MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
-        
-        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
 
-        songVC.selectedFromTable = true
-        songVC.musicViewController = self.musicViewController
-        songVC.nowView = nowView
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
+
+        SongViewController.sharedInstance.reloadSongVC(selectedFromTable: true)
         
         //reload table to show loudspeaker icon on current selected row
-        tableView.reloadData()
-        self.presentViewController(songVC, animated: true, completion: nil)
+        self.isReloadTable = true
+        self.presentViewController(SongViewController.sharedInstance, animated: true, completion: nil)
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if(isReloadTable){
+            self.albumTable.reloadData()
+            isReloadTable = false
+        }
     }
     
  }

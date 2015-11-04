@@ -4,7 +4,6 @@ import MediaPlayer
 
 class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
 
-    @IBOutlet weak var tableView: UITableView!
     private var uniqueSongs = [MPMediaItem]()
     private var uniqueArtists = [Artist]()
     private var uniqueAlbums = [Album]()
@@ -16,13 +15,14 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var musicDataManager = MusicDataManager()
     private var rwLock = pthread_rwlock_t()
     
+    private var isReloadTable:Bool = false
+    
     
     var pageIndex = 0
     
     @IBOutlet weak var musicTable: UITableView!
     
-    //for transition view animator
-    var animator: CustomTransitionAnimation?
+
     var nowView: VisualizerView!
     
     private  var songCount: Int64 = 0
@@ -38,15 +38,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         songsByFirstAlphabet = sort(uniqueSongs)
         artistsByFirstAlphabet = sort(uniqueArtists)
         albumsByFirstAlphabet = sort(uniqueAlbums)
-        
-        createTransitionAnimation()
+
         registerMusicPlayerNotificationForSongChanged()
         UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
         
-        if(!KEY_isSoundWaveFormInBackgroundGenerated){
+        if(!KEY_isSoundWaveFormInBackgroundChecked){
             generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-            KEY_isSoundWaveFormInBackgroundGenerated = true
+            KEY_isSoundWaveFormInBackgroundChecked = true
         }
+        
+        SongViewController.sharedInstance.musicViewController = self
+        SongViewController.sharedInstance.nowView = self.nowView
     }
     
     deinit{
@@ -77,19 +79,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
     }
 
-    func createTransitionAnimation(){
-        if(animator == nil){
-            self.animator = CustomTransitionAnimation()
-        }
-    }
     
     func popToCurrentSong(){
-        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.selectedFromTable = false
-        songVC.musicViewController = self
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
-        self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
+
+        SongViewController.sharedInstance.reloadSongVC(selectedFromTable: false)
+        self.navigationController!.presentViewController(SongViewController.sharedInstance, animated: true, completion: nil)
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         if pageIndex == 0  {
@@ -254,24 +248,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
 
-            let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-            songVC.selectedFromTable = true
+            SongViewController.sharedInstance.reloadSongVC(selectedFromTable: true)
             
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            songVC.musicViewController = self //for goToArtist and goToAlbum from here
-            songVC.nowView = self.nowView
              //reload table to show loudspeaker icon on current selected row
-            tableView.reloadData()
-            self.presentViewController(songVC, animated: true, completion: nil)
+            self.isReloadTable = true
+            self.presentViewController(SongViewController.sharedInstance, animated: true, completion: nil)
         }
         else if pageIndex == 1 {
 
             let allArtistsSorted = getAllSortedItems(artistsByFirstAlphabet)
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
-            artistVC.musicViewController = self
-            artistVC.nowView = self.nowView
             artistVC.theArtist = allArtistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
@@ -283,8 +270,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let indexToBePlayed = findIndexToBePlayed(albumsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
-            albumVC.musicViewController = self
-            albumVC.nowView = self.nowView
             albumVC.theAlbum = allAlbumsSorted[indexToBePlayed]
             
             self.showViewController(albumVC, sender: self)
@@ -299,8 +284,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         for artist in MusicManager.sharedInstance.uniqueArtists {
             if theArtist == artist.artistName {
                 let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
-                artistVC.musicViewController = self
-                artistVC.nowView = self.nowView
                 artistVC.theArtist = artist
                 self.showViewController(artistVC, sender: self)
                 print("jumping to artist \(theArtist)")
@@ -313,8 +296,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         for album in MusicManager.sharedInstance.uniqueAlbums {
             if theAlbum == album.albumTitle {
                 let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
-                albumVC.musicViewController = self
-                albumVC.nowView = self.nowView
                 albumVC.theAlbum = album
                 self.showViewController(albumVC, sender: self)
                 print("jumping to album \(theAlbum)")
@@ -384,6 +365,14 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
         }
         return itemsInPreviousSections + currentRow
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if(isReloadTable){
+            self.musicTable.reloadData()
+            isReloadTable = false
+        }
     }
     
 }

@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Universal setting
         UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+        SongViewController.sharedInstance.setUpSubLayout()
                 
         return true
     }
@@ -39,7 +40,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("Song VC entering background")
         }
     }
-
+    
+   
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         let currentVC = topViewController(rootViewController())

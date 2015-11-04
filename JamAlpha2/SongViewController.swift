@@ -13,6 +13,9 @@ let progressWidthMultiplier:CGFloat = 2
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     var musicViewController: MusicViewController!
+    var animator: CustomTransitionAnimation?
+    
+    let customView:UIView = UIView(frame: CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
     
     private var rwLock = pthread_rwlock_t()
     
@@ -185,8 +188,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
     
-    
-    
+    class var sharedInstance: SongViewController {
+        struct Static {
+            static var onceToken: dispatch_once_t = 0
+            static var instance: SongViewController? = nil
+        }
+        dispatch_once(&Static.onceToken) {
+            Static.instance = SongViewController()
+        }
+        return Static.instance!
+    }
     
     
     func setUpSubLayout(){
@@ -206,25 +217,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpActionViews()
         setUpCountdownView()
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
+        createTransitionAnimation()
     }
-
     
+    func createTransitionAnimation(){
+        if(animator == nil){
+            self.animator = CustomTransitionAnimation()
+            self.transitioningDelegate = self.animator
+            self.animator!.attachToViewController()
+        }
+    }
+ 
 
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
-        self.setUpSubLayout() ///////////////////////////delete
+        //self.setUpSubLayout() ///////////////////////////delete
         player = MusicManager.sharedInstance.player
-        
-        musicDataManager.initializeSongToDatabase(player.nowPlayingItem!)
-        firstLoadSongTime = player.nowPlayingItem!.playbackDuration
-        firstloadSongTitle = player.nowPlayingItem!.title
-        
-        removeAllObserver()
-        setUpMusicData(player.nowPlayingItem!)
-        setShuffleButtonImage()
-        reloadSongVC()
-     
     }
 
     
@@ -251,7 +260,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             loadDisplayMode()
-            updateMusicData(player.nowPlayingItem!)
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -268,15 +276,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpBackgroundImage(){
         //create an UIImageView
-        let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
+        let imageDimension = self.customView.frame.height-CGRectGetMaxY(topView.frame)
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
         
-        backgroundImageView.center.x = self.view.center.x
+        backgroundImageView.center.x = self.customView.center.x
         
 //        //get the image from MPMediaItem
 //        print(player.nowPlayingItem!.title)
 //        if let artwork = player.nowPlayingItem!.artwork {
-//            currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+//            currentImage = artwork.imageWithSize(CGSize(width: self.customView.frame.height/8, height: self.customView.frame.height/8))
 //        }
 //        //create blurred image
 //        let blurredImage:UIImage = currentImage!.applyLightEffect()!
@@ -284,29 +292,29 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 //        backgroundImageView.image = blurredImage
 //        textColor = blurredImage.averageColor()
         
-        self.view.addSubview(backgroundImageView)
+        self.customView.addSubview(backgroundImageView)
     }
     
     func setUpTopButtons() {
-        let statusBarLayer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: statusBarHeight))
+        let statusBarLayer = UIView(frame: CGRect(x: 0, y: 0, width: SCREEN_WIDTH, height: statusBarHeight))
         statusBarLayer.backgroundColor = UIColor.mainPinkColor()
-        self.view.addSubview(statusBarLayer)
+        self.customView.addSubview(statusBarLayer)
         
-        topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
+        topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: SCREEN_WIDTH, height: topViewHeight))
         topView.backgroundColor = UIColor.mainPinkColor()
-        self.view.addSubview(topView)
+        self.customView.addSubview(topView)
         
         let buttonCenterY: CGFloat = topViewHeight/2
         pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
         
         pulldownButton.setImage(UIImage(named: "pullDown"), forState: UIControlState.Normal)
-        pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
+        pulldownButton.center = CGPoint(x: SCREEN_WIDTH / 12, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         topView.addSubview(pulldownButton)
         
         tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
-        tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
+        tuningButton.center = CGPoint(x: SCREEN_WIDTH * 11 / 12, y: buttonCenterY)
         tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         topView.addSubview(tuningButton)
         
@@ -321,7 +329,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         capoButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         capoButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
-        self.view.addSubview(capoButton)
+        self.customView.addSubview(capoButton)
     }
 
     func updateTuning(tuning: String) {
@@ -354,7 +362,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             tuningLabel.textAlignment = .Center
             tuningLabel.center = CGPoint(x: topPoints[i]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
             tuningLabel.hidden = true
-            self.view.addSubview(tuningLabel)
+            self.customView.addSubview(tuningLabel)
             tuningLabels.append(tuningLabel)
         }
     }
@@ -397,10 +405,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //TODO: set a max of width to avoid clashing with pulldown and tuning button
         songNameLabel.frame.size = CGSize(width: songNameLabel.frame.width + 20, height: 30)
         artistNameLabel.frame.size = CGSize(width: artistNameLabel.frame.width + 20, height: 30)
-        songNameLabel.center.x = self.view.frame.width / 2
+        songNameLabel.center.x = self.customView.frame.width / 2
         songNameLabel.center.y = pulldownButton.center.y - 7
         
-        artistNameLabel.center.x = self.view.frame.width / 2
+        artistNameLabel.center.x = self.customView.frame.width / 2
         artistNameLabel.center.y = CGRectGetMaxY(songNameLabel.frame) + 3
         
         songNameLabel.textColor = UIColor.whiteColor()
@@ -422,10 +430,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         nextButton = UIButton(frame: CGRect(x: 0, y: chordBase.frame.origin.y, width: buttonDimension, height: buttonDimension))
         nextButton.setImage(UIImage(named: "next"), forState: .Normal)
         nextButton.addTarget(self, action: "nextPressed:", forControlEvents: .TouchUpInside)
-        nextButton.frame.origin.x = self.view.frame.width - nextButton.frame.width
+        nextButton.frame.origin.x = self.customView.frame.width - nextButton.frame.width
         nextButton.contentHorizontalAlignment = .Right
-        self.view.addSubview(previousButton)
-        self.view.addSubview(nextButton)
+        self.customView.addSubview(previousButton)
+        self.customView.addSubview(nextButton)
     }
     
     func previousPressed(button: UIButton){
@@ -472,7 +480,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.capoOfTheTabsSet = 0
         
         //return a tuple of ([Chord],tuning, capo)
-        let tabsFromCoreData = musicDataManager.getTabs(player.nowPlayingItem!)
+        let tabsFromCoreData = musicDataManager.getTabs(song)
         if tabsFromCoreData.0.count > 0 {
             print("chords length: \(tabsFromCoreData.0.count)")
             if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
@@ -486,7 +494,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
 
-        let lyricsFromCoreData = musicDataManager.getLyrics(player.nowPlayingItem!)
+        let lyricsFromCoreData = musicDataManager.getLyrics(song)
         
         if lyricsFromCoreData.count > 0 {
             self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
@@ -498,11 +506,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         currentLyricsIndex = -1
         let sideMargin: CGFloat = 20
         
-        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
+        lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.customView.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
         lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
         lyricbase.alpha = 0.8
         
-        self.view.addSubview(lyricbase)
+        self.customView.addSubview(lyricbase)
         
         let contentMargin: CGFloat = 5
         
@@ -532,10 +540,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let marginToTopView: CGFloat = 20
         let marginToProgressContainer: CGFloat = 10
         
-        basesHeight = self.view.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
+        basesHeight = self.customView.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
         
-        chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
-        chordBase.center.x = self.view.center.x
+        chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.customView.frame.width * 0.62, height: basesHeight * 0.55))
+        chordBase.center.x = self.customView.center.x
         chordBase.backgroundColor = UIColor.clearColor()
         chordBase.alpha = 0.8
         
@@ -545,7 +553,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         panRecognizer.delegate = self
         chordBase.addGestureRecognizer(panRecognizer)
         
-        self.view.addSubview(chordBase)
+        self.customView.addSubview(chordBase)
         
         //add tap gesture to chordbase too
         chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
@@ -673,11 +681,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.artistNameLabel.text = nowPlayingItem!.artist
         
                     if let artwork = self.player.nowPlayingItem!.artwork {
-                        let image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+                        let image = artwork.imageWithSize(CGSize(width: self.customView.frame.height/8, height: self.customView.frame.height/8))
                         let blurredImage = image!.applyLightEffect()!
                         self.textColor = blurredImage.averageColor()
                         
-                        self.backgroundImageView.center.x = self.view.center.x
+                        self.backgroundImageView.center.x = self.customView.center.x
                         self.backgroundImageView.image = blurredImage
                     }
 
@@ -752,9 +760,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //TODO: BUG: when soundwave is generating, the volume is somehow lowered 
             // until the player.currentPlaybacktime is set, as move the progress block would 
             // restore the normal volume
-            player.currentPlaybackTime = player.currentPlaybackTime
             player.play()
-            startTimer()
+            
+            if player.playbackState != MPMusicPlaybackState.Playing{
+                KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                startTimer()
+            }
+            
         } else { // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
@@ -777,11 +789,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpProgressContainer(){
-        progressChangedOrigin = self.view.frame.width / 2
-        progressBlockContainer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: progressContainerHeight))
-        progressBlockContainer.center.y = self.view.frame.height - bottomViewHeight - progressContainerHeight / 2
+        progressChangedOrigin = self.customView.frame.width / 2
+        progressBlockContainer = UIView(frame: CGRect(x: 0, y: 0, width: self.customView.frame.width, height: progressContainerHeight))
+        progressBlockContainer.center.y = self.customView.frame.height - bottomViewHeight - progressContainerHeight / 2
         progressBlockContainer.backgroundColor = UIColor.clearColor()
-        self.view.addSubview(progressBlockContainer)
+        self.customView.addSubview(progressBlockContainer)
         
 //        var progressBarWidth:CGFloat!
 //
@@ -850,7 +862,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func handleProgressPan(recognizer: UIPanGestureRecognizer) {
-        let translation = recognizer.translationInView(self.view)
+        let translation = recognizer.translationInView(self.customView)
         for childview in recognizer.view!.subviews {
             let child = childview
             self.isPanning = true
@@ -858,23 +870,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             var newPosition = progressChangedOrigin + translation.x
             
             // leftmost point of inner bar cannot be more than half of the view
-            if newPosition > self.view.frame.width / 2 {
-                newPosition = self.view.frame.width / 2
+            if newPosition > self.customView.frame.width / 2 {
+                newPosition = self.customView.frame.width / 2
             }
             
             // the end of inner bar cannot be smaller left half of view
-            if newPosition + child.frame.width < self.view.frame.width / 2 {
-                newPosition = self.view.frame.width / 2 - child.frame.width
+            if newPosition + child.frame.width < self.customView.frame.width / 2 {
+                newPosition = self.customView.frame.width / 2 - child.frame.width
             }
             
             //update all chords, lyrics
             timer.invalidate()
             
             //new Position from 160 to -357
-            //-self.view.frame.width /2
+            //-self.customView.frame.width /2
             //= from 0 ot -517
             //divide by -2: from 0 to 258
-            let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
+            let toTime = Float(newPosition - self.customView.frame.width / 2) / -(Float(progressWidthMultiplier))
             KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
             //258  517
             updateAll(toTime)
@@ -896,7 +908,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func handleChordBasePan(recognizer: UIPanGestureRecognizer) {
-        let translation = recognizer.translationInView(self.view)
+        let translation = recognizer.translationInView(self.customView)
         
         switch recognizer.state {
             
@@ -948,13 +960,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let timeLabelOriginY = CGRectGetMaxY(progressBlockContainer.frame)-labelHeight
         
         let wrapper = UIView(frame: CGRect(x: 0, y: timeLabelOriginY, width: 85, height: labelHeight))
-        wrapper.center.x = self.view.center.x
+        wrapper.center.x = self.customView.center.x
         wrapper.backgroundColor = UIColor.darkGrayColor()
         wrapper.alpha = 0.7
         wrapper.layer.cornerRadius = labelHeight/5
-        self.view.addSubview(wrapper)
+        self.customView.addSubview(wrapper)
         
-        currentTimeLabel = UILabel(frame: CGRect(x: self.view.center.x-labelWidth, y: timeLabelOriginY , width: labelWidth, height: labelHeight))
+        currentTimeLabel = UILabel(frame: CGRect(x: self.customView.center.x-labelWidth, y: timeLabelOriginY , width: labelWidth, height: labelHeight))
         currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         currentTimeLabel.text = "0:00.0"
         currentTimeLabel.textAlignment = .Left
@@ -966,24 +978,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         currentTimeLabel.layer.shadowOpacity = 1.0
         currentTimeLabel.layer.shadowOffset = CGSizeZero
         currentTimeLabel.layer.masksToBounds = false
-        self.view.addSubview(currentTimeLabel)
+        self.customView.addSubview(currentTimeLabel)
         
-        totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
+        totalTimeLabel = UILabel(frame: CGRect(x: self.customView.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         //totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
         totalTimeLabel.textAlignment = .Right
-        self.view.addSubview(totalTimeLabel)
+        self.customView.addSubview(totalTimeLabel)
         
     }
     
     //from left to right: share, favoriate, shuffle, others
     func setUpBottomViewWithButtons(){
 
-        bottomView = UIView(frame: CGRect(x: 0, y: self.view.frame.height - bottomViewHeight, width: self.view.frame.width, height: bottomViewHeight))
+        bottomView = UIView(frame: CGRect(x: 0, y: self.customView.frame.height - bottomViewHeight, width: self.customView.frame.width, height: bottomViewHeight))
         bottomView.backgroundColor = UIColor.darkGrayColor()
         bottomView.alpha = 0.7
-        self.view.addSubview(bottomView)
+        self.customView.addSubview(bottomView)
         
         let bottomButtonSize: CGSize = CGSizeMake(bottomView.frame.width / 4, bottomView.frame.height)
         
@@ -1039,16 +1051,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpActionViews() {
         // add this layer first before adding two action views to prevent view blocking
-        actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: self.customView.frame.width, height: self.customView.frame.height))
         actionDismissLayerButton.backgroundColor = UIColor.clearColor()
         actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
-        self.view.addSubview(actionDismissLayerButton)
+        self.customView.addSubview(actionDismissLayerButton)
         actionDismissLayerButton.hidden = true
 
         // NOTE: we have to call all the embedded action events from the custom views, not in this class.
-        guitarActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: actionViewHeight))
+        guitarActionView = UIView(frame: CGRect(x: 0, y: self.customView.frame.height, width: self.customView.frame.width, height: actionViewHeight))
         guitarActionView.backgroundColor = UIColor.actionGray()
-        self.view.addSubview(guitarActionView)
+        self.customView.addSubview(guitarActionView)
         let width = guitarActionView.frame.width
         
         var rowWrappers = [UIView]()
@@ -1108,7 +1120,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         countdownSwitch = switchHolders[3]
         countdownSwitch.addTarget(self, action: "countDownChanged:", forControlEvents: .ValueChanged)
         
-        speedStepper = UIStepper(frame: CGRect(x: self.view.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
+        speedStepper = UIStepper(frame: CGRect(x: self.customView.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
         speedStepper.center.y = childCenterY
         speedStepper.tintColor = UIColor.mainPinkColor()
         speedStepper.minimumValue = 0.7 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
@@ -1126,9 +1138,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         rowWrappers[5].addSubview(speedLabel)
         
         // Add navigation out view, all actions are navigated to other viewControllers
-        navigationOutActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: actionViewHeight))
+        navigationOutActionView = UIView(frame: CGRect(x: 0, y: self.customView.frame.height, width: self.customView.frame.width, height: actionViewHeight))
         navigationOutActionView.backgroundColor = UIColor.actionGray()
-        self.view.addSubview(navigationOutActionView)
+        self.customView.addSubview(navigationOutActionView)
 
         // position 1
         addTabsButton = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: rowHeight))
@@ -1200,13 +1212,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func dismissAction() {
         UIView.animateWithDuration(0.3, animations: {
             
-            if self.guitarActionView.frame.origin.y < self.view.frame.height - 10 {
-                self.guitarActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.height, self.actionViewHeight)
+            if self.guitarActionView.frame.origin.y < self.customView.frame.height - 10 {
+                self.guitarActionView.frame = CGRectMake(0, self.customView.frame.height, self.customView.frame.height, self.actionViewHeight)
             }
             
-            if self.navigationOutActionView.frame.origin.y < self.view.frame.height - 10 {
+            if self.navigationOutActionView.frame.origin.y < self.customView.frame.height - 10 {
                 print("dismiss navigation action")
-                self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.width, self.actionViewHeight)
+                self.navigationOutActionView.frame = CGRectMake(0, self.customView.frame.height, self.customView.frame.width, self.actionViewHeight)
             }
 
             self.actionDismissLayerButton.backgroundColor = UIColor.clearColor()
@@ -1221,7 +1233,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func showGuitarActions(){
         actionDismissLayerButton.hidden = false
         UIView.animateWithDuration(0.3, animations: {
-            self.guitarActionView.frame = CGRectMake(0, self.view.frame.height-self.actionViewHeight, self.view.frame.width, self.actionViewHeight)
+            self.guitarActionView.frame = CGRectMake(0, self.customView.frame.height-self.actionViewHeight, self.customView.frame.width, self.actionViewHeight)
                 self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
                 self.actionDismissLayerButton.alpha = 0.3
             }, completion: nil)
@@ -1231,7 +1243,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         actionDismissLayerButton.hidden = false
         UIView.animateWithDuration(0.3, animations: {
-            self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height-self.actionViewHeight, self.view.frame.width, self.actionViewHeight)
+            self.navigationOutActionView.frame = CGRectMake(0, self.customView.frame.height-self.actionViewHeight, self.customView.frame.width, self.actionViewHeight)
             self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
             self.actionDismissLayerButton.alpha = 0.3
             }, completion: nil)
@@ -1297,15 +1309,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func unblurImageIfAllIsHidden() {
         if !isChordShown && !isTabsShown && !isLyricsShown {
-            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-            self.backgroundImageView.center.x = self.view.center.x
+            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.customView.frame.height/8, height: self.customView.frame.height/8))
+            self.backgroundImageView.center.x = self.customView.center.x
             self.backgroundImageView.image = image
             artWorkUnblurred = true
         } else if artWorkUnblurred { //if only we have unblurred it before, we blur the image
             
-            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.customView.frame.height/8, height: self.customView.frame.height/8))
             let blurredImage = image!.applyLightEffect()!
-            self.backgroundImageView.center.x = self.view.center.x
+            self.backgroundImageView.center.x = self.customView.center.x
             self.backgroundImageView.image = blurredImage
             
             artWorkUnblurred = false
@@ -1324,10 +1336,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpCountdownView() {
         countdownView = CountdownView(frame: CGRect(x: 0, y: CGRectGetMaxY(chordBase.frame)-35, width: 70, height: 70))
-        countdownView.center.x = self.view.center.x
+        countdownView.center.x = self.customView.center.x
         countdownView.backgroundColor = UIColor.clearColor()
         countdownView.hidden = true
-        self.view.addSubview(countdownView)
+        self.customView.addSubview(countdownView)
     }
     
     func startCountdown() {
@@ -1542,7 +1554,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
         
-        let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
+        let newOriginX = self.customView.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
         
         if !isPanning {
             self.progressChangedOrigin = newOriginX
@@ -1807,86 +1819,88 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 }
 
 extension SongViewController{
-    func reloadSongVC(){
+    func reloadSongVC(selectedFromTable selectedFromTable:Bool){
+        
         pthread_rwlock_wrlock(&self.rwLock)
-        for label in self.tuningLabels {
-            label.hidden = true
-        }
-        if self.player.repeatMode == .One {
-            print("\(self.player.nowPlayingItem!.title) is repeating")
-            self.updateAll(0)
-            return
-        }
+        
+        self.selectedFromTable = selectedFromTable
+        
+        removeAllObserver()
         
         let nowPlayingItem = self.player.nowPlayingItem
+        let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
         
-        // use current item's playbackduration to validate nowPlayingItem duration
-        if self.firstloadSongTitle == nowPlayingItem!.title && self.firstLoadSongTime == nowPlayingItem!.playbackDuration {
             
-            self.musicDataManager.initializeSongToDatabase(self.player.nowPlayingItem!)
-            self.firstloadSongTitle = nowPlayingItem!.title
-            self.firstLoadSongTime = nowPlayingItem!.playbackDuration
-            
-            self.updateMusicData(nowPlayingItem!)
-            
-            // The following won't run when selected from table
-            // update the progressblockWidth
-            
-            self.progressBlockViewWidth = nil
-            
-            let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
+        self.musicDataManager.initializeSongToDatabase(nowPlayingItem!)
+        self.firstloadSongTitle = nowPlayingItem!.title
+        self.firstLoadSongTime = nowPlayingItemDuration
         
-            //remove from superView
-            if(KGLOBAL_progressBlock != nil ){
-                KGLOBAL_progressBlock.removeFromSuperview()
-            }
-            
-            // get a new progressBlock
-            var progressBarWidth:CGFloat!
-            progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
-            KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
-            KGLOBAL_progressBlock.center.y = progressContainerHeight
-            self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
-            
-            //if there is soundwave in the coredata then we load the image in viewdidload
-            if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
-                KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-                print("sound wave data found")
-                KGLOBAL_init_queue.suspended = false
-                isGenerated = true
-            }else{
-                //if didn't find it then we will generate then waveform later, in the viewdidappear method
-                // this is a flag to determine if the generateSoundWave function will be called
-                isGenerated = false
-            }
-            
-            
-            KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
-            
-            if self.player.playbackState == MPMusicPlaybackState.Paused{
-                KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
-            }
-            
-            // if we are NOT repeating song
-            if self.player.repeatMode != .One {
-                
-                self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
-                self.songNameLabel.textAlignment = NSTextAlignment.Center
-                self.artistNameLabel.text = nowPlayingItem!.artist
-                
-                if let artwork = self.player.nowPlayingItem!.artwork {
-                    let image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-                    let blurredImage = image!.applyLightEffect()!
-                    self.textColor = blurredImage.averageColor()
-                    
-                    self.backgroundImageView.center.x = self.view.center.x
-                    self.backgroundImageView.image = blurredImage
-                }
-                
-                
-                self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
-            }
+        
+        updateMusicData(nowPlayingItem!)
+        setShuffleButtonImage()
+        
+        self.customView.removeFromSuperview()
+        self.view.addSubview(self.customView)
+        
+        //self.updateMusicData(nowPlayingItem!)
+        
+        // The following won't run when selected from table
+        // update the progressblockWidth
+        
+        self.progressBlockViewWidth = nil
+        
+     
+    
+        //remove from superView
+        if(KGLOBAL_progressBlock != nil ){
+            KGLOBAL_progressBlock.removeFromSuperview()
         }
+        
+        // get a new progressBlock
+        var progressBarWidth:CGFloat!
+        progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
+        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+        KGLOBAL_progressBlock.center.y = progressContainerHeight
+        self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
+        
+        //if there is soundwave in the coredata then we load the image in viewdidload
+        if let soundWaveData = musicDataManager.getSongWaveFormImage(nowPlayingItem!) {
+            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+            print("sound wave data found")
+            KGLOBAL_init_queue.suspended = false
+            isGenerated = true
+        }else{
+            //if didn't find it then we will generate then waveform later, in the viewdidappear method
+            // this is a flag to determine if the generateSoundWave function will be called
+            isGenerated = false
+        }
+        
+        
+        KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+        
+        if self.player.playbackState == MPMusicPlaybackState.Paused{
+            KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
+        }
+        
+        // if we are NOT repeating song
+   
+            
+        self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
+        self.songNameLabel.textAlignment = NSTextAlignment.Center
+        self.artistNameLabel.text = nowPlayingItem!.artist
+        print(self.artistNameLabel.text)
+        
+        if let artwork = self.player.nowPlayingItem!.artwork {
+            let image = artwork.imageWithSize(CGSize(width: self.customView.frame.height/10, height: self.customView.frame.height/10))
+            let blurredImage = image!.applyLightEffect()!
+            self.textColor = blurredImage.averageColor()
+            
+            self.backgroundImageView.center.x = self.customView.center.x
+            self.backgroundImageView.image = blurredImage
+        }
+   
+        self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
+ 
         self.speed = 1
         //self.nowPlayingItemSpeed = 1
         if self.player.playbackState == MPMusicPlaybackState.Playing{
