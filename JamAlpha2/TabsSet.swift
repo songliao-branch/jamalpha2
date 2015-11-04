@@ -15,4 +15,6 @@ class TabsSet: NSManagedObject {
     @NSManaged var chords: AnyObject
     @NSManaged var tabs: AnyObject
     @NSManaged var times: AnyObject
+    @NSManaged var capo: NSNumber
+    @NSManaged var tuning: String
 }

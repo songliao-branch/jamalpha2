@@ -1,7 +1,8 @@
 import UIKit
 import MediaPlayer
 
-class MusicViewController: UIViewController,UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate {
+
+class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
 
     @IBOutlet weak var tableView: UITableView!
     private var uniqueSongs = [MPMediaItem]()
@@ -424,7 +425,7 @@ extension MusicViewController{
                         if(op!.cancelled){
                             return
                         }
-                        tempProgressBlock.SetSoundURL(assetURL as! NSURL)
+                        tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
 
                         let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                         tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
@@ -446,23 +447,6 @@ extension MusicViewController{
         }
     }
     
-    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        //1
-        KGLOBAL_init_queue.suspended = true
-
-    }
-    
-    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        // 2
-        if !decelerate {
-             KGLOBAL_init_queue.suspended = false
-        }
-    }
-    
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        KGLOBAL_init_queue.suspended = false
-    }
-  
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -497,7 +481,7 @@ extension MusicViewController{
                             if(op!.cancelled){
                                 return
                             }
-                            tempProgressBlock.SetSoundURL(assetURL as! NSURL)
+                            tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
                             
                             let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                             tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)

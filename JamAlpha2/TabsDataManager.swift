@@ -186,7 +186,32 @@ class TabsDataManager: NSObject {
         }
         return [NormalTabs]()
     }
-
+    
+    // get tabs by index, name and content
+    func getUniqueTab(index: NSNumber, name: String, content: String) -> NormalTabs {
+        var tempNormalTabs: NormalTabs = NormalTabs()
+        let fetchRequest = NSFetchRequest(entityName: "Tabs")
+        fetchRequest.predicate = NSPredicate(format: "index == '\(index)' AND name == '\(name)' AND content == '\(content)'")
+        do {
+            if let results = try moc.executeFetchRequest(fetchRequest) as? [Tabs] {
+                for item in results {
+                    let tempItem: Tabs = item as Tabs
+                    let tempTab: NormalTabs = NormalTabs()
+                    tempTab.name = tempItem.name
+                    print("\(tempItem.index)")
+                    tempTab.index = tempItem.index
+                    tempTab.content = tempItem.content
+                    tempTab.isOriginal = tempItem.isOriginal
+                    tempTab.tabs = tempItem
+                    tempNormalTabs = tempTab
+                }
+                return tempNormalTabs
+            }
+        } catch {
+            fatalError("There was an error fetching tabs on the index \(index)")
+        }
+        return tempNormalTabs
+    }
     
     func addNewTabs(index: NSNumber, name: String, content: String) -> Tabs {
         let tabs: Tabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Tabs), managedObjectConect: moc) as! Tabs

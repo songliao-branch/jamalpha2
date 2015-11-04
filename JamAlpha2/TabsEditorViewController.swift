@@ -35,6 +35,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var fretBoardView: UIView = UIView()
     
     // music section
+    //MARK: decide the progress block width
+    let tabsEditorProgressWidthMultiplier: CGFloat = 6
     var progressBlock: SoundWaveView!
     var theSong: MPMediaItem!
     var currentTime: NSTimeInterval = NSTimeInterval()
@@ -42,6 +44,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var duration: NSTimeInterval = NSTimeInterval()
     var musicControlView: UIView = UIView()
     
+    var musicSingleTapRecognizer: UITapGestureRecognizer!
     // screen height and width
     var trueWidth: CGFloat = CGFloat()
     var trueHeight: CGFloat = CGFloat()
@@ -58,7 +61,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var fretPosition: [CGFloat] = [CGFloat]()
     
     // core data functions
-    var data: TabsDataManager = TabsDataManager()
+    var tabsDataManager: TabsDataManager = TabsDataManager()
     
     // objects on view which need to be changed in different places
     var removeButton: UIButton = UIButton()
@@ -70,14 +73,36 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentNoteButton: UIButton = UIButton()
     var currentTimeLabel: UILabel = UILabel()
     var totalTimeLabel: UILabel = UILabel()
-    var countDownImageView: UIImageView = UIImageView()
-    var countDownNumberImageView: UIImageView = UIImageView()
+//    var countDownImageView: UIImageView = UIImageView()
+//    var countDownNumberImageView: UIImageView = UIImageView()
     var string6View: [UIView] = [UIView]()
     var currentTabViewIndex: Int = Int()
     var currentBaseButton: UIButton = UIButton()
     
     // timer
     var timer = NSTimer()
+    
+    var tuningMenu: UIView!
+    var actionDismissLayerButton: UIButton!
+    
+    var speedLabel: UILabel!
+    var speedStepper: UIStepper!
+    
+    var capoLabel: UILabel!
+    var capoStepper: UIStepper!
+    // capo and 6 string
+    var defaultTunings =  ["E","B","G","D","A","E"]
+    var stepDownButtons = [UIButton]()
+    var stepUpButtons = [UIButton]()
+    var tuningValueLabels = [UILabel]()
+    var tunings = [Tuning]()
+    
+    
+    // count down section
+    
+    var countdownTimer = NSTimer()
+    var countDownStartSecond = 0 //will increments to 3
+    var countdownView: CountdownView!
     
     // data array
     var specificTabSets: [NormalTabs] = [NormalTabs]()
@@ -152,7 +177,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.addSubview(backgroundImage)
 
         // add the default tab data into coredata if it doesn't exist
-        self.data.addDefaultData()
+        self.tabsDataManager.addDefaultData()
         
         // initial the edit view
         self.editView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 18 / 20 * self.trueHeight)
@@ -163,13 +188,149 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.createStringAndFretPosition()
         self.addMusicControlView()
         self.setUpTimeLabels()
+        self.setUpCountdownView()
+
         // initial collection view
         self.initCollectionView()
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
-        
+        setUpTuningControlMenu()
+
         // initial main view tab data array
         self.initialMainViewDataArray()
+        
+        
+        // MARK: add exist chord to tab editor view
+        self.addChordToEditorView(theSong)
+    }
+
+    // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
+    func setUpTuningControlMenu() {
+        // a gray button covers the entire background behind tuning menu, is to dismiss the tuning menus
+        actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
+        actionDismissLayerButton.backgroundColor = UIColor.clearColor()
+        actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
+        self.view.addSubview(actionDismissLayerButton)
+        actionDismissLayerButton.hidden = true
+        
+        tuningMenu = UIView(frame: CGRect(x: -trueWidth/3, y: 0, width: trueWidth/3, height: trueHeight))
+        tuningMenu.backgroundColor = UIColor.actionGray()
+        self.view.addSubview(tuningMenu)
+        
+        //draw 7 lines to give rooms for eight rows
+        let rowHeight = trueHeight/8
+        for i in 0..<7 {
+            let separator = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i+1), width: tuningMenu.frame.width, height: 1))
+            separator.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+            tuningMenu.addSubview(separator)
+        }
+        
+        let sideMargin: CGFloat = 10
+        
+        //SECTION: add speed label, stepper
+        speedLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 100, height: 25))
+        speedLabel.textColor = UIColor.mainPinkColor()
+        speedLabel.text = "Speed: 1.0x"
+        speedLabel.center.y = rowHeight/2
+        tuningMenu.addSubview(speedLabel)
+
+        speedStepper = UIStepper(frame: CGRect(x: tuningMenu.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
+        speedStepper.center.y = rowHeight/2
+        speedStepper.tintColor = UIColor.mainPinkColor()
+        speedStepper.minimumValue = 0.2 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
+        speedStepper.maximumValue = 2.0
+        speedStepper.stepValue = 0.1
+        speedStepper.value = 1.0 //default
+        speedStepper.addTarget(self, action: "speedStepperValueChanged:", forControlEvents: .ValueChanged)
+        tuningMenu.addSubview(speedStepper)
+        
+        
+        //SECTION: add capo label, stepper
+        capoLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 100, height: 25))
+        capoLabel.textColor = UIColor.mainPinkColor()
+        capoLabel.text = "Capo: 0"
+        capoLabel.center.y = rowHeight*3/2
+        tuningMenu.addSubview(capoLabel)
+        
+        capoStepper = UIStepper(frame: CGRect(x: 0, y: 0, width: 94, height: 29))
+        capoStepper.center = CGPoint(x: speedStepper.center.x, y: speedStepper.center.y+rowHeight)
+        capoStepper.tintColor = UIColor.mainPinkColor()
+        capoStepper.minimumValue = 0
+        capoStepper.maximumValue = 12
+        capoStepper.stepValue = 1
+        capoStepper.value = 0 //default
+        capoStepper.addTarget(self, action: "capoStepperValueChanged:", forControlEvents: .ValueChanged)
+        tuningMenu.addSubview(capoStepper)
+        
+        let buttonDimension: CGFloat = 30
+        
+        //SECTION: Tunings
+        var tuningTexts = ["1st:", "2nd:", "3rd:", "4th:", "5th:", "6th:"]
+        //add tunings labels and buttons
+        for i in 0..<6 {
+            let stringIndicatorLabel = UILabel(frame: CGRect(x: 10, y: 0, width: 100, height: 25))
+            stringIndicatorLabel.textColor = UIColor.mainPinkColor()
+            stringIndicatorLabel.text = tuningTexts[i]
+            stringIndicatorLabel.sizeToFit()
+            stringIndicatorLabel.center.y = rowHeight/2 + rowHeight * CGFloat(i+2)
+            tuningMenu.addSubview(stringIndicatorLabel)
+            
+            //initialize tuning with our custom class Tuning
+            let originalTuning = Tuning(originalNote: defaultTunings[i])
+            tunings.append(originalTuning)
+            
+            let tuningValueLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
+            tuningValueLabel.text = defaultTunings[i]
+            tuningValueLabel.textColor = UIColor.mainPinkColor()
+            tuningValueLabel.center = CGPoint(x: speedStepper.center.x, y: stringIndicatorLabel.center.y)
+            tuningValueLabel.textAlignment = .Center
+            tuningMenu.addSubview(tuningValueLabel)
+            tuningValueLabels.append(tuningValueLabel)
+            
+            let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: buttonDimension, height: buttonDimension))
+            stepUpButton.setImage(UIImage(named: "up_arrow"), forState: .Normal)
+            stepUpButton.tag = i
+            stepUpButton.addTarget(self, action: "stepUpPressed:", forControlEvents: .TouchUpInside)
+            stepUpButton.center = CGPoint(x: tuningValueLabel.center.x + buttonDimension, y: tuningValueLabel.center.y)
+            tuningMenu.addSubview(stepUpButton)
+            stepUpButtons.append(stepUpButton)
+
+            let stepDownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
+            stepDownButton.tag = i
+            stepDownButton.addTarget(self, action: "stepDownPressed:", forControlEvents: .TouchUpInside)
+            stepDownButton.setImage(UIImage(named: "down_arrow"), forState: .Normal)
+            stepDownButton.center = CGPoint(x: tuningValueLabel.center.x - buttonDimension, y: tuningValueLabel.center.y)
+            tuningMenu.addSubview(stepDownButton)
+            stepDownButtons.append(stepDownButton)
+        }
+    }
+    
+    func speedStepperValueChanged(stepper: UIStepper) {
+        self.speedLabel.text = "Speed: \(stepper.value)x"
+        self.player.rate = Float(stepper.value)
+    }
+    
+    func capoStepperValueChanged(stepper: UIStepper) {
+        capoLabel.text = "Capo: \(Int(stepper.value))"
+    }
+    
+    func stepUpPressed(button: UIButton) {
+        let currentNote = tunings[button.tag]
+        currentNote.stepUp()
+        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+        let center = tuningValueLabels[button.tag].center
+        tuningValueLabels[button.tag].sizeToFit()
+        tuningValueLabels[button.tag].center = center
+    }
+    
+    func stepDownPressed(button: UIButton) {
+        let currentNote = tunings[button.tag]
+        currentNote.stepDown()
+        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+        let center = tuningValueLabels[button.tag].center
+
+        tuningValueLabels[button.tag].sizeToFit()
+         tuningValueLabels[button.tag].center = center
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
@@ -242,7 +403,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
-        print(indexPath.item)
         cell.imageView.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
         for subview in cell.contentView.subviews {
@@ -459,8 +619,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.editView.addSubview(completeStringView)
         
         let singleTapOnString6View: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnString6View:")
-        singleTapOnString6View.numberOfTapsRequired = 1
-        singleTapOnString6View.numberOfTouchesRequired = 1
         self.completeStringView.addGestureRecognizer(singleTapOnString6View)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
@@ -505,7 +663,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     noteButton.layer.borderWidth = 1
                     noteButton.tag = (indexString + 1) * 100 + indexFret
                     noteButton.addTarget(self, action: "pressNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
-                    let tabName = self.data.fretsBoard[indexString][indexFret]
+                    let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
                     noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
                     self.currentNoteButton = noteButton
                     self.currentBaseButton = noteButton
@@ -597,7 +755,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func addSpecificTabButton(sender: Int) {
         let index: NSNumber = NSNumber(integer: sender)
         self.specificTabSets.removeAll()
-        self.specificTabSets = self.data.getTabsSets(index)
+        self.specificTabSets = self.tabsDataManager.getTabsSets(index)
         let buttonHeight: CGFloat = 2 / 20 * self.trueHeight
         let buttonWidth: CGFloat = 3 / 20 * self.trueHeight
         for var i = 0; i < self.specificTabSets.count; i++ {
@@ -653,7 +811,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 //sender.removeFromSuperview()
                 //self.removeObjectsOnCompleteStringView()
                 self.removeObjectsOnSpecificTabsScrollView()
-                data.removeTabs(self.currentSelectedSpecificTab.tabs)
+                tabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
                 self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
                 self.changeRemoveButtonStatus(self.removeButton)
                 self.addSpecificTabButton(self.currentNoteButton.tag)
@@ -764,16 +922,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
         
-        let musicSingleTapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
-        musicSingleTapRecognizer.numberOfTapsRequired = 1
-        musicSingleTapRecognizer.numberOfTouchesRequired = 1
+        musicSingleTapRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
         self.musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
         
         let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
-        musicPanRecognizer.maximumNumberOfTouches = 1
-        musicPanRecognizer.minimumNumberOfTouches = 1
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
-        
     }
     
     func setUpTimeLabels() {
@@ -781,7 +934,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let wrapperHeight: CGFloat = 12
         let labelFontSize: CGFloat = 10
         let wrapperWidth: CGFloat = 80
-        let wrapper = UIView(frame: CGRect(x: 0, y: progressBlock.frame.height/2-wrapperHeight, width: wrapperWidth, height: wrapperHeight))
+        let wrapper = UIView(frame: CGRect(x: 0, y: musicControlView.frame.height / 2 - wrapperHeight, width: wrapperWidth, height: wrapperHeight))
         wrapper.center.x = trueWidth/2
         wrapper.backgroundColor = UIColor.darkGrayColor()
         wrapper.alpha = 0.7
@@ -814,9 +967,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         musicControlView.addSubview(totalTimeLabel)
     }
     
+    func setUpCountdownView() {
+        countdownView = CountdownView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
+        countdownView.center = self.musicControlView.center
+        countdownView.backgroundColor = UIColor.clearColor()
+        countdownView.hidden = true
+        self.view.addSubview(countdownView)
+    }
+    
     // pan on music control view to change music time and progressblock time
     func panOnMusicControlView(sender: UIPanGestureRecognizer) {
-        self.view.bringSubviewToFront(sender.view!)
+        
         let translation = sender.translationInView(self.view)
         sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
         sender.setTranslation(CGPointZero, inView: self.view)
@@ -825,31 +986,64 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTime = self.player.currentTime
         let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
         self.progressBlock.setProgress(persent)
-        self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6))
 
         self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
         // find the current tab according to the current time and make the current tab view to yellow
         self.findCurrentTabView()
+        
     }
     
+    func startTimer() {
+        if !timer.valid {
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        }
+    }
+
+    func startCountdown() {
+        countDownStartSecond++
+        countdownView.setNumber(countDownStartSecond+1)
+
+        if countDownStartSecond >= 3 {
+            musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
+            countdownTimer.invalidate()
+            countdownView.hidden = true
+            countDownStartSecond = 0
+            player.play()
+            startTimer()
+            self.currentTime = player.currentTime
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        }
+    }
+
+
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer) {
-        if self.player.playing == false {
-            let imageWidth: CGFloat = 5 / 20 * self.trueHeight
-            self.countDownImageView.frame = CGRectMake(0.5 * self.trueWidth - imageWidth / 2, 0.5 / 20 * self.trueHeight, imageWidth, imageWidth)
-            self.countDownImageView.image = UIImage(named: "countdown-timer")
-            self.countDownNumberImageView.frame = CGRectMake(0, 0, imageWidth, imageWidth)
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-3")
-            self.countDownImageView.addSubview(countDownNumberImageView)
-            self.musicControlView.addSubview(countDownImageView)
-            self.currentTime = player.currentTime
+        if player.playing {
             
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            //animate down progress block
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+                self.progressBlock!.alpha = 0.5
+                }, completion: nil)
+            
+            //pause music and stop timer
+            player.pause()
+            timer.invalidate()
+        
         } else {
-            self.player.pause()
-            self.timer.invalidate()
-            self.timer = NSTimer()
-            self.countDownNumber = 0
+            
+            //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
+            UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+                self.progressBlock!.alpha = 1.0
+            }, completion: nil)
+            
+            //start counting down 3 seconds
+            //disable tap gesture that inadvertly starts timer
+            musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
+            countdownView.hidden = false
+            countdownView.setNumber(1)
+            countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
+            NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
         }
     }
     
@@ -892,8 +1086,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+
     func createSoundWave() {
-        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, 6 * CGFloat(theSong.playbackDuration), 6 / 20 * self.trueHeight)
+        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.playbackDuration), 6 / 20 * self.trueHeight)
         self.progressBlock = SoundWaveView(frame: frame)
         if(theSong == nil){
             print("the song is empty")
@@ -901,39 +1096,32 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
         self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.duration = self.player.duration
+        self.player.enableRate = true
+        self.player.rate = 1.0
         self.player.volume = 1
         progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
-        self.progressBlock.SetSoundURL(url)
+        self.progressBlock.SetSoundURL(url,isForTabsEditor:true)
+        self.progressBlock!.alpha = 0.5
+
     }
     
     func update() {
-        if self.countDownNumber > 3.0 {
-            self.findCurrentTabView()
-            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
-
-            self.currentTime = self.player.currentTime
-            let persent = CGFloat(self.currentTime / self.duration)
-            self.progressBlock.setProgress(persent)
-            self.progressBlock.frame = CGRectMake(0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6)), 2 / 20 * self.trueHeight, CGFloat(theSong.playbackDuration * 6), 6 / 20 * self.trueHeight)
-            if self.player.playing == false {
-                self.timer.invalidate()
-                self.timer = NSTimer()
-            }
-        } else if self.countDownNumber <= 0.9 {
-            self.countDownNumber = self.countDownNumber + 0.1
-        } else if self.countDownNumber > 0.9 && self.countDownNumber <= 1.9 {
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-2")
-            self.countDownNumber = self.countDownNumber + 0.1
-        } else if self.countDownNumber > 1.9 && self.countDownNumber <= 2.9 {
-            self.countDownNumberImageView.image = UIImage(named: "countdown-timer-1")
-            self.countDownNumber = self.countDownNumber + 0.1
-        } else if self.countDownNumber > 2.9 && self.countDownNumber <= 3.0 {
-            self.countDownImageView.removeFromSuperview()
-            self.countDownNumberImageView.removeFromSuperview()
-            self.countDownNumber++
-            self.player.play()
-        }
         
+        self.currentTime = self.player.currentTime
+        
+        //refresh current time label
+        self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+        
+        //refresh progress block
+        let presentPosition = CGFloat(self.currentTime / self.duration)
+        self.progressBlock.setProgress(presentPosition)
+        
+        
+        //MARK: progessBlock width
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration) * tabsEditorProgressWidthMultiplier)
+        
+        self.findCurrentTabView()
+
     }
     
     func moveDataItem(fromIndexPath : NSIndexPath, toIndexPath: NSIndexPath) {
@@ -1018,7 +1206,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     // correctly put the tabs on music line
-    func setMainViewTabPosition(sender: Int, tab: NormalTabs) -> CGRect {
+    func setMainViewTabPosition(tab: NormalTabs) -> CGRect {
         let labelHeight = self.progressBlock.frame.height / 2 / 4
         let width = self.trueWidth / 20
         var frame: CGRect = CGRect()
@@ -1054,28 +1242,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // press the note button to add the tab in music line
     func pressMainViewNoteButton(sender: UIButton) {
         if self.removeAvaliable == false {
-            let tempView: UIView = UIView()
-            tempView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
-            tempView.layer.cornerRadius = 2
-            var tempStruct: tabOnMusicLine = tabOnMusicLine()
-            let name = self.noteButtonWithTabArray[sender.tag].tab.name
-            tempView.frame = setMainViewTabPosition(allTabsOnMusicLine.count, tab: self.noteButtonWithTabArray[sender.tag].tab)
-            let tempLabelView: UILabel = UILabel()
+            let index = sender.tag
+            let returnValue = addTabViewOnMusicControlView(index)
             
-            tempLabelView.frame = CGRectMake(0, 0, tempView.frame.width, tempView.frame.height)
-            tempLabelView.layer.cornerRadius = 2
-            tempLabelView.font = UIFont.systemFontOfSize(11)
-            tempLabelView.textAlignment = NSTextAlignment.Center
-            tempLabelView.numberOfLines = 3
-            tempLabelView.text = name
-            tempView.addSubview(tempLabelView)
-            
-            tempStruct.tabView = tempView
-            tempStruct.time = self.currentTime
-            tempStruct.tab = self.noteButtonWithTabArray[sender.tag].tab
-            
-            self.allTabsOnMusicLine.append(tempStruct)
-            self.progressBlock.addSubview(tempView)
+            self.allTabsOnMusicLine.append(returnValue.1)
+            self.progressBlock.addSubview(returnValue.0)
         } else {
             let fretNumber = Int(noteButtonWithTabArray[sender.tag].tab.index) - Int(noteButtonWithTabArray[sender.tag].tab.index) / 100 * 100
             for var i = 0; i < self.mainViewDataArray.count; i++ {
@@ -1096,6 +1267,30 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    func addTabViewOnMusicControlView(sender: Int) -> (UIView, tabOnMusicLine) {
+        let tempView: UIView = UIView()
+        tempView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
+        tempView.layer.cornerRadius = 2
+        var tempStruct: tabOnMusicLine = tabOnMusicLine()
+        let name = self.noteButtonWithTabArray[sender].tab.name
+        tempView.frame = setMainViewTabPosition(self.noteButtonWithTabArray[sender].tab)
+        let tempLabelView: UILabel = UILabel()
+        
+        tempLabelView.frame = CGRectMake(0, 0, tempView.frame.width, tempView.frame.height)
+        tempLabelView.layer.cornerRadius = 2
+        tempLabelView.font = UIFont.systemFontOfSize(11)
+        tempLabelView.textAlignment = NSTextAlignment.Center
+        tempLabelView.numberOfLines = 3
+        tempLabelView.text = name
+        tempView.addSubview(tempLabelView)
+        
+        tempStruct.tabView = tempView
+        tempStruct.time = self.currentTime
+        tempStruct.tab = self.noteButtonWithTabArray[sender].tab
+        
+        return (tempView, tempStruct)
+    }
+    
     //Mark: press the button on the top functions
     // back to the main view or back to root view
     func pressBackButton(sender: UIButton) {
@@ -1103,12 +1298,33 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.backToMainView()
         } else {
             print("back to song view controller")
+            
+            //hide these two views first because they still appear until this viewcontroller is fully dismissed
+            tuningMenu.hidden = true
+            musicControlView.hidden = true
             self.dismissViewControllerAnimated(true, completion: nil)
         }
     }
     
+    func dismissAction() {
+        UIView.animateWithDuration(0.3, animations: {
+            self.tuningMenu.frame = CGRect(x: -self.tuningMenu.frame.width, y: 0, width: self.tuningMenu.frame.width, height: self.tuningMenu.frame.height)
+            
+            }, completion:
+            {
+                completed in
+                self.actionDismissLayerButton.hidden = true
+            }
+        )
+    }
     func pressTuningButton(sender: UIButton) {
         print("press tuning button")
+        self.actionDismissLayerButton.hidden = false
+        UIView.animateWithDuration(0.3, animations: {
+            self.tuningMenu.frame = CGRect(x: 0, y: 0, width: self.tuningMenu.frame.width, height: self.trueHeight)
+            self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
+            self.actionDismissLayerButton.alpha = 0.3
+        })
     }
     
     func pressResetButton(sender: UIButton) {
@@ -1186,7 +1402,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                                 }
                             }
                         }
-                        let tempTabs: Tabs = self.data.addNewTabs(index, name: name, content: content)
+                        let tempTabs: Tabs = self.tabsDataManager.addNewTabs(index, name: name, content: content)
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
                         self.currentSelectedSpecificTab = NormalTabs()
                         self.currentSelectedSpecificTab.tabs = tempTabs
@@ -1224,37 +1440,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                     
                     if addNew == true {
-                        let tempButton: UIButton = UIButton()
-                        let buttonY = Int(self.currentSelectedSpecificTab.index) / 100 - 1
-                        let buttonWidth = self.trueWidth / 5 / 3
-                        let stringPosition = self.string3Position[buttonY - 3] - buttonWidth / 2
-                        let fretPosition = self.trueWidth / 5 / 2 - buttonWidth / 2
-                        tempButton.setTitle(self.currentSelectedSpecificTab.name, forState: UIControlState.Normal)
-                        tempButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
-                        tempButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
-                        tempButton.addTarget(self, action: "pressMainViewNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
-                        tempButton.layer.cornerRadius = 0.5 * buttonWidth
-                        tempButton.frame = CGRectMake(fretPosition, stringPosition, buttonWidth, buttonWidth)
-                        
-                        let tempTab: NormalTabs = NormalTabs()
-                        tempTab.index = self.currentSelectedSpecificTab.index
-                        tempTab.name = self.currentSelectedSpecificTab.name
-                        tempTab.content = self.currentSelectedSpecificTab.content
-                        tempTab.isOriginal = self.currentSelectedSpecificTab.isOriginal
-                        
-                        let tempNoteButtonWithTab: noteButtonWithTab = noteButtonWithTab()
-                        tempNoteButtonWithTab.noteButton = tempButton
-                        tempNoteButtonWithTab.tab = tempTab
-                        
-                        for item in self.mainViewDataArray {
-                            if item.fretNumber == Int(tempTab.index) - Int(tempTab.index) / 100 * 100 {
-                                item.noteButtonsWithTab.append(tempNoteButtonWithTab)
-                            }
-                        }
-                        self.noteButtonWithTabArray.append(tempNoteButtonWithTab)
-                        tempNoteButtonWithTab.noteButton.tag = self.noteButtonWithTabArray.count - 1
+                        addTabsToMainViewDataArray(self.currentSelectedSpecificTab)
                         reorganizeMainViewDataArray()
                         collectionView.reloadData()
+                        
                         self.statusLabel.image = UIImage(named: "tabEditor")
                         backToMainView()
                     }
@@ -1277,12 +1466,51 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 
                 print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
             }
-            self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes)
+            
+            var tuningOfTheSong = ""
+            for label in tuningValueLabels {
+                tuningOfTheSong += "\(label.text!)-"
+            }
+            self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
             self.dismissViewControllerAnimated(true, completion: nil)
         }
         self.currentSelectedSpecificTab = nil
     }
     
+    // add noteButtonWithTab to mainViewDataArray
+    func addTabsToMainViewDataArray(sender: NormalTabs) {
+        let tempButton: UIButton = UIButton()
+        let buttonY = Int(sender.index) / 100 - 1
+        let buttonWidth = self.trueWidth / 5 / 3
+        let stringPosition = self.string3Position[buttonY - 3] - buttonWidth / 2
+        let fretPosition = self.trueWidth / 5 / 2 - buttonWidth / 2
+        tempButton.setTitle(sender.name, forState: UIControlState.Normal)
+        tempButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        tempButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        tempButton.addTarget(self, action: "pressMainViewNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        tempButton.layer.cornerRadius = 0.5 * buttonWidth
+        tempButton.frame = CGRectMake(fretPosition, stringPosition, buttonWidth, buttonWidth)
+        
+        let tempTab: NormalTabs = NormalTabs()
+        tempTab.index = sender.index
+        tempTab.name = sender.name
+        tempTab.content = sender.content
+        tempTab.isOriginal = sender.isOriginal
+        
+        let tempNoteButtonWithTab: noteButtonWithTab = noteButtonWithTab()
+        tempNoteButtonWithTab.noteButton = tempButton
+        tempNoteButtonWithTab.tab = tempTab
+        
+        
+        for item in self.mainViewDataArray {
+            if item.fretNumber == Int(tempTab.index) - Int(tempTab.index) / 100 * 100 {
+                item.noteButtonsWithTab.append(tempNoteButtonWithTab)
+            }
+        }
+        
+        self.noteButtonWithTabArray.append(tempNoteButtonWithTab)
+        tempNoteButtonWithTab.noteButton.tag = self.noteButtonWithTabArray.count - 1
+    }
     // compare the tab whether equals
     func compareTabs(tab1: NormalTabs, tab2: NormalTabs) -> Bool {
         if tab1.index == tab2.index && tab1.name == tab2.name && tab1.content == tab2.content {
@@ -1383,5 +1611,101 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+
+}
+
+
+//MARK: ADD exist chord to tab editor view
+extension TabsEditorViewController {
+    // get tabs from coredata and show it on tab editor
+    func getBasicNoteIndex(sender: [String]) -> Int {
+        for var i = 0; i < 6; i++ {
+            if sender[i] != "x" {
+                let stringIndex = 6 - i
+                let fretIndex = Int(sender[i])
+                return stringIndex * 100 + fretIndex!
+            }
+        }
+        return 0
+    }
+    
+    func getUnrepeatTabs(sender: [Chord]) -> [NormalTabs] {
+        var tabs: [NormalTabs] = [NormalTabs]()
+        for item in sender {
+            let tempNormalTabs = getNormalTabFromChord(item)
+            var unrepeat: Bool = false
+            for tab in tabs {
+                if tab.tabs == tempNormalTabs.tabs {
+                    unrepeat = true
+                }
+            }
+            if unrepeat == false {
+                tabs.append(tempNormalTabs)
+            }
+        }
+        return tabs
+    }
+    
+    func getNormalTabFromChord(sender: Chord) -> NormalTabs {
+        let index = getBasicNoteIndex(sender.tab.contentArray)
+        let name = sender.tab.name
+        let content = sender.tab.content
+        let tempNormalTabs = tabsDataManager.getUniqueTab(index, name: name, content: content)
+        return tempNormalTabs
+    }
+    
+    func addTabsFromCoreDataToMainViewDataArray(sender: [Chord]) {
+        let unrepeatTabs = self.getUnrepeatTabs(sender)
+        //noteButtonWithTabArray.removeAll()
+        for item in unrepeatTabs {
+            self.addTabsToMainViewDataArray(item)
+        }
+        reorganizeMainViewDataArray()
+        collectionView.reloadData()
+    }
+    
+    func addTabsFromCoreDataToMusicControlView(sender: [Chord]) {
+        for item in sender {
+            print("\(item.time.toDecimalNumer())")
+        }
+        for item in sender {
+            for var i = 0; i < noteButtonWithTabArray.count; i++ {
+                let normalTab = getNormalTabFromChord(item)
+                if normalTab.name == noteButtonWithTabArray[i].tab.name && normalTab.index == noteButtonWithTabArray[i].tab.index && normalTab.content == noteButtonWithTabArray[i].tab.content {
+                    
+                    self.currentTime = Double(item.time.toDecimalNumer())
+                    print("\(currentTime)")
+                    print("\(normalTab.name)")
+                    //refresh progress block
+                    let presentPosition = CGFloat(self.currentTime / self.duration)
+                    self.progressBlock.setProgress(presentPosition)
+                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration) * tabsEditorProgressWidthMultiplier)
+                    
+                    let returnValue = addTabViewOnMusicControlView(i)
+                    
+                    self.allTabsOnMusicLine.append(returnValue.1)
+                    self.progressBlock.addSubview(returnValue.0)
+                }
+            }
+            
+        }
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+        self.progressBlock.setProgress(0)
+        self.currentTime = 0
+    }
+
+    
+    // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
+    func addChordToEditorView(sender: MPMediaItem) {
+        let tabs = musicDataManager.getTabs(sender)
+        let chord: [Chord] = tabs.0
+        let tuning: String = tabs.1
+        let capo: Int = tabs.2
+        
+        addTabsFromCoreDataToMainViewDataArray(chord)
+        addTabsFromCoreDataToMusicControlView(chord)
+    }
+    
+
 }
 

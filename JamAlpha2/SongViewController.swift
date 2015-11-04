@@ -1,7 +1,7 @@
 import UIKit
 import MediaPlayer
 
-let stepPerSecond: Float = 50   //steps of chord move persecond
+let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
 let timeToDisappear: Float = 0.8
 let timeDisappeared: Float = 0.4
@@ -59,6 +59,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var basesHeight: CGFloat!
     let marginBetweenBases: CGFloat = 15
     
+    var chordBaseTapGesture: UITapGestureRecognizer!
     //MARK: progress Container
     //var progressBlock: SoundWaveView!
     
@@ -68,7 +69,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var panRecognizer:UIPanGestureRecognizer!
     var isPanning = false
     
-    var tapRecognizer: UITapGestureRecognizer!
+    var progressContainerTapGesture: UITapGestureRecognizer!
 
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
@@ -79,7 +80,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     
-
+    //tuning of capo 
+    var tuningOfTheTabsSet = "E-B-G-D-A-E"//standard tuning, from high E to low E
+    // we reverse the order when present above the chordBase
+    var capoOfTheTabsSet = 0
+    
     //time
     var timer: NSTimer = NSTimer()
     var updateInterval: NSTimeInterval = 0 //used to calculate count down reduce
@@ -116,6 +121,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var shuffleButton:UIButton!
     var guitarButton:UIButton!
     var othersButton:UIButton!
+    
+    
+    // count down section
+    var countdownTimer = NSTimer()
+    var countDownStartSecond = 0 //will increments to 3
+    var countdownView: CountdownView!
     
     // Guitar actions views
     var guitarActionView: UIView!
@@ -200,9 +211,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpTimeLabels()
         setUpBottomViewWithButtons()
         setUpActionViews()
-        //get top and bottom points of six lines
-        setTuning("E-B-G-D-A-E") // placeholder
-        setCapo(1)
+        setUpCountdownView()
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
@@ -228,7 +237,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             loadDisplayMode()
-            setUpMusicData(player.nowPlayingItem!)
+            updateMusicData(player.nowPlayingItem!)
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -299,7 +308,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(capoButton)
     }
 
-    func setTuning(tuning: String) {
+    func updateTuning(tuning: String) {
+        print("current tuning is \(tuning)")
         let tuningArray = tuning.characters.split{$0 == "-"}.map(String.init)
         let tuningToShow = Array(tuningArray.reverse())
         for i in 0..<tuningLabels.count {
@@ -309,7 +319,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
-    func setCapo(capo: Int) {
+    func updateCapo(capo: Int) {
         if capo < 1 {
             capoButton.hidden = true
             return
@@ -414,6 +424,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+    func updateMusicData(song: MPMediaItem) {
+        self.setUpMusicData(song)
+        //TODO: because before add the tuning to the data some songs don't have tuning
+        // so temporary we add default tuing and capo
+        if self.tuningOfTheTabsSet == "" {
+            tuningOfTheTabsSet = "E-B-G-D-A-E"
+            capoOfTheTabsSet = 0
+        }
+        self.updateTuning(self.tuningOfTheTabsSet)
+        self.updateCapo(self.capoOfTheTabsSet)
+    }
+    
     func setUpMusicData(song: MPMediaItem){
          if song.title == "Rolling In The Deep" {
             chords = Chord.getRollingChords()
@@ -430,11 +452,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             lyric = Lyric.getExtremeLyrics()
         }
         
+        self.tuningOfTheTabsSet = "E-B-G-D-A-E"
+        self.capoOfTheTabsSet = 0
+        
+        //return a tuple of ([Chord],tuning, capo)
         let tabsFromCoreData = musicDataManager.getTabs(player.nowPlayingItem!)
-        if tabsFromCoreData.count > 0 {
-            print("chords length: \(tabsFromCoreData.count)")
-            if tabsFromCoreData.count > 2 {
-                self.chords = tabsFromCoreData
+        if tabsFromCoreData.0.count > 0 {
+            print("chords length: \(tabsFromCoreData.0.count)")
+            if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
+                self.chords = tabsFromCoreData.0
+                self.tuningOfTheTabsSet = tabsFromCoreData.1
+                print("tuning from data: \(tabsFromCoreData.1) capo: \(tabsFromCoreData.2)")
+                self.capoOfTheTabsSet = tabsFromCoreData.2
             } else {
                 self.chords = Chord.getRainbowChords()
             }
@@ -501,6 +530,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBase.addGestureRecognizer(panRecognizer)
         
         self.view.addSubview(chordBase)
+        
+        //add tap gesture to chordbase too
+        chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        chordBase.addGestureRecognizer(chordBaseTapGesture)
+        
         calculateXPoints()
     }
     
@@ -575,7 +609,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.firstloadSongTitle = nowPlayingItem!.title
                 self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
-                self.setUpMusicData(nowPlayingItem!)
+                self.updateMusicData(nowPlayingItem!)
+                
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
@@ -755,8 +790,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
         panRecognizer.delegate = self
         progressBlockContainer.addGestureRecognizer(panRecognizer)
-        tapRecognizer = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
-        progressBlockContainer.addGestureRecognizer(tapRecognizer)
+        
+        progressContainerTapGesture = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
+        progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
     }
     
     // to generate sound wave in a nsoperation thread
@@ -778,7 +814,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     
                     print("generating sound wave..")
                     let time1 = CFAbsoluteTimeGetCurrent()
-                    tempProgressBlock.SetSoundURL(assetURL as! NSURL)
+                    tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
                     let time2 = CFAbsoluteTimeGetCurrent()
                     print("generating sound wave takes: \((time2 - time1)*1000) ms")
                     
@@ -1270,6 +1306,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
     }
+    
+    func setUpCountdownView() {
+        countdownView = CountdownView(frame: CGRect(x: 0, y: CGRectGetMaxY(chordBase.frame)-35, width: 70, height: 70))
+        countdownView.center.x = self.view.center.x
+        countdownView.backgroundColor = UIColor.clearColor()
+        countdownView.hidden = true
+        self.view.addSubview(countdownView)
+    }
+    
+    func startCountdown() {
+        countDownStartSecond++
+        countdownView.setNumber(countDownStartSecond+1)
+
+        if countDownStartSecond >= 3 {
+            //add tap gesture back
+            chordBase.addGestureRecognizer(chordBaseTapGesture)
+            progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
+            
+            countdownTimer.invalidate()
+            countdownView.hidden = true
+            countDownStartSecond = 0
+            player.play()
+        }
+
+    }
+    
 
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
@@ -1599,7 +1661,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if player.playbackState == MPMusicPlaybackState.Paused {
-            player.play()
+            if countdownOn {
+                //temporarily disable tap gesture to avoid accidental start count down again
+                chordBase.removeGestureRecognizer(chordBaseTapGesture)
+                progressBlockContainer.removeGestureRecognizer(progressContainerTapGesture)
+                
+                countdownView.hidden = false
+                countdownView.setNumber(1)
+                countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
+                NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
+                
+            } else {
+                player.play()
+            }
             
         } else {
             //nowPlayingItemSpeed = player.currentPlaybackRate
@@ -1666,7 +1740,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //////////////////////////////////
 
     func activelabelAppend(index: Int){
-        activelabels.append(createLabels(chords[index].tab.name, fretPositions: chords[index].tab.fretPositions))
+        activelabels.append(createLabels(chords[index].tab.name, fretPositions: chords[index].tab.contentArray))
         dealWithLabelofChordName(activelabels.last!.labels.first! as! UILabel)
     }
 

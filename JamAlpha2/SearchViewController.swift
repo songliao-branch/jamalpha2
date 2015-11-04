@@ -3,7 +3,9 @@
 import UIKit
 import MediaPlayer
 import Alamofire
+import Haneke
 import SwiftyJSON
+
 class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
@@ -30,8 +32,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-
-
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -56,21 +56,19 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         resultSearchController.hidesNavigationBarDuringPresentation = false
         searchBar.searchBarStyle = UISearchBarStyle.Minimal
         definesPresentationContext = true
-        searchBar.tintColor = UIColor.whiteColor()
-       
+        
+        
         if let searchTextField = searchBar.valueForKey("searchField") as? UITextField {
             
             searchTextField.textAlignment = NSTextAlignment.Left
-            searchTextField.tintColor = UIColor.grayColor()
+            searchTextField.tintColor = UIColor.mainPinkColor()
             
             for view in searchTextField.subviews {
+                //set inner text area background to white
                 view.layer.backgroundColor = UIColor.whiteColor().CGColor
                 view.layer.cornerRadius = 5
-                view.subviews[1].tintColor = UIColor.redColor()
             }
         }
-        
-        
         
         searchBar.placeholder = "What do you want to play?"
     }
@@ -176,20 +174,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }
                 
                 if let imageURL = searchResults[indexPath.row].artworkUrl100 {
-                    cell.request?.cancel()
                     cell.albumCover.image = nil
-                    
-                    
-                    
-                    cell.request = Alamofire.request(.GET, imageURL).validate(contentType: ["image/*"]).responseImage() {
-                        request, _, result in
-                        
-                        guard let image = result.value else {
-                            print("download image error")
-                            return
-                        }
-                        cell.albumCover.image = image
-                    }
+                    cell.albumCover.hnk_setImageFromURL(NSURL(string: imageURL)!)
                 }
             
             }
@@ -282,7 +268,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    func addDataToResults(data: JSON){
+    func addDataToResults(data: SwiftyJSON.JSON){
         for item in data["results"].array! {
             let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
             
