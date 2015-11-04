@@ -119,7 +119,7 @@ class MusicDataManager: NSObject {
     }
     
     //Tabs, TODO: need to store tuning, capo number
-    func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval]) {
+    func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int) {
         
         if let matchedSong = findSong(item) {
             // TODO: find a better way managing user's lyrics, now just clear existing lyrics
@@ -134,12 +134,14 @@ class MusicDataManager: NSObject {
             tabsSet.tabs = tabsData
             tabsSet.times = timesData
             tabsSet.song = matchedSong
+            tabsSet.tuning = tuning
+            tabsSet.capo = capo
             print("just saved tabs")
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     
-    func getTabs(item: MPMediaItem) -> [Chord]{
+    func getTabs(item: MPMediaItem) -> ([Chord], String, Int) { //return chords, tuning and capo
         
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.tabsSets.count) set of tabs")
@@ -158,22 +160,12 @@ class MusicDataManager: NSObject {
                     let timedChord = Chord(tab: singleChord, time: TimeNumber(time: Float(times[i])))
                     chordsToBeUsed.append(timedChord)
                 }
-  
-                return chordsToBeUsed
+                return (chordsToBeUsed, theSet.tuning, Int(theSet.capo))
             }
         }
-        return [Chord]()
+        return ([Chord](), "", 0)
     }
     
-    // var chords = [Chord]()
-//    let G = Tab(name:"G",content:"030200000300")
-//    let D = Tab(name:"D",content:"xxxx00020302")
-//    let Em =    Tab(name: "Em", content: "000202000000")
-//    let C = Tab(name:"C",content:"xx0302000100")
-//    
-//    chords.append(Chord(tab: G, time: TimeNumber(time: 1.00)))
-//    chords.append(Chord(tab: D, time: TimeNumber(time: 3.88)))
-//    chords.append(Chord(tab: Em, time: TimeNumber(time: 6.99)))
-//    chords.append(Chord(tab: C, time: TimeNumber(time: 10.11)))
+    
     
 }

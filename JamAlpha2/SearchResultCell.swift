@@ -7,22 +7,14 @@
 //
 
 import UIKit
-import Alamofire
 
 class SearchResultCell: UITableViewCell {
 
-    
     @IBOutlet weak var searchHistoryLabel: UILabel!
     
-    var request: Alamofire.Request?
     @IBOutlet weak var albumCover: UIImageView!
     
     @IBOutlet weak var titleLabel: UILabel!
     
     @IBOutlet weak var subtitleLabel: UILabel!
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-    }
 }
