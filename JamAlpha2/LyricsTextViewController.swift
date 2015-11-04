@@ -94,7 +94,7 @@ class LyricsTextViewController: UIViewController {
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
         backgroundImage.image = theSong.artwork!.imageWithSize(size)
-        let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
+        let blurredImage: UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
         self.addTitleView()

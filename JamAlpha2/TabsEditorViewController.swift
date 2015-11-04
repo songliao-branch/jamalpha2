@@ -1160,6 +1160,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTabViewIndex = Int()
         self.removeObjectsOnCompleteStringView()
         self.removeObjectsOnSpecificTabsScrollView()
+        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
+        
         let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
         dispatch_after(delayTime, dispatch_get_main_queue()) {
             self.editView.removeFromSuperview()
@@ -1325,6 +1330,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
             self.actionDismissLayerButton.alpha = 0.3
         })
+        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
     }
     
     func pressResetButton(sender: UIButton) {
@@ -1346,7 +1355,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.player.currentTime = 0
         }))
-        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
         self.presentViewController(alertController, animated: true, completion: nil)
     }
     
@@ -1374,9 +1385,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.tabNameTextField.alpha = 1
             self.completeStringView.frame = CGRectMake(0, 3 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
         })
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
     }
     
     func pressDoneButton(sender: UIButton) {
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
         if self.intoEditView == true {
             if self.addNewTab == true {
                 var addSuccessed: Bool = true
@@ -1578,6 +1595,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         } else {
             self.player.currentTime = 0
             self.currentTime = 0
+        }
+        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
         }
     }
     
