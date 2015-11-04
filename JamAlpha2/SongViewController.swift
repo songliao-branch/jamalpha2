@@ -812,21 +812,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let tempMusicDataManager = self.musicDataManager
                 op = NSBlockOperation(block: {
                     
-                    print("generating sound wave..")
-                    let time1 = CFAbsoluteTimeGetCurrent()
                     tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
-                    let time2 = CFAbsoluteTimeGetCurrent()
-                    print("generating sound wave takes: \((time2 - time1)*1000) ms")
-                    
                     let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                     
-                    let startTime = CFAbsoluteTimeGetCurrent()
-                    
                     tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                    
-                    let endTime = CFAbsoluteTimeGetCurrent()
-                    let elapsedTime = (endTime - startTime) * 1000
-                    print("Saving the context took \(elapsedTime) ms")
                     
                     dispatch_async(dispatch_get_main_queue()) {
                         KGLOBAL_operationCache.removeValueForKey(assetURL as! NSURL)

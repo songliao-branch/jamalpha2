@@ -45,10 +45,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         
         if(!KEY_isSoundWaveFormInBackgroundGenerated){
             generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-            //generateWaveFormInBackEndTest()
             KEY_isSoundWaveFormInBackgroundGenerated = true
         }
-        
     }
     
     deinit{
@@ -390,7 +388,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
 }
 
-extension MusicViewController{
+extension MusicViewController {
     
     func generateWaveFormInBackEnd(nowPlayingItem:MPMediaItem){
         
@@ -402,7 +400,6 @@ extension MusicViewController{
                 self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&self.songCount))])
             }
              pthread_rwlock_unlock(&self.rwLock)
-            print("sound wave data found")
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                 guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
@@ -421,7 +418,7 @@ extension MusicViewController{
                     
                     let tempMusicDataManager = self.musicDataManager
                     op = NSBlockOperation(block: {
-                        print("init: \(nowPlayingItem.title)")
+                        
                         if(op!.cancelled){
                             return
                         }
@@ -429,7 +426,7 @@ extension MusicViewController{
 
                         let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                         tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                        print(nowPlayingItem.title)
+                        print("Background wave finished for \(nowPlayingItem.title)")
                         
                         KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
                         
@@ -446,57 +443,6 @@ extension MusicViewController{
             }
         }
     }
-    
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//for test purpose not FORMAL
-extension MusicViewController{
-    func generateWaveFormInBackEndTest(){
-        
-        for nowPlayingItem in uniqueSongs {
-            self.musicDataManager.initializeSongToDatabase(nowPlayingItem)
-            
-            if let _ = self.musicDataManager.getSongWaveFormImage(nowPlayingItem) {
-                print("sound wave data found")
-            } else {
-                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
-                        print("sound url not available")
-                        return
-                    }
-                    
-                    var op:NSBlockOperation?
-                    op = KGLOBAL_init_operationCache[assetURL as! NSURL]
-                    if(op == nil){
-                        // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-                        let tempNowPlayingItem = nowPlayingItem
-                        var progressBarWidth:CGFloat!
-                        progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
-                        let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
-                        
-                        let tempMusicDataManager = self.musicDataManager
-                        op = NSBlockOperation(block: {
-                            print("init: \(nowPlayingItem.title)")
-                            if(op!.cancelled){
-                                return
-                            }
-                            tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
-                            
-                            let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                            tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                            print(nowPlayingItem.title)
-                            
-                            KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
-                            
-                        })
-                        KGLOBAL_init_operationCache[assetURL as! NSURL] = op
-                        KGLOBAL_init_queue.addOperation(op!)
-                    }
-                }
-            }
-        }
-    }
-
-}
 
