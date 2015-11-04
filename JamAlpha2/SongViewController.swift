@@ -184,21 +184,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        pthread_rwlock_init(&rwLock, nil)
-       
-        player = MusicManager.sharedInstance.player
-        firstLoadSongTime = player.nowPlayingItem!.playbackDuration
-        firstloadSongTitle = player.nowPlayingItem!.title
-        
-        musicDataManager.initializeSongToDatabase(player.nowPlayingItem!)
     
-        removeAllObserver()
+    
+    
+    
+    
+    func setUpSubLayout(){
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
-        setUpMusicData(player.nowPlayingItem!)
         setUpTopButtons()
         setUpNameAndArtistButtons()
         setUpBackgroundImage()
@@ -214,10 +207,31 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpCountdownView()
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
+
+    
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        pthread_rwlock_init(&rwLock, nil)
+        self.setUpSubLayout() ///////////////////////////delete
+        player = MusicManager.sharedInstance.player
+        
+        musicDataManager.initializeSongToDatabase(player.nowPlayingItem!)
+        firstLoadSongTime = player.nowPlayingItem!.playbackDuration
+        firstloadSongTitle = player.nowPlayingItem!.title
+        
+        removeAllObserver()
+        setUpMusicData(player.nowPlayingItem!)
+        setShuffleButtonImage()
+        reloadSongVC()
+     
+    }
+
     
     deinit{
         pthread_rwlock_destroy(&rwLock)
     }
+    
     
     func removeAllObserver(){
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
@@ -256,17 +270,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //create an UIImageView
         let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
-        //get the image from MPMediaItem
-        print(player.nowPlayingItem!.title)
-        if let artwork = player.nowPlayingItem!.artwork {
-            currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-        }
-        //create blurred image
-        let blurredImage:UIImage = currentImage!.applyLightEffect()!
         
         backgroundImageView.center.x = self.view.center.x
-        backgroundImageView.image = blurredImage
-        textColor = blurredImage.averageColor()
+        
+//        //get the image from MPMediaItem
+//        print(player.nowPlayingItem!.title)
+//        if let artwork = player.nowPlayingItem!.artwork {
+//            currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+//        }
+//        //create blurred image
+//        let blurredImage:UIImage = currentImage!.applyLightEffect()!
+//       
+//        backgroundImageView.image = blurredImage
+//        textColor = blurredImage.averageColor()
         
         self.view.addSubview(backgroundImageView)
     }
@@ -366,12 +382,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
         artistNameLabel.textAlignment = NSTextAlignment.Center
         
-        let title:String = player.nowPlayingItem!.title!
-        let attributedString = NSMutableAttributedString(string:title)
-        songNameLabel.attributedText = attributedString
-        songNameLabel.textAlignment = NSTextAlignment.Center
-            
-        artistNameLabel.text = player.nowPlayingItem!.artist
+//        let title:String = player.nowPlayingItem!.title!
+//        let attributedString = NSMutableAttributedString(string:title)
+//        songNameLabel.attributedText = attributedString
+//        songNameLabel.textAlignment = NSTextAlignment.Center
+//            
+//        artistNameLabel.text = player.nowPlayingItem!.artist
         
         
         songNameLabel!.font = UIFont.systemFontOfSize(18)
@@ -767,25 +783,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
         
-        var progressBarWidth:CGFloat!
-
-        progressBarWidth = CGFloat(player.nowPlayingItem!.playbackDuration) * progressWidthMultiplier
-        
-        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
-        KGLOBAL_progressBlock.center.y = progressContainerHeight
-        self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
-        
-        //if there is soundwave in the coredata then we load the image in viewdidload
-        if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
-            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-            print("sound wave data found")
-            KGLOBAL_init_queue.suspended = false
-            isGenerated = true
-        }else{
-            //if didn't find it then we will generate then waveform later, in the viewdidappear method
-            // this is a flag to determine if the generateSoundWave function will be called
-            isGenerated = false
-        }
+//        var progressBarWidth:CGFloat!
+//
+//        progressBarWidth = CGFloat(player.nowPlayingItem!.playbackDuration) * progressWidthMultiplier
+//        
+//        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+//        KGLOBAL_progressBlock.center.y = progressContainerHeight
+//        self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
+//        
+//        //if there is soundwave in the coredata then we load the image in viewdidload
+//        if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
+//            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+//            print("sound wave data found")
+//            KGLOBAL_init_queue.suspended = false
+//            isGenerated = true
+//        }else{
+//            //if didn't find it then we will generate then waveform later, in the viewdidappear method
+//            // this is a flag to determine if the generateSoundWave function will be called
+//            isGenerated = false
+//        }
     
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
         panRecognizer.delegate = self
@@ -955,7 +971,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
-        totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
+        //totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
         totalTimeLabel.textAlignment = .Right
         self.view.addSubview(totalTimeLabel)
         
@@ -978,13 +994,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         favoriateButton.sizeToFit()
         
         shuffleButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
-        if player.repeatMode == .All && player.shuffleMode == .Off {
-             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
-        } else if player.repeatMode == .One && player.shuffleMode == .Off {
-             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
-        } else if player.repeatMode == .All && player.shuffleMode == .Songs {
-            shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
-        }
+//        if player.repeatMode == .All && player.shuffleMode == .Off {
+//             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
+//        } else if player.repeatMode == .One && player.shuffleMode == .Off {
+//             shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
+//        } else if player.repeatMode == .All && player.shuffleMode == .Songs {
+//            shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
+//        }
         
         shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         
@@ -1008,6 +1024,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             bottomButtons[i].center.x = orderIndex[i] * eigthOfWidth
             bottomButtons[i].center.y = bottomViewHeight / 2
             bottomView.addSubview(bottomButtons[i])
+        }
+    }
+    
+    func setShuffleButtonImage(){
+        if player.repeatMode == .All && player.shuffleMode == .Off {
+            shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
+        } else if player.repeatMode == .One && player.shuffleMode == .Off {
+            shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
+        } else if player.repeatMode == .All && player.shuffleMode == .Songs {
+            shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
         }
     }
     
@@ -1778,5 +1804,99 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         return UIInterfaceOrientationMask.Portrait
     }
     
+}
+
+extension SongViewController{
+    func reloadSongVC(){
+        pthread_rwlock_wrlock(&self.rwLock)
+        for label in self.tuningLabels {
+            label.hidden = true
+        }
+        if self.player.repeatMode == .One {
+            print("\(self.player.nowPlayingItem!.title) is repeating")
+            self.updateAll(0)
+            return
+        }
+        
+        let nowPlayingItem = self.player.nowPlayingItem
+        
+        // use current item's playbackduration to validate nowPlayingItem duration
+        if self.firstloadSongTitle == nowPlayingItem!.title && self.firstLoadSongTime == nowPlayingItem!.playbackDuration {
+            
+            self.musicDataManager.initializeSongToDatabase(self.player.nowPlayingItem!)
+            self.firstloadSongTitle = nowPlayingItem!.title
+            self.firstLoadSongTime = nowPlayingItem!.playbackDuration
+            
+            self.updateMusicData(nowPlayingItem!)
+            
+            // The following won't run when selected from table
+            // update the progressblockWidth
+            
+            self.progressBlockViewWidth = nil
+            
+            let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
+        
+            //remove from superView
+            if(KGLOBAL_progressBlock != nil ){
+                KGLOBAL_progressBlock.removeFromSuperview()
+            }
+            
+            // get a new progressBlock
+            var progressBarWidth:CGFloat!
+            progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
+            KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+            KGLOBAL_progressBlock.center.y = progressContainerHeight
+            self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
+            
+            //if there is soundwave in the coredata then we load the image in viewdidload
+            if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
+                KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+                print("sound wave data found")
+                KGLOBAL_init_queue.suspended = false
+                isGenerated = true
+            }else{
+                //if didn't find it then we will generate then waveform later, in the viewdidappear method
+                // this is a flag to determine if the generateSoundWave function will be called
+                isGenerated = false
+            }
+            
+            
+            KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+            
+            if self.player.playbackState == MPMusicPlaybackState.Paused{
+                KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
+            }
+            
+            // if we are NOT repeating song
+            if self.player.repeatMode != .One {
+                
+                self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
+                self.songNameLabel.textAlignment = NSTextAlignment.Center
+                self.artistNameLabel.text = nowPlayingItem!.artist
+                
+                if let artwork = self.player.nowPlayingItem!.artwork {
+                    let image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+                    let blurredImage = image!.applyLightEffect()!
+                    self.textColor = blurredImage.averageColor()
+                    
+                    self.backgroundImageView.center.x = self.view.center.x
+                    self.backgroundImageView.image = blurredImage
+                }
+                
+                
+                self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
+            }
+        }
+        self.speed = 1
+        //self.nowPlayingItemSpeed = 1
+        if self.player.playbackState == MPMusicPlaybackState.Playing{
+            self.timer.invalidate()
+            self.startTimer()
+        }
+        
+        self.updateAll(0)
+        pthread_rwlock_unlock(&self.rwLock)
+    }
+
 }
 

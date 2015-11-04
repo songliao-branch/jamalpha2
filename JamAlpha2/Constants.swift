@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 let KGLOBAL_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_operationCache = [NSURL:NSBlockOperation]()
@@ -18,3 +19,6 @@ var KGLOBAL_progressBlock: SoundWaveView!
 
 // value is a BOOL
 var KEY_isSoundWaveFormInBackgroundGenerated:Bool = false
+
+let SCREEN_WIDTH = UIScreen.mainScreen().bounds.size.width
+let SCREEN_HEIGHT = UIScreen.mainScreen().bounds.size.height
