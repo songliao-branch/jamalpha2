@@ -1306,7 +1306,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissAction()
         self.dismissViewControllerAnimated(false, completion: {
             completed in
-            self.musicViewController.goToArtist(self.player.nowPlayingItem!.artist!)
+            if(self.musicViewController != nil){
+                self.musicViewController.goToArtist(self.player.nowPlayingItem!.artist!)
+            }
         })
     }
 
@@ -1314,7 +1316,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissAction()
         self.dismissViewControllerAnimated(false, completion: {
             completed in
-            self.musicViewController.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
+            if(self.musicViewController != nil){
+                self.musicViewController.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
+            }
+            
         })
     }
     

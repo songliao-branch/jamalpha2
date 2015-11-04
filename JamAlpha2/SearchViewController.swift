@@ -15,7 +15,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     var searchResults: [SearchResult]!
     var musicRequest: Request?
-    var animator: CustomTransitionAnimation!
+    var animator: CustomTransitionAnimation?
     
     var searchHistoryManager =  SearchHistoryManager()
 
@@ -32,8 +32,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-
-
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -49,11 +47,29 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
         
         let searchBar = resultSearchController.searchBar
+        
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        
         navigationItem.titleView = searchBar
         resultSearchController.hidesNavigationBarDuringPresentation = false
         searchBar.searchBarStyle = UISearchBarStyle.Minimal
         definesPresentationContext = true
-        searchBar.tintColor = UIColor.mainPinkColor()
+        
+        
+        if let searchTextField = searchBar.valueForKey("searchField") as? UITextField {
+            
+            searchTextField.textAlignment = NSTextAlignment.Left
+            searchTextField.tintColor = UIColor.mainPinkColor()
+            
+            for view in searchTextField.subviews {
+                //set inner text area background to white
+                view.layer.backgroundColor = UIColor.whiteColor().CGColor
+                view.layer.cornerRadius = 5
+            }
+        }
+        
         searchBar.placeholder = "What do you want to play?"
     }
     
@@ -198,9 +214,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
-                
-                self.presentViewController(songVC, animated: true, completion: nil)
                 reloadMusicTable()
+                self.presentViewController(songVC, animated: true, completion: nil)
+                
             }
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
