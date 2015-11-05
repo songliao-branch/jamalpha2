@@ -314,6 +314,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 for childVC in tabItemController.childViewControllers {
                     if childVC.isKindOfClass(BaseViewController) {
                         let baseVC = childVC as! BaseViewController
+                        baseVC.nowView.start()
                         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                             musicVC.musicTable.reloadData()
                         }
