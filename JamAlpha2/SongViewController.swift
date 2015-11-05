@@ -9,6 +9,7 @@ let totalalpha: Int = Int((timeToDisappear - timeDisappeared) * stepPerSecond)
 
 let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange, used in LyricsSync
 let progressWidthMultiplier:CGFloat = 2
+let soundwaveHeight: CGFloat = 161
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
@@ -254,12 +255,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpBackgroundImage(){
         //create an UIImageView
+        
         let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
         //get the image from MPMediaItem
         print(player.nowPlayingItem!.title)
         if let artwork = player.nowPlayingItem!.artwork {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+        } else {
+            //TODO: add a placeholder album cover
+            return
         }
         //create blurred image
         let blurredImage:UIImage = currentImage!.applyLightEffect()!
@@ -626,7 +631,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // get a new progressBlock
                 var progressBarWidth:CGFloat!
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
-                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
                 KGLOBAL_progressBlock.center.y = progressContainerHeight
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
@@ -663,6 +668,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         
                         self.backgroundImageView.center.x = self.view.center.x
                         self.backgroundImageView.image = blurredImage
+                    } else {
+                        
+                        //TODO: add a placeholder cover
                     }
 
        
@@ -771,7 +779,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         progressBarWidth = CGFloat(player.nowPlayingItem!.playbackDuration) * progressWidthMultiplier
         
-        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         

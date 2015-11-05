@@ -16,7 +16,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var musicDataManager = MusicDataManager()
     private var rwLock = pthread_rwlock_t()
     
-    
     var pageIndex = 0
     
     @IBOutlet weak var musicTable: UITableView!
@@ -43,9 +42,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         registerMusicPlayerNotificationForSongChanged()
         UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
         
-        if(!KEY_isSoundWaveFormInBackgroundGenerated){
+        // if not generating, we start generating
+        if !KEY_isSoundWaveformGeneratingInBackground {
             generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-            KEY_isSoundWaveFormInBackgroundGenerated = true
+            KEY_isSoundWaveformGeneratingInBackground = true
         }
     }
     
@@ -170,8 +170,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             if MusicManager.sharedInstance.player.nowPlayingItem != nil {
                 if song == MusicManager.sharedInstance.player.nowPlayingItem {
-                    
-                    // TODO: change asset icon to pink
                     cell.loudspeakerImage.hidden = false
                 }
                 else {
@@ -180,12 +178,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             } else {
                 cell.loudspeakerImage.hidden = true
             }
+            // some song does not have an album cover
+            if let cover = song.artwork {
+                let image = cover.imageWithSize(CGSize(width: 54, height: 54))
+                cell.coverImage.image = image
+            } else {
+                //TODO: add a placeholder cover
+                cell.coverImage.image = nil
+            }
             
-            let image = song.artwork!.imageWithSize(CGSize(width: 54, height: 54))
-            cell.coverImage.image = image
             cell.mainTitle.text = song.title
             cell.subtitle.text = song.artist
-            
             
         } else if pageIndex == 1  {
             
@@ -195,7 +198,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             cell.coverImage.image = image
-            
             
             let numberOfAlbums = theArtist.getAlbums().count
             let albumPrompt = "album".addPluralSubscript(numberOfAlbums)
@@ -220,6 +222,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.mainTitle.text = theAlbum.albumTitle
             cell.subtitle.text = "\(numberOfTracks) \(trackPrompt)"
         }
+        
         if (!tableView.dragging && !tableView.decelerating) {
             KGLOBAL_init_queue.suspended = false
         }else{
@@ -390,16 +393,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 
 extension MusicViewController {
     
-    func generateWaveFormInBackEnd(nowPlayingItem:MPMediaItem){
+    func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
         
         self.musicDataManager.initializeSongToDatabase(nowPlayingItem)
         
         if let _ = self.musicDataManager.getSongWaveFormImage(nowPlayingItem) {
+            // songCount can be only incremented in one queue no matter how many threads
             pthread_rwlock_wrlock(&self.rwLock)
             if(Int(self.songCount) < self.uniqueSongs.count-1){
                 self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&self.songCount))])
             }
-             pthread_rwlock_unlock(&self.rwLock)
+            pthread_rwlock_unlock(&self.rwLock)
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                 guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
@@ -414,7 +418,7 @@ extension MusicViewController {
                     let tempNowPlayingItem = nowPlayingItem
                     var progressBarWidth:CGFloat!
                     progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
-                    let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: 161))
+                    let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
                     
                     let tempMusicDataManager = self.musicDataManager
                     op = NSBlockOperation(block: {
@@ -426,11 +430,10 @@ extension MusicViewController {
 
                         let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                         tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                        print("Background wave finished for \(nowPlayingItem.title)")
+                        print("Soundwave generated for \(nowPlayingItem.title!) in background")
                         
                         KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
                         
-                        // make the
                         pthread_rwlock_wrlock(&self.rwLock)
                         if(Int(self.songCount) < self.uniqueSongs.count-1){
                             self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&(self.songCount)))])

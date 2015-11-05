@@ -22,10 +22,23 @@ class MusicDataManager: NSObject {
     
     private func findSong(item: MPMediaItem) -> Song? {
         // TODO: other special characters might corrupt the predicate, needs to check more later
-        let title = item.title!.replaceApostrophe()
-        let artist = item.artist!.replaceApostrophe()
-        let album = item.albumTitle!.replaceApostrophe()
-        let predicate: NSPredicate = NSPredicate(format: "(title == '\(title)') AND (artist == '\(artist)') AND (album == '\(album)')")
+        
+        // some songs do NOT have all these attributes so we assign them an empty string to prevent optional unwrapping
+        var titleToBeUsed = ""
+        var artistToBeUsed = ""
+        var albumToBeUsed = ""
+        
+        if let title = item.title {
+            titleToBeUsed = title.replaceApostrophe()
+        }
+        if let artist = item.artist {
+            artistToBeUsed = artist.replaceApostrophe()
+        }
+        if let album = item.albumTitle {
+            albumToBeUsed = album.replaceApostrophe()
+        }
+        
+        let predicate: NSPredicate = NSPredicate(format: "(title == '\(titleToBeUsed)') AND (artist == '\(artistToBeUsed)') AND (album == '\(albumToBeUsed)')")
         
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
@@ -41,10 +54,20 @@ class MusicDataManager: NSObject {
         // if we don't have the song in the database
         if findSong(item) == nil {
             let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
-            song.title = item.title!
-            song.artist = item.artist!
-            song.album = item.albumTitle!
+            
+            // some songs do NOT have all these attributes
+            if let title = item.title {
+                song.title = title
+            }
+            if let artist = item.artist {
+                song.artist = artist
+            }
+            if let album = item.albumTitle {
+                song.album = album
+            }
+            
             song.playbackDuration = Float(item.playbackDuration)
+            
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
