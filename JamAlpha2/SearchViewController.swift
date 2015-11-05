@@ -249,20 +249,19 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
 
     func webSearchSong(searchText: String) {
+        if searchText.characters.count < 1 {
+            return
+        }
         musicRequest?.cancel()
         searchResults = [SearchResult]()
         self.searchResultTableView.reloadData()
         
-        musicRequest = Alamofire.request(API.Router.Term(searchText)).responseJSON() {
-            _, _, result in
-            
-            switch result {
-            case .Success(let data):
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
-                    self.addDataToResults(JSON(data))
-                }
-            case .Failure(_, let error):
-                print("Search request failed with error: \(error)")
+        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
+            if let data = response.result.value {
+                print("JSON: \(data)")
+                self.addDataToResults(JSON(data))
+            } else {
+                print("something went wrong with search \(response.result.error)")
             }
         }
     }

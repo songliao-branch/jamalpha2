@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
@@ -118,7 +118,7 @@
             </objects>
             <point key="canvasLocation" x="90" y="-643"/>
         </scene>
-        <!--JamList-->
+        <!--List-->
         <scene sceneID="Gze-Ai-2T8">
             <objects>
                 <viewController id="ZPh-Yv-NLo" sceneMemberID="viewController">
@@ -132,7 +132,7 @@
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="JamList" image="list" selectedImage="jamlist" id="zxU-Fa-Nj7">
+                    <tabBarItem key="tabBarItem" title="List" image="list" id="zxU-Fa-Nj7">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
                                 <color key="value" red="0.94117647058823528" green="0.35686274509803922" blue="0.38039215686274508" alpha="1" colorSpace="calibratedRGB"/>
@@ -714,7 +714,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="jamlist" width="193" height="244"/>
         <image name="list" width="20" height="25"/>
         <image name="me" width="20" height="25"/>
         <image name="music" width="25" height="25"/>
