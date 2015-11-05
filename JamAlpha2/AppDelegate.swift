@@ -12,6 +12,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var suspended:Bool = false
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
@@ -36,11 +37,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.timer.invalidate()
-            KGLOBAL_init_queue.suspended = true
             print("Song VC entering background")
         }
+        self.suspended = KGLOBAL_init_queue.suspended
+        KGLOBAL_queue.suspended = true
+        KGLOBAL_init_queue.suspended = true
+        print("Go into Background suspend nsoperationqueue:\(self.suspended)")
     }
-
+    
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         let currentVC = topViewController(rootViewController())
@@ -48,10 +52,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.selectedFromTable = false
             currentSongVC.resumeSong()
-            KGLOBAL_init_queue.suspended = false
+            KGLOBAL_queue.suspended = true
             print("Song VC entering forground")
         }
-        
+        KGLOBAL_queue.suspended = false
+        KGLOBAL_init_queue.suspended = self.suspended
+        print("Go into forground:\(self.suspended)")
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
