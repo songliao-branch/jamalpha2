@@ -584,7 +584,7 @@
         <!--Me-->
         <scene sceneID="eAN-Ol-AA5">
             <objects>
-                <viewController storyboardIdentifier="mecreateaccountVC" id="tM8-pp-IGs" customClass="MeCreateAccountViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="meVC" id="tM8-pp-IGs" customClass="MeViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Lbr-rI-MvI"/>
                         <viewControllerLayoutGuide type="bottom" id="HrG-Fe-utN"/>
@@ -608,26 +608,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OqA-ks-IwD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-620" y="929"/>
-        </scene>
-        <!--Me Sign In View Controller-->
-        <scene sceneID="A6f-7t-OkV">
-            <objects>
-                <viewController storyboardIdentifier="mesigninVC" id="Uc9-1c-HeE" customClass="MeSignInViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="gjD-oh-78L"/>
-                        <viewControllerLayoutGuide type="bottom" id="gKc-V5-aBQ"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="21z-Pm-shZ">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <animations/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="AbJ-WV-cVa" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-251" y="933"/>
+            <point key="canvasLocation" x="-628" y="929"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">

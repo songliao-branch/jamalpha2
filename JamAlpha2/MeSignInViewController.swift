@@ -10,60 +10,34 @@ import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
 
-class MeSignInViewController: UIViewController {
+extension MeViewController {
 
-    var viewWidth: CGFloat = CGFloat()
-    var viewHeight: CGFloat = CGFloat()
-    var emailTextField: UITextField = UITextField()
-    var passwordTextField: UITextField = UITextField()
-    
-    var topViewImage: UIImage = UIImage(named: "meVCTopBackground")!
-    
-    var fbLoginManager: FBSDKLoginManager!
-    var userName: String!
-    var userId: String!
-    var userURL: String!
-    
-    var editView: UIView = UIView()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-        
+    func initialSignInView() {
         self.setUpEditView()
         self.setUpTopView()
         self.setUpSignUpView()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     func setUpEditView() {
-        self.viewWidth = self.view.frame.size.width
-        self.viewHeight = self.view.frame.size.height
-        self.editView.frame = CGRectMake(0, 0, self.viewWidth, self.viewHeight)
-        self.editView.backgroundColor = UIColor.grayColor()
-        self.view.addSubview(self.editView)
+        self.signInEditView.frame = CGRectMake(0, 0, self.viewWidth, self.viewHeight - (self.tabBarController?.tabBar.frame.size.height)!)
+        self.signInEditView.backgroundColor = UIColor.grayColor()
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
-        self.editView.addGestureRecognizer(tapOnEditView)
+        self.signInEditView.addGestureRecognizer(tapOnEditView)
     }
     
     func tapOnEditView(sender: UITapGestureRecognizer) {
-        self.emailTextField.resignFirstResponder()
-        self.passwordTextField.resignFirstResponder()
+        self.signInEmailTextField.resignFirstResponder()
+        self.signInPasswordTextField.resignFirstResponder()
     }
 
     func setUpTopView() {
         let topView: UIView = UIView()
         topView.frame = CGRectMake(0, 0, self.viewWidth, 0.2 * self.viewHeight)
-        self.editView.addSubview(topView)
+        self.signInEditView.addSubview(topView)
         
-        let blurredImage: UIImage = topViewImage.applyLightEffect()!
+        let blurredImage: UIImage = self.signInTopViewImage.applyLightEffect()!
         
         let topImageView: UIImageView = UIImageView()
         topImageView.frame = CGRectMake(0, 0, topView.frame.size.width, topView.frame.size.height)
@@ -91,15 +65,11 @@ class MeSignInViewController: UIViewController {
         topView.addSubview(backButton)
     }
     
-    func pressBackButton(sender: UIButton) {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
     func setUpSignUpView() {
         let signUpByFBView: UIView = UIView()
         signUpByFBView.frame = CGRectMake(0, 0.225 * self.viewHeight, self.viewWidth, 0.1 * self.viewHeight)
         signUpByFBView.layer.borderWidth = 1
-        self.editView.addSubview(signUpByFBView)
+        self.signInEditView.addSubview(signUpByFBView)
         
         self.setUpFBLogin(signUpByFBView)
         
@@ -107,12 +77,12 @@ class MeSignInViewController: UIViewController {
         orLabel.frame = CGRectMake(0, 0.325 * self.viewHeight, self.viewWidth, 0.05 * self.viewHeight)
         orLabel.text = "or"
         orLabel.textAlignment = NSTextAlignment.Center
-        self.editView.addSubview(orLabel)
+        self.signInEditView.addSubview(orLabel)
         
         let signUpByTJView: UIView = UIView()
         signUpByTJView.frame = CGRectMake(0, 0.375 * self.viewHeight, self.viewWidth, 0.21 * self.viewHeight)
         signUpByTJView.layer.borderWidth = 1
-        self.editView.addSubview(signUpByTJView)
+        self.signInEditView.addSubview(signUpByTJView)
         
         let emailTitleLabel: UILabel = UILabel()
         emailTitleLabel.frame = CGRectMake(0, 0, 0.3 * self.viewWidth, 0.1 * self.viewHeight)
@@ -120,9 +90,9 @@ class MeSignInViewController: UIViewController {
         emailTitleLabel.textAlignment = NSTextAlignment.Right
         signUpByTJView.addSubview(emailTitleLabel)
         
-        self.emailTextField.frame = CGRectMake(0.3 * self.viewWidth, 0, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
-        self.emailTextField.text = "example@gmail.com"
-        signUpByTJView.addSubview(self.emailTextField)
+        self.signInEmailTextField.frame = CGRectMake(0.3 * self.viewWidth, 0, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
+        self.signInEmailTextField.text = "example@gmail.com"
+        signUpByTJView.addSubview(self.signInEmailTextField)
         
         let passwordTitleLabel: UILabel = UILabel()
         passwordTitleLabel.frame = CGRectMake(0, 0.11 * self.viewHeight, 0.3 * self.viewWidth, 0.1 * self.viewHeight)
@@ -130,9 +100,9 @@ class MeSignInViewController: UIViewController {
         passwordTitleLabel.textAlignment = NSTextAlignment.Right
         signUpByTJView.addSubview(passwordTitleLabel)
         
-        self.passwordTextField.frame = CGRectMake(0.3 * self.viewWidth, 0.11 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
-        self.passwordTextField.text = "********"
-        signUpByTJView.addSubview(self.passwordTextField)
+        self.signInPasswordTextField.frame = CGRectMake(0.3 * self.viewWidth, 0.11 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
+        self.signInPasswordTextField.text = "********"
+        signUpByTJView.addSubview(self.signInPasswordTextField)
         
         let forgetPassword: UIButton = UIButton()
         forgetPassword.frame = CGRectMake(0.2 * self.viewWidth, 0.6 * self.viewHeight, 0.6 * self.viewWidth, 0.05 * self.viewHeight)
@@ -140,64 +110,17 @@ class MeSignInViewController: UIViewController {
         forgetPassword.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
         forgetPassword.layer.borderWidth = 1
         forgetPassword.addTarget(self, action: "pressForgetPasswordButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        self.editView.addSubview(forgetPassword)
+        self.signInEditView.addSubview(forgetPassword)
     }
     
     func pressForgetPasswordButton(sender: UIButton) {
         print("forget password")
     }
+    
+    func pressBackButton(sender: UIButton) {
+        self.dismissSecondView(self.signInEditView)
+        self.addSecondView(self.createAccountEditView)
+    }
 
-}
 
-// facebook login
-extension MeSignInViewController: FBSDKLoginButtonDelegate {
-    
-    func setUpFBLogin(sender: UIView) {
-        let fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
-        fbLoginButton.frame = CGRectMake(0.2 * self.viewWidth, 0.2 * sender.frame.size.height, 0.6 * self.viewWidth, 0.6 * sender.frame.size.height)
-        fbLoginButton.delegate = self
-        fbLoginButton.readPermissions = ["public_profile", "email", "user_friends"]
-        sender.addSubview(fbLoginButton)
-    }
-    
-    func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
-        print("User Logged In")
-        
-        if ((error) != nil)
-        {
-            // Process error
-        }
-        else if result.isCancelled {
-            // Handle cancellations
-        }
-        else {
-            // If you ask for multiple permissions at once, you
-            // should check if specific permissions missing
-            returnUserData()
-            if result.grantedPermissions.contains("email")
-            {
-                // Do work
-                print("\(result)")
-            }
-        }
-    }
-    
-    func loginButtonDidLogOut(loginButton: FBSDKLoginButton!) {
-        print("User Logged Out")
-    }
-    
-    func returnUserData() {
-        let graphRequest : FBSDKGraphRequest = FBSDKGraphRequest(graphPath: "me", parameters: nil)
-        graphRequest.startWithCompletionHandler({ (connection, result, error) -> Void in
-            if ((error) != nil){
-                // Process error
-                print("graph request Error: \(error)")
-            } else {
-                print("FB fetched user: \(result)")
-                self.userName = result.valueForKey("name") as! String
-                self.userId = result.valueForKey("id") as! String
-                self.userURL = "http://graph.facebook.com/\(self.userId)/picture?type=large"
-            }
-        })
-    }
 }

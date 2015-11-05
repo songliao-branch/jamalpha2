@@ -11,6 +11,9 @@
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
+		BF5A77B31BEABC4300BCE723 /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77B21BEABC4300BCE723 /* MeViewController.swift */; };
+		BF5A77B51BEABD6C00BCE723 /* FBLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */; };
+		BF5A77B71BEAF0D400BCE723 /* ProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77B61BEAF0D400BCE723 /* ProfileTableViewCell.swift */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
 		BFFA248F1BE8671C0037D9C0 /* MeCreateAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFA248E1BE8671C0037D9C0 /* MeCreateAccountViewController.swift */; };
 		BFFA24961BE96A530037D9C0 /* MeSignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFA24951BE96A530037D9C0 /* MeSignInViewController.swift */; };
@@ -95,6 +98,9 @@
 		5491F35DF2FB90338EBDC0CC /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		842DB0241B55EA8B00B4E165 /* TimeNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeNumber.swift; sourceTree = "<group>"; };
 		84DA61A31B4E211100979A42 /* Lyric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lyric.swift; sourceTree = "<group>"; };
+		BF5A77B21BEABC4300BCE723 /* MeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
+		BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FBLogin.swift; sourceTree = "<group>"; };
+		BF5A77B61BEAF0D400BCE723 /* ProfileTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileTableViewCell.swift; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
 		BFFA248E1BE8671C0037D9C0 /* MeCreateAccountViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeCreateAccountViewController.swift; sourceTree = "<group>"; };
 		BFFA24951BE96A530037D9C0 /* MeSignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeSignInViewController.swift; sourceTree = "<group>"; };
@@ -185,8 +191,11 @@
 		BFFA248C1BE866F60037D9C0 /* MeViewController */ = {
 			isa = PBXGroup;
 			children = (
+				BF5A77B21BEABC4300BCE723 /* MeViewController.swift */,
 				BFFA248E1BE8671C0037D9C0 /* MeCreateAccountViewController.swift */,
 				BFFA24951BE96A530037D9C0 /* MeSignInViewController.swift */,
+				BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */,
+				BF5A77B61BEAF0D400BCE723 /* ProfileTableViewCell.swift */,
 			);
 			name = MeViewController;
 			sourceTree = "<group>";
@@ -598,6 +607,7 @@
 				1045413F1BCAFBB300A4590B /* TabBarController.swift in Sources */,
 				E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */,
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
+				BF5A77B31BEABC4300BCE723 /* MeViewController.swift in Sources */,
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
@@ -615,6 +625,7 @@
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
+				BF5A77B71BEAF0D400BCE723 /* ProfileTableViewCell.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
@@ -637,6 +648,7 @@
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
 				E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */,
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
+				BF5A77B51BEABD6C00BCE723 /* FBLogin.swift in Sources */,
 				E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */,
 				E48AE2D21B955BB40044CFDB /* API.swift in Sources */,
 			);
