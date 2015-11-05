@@ -111,7 +111,7 @@ extension MeViewController {
         signInButton.setTitle("Sign In", forState: UIControlState.Normal)
         signInButton.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
         signInButton.layer.borderWidth = 1
-        signInButton.addTarget(self, action: "pressSignInButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        signInButton.addTarget(self, action: "pressCreateAccountSignInButton:", forControlEvents: UIControlEvents.TouchUpInside)
         self.createAccountEditView.addSubview(signInButton)
     }
     
@@ -121,7 +121,7 @@ extension MeViewController {
         print("create account")
     }
     
-    func pressSignInButton(sender: UIButton) {
+    func pressCreateAccountSignInButton(sender: UIButton) {
         self.dismissSecondView(self.createAccountEditView)
         self.addSecondView(self.signInEditView)
         

@@ -104,13 +104,26 @@ extension MeViewController {
         self.signInPasswordTextField.text = "********"
         signUpByTJView.addSubview(self.signInPasswordTextField)
         
+        let signInButton: UIButton = UIButton()
+        signInButton.frame = CGRectMake(0.2 * self.viewWidth, 0.6 * self.viewHeight, 0.6 * self.viewWidth, 0.05 * self.viewHeight)
+        signInButton.setTitle("Sign In", forState: UIControlState.Normal)
+        signInButton.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
+        signInButton.layer.borderWidth = 1
+        signInButton.addTarget(self, action: "pressSignInButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.signInEditView.addSubview(signInButton)
+        
         let forgetPassword: UIButton = UIButton()
-        forgetPassword.frame = CGRectMake(0.2 * self.viewWidth, 0.6 * self.viewHeight, 0.6 * self.viewWidth, 0.05 * self.viewHeight)
+        forgetPassword.frame = CGRectMake(0.2 * self.viewWidth, 0.7 * self.viewHeight, 0.6 * self.viewWidth, 0.05 * self.viewHeight)
         forgetPassword.setTitle("Forgot Password", forState: UIControlState.Normal)
         forgetPassword.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
         forgetPassword.layer.borderWidth = 1
         forgetPassword.addTarget(self, action: "pressForgetPasswordButton:", forControlEvents: UIControlEvents.TouchUpInside)
         self.signInEditView.addSubview(forgetPassword)
+    }
+    
+    func pressSignInButton(sender: UIButton) {
+        self.dismissSecondView(self.createAccountEditView)
+        self.dismissSecondView(self.signInEditView)
     }
     
     func pressForgetPasswordButton(sender: UIButton) {
