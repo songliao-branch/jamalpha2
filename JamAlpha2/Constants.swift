@@ -22,3 +22,5 @@ var KEY_isSoundWaveFormInBackgroundChecked:Bool = false
 
 let SCREEN_WIDTH = UIScreen.mainScreen().bounds.size.width
 let SCREEN_HEIGHT = UIScreen.mainScreen().bounds.size.height
+
+var KGLOBAL_isQueueChanged = false

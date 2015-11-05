@@ -132,7 +132,7 @@
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="JamList" image="list" selectedImage="jamlist" id="zxU-Fa-Nj7">
+                    <tabBarItem key="tabBarItem" title="JamList" image="list" id="zxU-Fa-Nj7">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
                                 <color key="value" red="0.94117647058823528" green="0.35686274509803922" blue="0.38039215686274508" alpha="1" colorSpace="calibratedRGB"/>
@@ -714,7 +714,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="jamlist" width="193" height="244"/>
         <image name="list" width="20" height="25"/>
         <image name="me" width="20" height="25"/>
         <image name="music" width="25" height="25"/>

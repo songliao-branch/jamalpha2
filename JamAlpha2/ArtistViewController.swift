@@ -144,11 +144,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         }
         let indexToBePlayed = songsInPreviousSections + indexPath.row
         
-        MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
-        MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
-        
-
-        SongViewController.sharedInstance.reloadSongVC(selectedFromTable: true)
+        self.reloadSongVC(allSongsSorted: artistAllSongs, indexToBePlayed: indexToBePlayed)
         
         //reload table to show loudspeaker icon on current selected row
         self.isReloadTable = true

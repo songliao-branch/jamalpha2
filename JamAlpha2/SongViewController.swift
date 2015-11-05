@@ -272,6 +272,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let nowPlayingItem = player.nowPlayingItem!
             generateSoundWave(nowPlayingItem)
         }
+//        if(KGLOBAL_isQueueChanged){
+//            startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+//            updateAll(startTime.toDecimalNumer())
+//            KGLOBAL_isQueueChanged = false
+//        }
     }
     
     func setUpBackgroundImage(){
@@ -760,12 +765,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //TODO: BUG: when soundwave is generating, the volume is somehow lowered 
             // until the player.currentPlaybacktime is set, as move the progress block would 
             // restore the normal volume
-            player.play()
-            
-            if player.playbackState != MPMusicPlaybackState.Playing{
-                KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
-                startTimer()
+            player.currentPlaybackTime = player.currentPlaybackTime
+            if(KGLOBAL_isQueueChanged){
+                player.play()
             }
+            
+//            if player.playbackState != MPMusicPlaybackState.Playing{
+//                
+//                KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+//            }
+          
+            
+            startTimer()
             
         } else { // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
@@ -1389,6 +1400,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func browseLyrics(button: UIButton) {
         
     }
+    
     func goToLyricsEditor(button: UIButton) {
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController

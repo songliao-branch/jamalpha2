@@ -96,11 +96,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
        
         KGLOBAL_init_queue.suspended = true
        
-        MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
-        MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
-
-
-        SongViewController.sharedInstance.reloadSongVC(selectedFromTable: true)
+        self.reloadSongVC(allSongsSorted: songsInTheAlbum, indexToBePlayed: indexPath.row)
         
         //reload table to show loudspeaker icon on current selected row
         self.isReloadTable = true

@@ -73,6 +73,7 @@ class MusicManager: NSObject {
             print(MPMediaItemPropertyReleaseDate)
             
             queueChanged = true
+            KGLOBAL_isQueueChanged = true
             //testing
             for song in collection {
                 print("\(_TAG) setting up queue of song: \(song.title!)")
