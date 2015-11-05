@@ -52,7 +52,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.selectedFromTable = false
             currentSongVC.resumeSong()
-            KGLOBAL_queue.suspended = true
             print("Song VC entering forground")
         }
         KGLOBAL_queue.suspended = false
