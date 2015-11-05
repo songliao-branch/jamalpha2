@@ -1296,6 +1296,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func uploadTabs(button: UIButton) {
         print("upload tabs")
+        musicDataManager.getTabs(player.nowPlayingItem!)
+        
+        //check if this song exists in the cloud, if it does, get the song_id, if not create this song and then return a song_id
+        
         //Alamofire.request(.POST, <#T##URLString: URLStringConvertible##URLStringConvertible#>)
     }
     

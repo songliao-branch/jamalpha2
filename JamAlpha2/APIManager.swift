@@ -7,6 +7,8 @@
 
 import UIKit
 import Alamofire
+import SwiftyJSON
+import MediaPlayer
 
 class SearchResult {
     
@@ -35,5 +37,21 @@ class APIManager: NSObject {
     }
     
     static let jamBaseURL = "https://jamapi.herokuapp.com"
+    
+    class func findSong(mediaItem: MPMediaItem) -> Int {
+        Alamofire.request(.GET, jamBaseURL)
+        
+        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "album": mediaItem.albumTitle!]
+        Alamofire.request(.GET, jamBaseURL, parameters: parameters).responseJSON { response in
+            if let data = response.result.value {
+                print("JSON: \(data)")
+                
+            } else {
+                print("something went wrong with find song \(response.result.error)")
+            }
+        }
+
+        return -1
+    }
     
 }
