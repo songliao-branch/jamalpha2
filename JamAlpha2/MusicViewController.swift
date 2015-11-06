@@ -193,6 +193,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         } else if pageIndex == 1  {
             
             let theArtist = artistsByFirstAlphabet[indexPath.section].1[indexPath.row]
+            
+            
             let image = theArtist.getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
             cell.loudspeakerImage.hidden = true
             cell.imageWidth.constant = 80
