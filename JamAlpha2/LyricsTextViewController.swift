@@ -170,7 +170,7 @@ class LyricsTextViewController: UIViewController {
             self.lyricsTextView.textColor = UIColor.whiteColor()
         } else {
             self.lyricsTextView.text = "Put your lyrics here"
-            self.lyricsTextView.textColor = UIColor.grayColor()
+            self.lyricsTextView.textColor = UIColor.lightGrayColor()
         }
         
         
@@ -276,7 +276,7 @@ extension LyricsTextViewController: UITextViewDelegate {
     //when user begins editing, if it has the placeholder(having a gray text color)
     //clear the text
     func textViewDidBeginEditing(textView: UITextView) {
-        if textView.textColor == UIColor.grayColor() {
+        if textView.textColor == UIColor.lightGrayColor() {
             textView.text = ""
             textView.textColor = UIColor.whiteColor()
         }
