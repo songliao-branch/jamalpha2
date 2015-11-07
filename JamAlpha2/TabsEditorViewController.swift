@@ -1298,11 +1298,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.backToMainView()
         } else {
             print("back to song view controller")
-            
-            //hide these two views first because they still appear until this viewcontroller is fully dismissed
-            tuningMenu.hidden = true
-            musicControlView.hidden = true
-            self.dismissViewControllerAnimated(true, completion: nil)
+            self.dismissViewControllerAnimated(false, completion: nil)
         }
     }
     
@@ -1472,7 +1468,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
-            self.dismissViewControllerAnimated(true, completion: nil)
+            self.dismissViewControllerAnimated(false, completion: nil)
         }
         self.currentSelectedSpecificTab = nil
     }
