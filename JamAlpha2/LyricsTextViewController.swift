@@ -156,6 +156,8 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.textAlignment = NSTextAlignment.Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
+        self.lyricsTextView.tintColor = UIColor.mainPinkColor()
+        self.lyricsTextView.delegate = self
         let musicDataManager = MusicDataManager()
         
         let lyricsTimes = musicDataManager.getLyrics(theSong)
@@ -165,8 +167,10 @@ class LyricsTextViewController: UIViewController {
                 lyricsToDisplay+="\(line.0)\n"
             }
             self.lyricsTextView.text = lyricsToDisplay
+            self.lyricsTextView.textColor = UIColor.whiteColor()
         } else {
             self.lyricsTextView.text = "Put your lyrics here"
+            self.lyricsTextView.textColor = UIColor.grayColor()
         }
         
         
@@ -267,7 +271,15 @@ class LyricsTextViewController: UIViewController {
         }
         return tempString
     }
-    
-
+}
+extension LyricsTextViewController: UITextViewDelegate {
+    //when user begins editing, if it has the placeholder(having a gray text color)
+    //clear the text
+    func textViewDidBeginEditing(textView: UITextView) {
+        if textView.textColor == UIColor.grayColor() {
+            textView.text = ""
+            textView.textColor = UIColor.whiteColor()
+        }
+    }
 }
 
