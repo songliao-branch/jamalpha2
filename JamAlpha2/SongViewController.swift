@@ -125,7 +125,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     // count down section
     var countdownTimer = NSTimer()
-    var countDownStartSecond = 0 //will increments to 3
+    var countDownStartSecond = 3 //count from 3 to 1
     var countdownView: CountdownView!
     
     // Guitar actions views
@@ -1312,17 +1312,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func startCountdown() {
-        countDownStartSecond++
-        countdownView.setNumber(countDownStartSecond+1)
-
-        if countDownStartSecond >= 3 {
+        countDownStartSecond--
+        countdownView.setNumber(countDownStartSecond)
+        
+        if countDownStartSecond <= 0 {
             //add tap gesture back
             chordBase.addGestureRecognizer(chordBaseTapGesture)
             progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
             
             countdownTimer.invalidate()
             countdownView.hidden = true
-            countDownStartSecond = 0
+            countDownStartSecond = 3
             player.play()
         }
 
@@ -1661,9 +1661,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 //temporarily disable tap gesture to avoid accidental start count down again
                 chordBase.removeGestureRecognizer(chordBaseTapGesture)
                 progressBlockContainer.removeGestureRecognizer(progressContainerTapGesture)
-                
+                countdownView.setNumber(countDownStartSecond)
                 countdownView.hidden = false
-                countdownView.setNumber(1)
                 countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
                 NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
                 

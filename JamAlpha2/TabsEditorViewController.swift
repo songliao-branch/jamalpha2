@@ -101,7 +101,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // count down section
     
     var countdownTimer = NSTimer()
-    var countDownStartSecond = 0 //will increments to 3
+    var countDownStartSecond = 3 //will countdown from 3 to 1
     var countdownView: CountdownView!
     
     // data array
@@ -1001,14 +1001,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
 
     func startCountdown() {
-        countDownStartSecond++
-        countdownView.setNumber(countDownStartSecond+1)
-
-        if countDownStartSecond >= 3 {
+        countDownStartSecond--
+        countdownView.setNumber(countDownStartSecond)
+        
+        if countDownStartSecond <= 0 {
             musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
             countdownTimer.invalidate()
             countdownView.hidden = true
-            countDownStartSecond = 0
+            countDownStartSecond = 3
             player.play()
             startTimer()
             self.currentTime = player.currentTime
@@ -1041,7 +1041,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             //disable tap gesture that inadvertly starts timer
             musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
             countdownView.hidden = false
-            countdownView.setNumber(1)
+            countdownView.setNumber(countDownStartSecond)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
         }
