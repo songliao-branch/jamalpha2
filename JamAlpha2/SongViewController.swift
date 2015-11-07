@@ -123,7 +123,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var guitarButton:UIButton!
     var othersButton:UIButton!
     
-    
     // count down section
     var countdownTimer = NSTimer()
     var countDownStartSecond = 0 //will increments to 3
@@ -499,7 +498,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
         topLyricLabel.center.y = lyricbase.frame.height / 3
-        topLyricLabel.numberOfLines = 2
+        topLyricLabel.numberOfLines = 3
         topLyricLabel.textAlignment = NSTextAlignment.Center
         topLyricLabel.font = UIFont.systemFontOfSize(23)
         topLyricLabel.lineBreakMode = .ByWordWrapping
@@ -508,7 +507,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
         bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
-        bottomLyricLabel.numberOfLines = 2
+        bottomLyricLabel.numberOfLines = 3
         bottomLyricLabel.textAlignment = NSTextAlignment.Center
         bottomLyricLabel.font = UIFont.systemFontOfSize(16)
         bottomLyricLabel.lineBreakMode = .ByWordWrapping
