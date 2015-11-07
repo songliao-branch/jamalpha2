@@ -185,7 +185,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+        APIManager.findSong(player.nowPlayingItem!)
+        
         player = MusicManager.sharedInstance.player
         firstLoadSongTime = player.nowPlayingItem!.playbackDuration
         firstloadSongTitle = player.nowPlayingItem!.title
