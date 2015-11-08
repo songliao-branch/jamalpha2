@@ -58,6 +58,8 @@
 		E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0021B9E88BA00473FC4 /* TJDatabase.xcdatamodeld */; };
 		E4D2F19B1B4CA6A800091A45 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */; };
 		E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */; };
+		E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */; };
+		E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3F1BE9BC4700D54174 /* Constants.swift */; };
 		E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */; };
 		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
 		E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */; };
@@ -100,7 +102,7 @@
 		C8F505071B9101920077F508 /* UIWindowEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIWindowEffects.swift; sourceTree = "<group>"; };
 		E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchHistoryManager.swift; sourceTree = "<group>"; };
 		E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSyncTimeTableViewCell.swift; sourceTree = "<group>"; };
-		E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSyncTimeViewController.swift; sourceTree = "<group>"; };
+		E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LyricsSyncTimeViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsTextViewController.swift; sourceTree = "<group>"; };
 		E431BA9A1B913A1B00E32A0B /* MusicManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicManager.swift; sourceTree = "<group>"; };
 		E431BA9C1B913AE700E32A0B /* String+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Utils.swift"; sourceTree = "<group>"; };
@@ -122,14 +124,14 @@
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E48877421B151628004785D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E48877441B151628004785D3 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
-		E48877461B151628004785D3 /* MusicViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewController.swift; sourceTree = "<group>"; };
+		E48877461B151628004785D3 /* MusicViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MusicViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E488774B1B151628004785D3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E488774E1B151628004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		E48877541B151628004785D3 /* JamAlpha2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JamAlpha2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877591B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E488775A1B151628004785D3 /* JamAlpha2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamAlpha2Tests.swift; sourceTree = "<group>"; };
 		E48877671B151E2B004785D3 /* MusicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
-		E48877691B1520A0004785D3 /* SongViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongViewController.swift; sourceTree = "<group>"; };
+		E48877691B1520A0004785D3 /* SongViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SongViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E48AE2D11B955BB40044CFDB /* APIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 		E49AF0961B2699C800DD3342 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
@@ -144,6 +146,8 @@
 		E4CBC0031B9E88BA00473FC4 /* TJDatabase.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TJDatabase.xcdatamodel; sourceTree = "<group>"; };
 		E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
+		E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuspendThreadViewController.swift; sourceTree = "<group>"; };
+		E4D58E3F1BE9BC4700D54174 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownView.swift; sourceTree = "<group>"; };
 		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
 		E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
@@ -200,6 +204,7 @@
 				E48877461B151628004785D3 /* MusicViewController.swift */,
 				E45F6BB71B16C1860018645D /* ArtistViewController.swift */,
 				E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */,
+				E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */,
 			);
 			name = MusicListControllers;
 			sourceTree = "<group>";
@@ -318,6 +323,7 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
+				E4D58E3E1BE9BC3F00D54174 /* Utils */,
 				E4CBC0081B9E88D900473FC4 /* CoreData */,
 				E48AE2D01B955BA30044CFDB /* Networking */,
 				E4B6362F1B854A6A00F331A7 /* Extensions */,
@@ -410,6 +416,14 @@
 				E48877441B151628004785D3 /* SearchViewController.swift */,
 			);
 			name = TabItemControllers;
+			sourceTree = "<group>";
+		};
+		E4D58E3E1BE9BC3F00D54174 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				E4D58E3F1BE9BC4700D54174 /* Constants.swift */,
+			);
+			name = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -592,6 +606,7 @@
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
+				E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
@@ -606,6 +621,7 @@
 				E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */,
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
+				E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */,
 				E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */,

@@ -8,6 +8,7 @@
 
 import Foundation
 import MediaPlayer
+
 class MusicManager: NSObject {
     
     let _TAG = "MusicManager"

@@ -3,7 +3,7 @@
 import UIKit
 import MediaPlayer
 
-class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewDataSource {
+class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UITableViewDataSource{
 
     var musicViewController: MusicViewController! // for songviewcontroller to go to artist or album from musicviewcontroller
     var nowView: VisualizerView!
@@ -101,7 +101,9 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-
+       
+        KGLOBAL_init_queue.suspended = true
+       
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
         MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
         
@@ -121,3 +123,4 @@ class AlbumViewController: UIViewController,UITableViewDelegate, UITableViewData
     }
     
  }
+
