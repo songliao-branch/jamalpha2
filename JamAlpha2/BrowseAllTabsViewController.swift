@@ -106,16 +106,11 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         let tabsCell = tableView.dequeueReusableCellWithIdentifier("browsetabscell", forIndexPath: indexPath) as! BrowseTabsCell
         let tabsSet = downloadedTabsSets[indexPath.row]
         
-        //TODO: get a real tinted image from UI
-        let tintedTuningImage = tabsCell.tuningCapoImage.image!.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
-        tabsCell.tuningCapoImage.tintColor = UIColor.grayColor()
-        tabsCell.tuningCapoImage.image = tintedTuningImage
-            
         tabsCell.votesLabel.text = String(tabsSet.upVote - tabsSet.downVote)
         tabsCell.votesLabel.sizeToFit()
         var chordsPreview = ""
         for i in 0..<tabsSet.chords.count {
-            chordsPreview += tabsSet.chords[i] + " "
+            chordsPreview += tabsSet.chords[i] + "  "//add two spaces between each chord
         }
       
         tabsCell.chordsPreviewLabel.text = chordsPreview
