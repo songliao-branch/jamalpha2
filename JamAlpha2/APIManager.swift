@@ -30,10 +30,15 @@ class SearchResult {
 }
 
 struct DownloadedTabs {
+    var tuning: String
+    var capo: Int
+    
     var chords: [String]
     var tabs: [String]
     var times: [Float]
+    
     var songId = -1
+    
     var upVote = 0
     var downVote = 0
     //var userId
@@ -101,8 +106,9 @@ class APIManager: NSObject {
         })
     }
     
-    class func downloadTabs(mediaItem: MPMediaItem) -> [DownloadedTabs] {
-        let downloadedTabs = [DownloadedTabs]()
+    //download all tabs sets for one song, the callback return the result
+    class func downloadTabs(mediaItem: MPMediaItem, callbackResults: (downloads: [DownloadedTabs]) -> Void ) {
+        var allDownloads = [DownloadedTabs]()
         
         findSongId(mediaItem, callback: { songId in
             
@@ -113,16 +119,29 @@ class APIManager: NSObject {
                 case .Success:
                     if let data = response.result.value {
                         let json = JSON(data)
-                       
-                        print(json)
+                        print("Downloaded JSON:\(json)")
+                        
+                        for set in json["tabs_sets"].array! {
+                            var theTimes = [Float]()
+                            
+                            //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                            for time in set["times"].arrayObject as! [String] {
+                                theTimes.append(Float(time)!)
+                            }
+                            
+                            let theChords = set["chords"].arrayObject as! [String]
+                            let theTabs = set["tabs"].arrayObject as! [String]
+                            let t = DownloadedTabs(tuning: set["tuning"].string!, capo: set["capo"].int!, chords: theChords, tabs: theTabs, times: theTimes, songId: set["song_id"].int!, upVote: set["upvotes"].int!, downVote: set["downvotes"].int!)
+                            allDownloads.append(t)
+                        }
+                        
+                        callbackResults(downloads: allDownloads)
                     }
                 case .Failure(let error):
                     print(error)
                 }
             }
-            
         })
-        return downloadedTabs
     }
     
     

@@ -12,7 +12,7 @@ class BrowseTabsCell: UITableViewCell {
 
     @IBOutlet weak var upVoteButton: UIButton!
     @IBOutlet weak var downVoteButton: UIButton!
-    
+
     @IBOutlet weak var votesLabel: UILabel!
     
     @IBOutlet weak var chordsPreviewLabel: UILabel!
@@ -22,4 +22,5 @@ class BrowseTabsCell: UITableViewCell {
     @IBOutlet weak var profileButton: UIButton!
     
     @IBOutlet weak var profileNameLabel: UILabel!
+    
 }

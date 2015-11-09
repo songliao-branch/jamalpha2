@@ -14,6 +14,7 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
 
     @IBOutlet weak var tabsTableView: UITableView!
     
+    var downloadedTabsSets = [DownloadedTabs]()
     var mediaItem: MPMediaItem!
     var songId = -1
     
@@ -21,9 +22,15 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         setUpHeader()
     }
     
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        APIManager.downloadTabs(mediaItem)
+        downloadedTabsSets = [DownloadedTabs]()
+        APIManager.downloadTabs(mediaItem, callbackResults:{
+            downloads in
+            self.downloadedTabsSets = downloads
+            self.tabsTableView.reloadData()
+        })
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -91,11 +98,28 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return downloadedTabsSets.count
     }
+    
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let tabsCell = tableView.dequeueReusableCellWithIdentifier("browsetabscell", forIndexPath: indexPath) as! BrowseTabsCell
+        let tabsSet = downloadedTabsSets[indexPath.row]
+        
+        //TODO: get a real tinted image from UI
+        let tintedTuningImage = tabsCell.tuningCapoImage.image!.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+        tabsCell.tuningCapoImage.tintColor = UIColor.grayColor()
+        tabsCell.tuningCapoImage.image = tintedTuningImage
+            
+        tabsCell.votesLabel.text = String(tabsSet.upVote - tabsSet.downVote)
+        tabsCell.votesLabel.sizeToFit()
+        var chordsPreview = ""
+        for i in 0..<tabsSet.chords.count {
+            chordsPreview += tabsSet.chords[i] + " "
+        }
+      
+        tabsCell.chordsPreviewLabel.text = chordsPreview
+        
         return tabsCell
     }
 }
