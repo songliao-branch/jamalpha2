@@ -1359,6 +1359,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // MARK: functions used in NavigationOutView
     func browseTabs(button: UIButton) {
         
+        let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browsealltabsviewcontroller") as! BrowseAllTabsViewController
+        browseAllTabsVC.songName = player.nowPlayingItem!.title!
+        browseAllTabsVC.artistName = player.nowPlayingItem!.artist!
+        self.presentViewController(browseAllTabsVC, animated: true, completion: {
+            completed in
+            self.dismissAction()
+        })
     }
     
     func uploadTabs(button: UIButton) {
