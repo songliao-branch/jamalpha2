@@ -312,9 +312,12 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="15.3K" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G5R-vs-Mql">
-                                                    <rect key="frame" x="15" y="34" width="42.5" height="20.5"/>
+                                                    <rect key="frame" x="8" y="35" width="57" height="18"/>
                                                     <animations/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="57" id="cQ1-Ff-F2h"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -336,10 +339,10 @@
                                                     </constraints>
                                                     <state key="normal" title="Button" image="down_arrow"/>
                                                 </button>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="D F# G A G D F# A" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mud-87-rVq">
-                                                    <rect key="frame" x="73" y="30" width="198" height="27.5"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="D  F#m  G  A  D  F#m  G  A  D  F#m  G  A" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mud-87-rVq">
+                                                    <rect key="frame" x="73" y="36" width="189" height="18"/>
                                                     <animations/>
-                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -352,13 +355,6 @@
                                                     </constraints>
                                                     <state key="normal" title="Button" image="kitten_profile"/>
                                                 </button>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mysterious Kitten" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IcB-Yq-4jC">
-                                                    <rect key="frame" x="73" y="67.5" width="201" height="12"/>
-                                                    <animations/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="tuning" translatesAutoresizingMaskIntoConstraints="NO" id="Htf-0V-OtK">
                                                     <rect key="frame" x="279" y="8" width="30" height="30"/>
                                                     <animations/>
@@ -367,15 +363,35 @@
                                                         <constraint firstAttribute="width" constant="30" id="Q0o-G3-ixQ"/>
                                                     </constraints>
                                                 </imageView>
+                                                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tuning: Standard | Capo: 0" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bcu-Wr-OUQ">
+                                                    <rect key="frame" x="71" y="12" width="203" height="12"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                                    <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mysterious Kitten" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IcB-Yq-4jC">
+                                                    <rect key="frame" x="73" y="67" width="201" height="12"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                                    <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <animations/>
                                             <constraints>
-                                                <constraint firstItem="G5R-vs-Mql" firstAttribute="leading" secondItem="BoY-gv-2qd" secondAttribute="leading" constant="15" id="4XH-1B-Bd0"/>
+                                                <constraint firstItem="G5R-vs-Mql" firstAttribute="leading" secondItem="BoY-gv-2qd" secondAttribute="leading" constant="8" id="4XH-1B-Bd0"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="mud-87-rVq" secondAttribute="trailing" constant="50" id="6Fw-cN-dsE"/>
                                                 <constraint firstItem="Htf-0V-OtK" firstAttribute="top" secondItem="BoY-gv-2qd" secondAttribute="top" constant="8" id="7fc-Uu-nX8"/>
                                                 <constraint firstItem="NTz-7k-bBB" firstAttribute="top" secondItem="BoY-gv-2qd" secondAttribute="top" constant="8" id="9S4-GM-2fH"/>
+                                                <constraint firstItem="Htf-0V-OtK" firstAttribute="leading" secondItem="bcu-Wr-OUQ" secondAttribute="trailing" constant="5" id="CzC-Wm-vdc"/>
                                                 <constraint firstItem="NTz-7k-bBB" firstAttribute="leading" secondItem="BoY-gv-2qd" secondAttribute="leading" constant="21" id="FEr-xc-3k0"/>
+                                                <constraint firstItem="bcu-Wr-OUQ" firstAttribute="leading" secondItem="NTz-7k-bBB" secondAttribute="trailing" constant="20" id="UEt-gG-yNJ"/>
+                                                <constraint firstItem="bcu-Wr-OUQ" firstAttribute="top" secondItem="BoY-gv-2qd" secondAttribute="top" constant="12" id="VvK-1w-JdA"/>
                                                 <constraint firstItem="H86-FJ-Fyr" firstAttribute="leading" secondItem="IcB-Yq-4jC" secondAttribute="trailing" constant="5" id="Xr9-kI-0oi"/>
+                                                <constraint firstItem="mud-87-rVq" firstAttribute="centerY" secondItem="BoY-gv-2qd" secondAttribute="centerY" id="euO-MB-1dd"/>
                                                 <constraint firstItem="dFI-YH-Xem" firstAttribute="leading" secondItem="BoY-gv-2qd" secondAttribute="leading" constant="21" id="ezj-2g-i8M"/>
+                                                <constraint firstItem="mud-87-rVq" firstAttribute="leading" secondItem="G5R-vs-Mql" secondAttribute="trailing" constant="8" id="gKs-26-gM3"/>
                                                 <constraint firstAttribute="trailing" secondItem="Htf-0V-OtK" secondAttribute="trailing" constant="11" id="h5C-bN-Rxl"/>
                                                 <constraint firstAttribute="bottom" secondItem="H86-FJ-Fyr" secondAttribute="bottom" constant="8.5" id="ibc-Xd-OAu"/>
                                                 <constraint firstItem="G5R-vs-Mql" firstAttribute="centerY" secondItem="BoY-gv-2qd" secondAttribute="centerY" id="kPB-Us-rd8"/>
