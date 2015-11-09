@@ -1360,8 +1360,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func browseTabs(button: UIButton) {
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browsealltabsviewcontroller") as! BrowseAllTabsViewController
-        browseAllTabsVC.songName = player.nowPlayingItem!.title!
-        browseAllTabsVC.artistName = player.nowPlayingItem!.artist!
+        browseAllTabsVC.mediaItem = player.nowPlayingItem!
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in
             self.dismissAction()
@@ -1370,7 +1369,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func uploadTabs(button: UIButton) {
         print("upload tabs")
-        //musicDataManager.getTabs(player.nowPlayingItem!)
+       
         
         APIManager.uploadTabs(player.nowPlayingItem!)
     }

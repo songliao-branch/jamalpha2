@@ -7,18 +7,23 @@
 //
 
 import Foundation
+import MediaPlayer
 import UIKit
 
 class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var tabsTableView: UITableView!
     
-    var songName = ""
-    var artistName = ""
+    var mediaItem: MPMediaItem!
     var songId = -1
     
     override func viewDidLoad() {
         setUpHeader()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        APIManager.downloadTabs(mediaItem)
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -51,12 +56,12 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         let artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
         artistNameLabel.textAlignment = NSTextAlignment.Center
         
-        let title:String = self.songName
+        let title:String = mediaItem.title!
         let attributedString = NSMutableAttributedString(string:title)
         songNameLabel.attributedText = attributedString
         songNameLabel.textAlignment = NSTextAlignment.Center
         
-        artistNameLabel.text = self.artistName
+        artistNameLabel.text = mediaItem.artist!
         
         
         songNameLabel.font = UIFont.systemFontOfSize(18)
