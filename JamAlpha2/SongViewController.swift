@@ -241,7 +241,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             loadDisplayMode()
-            updateMusicData(player.nowPlayingItem!)
+           // updateMusicData(player.nowPlayingItem!)
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -1360,6 +1360,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func browseTabs(button: UIButton) {
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browsealltabsviewcontroller") as! BrowseAllTabsViewController
+        browseAllTabsVC.songViewController = self
         browseAllTabsVC.mediaItem = player.nowPlayingItem!
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in

@@ -12,6 +12,7 @@ import UIKit
 
 class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    var songViewController: SongViewController!
     @IBOutlet weak var tabsTableView: UITableView!
     
     var downloadedTabsSets = [DownloadedTabs]()
@@ -104,6 +105,12 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let tabsCell = tableView.dequeueReusableCellWithIdentifier("browsetabscell", forIndexPath: indexPath) as! BrowseTabsCell
+        
+        // add additional gray separators
+        let additionalSeparatorTop = UIView(frame: CGRectMake(0, tabsCell.frame.height-1, tabsCell.frame.size.width, 1))
+        additionalSeparatorTop.backgroundColor = UIColor.lightGrayColor()
+        tabsCell.addSubview(additionalSeparatorTop)
+        
         let tabsSet = downloadedTabsSets[indexPath.row]
         
         tabsCell.votesLabel.text = String(tabsSet.upVote - tabsSet.downVote)
@@ -112,9 +119,25 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         for i in 0..<tabsSet.chords.count {
             chordsPreview += tabsSet.chords[i] + "  "//add two spaces between each chord
         }
-      
+        
         tabsCell.chordsPreviewLabel.text = chordsPreview
         
         return tabsCell
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let tabsSet = downloadedTabsSets[indexPath.row]
+        var timedTabs = [Chord]()
+        for i in 0..<tabsSet.times.count {
+            let c = Chord(tab: Tab(name: tabsSet.chords[i], content: tabsSet.tabs[i]), time: TimeNumber(time: tabsSet.times[i]))
+            timedTabs.append(c)
+        }
+       
+        songViewController.updateTuning(tabsSet.tuning)
+        songViewController.updateCapo(tabsSet.capo)
+        songViewController.chords = timedTabs
+        
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
 }
