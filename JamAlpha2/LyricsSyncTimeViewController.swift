@@ -56,7 +56,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     
     // count down section
     var countdownTimer = NSTimer()
-    var countDownStartSecond = 0 //will increments to 3
+    var countDownStartSecond = 3 //will count down from 3 to 1
     var countdownView: CountdownView!
     
     // MARK: UIGestures
@@ -313,7 +313,7 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
             //disable tap gesture that inadvertly starts timer
             progressBlockContainer.removeGestureRecognizer(tapGesture)
             countdownView.hidden = false
-            countdownView.setNumber(1)
+            countdownView.setNumber(countDownStartSecond)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
 
@@ -338,14 +338,14 @@ class LyricsSyncViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func startCountdown() {
-        countDownStartSecond++
-        countdownView.setNumber(countDownStartSecond+1)
+        countDownStartSecond--
+        countdownView.setNumber(countDownStartSecond)
 
-        if countDownStartSecond >= 3 {
+        if countDownStartSecond <= 0 {
             progressBlockContainer.addGestureRecognizer(tapGesture)
             countdownTimer.invalidate()
             countdownView.hidden = true
-            countDownStartSecond = 0
+            countDownStartSecond = 3
             player.play()
             startUpdateTimer()
             

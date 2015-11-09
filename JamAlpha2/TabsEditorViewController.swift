@@ -101,7 +101,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // count down section
     
     var countdownTimer = NSTimer()
-    var countDownStartSecond = 0 //will increments to 3
+    var countDownStartSecond = 3 //will countdown from 3 to 1
     var countdownView: CountdownView!
     
     // data array
@@ -1001,14 +1001,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
 
     func startCountdown() {
-        countDownStartSecond++
-        countdownView.setNumber(countDownStartSecond+1)
-
-        if countDownStartSecond >= 3 {
+        countDownStartSecond--
+        countdownView.setNumber(countDownStartSecond)
+        
+        if countDownStartSecond <= 0 {
             musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
             countdownTimer.invalidate()
             countdownView.hidden = true
-            countDownStartSecond = 0
+            countDownStartSecond = 3
             player.play()
             startTimer()
             self.currentTime = player.currentTime
@@ -1041,7 +1041,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             //disable tap gesture that inadvertly starts timer
             musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
             countdownView.hidden = false
-            countdownView.setNumber(1)
+            countdownView.setNumber(countDownStartSecond)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
         }
@@ -1298,11 +1298,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.backToMainView()
         } else {
             print("back to song view controller")
-            
-            //hide these two views first because they still appear until this viewcontroller is fully dismissed
-            tuningMenu.hidden = true
-            musicControlView.hidden = true
-            self.dismissViewControllerAnimated(true, completion: nil)
+            self.dismissViewControllerAnimated(false, completion: nil)
         }
     }
     
@@ -1472,7 +1468,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
-            self.dismissViewControllerAnimated(true, completion: nil)
+            self.dismissViewControllerAnimated(false, completion: nil)
         }
         self.currentSelectedSpecificTab = nil
     }

@@ -123,10 +123,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var guitarButton:UIButton!
     var othersButton:UIButton!
     
-    
     // count down section
     var countdownTimer = NSTimer()
-    var countDownStartSecond = 0 //will increments to 3
+    var countDownStartSecond = 3 //count from 3 to 1
     var countdownView: CountdownView!
     
     // Guitar actions views
@@ -499,7 +498,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
         topLyricLabel.center.y = lyricbase.frame.height / 3
-        topLyricLabel.numberOfLines = 2
+        topLyricLabel.numberOfLines = 3
         topLyricLabel.textAlignment = NSTextAlignment.Center
         topLyricLabel.font = UIFont.systemFontOfSize(23)
         topLyricLabel.lineBreakMode = .ByWordWrapping
@@ -508,7 +507,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
         bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
-        bottomLyricLabel.numberOfLines = 2
+        bottomLyricLabel.numberOfLines = 3
         bottomLyricLabel.textAlignment = NSTextAlignment.Center
         bottomLyricLabel.font = UIFont.systemFontOfSize(16)
         bottomLyricLabel.lineBreakMode = .ByWordWrapping
@@ -1313,17 +1312,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func startCountdown() {
-        countDownStartSecond++
-        countdownView.setNumber(countDownStartSecond+1)
-
-        if countDownStartSecond >= 3 {
+        countDownStartSecond--
+        countdownView.setNumber(countDownStartSecond)
+        
+        if countDownStartSecond <= 0 {
             //add tap gesture back
             chordBase.addGestureRecognizer(chordBaseTapGesture)
             progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
             
             countdownTimer.invalidate()
             countdownView.hidden = true
-            countDownStartSecond = 0
+            countDownStartSecond = 3
             player.play()
         }
 
@@ -1662,9 +1661,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 //temporarily disable tap gesture to avoid accidental start count down again
                 chordBase.removeGestureRecognizer(chordBaseTapGesture)
                 progressBlockContainer.removeGestureRecognizer(progressContainerTapGesture)
-                
+                countdownView.setNumber(countDownStartSecond)
                 countdownView.hidden = false
-                countdownView.setNumber(1)
                 countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
                 NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
                 
