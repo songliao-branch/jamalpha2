@@ -721,10 +721,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if nowView != nil {
                 self.nowView.start()
             }
-            //TODO: BUG: when soundwave is generating, the volume is somehow lowered 
-            // until the player.currentPlaybacktime is set, as move the progress block would 
-            // restore the normal volume
-            player.currentPlaybackTime = player.currentPlaybackTime
+         
             player.play()
             startTimer()
         } else { // selected from now view button
