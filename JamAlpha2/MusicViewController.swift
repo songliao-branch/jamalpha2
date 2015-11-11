@@ -408,15 +408,13 @@ extension MusicViewController {
         
         if let _ = self.musicDataManager.getSongWaveFormImage(nowPlayingItem) {
             // songCount can be only incremented in one queue no matter how many threads
-            pthread_rwlock_wrlock(&self.rwLock)
-            if(Int(self.songCount) < self.uniqueSongs.count-1){
-                self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&self.songCount))])
-            }
-            pthread_rwlock_unlock(&self.rwLock)
+            self.incrementSongCountInThread()
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                 guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
                     print("sound url not available")
+                    
+                    self.incrementSongCountInThread()
                     return
                 }
             
@@ -442,18 +440,22 @@ extension MusicViewController {
                         print("Soundwave generated for \(nowPlayingItem.title!) in background")
                         
                         KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
-                        
-                        pthread_rwlock_wrlock(&self.rwLock)
-                        if(Int(self.songCount) < self.uniqueSongs.count-1){
-                            self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&(self.songCount)))])
-                        }
-                        pthread_rwlock_unlock(&self.rwLock)
+                        self.incrementSongCountInThread()
+       
                     })
                     KGLOBAL_init_operationCache[assetURL as! NSURL] = op
                     KGLOBAL_init_queue.addOperation(op!)
                 }
             }
         }
+    }
+    
+    func incrementSongCountInThread(){
+        pthread_rwlock_wrlock(&self.rwLock)
+        if(Int(self.songCount) < self.uniqueSongs.count-1){
+            self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&(self.songCount)))])
+        }
+        pthread_rwlock_unlock(&self.rwLock)
     }
 }
 

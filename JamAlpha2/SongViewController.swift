@@ -225,7 +225,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func removeAllObserver(){
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
     }
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -585,15 +585,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playerVolumeChanged:"), name:MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
         player.beginGeneratingPlaybackNotifications()
     }
-    
-//    func synced(lock: AnyObject, closure: () -> ()) {
-//        objc_sync_enter(lock)
-//        closure()
-//        objc_sync_exit(lock)
-//    }
+
     
     func currentSongChanged(notification: NSNotification){
         pthread_rwlock_wrlock(&self.rwLock)
@@ -718,22 +712,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             })
         }
     }
-    
-    override func didReceiveMemoryWarning() {
-        print("memory warning")
-        removeMusicPlayerObserver()
-        player.endGeneratingPlaybackNotifications()
-    }
-    func removeMusicPlayerObserver(){
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerVolumeDidChangeNotification, object: player)
-    }
-    
-    func playerVolumeChanged(notification: NSNotification){
-        print("volume changed")
-    }
-    
+
     func resumeSong(){
         
         //musicViewController!.nowView!.stop()
@@ -1411,7 +1390,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if player.playbackState == MPMusicPlaybackState.Playing {
             player.currentPlaybackRate = 1
         }
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+        
+        removeAllObserver()
     }
     
     func calculateXPoints(){
