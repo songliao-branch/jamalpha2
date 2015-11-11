@@ -18,7 +18,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     private var rwLock = pthread_rwlock_t()
     
     //for nsoperation
-    var isGenerated:Bool = false
+    var isGenerated:Bool = true
     
     var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
@@ -963,7 +963,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
-        totalTimeLabel.text = TimeNumber(time: Float(firstLoadPlayingItem.playbackDuration)).toDisplayString()
+        totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
         totalTimeLabel.textAlignment = .Right
         self.view.addSubview(totalTimeLabel)
         
