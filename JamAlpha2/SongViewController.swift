@@ -87,7 +87,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var capoOfTheTabsSet = 0
     
     //time
-    var timer: NSTimer = NSTimer()
+    var timer: NSTimer!
     var updateInterval: NSTimeInterval = 0 //used to calculate count down reduce
     var currentChordTime:Float = 0
     var toChordTime:Float = 0
@@ -627,6 +627,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 //remove from superView
                 if(KGLOBAL_progressBlock != nil ){
                     KGLOBAL_progressBlock.removeFromSuperview()
+                    KGLOBAL_progressBlock = nil
                 }
                 
                 // get a new progressBlock
@@ -680,7 +681,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.speed = 1
             //self.nowPlayingItemSpeed = 1
             if self.player.playbackState == MPMusicPlaybackState.Playing{
-                self.timer.invalidate()
+                self.stopTimer()
                 self.startTimer()
             }
             
@@ -692,7 +693,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let playbackState = player.playbackState
         
         if playbackState == .Paused {
-            timer.invalidate()
+            stopTimer()
             
             //fade down the soundwave
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
@@ -756,7 +757,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.nowView.stop()
                 }
                 
-                timer.invalidate()
+                stopTimer()
                 // progress bar should be lowered
                 KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 KGLOBAL_progressBlock!.alpha = 0.5
@@ -779,8 +780,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         progressBarWidth = CGFloat(firstLoadPlayingItem.playbackDuration) * progressWidthMultiplier
         
-        if(KGLOBAL_progressBlock != nil){
-            KGLOBAL_progressBlock.removeFromSuperview()
+        if(KGLOBAL_progressBlock != nil ){
+                    KGLOBAL_progressBlock.removeFromSuperview()
+                    KGLOBAL_progressBlock = nil
         }
         KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
@@ -832,7 +834,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         KGLOBAL_operationCache.removeValueForKey(assetURL as! NSURL)
                         if(tempNowPlayingItem == self.player.nowPlayingItem){
                             NSOperationQueue.mainQueue().addOperationWithBlock({
-                                KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                if(KGLOBAL_progressBlock != nil ){
+                                    KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                }
                                 KGLOBAL_init_queue.suspended = false
                             })
                         }
@@ -863,7 +867,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             //update all chords, lyrics
-            timer.invalidate()
+            stopTimer()
             
             //new Position from 160 to -357
             //-self.view.frame.width /2
@@ -897,8 +901,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         case UIGestureRecognizerState.Began:
             isPanning = true
-            currentChordTime = startTime.toDecimalNumer()+0.01
-            timer.invalidate()
+            currentChordTime = startTime.toDecimalNumer()
+            stopTimer()
             updateAll(currentChordTime)
             
             break;
@@ -1335,7 +1339,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
-        timer.invalidate()
+        stopTimer()
         let roundedValue = Double(round(10*stepper.value)/10)
         let adjustedSpeed = Float(speedMatcher[roundedValue]!)
         self.speed = adjustedSpeed
@@ -1398,8 +1402,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         print("view will disappear")
-        timer.invalidate()
+        stopTimer()
         viewDidFullyDisappear = true
+        if(KGLOBAL_progressBlock != nil ){
+            KGLOBAL_progressBlock.removeFromSuperview()
+            KGLOBAL_progressBlock = nil
+        }
         if player.playbackState == MPMusicPlaybackState.Playing {
             player.currentPlaybackRate = 1
         }
@@ -1685,16 +1693,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //NOTE: To prevent startTimer() to be called consecutively
         //which would double the update speed. We only
         //start the timer when it is not valid
-        //In case of receiving song changed and playback state 
+        //In case of receiving song changed and playback state
         //notifications, notifications are triggered twice somehow
-        if !timer.valid {
+        if timer == nil {
+            timer = NSTimer()
             timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
+            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+        }
+    }
+    
+    func stopTimer(){
+        if(timer != nil){
+            timer.invalidate()
+            timer = nil
         }
     }
     
     func update(){
-        startTime.addTime(Int(100 / stepPerSecond))
+        if(!isPanning){
+            startTime.addTime(Int(100 / stepPerSecond))
+        }
         refreshChordLabel()
         refreshLyrics()
         refreshProgressBlock()
