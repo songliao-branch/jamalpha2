@@ -11,6 +11,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     var theAlbum:Album!
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
+    private var isReload = false
     
     @IBOutlet weak var albumTable: UITableView!
     
@@ -116,10 +117,17 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         self.animator!.attachToViewController(songVC)
         
         //reload table to show loudspeaker icon on current selected row
-        tableView.reloadData()
+        isReload = true
         self.presentViewController(songVC, animated: true, completion: nil)
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        if(isReload){
+            self.albumTable.reloadData()
+            isReload = false
+        }
     }
     
  }

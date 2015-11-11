@@ -16,6 +16,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var searchResults: [SearchResult]!
     var musicRequest: Request?
     var animator: CustomTransitionAnimation?
+    private var isReload = false
     
     var searchHistoryManager =  SearchHistoryManager()
 
@@ -214,7 +215,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
-                reloadMusicTable()
+                isReload = true
                 self.presentViewController(songVC, animated: true, completion: nil)
                 
             }
@@ -305,6 +306,13 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return song.title!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
         })
         self.searchResultTableView.reloadData()
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        if(isReload){
+            self.reloadMusicTable()
+            isReload = false
+        }
     }
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller

@@ -185,21 +185,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
+    
+    var firstLoadPlayingItem: MPMediaItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
        
         player = MusicManager.sharedInstance.player
-        firstLoadSongTime = player.nowPlayingItem!.playbackDuration
-        firstloadSongTitle = player.nowPlayingItem!.title
+        self.firstLoadPlayingItem = player.nowPlayingItem
+        firstLoadSongTime = firstLoadPlayingItem.playbackDuration
+        firstloadSongTitle = firstLoadPlayingItem.title
         
-        musicDataManager.initializeSongToDatabase(player.nowPlayingItem!)
+        musicDataManager.initializeSongToDatabase(firstLoadPlayingItem)
     
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
-        setUpMusicData(player.nowPlayingItem!)
         setUpTopButtons()
         setUpNameAndArtistButtons()
         setUpBackgroundImage()
@@ -213,6 +215,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         setUpActionViews()
         setUpCountdownView()
+        updateMusicData(firstLoadPlayingItem)
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
@@ -238,7 +241,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
             loadDisplayMode()
-            updateMusicData(player.nowPlayingItem!)
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -248,8 +250,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewDidAppear(animated)
         self.registerMediaPlayerNotification()
         if(!isGenerated){
-            let nowPlayingItem = player.nowPlayingItem!
-            generateSoundWave(nowPlayingItem)
+            generateSoundWave(firstLoadPlayingItem)
         }
     }
     
@@ -259,8 +260,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
         //get the image from MPMediaItem
-        print(player.nowPlayingItem!.title)
-        if let artwork = player.nowPlayingItem!.artwork {
+        print(firstLoadPlayingItem.title)
+        if let artwork = firstLoadPlayingItem.artwork {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
         } else {
             //TODO: add a placeholder album cover
@@ -371,12 +372,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
         artistNameLabel.textAlignment = NSTextAlignment.Center
         
-        let title:String = player.nowPlayingItem!.title!
+        let title:String = firstLoadPlayingItem.title!
         let attributedString = NSMutableAttributedString(string:title)
         songNameLabel.attributedText = attributedString
         songNameLabel.textAlignment = NSTextAlignment.Center
             
-        artistNameLabel.text = player.nowPlayingItem!.artist
+        artistNameLabel.text = firstLoadPlayingItem.artist
         
         
         songNameLabel!.font = UIFont.systemFontOfSize(18)
@@ -461,7 +462,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.capoOfTheTabsSet = 0
         
         //return a tuple of ([Chord],tuning, capo)
-        let tabsFromCoreData = musicDataManager.getTabs(player.nowPlayingItem!)
+        let tabsFromCoreData = musicDataManager.getTabs(song)
         if tabsFromCoreData.0.count > 0 {
             print("chords length: \(tabsFromCoreData.0.count)")
             if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
@@ -475,7 +476,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
 
-        let lyricsFromCoreData = musicDataManager.getLyrics(player.nowPlayingItem!)
+        let lyricsFromCoreData = musicDataManager.getLyrics(song)
         
         if lyricsFromCoreData.count > 0 {
             self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
@@ -610,7 +611,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
             if self.firstloadSongTitle != nowPlayingItem!.title && self.firstLoadSongTime != nowPlayingItem!.playbackDuration {
-                self.musicDataManager.initializeSongToDatabase(self.player.nowPlayingItem!)
+                self.musicDataManager.initializeSongToDatabase(nowPlayingItem!)
                 self.firstloadSongTitle = nowPlayingItem!.title
                 self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
@@ -637,7 +638,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 if let soundWaveData = self.musicDataManager.getSongWaveFormImage(nowPlayingItem!) {
                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-                     self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                     print("sound wave data found")
                     KGLOBAL_init_queue.suspended = false
                 } else {
@@ -661,7 +661,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.songNameLabel.textAlignment = NSTextAlignment.Center
                     self.artistNameLabel.text = nowPlayingItem!.artist
         
-                    if let artwork = self.player.nowPlayingItem!.artwork {
+                    if let artwork = nowPlayingItem!.artwork {
                         let image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
                         let blurredImage = image!.applyLightEffect()!
                         self.textColor = blurredImage.averageColor()
@@ -777,14 +777,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         var progressBarWidth:CGFloat!
 
-        progressBarWidth = CGFloat(player.nowPlayingItem!.playbackDuration) * progressWidthMultiplier
+        progressBarWidth = CGFloat(firstLoadPlayingItem.playbackDuration) * progressWidthMultiplier
         
         KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
         //if there is soundwave in the coredata then we load the image in viewdidload
-        if let soundWaveData = musicDataManager.getSongWaveFormImage(player.nowPlayingItem!) {
+        if let soundWaveData = musicDataManager.getSongWaveFormImage(firstLoadPlayingItem) {
             KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
             KGLOBAL_init_queue.suspended = false
@@ -963,7 +963,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
-        totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
+        totalTimeLabel.text = TimeNumber(time: Float(firstLoadPlayingItem.playbackDuration)).toDisplayString()
         totalTimeLabel.textAlignment = .Right
         self.view.addSubview(totalTimeLabel)
         
