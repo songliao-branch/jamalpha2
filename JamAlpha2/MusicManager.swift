@@ -73,10 +73,7 @@ class MusicManager: NSObject {
             print(MPMediaItemPropertyReleaseDate)
             
             queueChanged = true
-            //testing
-            for song in collection {
-                print("\(_TAG) setting up queue of song: \(song.title!)")
-            }
+            KGLOBAL_isChangedQueue = true
         }
     }
     
@@ -95,15 +92,14 @@ class MusicManager: NSObject {
             
             // if current playing song is not what we selected from the table
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
-                player.prepareToPlay()
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
+                
             } else {
                 if queueChanged { // if we selected the same song from a different queue this time
                     let lastPlaybackTime = player.currentPlaybackTime
-                    player.prepareToPlay() // set current playing index to zero
                     player.nowPlayingItem = lastPlayerQueue[selectedIndex] // this has a really short time lag
-                    
                     player.currentPlaybackTime = lastPlaybackTime
+                    
                 }
             }
         }

@@ -252,12 +252,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if pageIndex == 0 {
             KGLOBAL_init_queue.suspended = true
-            
-            let allSongsSorted = getAllSortedItems(songsByFirstAlphabet)
-            MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
-            
-            let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
-            MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+                let allSongsSorted = self.getAllSortedItems(self.songsByFirstAlphabet)
+                MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
+                
+                let indexToBePlayed = self.findIndexToBePlayed(self.songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
+                MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+           
 
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             songVC.selectedFromTable = true
