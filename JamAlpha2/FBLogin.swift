@@ -13,12 +13,11 @@ import FBSDKLoginKit
 
 extension MeViewController: FBSDKLoginButtonDelegate {
     
-    func setUpFBLogin(sender: UIView) {
-        let fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
-        fbLoginButton.frame = CGRectMake(0.2 * self.viewWidth, 0.2 * sender.frame.size.height, 0.6 * self.viewWidth, 0.6 * sender.frame.size.height)
-        fbLoginButton.delegate = self
-        fbLoginButton.readPermissions = ["public_profile", "email", "user_friends"]
-        sender.addSubview(fbLoginButton)
+    func setUpFBLogin() {
+        self.fbLoginButton.delegate = self
+        self.fbLoginButton.readPermissions = ["public_profile", "email", "user_friends"]
+        self.fbLoginButton.loginBehavior = FBSDKLoginBehavior.Web
+        self.fbLoginButton.defaultAudience = FBSDKDefaultAudience.Friends
     }
     
     func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
@@ -39,8 +38,8 @@ extension MeViewController: FBSDKLoginButtonDelegate {
             {
                 // Do work
                 print("\(result)")
-                self.dismissSecondView(self.signInEditView)
-                self.dismissSecondView(self.createAccountEditView)
+                returnUserData()
+
             }
         }
     }
@@ -57,6 +56,7 @@ extension MeViewController: FBSDKLoginButtonDelegate {
                 print("graph request Error: \(error)")
             } else {
                 print("FB fetched user: \(result)")
+                //self.userEmail = result.valueForKey("email") as! String
                 self.userName = result.valueForKey("name") as! String
                 self.userId = result.valueForKey("id") as! String
                 self.userURL = "http://graph.facebook.com/\(self.userId)/picture?type=large"

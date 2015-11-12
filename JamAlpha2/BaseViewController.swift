@@ -24,7 +24,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     var isPageScrolling = false //prevent scrolling / button tap crash
     
-    var statusAndNavigationBarHeight: CGFloat = 64
+    var statusAndNavigationBarHeight: CGFloat = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,8 +89,8 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let allViewControllers: [UIViewController] = [startVC]
         self.pageViewController.setViewControllers(allViewControllers, direction: .Forward, animated: true, completion: nil)
         
-        let heightOffset: CGFloat = 5 // height of table looks cut without minus 5
-        self.pageViewController.view.frame = CGRectMake(0, statusAndNavigationBarHeight+CGRectGetMaxY(musicUnderlineSelector.frame), self.view.frame.width, self.view.frame.size.height-heightOffset)
+        //let heightOffset: CGFloat = 5 // height of table looks cut without minus 5
+        self.pageViewController.view.frame = CGRectMake(0, statusAndNavigationBarHeight+CGRectGetMaxY(musicUnderlineSelector.frame), self.view.frame.width, self.view.frame.size.height + 60)
         
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
@@ -120,6 +120,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
     }
     
     

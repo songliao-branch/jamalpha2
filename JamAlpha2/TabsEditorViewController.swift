@@ -1596,7 +1596,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.player.currentTime = 0
             self.currentTime = 0
         }
-        
+        update()
         if self.removeAvaliable == true {
             self.changeRemoveButtonStatus(self.removeButton)
         }
@@ -1710,9 +1710,9 @@ extension TabsEditorViewController {
             }
             
         }
-        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
-        self.progressBlock.setProgress(0)
-        self.currentTime = 0
+        let current = NSTimeInterval(sender[sender.count - 1].time.toDecimalNumer()) + 0.1
+        self.player.currentTime = current
+        update()
     }
 
     
@@ -1720,6 +1720,7 @@ extension TabsEditorViewController {
     func addChordToEditorView(sender: MPMediaItem) {
         let tabs = musicDataManager.getTabs(sender)
         let chord: [Chord] = tabs.0
+        
         let tuning: String = tabs.1
         let capo: Int = tabs.2
         
