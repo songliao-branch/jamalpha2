@@ -191,7 +191,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
-       
         player = MusicManager.sharedInstance.player
         self.firstLoadPlayingItem = player.nowPlayingItem
         firstLoadSongTime = firstLoadPlayingItem.playbackDuration
@@ -718,21 +717,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //musicViewController!.nowView!.stop()
         // if we are pressing the now button this is false, or coming from background
         if selectedFromTable {
-            if nowView != nil {
-                self.nowView.start()
-            }
-         
             player.play()
             startTimer()
         } else { // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
+                startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+                updateAll(startTime.toDecimalNumer())
+
             }
             else if player.playbackState == MPMusicPlaybackState.Paused {
-                if nowView != nil {
-                    self.nowView.stop()
-                }
-                
                 stopTimer()
                 // progress bar should be lowered
                 KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -741,8 +735,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
 
-        startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
-        updateAll(startTime.toDecimalNumer())
+        
     }
     
     func setUpProgressContainer(){
@@ -1373,6 +1366,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        if(player.playbackState == .Playing){
+            if nowView != nil {
+                self.nowView.start()
+            }
+        }else{
+            if nowView != nil {
+                self.nowView.stop()
+            }
+        }
+    }
+    
     // ISSUE: when app goes to background this is not called
     //stop timer,stop refreshing UIs after view is completely gone of sight
     override func viewDidDisappear(animated: Bool) {
@@ -1676,7 +1682,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             timer = NSTimer()
             timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
-            NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            //NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
         }
     }
     
@@ -1689,7 +1695,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func update(){
         if(!isPanning){
-            startTime.addTime(Int(100 / stepPerSecond))
+            //startTime.addTime(Int(100 / stepPerSecond))
+            startTime = TimeNumber(time: Float(player.currentPlaybackTime))
         }
         refreshChordLabel()
         refreshLyrics()
