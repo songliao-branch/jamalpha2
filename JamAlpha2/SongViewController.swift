@@ -187,6 +187,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let bottomViewHeight:CGFloat = 40 //this is fixed
     
     var firstLoadPlayingItem: MPMediaItem!
+    var isRemoveProgressBlock = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -239,6 +240,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
             //println("resume song when Fully Disapper")
+            if(!isRemoveProgressBlock){
+                updateMusicData(player.nowPlayingItem!)
+                isRemoveProgressBlock = true
+            }
             loadDisplayMode()
             resumeSong()
             viewDidFullyDisappear = false
@@ -1325,6 +1330,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func goToTabsEditor(button: UIButton) {
+        self.isRemoveProgressBlock = false
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
         self.player.pause()
@@ -1336,6 +1342,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     func goToLyricsEditor(button: UIButton) {
+        self.isRemoveProgressBlock = false
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
@@ -1386,15 +1393,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         print("view will disappear")
         stopTimer()
         viewDidFullyDisappear = true
-        if(KGLOBAL_progressBlock != nil ){
-            KGLOBAL_progressBlock.removeFromSuperview()
-            KGLOBAL_progressBlock = nil
+        if(isRemoveProgressBlock){
+            if(KGLOBAL_progressBlock != nil ){
+                KGLOBAL_progressBlock.removeFromSuperview()
+                KGLOBAL_progressBlock = nil
+            }
         }
+        
         if player.playbackState == MPMusicPlaybackState.Playing {
             player.currentPlaybackRate = 1
         }
         
-        removeAllObserver()
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
     }
     
     func calculateXPoints(){
@@ -1695,8 +1705,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func update(){
         if(!isPanning){
-            //startTime.addTime(Int(100 / stepPerSecond))
-            startTime = TimeNumber(time: Float(player.currentPlaybackTime))
+            startTime.addTime(Int(100 / stepPerSecond))
+           // startTime = TimeNumber(time: Float(player.currentPlaybackTime))
         }
         refreshChordLabel()
         refreshLyrics()
