@@ -103,7 +103,7 @@ class MusicManager: NSObject {
                    // player.prepareToPlay() // set current playing index to zero
                     player.nowPlayingItem = lastPlayerQueue[selectedIndex] // this has a really short time lag
                     
-                    player.currentPlaybackTime = lastPlaybackTime
+                    player.currentPlaybackTime = lastPlaybackTime + 0.32
                 }
             }
         }
