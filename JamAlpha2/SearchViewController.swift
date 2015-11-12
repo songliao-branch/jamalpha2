@@ -214,8 +214,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
-                reloadMusicTable()
-                self.presentViewController(songVC, animated: true, completion: nil)
+                self.presentViewController(songVC, animated: true, completion: {
+                    completed in
+                    self.reloadMusicTable()
+                })
                 
             }
             

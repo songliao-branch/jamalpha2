@@ -163,13 +163,13 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         
-         //reload table to show loudspeaker icon on current selected row
-        tableView.reloadData()
-        
-        self.presentViewController(songVC, animated: true, completion: nil)
-        
-        
+        self.presentViewController(songVC, animated: true, completion: {
+                completed in
+                tableView.reloadData()
+            }
+        )
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
+    
  }
 
