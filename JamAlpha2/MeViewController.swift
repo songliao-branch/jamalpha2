@@ -60,6 +60,10 @@ class MeViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        setUpNavigationBar()
+    }
+    
     func setUpNavigationBar(){
 //        let logo = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSizeMake(self.view.frame.width/2, 22)))
 //        logo.image = UIImage(named: "logo_bold")
@@ -290,6 +294,10 @@ extension MeViewController {
     }
     
     func pressNextButton(sender: UIButton) {
-        
+        if self.emailSignUpTextField.text != "" {
+            let meSignUpVC: MeSignUpViewController = (self.storyboard?.instantiateViewControllerWithIdentifier("mesignupVC"))! as! MeSignUpViewController
+            meSignUpVC.email = self.emailSignUpTextField.text!
+            self.navigationController?.pushViewController(meSignUpVC, animated: true)
+        }
     }
 }

@@ -13,6 +13,7 @@
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
 		BF5A77B51BEABD6C00BCE723 /* FBLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */; };
 		BF5A77D81BEFFA5600BCE723 /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D71BEFFA5600BCE723 /* MeViewController.swift */; };
+		BF5A77DA1BF4484200BCE723 /* MeSignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D91BF4484200BCE723 /* MeSignUpViewController.swift */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
@@ -97,6 +98,7 @@
 		84DA61A31B4E211100979A42 /* Lyric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lyric.swift; sourceTree = "<group>"; };
 		BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FBLogin.swift; sourceTree = "<group>"; };
 		BF5A77D71BEFFA5600BCE723 /* MeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
+		BF5A77D91BF4484200BCE723 /* MeSignUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeSignUpViewController.swift; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				BF5A77D71BEFFA5600BCE723 /* MeViewController.swift */,
+				BF5A77D91BF4484200BCE723 /* MeSignUpViewController.swift */,
 				BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */,
 			);
 			name = MeViewController;
@@ -616,6 +619,7 @@
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
+				BF5A77DA1BF4484200BCE723 /* MeSignUpViewController.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,

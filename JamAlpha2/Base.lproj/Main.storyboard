@@ -603,6 +603,25 @@
             </objects>
             <point key="canvasLocation" x="-188" y="929"/>
         </scene>
+        <!--Me Sign Up View Controller-->
+        <scene sceneID="Jgn-f8-dBh">
+            <objects>
+                <viewController storyboardIdentifier="mesignupVC" id="fD5-FT-xpr" customClass="MeSignUpViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="or3-YE-8n6"/>
+                        <viewControllerLayoutGuide type="bottom" id="sMv-Ku-rLN"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="k10-2q-RUc">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5FB-Qu-USL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="182" y="929"/>
+        </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">
             <objects>
