@@ -16,8 +16,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var musicDataManager = MusicDataManager()
     private var rwLock = pthread_rwlock_t()
     
-    private var isReload:Bool = false
-    
     var pageIndex = 0
     
     @IBOutlet weak var musicTable: UITableView!
@@ -268,9 +266,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             self.animator!.attachToViewController(songVC)
             songVC.musicViewController = self //for goToArtist and goToAlbum from here
             songVC.nowView = self.nowView
-             //reload table to show loudspeaker icon on current selected row
-            isReload = true
-            self.presentViewController(songVC, animated: true, completion: nil)
+                self.presentViewController(songVC, animated: true, completion: {
+                completed in
+                //reload table to show loudspeaker icon on current selected row
+                tableView.reloadData()
+            })
         }
         else if pageIndex == 1 {
 
@@ -391,13 +391,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
         }
         return itemsInPreviousSections + currentRow
-    }
-    
-    override func viewDidDisappear(animated: Bool) {
-        if(isReload){
-            self.musicTable.reloadData()
-            isReload = false
-        }
     }
     
 }

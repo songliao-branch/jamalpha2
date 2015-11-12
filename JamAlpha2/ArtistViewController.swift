@@ -17,8 +17,6 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
     
-    private var isReload = false
-    
     @IBOutlet weak var artistTable: UITableView!
     
     
@@ -165,20 +163,13 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         
-         //reload table to show loudspeaker icon on current selected row
-        isReload = true
-        
-        self.presentViewController(songVC, animated: true, completion: nil)
-        
-        
+        self.presentViewController(songVC, animated: true, completion: {
+                completed in
+                tableView.reloadData()
+            }
+        )
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
-    override func viewDidDisappear(animated: Bool) {
-        if(isReload){
-            self.artistTable.reloadData()
-            isReload = false
-        }
-    }
  }
 
