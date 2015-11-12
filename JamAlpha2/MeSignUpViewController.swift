@@ -68,7 +68,7 @@ class MeSignUpViewController: UIViewController {
     func setUpEditView() {
         
         editView.frame = CGRectMake(0, 0, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight)
-        editView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight + 0.1 * self.viewHeight)
+        editView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight + 0.15 * self.viewHeight)
         self.view.addSubview(editView)
         
         let imageWidth: CGFloat = 0.15 * self.viewHeight
@@ -122,6 +122,7 @@ class MeSignUpViewController: UIViewController {
         passwordTitleImage.image = UIImage(named: "password")
         editView.addSubview(passwordTitleImage)
         self.passwordTextField.frame = CGRectMake(0.25 * self.viewWidth, 0.45 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
+        self.passwordTextField.secureTextEntry = true
         self.passwordTextField.backgroundColor = UIColor.clearColor()
         self.passwordTextField.addTarget(self, action: "valueChangeOnPasswordTextField:", forControlEvents: UIControlEvents.EditingChanged)
         self.passwordTextField.accessibilityIdentifier = "unedit"
@@ -135,6 +136,15 @@ class MeSignUpViewController: UIViewController {
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
         editView.addGestureRecognizer(tapOnEditView)
+        
+        let policyLabel: UILabel = UILabel()
+        policyLabel.frame = CGRectMake(0.1 * self.viewWidth, 0.55 * self.viewHeight, 0.8 * self.viewWidth, 0.2 * self.viewHeight)
+        policyLabel.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        policyLabel.numberOfLines = 0
+        policyLabel.text = "By tapping to continue, you are indicating that you have read the Privacy Policy and agree to the Terms of Service"
+        policyLabel.font = UIFont.systemFontOfSize(12)
+        editView.addSubview(policyLabel)
+        
         
     }
     
