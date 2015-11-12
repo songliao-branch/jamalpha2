@@ -226,6 +226,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func removeAllObserver(){
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+        player.endGeneratingPlaybackNotifications()
     }
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -1331,6 +1332,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToTabsEditor(button: UIButton) {
         self.isRemoveProgressBlock = false
+        self.selectedFromTable = true
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
         self.player.pause()
@@ -1343,6 +1345,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func goToLyricsEditor(button: UIButton) {
         self.isRemoveProgressBlock = false
+        self.selectedFromTable = true
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
@@ -1705,8 +1708,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func update(){
         if(!isPanning){
+//            if ( player.nowPlayingItem == nil){
+//                startTime.addTime(Int(100 / stepPerSecond))
+//            }else{
+//                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
+//            }
             startTime.addTime(Int(100 / stepPerSecond))
-           // startTime = TimeNumber(time: Float(player.currentPlaybackTime))
         }
         refreshChordLabel()
         refreshLyrics()
