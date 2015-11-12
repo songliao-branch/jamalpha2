@@ -239,7 +239,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
-            //println("resume song when Fully Disapper")
+
             if(!isRemoveProgressBlock){
                 updateMusicData(player.nowPlayingItem!)
                 isRemoveProgressBlock = true
@@ -1374,18 +1374,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        if(player.playbackState == .Playing){
-            if nowView != nil {
-                self.nowView.start()
-            }
-        }else{
-            if nowView != nil {
-                self.nowView.stop()
-            }
-        }
-    }
     
     // ISSUE: when app goes to background this is not called
     //stop timer,stop refreshing UIs after view is completely gone of sight
@@ -1398,6 +1386,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(KGLOBAL_progressBlock != nil ){
                 KGLOBAL_progressBlock.removeFromSuperview()
                 KGLOBAL_progressBlock = nil
+            }
+        }
+        
+        if player.playbackState == .Playing {
+            if nowView != nil {
+                self.nowView.start()
+            }
+        } else {
+            if nowView != nil {
+                self.nowView.stop()
             }
         }
         
@@ -1705,11 +1703,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func update(){
         if(!isPanning){
-//            if ( player.nowPlayingItem == nil){
-//                startTime.addTime(Int(100 / stepPerSecond))
-//            }else{
-//                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
-//            }
+            
+            //TODO: sometimes when songviewcontroller takes time to load, player.currentPlaybackTime does not sync with the startTime, causing delays in showing the chords and lyrics. This has some issues for now, resolve later.
+            //            if ( player.nowPlayingItem == nil){
+            //                startTime.addTime(Int(100 / stepPerSecond))
+            //            }else{
+            //                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
+            //            }
             startTime.addTime(Int(100 / stepPerSecond))
         }
         refreshChordLabel()
