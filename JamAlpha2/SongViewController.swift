@@ -722,7 +722,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //musicViewController!.nowView!.stop()
         // if we are pressing the now button this is false, or coming from background
         if selectedFromTable {
-
             player.play()
             startTimer()
         } else { // selected from now view button
@@ -912,8 +911,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
 
-    
-    
+
     func setUpTimeLabels(){
         
         let labelWidth: CGFloat = 40
