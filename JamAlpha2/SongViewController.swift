@@ -1524,16 +1524,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshProgressBlock(){
-
-        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
-        
-        let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
-        
-        if !isPanning {
-            self.progressChangedOrigin = newOriginX
-            KGLOBAL_progressBlock.setProgress(newProgressPosition)
+        if(KGLOBAL_progressBlock != nil){
+            let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
+            
+            let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
+            
+            if !isPanning {
+                self.progressChangedOrigin = newOriginX
+                KGLOBAL_progressBlock.setProgress(newProgressPosition)
+            }
+            KGLOBAL_progressBlock.frame.origin.x = newOriginX
         }
-        KGLOBAL_progressBlock.frame.origin.x = newOriginX
     }
     
     func refreshTimeLabel(){
