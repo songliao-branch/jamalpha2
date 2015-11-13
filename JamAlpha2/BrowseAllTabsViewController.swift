@@ -15,7 +15,7 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
     var songViewController: SongViewController!
     @IBOutlet weak var tabsTableView: UITableView!
     
-    var downloadedTabsSets = [DownloadedTabs]()
+    var downloadedTabsSets = [DownloadedTabsSet]()
     var mediaItem: MPMediaItem!
     var songId = -1
     
@@ -23,15 +23,15 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         setUpHeader()
     }
     
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        downloadedTabsSets = [DownloadedTabs]()
-        APIManager.downloadTabs(mediaItem, callbackResults:{
+        downloadedTabsSets = [DownloadedTabsSet]()
+        APIManager.downloadTabs(mediaItem, completion: {
             downloads in
             self.downloadedTabsSets = downloads
             self.tabsTableView.reloadData()
         })
+        
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -113,12 +113,12 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         
         let tabsSet = downloadedTabsSets[indexPath.row]
         
-        tabsCell.votesLabel.text = String(tabsSet.upVote - tabsSet.downVote)
+        tabsCell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
         tabsCell.votesLabel.sizeToFit()
         var chordsPreview = ""
-        for i in 0..<tabsSet.chords.count {
-            chordsPreview += tabsSet.chords[i] + "  "//add two spaces between each chord
-        }
+//        for i in 0..<tabsSet.chords.count {
+//            chordsPreview += tabsSet.chords[i] + "  "//add two spaces between each chord
+//        }
         
         tabsCell.chordsPreviewLabel.text = chordsPreview
         
@@ -133,7 +133,14 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
             let c = Chord(tab: Tab(name: tabsSet.chords[i], content: tabsSet.tabs[i]), time: TimeNumber(time: tabsSet.times[i]))
             timedTabs.append(c)
         }
-       
+        
+        APIManager.downloadTabsSetContent(tabsSet, completion: {
+            download in
+            for t in download.times {
+                print("TIMES: \(t)")
+            }
+        })
+        
         songViewController.updateTuning(tabsSet.tuning)
         songViewController.updateCapo(tabsSet.capo)
         songViewController.chords = timedTabs

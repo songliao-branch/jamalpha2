@@ -29,22 +29,7 @@ class SearchResult {
     }
 }
 
-struct DownloadedTabs {
-    var tuning: String
-    var capo: Int
-    
-    var chords: [String]
-    var tabs: [String]
-    var times: [Float]
-    
-    var songId = -1
-    
-    var upVote = 0
-    var downVote = 0
-    //var userId
-    //var userName
-    
-}
+
 class APIManager: NSObject {
     
     //MARK: iTunes search
@@ -56,10 +41,12 @@ class APIManager: NSObject {
     
     //MARK: heroku server codes
     static let jamBaseURL = "https://jamapi.herokuapp.com"
+    
+    static let findSongOrCreateURL = "/findsongorcreate"
+    
     static let songURL = jamBaseURL + "/songs"
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
     
-
     class func uploadTabs(mediaItem: MPMediaItem) {
         let musicDataManager = MusicDataManager()
         
@@ -88,7 +75,8 @@ class APIManager: NSObject {
                     "times": timesData,
                     "chords": chordsData,
                     "tabs": tabsData,
-                    "song_id":  songId
+                    "song_id":  songId,
+                    "user_id": 1 //TODO: change later
                 ]
             ]
             
@@ -107,54 +95,74 @@ class APIManager: NSObject {
     }
     
     //download all tabs sets for one song, the callback return the result
-    class func downloadTabs(mediaItem: MPMediaItem, callbackResults: (downloads: [DownloadedTabs]) -> Void ) {
-        var allDownloads = [DownloadedTabs]()
+    class func downloadTabs(mediaItem: MPMediaItem, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
         
-        findSongId(mediaItem, callback: { songId in
-            
-            let parameters = ["song_id": songId]
-            
-            Alamofire.request(.GET, tabsSetURL, parameters: parameters).responseJSON { response in
-                switch response.result {
-                case .Success:
-                    if let data = response.result.value {
-                        let json = JSON(data)
-                        print("Downloaded JSON:\(json)")
-                        
-                        for set in json["tabs_sets"].array! {
-                            var theTimes = [Float]()
-                            
-                            //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
-                            for time in set["times"].arrayObject as! [String] {
-                                theTimes.append(Float(time)!)
-                            }
-                            
-                            let theChords = set["chords"].arrayObject as! [String]
-                            let theTabs = set["tabs"].arrayObject as! [String]
-                            let t = DownloadedTabs(tuning: set["tuning"].string!, capo: set["capo"].int!, chords: theChords, tabs: theTabs, times: theTimes, songId: set["song_id"].int!, upVote: set["upvotes"].int!, downVote: set["downvotes"].int!)
-                            allDownloads.append(t)
-                        }
-                        
-                        callbackResults(downloads: allDownloads)
-                    }
-                case .Failure(let error):
-                    print(error)
-                }
-            }
-        })
-    }
-    
-    
-    
-    //HELPER: find the songId required to associate with the tabs
-    private class func findSongId(mediaItem: MPMediaItem, callback: (songId: Int) -> Void ) {
-        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "album": mediaItem.albumTitle!]
+        var allDownloads = [DownloadedTabsSet]()
         
-        Alamofire.request(.GET, songURL, parameters: parameters).responseJSON { response in
+        //given a song's title, artist, and duration, we can find all its corresponding tabs
+        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_tabs_sets", parameters: parameters as? [String : AnyObject]).responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
+                    print(json)
+                    for set in json["tabs_sets"].array! {
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, upVotes: set["upvotes"].int!, downVotes: set["downvotes"].int!, userId: set["user_id"].int!)
+
+                        allDownloads.append(t)
+                    }
+                   //after completed, pass everything to the callback
+                   completion(downloads: allDownloads)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    class func downloadTabsSetContent(downloadedTabsSet: DownloadedTabsSet, completion: (( downloadWithContent: DownloadedTabsSet) -> Void)) {
+        
+        Alamofire.request(.GET, jamBaseURL + "/tabs_sets/\(downloadedTabsSet.id)").responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    let set = json["tabs_set_content"]
+                    
+                    print(json)
+                    var theTimes = [Float]()
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
+                    
+                    downloadedTabsSet.times = theTimes
+                    downloadedTabsSet.chords  = set["chords"].arrayObject as! [String]
+                    downloadedTabsSet.tabs  = set["tabs"].arrayObject as! [String]
+                    
+                    //after completed, pass everything to the callback
+                    completion(downloadWithContent: downloadedTabsSet)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+    
+    }
+    
+    //HELPER: find the songId required to associate with the tabs
+    private class func findSongId(mediaItem: MPMediaItem, callback: (songId: Int) -> Void ) {
+        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        
+        Alamofire.request(.GET, songURL, parameters: parameters as? [String : AnyObject]).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
                     if json["songs"].count > 1 {
                         print("this song should never have been initialized twice")
                         return
