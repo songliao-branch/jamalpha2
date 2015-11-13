@@ -187,6 +187,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var firstLoadPlayingItem: MPMediaItem!
     var isRemoveProgressBlock = true
+    
+    var songBeginTime:Double!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -1655,7 +1657,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 activelabels[i].ylocation = maxylocation
             }
         }
-        
+        self.songBeginTime = CACurrentMediaTime() - Double(time)
         update()
         //Update the content of the lyric
     }
@@ -1689,6 +1691,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //notifications, notifications are triggered twice somehow
         if timer == nil {
             timer = NSTimer()
+            self.songBeginTime = CACurrentMediaTime() - Double(startTime.toDecimalNumer())
+
             timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
             //NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
@@ -1711,7 +1715,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //            }else{
             //                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
             //            }
-            startTime.addTime(Int(100 / stepPerSecond))
+            startTime = TimeNumber(time: Float(CACurrentMediaTime() - self.songBeginTime))
+            
         }
         refreshChordLabel()
         refreshLyrics()
