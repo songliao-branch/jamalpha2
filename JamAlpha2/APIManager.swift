@@ -42,13 +42,20 @@ class APIManager: NSObject {
     //MARK: heroku server codes
     static let jamBaseURL = "https://jamapi.herokuapp.com"
     
-    static let findSongOrCreateURL = "/findsongorcreate"
-    
-    static let songURL = jamBaseURL + "/songs"
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
     
     class func uploadTabs(mediaItem: MPMediaItem) {
         let musicDataManager = MusicDataManager()
+        
+        var title = ""
+        var artist = ""
+        let duration = Float(mediaItem.playbackDuration)
+        if let t = mediaItem.title {
+            title = t
+        }
+        if let a = mediaItem.artist {
+            artist = a
+        }
         
         var chords = [Chord]() //([Chord], String, Int)
         var tuning = ""
@@ -66,32 +73,29 @@ class APIManager: NSObject {
             tabsData.append(chords[i].tab.content)
         }
         
-        findSongId(mediaItem, callback: { (songId: Int) in
-            //TODO: needs user_id parameter
-            let parameters = [
-                "tabs_set": [
-                    "tuning": tuning,
-                    "capo": capo,
-                    "times": timesData,
-                    "chords": chordsData,
-                    "tabs": tabsData,
-                    "song_id":  songId,
-                    "user_id": 1 //TODO: change later
-                ]
-            ]
+        let parameters = [
+            "title": title,
+            "artist": artist,
+            "duration": duration,
             
-            Alamofire.request(.POST, tabsSetURL, parameters: parameters, encoding: .JSON).responseJSON
-                {
-                    response in
-                    
-                    switch response.result {
-                    case .Success:
-                        print("Tabs uploaded succesfully")
-                    case .Failure(let error):
-                        print(error)
-                    }
-            }
-        })
+            "tuning": tuning,
+            "capo": capo,
+            "times": timesData,
+            "chords": chordsData,
+            "tabs": tabsData,
+            "user_id": 1 //TODO: change later
+        ]
+        
+        Alamofire.request(.POST, tabsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
+            {
+                response in
+                switch response.result {
+                case .Success:
+                    print("Tabs uploaded succesfully")
+                case .Failure(let error):
+                    print(error)
+                }
+        }
     }
     
     //download all tabs sets for one song, the callback return the result
@@ -150,33 +154,5 @@ class APIManager: NSObject {
                 print(error)
             }
         }
-    
     }
-    
-    //HELPER: find the songId required to associate with the tabs
-    private class func findSongId(mediaItem: MPMediaItem, callback: (songId: Int) -> Void ) {
-        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
-        
-        Alamofire.request(.GET, songURL, parameters: parameters as? [String : AnyObject]).responseJSON { response in
-            switch response.result {
-            case .Success:
-                if let data = response.result.value {
-                    let json = JSON(data)
-                    
-                    if json["songs"].count > 1 {
-                        print("this song should never have been initialized twice")
-                        return
-                    }
-                    
-                    let id = json["songs"][0]["id"].int!
-                    
-                    //then initialize callback for another request
-                    callback(songId: id)
-                }
-            case .Failure(let error):
-                print(error)
-            }
-        }
-    }
-    
 }

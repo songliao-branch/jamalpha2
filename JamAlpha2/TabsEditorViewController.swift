@@ -1378,7 +1378,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 var addSuccessed: Bool = true
                 if self.tabFingerPointChanged == true {
                     print("\(self.currentNoteButton.titleLabel?.text)")
-                    let index = self.currentNoteButton.tag
+                    let index = self.currentBaseButton.tag
                     let name: String = self.tabNameTextField.text!
                     var content: String = String()
                     if name == "" || name.containsString(" ") {

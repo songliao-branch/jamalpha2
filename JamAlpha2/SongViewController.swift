@@ -1353,8 +1353,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func uploadTabs(button: UIButton) {
         print("upload tabs")
-       
-        
         APIManager.uploadTabs(player.nowPlayingItem!)
     }
     
