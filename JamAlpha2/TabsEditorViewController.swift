@@ -201,7 +201,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         // MARK: add exist chord to tab editor view
-        self.addChordToEditorView(theSong)
+        //self.addChordToEditorView(theSong)
     }
 
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
@@ -1399,7 +1399,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 var addSuccessed: Bool = true
                 if self.tabFingerPointChanged == true {
                     print("\(self.currentNoteButton.titleLabel?.text)")
-                    let index = self.currentNoteButton.tag
+                    let index = self.currentBaseButton.tag
                     let name: String = self.tabNameTextField.text!
                     var content: String = String()
                     if name == "" || name.containsString(" ") {

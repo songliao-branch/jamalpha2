@@ -182,6 +182,7 @@ extension MeViewController {
         self.emailLogInTextField.backgroundColor = UIColor.clearColor()
         self.emailLogInTextField.addTarget(self, action: "valueChangedInLogInEmailTextField:", forControlEvents: UIControlEvents.EditingChanged)
         self.emailLogInTextField.accessibilityIdentifier = "unedit"
+        self.emailLogInTextField.autocorrectionType = UITextAutocorrectionType.No
         self.editLogInScrollView.addSubview(self.emailLogInTextField)
         
         self.passwordLogInBackgroundLabel.frame = CGRectMake(0.1 * self.viewHeight, 0.1 * self.viewHeight, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
@@ -193,6 +194,7 @@ extension MeViewController {
         self.passwordLogInTextField.backgroundColor = UIColor.clearColor()
         self.passwordLogInTextField.addTarget(self, action: "valueChangedInLogInPasswordTextField:", forControlEvents: UIControlEvents.EditingChanged)
         self.passwordLogInTextField.accessibilityIdentifier = "unedit"
+        self.passwordLogInTextField.autocorrectionType = UITextAutocorrectionType.No
         self.editLogInScrollView.addSubview(self.passwordLogInTextField)
         
         let logInButton: UIButton = UIButton()
@@ -262,6 +264,7 @@ extension MeViewController {
         self.emailSignUpTextField.backgroundColor = UIColor.clearColor()
         self.emailSignUpTextField.addTarget(self, action: "valueChangedInEmailTextField:", forControlEvents: UIControlEvents.EditingChanged)
         self.emailSignUpTextField.accessibilityIdentifier = "unedit"
+        self.emailSignUpTextField.autocorrectionType = UITextAutocorrectionType.No
         self.editSignUpScrollView.addSubview(self.emailSignUpTextField)
         
     }
@@ -295,6 +298,9 @@ extension MeViewController {
     
     func pressNextButton(sender: UIButton) {
         if self.emailSignUpTextField.text != "" {
+            self.emailSignUpTextField.resignFirstResponder()
+            self.emailLogInTextField.resignFirstResponder()
+            self.passwordLogInTextField.resignFirstResponder()
             let meSignUpVC: MeSignUpViewController = (self.storyboard?.instantiateViewControllerWithIdentifier("mesignupVC"))! as! MeSignUpViewController
             meSignUpVC.email = self.emailSignUpTextField.text!
             self.navigationController?.pushViewController(meSignUpVC, animated: true)

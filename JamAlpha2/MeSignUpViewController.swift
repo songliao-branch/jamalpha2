@@ -36,7 +36,6 @@ class MeSignUpViewController: UIViewController {
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
         self.statusAndNavigationBarHeight = UIApplication.sharedApplication().statusBarFrame.size.height + (self.navigationController?.navigationBar.height)!
-        
         setUpNavigationBar()
         setUpEditView()
     }
@@ -46,29 +45,39 @@ class MeSignUpViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.addObserver(self, selector: "handleKeyboardWillShowNotification:", name: UIKeyboardWillShowNotification, object: nil)
+        notificationCenter.addObserver(self, selector: "handleKeyboardWillHideNotification:", name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+        notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
     func setUpNavigationBar(){
-//        let logo = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSizeMake(self.view.frame.width/2, 22)))
-//        logo.image = UIImage(named: "logo_bold")
-//        logo.center = CGPointMake(self.view.center.x, 25) // half of navigation height
-//        logo.contentMode = UIViewContentMode.ScaleAspectFit
-//        //add logo to navigation bar
-//        self.navigationController!.navigationBar.addSubview(logo)
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         // hide the navigation bar
         self.navigationController?.navigationBar.hidden = false
         // change the navigationbar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-        // 
+        // no blur
         self.navigationController?.navigationBar.translucent = false
         
         self.view.backgroundColor = UIColor(red: 0.918, green: 0.918, blue: 0.918, alpha: 1)
     }
-    
+
+}
+
+// set up edit view and all objects on it
+extension MeSignUpViewController {
     func setUpEditView() {
-        
-        editView.frame = CGRectMake(0, 0, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight)
-        editView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight + 0.15 * self.viewHeight)
+        editView.frame = CGRectMake(0, 0, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight - (self.tabBarController?.tabBar.frame.size.height)!)
+        editView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight - (self.tabBarController?.tabBar.frame.size.height)!)
         self.view.addSubview(editView)
         
         let imageWidth: CGFloat = 0.15 * self.viewHeight
@@ -96,11 +105,13 @@ class MeSignUpViewController: UIViewController {
         self.emailTestField.text = self.email
         self.emailTestField.addTarget(self, action: "valueChangeOnEmailTestField:", forControlEvents: UIControlEvents.EditingChanged)
         self.emailTestField.accessibilityIdentifier = "edit"
+        self.emailTestField.autocorrectionType = UITextAutocorrectionType.No
         editView.addSubview(self.emailTestField)
         
         self.emailBackgroundLabel.frame = CGRectMake(0.25 * self.viewWidth, 0.25 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
         self.emailBackgroundLabel.text = "Enter your email"
         self.emailBackgroundLabel.textColor = UIColor.grayColor()
+        self.emailBackgroundLabel.backgroundColor = UIColor.whiteColor()
         
         let usernameTitleImage: UIImageView = UIImageView()
         usernameTitleImage.frame = CGRectMake(0.05 * self.viewWidth, 0.4 * self.viewHeight - 0.05 * self.viewWidth, 0.1 * self.viewWidth, 0.1 * self.viewWidth)
@@ -110,6 +121,7 @@ class MeSignUpViewController: UIViewController {
         self.usernameTextField.backgroundColor = UIColor.clearColor()
         self.usernameTextField.addTarget(self, action: "valueChangeOnUsernameTextField:", forControlEvents: UIControlEvents.EditingChanged)
         self.usernameTextField.accessibilityIdentifier = "unedit"
+        self.usernameTextField.autocorrectionType = UITextAutocorrectionType.No
         editView.addSubview(self.usernameTextField)
         
         self.usernameBackgroundLabel.frame = CGRectMake(0.25 * self.viewWidth, 0.35 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
@@ -126,6 +138,7 @@ class MeSignUpViewController: UIViewController {
         self.passwordTextField.backgroundColor = UIColor.clearColor()
         self.passwordTextField.addTarget(self, action: "valueChangeOnPasswordTextField:", forControlEvents: UIControlEvents.EditingChanged)
         self.passwordTextField.accessibilityIdentifier = "unedit"
+        self.passwordTextField.autocorrectionType = UITextAutocorrectionType.No
         editView.addSubview(self.passwordTextField)
         
         self.passwordBackgroundLabel.frame = CGRectMake(0.25 * self.viewWidth, 0.45 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
@@ -144,8 +157,6 @@ class MeSignUpViewController: UIViewController {
         policyLabel.text = "By tapping to continue, you are indicating that you have read the Privacy Policy and agree to the Terms of Service"
         policyLabel.font = UIFont.systemFontOfSize(12)
         editView.addSubview(policyLabel)
-        
-        
     }
     
     func tapOnEditView(sender: UITapGestureRecognizer) {
@@ -165,7 +176,7 @@ class MeSignUpViewController: UIViewController {
             }
         }
     }
-
+    
     func valueChangeOnUsernameTextField(sender: UITextField) {
         if sender.text == "" {
             self.editView.addSubview(self.usernameBackgroundLabel)
@@ -191,6 +202,43 @@ class MeSignUpViewController: UIViewController {
     }
 }
 
+
+// deal with the keyboard shows up
+extension MeSignUpViewController {
+    
+    func handleKeyboardWillShowNotification(notification: NSNotification) {
+        keyboardWillChangeFrameWithNotification(notification, showsKeyboard: true)
+    }
+    
+    func handleKeyboardWillHideNotification(notification: NSNotification) {
+        keyboardWillChangeFrameWithNotification(notification, showsKeyboard: false)
+    }
+    
+    func keyboardWillChangeFrameWithNotification(notification: NSNotification, showsKeyboard: Bool) {
+        let userInfo = notification.userInfo!
+        //let animationDuration: NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
+        // Convert the keyboard frame from screen to view coordinates.
+        let keyboardScreenBeginFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as! NSValue).CGRectValue()
+        let keyboardScreenEndFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
+        let keyboardViewBeginFrame = view.convertRect(keyboardScreenBeginFrame, fromView: view.window)
+        let keyboardViewEndFrame = view.convertRect(keyboardScreenEndFrame, fromView: view.window)
+        var originDelta: CGFloat = CGFloat()
+        if showsKeyboard == true {
+            originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
+        } else {
+            originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
+        }
+        print(self.editView.frame.height)
+        self.editView.frame = CGRectMake(0, 0, self.viewWidth, self.editView.frame.height + originDelta)
+        self.editView.layer.opacity = 0.1
+        UIView.animateWithDuration(1.4, animations: {
+            self.editView.layer.opacity = 1
+        })
+    }
+}
+
+
+// deal with the image picker
 extension MeSignUpViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func pressAddProfileImageButton(sender: UIButton) {
