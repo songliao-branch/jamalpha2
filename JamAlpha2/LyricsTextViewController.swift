@@ -189,9 +189,7 @@ class LyricsTextViewController: UIViewController {
             lyricsSyncViewController.lyricsFromTextView = lyricsTextView.text
             lyricsSyncViewController.lyricsOrganizedArray = self.lyricsReorganizedArray
         }
-        
         lyricsSyncViewController.theSong  = self.theSong
-        
         self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
 
