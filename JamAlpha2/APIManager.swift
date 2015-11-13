@@ -113,8 +113,7 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     print(json)
                     for set in json["tabs_sets"].array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, upVotes: set["upvotes"].int!, downVotes: set["downvotes"].int!, userId: set["user_id"].int!)
-
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, upVotes: set["upvotes"].int!, downVotes: set["downvotes"].int!, userId: set["user_id"].int!, chordsPreview: set["chords_preview"].string!)
                         allDownloads.append(t)
                     }
                    //after completed, pass everything to the callback

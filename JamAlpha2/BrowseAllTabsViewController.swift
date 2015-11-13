@@ -113,14 +113,17 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         
         let tabsSet = downloadedTabsSets[indexPath.row]
         
+        var tuning = ""
+        if tabsSet.tuning == "E-B-G-D-A-E-" {
+            tuning = "standard"
+        } else {
+            tuning = tabsSet.tuning
+        }
+        
         tabsCell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
         tabsCell.votesLabel.sizeToFit()
-        var chordsPreview = ""
-//        for i in 0..<tabsSet.chords.count {
-//            chordsPreview += tabsSet.chords[i] + "  "//add two spaces between each chord
-//        }
-        
-        tabsCell.chordsPreviewLabel.text = chordsPreview
+        tabsCell.tuningCapoLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
+        tabsCell.chordsPreviewLabel.text = tabsSet.chordsPreview + "..."
         
         return tabsCell
     }

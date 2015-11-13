@@ -399,6 +399,7 @@
                                             <outlet property="downVoteButton" destination="dFI-YH-Xem" id="7kG-au-qzM"/>
                                             <outlet property="profileButton" destination="H86-FJ-Fyr" id="Izc-tG-1AP"/>
                                             <outlet property="profileNameLabel" destination="IcB-Yq-4jC" id="vEV-BJ-fwI"/>
+                                            <outlet property="tuningCapoLabel" destination="bcu-Wr-OUQ" id="Aja-Vc-qLe"/>
                                             <outlet property="upVoteButton" destination="NTz-7k-bBB" id="aGS-BP-0wO"/>
                                             <outlet property="votesLabel" destination="G5R-vs-Mql" id="9Oz-G7-6Yp"/>
                                         </connections>

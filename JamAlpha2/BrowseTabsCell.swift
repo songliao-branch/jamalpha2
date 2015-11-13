@@ -16,9 +16,8 @@ class BrowseTabsCell: UITableViewCell {
     @IBOutlet weak var votesLabel: UILabel!
     
     @IBOutlet weak var chordsPreviewLabel: UILabel!
-    
-    @IBOutlet weak var tuningCapoImage: UIImageView!
 
+    @IBOutlet weak var tuningCapoLabel: UILabel!
     @IBOutlet weak var profileButton: UIButton!
     
     @IBOutlet weak var profileNameLabel: UILabel!
