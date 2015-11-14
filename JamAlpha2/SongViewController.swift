@@ -682,9 +682,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //self.nowPlayingItemSpeed = 1
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.stopTimer()
+                self.startTime.set(0.0)
+                self.songBeginTime = 0.0
                 self.startTimer()
+            }else{
+                self.startTime.set(0.0)
+                self.songBeginTime = 0.0
             }
-            
             self.updateAll(0)
         pthread_rwlock_unlock(&self.rwLock)
     }
@@ -703,8 +707,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         }
         else if playbackState == .Playing {
+            self.player.currentPlaybackRate = self.speed
             startTimer()
-            
             //bring up the soundwave, give it a little jump animation
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
@@ -729,7 +733,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else { // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
-                startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+                startTime.set(Float(player.currentPlaybackTime))
                 updateAll(startTime.toDecimalNumer())
 
             }
@@ -1231,7 +1235,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chordBase.hidden = false
         }
         
-        startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+        startTime.set(Float(player.currentPlaybackTime))
         updateAll(startTime.toDecimalNumer())
         
         unblurImageIfAllIsHidden()
@@ -1582,8 +1586,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func updateAll(time: Float){
         ///Set the start time
-        startTime = TimeNumber(time: time)
-        
+        startTime.set(time)
         ///Remove all label in current screen
         for labels in activelabels{
             for label in labels.labels{
@@ -1657,9 +1660,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 activelabels[i].ylocation = maxylocation
             }
         }
-        self.songBeginTime = CACurrentMediaTime() - Double(time)
         update()
-        //Update the content of the lyric
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
@@ -1691,11 +1692,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //notifications, notifications are triggered twice somehow
         if timer == nil {
             timer = NSTimer()
-            self.songBeginTime = CACurrentMediaTime() - Double(startTime.toDecimalNumer())
-
             timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
             //NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            self.songBeginTime = CACurrentMediaTime() - Double(player.currentPlaybackTime)/Double(speed)
         }
     }
     
@@ -1715,8 +1715,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //            }else{
             //                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
             //            }
-            startTime = TimeNumber(time: Float(CACurrentMediaTime() - self.songBeginTime))
-            
+            if(timer == nil){
+                self.songBeginTime = CACurrentMediaTime() - Double(startTime.toDecimalNumer())/Double(speed)
+            }
+                startTime.set(Float((CACurrentMediaTime() - self.songBeginTime) * Double(speed)))
+           
+            // startTime.addTime(Int(100 / stepPerSecond))
         }
         refreshChordLabel()
         refreshLyrics()

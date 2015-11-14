@@ -24,6 +24,13 @@ class TimeNumber {
         decimal = (nums.count > 1) ? Int(nums[1])! : 0
     }
     
+    func set(time: Float){
+        let str = NSString(format: "%.2f", time) as String
+        var nums = str.characters.split{$0 == "." }.map { String($0) }
+        second = Int(nums[0])!
+        decimal = (nums.count > 1) ? Int(nums[1])! : 0
+    }
+    
     func isEqual(tn: TimeNumber) -> Bool{
         return self.second == tn.second && self.decimal == tn.decimal
     }
