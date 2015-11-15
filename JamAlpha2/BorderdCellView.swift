@@ -11,7 +11,6 @@ import UIKit
 @IBDesignable
 class BorderdCellView: UIView {
 
-
     // An empty implementation adversely affects performance during animation.
     override func drawRect(rect: CGRect) {
         // Drawing code

@@ -108,9 +108,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let tabsCell = tableView.dequeueReusableCellWithIdentifier("browsetabscell", forIndexPath: indexPath) as! BrowseTabsCell
-    
-        
+        let tabsCell = tableView.dequeueReusableCellWithIdentifier("browseversionscell", forIndexPath: indexPath) as! BrowseVersionsCell
+
         let tabsSet = downloadedTabsSets[indexPath.row]
         
         var tuning = ""
@@ -157,7 +156,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
     
     func upVoted(button: UIButton) {
         APIManager.updateVotes(true, tabsSet: downloadedTabsSets[button.tag])
