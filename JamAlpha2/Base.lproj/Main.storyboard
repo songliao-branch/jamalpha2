@@ -287,10 +287,10 @@
             </objects>
             <point key="canvasLocation" x="2059" y="36"/>
         </scene>
-        <!--Browse All Tabs View Controller-->
+        <!--Browse Versions View Controller-->
         <scene sceneID="MdU-Q2-huo">
             <objects>
-                <viewController storyboardIdentifier="browsealltabsviewcontroller" id="sHz-Tw-hSU" customClass="BrowseAllTabsViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="browseversionsviewcontroller" id="sHz-Tw-hSU" customClass="BrowseVersionsViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="6HG-HN-aPy"/>
                         <viewControllerLayoutGuide type="bottom" id="2Rh-hY-z5t"/>

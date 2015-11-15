@@ -10,7 +10,7 @@ import Foundation
 import MediaPlayer
 import UIKit
 
-class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var songViewController: SongViewController!
     @IBOutlet weak var tabsTableView: UITableView!

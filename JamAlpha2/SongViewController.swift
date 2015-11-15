@@ -1342,7 +1342,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         
-        let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browsealltabsviewcontroller") as! BrowseAllTabsViewController
+        let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
         browseAllTabsVC.mediaItem = player.nowPlayingItem!
         self.presentViewController(browseAllTabsVC, animated: true, completion: {

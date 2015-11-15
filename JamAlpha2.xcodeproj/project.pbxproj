@@ -49,7 +49,7 @@
 		E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48AE2D11B955BB40044CFDB /* APIManager.swift */; };
 		E48F22671BF5924000F24962 /* DownloadedTabsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */; };
 		E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49AF0961B2699C800DD3342 /* BaseViewController.swift */; };
-		E4A9A5531BF04FB9000E5F1C /* BrowseAllTabsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A9A5521BF04FB9000E5F1C /* BrowseAllTabsViewController.swift */; };
+		E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A9A5521BF04FB9000E5F1C /* BrowseVersionsViewController.swift */; };
 		E4A9A5551BF05289000E5F1C /* BrowseTabsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A9A5541BF05289000E5F1C /* BrowseTabsCell.swift */; };
 		E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B6362D1B854A5900F331A7 /* Colors+.swift */; };
 		E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */; };
@@ -141,7 +141,7 @@
 		E48AE2D11B955BB40044CFDB /* APIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 		E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadedTabsSet.swift; sourceTree = "<group>"; };
 		E49AF0961B2699C800DD3342 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
-		E4A9A5521BF04FB9000E5F1C /* BrowseAllTabsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowseAllTabsViewController.swift; sourceTree = "<group>"; };
+		E4A9A5521BF04FB9000E5F1C /* BrowseVersionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowseVersionsViewController.swift; sourceTree = "<group>"; };
 		E4A9A5541BF05289000E5F1C /* BrowseTabsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowseTabsCell.swift; sourceTree = "<group>"; };
 		E4B6362D1B854A5900F331A7 /* Colors+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Colors+.swift"; sourceTree = "<group>"; };
 		E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumSectionCell.swift; sourceTree = "<group>"; };
@@ -306,7 +306,7 @@
 				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
 				E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */,
 				E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */,
-				E4A9A5521BF04FB9000E5F1C /* BrowseAllTabsViewController.swift */,
+				E4A9A5521BF04FB9000E5F1C /* BrowseVersionsViewController.swift */,
 			);
 			name = SongViewController;
 			sourceTree = "<group>";
@@ -614,7 +614,7 @@
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
-				E4A9A5531BF04FB9000E5F1C /* BrowseAllTabsViewController.swift in Sources */,
+				E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */,
 				E46EA8061BD0CAE8006EAB31 /* Tuning.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E4473CA31BF909E20061D4C9 /* BorderdCellView.swift in Sources */,
