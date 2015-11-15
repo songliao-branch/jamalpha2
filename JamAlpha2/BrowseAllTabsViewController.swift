@@ -119,11 +119,19 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         } else {
             tuning = tabsSet.tuning
         }
+
         
         tabsCell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
         tabsCell.votesLabel.sizeToFit()
         tabsCell.tuningCapoLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
         tabsCell.chordsPreviewLabel.text = tabsSet.chordsPreview + "..."
+        
+        //add actions for up and down vote buttons
+        tabsCell.upVoteButton.addTarget(self, action: "upVoted:", forControlEvents: .TouchUpInside)
+        tabsCell.upVoteButton.tag = indexPath.row
+        
+        tabsCell.downVoteButton.addTarget(self, action: "downVoted:", forControlEvents: .TouchUpInside)
+        tabsCell.downVoteButton.tag = indexPath.row
         
         return tabsCell
     }
@@ -150,4 +158,18 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         
         self.dismissViewControllerAnimated(true, completion: nil)
     }
+    
+    
+    func upVoted(button: UIButton) {
+        APIManager.updateVotes(true, tabsSet: downloadedTabsSets[button.tag])
+        //should be callback to see if it is s
+        print("up button: \(button.tag) pressed")
+    }
+    
+    func downVoted(button: UIButton) {
+        APIManager.updateVotes(false, tabsSet: downloadedTabsSets[button.tag])
+
+        print("down button: \(button.tag) pressed")
+    }
+    
 }

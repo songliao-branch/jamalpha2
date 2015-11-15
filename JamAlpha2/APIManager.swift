@@ -154,4 +154,22 @@ class APIManager: NSObject {
             }
         }
     }
+    
+    class func updateVotes(isUp: Bool, tabsSet: DownloadedTabsSet){
+        //TODO: need a user token to update, and one user can only update a tabs once!
+        let parameters = ["increment_votes": (isUp ? 1 : 0)]
+        Alamofire.request(.PUT, jamBaseURL + "/tabs_sets/\(tabsSet.id)", parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    print(json)
+                }
+            case .Failure(let error):
+                //TODO: show alert dialog cannot update
+                print(error)
+            }
+        }
+    }
 }
