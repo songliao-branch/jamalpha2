@@ -21,6 +21,10 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
     
     override func viewDidLoad() {
         setUpHeader()
+        
+        let layer = UIView()
+        layer.backgroundColor = UIColor.backgroundGray()
+        tabsTableView.backgroundView = layer
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -105,11 +109,7 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let tabsCell = tableView.dequeueReusableCellWithIdentifier("browsetabscell", forIndexPath: indexPath) as! BrowseTabsCell
-        
-        // add additional gray separators
-        let additionalSeparatorTop = UIView(frame: CGRectMake(0, tabsCell.frame.height-1, tabsCell.frame.size.width, 1))
-        additionalSeparatorTop.backgroundColor = UIColor.lightGrayColor()
-        tabsCell.addSubview(additionalSeparatorTop)
+    
         
         let tabsSet = downloadedTabsSets[indexPath.row]
         
@@ -119,13 +119,12 @@ class BrowseAllTabsViewController: UIViewController, UITableViewDelegate, UITabl
         } else {
             tuning = tabsSet.tuning
         }
-
         
         tabsCell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
         tabsCell.votesLabel.sizeToFit()
-        tabsCell.tuningCapoLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-        tabsCell.chordsPreviewLabel.text = tabsSet.chordsPreview + "..."
-        
+        tabsCell.titleLabel.text = tabsSet.chordsPreview + "..."
+        tabsCell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
+   
         //add actions for up and down vote buttons
         tabsCell.upVoteButton.addTarget(self, action: "upVoted:", forControlEvents: .TouchUpInside)
         tabsCell.upVoteButton.tag = indexPath.row

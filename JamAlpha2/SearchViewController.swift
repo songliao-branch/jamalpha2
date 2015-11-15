@@ -108,7 +108,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             
             let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
-            view.backgroundColor = UIColor.backGray()
+            view.backgroundColor = UIColor.backgroundGray()
             let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
             label.center.y = view.center.y
             label.textColor = UIColor.mainPinkColor()
@@ -122,7 +122,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 return nil
             }
             let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
-            view.backgroundColor = UIColor.backGray()
+            view.backgroundColor = UIColor.backgroundGray()
             
             let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
             label.center.y = view.center.y

@@ -15,11 +15,12 @@ class BrowseTabsCell: UITableViewCell {
 
     @IBOutlet weak var votesLabel: UILabel!
     
-    @IBOutlet weak var chordsPreviewLabel: UILabel!
-
-    @IBOutlet weak var tuningCapoLabel: UILabel!
-    @IBOutlet weak var profileButton: UIButton!
+    @IBOutlet weak var titleLabel: UILabel!
     
-    @IBOutlet weak var profileNameLabel: UILabel!
+    @IBOutlet weak var subtitleLabel: UILabel!
+    
+    @IBOutlet weak var profileImage: UIImageView!
+    @IBOutlet weak var profileName: UILabel!
+    @IBOutlet weak var dateLabel: UILabel!
     
 }
