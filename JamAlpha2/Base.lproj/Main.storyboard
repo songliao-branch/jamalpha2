@@ -317,7 +317,7 @@
                                                     <rect key="frame" x="8" y="8" width="304" height="117"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kU0-NY-rsq">
-                                                            <rect key="frame" x="10" y="10" width="40" height="40"/>
+                                                            <rect key="frame" x="10" y="6" width="40" height="40"/>
                                                             <animations/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="40" id="b5U-Ri-QWW"/>
@@ -326,7 +326,7 @@
                                                             <state key="normal" image="vote_up_gray"/>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ubs-jq-38x">
-                                                            <rect key="frame" x="10" y="67" width="40" height="40"/>
+                                                            <rect key="frame" x="10" y="71" width="40" height="40"/>
                                                             <animations/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="40" id="aPn-Ps-qyb"/>
@@ -335,12 +335,12 @@
                                                             <state key="normal" image="vote_down_gray"/>
                                                         </button>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Gt-4B-ggq">
-                                                            <rect key="frame" x="5" y="49" width="50" height="19.5"/>
+                                                            <rect key="frame" x="5" y="48" width="50" height="21.5"/>
                                                             <animations/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="50" id="pzY-35-Fn8"/>
                                                             </constraints>
-                                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                             <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
@@ -352,7 +352,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KMp-Nr-4xb">
-                                                            <rect key="frame" x="58" y="71" width="246" height="0.5"/>
+                                                            <rect key="frame" x="58" y="71" width="246" height="0.29999999999999999"/>
                                                             <animations/>
                                                             <color key="backgroundColor" red="0.86274509803921573" green="0.86274509803921573" blue="0.86274509803921573" alpha="1" colorSpace="calibratedRGB"/>
                                                             <constraints>
@@ -406,10 +406,10 @@
                                                         <constraint firstItem="No9-Hd-vlr" firstAttribute="leading" secondItem="G8r-sc-dxH" secondAttribute="leading" constant="10" id="e7s-lN-xXH"/>
                                                         <constraint firstItem="Ioz-2C-MqP" firstAttribute="leading" secondItem="No9-Hd-vlr" secondAttribute="trailing" constant="8" id="gBh-T7-e1e"/>
                                                         <constraint firstItem="0GQ-vh-Kkz" firstAttribute="leading" secondItem="4Gt-4B-ggq" secondAttribute="trailing" constant="4" id="h19-AA-L22"/>
-                                                        <constraint firstAttribute="bottom" secondItem="Ubs-jq-38x" secondAttribute="bottom" constant="10" id="h7N-wa-q8O"/>
+                                                        <constraint firstAttribute="bottom" secondItem="Ubs-jq-38x" secondAttribute="bottom" constant="6" id="h7N-wa-q8O"/>
                                                         <constraint firstItem="ZQX-sH-xMj" firstAttribute="leading" secondItem="Ubs-jq-38x" secondAttribute="trailing" constant="40" id="hGo-xa-xMh"/>
                                                         <constraint firstItem="Mk3-9M-q0n" firstAttribute="leading" secondItem="kU0-NY-rsq" secondAttribute="trailing" constant="6" id="j14-OR-l3R"/>
-                                                        <constraint firstItem="kU0-NY-rsq" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="10" id="mZF-5X-ire"/>
+                                                        <constraint firstItem="kU0-NY-rsq" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="6" id="mZF-5X-ire"/>
                                                         <constraint firstItem="0GQ-vh-Kkz" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="50" id="n6h-zK-gaz"/>
                                                         <constraint firstItem="4Gt-4B-ggq" firstAttribute="leading" secondItem="G8r-sc-dxH" secondAttribute="leading" constant="5" id="uEa-jM-7pc"/>
                                                         <constraint firstAttribute="trailing" secondItem="Mk3-9M-q0n" secondAttribute="trailing" constant="8" id="udk-Ax-laK"/>
