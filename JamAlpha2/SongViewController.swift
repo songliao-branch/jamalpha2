@@ -220,9 +220,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     }
     
-    deinit{
-        pthread_rwlock_destroy(&rwLock)
-    }
     
     func removeAllObserver(){
         NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
@@ -1393,6 +1390,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KGLOBAL_progressBlock.removeFromSuperview()
                 KGLOBAL_progressBlock = nil
             }
+            self.speed = 1
+            self.startTime.set(0.0)
+            self.songBeginTime = 0.0
+            pthread_rwlock_destroy(&rwLock)
         }
         
         if player.playbackState == .Playing {
