@@ -360,7 +360,7 @@
                                                             </constraints>
                                                         </view>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="C  G  Am  F  C  G  Am  F ..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mk3-9M-q0n">
-                                                            <rect key="frame" x="56" y="25" width="240" height="23"/>
+                                                            <rect key="frame" x="58" y="25" width="238" height="23"/>
                                                             <animations/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="19"/>
                                                             <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
@@ -408,7 +408,7 @@
                                                         <constraint firstItem="0GQ-vh-Kkz" firstAttribute="leading" secondItem="4Gt-4B-ggq" secondAttribute="trailing" constant="4" id="h19-AA-L22"/>
                                                         <constraint firstAttribute="bottom" secondItem="Ubs-jq-38x" secondAttribute="bottom" constant="6" id="h7N-wa-q8O"/>
                                                         <constraint firstItem="ZQX-sH-xMj" firstAttribute="leading" secondItem="Ubs-jq-38x" secondAttribute="trailing" constant="40" id="hGo-xa-xMh"/>
-                                                        <constraint firstItem="Mk3-9M-q0n" firstAttribute="leading" secondItem="kU0-NY-rsq" secondAttribute="trailing" constant="6" id="j14-OR-l3R"/>
+                                                        <constraint firstItem="Mk3-9M-q0n" firstAttribute="leading" secondItem="kU0-NY-rsq" secondAttribute="trailing" constant="8" id="j14-OR-l3R"/>
                                                         <constraint firstItem="kU0-NY-rsq" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="6" id="mZF-5X-ire"/>
                                                         <constraint firstItem="0GQ-vh-Kkz" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="50" id="n6h-zK-gaz"/>
                                                         <constraint firstItem="4Gt-4B-ggq" firstAttribute="leading" secondItem="G8r-sc-dxH" secondAttribute="leading" constant="5" id="uEa-jM-7pc"/>

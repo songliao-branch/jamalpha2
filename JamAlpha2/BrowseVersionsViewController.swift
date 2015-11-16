@@ -19,6 +19,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     @IBOutlet weak var resultsTableView: UITableView!
     
     var downloadedTabsSets = [DownloadedTabsSet]()
+    var downloadedLyricsSets = [DownloadedLyricsSet]()
     var mediaItem: MPMediaItem!
     var songId = -1
     
@@ -30,19 +31,34 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         let layer = UIView()
         layer.backgroundColor = UIColor.backgroundGray()
         resultsTableView.backgroundView = layer
-        
+       
+        fetchData()
+    }
+    
+    func fetchData() {
         if isPullingTabs {
-         downloadedTabsSets = [DownloadedTabsSet]()
+            downloadedTabsSets = [DownloadedTabsSet]()
             APIManager.downloadTabs(mediaItem, completion: {
                 downloads in
                 self.downloadedTabsSets = downloads
-                self.resultsTableView.reloadData()
-                if downloads.count < 1 {
-                    self.centerButton.hidden = false
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.resultsTableView.reloadData()
+                    if downloads.count < 1 {
+                        self.centerButton.hidden = false
+                    }
                 }
             })
         } else {
-            
+            APIManager.downloadLyrics(mediaItem, completion: {
+                downloads in
+                self.downloadedLyricsSets = downloads
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.resultsTableView.reloadData()
+                    if downloads.count < 1 {
+                        self.centerButton.hidden = false
+                    }
+                }
+            })
         }
     }
     
@@ -144,34 +160,46 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return downloadedTabsSets.count
+        if isPullingTabs {
+            return downloadedTabsSets.count
+        }
+        return downloadedLyricsSets.count
     }
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let tabsCell = tableView.dequeueReusableCellWithIdentifier("browseversionscell", forIndexPath: indexPath) as! BrowseVersionsCell
-
-        let tabsSet = downloadedTabsSets[indexPath.row]
+        let cell = tableView.dequeueReusableCellWithIdentifier("browseversionscell", forIndexPath: indexPath) as! BrowseVersionsCell
         
-        var tuning = ""
-        if tabsSet.tuning == "E-B-G-D-A-E-" {
-            tuning = "standard"
+        if isPullingTabs {
+            let tabsSet = downloadedTabsSets[indexPath.row]
+            
+            var tuning = ""
+            if tabsSet.tuning == "E-B-G-D-A-E-" {
+                tuning = "standard"
+            } else {
+                tuning = tabsSet.tuning
+            }
+            
+            cell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
+            cell.titleLabel.text = tabsSet.chordsPreview + "..."
+            cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
+
         } else {
-            tuning = tabsSet.tuning
+            let lyricsSet = downloadedLyricsSets[indexPath.row]
+            
+            cell.votesLabel.text = String(lyricsSet.upVotes - lyricsSet.downVotes)
+            cell.titleLabel.text = lyricsSet.lyricsPreview + "..."
+            cell.subtitleLabel.text = "\(lyricsSet.numberOfLines) lines"
         }
         
-        tabsCell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
-        tabsCell.titleLabel.text = tabsSet.chordsPreview + "..."
-        tabsCell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-   
         //add actions for up and down vote buttons
-        tabsCell.upVoteButton.addTarget(self, action: "upVoted:", forControlEvents: .TouchUpInside)
-        tabsCell.upVoteButton.tag = indexPath.row
+        cell.upVoteButton.addTarget(self, action: "upVoted:", forControlEvents: .TouchUpInside)
+        cell.upVoteButton.tag = indexPath.row
         
-        tabsCell.downVoteButton.addTarget(self, action: "downVoted:", forControlEvents: .TouchUpInside)
-        tabsCell.downVoteButton.tag = indexPath.row
+        cell.downVoteButton.addTarget(self, action: "downVoted:", forControlEvents: .TouchUpInside)
+        cell.downVoteButton.tag = indexPath.row
         
-        return tabsCell
+        return cell
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {

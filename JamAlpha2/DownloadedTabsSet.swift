@@ -8,6 +8,8 @@
 
 import UIKit
 
+
+
 class DownloadedTabsSet: NSObject {
     var id = -1
     //these varibles are required for showing the array of DownloadedTabs in the browse tableview

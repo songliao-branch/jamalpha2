@@ -45,6 +45,7 @@ class APIManager: NSObject {
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
+    //upload tabs
     class func uploadTabs(mediaItem: MPMediaItem) {
         let musicDataManager = MusicDataManager()
         
@@ -99,6 +100,7 @@ class APIManager: NSObject {
         }
     }
     
+    //upload lyrics
     class func uploadLyrics(mediaItem: MPMediaItem) {
         let musicDataManager = MusicDataManager()
         
@@ -143,10 +145,6 @@ class APIManager: NSObject {
         }
     }
     
-    class func downloadLyrics() {
-    
-    }
-    
     //download all tabs sets for one song, the callback return the result
     class func downloadTabs(mediaItem: MPMediaItem, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
         
@@ -174,6 +172,7 @@ class APIManager: NSObject {
         }
     }
     
+    //download one tabs
     class func downloadTabsSetContent(downloadedTabsSet: DownloadedTabsSet, completion: (( downloadWithContent: DownloadedTabsSet) -> Void)) {
         
         Alamofire.request(.GET, jamBaseURL + "/tabs_sets/\(downloadedTabsSet.id)").responseJSON { response in
@@ -204,6 +203,38 @@ class APIManager: NSObject {
         }
     }
     
+    //download all lyrics related to one song
+    class func downloadLyrics(mediaItem: MPMediaItem, completion: ( (downloads: [DownloadedLyricsSet])-> Void ) ) {
+        var allDownloads = [DownloadedLyricsSet]()
+        
+        //given a song's title, artist, and duration, we can find all its corresponding tabs
+        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_lyrics_sets", parameters: parameters as? [String : AnyObject]).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    print(json)
+                    for set in json["lyrics_sets"].array! {
+
+                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userId: set["user_id"].int!, upvotes: set["upvotes"].int!, downvotes: set["downvotes"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!)
+                        allDownloads.append(l)
+                    }
+                    //after completed, pass everything to the callback
+                    completion(downloads: allDownloads)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+        
+    }
+    
+    class func downloadLyricsContent(inputLyricsSet: DownloadedLyricsSet, completion: ( (downloads: [DownloadedLyricsSet])-> Void ) ) {
+        
+    }
+
     class func updateVotes(isUp: Bool, tabsSet: DownloadedTabsSet){
         //TODO: need a user token to update, and one user can only update a tabs once!
         let parameters = ["increment_votes": (isUp ? 1 : 0)]

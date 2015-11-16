@@ -602,6 +602,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             for label in self.tuningLabels {
                 label.hidden = true
             }
+        
             if self.player.repeatMode == .One {
                 print("\(self.player.nowPlayingItem!.title) is repeating")
                 self.updateAll(0)
@@ -1242,10 +1243,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             chordBase.hidden = false
         }
-        
-        startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+    
+        startTime = TimeNumber(time: Float(player.currentPlaybackTime))
         updateAll(startTime.toDecimalNumer())
-        
         unblurImageIfAllIsHidden()
     }
     
@@ -1320,10 +1320,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             countDownStartSecond = 3
             player.play()
         }
-
     }
     
-
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
         stopTimer()
@@ -1426,6 +1424,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         print("view will disappear")
         stopTimer()
         viewDidFullyDisappear = true
+        
         if(isRemoveProgressBlock){
             if(KGLOBAL_progressBlock != nil ){
                 KGLOBAL_progressBlock.removeFromSuperview()
@@ -1570,16 +1569,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshProgressBlock(){
-
-        let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
-        
-        let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
-        
-        if !isPanning {
-            self.progressChangedOrigin = newOriginX
-            KGLOBAL_progressBlock.setProgress(newProgressPosition)
+        if KGLOBAL_progressBlock != nil {
+            let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
+            
+            let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
+            
+            if !isPanning {
+                self.progressChangedOrigin = newOriginX
+                KGLOBAL_progressBlock.setProgress(newProgressPosition)
+            }
+            KGLOBAL_progressBlock.frame.origin.x = newOriginX
         }
-        KGLOBAL_progressBlock.frame.origin.x = newOriginX
     }
     
     func refreshTimeLabel(){
@@ -1728,6 +1728,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
                 
             } else {
+               
                 player.play()
             }
             
