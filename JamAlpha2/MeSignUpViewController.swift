@@ -69,6 +69,18 @@ class MeSignUpViewController: UIViewController {
         self.navigationController?.navigationBar.translucent = false
         
         self.view.backgroundColor = UIColor(red: 0.918, green: 0.918, blue: 0.918, alpha: 1)
+        
+        // right button to sign up
+        let nextBarButton: UIBarButtonItem = UIBarButtonItem()
+        nextBarButton.title = "Next"
+        nextBarButton.style = UIBarButtonItemStyle.Plain
+        nextBarButton.target = self
+        nextBarButton.action = "pressNextBarButton:"
+        self.navigationItem.rightBarButtonItem = nextBarButton
+    }
+    
+    func pressNextBarButton(sender: UIBarButtonItem) {
+        
     }
 
 }
