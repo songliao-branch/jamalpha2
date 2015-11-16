@@ -1318,6 +1318,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.speed = adjustedSpeed
         self.player.currentPlaybackRate = adjustedSpeed
         self.startTimer()
+        self.updateAll(Float(player.currentPlaybackTime))
         self.speedLabel.text = "Speed: \(adjustedSpeed)x"
         print("stepper value:\(stepper.value) and value \(speedMatcher[roundedValue])")
     }
