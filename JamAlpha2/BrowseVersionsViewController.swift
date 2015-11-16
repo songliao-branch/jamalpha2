@@ -185,16 +185,18 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         
         APIManager.downloadTabsSetContent(tabsSet, completion: {
             download in
-            for t in download.times {
-                print("TIMES: \(t)")
+            
+            self.songViewController.updateTuning(tabsSet.tuning)
+            self.songViewController.updateCapo(tabsSet.capo)
+            
+            var chordsToBeUsed = [Chord]()
+            for i in 0..<download.chords.count {
+                let chord = Chord(tab: Tab(name: download.chords[i], content: download.tabs[i]), time: TimeNumber(time: download.times[i]))
+                chordsToBeUsed.append(chord)
             }
+            self.songViewController.chords = chordsToBeUsed
+            self.dismissViewControllerAnimated(true, completion: nil)
         })
-        
-        songViewController.updateTuning(tabsSet.tuning)
-        songViewController.updateCapo(tabsSet.capo)
-        songViewController.chords = timedTabs
-        
-        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     func upVoted(button: UIButton) {

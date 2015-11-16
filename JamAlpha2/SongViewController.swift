@@ -246,7 +246,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
 
             if(!isRemoveProgressBlock){
-                updateMusicData(player.nowPlayingItem!)
+               // updateMusicData(player.nowPlayingItem!)
                 isRemoveProgressBlock = true
             }
             loadDisplayMode()
