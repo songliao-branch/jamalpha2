@@ -1100,7 +1100,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         addTabsButton = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: rowHeight))
         addTabsButton.setTitle("Add your tabs", forState: .Normal)
         addTabsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        addTabsButton.addTarget(self, action: "goToTabsEditor:", forControlEvents: .TouchUpInside)
+        addTabsButton.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addTabsButton)
         
         uploadTabsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: 0, width: buttonDimension, height: buttonDimension))
@@ -1112,7 +1112,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
         addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
         addLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        addLyricsButton.addTarget(self, action: "goToLyricsEditor:", forControlEvents: .TouchUpInside)
+        addLyricsButton.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addLyricsButton)
         
         uploadLyricsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: rowHeight, width: buttonDimension, height: buttonDimension))
@@ -1344,6 +1344,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
+        browseAllTabsVC.isPullingTabs = true
         browseAllTabsVC.mediaItem = player.nowPlayingItem!
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in
@@ -1356,7 +1357,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         APIManager.uploadTabs(player.nowPlayingItem!)
     }
     
-    func goToTabsEditor(button: UIButton) {
+    func goToTabsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
@@ -1367,15 +1368,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func uploadLyrics(button: UIButton) {
-    
+        
     }
     
     func browseLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         
+        let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
+        browseAllTabsVC.songViewController = self
+        browseAllTabsVC.isPullingTabs = false
+        browseAllTabsVC.mediaItem = player.nowPlayingItem!
+        self.presentViewController(browseAllTabsVC, animated: true, completion: {
+            completed in
+            self.dismissAction()
+        })
+        
     }
-    func goToLyricsEditor(button: UIButton) {
+    func goToLyricsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
@@ -1482,12 +1492,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
-
     func refreshChordLabel(){
         if chords.count < minimumChordCount {
             return
         }
-        
         
         if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
             return

@@ -456,7 +456,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="tabsTableView" destination="AWW-4v-Oey" id="rXN-XA-4WX"/>
+                        <outlet property="resultsTableView" destination="AWW-4v-Oey" id="WdS-Gs-3gO"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yIP-pG-i9N" userLabel="First Responder" sceneMemberID="firstResponder"/>

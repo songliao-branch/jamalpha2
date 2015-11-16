@@ -13,29 +13,37 @@ import UIKit
 class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var songViewController: SongViewController!
-    @IBOutlet weak var tabsTableView: UITableView!
+    
+    var isPullingTabs = true //variable called when this viewcontroller is instantiated, a negative value means we are downloading lyrics
+    
+    @IBOutlet weak var resultsTableView: UITableView!
     
     var downloadedTabsSets = [DownloadedTabsSet]()
     var mediaItem: MPMediaItem!
     var songId = -1
     
+    var centerButton: UIButton!//to display "Add your own tabs or lyrics if none is found"
+    
     override func viewDidLoad() {
         setUpHeader()
-        
+        setUpCenterButton()
         let layer = UIView()
         layer.backgroundColor = UIColor.backgroundGray()
-        tabsTableView.backgroundView = layer
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        downloadedTabsSets = [DownloadedTabsSet]()
-        APIManager.downloadTabs(mediaItem, completion: {
-            downloads in
-            self.downloadedTabsSets = downloads
-            self.tabsTableView.reloadData()
-        })
+        resultsTableView.backgroundView = layer
         
+        if isPullingTabs {
+         downloadedTabsSets = [DownloadedTabsSet]()
+            APIManager.downloadTabs(mediaItem, completion: {
+                downloads in
+                self.downloadedTabsSets = downloads
+                self.resultsTableView.reloadData()
+                if downloads.count < 1 {
+                    self.centerButton.hidden = false
+                }
+            })
+        } else {
+            
+        }
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -96,6 +104,39 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         
         topView.addSubview(songNameLabel)
         topView.addSubview(artistNameLabel)
+    }
+    
+    func setUpCenterButton() {
+        centerButton = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 60))
+        centerButton.titleLabel?.font = UIFont.systemFontOfSize(18)
+        centerButton.titleLabel?.numberOfLines = 2
+        centerButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        centerButton.layer.borderWidth = 2
+        centerButton.layer.borderColor = UIColor.mainPinkColor().CGColor
+        centerButton.layer.cornerRadius = 20
+        if isPullingTabs {
+          centerButton.setTitle("No tabs found, click here to add your own.", forState: .Normal)
+        } else {
+          centerButton.setTitle("No lyrics found, click here to add your own.", forState: .Normal)
+        }
+        centerButton.center = self.view.center
+        centerButton.hidden = true
+        centerButton.addTarget(self, action: "centerButtonPressed", forControlEvents: .TouchUpInside)
+        self.view.addSubview(centerButton)
+    }
+    
+    func centerButtonPressed() {
+        if isPullingTabs {
+            self.dismissViewControllerAnimated(false, completion: {
+                completed in
+                self.songViewController.goToTabsEditor()
+            })
+        } else {
+            self.dismissViewControllerAnimated(false, completion: {
+                completed in
+                self.songViewController.goToLyricsEditor()
+            })
+        }
     }
     
     func pullDownButtonPressed(button: UIButton) {
