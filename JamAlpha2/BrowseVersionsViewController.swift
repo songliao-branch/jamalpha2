@@ -120,7 +120,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         }
         
         tabsCell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
-        tabsCell.votesLabel.sizeToFit()
         tabsCell.titleLabel.text = tabsSet.chordsPreview + "..."
         tabsCell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
    

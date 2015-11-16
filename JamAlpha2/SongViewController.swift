@@ -76,6 +76,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
     
+    let minimumChordCount = 3 // there must be at least three chords in a tabs to work
     var chords = [Chord]()
     var start: Int = 0
     var startdisappearing: Int = 0
@@ -438,19 +439,40 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+    
+    
     func updateMusicData(song: MPMediaItem) {
-        self.setUpMusicData(song)
-        //TODO: because before add the tuning to the data some songs don't have tuning
-        // so temporary we add default tuing and capo
-        if self.tuningOfTheTabsSet == "" {
-            tuningOfTheTabsSet = "E-B-G-D-A-E"
-            capoOfTheTabsSet = 0
+        
+        let tabsFromCoreData = musicDataManager.getTabs(song)
+        if tabsFromCoreData.0.count > 0 {
+            print("chords length: \(tabsFromCoreData.0.count)")
+            if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
+                self.chords = tabsFromCoreData.0
+                
+                updateTuning(tabsFromCoreData.1)
+                updateCapo(tabsFromCoreData.2)
+            } else {
+                self.chords = [Chord]()
+            }
+            
+        } else {
+            self.chords = [Chord]()
         }
-        self.updateTuning(self.tuningOfTheTabsSet)
-        self.updateCapo(self.capoOfTheTabsSet)
+        
+        let lyricsFromCoreData = musicDataManager.getLyrics(song)
+        if lyricsFromCoreData.count > 0 {
+            self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
+        } else {
+            self.lyric = Lyric()
+            self.topLyricLabel.text = ""
+            self.bottomLyricLabel.text = ""
+        }
+        
+        setUpTestData(song)
     }
     
-    func setUpMusicData(song: MPMediaItem){
+    //for testing
+    func setUpTestData(song: MPMediaItem){
          if song.title == "Rolling In The Deep" {
             chords = Chord.getRollingChords()
             lyric = Lyric.getRollingLyrics()
@@ -461,35 +483,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chords = Chord.getDaughters()
             lyric = Lyric.getDaughters()
             
-         } else { // use more than words for everything else for now
+         } else if song.title == "More Than Words"{ // use more than words for everything else for now
             chords = Chord.getExtremeChords()
             lyric = Lyric.getExtremeLyrics()
         }
-        
-        self.tuningOfTheTabsSet = "E-B-G-D-A-E"
-        self.capoOfTheTabsSet = 0
-        
-        //return a tuple of ([Chord],tuning, capo)
-        let tabsFromCoreData = musicDataManager.getTabs(song)
-        if tabsFromCoreData.0.count > 0 {
-            print("chords length: \(tabsFromCoreData.0.count)")
-            if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
-                self.chords = tabsFromCoreData.0
-                self.tuningOfTheTabsSet = tabsFromCoreData.1
-                print("tuning from data: \(tabsFromCoreData.1) capo: \(tabsFromCoreData.2)")
-                self.capoOfTheTabsSet = tabsFromCoreData.2
-            } else {
-                self.chords = Chord.getRainbowChords()
-            }
-        }
-        
-
-        let lyricsFromCoreData = musicDataManager.getLyrics(song)
-        
-        if lyricsFromCoreData.count > 0 {
-            self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
-        }
+        updateTuning("E-B-G-D-A-E")
+        updateCapo(0)
     }
+    
     
     func setUpLyricsBase(){
         //Lyric labels
@@ -596,7 +597,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         player.beginGeneratingPlaybackNotifications()
     }
 
-    
     func currentSongChanged(notification: NSNotification){
         pthread_rwlock_wrlock(&self.rwLock)
             for label in self.tuningLabels {
@@ -687,7 +687,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.startTimer()
             }
             
-            self.updateAll(0)
+        self.updateAll(0)
         pthread_rwlock_unlock(&self.rwLock)
     }
     
@@ -1484,7 +1484,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
 
     func refreshChordLabel(){
-    
+        if chords.count < minimumChordCount {
+            return
+        }
+        
+        
         if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
             return
         }
@@ -1576,6 +1580,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshLyrics() {
+        if lyric.lyric.count < 2 {
+            return
+        }
+        
         if !isLyricsShown { // avoid unnecessary computation if lyrics is hidden
             return
         }
@@ -1611,11 +1619,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
-    func updateAll(time: Float){
-        ///Set the start time
+    
+    
+    func updateAll(time: Float) {
+ 
         startTime = TimeNumber(time: time)
         
-        ///Remove all label in current screen
+        //remove all existing labels
         for labels in activelabels{
             for label in labels.labels{
                 label.removeFromSuperview()
@@ -1623,74 +1633,79 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         activelabels.removeAll(keepCapacity: true)
         
-        //find the start of the chord whose time is larger than current time
-        start = 0
-        var last: Int = 0 //the end index of the chord that would show on the screen
-        
-        var begin: Int = 0
-        var end: Int = chords.count - 1
-        
-        while true {
-            let mid: Int = (begin + end) / 2
-            if startTime.isLongerThan(chords[mid].time) {
-                begin = mid
-            } else {
-                end = mid
-            }
-            if begin == (end - 1) {
-                start = begin
-                if startTime.isLongerThan(chords[end].time) {
-                    start = end
+        //if no chords we are not updating
+        if chords.count >= minimumChordCount {
+            ///Remove all label in current screen
+
+            //find the start of the chord whose time is larger than current time
+            start = 0
+            var last: Int = 0 //the end index of the chord that would show on the screen
+            
+            var begin: Int = 0
+            var end: Int = chords.count - 1
+            
+            while true {
+                let mid: Int = (begin + end) / 2
+                if startTime.isLongerThan(chords[mid].time) {
+                    begin = mid
+                } else {
+                    end = mid
                 }
-                break
-            }
-        }
-        
-        begin = 0
-        end = chords.count - 1
-        let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
-        while true {
-            let mid: Int = (begin + end) / 2
-            if tn.isLongerThan(chords[mid].time) {
-                begin = mid
-            } else {
-                end = mid
-            }
-            if begin == (end - 1) {
-                last = begin
-                if tn.isLongerThan( chords[end].time ) {
-                    last = end
+                if begin == (end - 1) {
+                    start = begin
+                    if startTime.isLongerThan(chords[end].time) {
+                        start = end
+                    }
+                    break
                 }
-                break
-            }
-        }
-        
-        if start == last {
-            self.activelabelAppend(start)
-        }
-        
-        if start < last {
-            if startTime.isLongerThan(chords[start].time) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].time) {
-                self.start++
             }
             
-            for i in start...last {
-                self.activelabelAppend(i)
+            begin = 0
+            end = chords.count - 1
+            let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
+            while true {
+                let mid: Int = (begin + end) / 2
+                if tn.isLongerThan(chords[mid].time) {
+                    begin = mid
+                } else {
+                    end = mid
+                }
+                if begin == (end - 1) {
+                    last = begin
+                    if tn.isLongerThan( chords[end].time ) {
+                        last = end
+                    }
+                    break
+                }
+            }
+            
+            if start == last {
+                self.activelabelAppend(start)
+            }
+            
+            if start < last {
+                if startTime.isLongerThan(chords[start].time) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].time) {
+                    self.start++
+                }
+                
+                for i in start...last {
+                    self.activelabelAppend(i)
+                }
+            }
+            
+            startdisappearing = start
+            
+            //set the location of labels
+            for var i = 0; i < activelabels.count; i++ {
+                activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].time.toDecimalNumer()) * stepPerSecond)
+                if activelabels[i].ylocation > maxylocation {
+                    activelabels[i].ylocation = maxylocation
+                }
             }
         }
-        
-        startdisappearing = start
-        
-        //set the location of labels
-        for var i = 0; i < activelabels.count; i++ {
-            activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].time.toDecimalNumer()) * stepPerSecond)
-            if activelabels[i].ylocation > maxylocation {
-                activelabels[i].ylocation = maxylocation
-            }
-        }
-        
+
         update()
-        //Update the content of the lyric
+        
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
