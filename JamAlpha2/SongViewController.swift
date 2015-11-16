@@ -1368,7 +1368,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func uploadLyrics(button: UIButton) {
-        
+        APIManager.uploadLyrics(player.nowPlayingItem!)
     }
     
     func browseLyrics(button: UIButton) {

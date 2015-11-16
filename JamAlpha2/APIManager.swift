@@ -43,6 +43,7 @@ class APIManager: NSObject {
     static let jamBaseURL = "https://jamapi.herokuapp.com"
     
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
+    static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     class func uploadTabs(mediaItem: MPMediaItem) {
         let musicDataManager = MusicDataManager()
@@ -96,6 +97,54 @@ class APIManager: NSObject {
                     print(error)
                 }
         }
+    }
+    
+    class func uploadLyrics(mediaItem: MPMediaItem) {
+        let musicDataManager = MusicDataManager()
+        
+        var title = ""
+        var artist = ""
+        let duration = Float(mediaItem.playbackDuration)
+        if let t = mediaItem.title {
+            title = t
+        }
+        if let a = mediaItem.artist {
+            artist = a
+        }
+        
+        var data = [(String, NSTimeInterval)]()
+        data = musicDataManager.getLyrics(mediaItem)
+        var times = [Float]()
+        var lyrics = [String]()
+        for i in 0..<data.count {
+            times.append(Float(data[i].1))
+            lyrics.append(data[i].0)
+        }
+        
+        let parameters = [
+            "title": title,
+            "artist": artist,
+            "duration": duration,
+            
+            "times": times,
+            "lyrics": lyrics,
+            "user_id": 1 //TODO: change later
+        ]
+    
+        Alamofire.request(.POST, lyricsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
+            {
+                response in
+                switch response.result {
+                case .Success:
+                    print("Lyrics uploaded succesfully")
+                case .Failure(let error):
+                    print(error)
+                }
+        }
+    }
+    
+    class func downloadLyrics() {
+    
     }
     
     //download all tabs sets for one song, the callback return the result
