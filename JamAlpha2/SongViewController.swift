@@ -599,7 +599,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             if self.player.repeatMode == .One {
                 print("\(self.player.nowPlayingItem!.title) is repeating")
-                self.updateAll(0)
+                self.updateAll(Float(player.currentPlaybackTime))
                 return
             }
             
@@ -686,7 +686,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.startTime.set(0.0)
                 self.songBeginTime = 0.0
             }
-            self.updateAll(0)
+            self.updateAll(Float(player.currentPlaybackTime))
         pthread_rwlock_unlock(&self.rwLock)
     }
     
@@ -705,6 +705,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         else if playbackState == .Playing {
             self.player.currentPlaybackRate = self.speed
+            self.songBeginTime = CACurrentMediaTime() - Double(player.currentPlaybackTime)/Double(speed)
             startTimer()
             //bring up the soundwave, give it a little jump animation
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
@@ -730,9 +731,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else { // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
-                startTime.set(Float(player.currentPlaybackTime))
-                updateAll(startTime.toDecimalNumer())
-
             }
             else if player.playbackState == MPMusicPlaybackState.Paused {
                 stopTimer()
@@ -742,8 +740,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.speed = 1  //restore to original speed
             }
         }
-
-        
+         updateAll(Float(player.currentPlaybackTime))
     }
     
     func setUpProgressContainer(){
@@ -1232,8 +1229,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chordBase.hidden = false
         }
         
-        startTime.set(Float(player.currentPlaybackTime))
-        updateAll(startTime.toDecimalNumer())
+//        startTime.set(Float(player.currentPlaybackTime))
+//        updateAll(startTime.toDecimalNumer())
         
         unblurImageIfAllIsHidden()
     }
@@ -1661,6 +1658,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 activelabels[i].ylocation = maxylocation
             }
         }
+        self.songBeginTime = CACurrentMediaTime() - Double(time)/Double(speed)
         update()
     }
     
@@ -1696,7 +1694,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
             //NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
-            self.songBeginTime = CACurrentMediaTime() - Double(player.currentPlaybackTime)/Double(speed)
         }
     }
     
@@ -1717,7 +1714,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
             //            }
             if(timer == nil){
-                self.songBeginTime = CACurrentMediaTime() - Double(startTime.toDecimalNumer())/Double(speed)
+                self.songBeginTime = CACurrentMediaTime() - Double(player.currentPlaybackTime)/Double(speed)
             }
                 startTime.set(Float((CACurrentMediaTime() - self.songBeginTime) * Double(speed)))
            
