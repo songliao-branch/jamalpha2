@@ -231,8 +231,34 @@ class APIManager: NSObject {
         
     }
     
-    class func downloadLyricsContent(inputLyricsSet: DownloadedLyricsSet, completion: ( (downloads: [DownloadedLyricsSet])-> Void ) ) {
-        
+    //
+    
+    class func downloadLyricsSetContent(inputLyricsSet: DownloadedLyricsSet, completion: (( downloadWithContent: DownloadedLyricsSet) -> Void)) {
+        Alamofire.request(.GET, jamBaseURL + "/lyrics_sets/\(inputLyricsSet.id)").responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    let set = json["lyrics_set_content"]
+                    
+                    print(json)
+                    var theTimes = [Float]()
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
+                    
+                    inputLyricsSet.times = theTimes
+                    inputLyricsSet.lyrics  = set["lyrics"].arrayObject as! [String]
+                    
+                    //after completed, pass everything to the callback
+                    completion(downloadWithContent: inputLyricsSet)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
     }
 
     class func updateVotes(isUp: Bool, tabsSet: DownloadedTabsSet){

@@ -204,27 +204,37 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        let tabsSet = downloadedTabsSets[indexPath.row]
-        var timedTabs = [Chord]()
-        for i in 0..<tabsSet.times.count {
-            let c = Chord(tab: Tab(name: tabsSet.chords[i], content: tabsSet.tabs[i]), time: TimeNumber(time: tabsSet.times[i]))
-            timedTabs.append(c)
-        }
+        if isPullingTabs {
+            let tabsSet = downloadedTabsSets[indexPath.row]
+            APIManager.downloadTabsSetContent(tabsSet, completion: {
+                download in
+                
+                self.songViewController.updateTuning(tabsSet.tuning)
+                self.songViewController.updateCapo(tabsSet.capo)
+                
+                var chordsToBeUsed = [Chord]()
+                for i in 0..<download.chords.count {
+                    let chord = Chord(tab: Tab(name: download.chords[i], content: download.tabs[i]), time: TimeNumber(time: download.times[i]))
+                    chordsToBeUsed.append(chord)
+                }
+                self.songViewController.chords = chordsToBeUsed
+                self.dismissViewControllerAnimated(true, completion: nil)
+            })
         
-        APIManager.downloadTabsSetContent(tabsSet, completion: {
-            download in
-            
-            self.songViewController.updateTuning(tabsSet.tuning)
-            self.songViewController.updateCapo(tabsSet.capo)
-            
-            var chordsToBeUsed = [Chord]()
-            for i in 0..<download.chords.count {
-                let chord = Chord(tab: Tab(name: download.chords[i], content: download.tabs[i]), time: TimeNumber(time: download.times[i]))
-                chordsToBeUsed.append(chord)
-            }
-            self.songViewController.chords = chordsToBeUsed
-            self.dismissViewControllerAnimated(true, completion: nil)
-        })
+        } else {
+            let lyricsSet = downloadedLyricsSets[indexPath.row]
+            APIManager.downloadLyricsSetContent(lyricsSet, completion: {
+                download in
+                
+                var lyricsToBeUsed = Lyric()
+                for i in 0..<download.times.count {
+                    lyricsToBeUsed.addLine(TimeNumber(time: download.times[i]), str: download.lyrics[i])
+                }
+                
+                self.songViewController.lyric = lyricsToBeUsed
+                self.dismissViewControllerAnimated(true, completion: nil)
+            })
+        }
     }
     
     func upVoted(button: UIButton) {
