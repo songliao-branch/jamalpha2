@@ -17,14 +17,14 @@ PODS:
     - FBSDKCoreKit/arc
   - FBSDKLoginKit (4.7.1):
     - FBSDKCoreKit
-  - Haneke (1.0.1)
+  - HanekeSwift (0.10.0)
   - SwiftyJSON (2.3.1)
 
 DEPENDENCIES:
   - Alamofire (~> 2.0)
   - FBSDKCoreKit
   - FBSDKLoginKit
-  - Haneke (~> 1.0)
+  - HanekeSwift
   - SwiftyJSON (from `https://github.com/SwiftyJSON/SwiftyJSON.git`)
 
 EXTERNAL SOURCES:
@@ -41,7 +41,7 @@ SPEC CHECKSUMS:
   Bolts: 0e9bce58b9b9f5e8a7a4d47b16d2fabec289072b
   FBSDKCoreKit: 9141b70960a37930850370495fe565f4a27ac141
   FBSDKLoginKit: c11ed3c2833472db3bb4a4aecf27af4a6f69b173
-  Haneke: d60be8b96b228633b24708dd153169d6849d6f78
+  HanekeSwift: d6f5bdf9dbdbbc09d59623b2c1d533e46463dd4d
   SwiftyJSON: 592b53bee5ef3dd9b3bebc6b9cb7ee35426ae8c3
 
 COCOAPODS: 0.39.0

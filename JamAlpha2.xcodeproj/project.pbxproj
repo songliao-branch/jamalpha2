@@ -198,15 +198,6 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		BF4B83E61BFA896400AF8A2A /* MeTableViewCell */ = {
-			isa = PBXGroup;
-			children = (
-				BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */,
-				BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */,
-			);
-			name = MeTableViewCell;
-			sourceTree = "<group>";
-		};
 		BF4B83E71BFA898000AF8A2A /* MeProfileSecondView */ = {
 			isa = PBXGroup;
 			children = (
@@ -223,19 +214,11 @@
 				BF4B83E01BFA6FAB00AF8A2A /* MeViewController.swift */,
 				BF4B83F01BFBC93000AF8A2A /* CustomSegue.swift */,
 				BF4B83E71BFA898000AF8A2A /* MeProfileSecondView */,
-				BF4B83E61BFA896400AF8A2A /* MeTableViewCell */,
 				BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */,
 				BF5A77D91BF4484200BCE723 /* MeSignUpViewController.swift */,
 				BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */,
 			);
 			name = MeViewController;
-			sourceTree = "<group>";
-		};
-		BFFA248D1BE867040037D9C0 /* JamListViewController */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = JamListViewController;
 			sourceTree = "<group>";
 		};
 		E41D6CFC1BA149BF006A9993 /* Helper */ = {
@@ -340,6 +323,8 @@
 				E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */,
 				E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */,
 				E4CBBFF61B9E88A600473FC4 /* FretCell.swift */,
+				BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */,
+				BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -422,7 +407,6 @@
 		E48877641B151A58004785D3 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				BFFA248D1BE867040037D9C0 /* JamListViewController */,
 				BFFA248C1BE866F60037D9C0 /* MeViewController */,
 				E47FF6861BAD1AC500028F2D /* SongViewController */,
 				E431BA9E1B91552400E32A0B /* MusicListControllers */,
