@@ -36,7 +36,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // music section
     //MARK: decide the progress block width
-    let tabsEditorProgressWidthMultiplier: CGFloat = 6
+    let tabsEditorProgressWidthMultiplier: CGFloat = 10
     var progressBlock: SoundWaveView!
     var theSong: MPMediaItem!
     var currentTime: NSTimeInterval = NSTimeInterval()
@@ -73,8 +73,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentNoteButton: UIButton = UIButton()
     var currentTimeLabel: UILabel = UILabel()
     var totalTimeLabel: UILabel = UILabel()
-//    var countDownImageView: UIImageView = UIImageView()
-//    var countDownNumberImageView: UIImageView = UIImageView()
+
     var string6View: [UIView] = [UIView]()
     var currentTabViewIndex: Int = Int()
     var currentBaseButton: UIButton = UIButton()
@@ -213,7 +212,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.addSubview(actionDismissLayerButton)
         actionDismissLayerButton.hidden = true
         
-        tuningMenu = UIView(frame: CGRect(x: -trueWidth/3, y: 0, width: trueWidth/3, height: trueHeight))
+        tuningMenu = UIView(frame: CGRect(x: -250, y: 0, width: 250, height: trueHeight))
         tuningMenu.backgroundColor = UIColor.actionGray()
         self.view.addSubview(tuningMenu)
         
@@ -262,7 +261,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         capoStepper.addTarget(self, action: "capoStepperValueChanged:", forControlEvents: .ValueChanged)
         tuningMenu.addSubview(capoStepper)
         
-        let buttonDimension: CGFloat = 30
+        let buttonDimension: CGFloat = 20
         
         //SECTION: Tunings
         var tuningTexts = ["1st:", "2nd:", "3rd:", "4th:", "5th:", "6th:"]
@@ -287,19 +286,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             tuningMenu.addSubview(tuningValueLabel)
             tuningValueLabels.append(tuningValueLabel)
             
-            let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: buttonDimension, height: buttonDimension))
-            stepUpButton.setImage(UIImage(named: "up_arrow"), forState: .Normal)
+            let stepUpButton = UIButton(frame: CGRect(x:0, y: 0, width: 30, height: 20))
+            stepUpButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
+            stepUpButton.contentMode = .ScaleToFill
             stepUpButton.tag = i
             stepUpButton.addTarget(self, action: "stepUpPressed:", forControlEvents: .TouchUpInside)
-            stepUpButton.center = CGPoint(x: tuningValueLabel.center.x + buttonDimension, y: tuningValueLabel.center.y)
+            stepUpButton.center = CGPoint(x: tuningValueLabel.center.x + buttonDimension + 10, y: tuningValueLabel.center.y)
             tuningMenu.addSubview(stepUpButton)
             stepUpButtons.append(stepUpButton)
 
-            let stepDownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
+            let stepDownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 20))
+            
             stepDownButton.tag = i
             stepDownButton.addTarget(self, action: "stepDownPressed:", forControlEvents: .TouchUpInside)
-            stepDownButton.setImage(UIImage(named: "down_arrow"), forState: .Normal)
-            stepDownButton.center = CGPoint(x: tuningValueLabel.center.x - buttonDimension, y: tuningValueLabel.center.y)
+            stepDownButton.setImage(UIImage(named: "vote_down_pink"), forState: .Normal)
+            stepDownButton.contentMode = .ScaleToFill
+            stepDownButton.center = CGPoint(x: tuningValueLabel.center.x - buttonDimension - 10, y: tuningValueLabel.center.y)
             tuningMenu.addSubview(stepDownButton)
             stepDownButtons.append(stepDownButton)
         }
