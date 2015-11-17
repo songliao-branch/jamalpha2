@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import Alamofire
 
 let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
@@ -22,7 +23,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
-    var freefallTime:Float = 4
+    var freefallTime:Float = 3.2
     var minfont: CGFloat = 15
     
     var nowView: VisualizerView!
@@ -75,6 +76,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var currentTimeLabel:UILabel!
     var totalTimeLabel:UILabel!
     
+    let minimumChordCount = 3 // there must be at least three chords in a tabs to work
     var chords = [Chord]()
     var start: Int = 0
     var startdisappearing: Int = 0
@@ -143,8 +145,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var navigationOutActionView: UIView!
     var browseTabsButton: UIButton!
     var addTabsButton: UIButton!
+    var uploadTabsButton: UIButton!
     var browseLyricsButton: UIButton!
     var addLyricsButton: UIButton!
+    var uploadLyricsButton: UIButton!
     var goToArtistButton: UIButton!
     var goToAlbumButton: UIButton!
     
@@ -192,10 +196,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
         player = MusicManager.sharedInstance.player
+
         self.firstLoadPlayingItem = player.nowPlayingItem
         firstLoadSongTime = firstLoadPlayingItem.playbackDuration
         firstloadSongTitle = firstLoadPlayingItem.title
-        
+
         musicDataManager.initializeSongToDatabase(firstLoadPlayingItem)
     
         removeAllObserver()
@@ -241,7 +246,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if viewDidFullyDisappear {
 
             if(!isRemoveProgressBlock){
-                updateMusicData(player.nowPlayingItem!)
+               // updateMusicData(player.nowPlayingItem!)
                 isRemoveProgressBlock = true
             }
             loadDisplayMode()
@@ -434,19 +439,40 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+    
+    
     func updateMusicData(song: MPMediaItem) {
-        self.setUpMusicData(song)
-        //TODO: because before add the tuning to the data some songs don't have tuning
-        // so temporary we add default tuing and capo
-        if self.tuningOfTheTabsSet == "" {
-            tuningOfTheTabsSet = "E-B-G-D-A-E"
-            capoOfTheTabsSet = 0
+        
+        let tabsFromCoreData = musicDataManager.getTabs(song)
+        if tabsFromCoreData.0.count > 0 {
+            print("chords length: \(tabsFromCoreData.0.count)")
+            if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
+                self.chords = tabsFromCoreData.0
+                
+                updateTuning(tabsFromCoreData.1)
+                updateCapo(tabsFromCoreData.2)
+            } else {
+                self.chords = [Chord]()
+            }
+            
+        } else {
+            self.chords = [Chord]()
         }
-        self.updateTuning(self.tuningOfTheTabsSet)
-        self.updateCapo(self.capoOfTheTabsSet)
+        
+        let lyricsFromCoreData = musicDataManager.getLyrics(song)
+        if lyricsFromCoreData.count > 0 {
+            self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
+        } else {
+            self.lyric = Lyric()
+            self.topLyricLabel.text = ""
+            self.bottomLyricLabel.text = ""
+        }
+        
+        setUpTestData(song)
     }
     
-    func setUpMusicData(song: MPMediaItem){
+    //for testing
+    func setUpTestData(song: MPMediaItem){
          if song.title == "Rolling In The Deep" {
             chords = Chord.getRollingChords()
             lyric = Lyric.getRollingLyrics()
@@ -457,35 +483,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chords = Chord.getDaughters()
             lyric = Lyric.getDaughters()
             
-         } else { // use more than words for everything else for now
+         } else if song.title == "More Than Words"{ // use more than words for everything else for now
             chords = Chord.getExtremeChords()
             lyric = Lyric.getExtremeLyrics()
         }
-        
-        self.tuningOfTheTabsSet = "E-B-G-D-A-E"
-        self.capoOfTheTabsSet = 0
-        
-        //return a tuple of ([Chord],tuning, capo)
-        let tabsFromCoreData = musicDataManager.getTabs(song)
-        if tabsFromCoreData.0.count > 0 {
-            print("chords length: \(tabsFromCoreData.0.count)")
-            if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
-                self.chords = tabsFromCoreData.0
-                self.tuningOfTheTabsSet = tabsFromCoreData.1
-                print("tuning from data: \(tabsFromCoreData.1) capo: \(tabsFromCoreData.2)")
-                self.capoOfTheTabsSet = tabsFromCoreData.2
-            } else {
-                self.chords = Chord.getRainbowChords()
-            }
-        }
-        
-
-        let lyricsFromCoreData = musicDataManager.getLyrics(song)
-        
-        if lyricsFromCoreData.count > 0 {
-            self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
-        }
+        updateTuning("E-B-G-D-A-E")
+        updateCapo(0)
     }
+    
     
     func setUpLyricsBase(){
         //Lyric labels
@@ -592,12 +597,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         player.beginGeneratingPlaybackNotifications()
     }
 
-    
     func currentSongChanged(notification: NSNotification){
         pthread_rwlock_wrlock(&self.rwLock)
             for label in self.tuningLabels {
                 label.hidden = true
             }
+        
             if self.player.repeatMode == .One {
                 print("\(self.player.nowPlayingItem!.title) is repeating")
                 self.updateAll(0)
@@ -683,7 +688,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.startTimer()
             }
             
-            self.updateAll(0)
+        self.updateAll(0)
         pthread_rwlock_unlock(&self.rwLock)
     }
     
@@ -1096,15 +1101,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         addTabsButton = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: rowHeight))
         addTabsButton.setTitle("Add your tabs", forState: .Normal)
         addTabsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        addTabsButton.addTarget(self, action: "goToTabsEditor:", forControlEvents: .TouchUpInside)
+        addTabsButton.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addTabsButton)
+        
+        uploadTabsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: 0, width: buttonDimension, height: buttonDimension))
+        uploadTabsButton.setImage(UIImage(named: "uploaded"), forState: .Normal)
+        uploadTabsButton.addTarget(self, action: "uploadTabs:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(uploadTabsButton)
         
         //position 2
         addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
         addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
         addLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        addLyricsButton.addTarget(self, action: "goToLyricsEditor:", forControlEvents: .TouchUpInside)
+        addLyricsButton.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addLyricsButton)
+        
+        uploadLyricsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: rowHeight, width: buttonDimension, height: buttonDimension))
+        uploadLyricsButton.setImage(UIImage(named: "uploaded"), forState: .Normal)
+        uploadLyricsButton.addTarget(self, action: "uploadLyrics:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(uploadLyricsButton)
         
         //position 3
         goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
@@ -1129,7 +1144,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //position 6
         browseLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight*5, width: width, height: rowHeight))
-        browseLyricsButton.setTitle("Browse lyrics", forState: .Normal)
+        browseLyricsButton.setTitle("Browse all lyrics", forState: .Normal)
         browseLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         browseLyricsButton.addTarget(self, action: "browseLyrics:", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(browseLyricsButton)
@@ -1228,10 +1243,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             chordBase.hidden = false
         }
-        
-        startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+    
+        startTime = TimeNumber(time: Float(player.currentPlaybackTime))
         updateAll(startTime.toDecimalNumer())
-        
         unblurImageIfAllIsHidden()
     }
     
@@ -1306,10 +1320,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             countDownStartSecond = 3
             player.play()
         }
-
     }
     
-
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
         stopTimer()
@@ -1325,10 +1337,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     // MARK: functions used in NavigationOutView
     func browseTabs(button: UIButton) {
+        self.isRemoveProgressBlock = false
+        self.selectedFromTable = true
         
+        let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
+        browseAllTabsVC.songViewController = self
+        browseAllTabsVC.isPullingTabs = true
+        browseAllTabsVC.mediaItem = player.nowPlayingItem!
+        self.presentViewController(browseAllTabsVC, animated: true, completion: {
+            completed in
+            self.dismissAction()
+        })
     }
     
-    func goToTabsEditor(button: UIButton) {
+    func uploadTabs(button: UIButton) {
+        print("upload tabs")
+        APIManager.uploadTabs(player.nowPlayingItem!)
+    }
+    
+    func goToTabsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
@@ -1338,10 +1365,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
+    func uploadLyrics(button: UIButton) {
+        APIManager.uploadLyrics(player.nowPlayingItem!)
+    }
+    
     func browseLyrics(button: UIButton) {
+        self.isRemoveProgressBlock = false
+        self.selectedFromTable = true
+        
+        let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
+        browseAllTabsVC.songViewController = self
+        browseAllTabsVC.isPullingTabs = false
+        browseAllTabsVC.mediaItem = player.nowPlayingItem!
+        self.presentViewController(browseAllTabsVC, animated: true, completion: {
+            completed in
+            self.dismissAction()
+        })
         
     }
-    func goToLyricsEditor(button: UIButton) {
+    func goToLyricsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
@@ -1382,6 +1424,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         print("view will disappear")
         stopTimer()
         viewDidFullyDisappear = true
+        
         if(isRemoveProgressBlock){
             if(KGLOBAL_progressBlock != nil ){
                 KGLOBAL_progressBlock.removeFromSuperview()
@@ -1448,9 +1491,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
-
     func refreshChordLabel(){
-    
+        if chords.count < minimumChordCount {
+            return
+        }
+        
         if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
             return
         }
@@ -1524,7 +1569,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshProgressBlock(){
+
         if(KGLOBAL_progressBlock != nil){
+
             let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
             
             let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
@@ -1543,6 +1590,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshLyrics() {
+        if lyric.lyric.count < 2 {
+            return
+        }
+        
         if !isLyricsShown { // avoid unnecessary computation if lyrics is hidden
             return
         }
@@ -1578,11 +1629,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
-    func updateAll(time: Float){
-        ///Set the start time
+    
+    
+    func updateAll(time: Float) {
+ 
         startTime = TimeNumber(time: time)
         
-        ///Remove all label in current screen
+        //remove all existing labels
         for labels in activelabels{
             for label in labels.labels{
                 label.removeFromSuperview()
@@ -1590,74 +1643,79 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         activelabels.removeAll(keepCapacity: true)
         
-        //find the start of the chord whose time is larger than current time
-        start = 0
-        var last: Int = 0 //the end index of the chord that would show on the screen
-        
-        var begin: Int = 0
-        var end: Int = chords.count - 1
-        
-        while true {
-            let mid: Int = (begin + end) / 2
-            if startTime.isLongerThan(chords[mid].time) {
-                begin = mid
-            } else {
-                end = mid
-            }
-            if begin == (end - 1) {
-                start = begin
-                if startTime.isLongerThan(chords[end].time) {
-                    start = end
+        //if no chords we are not updating
+        if chords.count >= minimumChordCount {
+            ///Remove all label in current screen
+
+            //find the start of the chord whose time is larger than current time
+            start = 0
+            var last: Int = 0 //the end index of the chord that would show on the screen
+            
+            var begin: Int = 0
+            var end: Int = chords.count - 1
+            
+            while true {
+                let mid: Int = (begin + end) / 2
+                if startTime.isLongerThan(chords[mid].time) {
+                    begin = mid
+                } else {
+                    end = mid
                 }
-                break
-            }
-        }
-        
-        begin = 0
-        end = chords.count - 1
-        let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
-        while true {
-            let mid: Int = (begin + end) / 2
-            if tn.isLongerThan(chords[mid].time) {
-                begin = mid
-            } else {
-                end = mid
-            }
-            if begin == (end - 1) {
-                last = begin
-                if tn.isLongerThan( chords[end].time ) {
-                    last = end
+                if begin == (end - 1) {
+                    start = begin
+                    if startTime.isLongerThan(chords[end].time) {
+                        start = end
+                    }
+                    break
                 }
-                break
-            }
-        }
-        
-        if start == last {
-            self.activelabelAppend(start)
-        }
-        
-        if start < last {
-            if startTime.isLongerThan(chords[start].time) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].time) {
-                self.start++
             }
             
-            for i in start...last {
-                self.activelabelAppend(i)
+            begin = 0
+            end = chords.count - 1
+            let tn = TimeNumber(time: startTime.toDecimalNumer() + freefallTime)
+            while true {
+                let mid: Int = (begin + end) / 2
+                if tn.isLongerThan(chords[mid].time) {
+                    begin = mid
+                } else {
+                    end = mid
+                }
+                if begin == (end - 1) {
+                    last = begin
+                    if tn.isLongerThan( chords[end].time ) {
+                        last = end
+                    }
+                    break
+                }
+            }
+            
+            if start == last {
+                self.activelabelAppend(start)
+            }
+            
+            if start < last {
+                if startTime.isLongerThan(chords[start].time) && (TimeNumber(time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].time) {
+                    self.start++
+                }
+                
+                for i in start...last {
+                    self.activelabelAppend(i)
+                }
+            }
+            
+            startdisappearing = start
+            
+            //set the location of labels
+            for var i = 0; i < activelabels.count; i++ {
+                activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].time.toDecimalNumer()) * stepPerSecond)
+                if activelabels[i].ylocation > maxylocation {
+                    activelabels[i].ylocation = maxylocation
+                }
             }
         }
-        
-        startdisappearing = start
-        
-        //set the location of labels
-        for var i = 0; i < activelabels.count; i++ {
-            activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].time.toDecimalNumer()) * stepPerSecond)
-            if activelabels[i].ylocation > maxylocation {
-                activelabels[i].ylocation = maxylocation
-            }
-        }
-        
+
         update()
-        //Update the content of the lyric
+        
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
@@ -1672,6 +1730,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
                 
             } else {
+               
                 player.play()
             }
             

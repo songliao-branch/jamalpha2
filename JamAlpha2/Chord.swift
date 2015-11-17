@@ -24,6 +24,7 @@ struct Tab {
         }
     }
 }
+
 //Chord is timed..
 class Chord: NSObject {
     
