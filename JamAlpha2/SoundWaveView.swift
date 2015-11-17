@@ -33,9 +33,9 @@ class SoundWaveView: UIView {
     
     var averageSampleBuffer: NSMutableArray?
     
-    let tabEditorSampleRate:CGFloat = 5
+    let tabEditorSampleRate:CGFloat = 8
     let songVCSampleRate:CGFloat = 1
-    
+    let lineWidth:CGFloat = 2.5
     
     override init(frame: CGRect)  {
         super.init(frame: frame)
@@ -134,7 +134,7 @@ class SoundWaveView: UIView {
                 }
                 
                 CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
-                CGContextSetLineWidth(context, 1.5)
+                CGContextSetLineWidth(context, lineWidth)
                 CGContextSetStrokeColorWithColor(context, color.CGColor)
                 CGContextSetFillColorWithColor(context, color.CGColor)
                 
@@ -241,7 +241,7 @@ class SoundWaveView: UIView {
         let heightInPixels:CGFloat = size.height*pixelRatio
     
         CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
-        CGContextSetLineWidth(context, 2.5)
+        CGContextSetLineWidth(context, lineWidth)
         CGContextSetStrokeColorWithColor(context, color.CGColor)
         CGContextSetFillColorWithColor(context, color.CGColor)
 
