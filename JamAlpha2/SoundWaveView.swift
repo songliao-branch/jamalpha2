@@ -12,7 +12,6 @@ import AVFoundation
 
 let noiseFloor:Float = -50.0
 
-
 class SoundWaveView: UIView {
     
     var normalImageView:UIImageView!
@@ -201,7 +200,7 @@ class SoundWaveView: UIView {
                             if(bigSampleforTabAndChordCount == 3*samplesPerPixel){
                                 let averageSample:Double = bigSampleforTabAndChord / Double(bigSampleforTabAndChordCount)
                                 
-                                self.averageSampleBuffer?.addObject(averageSample)
+                                self.averageSampleBuffer!.addObject(averageSample)
                                 bigSampleforTabAndChord = 0
                                 bigSampleforTabAndChordCount = 0
                                 
@@ -308,25 +307,19 @@ class SoundWaveView: UIView {
         self.progressImageView.image = generatedProgressImage
     }
     
-    func generateWaveforms(){
+    func generateWaveforms(isForTabsEditor:Bool){
         
         let rect:CGRect = self.bounds
-       
-        
         if(self.asset != nil){
             
             self.generatedNormalImage = self.generateWaveformImage(self.asset, color: self.normalColor, size: CGSizeMake(rect.size.width, rect.size.height), antialiasingEnabled: self.antialiasingEnabled)
             self.normalImageView.image = generatedNormalImage
             normalColorDirty = false
         }
-        
-        
-        
-        self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
-        self.progressImageView.image = generatedProgressImage
-
-        
-        
+        if(isForTabsEditor){
+            self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
+            self.progressImageView.image = generatedProgressImage
+        }
     }
     
     func applyProgressToSubviews(){
@@ -369,10 +362,10 @@ class SoundWaveView: UIView {
         self.setNeedsDisplay()
     }
     
-    func SetSoundURL(soundURL:NSURL)
+    func SetSoundURL(soundURL:NSURL, isForTabsEditor:Bool)
     {
         self.asset = AVURLAsset(URL: soundURL, options: nil)
-        self.generateWaveforms()
+        self.generateWaveforms(isForTabsEditor)
     }
     
     func setProgress(progress:CGFloat)

@@ -7,7 +7,7 @@
 //July 7, 2015
 import UIKit
 import MediaPlayer
-class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate{
     
     var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
 
@@ -141,6 +141,9 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
     // when selecting section 2 2nd song, we iterate through all previous albums tracks
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+       
+        KGLOBAL_init_queue.suspended = true
+        
         let albumIndex = indexPath.section
         var songsInPreviousSections = 0
         if albumIndex > 0 {
@@ -160,12 +163,13 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         
-         //reload table to show loudspeaker icon on current selected row
-        tableView.reloadData()
-        
-        self.presentViewController(songVC, animated: true, completion: nil)
-        
-        
+        self.presentViewController(songVC, animated: true, completion: {
+                completed in
+                tableView.reloadData()
+            }
+        )
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
+    
  }
+

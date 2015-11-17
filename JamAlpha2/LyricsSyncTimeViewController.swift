@@ -65,7 +65,7 @@ class LyricsSyncViewController: UIViewController  {
     
     // count down section
     var countdownTimer = NSTimer()
-    var countDownStartSecond = 3 //will increments to 3
+    var countDownStartSecond = 3 //will count down from 3 to 1
     var countdownView: CountdownView!
     
     // MARK: UIGestures
@@ -178,7 +178,7 @@ class LyricsSyncViewController: UIViewController  {
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
 
-        self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.playbackDuration) * 2, 161))
+        self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.playbackDuration) * 2, soundwaveHeight))
         
         if let soundWaveData = musicDataManager.getSongWaveFormImage(theSong) {
             progressBlock.setWaveFormFromData(soundWaveData)
@@ -247,7 +247,7 @@ class LyricsSyncViewController: UIViewController  {
             //disable tap gesture that inadvertly starts timer
             progressBlockContainer.removeGestureRecognizer(tapGesture)
             countdownView.hidden = false
-            countdownView.setNumber(3)
+            countdownView.setNumber(countDownStartSecond)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
 
@@ -275,7 +275,7 @@ class LyricsSyncViewController: UIViewController  {
         countDownStartSecond--
         countdownView.setNumber(countDownStartSecond)
 
-        if countDownStartSecond == 0 {
+        if countDownStartSecond <= 0 {
             progressBlockContainer.addGestureRecognizer(tapGesture)
             countdownTimer.invalidate()
             countdownView.hidden = true

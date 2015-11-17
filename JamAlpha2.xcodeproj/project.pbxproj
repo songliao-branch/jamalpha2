@@ -27,6 +27,7 @@
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
 		C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F505071B9101920077F508 /* UIWindowEffects.swift */; };
 		E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */; };
+		E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */; };
 		E42DF9331BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */; };
 		E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */; };
 		E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */; };
@@ -38,6 +39,7 @@
 		E44358FE1B19471B0091E926 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44358FD1B19471B0091E926 /* Artist.swift */; };
 		E44359021B1947660091E926 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359011B1947660091E926 /* Album.swift */; };
 		E443B91B1BBBA2F20074A4E1 /* LyricsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */; };
+		E4473CA31BF909E20061D4C9 /* BorderdCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4473CA21BF909E20061D4C9 /* BorderdCellView.swift */; };
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
 		E455E7291BA272AD00210BD6 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E7281BA272AD00210BD6 /* Song.swift */; };
 		E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E72A1BA2760300210BD6 /* MusicDataManager.swift */; };
@@ -55,8 +57,11 @@
 		E48877681B151E2B004785D3 /* MusicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877671B151E2B004785D3 /* MusicCell.swift */; };
 		E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* SongViewController.swift */; };
 		E488776F1B152742004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E488776D1B152742004785D3 /* Main.storyboard */; };
-		E48AE2D21B955BB40044CFDB /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48AE2D11B955BB40044CFDB /* API.swift */; };
+		E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48AE2D11B955BB40044CFDB /* APIManager.swift */; };
+		E48F22671BF5924000F24962 /* DownloadedTabsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */; };
 		E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49AF0961B2699C800DD3342 /* BaseViewController.swift */; };
+		E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A9A5521BF04FB9000E5F1C /* BrowseVersionsViewController.swift */; };
+		E4A9A5551BF05289000E5F1C /* BrowseVersionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A9A5541BF05289000E5F1C /* BrowseVersionsCell.swift */; };
 		E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B6362D1B854A5900F331A7 /* Colors+.swift */; };
 		E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */; };
 		E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */; };
@@ -68,6 +73,8 @@
 		E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0021B9E88BA00473FC4 /* TJDatabase.xcdatamodeld */; };
 		E4D2F19B1B4CA6A800091A45 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */; };
 		E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */; };
+		E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */; };
+		E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3F1BE9BC4700D54174 /* Constants.swift */; };
 		E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */; };
 		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
 		E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */; };
@@ -119,8 +126,9 @@
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
 		C8F505071B9101920077F508 /* UIWindowEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIWindowEffects.swift; sourceTree = "<group>"; };
 		E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchHistoryManager.swift; sourceTree = "<group>"; };
+		E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadedLyricsSet.swift; sourceTree = "<group>"; };
 		E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSyncTimeTableViewCell.swift; sourceTree = "<group>"; };
-		E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSyncTimeViewController.swift; sourceTree = "<group>"; };
+		E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LyricsSyncTimeViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsTextViewController.swift; sourceTree = "<group>"; };
 		E431BA9A1B913A1B00E32A0B /* MusicManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicManager.swift; sourceTree = "<group>"; };
 		E431BA9C1B913AE700E32A0B /* String+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Utils.swift"; sourceTree = "<group>"; };
@@ -130,6 +138,7 @@
 		E44358FD1B19471B0091E926 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		E44359011B1947660091E926 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSet.swift; sourceTree = "<group>"; };
+		E4473CA21BF909E20061D4C9 /* BorderdCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BorderdCellView.swift; sourceTree = "<group>"; };
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		E455E7281BA272AD00210BD6 /* Song.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
 		E455E72A1BA2760300210BD6 /* MusicDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicDataManager.swift; sourceTree = "<group>"; };
@@ -142,17 +151,20 @@
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E48877421B151628004785D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E48877441B151628004785D3 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
-		E48877461B151628004785D3 /* MusicViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewController.swift; sourceTree = "<group>"; };
+		E48877461B151628004785D3 /* MusicViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MusicViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E488774B1B151628004785D3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E488774E1B151628004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		E48877541B151628004785D3 /* JamAlpha2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JamAlpha2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877591B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E488775A1B151628004785D3 /* JamAlpha2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamAlpha2Tests.swift; sourceTree = "<group>"; };
 		E48877671B151E2B004785D3 /* MusicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
-		E48877691B1520A0004785D3 /* SongViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongViewController.swift; sourceTree = "<group>"; };
+		E48877691B1520A0004785D3 /* SongViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SongViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		E48AE2D11B955BB40044CFDB /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		E48AE2D11B955BB40044CFDB /* APIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
+		E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadedTabsSet.swift; sourceTree = "<group>"; };
 		E49AF0961B2699C800DD3342 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		E4A9A5521BF04FB9000E5F1C /* BrowseVersionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowseVersionsViewController.swift; sourceTree = "<group>"; };
+		E4A9A5541BF05289000E5F1C /* BrowseVersionsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowseVersionsCell.swift; sourceTree = "<group>"; };
 		E4B6362D1B854A5900F331A7 /* Colors+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Colors+.swift"; sourceTree = "<group>"; };
 		E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumSectionCell.swift; sourceTree = "<group>"; };
 		E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumTrackCell.swift; sourceTree = "<group>"; };
@@ -164,6 +176,8 @@
 		E4CBC0031B9E88BA00473FC4 /* TJDatabase.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TJDatabase.xcdatamodel; sourceTree = "<group>"; };
 		E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
+		E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuspendThreadViewController.swift; sourceTree = "<group>"; };
+		E4D58E3F1BE9BC4700D54174 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownView.swift; sourceTree = "<group>"; };
 		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
 		E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
@@ -243,6 +257,7 @@
 				E48877461B151628004785D3 /* MusicViewController.swift */,
 				E45F6BB71B16C1860018645D /* ArtistViewController.swift */,
 				E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */,
+				E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */,
 			);
 			name = MusicListControllers;
 			sourceTree = "<group>";
@@ -300,6 +315,7 @@
 				C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */,
 				C82A4E961B81B668008B6AFC /* VisualizerView.swift */,
 				E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */,
+				E4473CA21BF909E20061D4C9 /* BorderdCellView.swift */,
 			);
 			name = CustomViews;
 			sourceTree = "<group>";
@@ -325,6 +341,7 @@
 				E4CBBFF61B9E88A600473FC4 /* FretCell.swift */,
 				BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */,
 				BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */,
+				E4A9A5541BF05289000E5F1C /* BrowseVersionsCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -336,6 +353,7 @@
 				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
 				E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */,
 				E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */,
+				E4A9A5521BF04FB9000E5F1C /* BrowseVersionsViewController.swift */,
 			);
 			name = SongViewController;
 			sourceTree = "<group>";
@@ -363,6 +381,7 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
+				E4D58E3E1BE9BC3F00D54174 /* Utils */,
 				E4CBC0081B9E88D900473FC4 /* CoreData */,
 				E48AE2D01B955BA30044CFDB /* Networking */,
 				E4B6362F1B854A6A00F331A7 /* Extensions */,
@@ -418,9 +437,19 @@
 		E48AE2D01B955BA30044CFDB /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				E48AE2D11B955BB40044CFDB /* API.swift */,
+				E48F22651BF5920300F24962 /* Models */,
+				E48AE2D11B955BB40044CFDB /* APIManager.swift */,
 			);
 			name = Networking;
+			sourceTree = "<group>";
+		};
+		E48F22651BF5920300F24962 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */,
+				E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 		E4B6362F1B854A6A00F331A7 /* Extensions */ = {
@@ -456,6 +485,14 @@
 				E48877441B151628004785D3 /* SearchViewController.swift */,
 			);
 			name = TabItemControllers;
+			sourceTree = "<group>";
+		};
+		E4D58E3E1BE9BC3F00D54174 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				E4D58E3F1BE9BC4700D54174 /* Constants.swift */,
+			);
+			name = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -517,6 +554,7 @@
 					};
 					E48877531B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = 978SMNLLT3;
 						TestTargetID = E488773C1B151628004785D3;
 					};
 				};
@@ -626,13 +664,17 @@
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
+				E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */,
+				E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */,
 				E46EA8061BD0CAE8006EAB31 /* Tuning.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
+				E4473CA31BF909E20061D4C9 /* BorderdCellView.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
 				BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */,
 				E42DF9331BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift in Sources */,
 				E44358FE1B19471B0091E926 /* Artist.swift in Sources */,
+				E4A9A5551BF05289000E5F1C /* BrowseVersionsCell.swift in Sources */,
 				E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */,
 				E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */,
 				E43DA1291B9FDCE1003180FB /* SearchHistory.swift in Sources */,
@@ -641,6 +683,7 @@
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
 				BF4B83E11BFA6FAB00AF8A2A /* MeViewController.swift in Sources */,
+				E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
 				BF5A77DA1BF4484200BCE723 /* MeSignUpViewController.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
@@ -649,6 +692,7 @@
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
 				E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */,
 				C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */,
+				E48F22671BF5924000F24962 /* DownloadedTabsSet.swift in Sources */,
 				84DA61A41B4E211100979A42 /* Lyric.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
 				BF4B83E91BFA89B600AF8A2A /* MyTabsOrLyricsViewController.swift in Sources */,
@@ -659,6 +703,7 @@
 				E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */,
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
+				E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */,
 				E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */,
@@ -670,7 +715,7 @@
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
 				BF5A77B51BEABD6C00BCE723 /* FBLogin.swift in Sources */,
 				E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */,
-				E48AE2D21B955BB40044CFDB /* API.swift in Sources */,
+				E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -802,6 +847,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Toucan-master/build/Debug-iphoneos",
@@ -825,6 +871,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Toucan-master/build/Debug-iphoneos",
@@ -843,6 +890,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -855,6 +904,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "co.songliao.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JamAlpha2.app/JamAlpha2";
 			};
 			name = Debug;
@@ -863,6 +913,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -871,6 +923,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "co.songliao.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JamAlpha2.app/JamAlpha2";
 			};
 			name = Release;

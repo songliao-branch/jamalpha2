@@ -15,7 +15,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     var searchResults: [SearchResult]!
     var musicRequest: Request?
-    var animator: CustomTransitionAnimation!
+    var animator: CustomTransitionAnimation?
     
     var searchHistoryManager =  SearchHistoryManager()
 
@@ -32,8 +32,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     
-
-
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -49,11 +47,29 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
         
         let searchBar = resultSearchController.searchBar
+        
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        //change navigation bar color
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        
         navigationItem.titleView = searchBar
         resultSearchController.hidesNavigationBarDuringPresentation = false
         searchBar.searchBarStyle = UISearchBarStyle.Minimal
         definesPresentationContext = true
-        searchBar.tintColor = UIColor.mainPinkColor()
+        
+        
+        if let searchTextField = searchBar.valueForKey("searchField") as? UITextField {
+            
+            searchTextField.textAlignment = NSTextAlignment.Left
+            searchTextField.tintColor = UIColor.mainPinkColor()
+            
+            for view in searchTextField.subviews {
+                //set inner text area background to white
+                view.layer.backgroundColor = UIColor.whiteColor().CGColor
+                view.layer.cornerRadius = 5
+            }
+        }
+        
         searchBar.placeholder = "What do you want to play?"
     }
     
@@ -92,7 +108,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             
             let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
-            view.backgroundColor = UIColor.backGray()
+            view.backgroundColor = UIColor.backgroundGray()
             let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
             label.center.y = view.center.y
             label.textColor = UIColor.mainPinkColor()
@@ -106,7 +122,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 return nil
             }
             let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
-            view.backgroundColor = UIColor.backGray()
+            view.backgroundColor = UIColor.backgroundGray()
             
             let label = UILabel(frame: CGRectMake(15, 0, self.view.frame.width, 20))
             label.center.y = view.center.y
@@ -198,9 +214,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: {
+                    completed in
+                    self.reloadMusicTable()
+                })
                 
-                self.presentViewController(songVC, animated: true, completion: nil)
-                reloadMusicTable()
             }
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
@@ -233,20 +251,19 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
 
     func webSearchSong(searchText: String) {
+        if searchText.characters.count < 1 {
+            return
+        }
         musicRequest?.cancel()
         searchResults = [SearchResult]()
         self.searchResultTableView.reloadData()
         
-        musicRequest = Alamofire.request(API.Router.Term(searchText)).responseJSON() {
-            _, _, result in
-            
-            switch result {
-            case .Success(let data):
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
-                    self.addDataToResults(JSON(data))
-                }
-            case .Failure(_, let error):
-                print("Search request failed with error: \(error)")
+        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
+            if let data = response.result.value {
+                print("JSON: \(data)")
+                self.addDataToResults(JSON(data))
+            } else {
+                print("something went wrong with search \(response.result.error)")
             }
         }
     }
@@ -298,6 +315,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 for childVC in tabItemController.childViewControllers {
                     if childVC.isKindOfClass(BaseViewController) {
                         let baseVC = childVC as! BaseViewController
+                        baseVC.nowView.start()
                         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                             musicVC.musicTable.reloadData()
                         }

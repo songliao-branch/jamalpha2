@@ -14,6 +14,7 @@ import FBSDKLoginKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var suspended:Bool = false
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
@@ -30,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FBSDKApplicationDelegate.sharedInstance().application(application, openURL: url, sourceApplication: sourceApplication, annotation: annotation)
         return true
     }
+    
 
     func applicationWillResignActive(application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -44,11 +46,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentVC = topViewController(rootViewController())
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
-            currentSongVC.timer.invalidate()
+            currentSongVC.stopTimer()
+       
             print("Song VC entering background")
         }
+        self.suspended = KGLOBAL_init_queue.suspended
+        KGLOBAL_queue.suspended = true
+        KGLOBAL_init_queue.suspended = true
+        print("Go into Background suspend nsoperationqueue:\(self.suspended)")
     }
-
+    
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         let currentVC = topViewController(rootViewController())
@@ -58,7 +65,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             currentSongVC.resumeSong()
             print("Song VC entering forground")
         }
-        
+        KGLOBAL_queue.suspended = false
+        KGLOBAL_init_queue.suspended = self.suspended
+        print("Go into forground:\(self.suspended)")
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
