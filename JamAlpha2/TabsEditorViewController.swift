@@ -101,12 +101,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     var countdownTimer = NSTimer()
     var countDownStartSecond = 3 //will countdown from 3 to 1
+
     var countdownView: CountdownView!
     
     // data array
     var specificTabSets: [NormalTabs] = [NormalTabs]()
     var currentSelectedSpecificTab: NormalTabs!
-    var countDownNumber: Float = 0
+    var countDownNumber: Float = 3
     
     // Mark: Main view data array structure
     class mainViewData {
@@ -200,7 +201,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         // MARK: add exist chord to tab editor view
-        self.addChordToEditorView(theSong)
+        //self.addChordToEditorView(theSong)
     }
 
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
@@ -494,9 +495,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if gesture.state == UIGestureRecognizerState.Began {
                 bundle.sourceCell.hidden = true
                 self.view?.addSubview(bundle.representationImageView)
-                UIView.animateWithDuration(0.5, animations: { () -> Void in
+                self.view.userInteractionEnabled = false
+                UIView.animateWithDuration(0.3, animations: { () -> Void in
                     bundle.representationImageView.alpha = 0.8
-                });
+                })
+                self.view.userInteractionEnabled = true
             }
             if gesture.state == UIGestureRecognizerState.Changed {
                 // Update the representation image
@@ -640,6 +643,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // choose the base note, move finger point
     func singleTapOnString6View(sender: UITapGestureRecognizer) {
+        self.view.userInteractionEnabled = false
         var indexFret: Int = Int()
         var indexString: Int = Int()
         if self.addNewTab == false {
@@ -653,6 +657,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }
             }
             for var index = 3; index < 6; index++ {
+                
                 if CGRectContainsPoint(self.string6View[index].frame, location) {
                     self.addNewTab = true
                     indexString = index
@@ -672,12 +677,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     self.noteButtonOnCompeteScrollView = noteButton
                     self.completeStringView.addSubview(noteButton)
                     noteButton.alpha = 0
-                    UIView.animateWithDuration(0.5, animations: {
+                    
+                    UIView.animateWithDuration(0.1, animations: {
                         noteButton.alpha = 1
                     })
+                    
                     self.addSpecificTabButton(noteButton.tag)
                     self.createEditFingerPoint(noteButton.tag)
                 }
+                
             }
         } else {
             let location = sender.locationInView(self.completeStringView)
@@ -696,11 +704,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }
             }
         }
+        self.view.userInteractionEnabled = true
     }
     
     // move finger point when tap on 6 string view
     func moveFingerPoint(indexFret: Int, indexString: Int) {
         print("move finger point")
+        self.view.userInteractionEnabled = false
         let noteString = self.currentNoteButton.tag / 100 - 1
         if indexString != noteString {
             let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
@@ -709,9 +719,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.fingerPoint[5 - indexString].frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
             self.fingerPoint[5 - indexString].alpha = 0
             self.fingerPoint[5 - indexString].tag = indexFret
-            UIView.animateWithDuration(0.5, animations: {
+            
+            UIView.animateWithDuration(0.3, animations: {
                 self.fingerPoint[5 - indexString].alpha = 1
             })
+            self.view.userInteractionEnabled = true
             self.tabFingerPointChanged = true
         }
     }
@@ -755,6 +767,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // add tabs on specific scrol view
     func addSpecificTabButton(sender: Int) {
+        self.view.userInteractionEnabled = false
         let index: NSNumber = NSNumber(integer: sender)
         self.specificTabSets.removeAll()
         self.specificTabSets = self.tabsDataManager.getTabsSets(index)
@@ -779,6 +792,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.buttonOnSpecificScrollView.append(specificButton)
             }
         }
+        
         UIView.animateWithDuration(0.2, animations: {
             for item in self.specificTabsScrollView.subviews {
                 if item.isMemberOfClass(UIButton) {
@@ -786,6 +800,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }
             }
         })
+        self.view.userInteractionEnabled = true
     }
     
     // choose specific tabs, and generate the finger point for this tab
@@ -854,12 +869,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             fingerButton.alpha = 0
             fingerButton.tag = temp
             self.fingerPoint.append(fingerButton)// store all the finger point for exist tabs
-            UIView.animateWithDuration(0.5, animations: {
+            self.view.userInteractionEnabled = false
+            UIView.animateWithDuration(0.3, animations: {
                 fingerButton.alpha = 1
             })
+            
             if i / 2 < stringNumber - 1 {
                 self.completeStringView.addSubview(fingerButton)
             }
+            self.view.userInteractionEnabled = true
         }
     }
     
@@ -877,13 +895,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // press base note button to cancel it or delete it
     func pressNoteButton(sender: UIButton) {
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
-            sender.removeFromSuperview()
-            self.removeObjectsOnSpecificTabsScrollView()
-            self.removeObjectsOnCompleteStringView()
-        }
-        UIView.animateWithDuration(0.5, animations: {
+        self.view.userInteractionEnabled = false
+        UIView.animateWithDuration(0.1, animations: {
             for item in self.buttonOnSpecificScrollView {
                 item.alpha = 0
             }
@@ -891,11 +904,19 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 item.alpha = 0
             }
             sender.alpha = 0
-        })
+            }, completion:
+            {   completed in
+                sender.removeFromSuperview()
+                self.removeObjectsOnSpecificTabsScrollView()
+                self.removeObjectsOnCompleteStringView()
+            }
+        )
+        
         self.fingerPoint.removeAll(keepCapacity: false)
         self.specificTabSets.removeAll(keepCapacity: false)
         self.addNewTab = false
         self.removeAvaliable = false
+        self.view.userInteractionEnabled = true
     }
     
     // remove all oebjects on 6 string View
@@ -988,7 +1009,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTime = self.player.currentTime
         let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
         self.progressBlock.setProgress(persent)
-        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * 6))
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * Double(tabsEditorProgressWidthMultiplier)))
 
         self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
         // find the current tab according to the current time and make the current tab view to yellow
@@ -1005,7 +1026,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func startCountdown() {
         countDownStartSecond--
         countdownView.setNumber(countDownStartSecond)
-        
+
         if countDownStartSecond <= 0 {
             musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
             countdownTimer.invalidate()
@@ -1024,6 +1045,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if player.playing {
             
             //animate down progress block
+            self.view.userInteractionEnabled = false
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                 self.progressBlock!.alpha = 0.5
                 }, completion: nil)
@@ -1031,10 +1053,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             //pause music and stop timer
             player.pause()
             timer.invalidate()
-        
+            self.view.userInteractionEnabled = true
         } else {
             
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
+            self.view.userInteractionEnabled = false
             UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.alpha = 1.0
             }, completion: nil)
@@ -1043,9 +1066,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             //disable tap gesture that inadvertly starts timer
             musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
             countdownView.hidden = false
+
             countdownView.setNumber(countDownStartSecond)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
+            self.view.userInteractionEnabled = true
         }
     }
     
@@ -1138,7 +1163,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
 
     func backToMainView() {
-        UIView.animateWithDuration(0.5, animations: {
+        self.view.userInteractionEnabled = false
+        
+        UIView.animateWithDuration(0.3, animations: {
             self.specificTabsScrollView.alpha = 0
             self.tabNameTextField.alpha = 0
             self.musicControlView.alpha = 1
@@ -1146,6 +1173,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.completeStringView.alpha = 0
             self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
             self.collectionView.alpha = 1
+            }, completion:  {
+                completed in
+                self.editView.removeFromSuperview()
         })
         
         self.tabNameTextField.text = ""
@@ -1162,10 +1192,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTabViewIndex = Int()
         self.removeObjectsOnCompleteStringView()
         self.removeObjectsOnSpecificTabsScrollView()
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
-            self.editView.removeFromSuperview()
+        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
         }
+        self.view.userInteractionEnabled = true
     }
     
     // change remove button when tap on it to show the remove status
@@ -1297,7 +1328,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // back to the main view or back to root view
     func pressBackButton(sender: UIButton) {
         if self.intoEditView == true {
+            self.view.userInteractionEnabled = false
             self.backToMainView()
+            self.view.userInteractionEnabled = true
         } else {
             print("back to song view controller")
             self.dismissViewControllerAnimated(false, completion: nil)
@@ -1305,6 +1338,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func dismissAction() {
+        self.view.userInteractionEnabled = false
         UIView.animateWithDuration(0.3, animations: {
             self.tuningMenu.frame = CGRect(x: -self.tuningMenu.frame.width, y: 0, width: self.tuningMenu.frame.width, height: self.tuningMenu.frame.height)
             
@@ -1314,15 +1348,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.actionDismissLayerButton.hidden = true
             }
         )
+        self.view.userInteractionEnabled = true
     }
     func pressTuningButton(sender: UIButton) {
         print("press tuning button")
+        self.view.userInteractionEnabled = false
         self.actionDismissLayerButton.hidden = false
         UIView.animateWithDuration(0.3, animations: {
             self.tuningMenu.frame = CGRect(x: 0, y: 0, width: self.tuningMenu.frame.width, height: self.trueHeight)
             self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
             self.actionDismissLayerButton.alpha = 0.3
         })
+        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
+        self.view.userInteractionEnabled = true
     }
     
     func pressResetButton(sender: UIButton) {
@@ -1330,21 +1371,35 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
         alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler: {
             action in
-            for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-                UIView.animateWithDuration(0.5, animations: {
-                    self.allTabsOnMusicLine[i].tabView.alpha = 0
+            self.view.userInteractionEnabled = false
+                UIView.animateWithDuration(0.3, animations: {
+                    for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+                        self.allTabsOnMusicLine[i].tabView.alpha = 0
+                    }
+                    }, completion: {
+                        completed in
+                        for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+                            self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
+                        }
+                        self.allTabsOnMusicLine.removeAll()
                 })
-            }
-            let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
-            dispatch_after(delayTime, dispatch_get_main_queue()) {
-                for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-                    self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
-                }
-                self.allTabsOnMusicLine.removeAll()
-            }
+            self.view.userInteractionEnabled = true
+//                UIView.animateWithDuration(0.3, animations: {
+//                    self.allTabsOnMusicLine[i].tabView.alpha = 0
+//                })
+            
+//            let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
+//            dispatch_after(delayTime, dispatch_get_main_queue()) {
+//                for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+//                    self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
+//                }
+//                self.allTabsOnMusicLine.removeAll()
+//            }
             self.player.currentTime = 0
         }))
-        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
         self.presentViewController(alertController, animated: true, completion: nil)
     }
     
@@ -1353,12 +1408,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressAddButton(sender: UIButton) {
+        self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
         
         self.player.pause()
         self.timer.invalidate()
         self.timer = NSTimer()
-        self.countDownNumber = 0
+        self.countDownNumber = 3
         
         self.addSpecificFingerPoint = false
         self.musicControlView.alpha = 0
@@ -1366,15 +1422,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.collectionView.alpha = 0
         self.statusLabel.image = UIImage(named: "addNewTab")
         self.intoEditView = true
-        UIView.animateWithDuration(0.5, animations: {
+        
+        UIView.animateWithDuration(0.3, animations: {
             self.completeStringView.alpha = 1
             self.specificTabsScrollView.alpha = 1
             self.tabNameTextField.alpha = 1
             self.completeStringView.frame = CGRectMake(0, 3 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
         })
+        
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
+        self.view.userInteractionEnabled = true
     }
     
     func pressDoneButton(sender: UIButton) {
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
         if self.intoEditView == true {
             if self.addNewTab == true {
                 var addSuccessed: Bool = true
@@ -1577,6 +1642,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.player.currentTime = 0
             self.currentTime = 0
         }
+        update()
+        if self.removeAvaliable == true {
+            self.changeRemoveButtonStatus(self.removeButton)
+        }
     }
     
     
@@ -1687,9 +1756,9 @@ extension TabsEditorViewController {
             }
             
         }
-        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
-        self.progressBlock.setProgress(0)
-        self.currentTime = 0
+        let current = NSTimeInterval(sender[sender.count - 1].time.toDecimalNumer()) + 0.1
+        self.player.currentTime = current
+        update()
     }
 
     
@@ -1697,6 +1766,7 @@ extension TabsEditorViewController {
     func addChordToEditorView(sender: MPMediaItem) {
         let tabs = musicDataManager.getTabs(sender)
         let chord: [Chord] = tabs.0
+        
         let tuning: String = tabs.1
         let capo: Int = tabs.2
         

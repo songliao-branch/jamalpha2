@@ -808,6 +808,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                     
                     tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                    self.isGenerated = true
                     
                     dispatch_async(dispatch_get_main_queue()) {
                         KGLOBAL_operationCache.removeValueForKey(assetURL as! NSURL)
