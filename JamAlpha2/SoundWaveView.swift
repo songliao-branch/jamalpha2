@@ -33,6 +33,9 @@ class SoundWaveView: UIView {
     
     var averageSampleBuffer: NSMutableArray?
     
+    let tabEditorSampleRate:CGFloat = 5
+    let songVCSampleRate:CGFloat = 1
+    
     
     override init(frame: CGRect)  {
         super.init(frame: frame)
@@ -131,7 +134,7 @@ class SoundWaveView: UIView {
                 }
                 
                 CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
-                CGContextSetLineWidth(context, 2.5)
+                CGContextSetLineWidth(context, 1.5)
                 CGContextSetStrokeColorWithColor(context, color.CGColor)
                 CGContextSetFillColorWithColor(context, color.CGColor)
                 
@@ -197,7 +200,7 @@ class SoundWaveView: UIView {
                             bigSampleforTabAndChord += Double(sample)
                             bigSampleforTabAndChordCount++
                             
-                            if(bigSampleforTabAndChordCount == 3*samplesPerPixel){
+                            if(bigSampleforTabAndChordCount == Int(songVCSampleRate) * samplesPerPixel){
                                 let averageSample:Double = bigSampleforTabAndChord / Double(bigSampleforTabAndChordCount)
                                 
                                 self.averageSampleBuffer!.addObject(averageSample)
@@ -206,10 +209,10 @@ class SoundWaveView: UIView {
                                 
                             }
                             
-                            if(bigSampleCount == 9*samplesPerPixel){
+                            if(bigSampleCount == Int(tabEditorSampleRate)*samplesPerPixel){
                                 let averageSample:Double = bigSample / Double(bigSampleCount)
                                 
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*9+1.5)
+                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*tabEditorSampleRate+0.5)
                                 
                                 currentX++
                                 bigSample = 0
@@ -223,12 +226,13 @@ class SoundWaveView: UIView {
                 
                 bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
                 while(currentX < 450){
-                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*9)
+                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*tabEditorSampleRate)
                     currentX++
                 }
             }
         }
     }
+    
     
     // render sound wave from the NSMutableArray we saved in SongViewController
     func renderWavefromFromStorage(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
@@ -247,7 +251,7 @@ class SoundWaveView: UIView {
 
         for averageSample in self.averageSampleBuffer!
         {
-            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*9+1.5)
+            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*tabEditorSampleRate+0.5)
             
             currentX++
         }
