@@ -11,7 +11,7 @@ import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
 
-extension MeLoginViewController: FBSDKLoginButtonDelegate {
+extension MeLoginOrSignupViewController: FBSDKLoginButtonDelegate {
     
     func setUpFBLogin() {
         self.fbLoginButton.delegate = self

@@ -1,5 +1,5 @@
 //
-//  MyLyricsViewController.swift
+//  MyTabsViewController.swift
 //  JamAlpha2
 //
 //  Created by Jun Zhou on 11/16/15.
@@ -8,7 +8,9 @@
 
 import UIKit
 
-class MyLyricsViewController: UIViewController {
+class MyTabsOrLyricsViewController: UIViewController {
+    
+    var myTitle: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +32,7 @@ class MyLyricsViewController: UIViewController {
         //
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         //
-        self.navigationItem.title = "My Lyrics"
+        self.navigationItem.title = self.myTitle
         
         
         self.view.backgroundColor = UIColor(red: 0.918, green: 0.918, blue: 0.918, alpha: 1)

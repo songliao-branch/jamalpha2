@@ -52,8 +52,16 @@ class MeViewController: UIViewController {
         // 
         self.navigationItem.title = "Me"
         
+        let leftButton: UIBarButtonItem = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain , target: self, action: "pressLeftButton:")
+        self.navigationItem.leftBarButtonItem = leftButton
         
         self.view.backgroundColor = UIColor(red: 0.918, green: 0.918, blue: 0.918, alpha: 1)
+    }
+    
+    func pressLeftButton(sender: UIBarButtonItem) {
+        let meVC: MeLoginOrSignupViewController = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
+        //self.navigationController?.viewControllers = NSArray(object: meVC) as! [UIViewController]
+        self.navigationController?.setViewControllers(NSArray(object: meVC) as! [UIViewController], animated: true)
     }
     
     func initialProfileView() {
@@ -155,10 +163,12 @@ extension MeViewController: UITableViewDataSource, UITableViewDelegate {
             self.navigationController?.pushViewController(meProfileVC, animated: true)
         } else if indexPath.section == 1 {
             if indexPath.item == 0 {
-                let myTabsVC: MyTabsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsVC") as! MyTabsViewController
+                let myTabsVC: MyTabsOrLyricsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsorlyricsVC") as! MyTabsOrLyricsViewController
+                myTabsVC.myTitle = "My Tabs"
                 self.navigationController?.pushViewController(myTabsVC, animated: true)
             } else {
-                let mylyricsVC: MyLyricsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mylyricsVC") as! MyLyricsViewController
+                let mylyricsVC: MyTabsOrLyricsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsorlyricsVC") as! MyTabsOrLyricsViewController
+                mylyricsVC.myTitle = "My Lyrics"
                 self.navigationController?.pushViewController(mylyricsVC, animated: true)
             }
         } else if indexPath.section == 2 {

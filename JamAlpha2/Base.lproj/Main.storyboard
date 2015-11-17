@@ -560,7 +560,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ojH-Bi-cBz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2591" y="1309"/>
+            <point key="canvasLocation" x="3123" y="1309"/>
         </scene>
         <!--Lyrics Sync View Controller-->
         <scene sceneID="1gc-YX-iw8">
@@ -579,7 +579,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1g1-iF-pFl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2981" y="1309"/>
+            <point key="canvasLocation" x="3513" y="1309"/>
         </scene>
         <!--Me View Controller-->
         <scene sceneID="eAN-Ol-AA5">
@@ -601,12 +601,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OqA-ks-IwD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-188" y="929"/>
+            <point key="canvasLocation" x="-398" y="1618"/>
         </scene>
-        <!--Me Login View Controller-->
+        <!--Me Login Or Signup View Controller-->
         <scene sceneID="GTS-xl-bjZ">
             <objects>
-                <viewController storyboardIdentifier="meloginVC" id="RhT-9S-kyM" customClass="MeLoginViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="meloginVC" id="RhT-9S-kyM" customClass="MeLoginOrSignupViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="KkS-pu-M1k"/>
                         <viewControllerLayoutGuide type="bottom" id="jvQ-LR-Loc"/>
@@ -617,10 +617,11 @@
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" id="ZPv-wE-jga"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bYc-Y7-Pnq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="163" y="929"/>
+            <point key="canvasLocation" x="-165" y="929"/>
         </scene>
         <!--Me Sign Up View Controller-->
         <scene sceneID="Jgn-f8-dBh">
@@ -639,7 +640,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5FB-Qu-USL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="533" y="929"/>
+            <point key="canvasLocation" x="223" y="929"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">
@@ -763,7 +764,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="tM8-pp-IGs" kind="relationship" relationship="rootViewController" id="jij-Z3-uLs"/>
+                        <segue destination="RhT-9S-kyM" kind="relationship" relationship="rootViewController" id="XPF-sR-dC6"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0Bb-Wf-eDZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -787,12 +788,13 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="u35-5M-qVM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-628" y="1620"/>
+            <point key="canvasLocation" x="-44" y="1618"/>
         </scene>
-        <!--My Tabs View Controller-->
+        <!--My Tabs Or Lyrics View Controller-->
         <scene sceneID="LgP-Yx-ibg">
             <objects>
-                <viewController storyboardIdentifier="mytabsVC" id="yje-jU-Gmt" customClass="MyTabsViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                <placeholder placeholderIdentifier="IBFirstResponder" id="EDa-rV-ewN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController storyboardIdentifier="mytabsorlyricsVC" id="yje-jU-Gmt" customClass="MyTabsOrLyricsViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="dv6-i6-oQg"/>
                         <viewControllerLayoutGuide type="bottom" id="Hul-ef-nzI"/>
@@ -804,28 +806,8 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="EDa-rV-ewN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-230" y="1618"/>
-        </scene>
-        <!--My Lyrics View Controller-->
-        <scene sceneID="3Ad-cc-gfW">
-            <objects>
-                <viewController storyboardIdentifier="mylyricsVC" id="mqg-Zg-QPt" customClass="MyLyricsViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="w7o-M5-E30"/>
-                        <viewControllerLayoutGuide type="bottom" id="aAm-hr-7vn"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="wM0-Jq-S7W">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <animations/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="STY-V8-m4p" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="172" y="1620"/>
+            <point key="canvasLocation" x="302" y="1618"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="TjZ-1H-QlN">
@@ -844,7 +826,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aC1-kR-L3Z" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="564" y="1616"/>
+            <point key="canvasLocation" x="668" y="1618"/>
         </scene>
     </scenes>
     <resources>

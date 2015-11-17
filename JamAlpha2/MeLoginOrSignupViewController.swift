@@ -10,7 +10,7 @@ import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
 
-class MeLoginViewController: UIViewController {
+class MeLoginOrSignupViewController: UIViewController {
 
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
@@ -65,12 +65,6 @@ class MeLoginViewController: UIViewController {
     }
     
     func setUpNavigationBar(){
-//        let logo = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSizeMake(self.view.frame.width/2, 22)))
-//        logo.image = UIImage(named: "logo_bold")
-//        logo.center = CGPointMake(self.view.center.x, 25) // half of navigation height
-//        logo.contentMode = UIViewContentMode.ScaleAspectFit
-//        //add logo to navigation bar
-//        self.navigationController!.navigationBar.addSubview(logo)
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         // hide the navigation bar
@@ -167,7 +161,7 @@ class MeLoginViewController: UIViewController {
 }
 
 // log in scroll view
-extension MeLoginViewController {
+extension MeLoginOrSignupViewController {
     func setUpLogInEditScrollView() {
         self.editLogInScrollView.frame = CGRectMake(0, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight - (self.tabBarController?.tabBar.frame.size.height)! - 0.17 * self.viewHeight)
         self.editLogInScrollView.contentSize = CGSizeMake(self.viewWidth, self.editLogInScrollView.frame.size.height + 15)
@@ -231,11 +225,15 @@ extension MeLoginViewController {
     
     func pressLogInButton(sender: UIButton) {
         
+        let meVC: MeViewController = self.storyboard?.instantiateViewControllerWithIdentifier("meVC") as! MeViewController
+        //self.navigationController?.viewControllers = NSArray(object: meVC) as! [UIViewController]
+        self.navigationController?.setViewControllers(NSArray(object: meVC) as! [UIViewController], animated: true)
+        //self.presentViewController(meVC, animated: true, completion: nil)
     }
 }
 
 // sign up scroll view
-extension MeLoginViewController {
+extension MeLoginOrSignupViewController {
     func setUpSignUpEditScrollView() {
         self.editSignUpScrollView.frame = CGRectMake(0, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight - (self.tabBarController?.tabBar.frame.size.height)! - 0.17 * self.viewHeight)
         self.editSignUpScrollView.contentSize = CGSizeMake(self.viewWidth, self.editSignUpScrollView.frame.size.height + 15)
