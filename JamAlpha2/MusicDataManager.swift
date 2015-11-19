@@ -20,6 +20,14 @@ class MusicDataManager: NSObject {
     
     let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
+    func saveUser(id: Int, email: String, authToken: String) {
+        let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
+        user.id  = id
+        user.email = email
+        user.authToken = authToken
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+    }
+    
     private func findSong(item: MPMediaItem) -> Song? {
         // TODO: other special characters might corrupt the predicate, needs to check more later
         

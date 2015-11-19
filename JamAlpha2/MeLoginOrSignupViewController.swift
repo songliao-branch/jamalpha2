@@ -250,7 +250,6 @@ class MeLoginOrSignupViewController: UIViewController {
                 "email": email,
                 "password": password
             ]
-            
             Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
             {
                 response in
