@@ -19,7 +19,6 @@
 		BF4B83EF1BFA89E400AF8A2A /* MeProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B83EE1BFA89E400AF8A2A /* MeProfileViewController.swift */; };
 		BF5A77B51BEABD6C00BCE723 /* FBLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */; };
 		BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */; };
-		BF5A77DA1BF4484200BCE723 /* MeSignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D91BF4484200BCE723 /* MeSignUpViewController.swift */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
@@ -28,6 +27,7 @@
 		E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */; };
 		E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */; };
 		E42032E21BFBE00000A5D36D /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42032E11BFBE00000A5D36D /* UserManager.swift */; };
+		E42032E41BFE87D200A5D36D /* UIViewController+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42032E31BFE87D200A5D36D /* UIViewController+Utils.swift */; };
 		E42DF9331BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */; };
 		E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */; };
 		E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */; };
@@ -118,7 +118,6 @@
 		BF4B83EE1BFA89E400AF8A2A /* MeProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeProfileViewController.swift; sourceTree = "<group>"; };
 		BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FBLogin.swift; sourceTree = "<group>"; };
 		BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeLoginOrSignupViewController.swift; sourceTree = "<group>"; };
-		BF5A77D91BF4484200BCE723 /* MeSignUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeSignUpViewController.swift; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
@@ -127,6 +126,7 @@
 		E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchHistoryManager.swift; sourceTree = "<group>"; };
 		E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadedLyricsSet.swift; sourceTree = "<group>"; };
 		E42032E11BFBE00000A5D36D /* UserManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
+		E42032E31BFE87D200A5D36D /* UIViewController+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Utils.swift"; sourceTree = "<group>"; };
 		E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSyncTimeTableViewCell.swift; sourceTree = "<group>"; };
 		E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LyricsSyncTimeViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsTextViewController.swift; sourceTree = "<group>"; };
@@ -228,7 +228,6 @@
 				BF4B83E01BFA6FAB00AF8A2A /* MeViewController.swift */,
 				BF4B83E71BFA898000AF8A2A /* MeProfileSecondView */,
 				BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */,
-				BF5A77D91BF4484200BCE723 /* MeSignUpViewController.swift */,
 				BF5A77B41BEABD6C00BCE723 /* FBLogin.swift */,
 			);
 			name = MeViewController;
@@ -429,6 +428,7 @@
 				E47FF6861BAD1AC500028F2D /* SongViewController */,
 				E431BA9E1B91552400E32A0B /* MusicListControllers */,
 				E4CBC0091B9E88F100473FC4 /* TabItemControllers */,
+				E42032E31BFE87D200A5D36D /* UIViewController+Utils.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -675,6 +675,7 @@
 				BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */,
 				E42DF9331BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift in Sources */,
 				E44358FE1B19471B0091E926 /* Artist.swift in Sources */,
+				E42032E41BFE87D200A5D36D /* UIViewController+Utils.swift in Sources */,
 				E4A9A5551BF05289000E5F1C /* BrowseVersionsCell.swift in Sources */,
 				E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */,
 				E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */,
@@ -686,7 +687,6 @@
 				BF4B83E11BFA6FAB00AF8A2A /* MeViewController.swift in Sources */,
 				E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* MusicDataManager.swift in Sources */,
-				BF5A77DA1BF4484200BCE723 /* MeSignUpViewController.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,

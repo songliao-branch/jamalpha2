@@ -37,11 +37,7 @@ class MeViewController: UIViewController {
         setUpNavigationBar()
         initialProfileView()
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+
     
     func setUpNavigationBar() {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black

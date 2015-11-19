@@ -20,18 +20,39 @@ class UserManager: NSObject {
         
     }
     
-    class func validateUsername(username: String) {
     
+    //TODO: add callback
+    class func signUp(email:String, password: String) {
+        
+        let parameters = [
+            "email": email,
+            "password": password
+        ]
+        
+        Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
+            {
+                response in
+                switch response.result {
+                case .Success:
+                    print(response)
+                    
+                    //store user token
+                    print("User created")
+                case .Failure(let error):
+                    print(error)
+                }
+        }
     }
+    
+    
     //user can login with either email or username
-    class func attemptLogin(credential: String, password: String, isEmail: Bool) {
+    class func attemptLogin(email: String, password: String) {
         
         var parameters = [String: String]()
         
-        let credentialKey = isEmail ? "email" : "username"
         parameters = [
             "attempt_login": "0", //the value does not matter
-            credentialKey: credential,
+            "email": email,
             "password": password
         ]
         
@@ -46,33 +67,7 @@ class UserManager: NSObject {
                     print(error)
                 }
         }
-        
     }
     
-    
-    //TODO: add callback
-    class func signUp(email:String, username: String, password: String) {
-        
-        let parameters = [
-            "email": email,
-            "username": username,
-            "password": password
-        ]
 
-        Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
-            {
-                response in
-                switch response.result {
-                case .Success:
-                    print(response)
-                    
-                    
-                    //store user token
-                    print("User created")
-                case .Failure(let error):
-                    print(error)
-                }
-        }
-    }
-    
 }
