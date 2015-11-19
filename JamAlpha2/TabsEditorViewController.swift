@@ -1384,17 +1384,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.allTabsOnMusicLine.removeAll()
                 })
             self.view.userInteractionEnabled = true
-//                UIView.animateWithDuration(0.3, animations: {
-//                    self.allTabsOnMusicLine[i].tabView.alpha = 0
-//                })
-            
-//            let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
-//            dispatch_after(delayTime, dispatch_get_main_queue()) {
-//                for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-//                    self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
-//                }
-//                self.allTabsOnMusicLine.removeAll()
-//            }
             self.player.currentTime = 0
         }))
         if self.removeAvaliable == true {

@@ -16,9 +16,12 @@ class MeLoginOrSignupViewController: UIViewController {
     var viewHeight: CGFloat = CGFloat()
     var statusAndNavigationBarHeight: CGFloat = CGFloat()
     
-    var signUpImageView: UIImageView = UIImageView()
-    var logInImageView: UIImageView = UIImageView()
+    var subtitleLabel: UILabel!
     var selectedIndex: Int = 0
+    
+    var signUpButton: UIButton!
+    var logInButton: UIButton!
+    var indicatorTriangleView: UIImageView! //indicate whether it's sign up or log in
     
     var editSignUpScrollView: UIScrollView = UIScrollView()
     var editLogInScrollView: UIScrollView = UIScrollView()
@@ -55,10 +58,6 @@ class MeLoginOrSignupViewController: UIViewController {
         setUpLogInEditScrollView()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     override func viewWillAppear(animated: Bool) {
         setUpNavigationBar()
@@ -70,7 +69,7 @@ class MeLoginOrSignupViewController: UIViewController {
         // hide the navigation bar
         self.navigationController?.navigationBar.hidden = true
         
-        self.view.backgroundColor = UIColor(red: 0.918, green: 0.918, blue: 0.918, alpha: 1)
+        self.view.backgroundColor = UIColor.whiteColor()
     }
     
     func setUpTopView() {
@@ -86,64 +85,50 @@ class MeLoginOrSignupViewController: UIViewController {
         titleImageView.image = UIImage(named: "logo_bold")
         topView.addSubview(titleImageView)
         
-        let subTitleImageView: UILabel = UILabel()
-        subTitleImageView.frame = CGRectMake(0, self.statusAndNavigationBarHeight, topView.frame.size.width, 0.1 * self.viewHeight)
-        subTitleImageView.text = "Sign Up to upload tabs and save your favorite songs"
-        subTitleImageView.textColor = UIColor.whiteColor()
-        subTitleImageView.textAlignment = NSTextAlignment.Center
-        subTitleImageView.numberOfLines = 2
-        subTitleImageView.lineBreakMode = NSLineBreakMode.ByWordWrapping
-        topView.addSubview(subTitleImageView)
+        subtitleLabel = UILabel()
+        subtitleLabel.frame = CGRectMake(0, self.statusAndNavigationBarHeight, topView.frame.size.width, 0.1 * self.viewHeight)
+        subtitleLabel.text = "Sign up to upload tabs and save your favorite songs"
+        subtitleLabel.textColor = UIColor.whiteColor()
+        subtitleLabel.font = UIFont.systemFontOfSize(15)
+        subtitleLabel.textAlignment = NSTextAlignment.Center
+        subtitleLabel.numberOfLines = 2
+        subtitleLabel.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        topView.addSubview(subtitleLabel)
+    
+        let yOffSet: CGFloat = 10
+        signUpButton = UIButton(frame: CGRect(x: 0, y: topView.frame.height-50-yOffSet, width: viewWidth/2, height: 50))
+        signUpButton.setTitle("Sign Up", forState: .Normal)
+        signUpButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
+        signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        signUpButton.addTarget(self, action: "tapToSignUp:", forControlEvents: .TouchUpInside)
+        topView.addSubview(signUpButton)
         
-        self.signUpImageView.frame = CGRectMake(0, 0.1 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth / 2, 0.07 * self.viewHeight)
-        self.signUpImageView.image = UIImage(named: "lightTab")
-        topView.addSubview(self.signUpImageView)
-        let signUpLabel: UILabel = UILabel()
-        signUpLabel.frame = CGRectMake(0, 0, self.signUpImageView.frame.size.width, self.signUpImageView.frame.size.height)
-        signUpLabel.textAlignment = NSTextAlignment.Center
-        signUpLabel.text = "Sign Up"
-        signUpLabel.textColor = UIColor.blackColor()
-        self.signUpImageView.addSubview(signUpLabel)
+        logInButton = UIButton(frame: CGRect(x: viewWidth/2, y: signUpButton.frame.origin.y, width: viewWidth/2, height: 50))
+        logInButton.setTitle("Log In", forState: .Normal)
+        logInButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
+        logInButton.addTarget(self, action: "tapToLogIn:", forControlEvents: .TouchUpInside)
+        logInButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        topView.addSubview(logInButton)
         
-        self.logInImageView.frame = CGRectMake(self.viewWidth / 2, 0.1 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth / 2, 0.07 * self.viewHeight)
-        self.logInImageView.image = UIImage(named: "darkTab")
-        topView.addSubview(self.logInImageView)
-        let logInLabel: UILabel = UILabel()
-        logInLabel.frame = CGRectMake(0, 0, self.logInImageView.frame.size.width, self.logInImageView.frame.size.height)
-        logInLabel.textAlignment = NSTextAlignment.Center
-        logInLabel.text = "Log In"
-        logInLabel.textColor = UIColor.blackColor()
-        self.logInImageView.addSubview(logInLabel)
-        
-        let tapToLogIn: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapToLogIn.addTarget(self, action: "tapToLogIn:")
-        let tapToSignUp: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapToSignUp.addTarget(self, action: "tapToSignUp:")
-        
-        self.signUpImageView.userInteractionEnabled = true
-        self.logInImageView.userInteractionEnabled = true
-        
-        self.logInImageView.addGestureRecognizer(tapToLogIn)
-        self.signUpImageView.addGestureRecognizer(tapToSignUp)
-        
-        let tapOnTopView: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapOnTopView.addTarget(self, action: "tapOnTopView:")
-        topView.addGestureRecognizer(tapOnTopView)
+        indicatorTriangleView = UIImageView(frame: CGRect(x: 0, y: topView.frame.height-10, width: 25, height: 10))
+        indicatorTriangleView.image = UIImage(named: "triangle")
+        indicatorTriangleView.center.x = signUpButton.center.x
+        topView.addSubview(indicatorTriangleView)
     }
     
-    func tapToLogIn(sender: UITapGestureRecognizer) {
-        self.logInImageView.image = UIImage(named: "lightTab")
-        self.signUpImageView.image = UIImage(named: "darkTab")
+    func tapToLogIn(sender: UIButton) {
+        self.indicatorTriangleView.center.x = self.logInButton.center.x
+        self.subtitleLabel.text = "Log in to upload tabs and save your favorite songs"
         if self.selectedIndex == 0 {
             self.editSignUpScrollView.removeFromSuperview()
             self.view.addSubview(self.editLogInScrollView)
             self.selectedIndex = 1
         }
     }
-    
-    func tapToSignUp(sender: UITapGestureRecognizer) {
-        self.signUpImageView.image = UIImage(named: "lightTab")
-        self.logInImageView.image = UIImage(named: "darkTab")
+
+    func tapToSignUp(sender: UIButton) {
+        self.indicatorTriangleView.center.x = self.signUpButton.center.x
+        self.subtitleLabel.text = "Sign up to upload tabs and save your favorite songs"
         if self.selectedIndex == 1 {
             self.editLogInScrollView.removeFromSuperview()
             self.view.addSubview(self.editSignUpScrollView)
@@ -156,7 +141,6 @@ class MeLoginOrSignupViewController: UIViewController {
         self.emailLogInTextField.resignFirstResponder()
         self.passwordLogInTextField.resignFirstResponder()
     }
-    
 
 }
 
@@ -225,10 +209,13 @@ extension MeLoginOrSignupViewController {
     
     func pressLogInButton(sender: UIButton) {
         
-        let meVC: MeViewController = self.storyboard?.instantiateViewControllerWithIdentifier("meVC") as! MeViewController
-        //self.navigationController?.viewControllers = NSArray(object: meVC) as! [UIViewController]
-        self.navigationController?.setViewControllers(NSArray(object: meVC) as! [UIViewController], animated: true)
-        //self.presentViewController(meVC, animated: true, completion: nil)
+        UserManager.attemptLogin(emailLogInTextField.text!, password: passwordLogInTextField.text!, isEmail: true)
+        
+//        
+//        let meVC: MeViewController = self.storyboard?.instantiateViewControllerWithIdentifier("meVC") as! MeViewController
+//        //self.navigationController?.viewControllers = NSArray(object: meVC) as! [UIViewController]
+//        self.navigationController?.setViewControllers(NSArray(object: meVC) as! [UIViewController], animated: true)
+//        //self.presentViewController(meVC, animated: true, completion: nil)
     }
 }
 

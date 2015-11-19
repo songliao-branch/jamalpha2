@@ -20,7 +20,7 @@ class MeSignUpViewController: UIViewController {
     
     var email: String = String()
     
-    var emailTestField: UITextField = UITextField()
+    var emailTextField: UITextField = UITextField()
     var usernameTextField: UITextField = UITextField()
     var passwordTextField: UITextField = UITextField()
     
@@ -81,8 +81,8 @@ class MeSignUpViewController: UIViewController {
     
     func pressNextBarButton(sender: UIBarButtonItem) {
         
+        UserManager.signUp(emailTextField.text!, username: usernameTextField.text!, password: passwordTextField.text!)
     }
-
 }
 
 // set up edit view and all objects on it
@@ -112,13 +112,13 @@ extension MeSignUpViewController {
         emailTitleImage.frame = CGRectMake(0.05 * self.viewWidth, 0.3 * self.viewHeight - 0.05 * self.viewWidth, 0.1 * self.viewWidth, 0.1 * self.viewWidth)
         emailTitleImage.image = UIImage(named: "email")
         editView.addSubview(emailTitleImage)
-        self.emailTestField.frame = CGRectMake(0.25 * self.viewWidth, 0.25 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
-        self.emailTestField.backgroundColor = UIColor.clearColor()
-        self.emailTestField.text = self.email
-        self.emailTestField.addTarget(self, action: "valueChangeOnEmailTestField:", forControlEvents: UIControlEvents.EditingChanged)
-        self.emailTestField.accessibilityIdentifier = "edit"
-        self.emailTestField.autocorrectionType = UITextAutocorrectionType.No
-        editView.addSubview(self.emailTestField)
+        self.emailTextField.frame = CGRectMake(0.25 * self.viewWidth, 0.25 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
+        self.emailTextField.backgroundColor = UIColor.clearColor()
+        self.emailTextField.text = self.email
+        self.emailTextField.addTarget(self, action: "valueChangeOnEmailTestField:", forControlEvents: UIControlEvents.EditingChanged)
+        self.emailTextField.accessibilityIdentifier = "edit"
+        self.emailTextField.autocorrectionType = UITextAutocorrectionType.No
+        editView.addSubview(self.emailTextField)
         
         self.emailBackgroundLabel.frame = CGRectMake(0.25 * self.viewWidth, 0.25 * self.viewHeight, 0.7 * self.viewWidth, 0.1 * self.viewHeight)
         self.emailBackgroundLabel.text = "Enter your email"
@@ -172,7 +172,7 @@ extension MeSignUpViewController {
     }
     
     func tapOnEditView(sender: UITapGestureRecognizer) {
-        self.emailTestField.resignFirstResponder()
+        self.emailTextField.resignFirstResponder()
         self.usernameTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
     }

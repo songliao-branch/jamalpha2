@@ -27,6 +27,7 @@
 		C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F505071B9101920077F508 /* UIWindowEffects.swift */; };
 		E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */; };
 		E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */; };
+		E42032E21BFBE00000A5D36D /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42032E11BFBE00000A5D36D /* UserManager.swift */; };
 		E42DF9331BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */; };
 		E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */; };
 		E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */; };
@@ -125,6 +126,7 @@
 		C8F505071B9101920077F508 /* UIWindowEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIWindowEffects.swift; sourceTree = "<group>"; };
 		E41D6D001BA149EB006A9993 /* SearchHistoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchHistoryManager.swift; sourceTree = "<group>"; };
 		E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadedLyricsSet.swift; sourceTree = "<group>"; };
+		E42032E11BFBE00000A5D36D /* UserManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		E42DF9321BAF419300187A95 /* LyricsSyncTimeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSyncTimeTableViewCell.swift; sourceTree = "<group>"; };
 		E42DF9341BAF419F00187A95 /* LyricsSyncTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LyricsSyncTimeViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsTextViewController.swift; sourceTree = "<group>"; };
@@ -436,6 +438,7 @@
 			children = (
 				E48F22651BF5920300F24962 /* Models */,
 				E48AE2D11B955BB40044CFDB /* APIManager.swift */,
+				E42032E11BFBE00000A5D36D /* UserManager.swift */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -651,6 +654,7 @@
 				E431BA9D1B913AE700E32A0B /* String+Utils.swift in Sources */,
 				E455E7291BA272AD00210BD6 /* Song.swift in Sources */,
 				E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */,
+				E42032E21BFBE00000A5D36D /* UserManager.swift in Sources */,
 				E4399C381B90048F00906DBD /* UIView+Geometry.swift in Sources */,
 				E443B91B1BBBA2F20074A4E1 /* LyricsSet.swift in Sources */,
 				BF4B83ED1BFA89CE00AF8A2A /* SettingsViewController.swift in Sources */,

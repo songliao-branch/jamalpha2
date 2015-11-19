@@ -30,6 +30,8 @@ class SearchResult {
 }
 
 
+let jamBaseURL = "https://jamapi.herokuapp.com"
+
 class APIManager: NSObject {
     
     //MARK: iTunes search
@@ -40,7 +42,7 @@ class APIManager: NSObject {
     }
     
     //MARK: heroku server codes
-    static let jamBaseURL = "https://jamapi.herokuapp.com"
+    //static let jamBaseURL = "https://jamapi.herokuapp.com"
     
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"

@@ -118,35 +118,6 @@
             </objects>
             <point key="canvasLocation" x="90" y="-643"/>
         </scene>
-        <!--List-->
-        <scene sceneID="Gze-Ai-2T8">
-            <objects>
-                <viewController id="ZPh-Yv-NLo" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="uud-iB-RfW"/>
-                        <viewControllerLayoutGuide type="bottom" id="u82-23-8mz"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="wPR-YG-ndy">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <animations/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                    <tabBarItem key="tabBarItem" title="List" image="list" id="zxU-Fa-Nj7">
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
-                                <color key="value" red="0.94117647058823528" green="0.35686274509803922" blue="0.38039215686274508" alpha="1" colorSpace="calibratedRGB"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="image" keyPath="selectedImage" value="list"/>
-                        </userDefinedRuntimeAttributes>
-                    </tabBarItem>
-                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
-                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="IeN-El-Hl9" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1004" y="929"/>
-        </scene>
         <!--Page View Controller-->
         <scene sceneID="gSS-jU-hp4">
             <objects>
@@ -834,7 +805,6 @@
                     <connections>
                         <segue destination="OD7-U1-wmr" kind="relationship" relationship="viewControllers" id="hg5-7d-wXz"/>
                         <segue destination="WoA-2F-8w5" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
-                        <segue destination="ZPh-Yv-NLo" kind="relationship" relationship="viewControllers" id="rxg-WN-v9e"/>
                         <segue destination="Pbp-fC-5bc" kind="relationship" relationship="viewControllers" id="LUe-vl-Gnn"/>
                     </connections>
                 </tabBarController>
@@ -1008,7 +978,6 @@
     </scenes>
     <resources>
         <image name="kitten_profile" width="50" height="50"/>
-        <image name="list" width="20" height="25"/>
         <image name="me" width="20" height="25"/>
         <image name="music" width="25" height="25"/>
         <image name="search" width="23" height="25"/>
