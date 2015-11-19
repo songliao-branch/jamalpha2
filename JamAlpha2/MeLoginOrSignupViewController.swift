@@ -16,6 +16,7 @@ class MeLoginOrSignupViewController: UIViewController {
     var viewHeight: CGFloat = CGFloat()
     var statusAndNavigationBarHeight: CGFloat = CGFloat()
     
+    var topView: UIView!
     var subtitleLabel: UILabel!
     var selectedIndex: Int = 0
     
@@ -25,6 +26,12 @@ class MeLoginOrSignupViewController: UIViewController {
     
     var editSignUpScrollView: UIScrollView = UIScrollView()
     var editLogInScrollView: UIScrollView = UIScrollView()
+    
+    //sign up view
+    var emailTextField: UITextField!
+    var orLabel: UILabel! // a label inside the separator from email textfield and facebook button
+    var facebookButton: UIButton!
+    
     
     var emailSignUpTextField: UITextField = UITextField()
     var emailSignUpBackgroundLabel: UILabel = UILabel()
@@ -73,7 +80,7 @@ class MeLoginOrSignupViewController: UIViewController {
     }
     
     func setUpTopView() {
-        let topView: UIView = UIView()
+        topView = UIView()
         topView.frame = CGRectMake(0, 0, self.viewWidth, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight)
         topView.backgroundColor = UIColor(patternImage: UIImage(named: "meVCTopBackground")!)
         self.view.addSubview(topView)
@@ -137,6 +144,7 @@ class MeLoginOrSignupViewController: UIViewController {
     }
     
     func tapOnTopView(sender: UITapGestureRecognizer) {
+        self.emailTextField.resignFirstResponder()
         self.emailSignUpTextField.resignFirstResponder()
         self.emailLogInTextField.resignFirstResponder()
         self.passwordLogInTextField.resignFirstResponder()
@@ -208,10 +216,10 @@ extension MeLoginOrSignupViewController {
     }
     
     func pressLogInButton(sender: UIButton) {
-        
-        UserManager.attemptLogin(emailLogInTextField.text!, password: passwordLogInTextField.text!, isEmail: true)
-        
 //        
+//        UserManager.attemptLogin(emailLogInTextField.text!, password: passwordLogInTextField.text!, isEmail: true)
+//        
+//
 //        let meVC: MeViewController = self.storyboard?.instantiateViewControllerWithIdentifier("meVC") as! MeViewController
 //        //self.navigationController?.viewControllers = NSArray(object: meVC) as! [UIViewController]
 //        self.navigationController?.setViewControllers(NSArray(object: meVC) as! [UIViewController], animated: true)
@@ -222,63 +230,74 @@ extension MeLoginOrSignupViewController {
 // sign up scroll view
 extension MeLoginOrSignupViewController {
     func setUpSignUpEditScrollView() {
-        self.editSignUpScrollView.frame = CGRectMake(0, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight - (self.tabBarController?.tabBar.frame.size.height)! - 0.17 * self.viewHeight)
-        self.editSignUpScrollView.contentSize = CGSizeMake(self.viewWidth, self.editSignUpScrollView.frame.size.height + 15)
+        
+        self.editSignUpScrollView = UIScrollView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: viewWidth, height: viewHeight))
+        editSignUpScrollView.showsVerticalScrollIndicator = false
+        self.editSignUpScrollView.contentSize.height = self.editSignUpScrollView.frame.size.height + 15
         self.view.addSubview(self.editSignUpScrollView)
         
-        self.fbLoginButton.frame = CGRectMake(0, 0.12 * self.viewHeight, self.viewWidth, 0.1 * self.viewHeight)
-        self.setUpFBLogin()
-        self.editSignUpScrollView.addSubview(self.fbLoginButton)
+        let verticalMargin: CGFloat = 10
+        emailTextField = UITextField(frame: CGRect(x: 0, y: verticalMargin, width: viewWidth-20, height: 44))
+        emailTextField.placeholder = "Enter your email"
+        emailTextField.textAlignment = .Center
+        emailTextField.center.x = self.view.center.x
+        emailTextField.tintColor = UIColor.mainPinkColor()
+        emailTextField.clearButtonMode = .WhileEditing
+        emailTextField.autocapitalizationType = .None
+        emailTextField.autocorrectionType = .No
+        emailTextField.accessibilityIdentifier = "unedit"
+        emailTextField.addTarget(self, action: "valueChangedInEmailTextField:", forControlEvents: .EditingChanged)
+        editSignUpScrollView.addSubview(emailTextField)
         
-        self.nextButton.frame = CGRectMake(0, 0.12 * self.viewHeight, self.viewWidth, 0.1 * self.viewHeight)
-        self.nextButton.setTitle("Next", forState: UIControlState.Normal)
-        self.nextButton.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        self.nextButton.addTarget(self, action: "pressNextButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        let graySeparator = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame)+5, width: emailTextField.frame.width, height: 1))
+        graySeparator.backgroundColor = UIColor.lightGrayColor()
+        editSignUpScrollView.addSubview(graySeparator)
         
-        self.resetButton.frame = CGRectMake(self.viewWidth - 0.1 * self.viewHeight, 0, 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.resetButton.setTitle("R", forState: UIControlState.Normal)
-        self.resetButton.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        self.resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        orLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 10))
+        orLabel.text = "OR"
+        orLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 12)
+        orLabel.textColor = UIColor.lightGrayColor()
+        orLabel.backgroundColor = UIColor.whiteColor()
+        orLabel.textAlignment = .Center
+        orLabel.center = graySeparator.center
+        editSignUpScrollView.addSubview(orLabel)
         
-        self.emailSignUpBackgroundLabel.frame = CGRectMake(0.1 * self.viewHeight, 0, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.emailSignUpBackgroundLabel.text = "Enter your email"
-        self.emailSignUpBackgroundLabel.textColor = UIColor.grayColor()
-        self.editSignUpScrollView.addSubview(self.emailSignUpBackgroundLabel)
+        facebookButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(graySeparator.frame)+verticalMargin, width: viewWidth, height: 44))
+        facebookButton.setTitle("Log in with facebook", forState: .Normal)
+        facebookButton.setImage(UIImage(named: "facebook_icon"), forState: .Normal)
+        facebookButton.setTitleColor(UIColor.facebookBlue(), forState: .Normal)
+        facebookButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right:
+            0)
+        facebookButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+        facebookButton.center.x = self.view.center.x
+        editSignUpScrollView.addSubview(facebookButton)
         
-        self.emailSignUpTextField.frame = CGRectMake(0.1 * self.viewHeight, 0, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.emailSignUpTextField.backgroundColor = UIColor.clearColor()
-        self.emailSignUpTextField.addTarget(self, action: "valueChangedInEmailTextField:", forControlEvents: UIControlEvents.EditingChanged)
-        self.emailSignUpTextField.accessibilityIdentifier = "unedit"
-        self.emailSignUpTextField.autocorrectionType = UITextAutocorrectionType.No
-        self.editSignUpScrollView.addSubview(self.emailSignUpTextField)
+        nextButton.frame = CGRectMake(0, CGRectGetMaxY(graySeparator.frame)+verticalMargin, self.viewWidth, 44)
+        nextButton.setTitle("Next", forState: UIControlState.Normal)
+        nextButton.setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Normal)
+        nextButton.addTarget(self, action: "pressNextButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        nextButton.hidden = true
+        editSignUpScrollView.addSubview(nextButton)
         
+        
+//        self.fbLoginButton.frame = CGRectMake(0, 0.12 * self.viewHeight, self.viewWidth, 0.1 * self.viewHeight)
+//        self.setUpFBLogin()
+//        self.editSignUpScrollView.addSubview(self.fbLoginButton)
+
     }
     
     func valueChangedInEmailTextField(sender: UITextField) {
         if sender.text == "" {
-            self.editSignUpScrollView.addSubview(self.emailSignUpBackgroundLabel)
-            self.editSignUpScrollView.addSubview(fbLoginButton)
-            self.nextButton.removeFromSuperview()
-            self.resetButton.removeFromSuperview()
+            facebookButton.hidden = false
+            nextButton.hidden = true
+            orLabel.hidden = false
             sender.accessibilityIdentifier = "unedit"
-        } else {
-            if sender.accessibilityIdentifier == "unedit" {
-                self.emailSignUpBackgroundLabel.removeFromSuperview()
-                self.fbLoginButton.removeFromSuperview()
-                self.editSignUpScrollView.addSubview(self.nextButton)
-                self.editSignUpScrollView.addSubview(self.resetButton)
-                sender.accessibilityIdentifier = "edit"
-            }
+        } else if sender.accessibilityIdentifier == "unedit" {
+            facebookButton.hidden = true
+            nextButton.hidden = false
+            orLabel.hidden = true
+            sender.accessibilityIdentifier = "edit"
         }
-    }
-    
-    func pressResetButton(sender: UIButton) {
-        self.emailSignUpTextField.text = ""
-        self.emailSignUpTextField.accessibilityIdentifier = "unedit"
-        self.editSignUpScrollView.addSubview(self.emailSignUpBackgroundLabel)
-        self.editSignUpScrollView.addSubview(self.fbLoginButton)
-        self.resetButton.removeFromSuperview()
-        self.nextButton.removeFromSuperview()
     }
     
     func pressNextButton(sender: UIButton) {
