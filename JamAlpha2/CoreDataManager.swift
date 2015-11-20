@@ -20,7 +20,39 @@ class CoreDataManager: NSObject {
     
     static let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
-    class func saveUser(id: Int, email: String, authToken: String) {
+    //User-related
+    class func logoutUser() {
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
+        
+        //for testing 
+        for o in results {
+            moc.deleteObject(o as! NSManagedObject)
+        }
+//        if results.count == 1 {
+//            let user = results.firstObject as? User
+//             moc.deleteObject(user!)
+//            
+//        }
+        
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+    }
+    
+    class func getCurrentUser() -> User? {
+        
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
+        
+        print("\(results.count) users found.")
+        
+        if results.count == 1 {
+            return results.lastObject as? User
+        }
+        
+        return nil
+    }
+    
+    class func initializeUser(id: Int, email: String, authToken: String) {
+        logoutUser()//for testing clear all users
+        
         let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
         user.id  = id
         user.email = email
@@ -28,6 +60,7 @@ class CoreDataManager: NSObject {
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
+    //song-related
     private class func findSong(item: MPMediaItem) -> Song? {
         // TODO: other special characters might corrupt the predicate, needs to check more later
         

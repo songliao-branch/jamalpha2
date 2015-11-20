@@ -4,12 +4,14 @@
 //
 //  Created by Jun Zhou on 11/8/15.
 //  Copyright © 2015 Song Liao. All rights reserved.
-//
+
 
 import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
 import Alamofire
+import SwiftyJSON
+
 class MeLoginOrSignupViewController: UIViewController {
 
     var viewWidth: CGFloat = CGFloat()
@@ -19,8 +21,6 @@ class MeLoginOrSignupViewController: UIViewController {
     var topView: UIView!
     var hideKeyboardGesture: UITapGestureRecognizer!
     var subtitleLabel: UILabel!
-    var selectedIndex: Int = 0
-    
     var signUpTabButton: UIButton!
     var loginTabButton: UIButton!
     var indicatorTriangleView: UIImageView! //indicate whether it's sign up or log in
@@ -34,7 +34,6 @@ class MeLoginOrSignupViewController: UIViewController {
     
     //log in screen
     var passwordTextField: UITextField!
-    var passwordTextFieldUnderline: UIView!
     var submitButton: UIButton!
     
     var fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
@@ -48,55 +47,50 @@ class MeLoginOrSignupViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.navigationController?.navigationBarHidden = true
         //TODO: check if user is signed in already.
-        
-        // Do any additional setup after loading the view.
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
-        self.statusAndNavigationBarHeight = UIApplication.sharedApplication().statusBarFrame.size.height + (self.navigationController?.navigationBar.height)!
         
-        setUpNavigationBar()
+        
         setUpTopView()
         setUpViews()
     }
-
     
     override func viewWillAppear(animated: Bool) {
-        setUpNavigationBar()
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBarHidden = true
     }
     
-    func setUpNavigationBar(){
-        //change status bar text to light
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        // hide the navigation bar
-        self.navigationController?.navigationBar.hidden = true
-        
-        self.view.backgroundColor = UIColor.whiteColor()
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBarHidden = false
     }
     
     func setUpTopView() {
         topView = UIView()
-        topView.frame = CGRectMake(0, 0, self.viewWidth, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight)
+        topView.frame = CGRectMake(0, 0, self.viewWidth, 200)
         topView.backgroundColor = UIColor(patternImage: UIImage(named: "meVCTopBackground")!)
         let topViewTapGesture = UITapGestureRecognizer(target: self, action: "topViewTapGesture:")
         topView.addGestureRecognizer(topViewTapGesture)
         self.view.addSubview(topView)
         
-        let imageWidth: CGFloat = self.viewWidth / 3
-        let imageHeight: CGFloat = (self.navigationController?.navigationBar.frame.size.height)! - 15
-        let titleImageView: UIImageView = UIImageView()
-        titleImageView.frame = CGRectMake(topView.frame.size.width / 2 - imageWidth / 2, UIApplication.sharedApplication().statusBarFrame.size.height + (self.navigationController?.navigationBar.frame.size.height)! / 2 - imageHeight / 2 + 5, imageWidth, imageHeight)
-        titleImageView.image = UIImage(named: "logo_bold")
-        topView.addSubview(titleImageView)
+        let logo = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
+        logo.image = UIImage(named: "logo_bold")
+        logo.center = CGPoint(x: topView.center.x, y: topView.center.y - 20)
+        logo.contentMode = .ScaleAspectFill
+        logo.sizeToFit()
+        topView.addSubview(logo)
         
         subtitleLabel = UILabel()
-        subtitleLabel.frame = CGRectMake(0, self.statusAndNavigationBarHeight, topView.frame.size.width, 0.1 * self.viewHeight)
+        subtitleLabel.frame = CGRectMake(0, CGRectGetMaxY(logo.frame), topView.frame.size.width-50, 50)
         subtitleLabel.text = "Sign up to upload tabs and save your favorite songs"
         subtitleLabel.textColor = UIColor.whiteColor()
-        subtitleLabel.font = UIFont.systemFontOfSize(15)
-        subtitleLabel.textAlignment = NSTextAlignment.Center
+        subtitleLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 14)
+        subtitleLabel.textAlignment = .Center
         subtitleLabel.numberOfLines = 2
-        subtitleLabel.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        subtitleLabel.lineBreakMode = .ByWordWrapping
+        subtitleLabel.center.x = topView.center.x
         topView.addSubview(subtitleLabel)
     
         let yOffSet: CGFloat = 10
@@ -175,7 +169,7 @@ class MeLoginOrSignupViewController: UIViewController {
         passwordTextField.tintColor = UIColor.mainPinkColor()
         scrollView.addSubview(passwordTextField)
         
-        passwordTextFieldUnderline = UITextField(frame: CGRect(x: credentialTextFieldUnderline.frame.origin.x, y: CGRectGetMaxY(passwordTextField.frame), width: credentialTextFieldUnderline.frame.width, height: 1))
+        let passwordTextFieldUnderline = UITextField(frame: CGRect(x: credentialTextFieldUnderline.frame.origin.x, y: CGRectGetMaxY(passwordTextField.frame), width: credentialTextFieldUnderline.frame.width, height: 1))
         passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(passwordTextFieldUnderline)
         
@@ -244,37 +238,22 @@ class MeLoginOrSignupViewController: UIViewController {
         }
         
         submitButton.enabled = false
+        
+        var parameters = [String: String]()
         if isSignUpSelected { //sigup up api
-            
-            let parameters = [
+            parameters = [
                 "email": email,
                 "password": password
             ]
-            Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
-            {
-                response in
-                self.submitButton.enabled = true
-                
-                switch response.result {
-                case .Success:
-                    print(response)
-                    
-                    //store user token
-                    print("User created")
-                case .Failure(let error):
-                    print(error)
-                }
-            }
-            
         } else { //login api
-            
-            let parameters = [
+            parameters = [
                 "attempt_login":"1",
                 "email": email,
                 "password": password
             ]
-            
-            Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
+        }
+
+        Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
             {
                 response in
                 self.submitButton.enabled = true
@@ -282,21 +261,40 @@ class MeLoginOrSignupViewController: UIViewController {
                 case .Success:
                     print(response)
                     
-                    //store user token
-                    print("User created")
+                    if let data = response.result.value {
+                        let json = JSON(data)
+                        
+                        let userInitialization = json["user_initialization"]
+                        
+                        if userInitialization != nil {
+                            
+                            CoreDataManager.initializeUser(userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
+                        
+                            //go back to user profile view
+                            self.navigationController?.popViewControllerAnimated(false)
+
+                            
+                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
+                            
+                        } else { //we have an error
+                            var errorMessage = ""
+                            
+                            if let erroMessages = json["error"].array {//it might be an array
+                                for msg in erroMessages {
+                                    
+                                    errorMessage += msg.string!
+                                }
+                                self.showMessage(errorMessage, message: "", actionTitle: "OK", completion: nil)
+                            } else { //or just a single value
+                                 self.showMessage(json["error"].string!, message: "", actionTitle: "OK", completion: nil)
+                            }
+                        }
+                    }
                 case .Failure(let error):
                     print(error)
                 }
-            }
-            
-//            //TODO: check if valid
-//            let meVC: MeViewController = self.storyboard?.instantiateViewControllerWithIdentifier("meVC") as! MeViewController
-//            //self.navigationController?.viewControllers = NSArray(object: meVC) as! [UIViewController]
-//            self.navigationController?.setViewControllers(NSArray(object: meVC) as! [UIViewController], animated: true)
-//            self.presentViewController(meVC, animated: true, completion: nil)
         }
     }
-    
 }
 
 

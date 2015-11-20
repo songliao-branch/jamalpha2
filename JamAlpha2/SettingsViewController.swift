@@ -2,52 +2,32 @@
 //  SettingsViewController.swift
 //  JamAlpha2
 //
-//  Created by Jun Zhou on 11/16/15.
+//  Created by Song Liao on 11/19/15.
 //  Copyright © 2015 Song Liao. All rights reserved.
 //
 
 import UIKit
 
-class SettingsViewController: UIViewController {
+class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+
     
-    var logoutButton: UIButton = UIButton()
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-        self.setUpNavigationBar()
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        logoutButton.frame = CGRectMake(50, 100, 20, 20)
-        logoutButton.setTitle("logout", forState: UIControlState.Normal)
-        logoutButton.addTarget(self, action: "pressLogoutButton", forControlEvents: UIControlEvents.TouchUpInside)
-        self.view.addSubview(logoutButton)
+        let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
+        cell.textLabel?.text = "Logout"
+        return cell
     }
     
-
-    func setUpNavigationBar() {
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        // hide the navigation bar
-        self.navigationController?.navigationBar.hidden = false
-        //
-        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-        //
-        self.navigationItem.title = "Settings"
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        
-        self.view.backgroundColor = UIColor(red: 0.918, green: 0.918, blue: 0.918, alpha: 1)
-    }
-    
-    func pressLogoutButton(sender: UIButton) {
-        self.dismissViewControllerAnimated(false, completion: nil)
-        self.navigationController?.popToRootViewControllerAnimated(true)
-    }
+        CoreDataManager.logoutUser()
 
-    
-    
+        self.navigationController?.popViewControllerAnimated(false)
+        //self.navigationController?.popToRootViewControllerAnimated(false)
+    }
 }
