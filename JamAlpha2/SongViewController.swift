@@ -21,7 +21,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //for nsoperation
     var isGenerated:Bool = true
     
-    var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 3.2
     var minfont: CGFloat = 15
@@ -201,7 +200,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         firstLoadSongTime = firstLoadPlayingItem.playbackDuration
         firstloadSongTitle = firstLoadPlayingItem.title
 
-        musicDataManager.initializeSongToDatabase(firstLoadPlayingItem)
+        CoreDataManager.initializeSongToDatabase(firstLoadPlayingItem)
     
         removeAllObserver()
         //hide tab bar
@@ -443,7 +442,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func updateMusicData(song: MPMediaItem) {
         
-        let tabsFromCoreData = musicDataManager.getTabs(song)
+        let tabsFromCoreData = CoreDataManager.getTabs(song)
         if tabsFromCoreData.0.count > 0 {
             print("chords length: \(tabsFromCoreData.0.count)")
             if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
@@ -459,7 +458,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.chords = [Chord]()
         }
         
-        let lyricsFromCoreData = musicDataManager.getLyrics(song)
+        let lyricsFromCoreData = CoreDataManager.getLyrics(song)
         if lyricsFromCoreData.count > 0 {
             self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
         } else {
@@ -614,7 +613,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
             if self.firstloadSongTitle != nowPlayingItem!.title && self.firstLoadSongTime != nowPlayingItem!.playbackDuration {
-                self.musicDataManager.initializeSongToDatabase(nowPlayingItem!)
+                CoreDataManager.initializeSongToDatabase(nowPlayingItem!)
                 self.firstloadSongTitle = nowPlayingItem!.title
                 self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
@@ -640,7 +639,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KGLOBAL_progressBlock.center.y = progressContainerHeight
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
-                if let soundWaveData = self.musicDataManager.getSongWaveFormImage(nowPlayingItem!) {
+                if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingItem!) {
                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
                     print("sound wave data found")
                     KGLOBAL_init_queue.suspended = false
@@ -768,7 +767,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
         //if there is soundwave in the coredata then we load the image in viewdidload
-        if let soundWaveData = musicDataManager.getSongWaveFormImage(firstLoadPlayingItem) {
+        if let soundWaveData = CoreDataManager.getSongWaveFormImage(firstLoadPlayingItem) {
             KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
             KGLOBAL_init_queue.suspended = false
@@ -801,13 +800,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // have to use the temp value to do the nsoperation, cannot use (self.) do that.
                 let tempNowPlayingItem = nowPlayingItem
                 let tempProgressBlock = KGLOBAL_progressBlock
-                let tempMusicDataManager = self.musicDataManager
                 op = NSBlockOperation(block: {
                     
                     tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
                     let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                     
-                    tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
                     self.isGenerated = true
                     
                     dispatch_async(dispatch_get_main_queue()) {

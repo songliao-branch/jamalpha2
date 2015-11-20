@@ -49,8 +49,7 @@ class APIManager: NSObject {
     
     //upload tabs
     class func uploadTabs(mediaItem: MPMediaItem) {
-        let musicDataManager = MusicDataManager()
-        
+
         var title = ""
         var artist = ""
         let duration = Float(mediaItem.playbackDuration)
@@ -65,7 +64,7 @@ class APIManager: NSObject {
         var tuning = ""
         var capo = 0
         
-        (chords, tuning, capo) = musicDataManager.getTabs(mediaItem)
+        (chords, tuning, capo) = CoreDataManager.getTabs(mediaItem)
         
         var timesData = [Float]()
         var chordsData = [String]()
@@ -104,8 +103,7 @@ class APIManager: NSObject {
     
     //upload lyrics
     class func uploadLyrics(mediaItem: MPMediaItem) {
-        let musicDataManager = MusicDataManager()
-        
+
         var title = ""
         var artist = ""
         let duration = Float(mediaItem.playbackDuration)
@@ -117,7 +115,7 @@ class APIManager: NSObject {
         }
         
         var data = [(String, NSTimeInterval)]()
-        data = musicDataManager.getLyrics(mediaItem)
+        data = CoreDataManager.getLyrics(mediaItem)
         var times = [Float]()
         var lyrics = [String]()
         for i in 0..<data.count {
