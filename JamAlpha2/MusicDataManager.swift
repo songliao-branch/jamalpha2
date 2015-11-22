@@ -33,12 +33,17 @@ class MusicDataManager: NSObject {
         }
         if let artist = item.artist {
             artistToBeUsed = artist.replaceApostrophe()
+        }else{
+            artistToBeUsed = "empty"
         }
         if let album = item.albumTitle {
             albumToBeUsed = album.replaceApostrophe()
+        }else{
+            albumToBeUsed = "empty"
         }
         
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(titleToBeUsed)') AND (artist == '\(artistToBeUsed)') AND (album == '\(albumToBeUsed)')")
+        //let predicate: NSPredicate = NSPredicate(format: "(title == '\(titleToBeUsed)')")
         
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
@@ -61,9 +66,13 @@ class MusicDataManager: NSObject {
             }
             if let artist = item.artist {
                 song.artist = artist
+            }else{
+                song.artist = "empty"
             }
             if let album = item.albumTitle {
                 song.album = album
+            }else{
+                song.artist = "empty"
             }
             
             song.playbackDuration = Float(item.playbackDuration)

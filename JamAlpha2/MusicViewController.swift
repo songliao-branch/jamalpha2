@@ -184,7 +184,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 cell.coverImage.image = image
             } else {
                 //TODO: add a placeholder cover
-                cell.coverImage.image = nil
+                cell.coverImage.image = UIImage(named: "liweng")
             }
             
             cell.mainTitle.text = song.title

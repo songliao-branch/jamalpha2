@@ -274,7 +274,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
         } else {
             //TODO: add a placeholder album cover
-            return
+            currentImage = UIImage(named: "liwengbg")
         }
         //create blurred image
         let blurredImage:UIImage = currentImage!.applyLightEffect()!
@@ -1274,13 +1274,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func unblurImageIfAllIsHidden() {
         if !isChordShown && !isTabsShown && !isLyricsShown {
-            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            //let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            var image:UIImage!
+            if let artwork = player.nowPlayingItem!.artwork {
+                image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            } else {
+                //TODO: add a placeholder album cover
+                image = UIImage(named: "liwengbg")
+            }
+
             self.backgroundImageView.center.x = self.view.center.x
             self.backgroundImageView.image = image
             artWorkUnblurred = true
         } else if artWorkUnblurred { //if only we have unblurred it before, we blur the image
             
-            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            var image:UIImage!
+            if let artwork = player.nowPlayingItem!.artwork {
+                image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            } else {
+                //TODO: add a placeholder album cover
+                image = UIImage(named: "liwengbg")
+            }
             let blurredImage = image!.applyLightEffect()!
             self.backgroundImageView.center.x = self.view.center.x
             self.backgroundImageView.image = blurredImage

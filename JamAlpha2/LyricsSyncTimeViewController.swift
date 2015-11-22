@@ -157,7 +157,15 @@ class LyricsSyncViewController: UIViewController  {
         let backgroundImage: UIImageView = UIImageView()
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
-        backgroundImage.image = theSong.artwork!.imageWithSize(size)
+        var image:UIImage!
+        if let artwork = theSong!.artwork {
+            image = artwork.imageWithSize(size)
+        } else {
+            //TODO: add a placeholder album cover
+            image = UIImage(named: "liwengbg")
+        }
+        backgroundImage.image = image
+        //backgroundImage.image = theSong.artwork!.imageWithSize(size)
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
