@@ -41,12 +41,10 @@ class CoreDataManager: NSObject {
         
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
         
-        print("\(results.count) users found.")
-        
         if results.count == 1 {
             return results.lastObject as? User
         }
-        
+        print("no users found")
         return nil
     }
     

@@ -13,22 +13,19 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     @IBOutlet weak var userTable: UITableView!
     
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
-    
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        
         showSignUpLoginScreen()
     }
-    
-    
     
     func showSignUpLoginScreen() {
         //check if there is a user, if not show signup/login screen
         if CoreDataManager.getCurrentUser() == nil {
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
+            
             self.navigationController?.pushViewController(signUpVC, animated: false)
         }
     }

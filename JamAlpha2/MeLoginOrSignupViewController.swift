@@ -57,6 +57,10 @@ class MeLoginOrSignupViewController: UIViewController {
         setUpViews()
     }
     
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBarHidden = true
