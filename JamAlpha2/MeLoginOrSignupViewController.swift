@@ -220,13 +220,11 @@ class MeLoginOrSignupViewController: UIViewController {
         //validate email is not empty
         guard let email = emailTextField.text where emailTextField.text?.characters.count > 0 else {
             self.showMessage("Email field is empty", message: "", actionTitle: "OK", completion: nil)
-            //self.abortSubmission("Phone number empty", message: "Please don't leave phone number blank")
             return
         }
         
         guard let password = passwordTextField.text where passwordTextField.text?.characters.count > 0 else {
             self.showMessage("Password is empty", message: "", actionTitle: "OK", completion: nil)
-            //self.abortSubmission("Phone number empty", message: "Please don't leave phone number blank")
             return
         }
         
