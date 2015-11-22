@@ -779,14 +779,22 @@
                                         <animations/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="avatarcell" rowHeight="90" id="bIV-2T-XSp" customClass="AvatarCell" customModule="JamAlpha2" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="158" width="320" height="90"/>
+                                        <rect key="frame" x="0.0" y="157.5" width="320" height="90"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bIV-2T-XSp" id="GQw-cS-Gm7">
-                                            <rect key="frame" x="0.0" y="0.0" width="287" height="90"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="287" height="89.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8We-ye-CGO">
-                                                    <rect key="frame" x="80" y="19" width="148" height="21"/>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="kitten_profile" translatesAutoresizingMaskIntoConstraints="NO" id="3oM-mk-oiR">
+                                                    <rect key="frame" x="19" y="15" width="60" height="60"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="60" id="9ld-EF-0XB"/>
+                                                        <constraint firstAttribute="height" constant="60" id="K9g-xV-eUF"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="email" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8We-ye-CGO">
+                                                    <rect key="frame" x="92" y="34" width="180" height="21.5"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -795,14 +803,16 @@
                                             </subviews>
                                             <animations/>
                                             <constraints>
-                                                <constraint firstItem="8We-ye-CGO" firstAttribute="leading" secondItem="GQw-cS-Gm7" secondAttribute="leadingMargin" constant="72" id="SRP-cf-Aa7"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="8We-ye-CGO" secondAttribute="trailing" constant="51" id="T6x-r7-8uV"/>
-                                                <constraint firstItem="8We-ye-CGO" firstAttribute="top" secondItem="GQw-cS-Gm7" secondAttribute="topMargin" constant="11" id="t5r-Dj-Zo7"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="8We-ye-CGO" secondAttribute="bottom" constant="41.5" id="wHg-Pq-Eoq"/>
+                                                <constraint firstItem="8We-ye-CGO" firstAttribute="leading" secondItem="3oM-mk-oiR" secondAttribute="trailing" constant="13" id="704-dD-L2F"/>
+                                                <constraint firstItem="3oM-mk-oiR" firstAttribute="centerY" secondItem="GQw-cS-Gm7" secondAttribute="centerY" id="9R4-Ma-3UD"/>
+                                                <constraint firstAttribute="trailing" secondItem="8We-ye-CGO" secondAttribute="trailing" constant="15" id="AEY-1w-teM"/>
+                                                <constraint firstItem="8We-ye-CGO" firstAttribute="centerY" secondItem="GQw-cS-Gm7" secondAttribute="centerY" id="DEm-Fx-RBo"/>
+                                                <constraint firstItem="3oM-mk-oiR" firstAttribute="leading" secondItem="GQw-cS-Gm7" secondAttribute="leading" constant="19" id="EnR-7w-C2H"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <animations/>
                                         <connections>
+                                            <outlet property="avatarImageView" destination="3oM-mk-oiR" id="Jgl-nn-qHR"/>
                                             <outlet property="titleLabel" destination="8We-ye-CGO" id="TxS-st-2IC"/>
                                         </connections>
                                     </tableViewCell>

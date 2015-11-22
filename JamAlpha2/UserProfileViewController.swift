@@ -52,6 +52,9 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("avatarcell", forIndexPath: indexPath) as! AvatarCell
             
+            cell.avatarImageView.layer.cornerRadius = cell.avatarImageView.frame.height/2
+            cell.avatarImageView.layer.borderWidth = 1
+            cell.avatarImageView.layer.borderColor = UIColor.backgroundGray().CGColor
             if let user = CoreDataManager.getCurrentUser() {
               cell.titleLabel.text = user.email
             }
