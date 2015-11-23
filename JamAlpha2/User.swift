@@ -10,10 +10,10 @@ import Foundation
 import CoreData
 @objc(User)
 class User: NSManagedObject {
-    
+   
     @NSManaged var id: NSNumber
     @NSManaged var email: String
-    @NSManaged var username: String
+    @NSManaged var username: String? //this is not required
     @NSManaged var authToken: String
     
     @NSManaged var tabsSets: NSSet

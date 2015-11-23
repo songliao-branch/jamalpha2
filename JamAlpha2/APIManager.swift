@@ -160,7 +160,7 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     print(json)
                     for set in json["tabs_sets"].array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, upVotes: set["upvotes"].int!, downVotes: set["downvotes"].int!, userId: set["user_id"].int!, chordsPreview: set["chords_preview"].string!)
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userId: set["user_id"].int!, chordsPreview: set["chords_preview"].string!)
                         allDownloads.append(t)
                     }
                    //after completed, pass everything to the callback
@@ -218,7 +218,7 @@ class APIManager: NSObject {
                     print(json)
                     for set in json["lyrics_sets"].array! {
 
-                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userId: set["user_id"].int!, upvotes: set["upvotes"].int!, downvotes: set["downvotes"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!)
+                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userId: set["user_id"].int!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!)
                         allDownloads.append(l)
                     }
                     //after completed, pass everything to the callback
@@ -260,15 +260,33 @@ class APIManager: NSObject {
             }
         }
     }
-
-    class func updateVotes(isUp: Bool, tabsSet: DownloadedTabsSet){
-        //TODO: need a user token to update, and one user can only update a tabs once!
-        let parameters = ["increment_votes": (isUp ? 1 : 0)]
-        Alamofire.request(.PUT, jamBaseURL + "/tabs_sets/\(tabsSet.id)", parameters: parameters).responseJSON { response in
+    
+    //upvote or downvote either tabsSet or lyricsSet
+    class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( newVote: Int) -> Void)){
+        
+        if CoreDataManager.getCurrentUser() == nil {
+            print("not logged in, cannot vote")
+            return
+        }
+        
+        let parameters = ["user_id": "\(CoreDataManager.getCurrentUser()!.id)"]
+        
+        var path = isTabs ? "/tabs_sets/\(setId)" : "lyrics_sets/\(setId)"
+        path += isUp ? "/like" : "/dislike"
+        
+        Alamofire.request(.PUT, jamBaseURL + path , parameters: parameters).responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
+                    
+                    if isTabs {
+                        let set = json["tabs_set"]
+                        completion(newVote: set["cached_votes_score"].int!)
+                    } else {
+                        let set = json["lyrics_set"]
+                        completion(newVote: set["cached_votes_score"].int!)
+                    }
                     
                     print(json)
                 }

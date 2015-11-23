@@ -9,8 +9,6 @@
 import UIKit
 
 class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-
-    
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
@@ -28,6 +26,5 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         CoreDataManager.logoutUser()
 
         self.navigationController?.popViewControllerAnimated(false)
-        //self.navigationController?.popToRootViewControllerAnimated(false)
     }
 }

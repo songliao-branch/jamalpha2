@@ -180,14 +180,14 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 tuning = tabsSet.tuning
             }
             
-            cell.votesLabel.text = String(tabsSet.upVotes - tabsSet.downVotes)
+            cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
 
         } else {
             let lyricsSet = downloadedLyricsSets[indexPath.row]
             
-            cell.votesLabel.text = String(lyricsSet.upVotes - lyricsSet.downVotes)
+            cell.votesLabel.text = String(lyricsSet.votesScore)
             cell.titleLabel.text = lyricsSet.lyricsPreview + "..."
             cell.subtitleLabel.text = "\(lyricsSet.numberOfLines) lines"
         }
@@ -226,7 +226,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             APIManager.downloadLyricsSetContent(lyricsSet, completion: {
                 download in
                 
-                var lyricsToBeUsed = Lyric()
+                let lyricsToBeUsed = Lyric()
                 for i in 0..<download.times.count {
                     lyricsToBeUsed.addLine(TimeNumber(time: download.times[i]), str: download.lyrics[i])
                 }
@@ -238,14 +238,45 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func upVoted(button: UIButton) {
-        APIManager.updateVotes(true, tabsSet: downloadedTabsSets[button.tag])
-        //should be callback to see if it is s
+        
+        let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
+        
+        APIManager.updateVotes(true, isTabs: isPullingTabs, setId: id, completion: {
+            vote in
+            
+            if self.isPullingTabs {
+                self.downloadedTabsSets[button.tag].votesScore = vote
+            } else {
+                self.downloadedLyricsSets[button.tag].votesScore = vote
+            }
+
+            dispatch_async(dispatch_get_main_queue()) {
+                self.resultsTableView.reloadData()
+            }
+            
+        })
+
         print("up button: \(button.tag) pressed")
     }
     
     func downVoted(button: UIButton) {
-        APIManager.updateVotes(false, tabsSet: downloadedTabsSets[button.tag])
-
+        
+        let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
+        
+        APIManager.updateVotes(false, isTabs: isPullingTabs, setId: id, completion: {
+            vote in
+            
+            if self.isPullingTabs {
+                self.downloadedTabsSets[button.tag].votesScore = vote
+            } else {
+                self.downloadedLyricsSets[button.tag].votesScore = vote
+            }
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                self.resultsTableView.reloadData()
+            }
+            
+        })
         print("down button: \(button.tag) pressed")
     }
     

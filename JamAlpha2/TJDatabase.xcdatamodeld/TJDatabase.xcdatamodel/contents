@@ -36,9 +36,9 @@
         <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="tabsSets" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="User" representedClassName="User" syncable="YES">
-        <attribute name="authToken" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="id" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="authToken" attributeType="String" syncable="YES"/>
+        <attribute name="email" attributeType="String" syncable="YES"/>
+        <attribute name="id" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="username" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="lyricsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="LyricsSet" inverseName="user" inverseEntity="LyricsSet" syncable="YES"/>
         <relationship name="tabsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TabsSet" inverseName="user" inverseEntity="TabsSet" syncable="YES"/>
