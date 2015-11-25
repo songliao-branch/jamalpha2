@@ -4,11 +4,13 @@
 //
 //  Created by Jun Zhou on 11/8/15.
 //  Copyright © 2015 Song Liao. All rights reserved.
-//
+
 
 import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
+import Alamofire
+import SwiftyJSON
 
 class MeLoginOrSignupViewController: UIViewController {
 
@@ -16,21 +18,23 @@ class MeLoginOrSignupViewController: UIViewController {
     var viewHeight: CGFloat = CGFloat()
     var statusAndNavigationBarHeight: CGFloat = CGFloat()
     
-    var signUpImageView: UIImageView = UIImageView()
-    var logInImageView: UIImageView = UIImageView()
-    var selectedIndex: Int = 0
+    var topView: UIView!
+    var hideKeyboardGesture: UITapGestureRecognizer!
+    var subtitleLabel: UILabel!
+    var signUpTabButton: UIButton!
+    var loginTabButton: UIButton!
+    var indicatorTriangleView: UIImageView! //indicate whether it's sign up or log in
+    var isSignUpSelected = true
     
-    var editSignUpScrollView: UIScrollView = UIScrollView()
-    var editLogInScrollView: UIScrollView = UIScrollView()
+    var scrollView: UIScrollView!
+    //sign up screen
+    var emailTextField: UITextField! //email in signup screen AND email/user in log in screen
+    var orLabel: UILabel! // a label inside the separator from email textfield and facebook button
+    var facebookButton: UIButton!
     
-    var emailSignUpTextField: UITextField = UITextField()
-    var emailSignUpBackgroundLabel: UILabel = UILabel()
-    var resetButton: UIButton = UIButton()
-    
-    var emailLogInBackgroundLabel: UILabel = UILabel()
-    let emailLogInTextField: UITextField = UITextField()
-    var passwordLogInBackgroundLabel: UILabel = UILabel()
-    let passwordLogInTextField: UITextField = UITextField()
+    //log in screen
+    var passwordTextField: UITextField!
+    var submitButton: UIButton!
     
     var fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
     var nextButton: UIButton = UIButton()
@@ -42,266 +46,257 @@ class MeLoginOrSignupViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
         
+        self.navigationController?.navigationBarHidden = true
+        //TODO: check if user is signed in already.
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
-        self.statusAndNavigationBarHeight = UIApplication.sharedApplication().statusBarFrame.size.height + (self.navigationController?.navigationBar.height)!
         
-        setUpNavigationBar()
+        
         setUpTopView()
-        setUpSignUpEditScrollView()
-        setUpLogInEditScrollView()
+        setUpViews()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
     }
     
     override func viewWillAppear(animated: Bool) {
-        setUpNavigationBar()
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBarHidden = true
     }
     
-    func setUpNavigationBar(){
-        //change status bar text to light
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        // hide the navigation bar
-        self.navigationController?.navigationBar.hidden = true
-        
-        self.view.backgroundColor = UIColor(red: 0.918, green: 0.918, blue: 0.918, alpha: 1)
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBarHidden = false
     }
     
     func setUpTopView() {
-        let topView: UIView = UIView()
-        topView.frame = CGRectMake(0, 0, self.viewWidth, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight)
+        topView = UIView()
+        topView.frame = CGRectMake(0, 0, self.viewWidth, 200)
         topView.backgroundColor = UIColor(patternImage: UIImage(named: "meVCTopBackground")!)
+        let topViewTapGesture = UITapGestureRecognizer(target: self, action: "topViewTapGesture:")
+        topView.addGestureRecognizer(topViewTapGesture)
         self.view.addSubview(topView)
         
-        let imageWidth: CGFloat = self.viewWidth / 3
-        let imageHeight: CGFloat = (self.navigationController?.navigationBar.frame.size.height)! - 15
-        let titleImageView: UIImageView = UIImageView()
-        titleImageView.frame = CGRectMake(topView.frame.size.width / 2 - imageWidth / 2, UIApplication.sharedApplication().statusBarFrame.size.height + (self.navigationController?.navigationBar.frame.size.height)! / 2 - imageHeight / 2 + 5, imageWidth, imageHeight)
-        titleImageView.image = UIImage(named: "logo_bold")
-        topView.addSubview(titleImageView)
+        let logo = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
+        logo.image = UIImage(named: "logo_bold")
+        logo.center = CGPoint(x: topView.center.x, y: topView.center.y - 20)
+        logo.contentMode = .ScaleAspectFill
+        logo.sizeToFit()
+        topView.addSubview(logo)
         
-        let subTitleImageView: UILabel = UILabel()
-        subTitleImageView.frame = CGRectMake(0, self.statusAndNavigationBarHeight, topView.frame.size.width, 0.1 * self.viewHeight)
-        subTitleImageView.text = "Sign Up to upload tabs and save your favorite songs"
-        subTitleImageView.textColor = UIColor.whiteColor()
-        subTitleImageView.textAlignment = NSTextAlignment.Center
-        subTitleImageView.numberOfLines = 2
-        subTitleImageView.lineBreakMode = NSLineBreakMode.ByWordWrapping
-        topView.addSubview(subTitleImageView)
+        subtitleLabel = UILabel()
+        subtitleLabel.frame = CGRectMake(0, CGRectGetMaxY(logo.frame), topView.frame.size.width-50, 50)
+        subtitleLabel.text = "Sign up to upload tabs and save your favorite songs"
+        subtitleLabel.textColor = UIColor.whiteColor()
+        subtitleLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 14)
+        subtitleLabel.textAlignment = .Center
+        subtitleLabel.numberOfLines = 2
+        subtitleLabel.lineBreakMode = .ByWordWrapping
+        subtitleLabel.center.x = topView.center.x
+        topView.addSubview(subtitleLabel)
+    
+        let yOffSet: CGFloat = 10
+        signUpTabButton = UIButton(frame: CGRect(x: 0, y: topView.frame.height-50-yOffSet, width: viewWidth/2, height: 50))
+        signUpTabButton.setTitle("Sign Up", forState: .Normal)
+        signUpTabButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
+        signUpTabButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        signUpTabButton.addTarget(self, action: "signUpTabPressed", forControlEvents: .TouchUpInside)
+        topView.addSubview(signUpTabButton)
         
-        self.signUpImageView.frame = CGRectMake(0, 0.1 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth / 2, 0.07 * self.viewHeight)
-        self.signUpImageView.image = UIImage(named: "lightTab")
-        topView.addSubview(self.signUpImageView)
-        let signUpLabel: UILabel = UILabel()
-        signUpLabel.frame = CGRectMake(0, 0, self.signUpImageView.frame.size.width, self.signUpImageView.frame.size.height)
-        signUpLabel.textAlignment = NSTextAlignment.Center
-        signUpLabel.text = "Sign Up"
-        signUpLabel.textColor = UIColor.blackColor()
-        self.signUpImageView.addSubview(signUpLabel)
+        loginTabButton = UIButton(frame: CGRect(x: viewWidth/2, y: signUpTabButton.frame.origin.y, width: viewWidth/2, height: 50))
+        loginTabButton.setTitle("Log In", forState: .Normal)
+        loginTabButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
+        loginTabButton.addTarget(self, action: "loginTabPressed", forControlEvents: .TouchUpInside)
+        loginTabButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        topView.addSubview(loginTabButton)
         
-        self.logInImageView.frame = CGRectMake(self.viewWidth / 2, 0.1 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth / 2, 0.07 * self.viewHeight)
-        self.logInImageView.image = UIImage(named: "darkTab")
-        topView.addSubview(self.logInImageView)
-        let logInLabel: UILabel = UILabel()
-        logInLabel.frame = CGRectMake(0, 0, self.logInImageView.frame.size.width, self.logInImageView.frame.size.height)
-        logInLabel.textAlignment = NSTextAlignment.Center
-        logInLabel.text = "Log In"
-        logInLabel.textColor = UIColor.blackColor()
-        self.logInImageView.addSubview(logInLabel)
-        
-        let tapToLogIn: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapToLogIn.addTarget(self, action: "tapToLogIn:")
-        let tapToSignUp: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapToSignUp.addTarget(self, action: "tapToSignUp:")
-        
-        self.signUpImageView.userInteractionEnabled = true
-        self.logInImageView.userInteractionEnabled = true
-        
-        self.logInImageView.addGestureRecognizer(tapToLogIn)
-        self.signUpImageView.addGestureRecognizer(tapToSignUp)
-        
-        let tapOnTopView: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapOnTopView.addTarget(self, action: "tapOnTopView:")
-        topView.addGestureRecognizer(tapOnTopView)
+        indicatorTriangleView = UIImageView(frame: CGRect(x: 0, y: topView.frame.height-10, width: 25, height: 10))
+        indicatorTriangleView.image = UIImage(named: "triangle")
+        indicatorTriangleView.center.x = signUpTabButton.center.x
+        topView.addSubview(indicatorTriangleView)
     }
     
-    func tapToLogIn(sender: UITapGestureRecognizer) {
-        self.logInImageView.image = UIImage(named: "lightTab")
-        self.signUpImageView.image = UIImage(named: "darkTab")
-        if self.selectedIndex == 0 {
-            self.editSignUpScrollView.removeFromSuperview()
-            self.view.addSubview(self.editLogInScrollView)
-            self.selectedIndex = 1
-        }
+    func setUpViews() {
+        
+        scrollView = UIScrollView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: viewWidth, height: viewHeight))
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.contentSize.height = self.scrollView.frame.size.height + 15
+        let scrollViewTapGesture = UITapGestureRecognizer(target: self, action: "scrollViewTapGesture:")
+        scrollView.addGestureRecognizer(scrollViewTapGesture)
+        self.view.addSubview(self.scrollView)
+        
+        //sign in screen
+        let verticalMargin: CGFloat = 10
+        emailTextField = UITextField(frame: CGRect(x: 0, y: verticalMargin, width: viewWidth-20, height: 44))
+        emailTextField.placeholder = "Email"
+        emailTextField.textAlignment = .Center
+        emailTextField.center.x = self.view.center.x
+        emailTextField.tintColor = UIColor.mainPinkColor()
+        emailTextField.clearButtonMode = .WhileEditing
+        emailTextField.autocapitalizationType = .None
+        emailTextField.autocorrectionType = .No
+        scrollView.addSubview(emailTextField)
+        
+        let credentialTextFieldUnderline = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
+        credentialTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
+        scrollView.addSubview(credentialTextFieldUnderline)
+        
+        //set it at the bottom of the scrollview
+        let originY: CGFloat = self.view.frame.height - CGRectGetMaxY(topView.frame) - 44 - 64 - 10
+        orLabel = UILabel(frame: CGRect(x: 0, y: originY, width: 50, height: 10))
+        orLabel.text = "OR"
+        orLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 12)
+        orLabel.textColor = UIColor.lightGrayColor()
+        orLabel.backgroundColor = UIColor.whiteColor()
+        orLabel.textAlignment = .Center
+        orLabel.center.x = self.view.center.x
+        scrollView.addSubview(orLabel)
+        
+        facebookButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(orLabel.frame), width: viewWidth, height: 44))
+        facebookButton.setTitle("Log in with facebook", forState: .Normal)
+        facebookButton.setImage(UIImage(named: "facebook_icon"), forState: .Normal)
+        facebookButton.setTitleColor(UIColor.facebookBlue(), forState: .Normal)
+        facebookButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right:
+            0)
+        facebookButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+        facebookButton.center.x = self.view.center.x
+        scrollView.addSubview(facebookButton)
+        
+        //log in screen
+        passwordTextField = UITextField(frame: CGRect(x: 0, y: CGRectGetMaxY(credentialTextFieldUnderline.frame)+verticalMargin, width: emailTextField.frame.width, height: emailTextField.frame.height))
+        passwordTextField.secureTextEntry = true
+        passwordTextField.placeholder = "Password (Mininum 6 characters)"
+        passwordTextField.textAlignment = .Center
+        passwordTextField.clearButtonMode = .WhileEditing
+        passwordTextField.tintColor = UIColor.mainPinkColor()
+        scrollView.addSubview(passwordTextField)
+        
+        let passwordTextFieldUnderline = UITextField(frame: CGRect(x: credentialTextFieldUnderline.frame.origin.x, y: CGRectGetMaxY(passwordTextField.frame), width: credentialTextFieldUnderline.frame.width, height: 1))
+        passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
+        scrollView.addSubview(passwordTextFieldUnderline)
+        
+        submitButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: viewWidth, height: 44))
+        submitButton.setTitle("Sign Up", forState: .Normal)
+        submitButton.addTarget(self, action: "submitPressed", forControlEvents: .TouchUpInside)
+        submitButton.titleLabel?.textAlignment = .Center
+        submitButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        submitButton.setTitleColor(UIColor.grayColor(), forState: .Disabled)
+        scrollView.addSubview(submitButton)
     }
     
-    func tapToSignUp(sender: UITapGestureRecognizer) {
-        self.signUpImageView.image = UIImage(named: "lightTab")
-        self.logInImageView.image = UIImage(named: "darkTab")
-        if self.selectedIndex == 1 {
-            self.editLogInScrollView.removeFromSuperview()
-            self.view.addSubview(self.editSignUpScrollView)
-            self.selectedIndex = 0
-        }
+    func signUpTabPressed() {
+        self.indicatorTriangleView.center.x = self.signUpTabButton.center.x
+        self.subtitleLabel.text = "Sign up to upload tabs and save your favorite songs"
+        isSignUpSelected = true
+        
+        self.passwordTextField.placeholder = "Password (Mininum 6 characters)"
+        self.submitButton.setTitle("Sign up", forState: .Normal)
     }
     
-    func tapOnTopView(sender: UITapGestureRecognizer) {
-        self.emailSignUpTextField.resignFirstResponder()
-        self.emailLogInTextField.resignFirstResponder()
-        self.passwordLogInTextField.resignFirstResponder()
+    func loginTabPressed() {
+        self.indicatorTriangleView.center.x = self.loginTabButton.center.x
+        self.subtitleLabel.text = "Log in to upload tabs and save your favorite songs"
+        isSignUpSelected = false
+        
+        self.submitButton.setTitle("Log in", forState: .Normal)
+        self.passwordTextField.placeholder = "Password"
     }
     
+    func topViewTapGesture(sender: UITapGestureRecognizer) {
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+    }
+    
+    func scrollViewTapGesture(sender: UITapGestureRecognizer) {
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+    }
 
-}
+    
+    func submitPressed() {
 
-// log in scroll view
-extension MeLoginOrSignupViewController {
-    func setUpLogInEditScrollView() {
-        self.editLogInScrollView.frame = CGRectMake(0, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight - (self.tabBarController?.tabBar.frame.size.height)! - 0.17 * self.viewHeight)
-        self.editLogInScrollView.contentSize = CGSizeMake(self.viewWidth, self.editLogInScrollView.frame.size.height + 15)
-        
-        self.emailLogInBackgroundLabel.frame = CGRectMake(0.1 * self.viewHeight, 0, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.emailLogInBackgroundLabel.text = "Enter your email"
-        self.emailLogInBackgroundLabel.textColor = UIColor.grayColor()
-        self.editLogInScrollView.addSubview(self.emailLogInBackgroundLabel)
-        
-        
-        self.emailLogInTextField.frame = CGRectMake(0.1 * self.viewHeight, 0, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.emailLogInTextField.backgroundColor = UIColor.clearColor()
-        self.emailLogInTextField.addTarget(self, action: "valueChangedInLogInEmailTextField:", forControlEvents: UIControlEvents.EditingChanged)
-        self.emailLogInTextField.accessibilityIdentifier = "unedit"
-        self.emailLogInTextField.autocorrectionType = UITextAutocorrectionType.No
-        self.editLogInScrollView.addSubview(self.emailLogInTextField)
-        
-        self.passwordLogInBackgroundLabel.frame = CGRectMake(0.1 * self.viewHeight, 0.1 * self.viewHeight, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.passwordLogInBackgroundLabel.text = "Enter your password"
-        self.passwordLogInBackgroundLabel.textColor = UIColor.grayColor()
-        self.editLogInScrollView.addSubview(self.passwordLogInBackgroundLabel)
-        
-        self.passwordLogInTextField.frame = CGRectMake(0.1 * self.viewHeight, 0.1 * self.viewHeight, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.passwordLogInTextField.backgroundColor = UIColor.clearColor()
-        self.passwordLogInTextField.addTarget(self, action: "valueChangedInLogInPasswordTextField:", forControlEvents: UIControlEvents.EditingChanged)
-        self.passwordLogInTextField.accessibilityIdentifier = "unedit"
-        self.passwordLogInTextField.autocorrectionType = UITextAutocorrectionType.No
-        self.editLogInScrollView.addSubview(self.passwordLogInTextField)
-        
-        let logInButton: UIButton = UIButton()
-        logInButton.frame = CGRectMake(0, 0.2 * self.viewHeight, self.viewWidth, 0.1 * self.viewHeight)
-        logInButton.setTitle("Log In", forState: UIControlState.Normal)
-        logInButton.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        logInButton.addTarget(self, action: "pressLogInButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        self.editLogInScrollView.addSubview(logInButton)
-    }
-    
-    func valueChangedInLogInEmailTextField(sender: UITextField) {
-        if sender.text == "" {
-            self.editLogInScrollView.addSubview(self.emailLogInBackgroundLabel)
-            sender.accessibilityIdentifier = "unedit"
-        } else {
-            if sender.accessibilityIdentifier == "unedit" {
-                self.emailLogInBackgroundLabel.removeFromSuperview()
-                sender.accessibilityIdentifier = "edit"
-            }
+        //validate email is not empty
+        guard let email = emailTextField.text where emailTextField.text?.characters.count > 0 else {
+            self.showMessage("Email field is empty", message: "", actionTitle: "OK", completion: nil)
+            return
         }
-    }
-    
-    func valueChangedInLogInPasswordTextField(sender: UITextField) {
-        if sender.text == "" {
-            self.editLogInScrollView.addSubview(self.passwordLogInBackgroundLabel)
-            sender.accessibilityIdentifier = "unedit"
-        } else {
-            if sender.accessibilityIdentifier == "unedit" {
-                self.passwordLogInBackgroundLabel.removeFromSuperview()
-                sender.accessibilityIdentifier = "edit"
-            }
-        }
-    }
-    
-    func pressLogInButton(sender: UIButton) {
         
-        let meVC: MeViewController = self.storyboard?.instantiateViewControllerWithIdentifier("meVC") as! MeViewController
-        //self.navigationController?.viewControllers = NSArray(object: meVC) as! [UIViewController]
-        self.navigationController?.setViewControllers(NSArray(object: meVC) as! [UIViewController], animated: true)
-        //self.presentViewController(meVC, animated: true, completion: nil)
-    }
-}
+        guard let password = passwordTextField.text where passwordTextField.text?.characters.count > 0 else {
+            self.showMessage("Password is empty", message: "", actionTitle: "OK", completion: nil)
+            return
+        }
+        
+        //validate email is in email format
+        if !email.isValidEmail() {
+            self.showMessage("Email is not valid", message: "", actionTitle: "OK", completion: nil)
+            return
+        }
+        
+        if password.characters.count < 6 {
+            self.showMessage("Password should have at least 6 characters.", message: "", actionTitle: "OK", completion: nil)
+            return
+        }
+        
+        submitButton.enabled = false
+        
+        var parameters = [String: String]()
+        if isSignUpSelected { //sigup up api
+            parameters = [
+                "email": email,
+                "password": password
+            ]
+        } else { //login api
+            parameters = [
+                "attempt_login":"1",
+                "email": email,
+                "password": password
+            ]
+        }
 
-// sign up scroll view
-extension MeLoginOrSignupViewController {
-    func setUpSignUpEditScrollView() {
-        self.editSignUpScrollView.frame = CGRectMake(0, 0.17 * self.viewHeight + self.statusAndNavigationBarHeight, self.viewWidth, self.viewHeight - self.statusAndNavigationBarHeight - (self.tabBarController?.tabBar.frame.size.height)! - 0.17 * self.viewHeight)
-        self.editSignUpScrollView.contentSize = CGSizeMake(self.viewWidth, self.editSignUpScrollView.frame.size.height + 15)
-        self.view.addSubview(self.editSignUpScrollView)
-        
-        self.fbLoginButton.frame = CGRectMake(0, 0.12 * self.viewHeight, self.viewWidth, 0.1 * self.viewHeight)
-        self.setUpFBLogin()
-        self.editSignUpScrollView.addSubview(self.fbLoginButton)
-        
-        self.nextButton.frame = CGRectMake(0, 0.12 * self.viewHeight, self.viewWidth, 0.1 * self.viewHeight)
-        self.nextButton.setTitle("Next", forState: UIControlState.Normal)
-        self.nextButton.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        self.nextButton.addTarget(self, action: "pressNextButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        
-        self.resetButton.frame = CGRectMake(self.viewWidth - 0.1 * self.viewHeight, 0, 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.resetButton.setTitle("R", forState: UIControlState.Normal)
-        self.resetButton.setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal)
-        self.resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        
-        self.emailSignUpBackgroundLabel.frame = CGRectMake(0.1 * self.viewHeight, 0, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.emailSignUpBackgroundLabel.text = "Enter your email"
-        self.emailSignUpBackgroundLabel.textColor = UIColor.grayColor()
-        self.editSignUpScrollView.addSubview(self.emailSignUpBackgroundLabel)
-        
-        self.emailSignUpTextField.frame = CGRectMake(0.1 * self.viewHeight, 0, self.viewWidth - 0.1 * self.viewHeight, 0.1 * self.viewHeight)
-        self.emailSignUpTextField.backgroundColor = UIColor.clearColor()
-        self.emailSignUpTextField.addTarget(self, action: "valueChangedInEmailTextField:", forControlEvents: UIControlEvents.EditingChanged)
-        self.emailSignUpTextField.accessibilityIdentifier = "unedit"
-        self.emailSignUpTextField.autocorrectionType = UITextAutocorrectionType.No
-        self.editSignUpScrollView.addSubview(self.emailSignUpTextField)
-        
-    }
-    
-    func valueChangedInEmailTextField(sender: UITextField) {
-        if sender.text == "" {
-            self.editSignUpScrollView.addSubview(self.emailSignUpBackgroundLabel)
-            self.editSignUpScrollView.addSubview(fbLoginButton)
-            self.nextButton.removeFromSuperview()
-            self.resetButton.removeFromSuperview()
-            sender.accessibilityIdentifier = "unedit"
-        } else {
-            if sender.accessibilityIdentifier == "unedit" {
-                self.emailSignUpBackgroundLabel.removeFromSuperview()
-                self.fbLoginButton.removeFromSuperview()
-                self.editSignUpScrollView.addSubview(self.nextButton)
-                self.editSignUpScrollView.addSubview(self.resetButton)
-                sender.accessibilityIdentifier = "edit"
-            }
-        }
-    }
-    
-    func pressResetButton(sender: UIButton) {
-        self.emailSignUpTextField.text = ""
-        self.emailSignUpTextField.accessibilityIdentifier = "unedit"
-        self.editSignUpScrollView.addSubview(self.emailSignUpBackgroundLabel)
-        self.editSignUpScrollView.addSubview(self.fbLoginButton)
-        self.resetButton.removeFromSuperview()
-        self.nextButton.removeFromSuperview()
-    }
-    
-    func pressNextButton(sender: UIButton) {
-        if self.emailSignUpTextField.text != "" {
-            self.emailSignUpTextField.resignFirstResponder()
-            self.emailLogInTextField.resignFirstResponder()
-            self.passwordLogInTextField.resignFirstResponder()
-            let meSignUpVC: MeSignUpViewController = (self.storyboard?.instantiateViewControllerWithIdentifier("mesignupVC"))! as! MeSignUpViewController
-            meSignUpVC.email = self.emailSignUpTextField.text!
-            self.navigationController?.pushViewController(meSignUpVC, animated: true)
+        Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
+            {
+                response in
+                self.submitButton.enabled = true
+                switch response.result {
+                case .Success:
+                    print(response)
+                    
+                    if let data = response.result.value {
+                        let json = JSON(data)
+                        
+                        let userInitialization = json["user_initialization"]
+                        
+                        if userInitialization != nil {
+                            
+                            CoreDataManager.initializeUser(userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
+                        
+                            //go back to user profile view
+                            self.navigationController?.popViewControllerAnimated(false)
+
+                            
+                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
+                            
+                        } else { //we have an error
+                            var errorMessage = ""
+                            
+                            if let erroMessages = json["error"].array {//it might be an array
+                                for msg in erroMessages {
+                                    
+                                    errorMessage += msg.string!
+                                }
+                                self.showMessage(errorMessage, message: "", actionTitle: "OK", completion: nil)
+                            } else { //or just a single value
+                                 self.showMessage(json["error"].string!, message: "", actionTitle: "OK", completion: nil)
+                            }
+                        }
+                    }
+                case .Failure(let error):
+                    print(error)
+                }
         }
     }
 }
+
+

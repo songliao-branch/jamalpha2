@@ -26,4 +26,8 @@ extension UIColor {
     class func actionGray()-> UIColor {
         return UIColor(red: 0.941, green: 0.941, blue: 0.941, alpha: 0.9)
     }
+    
+    class func facebookBlue() -> UIColor {
+        return UIColor(red: 0.231, green: 0.349, blue: 0.596, alpha: 1) /* #3b5998 */
+    }
 }

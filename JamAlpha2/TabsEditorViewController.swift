@@ -12,9 +12,6 @@ import AVFoundation
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate {
     
-    // Musci Data Manager
-    var musicDataManager = MusicDataManager()
-
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -1126,7 +1123,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.player.enableRate = true
         self.player.rate = 1.0
         self.player.volume = 1
-        progressBlock.averageSampleBuffer = musicDataManager.getSongWaveFormData(theSong)
+        progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
         self.progressBlock.SetSoundURL(url,isForTabsEditor:true)
         self.progressBlock!.alpha = 0.5
 
@@ -1384,17 +1381,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.allTabsOnMusicLine.removeAll()
                 })
             self.view.userInteractionEnabled = true
-//                UIView.animateWithDuration(0.3, animations: {
-//                    self.allTabsOnMusicLine[i].tabView.alpha = 0
-//                })
-            
-//            let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
-//            dispatch_after(delayTime, dispatch_get_main_queue()) {
-//                for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-//                    self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
-//                }
-//                self.allTabsOnMusicLine.removeAll()
-//            }
             self.player.currentTime = 0
         }))
         if self.removeAvaliable == true {
@@ -1534,7 +1520,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             for label in tuningValueLabels {
                 tuningOfTheSong += "\(label.text!)-"
             }
-            self.musicDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
+            CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
             self.dismissViewControllerAnimated(false, completion: nil)
         }
         self.currentSelectedSpecificTab = nil
@@ -1764,7 +1750,7 @@ extension TabsEditorViewController {
     
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: MPMediaItem) {
-        let tabs = musicDataManager.getTabs(sender)
+        let tabs = CoreDataManager.getTabs(sender)
         let chord: [Chord] = tabs.0
         
         let tuning: String = tabs.1

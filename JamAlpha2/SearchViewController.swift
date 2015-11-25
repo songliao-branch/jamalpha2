@@ -20,10 +20,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var searchHistoryManager =  SearchHistoryManager()
 
     @IBOutlet weak var searchResultTableView: UITableView!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
