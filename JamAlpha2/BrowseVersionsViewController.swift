@@ -180,12 +180,31 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 tuning = tabsSet.tuning
             }
             
+            if tabsSet.voteStatus == "up" {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
+            } else if tabsSet.voteStatus == "down" {
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_pink"), forState: .Normal)
+            } else {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_gray"), forState: .Normal)
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
+            }
+            
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
 
         } else {
             let lyricsSet = downloadedLyricsSets[indexPath.row]
+            
+            if lyricsSet.voteStatus == "up" {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
+            } else if lyricsSet.voteStatus == "down" {
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_pink"), forState: .Normal)
+            } else {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_gray"), forState: .Normal)
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
+            }
+            
             
             cell.votesLabel.text = String(lyricsSet.votesScore)
             cell.titleLabel.text = lyricsSet.lyricsPreview + "..."
