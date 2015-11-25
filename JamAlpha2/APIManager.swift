@@ -41,9 +41,6 @@ class APIManager: NSObject {
         return ["term":"\(searchTerm)", "limit":"20", "media":"music"]
     }
     
-    //MARK: heroku server codes
-    //static let jamBaseURL = "https://jamapi.herokuapp.com"
-    
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     

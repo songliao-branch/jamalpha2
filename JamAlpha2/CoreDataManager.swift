@@ -24,16 +24,10 @@ class CoreDataManager: NSObject {
     class func logoutUser() {
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
         
-        //for testing 
+        //delete all user objects just to make sure we have none left
         for o in results {
             moc.deleteObject(o as! NSManagedObject)
         }
-//        if results.count == 1 {
-//            let user = results.firstObject as? User
-//             moc.deleteObject(user!)
-//            
-//        }
-        
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
