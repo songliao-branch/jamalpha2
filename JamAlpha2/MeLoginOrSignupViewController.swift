@@ -250,10 +250,15 @@ class MeLoginOrSignupViewController: UIViewController {
                 "password": password
             ]
         }
-        signUpLoginRequest(parameters)
+        signUpLoginRequest(parameters, afterRetrievingUser: {
+            id, email, token in
+            
+            CoreDataManager.initializeUser(id, email: email, authToken: token)
+            
+        })
     }
     //used for facebook button too
-    private func signUpLoginRequest(parameters: [String: String]) {
+    private func signUpLoginRequest(parameters: [String: String],  afterRetrievingUser: (( id: Int, email: String, authToken: String) -> Void)) {
 
         Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
             {
@@ -270,8 +275,7 @@ class MeLoginOrSignupViewController: UIViewController {
                         
                         if userInitialization != nil {
                             
-                            CoreDataManager.initializeUser(userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
-                            
+                            afterRetrievingUser(id: userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
                             //go back to user profile view
                             self.navigationController?.popViewControllerAnimated(false)
                             
@@ -296,6 +300,8 @@ class MeLoginOrSignupViewController: UIViewController {
                 }
         }
     }
+    
+    
     
     //facebook button
     func pressFacebookButton(sender: UIButton) {
@@ -327,16 +333,20 @@ class MeLoginOrSignupViewController: UIViewController {
                     print(result)
                     
                     let email = result.valueForKey("email") as! String
-                    let username = result.valueForKey("name") as! String
+                    let fullName  = result.valueForKey("name") as! String
                     let userId = result.valueForKey("id") as! String
-                    let imageUrl = "http://graph.facebook.com/\(userId)/picture?type=large"
+                    let avatarUrl = "http://graph.facebook.com/\(userId)/picture?type=large"
                     
                     var parameters = [
                         "attempt_login":"facebook",
                         "email": email,
                         "password": (email + facebookLoginSalt).md5()//IMPORTANT: DO NOT MODIFY THIS SALT
                     ]
-                    self.signUpLoginRequest(parameters)
+                    self.signUpLoginRequest(parameters, afterRetrievingUser: {
+                        id, email, authToken in
+                        
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, username: fullName, avatarUrl: avatarUrl)
+                    })
                 }
             })
         }
