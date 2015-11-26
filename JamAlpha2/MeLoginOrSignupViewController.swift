@@ -11,6 +11,7 @@ import FBSDKCoreKit
 import FBSDKLoginKit
 import Alamofire
 import SwiftyJSON
+import CryptoSwift
 
 class MeLoginOrSignupViewController: UIViewController {
 
@@ -39,11 +40,6 @@ class MeLoginOrSignupViewController: UIViewController {
     var fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
     var nextButton: UIButton = UIButton()
     
-    var userName: String!
-    var userId: String!
-    var userURL: String!
-    var userEmail: String!
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -51,8 +47,6 @@ class MeLoginOrSignupViewController: UIViewController {
         //TODO: check if user is signed in already.
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
-        
-        
         setUpTopView()
         setUpViews()
     }
@@ -243,6 +237,7 @@ class MeLoginOrSignupViewController: UIViewController {
         submitButton.enabled = false
         
         var parameters = [String: String]()
+        
         if isSignUpSelected { //sigup up api
             parameters = [
                 "email": email,
@@ -255,6 +250,10 @@ class MeLoginOrSignupViewController: UIViewController {
                 "password": password
             ]
         }
+        signUpLoginRequest(parameters)
+    }
+    //used for facebook button too
+    private func signUpLoginRequest(parameters: [String: String]) {
 
         Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
             {
@@ -272,12 +271,11 @@ class MeLoginOrSignupViewController: UIViewController {
                         if userInitialization != nil {
                             
                             CoreDataManager.initializeUser(userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
-                        
+                            
                             //go back to user profile view
                             self.navigationController?.popViewControllerAnimated(false)
-
                             
-                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
+                            print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
                             
                         } else { //we have an error
                             var errorMessage = ""
@@ -289,13 +287,58 @@ class MeLoginOrSignupViewController: UIViewController {
                                 }
                                 self.showMessage(errorMessage, message: "", actionTitle: "OK", completion: nil)
                             } else { //or just a single value
-                                 self.showMessage(json["error"].string!, message: "", actionTitle: "OK", completion: nil)
+                                self.showMessage(json["error"].string!, message: "", actionTitle: "OK", completion: nil)
                             }
                         }
                     }
                 case .Failure(let error):
                     print(error)
                 }
+        }
+    }
+    
+    //facebook button
+    func pressFacebookButton(sender: UIButton) {
+        let permissons: [AnyObject] = ["public_profile", "email", "user_friends"] as [AnyObject]
+        
+        let fbLoginManager: FBSDKLoginManager = FBSDKLoginManager()
+        fbLoginManager.loginBehavior = FBSDKLoginBehavior.Web
+        fbLoginManager.defaultAudience = FBSDKDefaultAudience.Friends
+        
+        fbLoginManager.logInWithReadPermissions(permissons, fromViewController: self, handler: {
+            (result, error) -> Void in
+            if error != nil {
+                print("Error connecting with facebook: \(error)")
+            } else if result.isCancelled {
+                print("Facebook login request is cancelled")
+            } else {
+                self.getFBUserData()
+                
+            }
+        })
+    }
+    
+    func getFBUserData(){
+        if((FBSDKAccessToken.currentAccessToken()) != nil){
+            FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
+                (connection, result, error) -> Void in
+                if error == nil {
+                
+                    print(result)
+                    
+                    let email = result.valueForKey("email") as! String
+                    let username = result.valueForKey("name") as! String
+                    let userId = result.valueForKey("id") as! String
+                    let imageUrl = "http://graph.facebook.com/\(userId)/picture?type=large"
+                    
+                    var parameters = [
+                        "attempt_login":"facebook",
+                        "email": email,
+                        "password": (email + facebookLoginSalt).md5()//IMPORTANT: DO NOT MODIFY THIS SALT
+                    ]
+                    self.signUpLoginRequest(parameters)
+                }
+            })
         }
     }
 }
