@@ -76,7 +76,6 @@ class LyricsSyncViewController: UIViewController  {
         self.addedLyricsWithTime = lyricsWithTime(count: self.lyricsOrganizedArray.count)
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
-        //self.addLyricsToEditorView(theSong)
         setUpSong()
         setUpHeaderView()
         setUpLyricsTableView()
@@ -85,6 +84,8 @@ class LyricsSyncViewController: UIViewController  {
         setUpCountdownView()
         if tempLyricsTimeTuple.count > 0 {
             addUnfinishedLyrivsAndTime()
+        }else{
+            self.addLyricsToEditorView(theSong)
         }
     }
 
