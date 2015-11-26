@@ -302,7 +302,6 @@ class MeLoginOrSignupViewController: UIViewController {
     }
     
     
-    
     //facebook button
     func pressFacebookButton(sender: UIButton) {
         let permissons: [AnyObject] = ["public_profile", "email", "user_friends"] as [AnyObject]
@@ -337,7 +336,7 @@ class MeLoginOrSignupViewController: UIViewController {
                     let userId = result.valueForKey("id") as! String
                     let avatarUrl = "http://graph.facebook.com/\(userId)/picture?type=large"
                     
-                    var parameters = [
+                    let parameters = [
                         "attempt_login":"facebook",
                         "email": email,
                         "password": (email + facebookLoginSalt).md5()//IMPORTANT: DO NOT MODIFY THIS SALT

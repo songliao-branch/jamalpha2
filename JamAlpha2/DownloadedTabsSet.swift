@@ -21,12 +21,13 @@ class DownloadedTabsSet: NSObject {
     var votesScore = 0
     var chordsPreview = ""
     
+    var voteStatus = ""
     //these variables are downloaded again when a single tabsSet is selected
     var chords = [String]()
     var tabs = [String]()
     var times = [Float]()
     
-    init(id: Int, tuning: String, capo: Int, songId: Int, votesScore: Int, userId: Int, chordsPreview: String) {
+    init(id: Int, tuning: String, capo: Int, songId: Int, votesScore: Int, userId: Int, chordsPreview: String, voteStatus: String) {
         self.id = id
         self.tuning = tuning
         self.capo = capo
@@ -34,5 +35,6 @@ class DownloadedTabsSet: NSObject {
         self.userId = userId
         self.votesScore = votesScore
         self.chordsPreview = chordsPreview
+        self.voteStatus = voteStatus
     }
 }

@@ -17,16 +17,18 @@ class DownloadedLyricsSet: NSObject {
     var numberOfLines = 0
     
     var votesScore = 0
+    var voteStatus = "" //up, down, yet, not applicable
     var lyrics = [String]()
     var times = [Float]()
     
-    init(id: Int, songId: Int, userId: Int, votesScore: Int, lyricsPreview: String, lines: Int) {
+    init(id: Int, songId: Int, userId: Int, votesScore: Int, lyricsPreview: String, lines: Int, voteStatus: String) {
         self.id = id
         self.songId = songId
         self.userId = userId
         self.votesScore = votesScore
         self.lyricsPreview = lyricsPreview
         self.numberOfLines = lines
+        self.voteStatus = voteStatus
     }
     
 }
