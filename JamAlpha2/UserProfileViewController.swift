@@ -19,6 +19,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         
         showSignUpLoginScreen()
+        userTable.reloadData()
     }
     
     func showSignUpLoginScreen() {
@@ -60,11 +61,13 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             }
             
             return cell
+            
         } else if indexPath.section == 1 {
          let cell = tableView.dequeueReusableCellWithIdentifier("usercell", forIndexPath: indexPath)
          cell.textLabel?.text = cellTitles[indexPath.row]
-        return cell
-        } else {
+         return cell
+            
+        } else { //section 2
             let cell = tableView.dequeueReusableCellWithIdentifier("usercell", forIndexPath: indexPath)
             cell.textLabel?.text = "Settings"
             return cell

@@ -273,7 +273,7 @@ class APIManager: NSObject {
     }
     
     //upvote or downvote either tabsSet or lyricsSet
-    class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( newVote: Int) -> Void)){
+    class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( voteStatus: String, voteScore: Int) -> Void)){
         
         if CoreDataManager.getCurrentUser() == nil {
             print("not logged in, cannot vote")
@@ -293,10 +293,10 @@ class APIManager: NSObject {
                     
                     if isTabs {
                         let set = json["tabs_set"]
-                        completion(newVote: set["cached_votes_score"].int!)
+                        completion(voteStatus: set["vote_status"].string!, voteScore: set["cached_votes_score"].int!)
                     } else {
                         let set = json["lyrics_set"]
-                        completion(newVote: set["cached_votes_score"].int!)
+                        completion(voteStatus: set["vote_status"].string!, voteScore: set["cached_votes_score"].int!)
                     }
                     
                     print(json)
