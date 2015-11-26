@@ -497,8 +497,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sideMargin: CGFloat = 20
         
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
-        lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
-        lyricbase.alpha = 0.8
+        lyricbase.backgroundColor = UIColor.baseColor()
         
         self.view.addSubview(lyricbase)
         
@@ -535,7 +534,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
         chordBase.center.x = self.view.center.x
         chordBase.backgroundColor = UIColor.clearColor()
-        chordBase.alpha = 0.8
         
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
         panRecognizer.delaysTouchesEnded = true
