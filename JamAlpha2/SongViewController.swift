@@ -1548,7 +1548,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 labels[1].center.y = CGFloat(yPosition)
                 labels[1].transform = transformsize
             } else if isChordShown && !isTabsShown { //show only chord name
-                 labels[0].hidden = false
+                labels[0].hidden = false
+            
                 labels[0].center = CGPointMake(chordBase.frame.width / 2, CGFloat(yPosition))
             
             } else if !isChordShown && isTabsShown { // show only tabs name
@@ -1821,37 +1822,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     private func dealWithLabelofChordName(chordLabel:UILabel){
-        //make the text glow
-        chordLabel.textColor = UIColor.blackColor()
-        let color:UIColor = chordLabel.textColor
-        chordLabel.layer.shadowColor = color.CGColor
-        chordLabel.layer.shadowRadius = 4.0
-        chordLabel.layer.shadowOpacity = 1.0
-        chordLabel.layer.shadowOffset = CGSizeZero
-        chordLabel.layer.masksToBounds = false
         
-        chordLabel.alpha = 0.9
-        
-        //make the frame of the label fit to the text
-        let chordNSString:NSString = NSString(string: chordLabel.text!)
-        if(chordNSString.length >= 2 && chordNSString.length <= 3){
+        if isChordShown && isTabsShown {
+            //make the text glow
+            chordLabel.textColor = UIColor.whiteColor()
+            chordLabel.font = UIFont.systemFontOfSize(17)
             
-            let fontSize:CGFloat = 18.0
-            
-            let textFont = UIFont.systemFontOfSize(fontSize)
-            
-            
-            chordLabel.font = textFont
-       
-            chordLabel.sizeToFit()
-            
-        } else if(chordNSString.length >= 4 ){
-            
-            let fontSize:CGFloat = 16.0
-            
-            let textFont = UIFont.systemFontOfSize(fontSize)
-            
-            chordLabel.font = textFont
+            //should we add shadows? white is enough i think
+//            chordLabel.layer.shadowColor = UIColor.whiteColor().CGColor
+//            chordLabel.layer.shadowRadius = 4.0
+//            chordLabel.layer.shadowOpacity = 1.0
+//            chordLabel.layer.shadowOffset = CGSizeZero
+//            chordLabel.layer.masksToBounds = false
+        } else if isChordShown && !isTabsShown {
+            //make the text glow
+            chordLabel.textColor = UIColor.silverGray()
+            chordLabel.font = UIFont.systemFontOfSize(20)
             chordLabel.sizeToFit()
         }
     }

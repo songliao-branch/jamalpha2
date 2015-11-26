@@ -15,7 +15,7 @@ extension UIColor {
     
     // for falling labels and lyrics in SongViewController
     class func silverGray() -> UIColor {
-        return UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alpha: 1)
+        return UIColor(red: 100 / 255, green: 100 / 255, blue: 100 / 255, alpha: 1)
     }
     
     // for use in search table view section header

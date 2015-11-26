@@ -310,7 +310,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             dispatch_async(dispatch_get_main_queue()) {
                 self.resultsTableView.reloadData()
             }
-            
         })
         print("down button: \(button.tag) pressed")
     }
