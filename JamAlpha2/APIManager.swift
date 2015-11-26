@@ -148,16 +148,25 @@ class APIManager: NSObject {
         var allDownloads = [DownloadedTabsSet]()
         
         //given a song's title, artist, and duration, we can find all its corresponding tabs
-        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        var parameters = [String: AnyObject]()
         
-        Alamofire.request(.GET, jamBaseURL + "/get_tabs_sets", parameters: parameters as? [String : AnyObject]).responseJSON { response in
+        parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        
+        //we use user id to determine the vote status of each tabsSet for the current user
+        if CoreDataManager.getCurrentUser() != nil {
+            parameters["user_id"] = Int(CoreDataManager.getCurrentUser()!.id)
+        }
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_tabs_sets", parameters: parameters).responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
                     print(json)
                     for set in json["tabs_sets"].array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userId: set["user_id"].int!, chordsPreview: set["chords_preview"].string!)
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userId: set["user_id"].int!, chordsPreview: set["chords_preview"].string!, voteStatus: set["vote_status"].string!)
+                        
+                        
                         allDownloads.append(t)
                     }
                    //after completed, pass everything to the callback
@@ -205,9 +214,16 @@ class APIManager: NSObject {
         var allDownloads = [DownloadedLyricsSet]()
         
         //given a song's title, artist, and duration, we can find all its corresponding tabs
-        let parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        var parameters = [String: AnyObject]()
         
-        Alamofire.request(.GET, jamBaseURL + "/get_lyrics_sets", parameters: parameters as? [String : AnyObject]).responseJSON { response in
+        parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        
+        //we use user id to determine the vote status of each lyricsSet for the current user
+        if CoreDataManager.getCurrentUser() != nil {
+            parameters["user_id"] = Int(CoreDataManager.getCurrentUser()!.id)
+        }
+
+        Alamofire.request(.GET, jamBaseURL + "/get_lyrics_sets", parameters: parameters).responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
@@ -215,7 +231,7 @@ class APIManager: NSObject {
                     print(json)
                     for set in json["lyrics_sets"].array! {
 
-                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userId: set["user_id"].int!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!)
+                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userId: set["user_id"].int!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!, voteStatus: set["vote_status"].string!)
                         allDownloads.append(l)
                     }
                     //after completed, pass everything to the callback
@@ -227,8 +243,6 @@ class APIManager: NSObject {
         }
         
     }
-    
-    //
     
     class func downloadLyricsSetContent(inputLyricsSet: DownloadedLyricsSet, completion: (( downloadWithContent: DownloadedLyricsSet) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/lyrics_sets/\(inputLyricsSet.id)").responseJSON { response in
@@ -259,7 +273,7 @@ class APIManager: NSObject {
     }
     
     //upvote or downvote either tabsSet or lyricsSet
-    class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( newVote: Int) -> Void)){
+    class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( voteStatus: String, voteScore: Int) -> Void)){
         
         if CoreDataManager.getCurrentUser() == nil {
             print("not logged in, cannot vote")
@@ -268,7 +282,7 @@ class APIManager: NSObject {
         
         let parameters = ["user_id": "\(CoreDataManager.getCurrentUser()!.id)"]
         
-        var path = isTabs ? "/tabs_sets/\(setId)" : "lyrics_sets/\(setId)"
+        var path = isTabs ? "/tabs_sets/\(setId)" : "/lyrics_sets/\(setId)"
         path += isUp ? "/like" : "/dislike"
         
         Alamofire.request(.PUT, jamBaseURL + path , parameters: parameters).responseJSON { response in
@@ -279,10 +293,10 @@ class APIManager: NSObject {
                     
                     if isTabs {
                         let set = json["tabs_set"]
-                        completion(newVote: set["cached_votes_score"].int!)
+                        completion(voteStatus: set["vote_status"].string!, voteScore: set["cached_votes_score"].int!)
                     } else {
                         let set = json["lyrics_set"]
-                        completion(newVote: set["cached_votes_score"].int!)
+                        completion(voteStatus: set["vote_status"].string!, voteScore: set["cached_votes_score"].int!)
                     }
                     
                     print(json)

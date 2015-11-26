@@ -205,9 +205,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
+        setUpBackgroundImage()
         setUpTopButtons()
         setUpNameAndArtistButtons()
-        setUpBackgroundImage()
         //set up views from top to bottom
         setUpChordBase()
         setUpTuningLabels()
@@ -265,8 +265,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func setUpBackgroundImage(){
         //create an UIImageView
         
-        let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
-        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
+        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
         print(firstLoadPlayingItem.title)
         if let artwork = firstLoadPlayingItem.artwork {
@@ -286,25 +285,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpTopButtons() {
-        let statusBarLayer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: statusBarHeight))
-        statusBarLayer.backgroundColor = UIColor.mainPinkColor()
-        self.view.addSubview(statusBarLayer)
-        
+
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
-        topView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(topView)
         
+     
         let buttonCenterY: CGFloat = topViewHeight/2
+        let buttonMargin: CGFloat = self.view.frame.width / 12
         pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
-        
         pulldownButton.setImage(UIImage(named: "pullDown"), forState: UIControlState.Normal)
-        pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
+        pulldownButton.center = CGPoint(x: buttonMargin, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         topView.addSubview(pulldownButton)
         
         tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
-        tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
+        tuningButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
         tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         topView.addSubview(tuningButton)
         
@@ -320,6 +316,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         capoButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
         self.view.addSubview(capoButton)
+        
+        let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.35 ))
+        topViewSeparator.backgroundColor = UIColor.baseColor()
+        self.view.addSubview(topViewSeparator)
     }
 
     func updateTuning(tuning: String) {
@@ -497,8 +497,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sideMargin: CGFloat = 20
         
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
-        lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
-        lyricbase.alpha = 0.8
+        lyricbase.backgroundColor = UIColor.baseColor()
         
         self.view.addSubview(lyricbase)
         
@@ -535,7 +534,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
         chordBase.center.x = self.view.center.x
         chordBase.backgroundColor = UIColor.clearColor()
-        chordBase.alpha = 0.8
         
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
         panRecognizer.delaysTouchesEnded = true
@@ -1548,7 +1546,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 labels[1].center.y = CGFloat(yPosition)
                 labels[1].transform = transformsize
             } else if isChordShown && !isTabsShown { //show only chord name
-                 labels[0].hidden = false
+                labels[0].hidden = false
+            
                 labels[0].center = CGPointMake(chordBase.frame.width / 2, CGFloat(yPosition))
             
             } else if !isChordShown && isTabsShown { // show only tabs name
@@ -1821,37 +1820,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     private func dealWithLabelofChordName(chordLabel:UILabel){
-        //make the text glow
-        chordLabel.textColor = UIColor.blackColor()
-        let color:UIColor = chordLabel.textColor
-        chordLabel.layer.shadowColor = color.CGColor
-        chordLabel.layer.shadowRadius = 4.0
-        chordLabel.layer.shadowOpacity = 1.0
-        chordLabel.layer.shadowOffset = CGSizeZero
-        chordLabel.layer.masksToBounds = false
         
-        chordLabel.alpha = 0.9
-        
-        //make the frame of the label fit to the text
-        let chordNSString:NSString = NSString(string: chordLabel.text!)
-        if(chordNSString.length >= 2 && chordNSString.length <= 3){
+        if isChordShown && isTabsShown {
+            //make the text glow
+            chordLabel.textColor = UIColor.whiteColor()
+            chordLabel.font = UIFont.systemFontOfSize(17)
             
-            let fontSize:CGFloat = 18.0
-            
-            let textFont = UIFont.systemFontOfSize(fontSize)
-            
-            
-            chordLabel.font = textFont
-       
-            chordLabel.sizeToFit()
-            
-        } else if(chordNSString.length >= 4 ){
-            
-            let fontSize:CGFloat = 16.0
-            
-            let textFont = UIFont.systemFontOfSize(fontSize)
-            
-            chordLabel.font = textFont
+            //should we add shadows? white is enough i think
+//            chordLabel.layer.shadowColor = UIColor.whiteColor().CGColor
+//            chordLabel.layer.shadowRadius = 4.0
+//            chordLabel.layer.shadowOpacity = 1.0
+//            chordLabel.layer.shadowOffset = CGSizeZero
+//            chordLabel.layer.masksToBounds = false
+        } else if isChordShown && !isTabsShown {
+            //make the text glow
+            chordLabel.textColor = UIColor.silverGray()
+            chordLabel.font = UIFont.systemFontOfSize(20)
             chordLabel.sizeToFit()
         }
     }

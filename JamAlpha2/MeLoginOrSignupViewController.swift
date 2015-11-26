@@ -274,7 +274,7 @@ class MeLoginOrSignupViewController: UIViewController {
                         
                             //go back to user profile view
                             self.navigationController?.popViewControllerAnimated(false)
-
+                            
                             
                              print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
                             

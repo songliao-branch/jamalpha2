@@ -41,6 +41,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             APIManager.downloadTabs(mediaItem, completion: {
                 downloads in
                 self.downloadedTabsSets = downloads
+                
                 dispatch_async(dispatch_get_main_queue()) {
                     self.resultsTableView.reloadData()
                     if downloads.count < 1 {
@@ -52,6 +53,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             APIManager.downloadLyrics(mediaItem, completion: {
                 downloads in
                 self.downloadedLyricsSets = downloads
+    
                 dispatch_async(dispatch_get_main_queue()) {
                     self.resultsTableView.reloadData()
                     if downloads.count < 1 {
@@ -166,7 +168,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         return downloadedLyricsSets.count
     }
     
-    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("browseversionscell", forIndexPath: indexPath) as! BrowseVersionsCell
         
@@ -180,12 +181,35 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 tuning = tabsSet.tuning
             }
             
+            if tabsSet.voteStatus == "up" {
+                  cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
+                  cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
+            } else if tabsSet.voteStatus == "down" {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_gray"), forState: .Normal)
+                 cell.downVoteButton.setImage(UIImage(named: "vote_down_pink"), forState: .Normal)
+            } else {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_gray"), forState: .Normal)
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
+            }
+            
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
 
         } else {
             let lyricsSet = downloadedLyricsSets[indexPath.row]
+            
+            if lyricsSet.voteStatus == "up" {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
+            } else if lyricsSet.voteStatus == "down" {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_gray"), forState: .Normal)
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_pink"), forState: .Normal)
+            } else {
+                cell.upVoteButton.setImage(UIImage(named: "vote_up_gray"), forState: .Normal)
+                cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
+            }
+            
             
             cell.votesLabel.text = String(lyricsSet.votesScore)
             cell.titleLabel.text = lyricsSet.lyricsPreview + "..."
@@ -238,18 +262,24 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func upVoted(button: UIButton) {
-        
+        if CoreDataManager.getCurrentUser() == nil {
+            print("sign in before vote")
+            
+            return
+        }
         let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
         
         APIManager.updateVotes(true, isTabs: isPullingTabs, setId: id, completion: {
-            vote in
+            voteStatus, voteScore in
             
             if self.isPullingTabs {
-                self.downloadedTabsSets[button.tag].votesScore = vote
+                self.downloadedTabsSets[button.tag].voteStatus = voteStatus
+                self.downloadedTabsSets[button.tag].votesScore = voteScore
             } else {
-                self.downloadedLyricsSets[button.tag].votesScore = vote
+                self.downloadedLyricsSets[button.tag].voteStatus = voteStatus
+                self.downloadedLyricsSets[button.tag].votesScore = voteScore
             }
-
+            
             dispatch_async(dispatch_get_main_queue()) {
                 self.resultsTableView.reloadData()
             }
@@ -260,24 +290,36 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func downVoted(button: UIButton) {
+        if CoreDataManager.getCurrentUser() == nil {
+            print("sign in before vote")
+            return
+        }
         
         let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
-        
         APIManager.updateVotes(false, isTabs: isPullingTabs, setId: id, completion: {
-            vote in
+            voteStatus, voteScore in
             
             if self.isPullingTabs {
-                self.downloadedTabsSets[button.tag].votesScore = vote
+                self.downloadedTabsSets[button.tag].voteStatus = voteStatus
+                self.downloadedTabsSets[button.tag].votesScore = voteScore
             } else {
-                self.downloadedLyricsSets[button.tag].votesScore = vote
+                self.downloadedLyricsSets[button.tag].voteStatus = voteStatus
+                self.downloadedLyricsSets[button.tag].votesScore = voteScore
             }
             
             dispatch_async(dispatch_get_main_queue()) {
                 self.resultsTableView.reloadData()
             }
-            
         })
         print("down button: \(button.tag) pressed")
     }
     
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
+    
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
+    }
+
 }
