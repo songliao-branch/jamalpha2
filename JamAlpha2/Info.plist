@@ -7,7 +7,8 @@
     <array>
         <string>fbauth2</string>
     </array>
-    
+
+
     <key>CFBundleURLTypes</key>
     <array>
         <dict>

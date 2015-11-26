@@ -162,6 +162,7 @@ class MeLoginOrSignupViewController: UIViewController {
             0)
         facebookButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         facebookButton.center.x = self.view.center.x
+        facebookButton.addTarget(self, action: "pressFacebookButton:", forControlEvents: UIControlEvents.TouchUpInside)
         scrollView.addSubview(facebookButton)
         
         //log in screen
