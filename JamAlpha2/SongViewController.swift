@@ -205,9 +205,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         removeAllObserver()
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
+        setUpBackgroundImage()
         setUpTopButtons()
         setUpNameAndArtistButtons()
-        setUpBackgroundImage()
         //set up views from top to bottom
         setUpChordBase()
         setUpTuningLabels()
@@ -265,8 +265,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func setUpBackgroundImage(){
         //create an UIImageView
         
-        let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
-        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
+        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
         print(firstLoadPlayingItem.title)
         if let artwork = firstLoadPlayingItem.artwork {
@@ -286,25 +285,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpTopButtons() {
-        let statusBarLayer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: statusBarHeight))
-        statusBarLayer.backgroundColor = UIColor.mainPinkColor()
-        self.view.addSubview(statusBarLayer)
-        
+
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
-        topView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(topView)
         
+     
         let buttonCenterY: CGFloat = topViewHeight/2
+        let buttonMargin: CGFloat = self.view.frame.width / 12
         pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
-        
         pulldownButton.setImage(UIImage(named: "pullDown"), forState: UIControlState.Normal)
-        pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
+        pulldownButton.center = CGPoint(x: buttonMargin, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         topView.addSubview(pulldownButton)
         
         tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
-        tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
+        tuningButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
         tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         topView.addSubview(tuningButton)
         
@@ -320,6 +316,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         capoButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
         self.view.addSubview(capoButton)
+        
+        let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.35 ))
+        topViewSeparator.backgroundColor = UIColor.baseColor()
+        self.view.addSubview(topViewSeparator)
     }
 
     func updateTuning(tuning: String) {
