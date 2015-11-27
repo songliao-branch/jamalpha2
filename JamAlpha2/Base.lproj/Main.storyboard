@@ -794,26 +794,37 @@
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="email" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8We-ye-CGO">
-                                                    <rect key="frame" x="92" y="34" width="180" height="21.5"/>
+                                                    <rect key="frame" x="93" y="47" width="179" height="18"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;Set a name&gt;" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9af-d8-0Bl">
+                                                    <rect key="frame" x="92" y="23.5" width="190" height="21.5"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
                                             <animations/>
                                             <constraints>
-                                                <constraint firstItem="8We-ye-CGO" firstAttribute="leading" secondItem="3oM-mk-oiR" secondAttribute="trailing" constant="13" id="704-dD-L2F"/>
+                                                <constraint firstItem="8We-ye-CGO" firstAttribute="leading" secondItem="3oM-mk-oiR" secondAttribute="trailing" constant="14" id="704-dD-L2F"/>
                                                 <constraint firstItem="3oM-mk-oiR" firstAttribute="centerY" secondItem="GQw-cS-Gm7" secondAttribute="centerY" id="9R4-Ma-3UD"/>
                                                 <constraint firstAttribute="trailing" secondItem="8We-ye-CGO" secondAttribute="trailing" constant="15" id="AEY-1w-teM"/>
-                                                <constraint firstItem="8We-ye-CGO" firstAttribute="centerY" secondItem="GQw-cS-Gm7" secondAttribute="centerY" id="DEm-Fx-RBo"/>
+                                                <constraint firstItem="8We-ye-CGO" firstAttribute="top" secondItem="GQw-cS-Gm7" secondAttribute="centerY" constant="2" id="DEm-Fx-RBo"/>
                                                 <constraint firstItem="3oM-mk-oiR" firstAttribute="leading" secondItem="GQw-cS-Gm7" secondAttribute="leading" constant="19" id="EnR-7w-C2H"/>
+                                                <constraint firstItem="9af-d8-0Bl" firstAttribute="leading" secondItem="3oM-mk-oiR" secondAttribute="trailing" constant="13" id="I6p-Y5-soL"/>
+                                                <constraint firstItem="9af-d8-0Bl" firstAttribute="bottom" secondItem="GQw-cS-Gm7" secondAttribute="centerY" id="RGX-f2-IlG"/>
+                                                <constraint firstAttribute="trailing" secondItem="9af-d8-0Bl" secondAttribute="trailing" constant="5" id="jBF-tv-t9l"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <animations/>
                                         <connections>
                                             <outlet property="avatarImageView" destination="3oM-mk-oiR" id="Jgl-nn-qHR"/>
-                                            <outlet property="titleLabel" destination="8We-ye-CGO" id="TxS-st-2IC"/>
+                                            <outlet property="subtitleLabel" destination="8We-ye-CGO" id="fZQ-Bd-Bpt"/>
+                                            <outlet property="titleLabel" destination="9af-d8-0Bl" id="rlT-si-wXy"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

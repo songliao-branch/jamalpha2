@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Haneke
 
 class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -17,7 +18,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-        
+
         showSignUpLoginScreen()
         userTable.reloadData()
     }
@@ -28,6 +29,9 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
             
             self.navigationController?.pushViewController(signUpVC, animated: false)
+        } else {
+            //means we are signed in here, refresh the table
+            userTable.reloadData()
         }
     }
     
@@ -56,8 +60,15 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             cell.avatarImageView.layer.cornerRadius = cell.avatarImageView.frame.height/2
             cell.avatarImageView.layer.borderWidth = 1
             cell.avatarImageView.layer.borderColor = UIColor.backgroundGray().CGColor
+            
             if let user = CoreDataManager.getCurrentUser() {
-              cell.titleLabel.text = user.email
+                if let name = user.username {
+                    cell.titleLabel.text = name
+                }
+                cell.subtitleLabel.text = user.email
+                if let url = user.avatarUrl {
+                    cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
+                }
             }
             
             return cell

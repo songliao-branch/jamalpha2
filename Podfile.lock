@@ -6,6 +6,7 @@ PODS:
   - Bolts/AppLinks (1.5.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.5.0)
+  - CryptoSwift (0.1.1)
   - FBSDKCoreKit (4.8.0):
     - Bolts (~> 1.1)
     - FBSDKCoreKit/arc (= 4.8.0)
@@ -22,6 +23,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire (~> 3.0)
+  - CryptoSwift
   - FBSDKCoreKit
   - FBSDKLoginKit
   - HanekeSwift
@@ -39,6 +41,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: 7c16ca65f3c7e681fd925fd7f2dec7747ff96855
   Bolts: 722ab9a4f8b50fc4ed1b9998a5a7a2b3f16d80b4
+  CryptoSwift: c11640d3d66107efc8333e4131a5173f072b1d61
   FBSDKCoreKit: 66a935d17b6e00b6b64e604f2eb9b72c9ab7deb8
   FBSDKLoginKit: d893fcbb98d854496925e9ff73c67b896982d3c4
   HanekeSwift: d6f5bdf9dbdbbc09d59623b2c1d533e46463dd4d

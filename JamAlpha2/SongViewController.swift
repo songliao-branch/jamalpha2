@@ -1853,6 +1853,4 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
-    
 }
-

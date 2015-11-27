@@ -42,16 +42,27 @@ class CoreDataManager: NSObject {
         return nil
     }
     
-    class func initializeUser(id: Int, email: String, authToken: String) {
+    //the last two parameters can necessary for facebook logins
+    // a normal call to this function only involves initializeUser(id,email,authToken)
+    // a call with facebook involves all 5 parameters
+    class func initializeUser(id: Int, email: String, authToken: String, username: String?=nil, avatarUrl: String?=nil) {
         logoutUser()//for testing clear all users
         
         let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
         user.id  = id
         user.email = email
         user.authToken = authToken
+        
+        if let name = username {
+            user.username = name
+        }
+        if let url = avatarUrl {
+            user.avatarUrl = url
+        }
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
+
     //song-related
     private class func findSong(item: MPMediaItem) -> Song? {
         // TODO: other special characters might corrupt the predicate, needs to check more later
