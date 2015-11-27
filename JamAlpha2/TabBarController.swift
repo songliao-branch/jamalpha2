@@ -8,8 +8,11 @@
 
 import UIKit
 
-class TabBarController: UITabBarController {
+class TabBarController: UITabBarController, UITabBarControllerDelegate {
     
+    override func viewDidLoad() {
+        self.delegate = self
+    }
     override func shouldAutorotate() -> Bool {
         return false
     }
@@ -17,4 +20,18 @@ class TabBarController: UITabBarController {
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
+    
+    func tabBarController(tabBarController: UITabBarController, shouldSelectViewController viewController: UIViewController) -> Bool {
+
+        let allVCs = tabBarController.viewControllers
+       
+        if CoreDataManager.getCurrentUser() == nil &&  allVCs?[tabBarController.selectedIndex] == viewController {
+            return false
+        }
+        return true
+    }    
 }
+
+
+
+

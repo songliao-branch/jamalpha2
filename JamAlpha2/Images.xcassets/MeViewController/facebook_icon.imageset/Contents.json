@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "darkTab.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "facebook_icon.png",
       "scale" : "2x"
     },
     {

@@ -47,8 +47,6 @@ class LyricsSyncViewController: UIViewController  {
     
     var progressChangedOrigin: CGFloat!
     
-    var musicDataManager = MusicDataManager()
-
     var lyricsFromTextView: String!
     
     var viewWidth = CGFloat()
@@ -189,7 +187,7 @@ class LyricsSyncViewController: UIViewController  {
 
         self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.playbackDuration) * 2, soundwaveHeight))
         
-        if let soundWaveData = musicDataManager.getSongWaveFormImage(theSong) {
+        if let soundWaveData = CoreDataManager.getSongWaveFormImage(theSong) {
             progressBlock.setWaveFormFromData(soundWaveData)
         }
         
@@ -482,7 +480,7 @@ extension LyricsSyncViewController {
         
         self.lyricsTextViewController.songViewController.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
         self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
-        musicDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: addedLyricsWithTime.time)
+        CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: addedLyricsWithTime.time)
     }
 }
 
@@ -512,7 +510,7 @@ extension LyricsSyncViewController {
     }
     
     func addLyricsToEditorView(sender: MPMediaItem) {
-        let lyricsWithTime = musicDataManager.getLyrics(sender)
+        let lyricsWithTime = CoreDataManager.getLyrics(sender)
         let count = lyricsWithTime.count
         if count > 0 {
             var lyrics: [String] = [String]()

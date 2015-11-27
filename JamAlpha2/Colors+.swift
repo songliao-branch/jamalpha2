@@ -12,10 +12,13 @@ extension UIColor {
     class func mainPinkColor() -> UIColor {
         return UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
     }
-    
+    //used for background for chordbase and lyricsbase
+    class func baseColor() -> UIColor {
+        return UIColor(red: 1, green: 1, blue: 1, alpha: 0.65)
+    }
     // for falling labels and lyrics in SongViewController
     class func silverGray() -> UIColor {
-        return UIColor(red: 119 / 255, green: 118 / 255, blue: 118 / 255, alpha: 1)
+        return UIColor(red: 100 / 255, green: 100 / 255, blue: 100 / 255, alpha: 1)
     }
     
     // for use in search table view section header
@@ -25,5 +28,9 @@ extension UIColor {
     
     class func actionGray()-> UIColor {
         return UIColor(red: 0.941, green: 0.941, blue: 0.941, alpha: 0.9)
+    }
+    
+    class func facebookBlue() -> UIColor {
+        return UIColor(red: 0.231, green: 0.349, blue: 0.596, alpha: 1) /* #3b5998 */
     }
 }
