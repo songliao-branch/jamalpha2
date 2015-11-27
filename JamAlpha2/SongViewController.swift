@@ -63,9 +63,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var chordBaseTapGesture: UITapGestureRecognizer!
     //MARK: progress Container
-    //var progressBlock: SoundWaveView!
     
-    var progressBlockViewWidth:CGFloat?
+    var timer: NSTimer!
+    var progressBlock: SoundWaveView!
     var progressBlockContainer:UIView!
     var progressChangedOrigin:CGFloat!
     var panRecognizer:UIPanGestureRecognizer!
@@ -190,20 +190,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let bottomViewHeight:CGFloat = 40 //this is fixed
     
     var firstLoadPlayingItem: MPMediaItem!
-    var isRemoveProgressBlock = true
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
         player = MusicManager.sharedInstance.player
-
+        registerMediaPlayerNotification()
         self.firstLoadPlayingItem = player.nowPlayingItem
         firstLoadSongTime = firstLoadPlayingItem.playbackDuration
         firstloadSongTitle = firstLoadPlayingItem.title
 
         musicDataManager.initializeSongToDatabase(firstLoadPlayingItem)
-    
-        removeAllObserver()
+        
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         setUpTopButtons()
@@ -226,12 +224,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     deinit{
         pthread_rwlock_destroy(&rwLock)
     }
-    
-    func removeAllObserver(){
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-        player.endGeneratingPlaybackNotifications()
-    }
+
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
         return UIStatusBarStyle.LightContent
@@ -252,13 +245,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        if(!isRemoveProgressBlock){
-            // updateMusicData(player.nowPlayingItem!)
-            isRemoveProgressBlock = true
-           // removeAllObserver()
-        }else{
-            self.registerMediaPlayerNotification()
-        }
         if(!isGenerated){
             generateSoundWave(firstLoadPlayingItem)
         }
@@ -623,26 +609,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 // The following won't run when selected from table
                 // update the progressblockWidth
-                
-                self.progressBlockViewWidth = nil
         
                 let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
-                //////////////////////////////
-                //remove from superView
-                if(KGLOBAL_progressBlock != nil ){
-                    KGLOBAL_progressBlock.removeFromSuperview()
-                    KGLOBAL_progressBlock = nil
-                }
-                
+
                 // get a new progressBlock
                 var progressBarWidth:CGFloat!
-                progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
-                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
-                KGLOBAL_progressBlock.center.y = progressContainerHeight
-                self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
+                progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
+                self.progressBlock.frame = CGRect(x: self.view.center.x, y: progressBlock.frame.origin.y, width: progressBarWidth, height: progressBlock.frame.height)
+
                 if let soundWaveData = self.musicDataManager.getSongWaveFormImage(nowPlayingItem!) {
-                    KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+                    progressBlock.setWaveFormFromData(soundWaveData)
                     print("sound wave data found")
                     KGLOBAL_init_queue.suspended = false
                 } else {
@@ -651,10 +628,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
  
                 ////////////////////////////
                 
-                    KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                    progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 
                 if self.player.playbackState == MPMusicPlaybackState.Paused{
-                    KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                    progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     print("changeScale")
                     //self.progressBlock!.alpha = 0.5
                 }
@@ -683,7 +660,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
             self.speed = 1
-            //self.nowPlayingItemSpeed = 1
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.stopTimer()
                 self.startTimer()
@@ -701,8 +677,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             //fade down the soundwave
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                KGLOBAL_progressBlock!.alpha = 0.5
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                self.progressBlock!.alpha = 0.5
                 }, completion: nil)
             
         }
@@ -710,12 +686,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             startTimer()
             //bring up the soundwave, give it a little jump animation
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                KGLOBAL_progressBlock!.alpha = 1.0
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+                self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
                     
                     UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                        KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                         }, completion: nil)
                     
             })
@@ -738,8 +714,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             else if player.playbackState == MPMusicPlaybackState.Paused {
                 stopTimer()
                 // progress bar should be lowered
-                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                KGLOBAL_progressBlock!.alpha = 0.5
+                progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                progressBlock!.alpha = 0.5
                 self.speed = 1  //restore to original speed
             }
         }
@@ -756,21 +732,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         progressBarWidth = CGFloat(firstLoadPlayingItem.playbackDuration) * progressWidthMultiplier
         
-        if(KGLOBAL_progressBlock != nil ){
-                    KGLOBAL_progressBlock.removeFromSuperview()
-                    KGLOBAL_progressBlock = nil
-        }
-        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
-        KGLOBAL_progressBlock.center.y = progressContainerHeight
-        self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
+        progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
+        progressBlock.center.y = progressContainerHeight
+        self.progressBlockContainer.addSubview(progressBlock)
         
         //if there is soundwave in the coredata then we load the image in viewdidload
         if let soundWaveData = musicDataManager.getSongWaveFormImage(firstLoadPlayingItem) {
-            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+            progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
             KGLOBAL_init_queue.suspended = false
             isGenerated = true
-        }else{
+        } else {
             //if didn't find it then we will generate then waveform later, in the viewdidappear method
             // this is a flag to determine if the generateSoundWave function will be called
             isGenerated = false
@@ -797,7 +769,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(op == nil){
                 // have to use the temp value to do the nsoperation, cannot use (self.) do that.
                 let tempNowPlayingItem = nowPlayingItem
-                let tempProgressBlock = KGLOBAL_progressBlock
+                let tempProgressBlock = self.progressBlock
                 let tempMusicDataManager = self.musicDataManager
                 op = NSBlockOperation(block: {
                     
@@ -811,8 +783,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         KGLOBAL_operationCache.removeValueForKey(assetURL as! NSURL)
                         if(tempNowPlayingItem == self.player.nowPlayingItem){
                             NSOperationQueue.mainQueue().addOperationWithBlock({
-                                if(KGLOBAL_progressBlock != nil ){
-                                    KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                if(self.progressBlock != nil ){
+                                    self.progressBlock.setWaveFormFromData(data!)
                                 }
                                 KGLOBAL_init_queue.suspended = false
                             })
@@ -851,11 +823,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //= from 0 ot -517
             //divide by -2: from 0 to 258
             let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
-            KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
+            progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
             //258  517
             updateAll(toTime)
-            
-            //child.frame.origin.x = newPosition
             
             //when finger is lifted
             if recognizer.state == UIGestureRecognizerState.Ended {
@@ -895,7 +865,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             //update soundwave progress
-            KGLOBAL_progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItem!.playbackDuration))
+            progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItem!.playbackDuration))
             
             updateAll(toChordTime)
             
@@ -1349,7 +1319,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     // MARK: functions used in NavigationOutView
     func browseTabs(button: UIButton) {
-        self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
@@ -1368,7 +1337,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func goToTabsEditor() {
-        self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
@@ -1382,7 +1350,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func browseLyrics(button: UIButton) {
-        self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
@@ -1396,7 +1363,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     func goToLyricsEditor() {
-        self.isRemoveProgressBlock = false
         self.selectedFromTable = true
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
@@ -1436,14 +1402,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         print("view will disappear")
         stopTimer()
         viewDidFullyDisappear = true
-        
-        if(isRemoveProgressBlock){
-            if(KGLOBAL_progressBlock != nil ){
-                KGLOBAL_progressBlock.removeFromSuperview()
-                KGLOBAL_progressBlock = nil
-            }
-        }
-        
+    
+    
         if player.playbackState == .Playing {
             if nowView != nil {
                 self.nowView.start()
@@ -1456,9 +1416,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if player.playbackState == MPMusicPlaybackState.Playing {
             player.currentPlaybackRate = 1
-        }
-        if(!isRemoveProgressBlock){
-           NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
         }
     }
     
@@ -1583,17 +1540,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func refreshProgressBlock(){
 
-        if(KGLOBAL_progressBlock != nil){
+        if(progressBlock != nil){
 
-            let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
+            let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / progressBlock.frame.size.width
             
             let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
             
             if !isPanning {
                 self.progressChangedOrigin = newOriginX
-                KGLOBAL_progressBlock.setProgress(newProgressPosition)
+                progressBlock.setProgress(newProgressPosition)
             }
-            KGLOBAL_progressBlock.frame.origin.x = newOriginX
+            progressBlock.frame.origin.x = newOriginX
            // print("\(startTime) = \(startTime.toDecimalNumer())")
         }
     }
@@ -1601,7 +1558,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func refreshTimeLabel(){
         // update current time label
         currentTimeLabel.text = startTime.toDisplayString()
-        //print(startTime.toDisplayString())
     }
     
     func refreshLyrics() {
@@ -1762,18 +1718,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //In case of receiving song changed and playback state
         //notifications, notifications are triggered twice somehow
         
-        if KGLOBAL_timer == nil {
-            KGLOBAL_timer = NSTimer()
-            KGLOBAL_timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        if timer == nil {
+            timer = NSTimer()
+            timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
             //NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
         }
     }
     
     func stopTimer(){
-        if(KGLOBAL_timer != nil){
-            KGLOBAL_timer!.invalidate()
-            KGLOBAL_timer = nil
+        if(timer != nil){
+            timer!.invalidate()
+            timer = nil
         }
     }
     

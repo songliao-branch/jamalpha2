@@ -66,13 +66,13 @@ class MusicDataManager: NSObject {
             }
             if let artist = item.artist {
                 song.artist = artist
-            }else{
-                song.artist = "empty"
+            } else {
+                song.artist = ""
             }
             if let album = item.albumTitle {
                 song.album = album
-            }else{
-                song.artist = "empty"
+            } else {
+                song.album = ""
             }
             
             song.playbackDuration = Float(item.playbackDuration)
