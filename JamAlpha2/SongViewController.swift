@@ -255,7 +255,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!isRemoveProgressBlock){
             // updateMusicData(player.nowPlayingItem!)
             isRemoveProgressBlock = true
-           // removeAllObserver()
         }else{
             self.registerMediaPlayerNotification()
         }
@@ -599,7 +598,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func currentSongChanged(notification: NSNotification){
+        if(viewDidFullyDisappear){
+            return
+        }
         pthread_rwlock_wrlock(&self.rwLock)
+        print(".....................")
             for label in self.tuningLabels {
                 label.hidden = true
             }
@@ -694,28 +697,30 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playbackStateChanged(notification: NSNotification){
+        if(viewDidFullyDisappear){
+            return
+        }
         let playbackState = player.playbackState
-        
         if playbackState == .Paused {
             stopTimer()
-            
             //fade down the soundwave
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                KGLOBAL_progressBlock!.alpha = 0.5
+                    KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                    KGLOBAL_progressBlock!.alpha = 0.5
                 }, completion: nil)
             
         }
         else if playbackState == .Playing {
+            updateAll(Float(player.currentPlaybackTime))
             startTimer()
             //bring up the soundwave, give it a little jump animation
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                KGLOBAL_progressBlock!.alpha = 1.0
+                    KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+                    KGLOBAL_progressBlock!.alpha = 1.0
                 }, completion: { finished in
                     
                     UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                        KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                         }, completion: nil)
                     
             })
@@ -1582,9 +1587,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshProgressBlock(){
-
-        if(KGLOBAL_progressBlock != nil){
-
             let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
             
             let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
@@ -1595,13 +1597,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             KGLOBAL_progressBlock.frame.origin.x = newOriginX
            // print("\(startTime) = \(startTime.toDecimalNumer())")
-        }
     }
     
     func refreshTimeLabel(){
         // update current time label
-        currentTimeLabel.text = startTime.toDisplayString()
-        //print(startTime.toDisplayString())
+        self.currentTimeLabel.text = startTime.toDisplayString()
     }
     
     func refreshLyrics() {
@@ -1778,15 +1778,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func update(){
+        if(viewDidFullyDisappear){
+            return
+        }
         if(!isPanning){
-            
-            //TODO: sometimes when songviewcontroller takes time to load, player.currentPlaybackTime does not sync with the startTime, causing delays in showing the chords and lyrics. This has some issues for now, resolve later.
-            //            if ( player.nowPlayingItem == nil){
-            //                startTime.addTime(Int(100 / stepPerSecond))
-            //            }else{
-            //                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
-            //            }
-
             startTime.addTime(Int(100 / stepPerSecond))
         }
         refreshChordLabel()
