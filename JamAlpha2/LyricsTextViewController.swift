@@ -165,9 +165,8 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.textColor = UIColor.whiteColor()
         self.lyricsTextView.tintColor = UIColor.mainPinkColor()
         self.lyricsTextView.delegate = self
-        let musicDataManager = MusicDataManager()
-        
-        let lyricsTimes = musicDataManager.getLyrics(theSong)
+
+        let lyricsTimes = CoreDataManager.getLyrics(theSong)
         if lyricsTimes.count > 0 {
             var lyricsToDisplay = ""
             for line in lyricsTimes {

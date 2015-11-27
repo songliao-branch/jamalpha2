@@ -12,6 +12,7 @@ import CoreData
 @objc(TabsSet)
 class TabsSet: NSManagedObject {
     @NSManaged var song: Song
+    @NSManaged var user: User
     @NSManaged var chords: AnyObject
     @NSManaged var tabs: AnyObject
     @NSManaged var times: AnyObject

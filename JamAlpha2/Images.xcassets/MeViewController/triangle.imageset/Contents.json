@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "lightTab.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "triangle.png",
       "scale" : "2x"
     },
     {

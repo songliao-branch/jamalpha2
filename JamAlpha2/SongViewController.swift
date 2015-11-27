@@ -21,7 +21,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //for nsoperation
     var isGenerated:Bool = true
     
-    var musicDataManager = MusicDataManager()
     //time for chords to fall from top to bottom of chordbase
     var freefallTime:Float = 3.2
     var minfont: CGFloat = 15
@@ -200,13 +199,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         firstLoadSongTime = firstLoadPlayingItem.playbackDuration
         firstloadSongTitle = firstLoadPlayingItem.title
 
-        musicDataManager.initializeSongToDatabase(firstLoadPlayingItem)
-        
+        CoreDataManager.initializeSongToDatabase(firstLoadPlayingItem)
+
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
+        setUpBackgroundImage()
         setUpTopButtons()
         setUpNameAndArtistButtons()
-        setUpBackgroundImage()
         //set up views from top to bottom
         setUpChordBase()
         setUpTuningLabels()
@@ -253,8 +252,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func setUpBackgroundImage(){
         //create an UIImageView
         
-        let imageDimension = self.view.frame.height-CGRectGetMaxY(topView.frame)
-        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: imageDimension, height: imageDimension))
+        backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
         print(firstLoadPlayingItem.title)
         if let artwork = firstLoadPlayingItem.artwork {
@@ -274,25 +272,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func setUpTopButtons() {
-        let statusBarLayer = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: statusBarHeight))
-        statusBarLayer.backgroundColor = UIColor.mainPinkColor()
-        self.view.addSubview(statusBarLayer)
-        
+
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
-        topView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(topView)
         
+     
         let buttonCenterY: CGFloat = topViewHeight/2
+        let buttonMargin: CGFloat = self.view.frame.width / 12
         pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
-        
         pulldownButton.setImage(UIImage(named: "pullDown"), forState: UIControlState.Normal)
-        pulldownButton.center = CGPoint(x: self.view.frame.width / 12, y: buttonCenterY)
+        pulldownButton.center = CGPoint(x: buttonMargin, y: buttonCenterY)
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         topView.addSubview(pulldownButton)
         
         tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
         tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
-        tuningButton.center = CGPoint(x: self.view.frame.width * 11 / 12, y: buttonCenterY)
+        tuningButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
         tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         topView.addSubview(tuningButton)
         
@@ -308,6 +303,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         capoButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
         self.view.addSubview(capoButton)
+        
+        let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.35 ))
+        topViewSeparator.backgroundColor = UIColor.baseColor()
+        self.view.addSubview(topViewSeparator)
     }
 
     func updateTuning(tuning: String) {
@@ -430,7 +429,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func updateMusicData(song: MPMediaItem) {
         
-        let tabsFromCoreData = musicDataManager.getTabs(song)
+        let tabsFromCoreData = CoreDataManager.getTabs(song)
         if tabsFromCoreData.0.count > 0 {
             print("chords length: \(tabsFromCoreData.0.count)")
             if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
@@ -446,7 +445,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.chords = [Chord]()
         }
         
-        let lyricsFromCoreData = musicDataManager.getLyrics(song)
+        let lyricsFromCoreData = CoreDataManager.getLyrics(song)
         if lyricsFromCoreData.count > 0 {
             self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
         } else {
@@ -485,8 +484,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sideMargin: CGFloat = 20
         
         lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
-        lyricbase.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.7)
-        lyricbase.alpha = 0.8
+        lyricbase.backgroundColor = UIColor.baseColor()
         
         self.view.addSubview(lyricbase)
         
@@ -523,7 +521,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
         chordBase.center.x = self.view.center.x
         chordBase.backgroundColor = UIColor.clearColor()
-        chordBase.alpha = 0.8
         
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
         panRecognizer.delaysTouchesEnded = true
@@ -601,7 +598,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
             if self.firstloadSongTitle != nowPlayingItem!.title && self.firstLoadSongTime != nowPlayingItem!.playbackDuration {
-                self.musicDataManager.initializeSongToDatabase(nowPlayingItem!)
+                CoreDataManager.initializeSongToDatabase(nowPlayingItem!)
                 self.firstloadSongTitle = nowPlayingItem!.title
                 self.firstLoadSongTime = nowPlayingItem!.playbackDuration
                 
@@ -617,8 +614,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
                 self.progressBlock.frame = CGRect(x: self.view.center.x, y: progressBlock.frame.origin.y, width: progressBarWidth, height: progressBlock.frame.height)
-
-                if let soundWaveData = self.musicDataManager.getSongWaveFormImage(nowPlayingItem!) {
+                
+                //TODO: if the current song does not have a url, it uses previous soundwave? Solve this
+                if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingItem!) {
                     progressBlock.setWaveFormFromData(soundWaveData)
                     print("sound wave data found")
                     KGLOBAL_init_queue.suspended = false
@@ -737,8 +735,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.progressBlockContainer.addSubview(progressBlock)
         
         //if there is soundwave in the coredata then we load the image in viewdidload
-        if let soundWaveData = musicDataManager.getSongWaveFormImage(firstLoadPlayingItem) {
+        if let soundWaveData = CoreDataManager.getSongWaveFormImage(firstLoadPlayingItem) {
             progressBlock.setWaveFormFromData(soundWaveData)
+
             print("sound wave data found")
             KGLOBAL_init_queue.suspended = false
             isGenerated = true
@@ -761,6 +760,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
             guard let assetURL = self.player.nowPlayingItem!.valueForProperty(MPMediaItemPropertyAssetURL) else {
                 print("sound url not available")
+                
                 return
             }
             
@@ -770,13 +770,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // have to use the temp value to do the nsoperation, cannot use (self.) do that.
                 let tempNowPlayingItem = nowPlayingItem
                 let tempProgressBlock = self.progressBlock
-                let tempMusicDataManager = self.musicDataManager
+
                 op = NSBlockOperation(block: {
                     
                     tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
                     let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                     
-                    tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
                     self.isGenerated = true
                     
                     dispatch_async(dispatch_get_main_queue()) {
@@ -1519,7 +1519,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 labels[1].center.y = CGFloat(yPosition)
                 labels[1].transform = transformsize
             } else if isChordShown && !isTabsShown { //show only chord name
-                 labels[0].hidden = false
+                labels[0].hidden = false
+            
                 labels[0].center = CGPointMake(chordBase.frame.width / 2, CGFloat(yPosition))
             
             } else if !isChordShown && isTabsShown { // show only tabs name
@@ -1795,37 +1796,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     private func dealWithLabelofChordName(chordLabel:UILabel){
-        //make the text glow
-        chordLabel.textColor = self.textColor
-        let color:UIColor = chordLabel.textColor
-        chordLabel.layer.shadowColor = color.CGColor
-        chordLabel.layer.shadowRadius = 4.0
-        chordLabel.layer.shadowOpacity = 1.0
-        chordLabel.layer.shadowOffset = CGSizeZero
-        chordLabel.layer.masksToBounds = false
-        
-        chordLabel.alpha = 0.9
-        
-        //make the frame of the label fit to the text
-        let chordNSString:NSString = NSString(string: chordLabel.text!)
-        if(chordNSString.length >= 2 && chordNSString.length <= 3){
-            
-            let fontSize:CGFloat = 18.0
-            
-            let textFont = UIFont.systemFontOfSize(fontSize)
-            
-            
-            chordLabel.font = textFont
-       
-            chordLabel.sizeToFit()
-            
-        } else if(chordNSString.length >= 4 ){
-            
-            let fontSize:CGFloat = 16.0
-            
-            let textFont = UIFont.systemFontOfSize(fontSize)
-            
-            chordLabel.font = textFont
+
+        if isChordShown && isTabsShown {
+            //make the text glow
+            chordLabel.textColor = UIColor.whiteColor()
+            chordLabel.font = UIFont.systemFontOfSize(17)
+
+        } else if isChordShown && !isTabsShown {
+            //make the text glow
+            chordLabel.textColor = UIColor.silverGray()
+            chordLabel.font = UIFont.systemFontOfSize(20)
             chordLabel.sizeToFit()
         }
     }

@@ -13,7 +13,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var artistsByFirstAlphabet = [(String, [Artist])]()
     private var albumsByFirstAlphabet = [(String, [Album])]()
     
-    private var musicDataManager = MusicDataManager()
     private var rwLock = pthread_rwlock_t()
     
     var pageIndex = 0
@@ -399,9 +398,9 @@ extension MusicViewController {
     
     func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
         
-        self.musicDataManager.initializeSongToDatabase(nowPlayingItem)
+        CoreDataManager.initializeSongToDatabase(nowPlayingItem)
         
-        if let _ = self.musicDataManager.getSongWaveFormImage(nowPlayingItem) {
+        if let _ = CoreDataManager.getSongWaveFormImage(nowPlayingItem) {
             // songCount can be only incremented in one queue no matter how many threads
             self.incrementSongCountInThread()
         } else {
@@ -421,8 +420,7 @@ extension MusicViewController {
                     var progressBarWidth:CGFloat!
                     progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
                     let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
-                    
-                    let tempMusicDataManager = self.musicDataManager
+
                     op = NSBlockOperation(block: {
                         
                         if(op!.cancelled){
@@ -431,7 +429,7 @@ extension MusicViewController {
                         tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
 
                         let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                        tempMusicDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                        CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
                         print("Soundwave generated for \(nowPlayingItem.title!) in background")
                         
                         KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)

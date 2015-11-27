@@ -16,11 +16,44 @@ extension String {
     }
 }
 
-class MusicDataManager: NSObject {
+class CoreDataManager: NSObject {
     
-    let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
+    static let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
-    private func findSong(item: MPMediaItem) -> Song? {
+    //User-related
+    class func logoutUser() {
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
+        
+        //delete all user objects just to make sure we have none left
+        for o in results {
+            moc.deleteObject(o as! NSManagedObject)
+        }
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+    }
+    
+    class func getCurrentUser() -> User? {
+        
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
+        
+        if results.count == 1 {
+            return results.lastObject as? User
+        }
+        print("no users found")
+        return nil
+    }
+    
+    class func initializeUser(id: Int, email: String, authToken: String) {
+        logoutUser()//for testing clear all users
+        
+        let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
+        user.id  = id
+        user.email = email
+        user.authToken = authToken
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+    }
+    
+    //song-related
+    private class func findSong(item: MPMediaItem) -> Song? {
         // TODO: other special characters might corrupt the predicate, needs to check more later
         
         // some songs do NOT have all these attributes so we assign them an empty string to prevent optional unwrapping
@@ -55,7 +88,7 @@ class MusicDataManager: NSObject {
         }
     }
     
-    func initializeSongToDatabase(item: MPMediaItem) {
+    class func initializeSongToDatabase(item: MPMediaItem) {
         // if we don't have the song in the database
         if findSong(item) == nil {
             let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
@@ -82,7 +115,7 @@ class MusicDataManager: NSObject {
     }
     
     // MARK: save, retrieve soundwaves
-    func saveSoundWave(item: MPMediaItem, soundwaveData: NSMutableArray, soundwaveImage: NSData) {
+    class func saveSoundWave(item: MPMediaItem, soundwaveData: NSMutableArray, soundwaveImage: NSData) {
         
         if let matchedSong = findSong(item) {
             let data: NSData = NSKeyedArchiver.archivedDataWithRootObject(soundwaveData as AnyObject)
@@ -93,7 +126,7 @@ class MusicDataManager: NSObject {
     }
     
 
-    func getSongWaveFormData(item: MPMediaItem) -> NSMutableArray? {
+    class func getSongWaveFormData(item: MPMediaItem) -> NSMutableArray? {
         if let matchedSong = findSong(item) {
             print("sound wave data found for song")
             
@@ -102,7 +135,7 @@ class MusicDataManager: NSObject {
         return nil
     }
     
-    func getSongWaveFormImage(item: MPMediaItem) -> NSData? {
+    class func getSongWaveFormImage(item: MPMediaItem) -> NSData? {
         if let matchedSong = findSong(item) {
             print("sound wave image found for song")
             return matchedSong.soundwaveImage
@@ -112,7 +145,7 @@ class MusicDataManager: NSObject {
     }
     
     // MARK: save, retrieve lyrics
-    func saveLyrics(item: MPMediaItem, lyrics: [String], times: [NSTimeInterval]) {
+    class func saveLyrics(item: MPMediaItem, lyrics: [String], times: [NSTimeInterval]) {
         
         if let matchedSong = findSong(item) {
             // TODO: find a better way managing user's lyrics, now just clear existing lyrics
@@ -130,7 +163,7 @@ class MusicDataManager: NSObject {
         }
     }
     
-    func getLyrics(item: MPMediaItem) -> [(String, NSTimeInterval)] {
+    class func getLyrics(item: MPMediaItem) -> [(String, NSTimeInterval)] {
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.lyricsSets.count) set of lyrics")
             if matchedSong.lyricsSets.count > 0 {
@@ -149,7 +182,7 @@ class MusicDataManager: NSObject {
     }
     
     //Tabs, TODO: need to store tuning, capo number
-    func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int) {
+    class func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int) {
         
         if let matchedSong = findSong(item) {
             // TODO: find a better way managing user's lyrics, now just clear existing lyrics
@@ -171,7 +204,7 @@ class MusicDataManager: NSObject {
         }
     }
     
-    func getTabs(item: MPMediaItem) -> ([Chord], String, Int) { //return chords, tuning and capo
+    class func getTabs(item: MPMediaItem) -> ([Chord], String, Int) { //return chords, tuning and capo
         
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.tabsSets.count) set of tabs")
