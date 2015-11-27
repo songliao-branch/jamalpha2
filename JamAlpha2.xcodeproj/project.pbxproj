@@ -537,6 +537,11 @@
 					E488773C1B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
 						DevelopmentTeam = 978SMNLLT3;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+						};
 					};
 					E48877531B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;

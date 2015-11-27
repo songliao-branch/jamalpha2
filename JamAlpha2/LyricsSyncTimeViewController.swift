@@ -74,7 +74,6 @@ class LyricsSyncViewController: UIViewController  {
         self.addedLyricsWithTime = lyricsWithTime(count: self.lyricsOrganizedArray.count)
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
-        //self.addLyricsToEditorView(theSong)
         setUpSong()
         setUpHeaderView()
         setUpLyricsTableView()
@@ -83,6 +82,8 @@ class LyricsSyncViewController: UIViewController  {
         setUpCountdownView()
         if tempLyricsTimeTuple.count > 0 {
             addUnfinishedLyrivsAndTime()
+        }else{
+            self.addLyricsToEditorView(theSong)
         }
     }
 
@@ -155,7 +156,15 @@ class LyricsSyncViewController: UIViewController  {
         let backgroundImage: UIImageView = UIImageView()
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
-        backgroundImage.image = theSong.artwork!.imageWithSize(size)
+        var image:UIImage!
+        if let artwork = theSong!.artwork {
+            image = artwork.imageWithSize(size)
+        } else {
+            //TODO: add a placeholder album cover
+            image = UIImage(named: "liwengbg")
+        }
+        backgroundImage.image = image
+        //backgroundImage.image = theSong.artwork!.imageWithSize(size)
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)

@@ -16,6 +16,8 @@ var KGLOBAL_init_operationCache = [NSURL:NSBlockOperation]()
 
 var KGLOBAL_progressBlock: SoundWaveView!
 
+var KGLOBAL_timer:NSTimer!
+
 // value is a BOOL
 var KEY_isSoundWaveformGeneratingInBackground:Bool = false
 
