@@ -88,7 +88,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var capoOfTheTabsSet = 0
     
     //time
-    var timer: NSTimer!
+    //var timer: NSTimer?
     var updateInterval: NSTimeInterval = 0 //used to calculate count down reduce
     var currentChordTime:Float = 0
     var toChordTime:Float = 0
@@ -243,11 +243,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
-
-            if(!isRemoveProgressBlock){
-               // updateMusicData(player.nowPlayingItem!)
-                isRemoveProgressBlock = true
-            }
             loadDisplayMode()
             resumeSong()
             viewDidFullyDisappear = false
@@ -256,7 +251,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        self.registerMediaPlayerNotification()
+        if(!isRemoveProgressBlock){
+            // updateMusicData(player.nowPlayingItem!)
+            isRemoveProgressBlock = true
+        }else{
+            self.registerMediaPlayerNotification()
+        }
         if(!isGenerated){
             generateSoundWave(firstLoadPlayingItem)
         }
@@ -272,7 +272,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
         } else {
             //TODO: add a placeholder album cover
-            return
+            currentImage = UIImage(named: "liwengbg")
         }
         //create blurred image
         let blurredImage:UIImage = currentImage!.applyLightEffect()!
@@ -595,7 +595,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func currentSongChanged(notification: NSNotification){
+        if(viewDidFullyDisappear){
+            return
+        }
         pthread_rwlock_wrlock(&self.rwLock)
+    
             for label in self.tuningLabels {
                 label.hidden = true
             }
@@ -690,29 +694,30 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playbackStateChanged(notification: NSNotification){
+        if(viewDidFullyDisappear){
+            return
+        }
         let playbackState = player.playbackState
-        
         if playbackState == .Paused {
             stopTimer()
-            
             //fade down the soundwave
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
-                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                KGLOBAL_progressBlock!.alpha = 0.5
+                    KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                    KGLOBAL_progressBlock!.alpha = 0.5
                 }, completion: nil)
             
         }
         else if playbackState == .Playing {
+            updateAll(Float(player.currentPlaybackTime))
             startTimer()
-            
             //bring up the soundwave, give it a little jump animation
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                KGLOBAL_progressBlock!.alpha = 1.0
+                    KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+                    KGLOBAL_progressBlock!.alpha = 1.0
                 }, completion: { finished in
                     
                     UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                        KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                         }, completion: nil)
                     
             })
@@ -729,9 +734,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else { // selected from now view button
             if player.playbackState == MPMusicPlaybackState.Playing {
                 startTimer()
-                startTime =  TimeNumber(time: Float(player.currentPlaybackTime))
+                startTime.setTime(Float(player.currentPlaybackTime))
                 updateAll(startTime.toDecimalNumer())
-
             }
             else if player.playbackState == MPMusicPlaybackState.Paused {
                 stopTimer()
@@ -741,8 +745,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.speed = 1  //restore to original speed
             }
         }
-
-        
     }
     
     func setUpProgressContainer(){
@@ -1241,8 +1243,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chordBase.hidden = false
         }
     
-        startTime = TimeNumber(time: Float(player.currentPlaybackTime))
-        updateAll(startTime.toDecimalNumer())
+        //startTime = TimeNumber(time: Float(player.currentPlaybackTime))
+        updateAll(Float(player.currentPlaybackTime))
         unblurImageIfAllIsHidden()
     }
     
@@ -1270,13 +1272,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func unblurImageIfAllIsHidden() {
         if !isChordShown && !isTabsShown && !isLyricsShown {
-            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            //let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            var image:UIImage!
+            if let artwork = player.nowPlayingItem!.artwork {
+                image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            } else {
+                //TODO: add a placeholder album cover
+                image = UIImage(named: "liwengbg")
+            }
+
             self.backgroundImageView.center.x = self.view.center.x
             self.backgroundImageView.image = image
             artWorkUnblurred = true
         } else if artWorkUnblurred { //if only we have unblurred it before, we blur the image
             
-            let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            var image:UIImage!
+            if let artwork = player.nowPlayingItem!.artwork {
+                image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            } else {
+                //TODO: add a placeholder album cover
+                image = UIImage(named: "liwengbg")
+            }
             let blurredImage = image!.applyLightEffect()!
             self.backgroundImageView.center.x = self.view.center.x
             self.backgroundImageView.image = blurredImage
@@ -1442,8 +1458,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if player.playbackState == MPMusicPlaybackState.Playing {
             player.currentPlaybackRate = 1
         }
-        
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+        if(!isRemoveProgressBlock){
+           NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+        }
     }
     
     func calculateXPoints(){
@@ -1567,9 +1584,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func refreshProgressBlock(){
-
-        if(KGLOBAL_progressBlock != nil){
-
             let newProgressPosition = (CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier) / KGLOBAL_progressBlock.frame.size.width
             
             let newOriginX = self.view.center.x - CGFloat(startTime.toDecimalNumer()) * progressWidthMultiplier
@@ -1579,12 +1593,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KGLOBAL_progressBlock.setProgress(newProgressPosition)
             }
             KGLOBAL_progressBlock.frame.origin.x = newOriginX
-        }
+           // print("\(startTime) = \(startTime.toDecimalNumer())")
     }
     
     func refreshTimeLabel(){
         // update current time label
-        currentTimeLabel.text = startTime.toDisplayString()
+        self.currentTimeLabel.text = startTime.toDisplayString()
     }
     
     func refreshLyrics() {
@@ -1631,7 +1645,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func updateAll(time: Float) {
  
-        startTime = TimeNumber(time: time)
+        startTime.setTime(time)
         
         //remove all existing labels
         for labels in activelabels{
@@ -1744,30 +1758,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //start the timer when it is not valid
         //In case of receiving song changed and playback state
         //notifications, notifications are triggered twice somehow
-        if timer == nil {
-            timer = NSTimer()
-            timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        
+        if KGLOBAL_timer == nil {
+            KGLOBAL_timer = NSTimer()
+            KGLOBAL_timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
             //NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
         }
     }
     
     func stopTimer(){
-        if(timer != nil){
-            timer.invalidate()
-            timer = nil
+        if(KGLOBAL_timer != nil){
+            KGLOBAL_timer!.invalidate()
+            KGLOBAL_timer = nil
         }
     }
     
     func update(){
+        if(viewDidFullyDisappear){
+            return
+        }
         if(!isPanning){
-            
-            //TODO: sometimes when songviewcontroller takes time to load, player.currentPlaybackTime does not sync with the startTime, causing delays in showing the chords and lyrics. This has some issues for now, resolve later.
-            //            if ( player.nowPlayingItem == nil){
-            //                startTime.addTime(Int(100 / stepPerSecond))
-            //            }else{
-            //                startTime = TimeNumber(time: Float(player.currentPlaybackTime))
-            //            }
             startTime.addTime(Int(100 / stepPerSecond))
         }
         refreshChordLabel()
@@ -1820,18 +1831,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     private func dealWithLabelofChordName(chordLabel:UILabel){
-        
+
         if isChordShown && isTabsShown {
             //make the text glow
             chordLabel.textColor = UIColor.whiteColor()
             chordLabel.font = UIFont.systemFontOfSize(17)
-            
-            //should we add shadows? white is enough i think
-//            chordLabel.layer.shadowColor = UIColor.whiteColor().CGColor
-//            chordLabel.layer.shadowRadius = 4.0
-//            chordLabel.layer.shadowOpacity = 1.0
-//            chordLabel.layer.shadowOffset = CGSizeZero
-//            chordLabel.layer.masksToBounds = false
+
         } else if isChordShown && !isTabsShown {
             //make the text glow
             chordLabel.textColor = UIColor.silverGray()

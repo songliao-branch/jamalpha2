@@ -167,7 +167,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let backgroundImage: UIImageView = UIImageView()
         backgroundImage.frame = CGRectMake(0, 0, self.trueWidth, self.trueWidth)
         let size: CGSize = CGSizeMake(self.trueWidth, self.trueWidth)
-        backgroundImage.image = theSong.artwork!.imageWithSize(size)
+        var image:UIImage!
+        if let artwork = theSong!.artwork {
+            image = artwork.imageWithSize(size)
+        } else {
+            //TODO: add a placeholder album cover
+            image = UIImage(named: "liwengbg")
+        }
+        backgroundImage.image = image
         
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage

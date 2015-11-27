@@ -72,6 +72,7 @@ class CoreDataManager: NSObject {
         }
         
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(titleToBeUsed)') AND (artist == '\(artistToBeUsed)') AND (album == '\(albumToBeUsed)')")
+        //let predicate: NSPredicate = NSPredicate(format: "(title == '\(titleToBeUsed)')")
         
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
@@ -94,9 +95,13 @@ class CoreDataManager: NSObject {
             }
             if let artist = item.artist {
                 song.artist = artist
+            }else{
+                song.artist = ""
             }
             if let album = item.albumTitle {
                 song.album = album
+            }else{
+                song.artist = ""
             }
             
             song.playbackDuration = Float(item.playbackDuration)
