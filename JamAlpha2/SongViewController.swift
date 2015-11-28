@@ -166,7 +166,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //var navigationOutActionViewHeight: CGFloat = 44 * 4 + 4 //4 rows of height + 4 lines
     var actionDismissLayerButton: UIButton!
     
-    var textColor:UIColor!
+    var chordsTextColor: UIColor!
 
     //background images
     var currentImage:UIImage?
@@ -278,7 +278,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         backgroundImageView.center.x = self.view.center.x
         backgroundImageView.image = blurredImage
-        textColor = blurredImage.averageColor()
+        chordsTextColor = blurredImage.averageColor()
         
         self.view.addSubview(backgroundImageView)
     }
@@ -711,10 +711,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
 
-    func resumeSong(){
-        
-        //musicViewController!.nowView!.stop()
-        // if we are pressing the now button this is false, or coming from background
+    func resumeSong() {
         if selectedFromTable {
             player.play()
             startTimer()
@@ -1349,7 +1346,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // MARK: functions used in NavigationOutView
     func browseTabs(button: UIButton) {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
@@ -1368,7 +1365,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
+        
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
         self.player.pause()
@@ -1382,7 +1380,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func browseLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
@@ -1396,7 +1394,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func goToLyricsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
@@ -1832,7 +1830,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         if isChordShown && isTabsShown {
             //make the text glow
-            chordLabel.textColor = self.textColor
+            chordLabel.textColor = self.chordsTextColor
             chordLabel.font = UIFont.systemFontOfSize(17)
 
         } else if isChordShown && !isTabsShown {

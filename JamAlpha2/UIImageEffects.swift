@@ -221,7 +221,7 @@ public extension UIImage {
             return UIColor.whiteColor()
         }
         else {
-            return UIColor.blackColor()
+            return UIColor.silverGray()
         }
     }
 }
