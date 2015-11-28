@@ -1,5 +1,8 @@
 PODS:
   - Alamofire (3.1.2)
+  - AWSCore (2.3.0)
+  - AWSS3 (2.3.0):
+    - AWSCore (= 2.3.0)
   - Bolts (1.5.0):
     - Bolts/AppLinks (= 1.5.0)
     - Bolts/Tasks (= 1.5.0)
@@ -24,6 +27,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire (~> 3.0)
+  - AWSS3
   - CryptoSwift
   - FBSDKCoreKit
   - FBSDKLoginKit
@@ -42,6 +46,8 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: 7c16ca65f3c7e681fd925fd7f2dec7747ff96855
+  AWSCore: dc200c885c9799f9f5d3ab9ec38a9c4b44d680f9
+  AWSS3: 0185482a8136da9c7542a767567ee18106b38bca
   Bolts: 722ab9a4f8b50fc4ed1b9998a5a7a2b3f16d80b4
   CryptoSwift: c11640d3d66107efc8333e4131a5173f072b1d61
   FBSDKCoreKit: 66a935d17b6e00b6b64e604f2eb9b72c9ab7deb8

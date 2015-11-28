@@ -11,3 +11,5 @@ pod 'FBSDKCoreKit'
 pod 'FBSDKLoginKit'
 
 pod 'RSKImageCropper'
+
+pod 'AWSS3'
