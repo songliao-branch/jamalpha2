@@ -220,6 +220,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpCountdownView()
         updateMusicData(firstLoadPlayingItem)
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
+           loadDisplayMode()
     }
     
     deinit{
@@ -243,7 +244,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
-            loadDisplayMode()
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -252,7 +252,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         if(!isRemoveProgressBlock){
-            // updateMusicData(player.nowPlayingItem!)
             isRemoveProgressBlock = true
         }else{
             self.registerMediaPlayerNotification()
@@ -264,7 +263,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpBackgroundImage(){
         //create an UIImageView
-        
+          self.view.backgroundColor = UIColor.darkGrayColor()
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
         print(firstLoadPlayingItem.title)
@@ -665,17 +664,38 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
                     self.songNameLabel.textAlignment = NSTextAlignment.Center
                     self.artistNameLabel.text = nowPlayingItem!.artist
-        
+                    
+                    var image:UIImage!
                     if let artwork = nowPlayingItem!.artwork {
-                        let image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-                        let blurredImage = image!.applyLightEffect()!
+                        var blurredImage:UIImage!
+                        if(!self.artWorkUnblurred){
+                              image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+                            blurredImage = image!.applyLightEffect()!
+                        }else{
+                              image = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
+                                blurredImage = image!
+                        }
+                      
                         self.textColor = blurredImage.averageColor()
                         
                         self.backgroundImageView.center.x = self.view.center.x
                         self.backgroundImageView.image = blurredImage
                     } else {
+                            //TODO: add a placeholder album cover
+                            image = UIImage(named: "liwengbg")
+                            var blurredImage:UIImage!
+                            if(!self.artWorkUnblurred){
+                                blurredImage = image!.applyLightEffect()!
+                            }else{
+                                blurredImage = image!
+                            }
+
+                            self.textColor = blurredImage.averageColor()
                         
-                        //TODO: add a placeholder cover
+                            self.backgroundImageView.center.x = self.view.center.x
+                            self.backgroundImageView.image = blurredImage
+
+
                     }
 
        
@@ -1157,18 +1177,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func toggleShuffle(button: UIButton){
         if player.repeatMode == .All && player.shuffleMode == .Off { //is repeat all
+            button.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
             player.repeatMode = .One
             player.shuffleMode = .Off
-            button.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
         } else if player.repeatMode == .One && player.shuffleMode == .Off { //is repeat one
+            button.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Songs
-            button.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             
         } else if player.shuffleMode == .Songs && player.repeatMode == .All { // is shuffle songs
+            button.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Off
-            button.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
         }
     }
     
@@ -1275,15 +1295,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
             var image:UIImage!
             if let artwork = player.nowPlayingItem!.artwork {
-                image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+                image = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
             } else {
                 //TODO: add a placeholder album cover
                 image = UIImage(named: "liwengbg")
             }
-
+            
             self.backgroundImageView.center.x = self.view.center.x
             self.backgroundImageView.image = image
-            artWorkUnblurred = true
+            
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                self.backgroundImageView.transform = CGAffineTransformMakeScale(0.4,0.4)
+                self.backgroundImageView.layer.shadowOpacity = 0.9
+                self.backgroundImageView.layer.shadowOffset = CGSize(width: 1, height: 1)
+                self.backgroundImageView.layer.shadowColor = UIColor.blackColor().CGColor
+                //self.backgroundImageView.layer.shadowPath = UIBezierPath(rect: self.backgroundImageView.bounds).CGPath
+                }, completion: {
+                    finished in
+                    self.artWorkUnblurred = true
+            })
         } else if artWorkUnblurred { //if only we have unblurred it before, we blur the image
             
             var image:UIImage!
@@ -1297,7 +1327,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.backgroundImageView.center.x = self.view.center.x
             self.backgroundImageView.image = blurredImage
             
-            artWorkUnblurred = false
+            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
+                self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
+                }, completion: {
+                    finished in
+                    self.artWorkUnblurred = false
+            })
+            
         }
     }
 
@@ -1834,7 +1870,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         if isChordShown && isTabsShown {
             //make the text glow
-            chordLabel.textColor = UIColor.whiteColor()
+            chordLabel.textColor = self.textColor
             chordLabel.font = UIFont.systemFontOfSize(17)
 
         } else if isChordShown && !isTabsShown {
