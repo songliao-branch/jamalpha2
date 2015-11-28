@@ -190,6 +190,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var firstLoadPlayingItem: MPMediaItem!
     var isRemoveProgressBlock = true
+    var isBlurred:Bool = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -416,11 +417,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         previousButton.setImage(UIImage(named: "previousplay"), forState: .Normal)
         previousButton.addTarget(self, action: "previousPressed:", forControlEvents: .TouchUpInside)
         
-        previousButton.center = CGPoint(x: marginToCenterAlbumImage/2, y: self.view.center.y)
+        previousButton.center = CGPoint(x: marginToCenterAlbumImage/2, y: self.chordBase.frame.origin.y + self.previousButton.frame.size.height/2)
         nextButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
         nextButton.setImage(UIImage(named: "nextplay"), forState: .Normal)
         nextButton.addTarget(self, action: "nextPressed:", forControlEvents: .TouchUpInside)
-        nextButton.center = CGPoint(x: self.view.frame.width - marginToCenterAlbumImage/2, y: self.view.center.y)
+        nextButton.center = CGPoint(x: self.view.frame.width - marginToCenterAlbumImage/2, y: self.chordBase.frame.origin.y + self.nextButton.frame.size.height/2)
         self.view.addSubview(previousButton)
         self.view.addSubview(nextButton)
     }
@@ -664,8 +665,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
                     self.songNameLabel.textAlignment = NSTextAlignment.Center
                     self.artistNameLabel.text = nowPlayingItem!.artist
-                    
-                    applyEffectsToBackgroundImage()
+                    isBlurred = !isBlurred
+                    applyEffectsToBackgroundImage(isNeedanimation: false)
        
                     self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
                 }
@@ -1228,7 +1229,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         updateAll(Float(player.currentPlaybackTime))
-        applyEffectsToBackgroundImage()
+        applyEffectsToBackgroundImage(isNeedanimation: true)
     }
     
     func lyricsSwitchChanged(uiswitch: UISwitch) {
@@ -1250,12 +1251,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isLyricsShownKey)
         }
         // if the chords base and lyrics base are all hiden, do not blur the image
-        applyEffectsToBackgroundImage()
+        applyEffectsToBackgroundImage(isNeedanimation: true)
     }
     
-    func applyEffectsToBackgroundImage() {
+
+    func applyEffectsToBackgroundImage(isNeedanimation isNeedanimation:Bool) {
         //we blur the image if one of the chord, tabs or lyrics is shown
-        if isChordShown || isTabsShown || isLyricsShown {
+        if (isChordShown || isTabsShown || isLyricsShown) && !isBlurred {
             var image:UIImage!
             if let artwork = player.nowPlayingItem!.artwork {
                 image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
@@ -1265,18 +1267,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             let blurredImage = image!.applyLightEffect()!
             self.backgroundImageView.image = blurredImage
+            self.isBlurred = true
             
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
-
-                self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
-                }, completion: {
-                    finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
-                        self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
-                        self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
-                        }, completion: nil)
-            })
-            
-        } else { // center the image
+            if(isNeedanimation){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
+                    
+                    self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
+                            self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                            }, completion: nil)
+                })
+            }
+        } else if (!isChordShown && !isTabsShown && !isLyricsShown && isBlurred) { // center the image
             
             var image:UIImage!
             if let artwork = player.nowPlayingItem!.artwork {
@@ -1286,21 +1290,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 image = UIImage(named: "liwengbg")
             }
             self.backgroundImageView.image = image
+            self.isBlurred = false
             
-            
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
-                
-                self.backgroundImageView.transform = CGAffineTransformMakeScale(self.backgroundScaleFactor, self.backgroundScaleFactor)
-                self.backgroundImageView.layer.shadowOpacity = 0.9
-                self.backgroundImageView.layer.shadowOffset = CGSize(width: 1, height: 1)
-                self.backgroundImageView.layer.shadowColor = UIColor.blackColor().CGColor
-                
-                }, completion: {
-                    finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
-                        self.previousButton.center.y = self.view.center.y
-                        self.nextButton.center.y = self.view.center.y
-                        }, completion: nil)
-            })
+            if(isNeedanimation){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                    
+                    self.backgroundImageView.transform = CGAffineTransformMakeScale(self.backgroundScaleFactor, self.backgroundScaleFactor)
+                    self.backgroundImageView.layer.shadowOpacity = 0.9
+                    self.backgroundImageView.layer.shadowOffset = CGSize(width: 1, height: 1)
+                    self.backgroundImageView.layer.shadowColor = UIColor.blackColor().CGColor
+                    
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.center.y = self.view.center.y
+                            self.nextButton.center.y = self.view.center.y
+                            }, completion: nil)
+                })
+            }
         }
     }
 
