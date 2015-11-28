@@ -19,6 +19,7 @@ PODS:
   - FBSDKLoginKit (4.8.0):
     - FBSDKCoreKit
   - HanekeSwift (0.10.0)
+  - RSKImageCropper (1.4.1)
   - SwiftyJSON (2.3.1)
 
 DEPENDENCIES:
@@ -27,6 +28,7 @@ DEPENDENCIES:
   - FBSDKCoreKit
   - FBSDKLoginKit
   - HanekeSwift
+  - RSKImageCropper
   - SwiftyJSON (from `https://github.com/SwiftyJSON/SwiftyJSON.git`)
 
 EXTERNAL SOURCES:
@@ -45,6 +47,7 @@ SPEC CHECKSUMS:
   FBSDKCoreKit: 66a935d17b6e00b6b64e604f2eb9b72c9ab7deb8
   FBSDKLoginKit: d893fcbb98d854496925e9ff73c67b896982d3c4
   HanekeSwift: d6f5bdf9dbdbbc09d59623b2c1d533e46463dd4d
+  RSKImageCropper: 98ae426eb4eb11b733ff87f8e2542a480f4fa8e6
   SwiftyJSON: 592b53bee5ef3dd9b3bebc6b9cb7ee35426ae8c3
 
 COCOAPODS: 0.39.0

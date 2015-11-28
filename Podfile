@@ -9,3 +9,5 @@ pod 'HanekeSwift'
 pod 'CryptoSwift'
 pod 'FBSDKCoreKit'
 pod 'FBSDKLoginKit'
+
+pod 'RSKImageCropper'
