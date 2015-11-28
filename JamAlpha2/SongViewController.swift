@@ -1265,13 +1265,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             let blurredImage = image!.applyLightEffect()!
             self.backgroundImageView.image = blurredImage
-            self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
-            self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
 
                 self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
-                }, completion: nil)
+                }, completion: {
+                    finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                        self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
+                        self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                        }, completion: nil)
+            })
             
         } else { // center the image
             
@@ -1283,8 +1286,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 image = UIImage(named: "liwengbg")
             }
             self.backgroundImageView.image = image
-            self.previousButton.center.y = self.view.center.y
-            self.nextButton.center.y = self.view.center.y
+            
             
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
                 
@@ -1293,7 +1295,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.backgroundImageView.layer.shadowOffset = CGSize(width: 1, height: 1)
                 self.backgroundImageView.layer.shadowColor = UIColor.blackColor().CGColor
                 
-                }, completion: nil)
+                }, completion: {
+                    finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                        self.previousButton.center.y = self.view.center.y
+                        self.nextButton.center.y = self.view.center.y
+                        }, completion: nil)
+            })
         }
     }
 
