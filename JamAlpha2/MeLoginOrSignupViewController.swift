@@ -12,6 +12,7 @@ import FBSDKLoginKit
 import Alamofire
 import SwiftyJSON
 import CryptoSwift
+import RSKImageCropper
 
 class MeLoginOrSignupViewController: UIViewController {
 
@@ -350,6 +351,60 @@ class MeLoginOrSignupViewController: UIViewController {
             })
         }
     }
+    
+
+    
+    
 }
+
+// crop the user profile image
+extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate, RSKImageCropViewControllerDataSource {
+  
+    func cropImage(sender: UIImage) {
+        let imageCropVC: RSKImageCropViewController = RSKImageCropViewController.init(image: sender)
+        imageCropVC.delegate = self
+        imageCropVC.dataSource = self
+        self.navigationController?.pushViewController(imageCropVC, animated: true)
+    }
+    
+    func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
+        
+        //sending the cropped image to s3 in here
+        
+        
+        self.navigationController?.popViewControllerAnimated(true)
+    }
+    
+    func imageCropViewControllerDidCancelCrop(controller: RSKImageCropViewController) {
+        self.navigationController?.popViewControllerAnimated(true)
+    }
+    
+    func imageCropViewControllerCustomMaskRect(controller: RSKImageCropViewController) -> CGRect {
+        let maskSize: CGSize = CGSizeMake(self.viewWidth, self.viewWidth)
+        let maskRect = CGRectMake(self.viewWidth / 2, self.viewHeight / 2, maskSize.width, maskSize.height)
+        return maskRect
+    }
+    
+    func imageCropViewControllerCustomMaskPath(controller: RSKImageCropViewController) -> UIBezierPath {
+        let rect: CGRect = controller.maskRect
+        let point1: CGPoint = CGPointMake(CGRectGetMinX(rect), CGRectGetMaxY(rect))
+        let point2: CGPoint = CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect))
+        let point3: CGPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect))
+        
+        let triangle: UIBezierPath = UIBezierPath()
+        triangle.moveToPoint(point1)
+        triangle.addLineToPoint(point2)
+        triangle.addLineToPoint(point3)
+        triangle.closePath()
+        
+        return triangle
+    }
+    
+    func imageCropViewControllerCustomMovementRect(controller: RSKImageCropViewController) -> CGRect {
+        return controller.maskRect
+    }
+    
+}
+
 
 

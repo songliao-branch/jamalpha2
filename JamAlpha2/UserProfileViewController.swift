@@ -18,7 +18,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-
+        
         showSignUpLoginScreen()
         userTable.reloadData()
     }
@@ -94,3 +94,4 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }
+
