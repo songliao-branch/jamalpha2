@@ -40,6 +40,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var firstloadSongTitle: String!
     
     var backgroundImageView: UIImageView!
+    var backgroundScaleFactor: CGFloat = 0.4
     
     var buttonDimension: CGFloat = 50
     var pulldownButton:UIButton!
@@ -158,7 +159,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let isChordShownKey = "isChordShown"
     let isTabsShownKey = "isTabsShown"
     let isLyricsShownKey = "isLyricsShown"
-    var artWorkUnblurred = false // a variable kept to restore blur image from unblurred state (when changed from everything is hidden to show chords or lyrics), to avoid unnecessary blurring
     var countdownOn = false
     var countdownOnKey = "countdownOn"
     
@@ -166,7 +166,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //var navigationOutActionViewHeight: CGFloat = 44 * 4 + 4 //4 rows of height + 4 lines
     var actionDismissLayerButton: UIButton!
     
-    var textColor:UIColor!
+    var chordsTextColor: UIColor!
 
     //background images
     var currentImage:UIImage?
@@ -190,6 +190,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var firstLoadPlayingItem: MPMediaItem!
     var isRemoveProgressBlock = true
+    var isBlurred:Bool = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -220,6 +221,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpCountdownView()
         updateMusicData(firstLoadPlayingItem)
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
+        loadDisplayMode()
     }
     
     deinit{
@@ -243,7 +245,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
-            loadDisplayMode()
             resumeSong()
             viewDidFullyDisappear = false
         }
@@ -252,7 +253,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         if(!isRemoveProgressBlock){
-            // updateMusicData(player.nowPlayingItem!)
             isRemoveProgressBlock = true
         }else{
             self.registerMediaPlayerNotification()
@@ -264,7 +264,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setUpBackgroundImage(){
         //create an UIImageView
-        
+        self.view.backgroundColor = UIColor.grayColor()
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         //get the image from MPMediaItem
         print(firstLoadPlayingItem.title)
@@ -279,7 +279,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         backgroundImageView.center.x = self.view.center.x
         backgroundImageView.image = blurredImage
-        textColor = blurredImage.averageColor()
+        chordsTextColor = blurredImage.averageColor()
         
         self.view.addSubview(backgroundImageView)
     }
@@ -412,16 +412,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     
     func setUpControlButtons(){
-        previousButton = UIButton(frame: CGRect(x: 0, y: chordBase.frame.origin.y, width: buttonDimension, height: buttonDimension))
-        previousButton.setImage(UIImage(named: "previous"), forState: .Normal)
+        let marginToCenterAlbumImage = (self.view.frame.width - backgroundScaleFactor * self.view.frame.height)/2
+        previousButton = UIButton(frame: CGRect(x: 5, y: 0, width: buttonDimension, height: buttonDimension))
+        previousButton.setImage(UIImage(named: "previousplay"), forState: .Normal)
         previousButton.addTarget(self, action: "previousPressed:", forControlEvents: .TouchUpInside)
-        previousButton.contentHorizontalAlignment = .Left
         
-        nextButton = UIButton(frame: CGRect(x: 0, y: chordBase.frame.origin.y, width: buttonDimension, height: buttonDimension))
-        nextButton.setImage(UIImage(named: "next"), forState: .Normal)
+        previousButton.center = CGPoint(x: marginToCenterAlbumImage/2, y: self.chordBase.frame.origin.y + self.previousButton.frame.size.height/2)
+        nextButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
+        nextButton.setImage(UIImage(named: "nextplay"), forState: .Normal)
         nextButton.addTarget(self, action: "nextPressed:", forControlEvents: .TouchUpInside)
-        nextButton.frame.origin.x = self.view.frame.width - nextButton.frame.width
-        nextButton.contentHorizontalAlignment = .Right
+        nextButton.center = CGPoint(x: self.view.frame.width - marginToCenterAlbumImage/2, y: self.chordBase.frame.origin.y + self.nextButton.frame.size.height/2)
         self.view.addSubview(previousButton)
         self.view.addSubview(nextButton)
     }
@@ -665,25 +665,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
                     self.songNameLabel.textAlignment = NSTextAlignment.Center
                     self.artistNameLabel.text = nowPlayingItem!.artist
-        
-                    if let artwork = nowPlayingItem!.artwork {
-                        let image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-                        let blurredImage = image!.applyLightEffect()!
-                        self.textColor = blurredImage.averageColor()
-                        
-                        self.backgroundImageView.center.x = self.view.center.x
-                        self.backgroundImageView.image = blurredImage
-                    } else {
-                        
-                        //TODO: add a placeholder cover
-                    }
-
+                    isBlurred = !isBlurred
+                    applyEffectsToBackgroundImage(isNeedanimation: false)
        
                     self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
                 }
             }
             self.speed = 1
-            //self.nowPlayingItemSpeed = 1
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.stopTimer()
                 self.startTimer()
@@ -724,10 +712,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
 
-    func resumeSong(){
-        
-        //musicViewController!.nowView!.stop()
-        // if we are pressing the now button this is false, or coming from background
+    func resumeSong() {
         if selectedFromTable {
             player.play()
             startTimer()
@@ -1157,18 +1142,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func toggleShuffle(button: UIButton){
         if player.repeatMode == .All && player.shuffleMode == .Off { //is repeat all
+            button.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
             player.repeatMode = .One
             player.shuffleMode = .Off
-            button.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
         } else if player.repeatMode == .One && player.shuffleMode == .Off { //is repeat one
+            button.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Songs
-            button.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             
         } else if player.shuffleMode == .Songs && player.repeatMode == .All { // is shuffle songs
+            button.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Off
-            button.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
         }
     }
     
@@ -1242,10 +1227,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             chordBase.hidden = false
         }
-    
-        //startTime = TimeNumber(time: Float(player.currentPlaybackTime))
+        
         updateAll(Float(player.currentPlaybackTime))
-        unblurImageIfAllIsHidden()
+        applyEffectsToBackgroundImage(isNeedanimation: true)
     }
     
     func lyricsSwitchChanged(uiswitch: UISwitch) {
@@ -1267,37 +1251,62 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isLyricsShownKey)
         }
         // if the chords base and lyrics base are all hiden, do not blur the image
-        unblurImageIfAllIsHidden()
+        applyEffectsToBackgroundImage(isNeedanimation: true)
     }
     
-    func unblurImageIfAllIsHidden() {
-        if !isChordShown && !isTabsShown && !isLyricsShown {
-            //let image = player.nowPlayingItem!.artwork!.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-            var image:UIImage!
-            if let artwork = player.nowPlayingItem!.artwork {
-                image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-            } else {
-                //TODO: add a placeholder album cover
-                image = UIImage(named: "liwengbg")
-            }
 
-            self.backgroundImageView.center.x = self.view.center.x
-            self.backgroundImageView.image = image
-            artWorkUnblurred = true
-        } else if artWorkUnblurred { //if only we have unblurred it before, we blur the image
-            
+    func applyEffectsToBackgroundImage(isNeedanimation isNeedanimation:Bool) {
+        //we blur the image if one of the chord, tabs or lyrics is shown
+        if (isChordShown || isTabsShown || isLyricsShown) && !isBlurred {
             var image:UIImage!
             if let artwork = player.nowPlayingItem!.artwork {
                 image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
             } else {
-                //TODO: add a placeholder album cover
+                //TODO: change placeholder image
                 image = UIImage(named: "liwengbg")
             }
             let blurredImage = image!.applyLightEffect()!
-            self.backgroundImageView.center.x = self.view.center.x
             self.backgroundImageView.image = blurredImage
+            self.isBlurred = true
             
-            artWorkUnblurred = false
+            if(isNeedanimation){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
+                    
+                    self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
+                            self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                            }, completion: nil)
+                })
+            }
+        } else if (!isChordShown && !isTabsShown && !isLyricsShown && isBlurred) { // center the image
+            
+            var image:UIImage!
+            if let artwork = player.nowPlayingItem!.artwork {
+                image = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
+            } else {
+                //TODO: change placeholder image
+                image = UIImage(named: "liwengbg")
+            }
+            self.backgroundImageView.image = image
+            self.isBlurred = false
+            
+            if(isNeedanimation){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                    
+                    self.backgroundImageView.transform = CGAffineTransformMakeScale(self.backgroundScaleFactor, self.backgroundScaleFactor)
+                    self.backgroundImageView.layer.shadowOpacity = 0.9
+                    self.backgroundImageView.layer.shadowOffset = CGSize(width: 1, height: 1)
+                    self.backgroundImageView.layer.shadowColor = UIColor.blackColor().CGColor
+                    
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.center.y = self.view.center.y
+                            self.nextButton.center.y = self.view.center.y
+                            }, completion: nil)
+                })
+            }
         }
     }
 
@@ -1308,7 +1317,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             NSUserDefaults.standardUserDefaults().setInteger(2, forKey: countdownOnKey)
         }
-        
     }
     
     func setUpCountdownView() {
@@ -1351,7 +1359,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // MARK: functions used in NavigationOutView
     func browseTabs(button: UIButton) {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
@@ -1370,7 +1378,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
+        
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
         self.player.pause()
@@ -1384,7 +1393,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func browseLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
@@ -1398,7 +1407,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func goToLyricsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = true
+        self.selectedFromTable = false
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
@@ -1458,7 +1467,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if player.playbackState == MPMusicPlaybackState.Playing {
             player.currentPlaybackRate = 1
         }
-        if(!isRemoveProgressBlock){
+        if(isRemoveProgressBlock){
            NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
         }
     }
@@ -1834,7 +1843,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         if isChordShown && isTabsShown {
             //make the text glow
-            chordLabel.textColor = UIColor.whiteColor()
+            chordLabel.textColor = self.chordsTextColor
             chordLabel.font = UIFont.systemFontOfSize(17)
 
         } else if isChordShown && !isTabsShown {
