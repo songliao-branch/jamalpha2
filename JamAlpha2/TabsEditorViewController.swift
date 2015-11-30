@@ -12,6 +12,7 @@ import AVFoundation
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate {
     
+    var songViewController: SongViewController!
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -1528,7 +1529,20 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
-            self.dismissViewControllerAnimated(false, completion: nil)
+            
+            var chords = [Chord]() //([Chord], String, Int)
+            var tuning = ""
+            var capo = 0
+            
+            (chords, tuning, capo) = CoreDataManager.getTabs(theSong)
+            self.songViewController.chords = chords
+            self.songViewController.updateTuning(tuning)
+            self.songViewController.updateCapo(capo)
+            
+            self.dismissViewControllerAnimated(false, completion: {
+                completed in
+                self.songViewController.updateAll(Float(self.songViewController.player.currentPlaybackTime))
+            })
         }
         self.currentSelectedSpecificTab = nil
     }

@@ -1155,10 +1155,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             player.repeatMode = MPMusicRepeatMode.All
             player.shuffleMode = MPMusicShuffleMode.Off
         }
+        
+        dismissAction()
     }
     
     // MARK: guitar buttons
     func dismissAction() {
+        self.actionDismissLayerButton.backgroundColor = UIColor.clearColor()
+        self.actionDismissLayerButton.hidden = true
         UIView.animateWithDuration(0.3, animations: {
             
             if self.guitarActionView.frame.origin.y < self.view.frame.height - 10 {
@@ -1169,14 +1173,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 print("dismiss navigation action")
                 self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.width, self.actionViewHeight)
             }
-
-            self.actionDismissLayerButton.backgroundColor = UIColor.clearColor()
-            
-            }, completion: {
-                completed in
-                self.actionDismissLayerButton.hidden = true
         })
-        
     }
     
     func showGuitarActions(){
@@ -1378,10 +1375,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
+        self.selectedFromTable = true //make sure songviewcontroller resume playing after coming back from TabsEditor
         
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
+        tabsEditorVC.songViewController = self
         self.player.pause()
         self.dismissAction()
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
@@ -1407,7 +1405,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func goToLyricsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
+        self.selectedFromTable = true
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
