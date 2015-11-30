@@ -1,0 +1,113 @@
+//
+//  AWSS3TransferManager.swift
+//  JamAlpha2
+//
+//  Created by Jun Zhou on 11/30/15.
+//  Copyright © 2015 Song Liao. All rights reserved.
+//
+
+import Foundation
+import AWSS3
+
+class AWSS3Manager: NSObject {
+    
+    var uploadRequests: Array<AWSS3TransferManagerUploadRequest?> = Array<AWSS3TransferManagerUploadRequest?>()
+    var uploadFileURLs: Array<NSURL?> = Array<NSURL?>()
+    
+    func addRequestToArray(sender: UIImage, name: String) {
+        
+        let fileName = NSProcessInfo.processInfo().globallyUniqueString.stringByAppendingString(".png")
+        let filePath = ((NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload") as NSString).stringByAppendingPathComponent(fileName)
+        let imageData = UIImagePNGRepresentation(sender)
+        imageData!.writeToFile(filePath, atomically: true)
+        
+        let uploadRequest = AWSS3TransferManagerUploadRequest()
+        uploadRequest.body = NSURL(fileURLWithPath: filePath)
+        uploadRequest.key = fileName
+        uploadRequest.bucket = S3BucketName
+        
+        self.uploadRequests.append(uploadRequest)
+        self.uploadFileURLs.append(nil)
+    }
+    
+    
+    func upload(uploadRequest: AWSS3TransferManagerUploadRequest) {
+
+        let transferManager = AWSS3TransferManager.defaultS3TransferManager()
+        
+        transferManager.upload(uploadRequest).continueWithBlock { (task) -> AnyObject! in
+            if let error = task.error {
+                if error.domain == AWSS3TransferManagerErrorDomain as String {
+                    if let errorCode = AWSS3TransferManagerErrorType(rawValue: error.code) {
+                        switch (errorCode) {
+                        case .Cancelled, .Paused:
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                // reload data
+                            })
+                            break;
+                            
+                        default:
+                            print("upload() failed: [\(error)]")
+                            break;
+                        }
+                    } else {
+                        print("upload() failed: [\(error)]")
+                    }
+                } else {
+                    print("upload() failed: [\(error)]")
+                }
+            }
+            
+            if let exception = task.exception {
+                print("upload() failed: [\(exception)]")
+            }
+            
+            if task.result != nil {
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    if let index = self.indexOfUploadRequest(self.uploadRequests, uploadRequest: uploadRequest) {
+                        self.uploadRequests[index] = nil
+                        self.uploadFileURLs[index] = uploadRequest.body
+                    }
+                })
+            }
+            return nil
+        }
+    }
+    
+    func cancelAllUploads() {
+        for (index, uploadRequest) in self.uploadRequests.enumerate() {
+            if let uploadRequest = uploadRequest {
+                uploadRequest.cancel().continueWithBlock({ (task) -> AnyObject! in
+                    if let error = task.error {
+                        print("cancel() failed: [\(error)]")
+                    }
+                    if let exception = task.exception {
+                        print("cancel() failed: [\(exception)]")
+                    }
+                    return nil
+                })
+            }
+        }
+    }
+    
+    func indexOfUploadRequest(array: Array<AWSS3TransferManagerUploadRequest?>, uploadRequest: AWSS3TransferManagerUploadRequest?) -> Int? {
+        for (index, object) in array.enumerate() {
+            if object == uploadRequest {
+                return index
+            }
+        }
+        return nil
+    }
+    
+    func randomStringWithLength (len : Int) -> NSString {
+        let letters : NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        let randomString : NSMutableString = NSMutableString(capacity: len)
+        for (var i=0; i < len; i++){
+            let length = UInt32 (letters.length)
+            let rand = arc4random_uniform(length)
+            randomString.appendFormat("%C", letters.characterAtIndex(Int(rand)))
+        }
+        return randomString
+    }
+
+}

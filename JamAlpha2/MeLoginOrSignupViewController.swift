@@ -13,9 +13,13 @@ import Alamofire
 import SwiftyJSON
 import CryptoSwift
 import RSKImageCropper
+import AWSS3
+import AWSCore
 
 class MeLoginOrSignupViewController: UIViewController {
 
+    
+    
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     var statusAndNavigationBarHeight: CGFloat = CGFloat()
@@ -335,7 +339,9 @@ class MeLoginOrSignupViewController: UIViewController {
                     let email = result.valueForKey("email") as! String
                     let fullName  = result.valueForKey("name") as! String
                     let userId = result.valueForKey("id") as! String
-                    let avatarUrl = "http://graph.facebook.com/\(userId)/picture?type=large"
+                    let avatarUrl = "https://graph.facebook.com/\(userId)/picture?height=250&width=250"
+                    let smallUrl = "https://graph.facebook.com/\(userId)/picture?height=50&width=50"
+                    
                     
                     let parameters = [
                         "attempt_login":"facebook",

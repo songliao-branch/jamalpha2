@@ -8,12 +8,41 @@
 
 import UIKit
 import Haneke
+import AWSS3
+import RSKImageCropper
 
 class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var userTable: UITableView!
     
+    var viewWidth: CGFloat = CGFloat()
+    var viewHeight: CGFloat = CGFloat()
+    
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
+    
+    // request array
+    var awsS3: AWSS3Manager = AWSS3Manager()
+    
+    var croppedImage: UIImage!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.viewWidth = self.view.frame.size.width
+        self.viewHeight = self.view.frame.size.height
+        
+        let error = NSErrorPointer()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'upload' directory failed. Error: \(error)")
+        }
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
@@ -86,12 +115,109 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
-        if indexPath.section == 2 { //settings section
+        if indexPath.section == 0 {
+            self.pressUploadImageButton()
+            
+        } else if indexPath.section == 1{
+            // my tabs, my lyrics, favorites
+        } else if indexPath.section == 2 { //settings section
             let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
             self.showViewController(settingsVC, sender: nil)
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }
+
+// upload user profile image
+extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func pressUploadImageButton() {
+        let refreshAlert = UIAlertController(title: "Add Photo", message: "Camera or Photo Library", preferredStyle: UIAlertControllerStyle.Alert)
+        let photoPicker = UIImagePickerController()
+        photoPicker.setEditing(true, animated: true)
+        
+        photoPicker.delegate = self
+        photoPicker.preferredContentSize = CGSize(width: 54, height: 54)
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
+            refreshAlert.addAction(UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
+                self.presentViewController(photoPicker, animated: true, completion: nil)
+            }))
+        }
+        refreshAlert.addAction(UIAlertAction(title: "Photo Library", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+            photoPicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+            self.presentViewController(photoPicker, animated: true, completion: nil)
+        }))
+        presentViewController(refreshAlert, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
+        
+        awsS3.addRequestToArray(image, name: "origin")
+        cropImage(image)
+
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+}
+
+// crop the user profile image
+extension UserProfileViewController: RSKImageCropViewControllerDelegate, RSKImageCropViewControllerDataSource {
+    
+    func cropImage(sender: UIImage) {
+        let imageCropVC: RSKImageCropViewController = RSKImageCropViewController.init(image: sender)
+        imageCropVC.delegate = self
+        imageCropVC.dataSource = self
+        self.navigationController?.pushViewController(imageCropVC, animated: true)
+    }
+    
+    func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
+        
+        //sending the cropped image to s3 in here
+        awsS3.addRequestToArray(croppedImage, name: "cropped")
+        print(awsS3.uploadRequests.count)
+        for item in awsS3.uploadRequests {
+            awsS3.upload(item!)
+        }
+        for item in awsS3.uploadFileURLs {
+            print(item?.filePathURL)
+            if ((item?.fileURL) != nil) {
+                print(item?.filePathURL)
+            }
+        }
+        awsS3.uploadRequests.removeAll()
+        self.navigationController?.popViewControllerAnimated(true)
+    }
+    
+    func imageCropViewControllerDidCancelCrop(controller: RSKImageCropViewController) {
+        self.navigationController?.popViewControllerAnimated(true)
+    }
+    
+    func imageCropViewControllerCustomMaskRect(controller: RSKImageCropViewController) -> CGRect {
+        let maskSize: CGSize = CGSizeMake(self.viewWidth, self.viewWidth)
+        let maskRect = CGRectMake(self.viewWidth / 2, self.viewHeight / 2, maskSize.width, maskSize.height)
+        return maskRect
+    }
+    
+    func imageCropViewControllerCustomMaskPath(controller: RSKImageCropViewController) -> UIBezierPath {
+        let rect: CGRect = controller.maskRect
+        let point1: CGPoint = CGPointMake(CGRectGetMinX(rect), CGRectGetMaxY(rect))
+        let point2: CGPoint = CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect))
+        let point3: CGPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect))
+        
+        let triangle: UIBezierPath = UIBezierPath()
+        triangle.moveToPoint(point1)
+        triangle.addLineToPoint(point2)
+        triangle.addLineToPoint(point3)
+        triangle.closePath()
+        
+        return triangle
+    }
+    
+    func imageCropViewControllerCustomMovementRect(controller: RSKImageCropViewController) -> CGRect {
+        return controller.maskRect
+    }
+    
+}
+
 
