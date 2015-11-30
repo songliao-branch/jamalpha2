@@ -180,7 +180,7 @@ class APIManager: NSObject {
     
     //download one tabs
     class func downloadTabsSetContent(downloadedTabsSet: DownloadedTabsSet, completion: (( downloadWithContent: DownloadedTabsSet) -> Void)) {
-        
+
         Alamofire.request(.GET, jamBaseURL + "/tabs_sets/\(downloadedTabsSet.id)").responseJSON { response in
             switch response.result {
             case .Success:
