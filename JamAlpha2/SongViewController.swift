@@ -1405,7 +1405,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func goToLyricsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
+        self.selectedFromTable = true
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
