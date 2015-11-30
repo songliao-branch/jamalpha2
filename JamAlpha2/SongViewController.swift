@@ -1375,7 +1375,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
+        self.selectedFromTable = true //make sure songviewcontroller resume playing after coming back from TabsEditor
         
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!

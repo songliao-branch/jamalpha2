@@ -1539,7 +1539,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.songViewController.updateTuning(tuning)
             self.songViewController.updateCapo(capo)
             
-            self.dismissViewControllerAnimated(false, completion: nil)
+            self.dismissViewControllerAnimated(false, completion: {
+                completed in
+                self.songViewController.updateAll(Float(self.songViewController.player.currentPlaybackTime))
+            })
         }
         self.currentSelectedSpecificTab = nil
     }
