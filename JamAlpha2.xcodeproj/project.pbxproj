@@ -219,7 +219,6 @@
 				10401C821C0BBC5200474D4C /* PhotoViewerViewController.swift */,
 				E42032E71BFED9E300A5D36D /* UserProfileViewController.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
-				10401C851C0D8A5D00474D4C /* CustomAlertView.swift */,
 			);
 			name = MeViewController;
 			sourceTree = "<group>";
@@ -301,6 +300,7 @@
 			children = (
 				E431BA9F1B91718C00E32A0B /* MainScreenViews */,
 				E4399C391B90049600906DBD /* SoundWave */,
+				10401C851C0D8A5D00474D4C /* CustomAlertView.swift */,
 				E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */,
 				C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */,
 				C82A4E961B81B668008B6AFC /* VisualizerView.swift */,

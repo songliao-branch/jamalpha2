@@ -20,7 +20,8 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
     
     var photo:UIImage?
     var photoURL:String!
-    var photoframe:CGRect!
+    
+    var panRecognizer:UIPanGestureRecognizer!
     
     // MARK: Life-Cycle
     
@@ -73,7 +74,7 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
         
         singleTapRecognizer.requireGestureRecognizerToFail(doubleTapRecognizer)
         
-        let panRecognizer = UIPanGestureRecognizer(target: self, action: "handlePan:")
+        panRecognizer = UIPanGestureRecognizer(target: self, action: "handlePan:")
         panRecognizer.maximumNumberOfTouches = 1
         self.view.addGestureRecognizer(panRecognizer)
         
@@ -157,9 +158,17 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
     }
     
     func handlePan(recognizer: UIPanGestureRecognizer!) {
-            if(recognizer.state == .Ended){
+            if(recognizer.state == .Ended && self.scrollView.zoomScale == self.scrollView.minimumZoomScale){
                 self.dismissViewControllerAnimated(false, completion: nil)
             }
+    }
+    
+    func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
+        if(self.scrollView.zoomScale > self.scrollView.minimumZoomScale){
+            self.view.removeGestureRecognizer(self.panRecognizer)
+        }else if(self.scrollView.zoomScale == self.scrollView.minimumZoomScale){
+            self.view.addGestureRecognizer(self.panRecognizer)
+        }
     }
     
     // MARK: ScrollView
