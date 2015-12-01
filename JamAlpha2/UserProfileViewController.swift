@@ -169,6 +169,24 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
             refreshAlert.addAction(UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
                 photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
+                
+//                var f: CGRect = photoPicker.view.bounds
+//                f.size.height -= photoPicker.navigationBar.bounds.size.height
+//                let statusBarHeight: CGFloat = UIApplication.sharedApplication().statusBarFrame.size.height
+//                
+//                let barHeight: CGFloat = (f.size.height - f.size.width) / 2 - statusBarHeight
+//                UIGraphicsBeginImageContext(f.size)
+//                
+//                UIColor().colorWithAlphaComponent(0.5)
+//                UIRectFillUsingBlendMode(CGRectMake(statusBarHeight, 0, f.size.width, barHeight), CGBlendMode.Normal)
+//                UIRectFillUsingBlendMode(CGRectMake(0, f.size.height - barHeight, f.size.width, barHeight), CGBlendMode.Normal)
+//                let overlayImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()
+//                UIGraphicsEndImageContext()
+//                
+//                let overlayIV:UIImageView = UIImageView.init(frame: f)
+//                overlayIV.image = overlayImage
+//                photoPicker.cameraOverlayView!.addSubview(overlayIV)
+               
                 self.presentViewController(photoPicker, animated: true, completion: nil)
             }))
         }
@@ -181,7 +199,21 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
         
-        self.originFileName = awsS3.addRequestToArray(image, style: "origin", userId: self.userEmail)
+        var originImage: UIImage = image
+        let imageSize: CGSize = image.size
+        let width : CGFloat = imageSize.width
+        let height: CGFloat = imageSize.height
+        if (width != height) {
+            let newDimension: CGFloat = min(width, height)
+            let widthOffset: CGFloat = (width - newDimension) / 2;
+            let heightOffset: CGFloat = (height - newDimension) / 2;
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(newDimension, newDimension), false, 0)
+            originImage.drawAtPoint(CGPointMake(-widthOffset, -heightOffset), blendMode: CGBlendMode.Normal, alpha: 1)
+            originImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+        }
+        
+        self.originFileName = awsS3.addRequestToArray(originImage, style: "origin", userId: self.userEmail)
         print(self.originFileName)
         cropImage(image)
 
