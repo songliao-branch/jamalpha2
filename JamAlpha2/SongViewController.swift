@@ -1377,19 +1377,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func goToTabsEditor() {
+        
+        
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
+        self.player.pause()
+        self.dismissAction()
+        
+        if showUserSignUpPage() {
+            return
+        }
         
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
-        self.player.pause()
-        self.dismissAction()
+      
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
     func uploadLyrics(button: UIButton) {
         APIManager.uploadLyrics(player.nowPlayingItem!)
     }
+    
+    
     
     func browseLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
@@ -1406,14 +1415,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     func goToLyricsEditor() {
+        //show sign up screen if no user found
+
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
+        self.player.pause()
+        self.dismissAction()
+        
+        if showUserSignUpPage() {
+            return
+        }
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
         lyricsEditor.theSong = self.player.nowPlayingItem
-        self.player.pause()
-        self.dismissAction()
+
         self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }
     
@@ -1438,6 +1454,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
+    func showUserSignUpPage() -> Bool {
+        //show sign up screen if no user found
+        if CoreDataManager.getCurrentUser() == nil {
+            let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
+            signUpVC.showCloseButton = true
+            self.presentViewController(signUpVC, animated: true, completion: nil)
+            return true
+        }
+        return false
+    }
     
     // ISSUE: when app goes to background this is not called
     //stop timer,stop refreshing UIs after view is completely gone of sight

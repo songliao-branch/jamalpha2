@@ -262,11 +262,12 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func upVoted(button: UIButton) {
-        if CoreDataManager.getCurrentUser() == nil {
-            print("sign in before vote")
-            
+        
+        //show sign up screen if no user found
+        if showUserSignUpPage() {
             return
         }
+        
         let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
         
         APIManager.updateVotes(true, isTabs: isPullingTabs, setId: id, completion: {
@@ -290,8 +291,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func downVoted(button: UIButton) {
-        if CoreDataManager.getCurrentUser() == nil {
-            print("sign in before vote")
+        
+        if showUserSignUpPage() {
             return
         }
         
@@ -312,6 +313,18 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
         })
         print("down button: \(button.tag) pressed")
+    }
+    
+    
+    func showUserSignUpPage() -> Bool {
+        //show sign up screen if no user found
+        if CoreDataManager.getCurrentUser() == nil {
+            let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
+            signUpVC.showCloseButton = true
+            self.presentViewController(signUpVC, animated: true, completion: nil)
+            return true
+        }
+        return false
     }
     
     override func shouldAutorotate() -> Bool {
