@@ -83,7 +83,7 @@ class APIManager: NSObject {
             "times": timesData,
             "chords": chordsData,
             "tabs": tabsData,
-            "user_id": 1 //TODO: change later
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
         ]
         
         Alamofire.request(.POST, tabsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -127,7 +127,7 @@ class APIManager: NSObject {
             
             "times": times,
             "lyrics": lyrics,
-            "user_id": 1 //TODO: change later
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
         ]
     
         Alamofire.request(.POST, lyricsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -275,10 +275,6 @@ class APIManager: NSObject {
     //upvote or downvote either tabsSet or lyricsSet
     class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( voteStatus: String, voteScore: Int) -> Void)){
         
-        if CoreDataManager.getCurrentUser() == nil {
-            print("not logged in, cannot vote")
-            return
-        }
         
         let parameters = ["user_id": "\(CoreDataManager.getCurrentUser()!.id)"]
         
@@ -302,7 +298,6 @@ class APIManager: NSObject {
                     print(json)
                 }
             case .Failure(let error):
-                //TODO: show alert dialog cannot update
                 print(error)
             }
         }
