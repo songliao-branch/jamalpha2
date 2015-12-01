@@ -18,10 +18,16 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
+    var userEmail: String!
+    
+    var originFileName: String!
+    var croppedFileName: String!
+    
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     
     // request array
     var awsS3: AWSS3Manager = AWSS3Manager()
+    var imageName: String!
     
     var croppedImage: UIImage!
     
@@ -40,6 +46,16 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         } catch let error1 as NSError {
             error.memory = error1
             print("Creating 'upload' directory failed. Error: \(error)")
+        }
+        
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("download"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'download' directory failed. Error: \(error)")
         }
     }
     
@@ -94,6 +110,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 if let name = user.username {
                     cell.titleLabel.text = name
                 }
+                self.userEmail = user.email
                 cell.subtitleLabel.text = user.email
                 if let url = user.avatarUrl {
                     cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
@@ -120,6 +137,17 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             
         } else if indexPath.section == 1{
             // my tabs, my lyrics, favorites
+            if indexPath.item == 0 {
+                awsS3.addDownloadRequestToArray(self.originFileName)
+                awsS3.download(awsS3.downloadRequests[0]!)
+            }
+            else if indexPath.item == 1{
+                if let downloadFileURL = awsS3.downloadFileURLs[0] {
+                    if let data = NSData(contentsOfURL: downloadFileURL) {
+                        print(downloadFileURL)
+                    }
+                }
+            }
         } else if indexPath.section == 2 { //settings section
             let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
             self.showViewController(settingsVC, sender: nil)
@@ -153,10 +181,17 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
         
-        awsS3.addRequestToArray(image, name: "origin")
+        self.originFileName = awsS3.addRequestToArray(image, style: "origin", userId: self.userEmail)
+        print(self.originFileName)
         cropImage(image)
 
         self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    // download the image
+    func downloadImage() {
+        awsS3.addDownloadRequestToArray(self.originFileName)
+        awsS3.download(awsS3.downloadRequests[0]!)
     }
     
 }
@@ -174,18 +209,12 @@ extension UserProfileViewController: RSKImageCropViewControllerDelegate, RSKImag
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
         
         //sending the cropped image to s3 in here
-        awsS3.addRequestToArray(croppedImage, name: "cropped")
-        print(awsS3.uploadRequests.count)
+        self.croppedFileName = awsS3.addRequestToArray(croppedImage, style: "cropped", userId: self.userEmail)
         for item in awsS3.uploadRequests {
             awsS3.upload(item!)
         }
-        for item in awsS3.uploadFileURLs {
-            print(item?.filePathURL)
-            if ((item?.fileURL) != nil) {
-                print(item?.filePathURL)
-            }
-        }
         awsS3.uploadRequests.removeAll()
+        
         self.navigationController?.popViewControllerAnimated(true)
     }
     
