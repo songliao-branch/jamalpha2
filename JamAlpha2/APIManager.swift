@@ -45,7 +45,7 @@ class APIManager: NSObject {
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     //upload tabs
-    class func uploadTabs(mediaItem: MPMediaItem) {
+    class func uploadTabs(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
 
         var title = ""
         var artist = ""
@@ -91,15 +91,17 @@ class APIManager: NSObject {
                 response in
                 switch response.result {
                 case .Success:
+                    completion(isSuccess: true)
                     print("Tabs uploaded succesfully")
                 case .Failure(let error):
+                    completion(isSuccess: false)
                     print(error)
                 }
         }
     }
     
     //upload lyrics
-    class func uploadLyrics(mediaItem: MPMediaItem) {
+    class func uploadLyrics(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
 
         var title = ""
         var artist = ""
@@ -136,8 +138,9 @@ class APIManager: NSObject {
                 switch response.result {
                 case .Success:
                     print("Lyrics uploaded succesfully")
+                    completion(isSuccess: true)
                 case .Failure(let error):
-                    print(error)
+                    completion(isSuccess: false)
                 }
         }
     }

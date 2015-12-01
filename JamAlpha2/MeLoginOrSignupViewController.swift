@@ -292,7 +292,12 @@ class MeLoginOrSignupViewController: UIViewController {
                             
                             afterRetrievingUser(id: userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
                             //go back to user profile view
-                            self.navigationController?.popViewControllerAnimated(false)
+                            
+                            if self.showCloseButton {
+                              self.dismissViewControllerAnimated(true, completion: nil)
+                            } else {
+                              self.navigationController?.popViewControllerAnimated(false)
+                            }
                             
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
                             
