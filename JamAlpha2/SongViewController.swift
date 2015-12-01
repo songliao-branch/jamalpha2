@@ -1453,7 +1453,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
-      
+        tabsEditorVC.songViewController = self
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
@@ -1932,8 +1932,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         dealWithLabelofChordName(activelabels.last!.labels.first! as! UILabel)
     }
 
-    private func dealWithLabelofChordName(chordLabel:UILabel){
-
+    private func dealWithLabelofChordName(chordLabel:UILabel) {
         if isChordShown && isTabsShown {
             //make the text glow
             chordLabel.textColor = self.chordsTextColor

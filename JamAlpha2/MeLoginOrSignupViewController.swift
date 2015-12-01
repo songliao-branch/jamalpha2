@@ -321,7 +321,6 @@ class MeLoginOrSignupViewController: UIViewController {
         }
     }
     
-    
     //facebook button
     func pressFacebookButton(sender: UIButton) {
         let permissons: [AnyObject] = ["public_profile", "email", "user_friends"] as [AnyObject]
