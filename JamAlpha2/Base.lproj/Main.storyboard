@@ -258,6 +258,25 @@
             </objects>
             <point key="canvasLocation" x="2059" y="36"/>
         </scene>
+        <!--Photo Viewer View Controller-->
+        <scene sceneID="lEn-J9-e8o">
+            <objects>
+                <viewController storyboardIdentifier="photoviewerVC" id="oBq-Tu-2dt" customClass="PhotoViewerViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="nJL-Ul-FLK"/>
+                        <viewControllerLayoutGuide type="bottom" id="O8F-hL-Itu"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="b7m-W8-rU9">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="IK4-Rx-nGa" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1815" y="684"/>
+        </scene>
         <!--Browse Versions View Controller-->
         <scene sceneID="MdU-Q2-huo">
             <objects>

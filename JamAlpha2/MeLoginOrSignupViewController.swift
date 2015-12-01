@@ -334,7 +334,7 @@ class MeLoginOrSignupViewController: UIViewController {
                     let email = result.valueForKey("email") as! String
                     let fullName  = result.valueForKey("name") as! String
                     let userId = result.valueForKey("id") as! String
-                    let avatarUrl = "http://graph.facebook.com/\(userId)/picture?type=large"
+                    let avatarUrl = "http://graph.facebook.com/\(userId)/picture?width=60&height=60"
                     
                     let parameters = [
                         "attempt_login":"facebook",

@@ -9,9 +9,11 @@
 import UIKit
 import Haneke
 
-class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
 
     @IBOutlet weak var userTable: UITableView!
+    var tapRecognizer:UITapGestureRecognizer!
+    var tempImageView:UIImageView!
     
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     override func viewWillAppear(animated: Bool) {
@@ -60,6 +62,9 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             cell.avatarImageView.layer.cornerRadius = cell.avatarImageView.frame.height/2
             cell.avatarImageView.layer.borderWidth = 1
             cell.avatarImageView.layer.borderColor = UIColor.backgroundGray().CGColor
+            self.tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("showPhotoDetail:"))
+            self.tapRecognizer.delegate = self
+            cell.addGestureRecognizer(tapRecognizer)
             
             if let user = CoreDataManager.getCurrentUser() {
                 if let name = user.username {
@@ -68,6 +73,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 cell.subtitleLabel.text = user.email
                 if let url = user.avatarUrl {
                     cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
+                    self.tempImageView = cell.avatarImageView
                 }
             }
             
@@ -92,5 +98,16 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             self.showViewController(settingsVC, sender: nil)
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    }
+    
+    func showPhotoDetail(recognizer: UITapGestureRecognizer){
+        let photoDetailVC = self.storyboard?.instantiateViewControllerWithIdentifier("photoviewerVC") as! PhotoViewerViewController
+        
+        photoDetailVC.photoURL = CoreDataManager.getCurrentUser()?.avatarUrl
+        photoDetailVC.photo = self.tempImageView.image
+        
+        self.presentViewController(photoDetailVC, animated: false, completion: nil)
+
+        
     }
 }
