@@ -1447,7 +1447,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.player.pause()
         self.dismissAction()
         
-        if showUserSignUpPage() {
+        if shouldShowSignUpPage() {
             return
         }
         
@@ -1489,7 +1489,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.player.pause()
         self.dismissAction()
         
-        if showUserSignUpPage() {
+        if shouldShowSignUpPage() {
             return
         }
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
@@ -1521,7 +1521,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
-    func showUserSignUpPage() -> Bool {
+    func shouldShowSignUpPage() -> Bool {
         //show sign up screen if no user found
         if CoreDataManager.getCurrentUser() == nil {
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController

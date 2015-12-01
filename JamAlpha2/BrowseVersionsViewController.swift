@@ -264,7 +264,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     func upVoted(button: UIButton) {
         
         //show sign up screen if no user found
-        if showUserSignUpPage() {
+        if shouldShowSignUpPage() {
             return
         }
         
@@ -292,7 +292,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     func downVoted(button: UIButton) {
         
-        if showUserSignUpPage() {
+        if shouldShowSignUpPage() {
             return
         }
         
@@ -316,7 +316,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     
-    func showUserSignUpPage() -> Bool {
+    func shouldShowSignUpPage() -> Bool {
         //show sign up screen if no user found
         if CoreDataManager.getCurrentUser() == nil {
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
