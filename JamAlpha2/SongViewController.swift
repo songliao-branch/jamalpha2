@@ -130,6 +130,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var countDownStartSecond = 3 //count from 3 to 1
     var countdownView: CountdownView!
     
+    //status view pop up
+    var statusView: UIView!
+    var successImage: UIImageView!
+    var failureImage: UIImageView!
+    var statusLabel: UILabel!
+    var hideStatusViewTimer = NSTimer()
+    
     // Guitar actions views
     var guitarActionView: UIView!
     var volumeView: MPVolumeView!
@@ -219,6 +226,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         setUpActionViews()
         setUpCountdownView()
+        setUpStatusView()
         updateMusicData(firstLoadPlayingItem)
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
         loadDisplayMode()
@@ -1343,6 +1351,57 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    func setUpStatusView() {
+        statusView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        statusView.backgroundColor = UIColor(red: 114/255, green: 114/255, blue: 114/255, alpha: 0.80)
+        statusView.hidden = true
+        statusView.center = self.view.center
+        statusView.layer.cornerRadius = 20
+        self.view.addSubview(statusView)
+        
+        successImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 40, height: 30))
+        successImage.image = UIImage(named: "check")
+        successImage.center.x = statusView.frame.width/2
+        successImage.hidden = true
+        statusView.addSubview(successImage)
+        
+        failureImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 35, height: 35))
+        failureImage.image = UIImage(named: "closebutton")
+        failureImage.center.x = statusView.frame.width/2
+        failureImage.hidden = true
+        statusView.addSubview(failureImage)
+        
+        statusLabel = UILabel(frame: CGRect(x: 0, y: 55, width: 100, height: 35))
+        statusLabel.textColor = UIColor.whiteColor()
+        statusLabel.textAlignment = .Center
+        statusLabel.font = UIFont.systemFontOfSize(16)
+        statusLabel.center.x = statusView.frame.width/2
+        statusView.addSubview(statusLabel)
+    }
+    
+    func showStatusView(isSucess: Bool) {
+        if isSucess {
+            statusView.hidden = false
+            successImage.hidden = false
+            failureImage.hidden = true
+            statusLabel.text = "Uploaded"
+        } else {
+            statusView.hidden = false
+            successImage.hidden = true
+            failureImage.hidden = false
+            statusLabel.text = "Upload failed"
+        }
+    }
+    
+    func startHideStatusViewTimer() {
+        hideStatusViewTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: Selector("hideStatusView"), userInfo: nil, repeats: false)
+        self.dismissAction()
+    }
+    
+    func hideStatusView() {
+        statusView.hidden = true
+    }
+    
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
         stopTimer()
@@ -1370,26 +1429,43 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.dismissAction()
         })
     }
+
     
     func uploadTabs(button: UIButton) {
         print("upload tabs")
-        APIManager.uploadTabs(player.nowPlayingItem!)
+        APIManager.uploadTabs(player.nowPlayingItem!, completion: {
+            isSuccess in
+            
+            self.showStatusView(isSuccess)
+            self.startHideStatusViewTimer()
+        })
     }
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
+        self.player.pause()
+        self.dismissAction()
+        
+        if shouldShowSignUpPage() {
+            return
+        }
         
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = self.player.nowPlayingItem!
-        self.player.pause()
-        self.dismissAction()
+      
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
     func uploadLyrics(button: UIButton) {
-        APIManager.uploadLyrics(player.nowPlayingItem!)
+        APIManager.uploadLyrics(player.nowPlayingItem!, completion: {
+            isSuccess in
+            
+            self.showStatusView(isSuccess)
+            self.startHideStatusViewTimer()
+        })
     }
+    
     
     func browseLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
@@ -1406,14 +1482,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     func goToLyricsEditor() {
+        //show sign up screen if no user found
+
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
+        self.player.pause()
+        self.dismissAction()
+        
+        if shouldShowSignUpPage() {
+            return
+        }
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
         lyricsEditor.theSong = self.player.nowPlayingItem
-        self.player.pause()
-        self.dismissAction()
+
         self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }
     
@@ -1438,6 +1521,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
+    func shouldShowSignUpPage() -> Bool {
+        //show sign up screen if no user found
+        if CoreDataManager.getCurrentUser() == nil {
+            let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
+            signUpVC.showCloseButton = true
+            self.presentViewController(signUpVC, animated: true, completion: nil)
+            return true
+        }
+        return false
+    }
     
     // ISSUE: when app goes to background this is not called
     //stop timer,stop refreshing UIs after view is completely gone of sight

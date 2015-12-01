@@ -45,7 +45,7 @@ class APIManager: NSObject {
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     //upload tabs
-    class func uploadTabs(mediaItem: MPMediaItem) {
+    class func uploadTabs(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
 
         var title = ""
         var artist = ""
@@ -83,7 +83,7 @@ class APIManager: NSObject {
             "times": timesData,
             "chords": chordsData,
             "tabs": tabsData,
-            "user_id": 1 //TODO: change later
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
         ]
         
         Alamofire.request(.POST, tabsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -91,15 +91,17 @@ class APIManager: NSObject {
                 response in
                 switch response.result {
                 case .Success:
+                    completion(isSuccess: true)
                     print("Tabs uploaded succesfully")
                 case .Failure(let error):
+                    completion(isSuccess: false)
                     print(error)
                 }
         }
     }
     
     //upload lyrics
-    class func uploadLyrics(mediaItem: MPMediaItem) {
+    class func uploadLyrics(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
 
         var title = ""
         var artist = ""
@@ -127,7 +129,7 @@ class APIManager: NSObject {
             
             "times": times,
             "lyrics": lyrics,
-            "user_id": 1 //TODO: change later
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
         ]
     
         Alamofire.request(.POST, lyricsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -136,8 +138,9 @@ class APIManager: NSObject {
                 switch response.result {
                 case .Success:
                     print("Lyrics uploaded succesfully")
+                    completion(isSuccess: true)
                 case .Failure(let error):
-                    print(error)
+                    completion(isSuccess: false)
                 }
         }
     }
@@ -275,10 +278,6 @@ class APIManager: NSObject {
     //upvote or downvote either tabsSet or lyricsSet
     class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( voteStatus: String, voteScore: Int) -> Void)){
         
-        if CoreDataManager.getCurrentUser() == nil {
-            print("not logged in, cannot vote")
-            return
-        }
         
         let parameters = ["user_id": "\(CoreDataManager.getCurrentUser()!.id)"]
         
@@ -302,7 +301,6 @@ class APIManager: NSObject {
                     print(json)
                 }
             case .Failure(let error):
-                //TODO: show alert dialog cannot update
                 print(error)
             }
         }
