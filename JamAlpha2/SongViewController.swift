@@ -1187,6 +1187,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     
+    //for actions that go out from SongViewController
+    func clearActions() {
+        self.guitarActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.height, self.actionViewHeight)
+        self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.width, self.actionViewHeight)
+        self.actionDismissLayerButton.backgroundColor = UIColor.clearColor()
+        self.actionDismissLayerButton.hidden = true
+    }
+    
     func showGuitarActions(){
         actionDismissLayerButton.hidden = false
         UIView.animateWithDuration(0.3, animations: {
@@ -1426,7 +1434,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         browseAllTabsVC.mediaItem = player.nowPlayingItem!
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in
-            self.dismissAction()
+            self.clearActions()
         })
     }
 
@@ -1445,7 +1453,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
         self.player.pause()
-        self.dismissAction()
+        self.clearActions()
         
         if shouldShowSignUpPage() {
             return
@@ -1477,7 +1485,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         browseAllTabsVC.mediaItem = player.nowPlayingItem!
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in
-            self.dismissAction()
+            self.clearActions()
         })
         
     }
@@ -1487,7 +1495,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
         self.player.pause()
-        self.dismissAction()
+        self.clearActions()
         
         if shouldShowSignUpPage() {
             return
@@ -1501,7 +1509,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func goToArtist(button: UIButton) {
-        self.dismissAction()
+        self.clearActions()
         self.dismissViewControllerAnimated(false, completion: {
             completed in
             if(self.musicViewController != nil){
@@ -1511,7 +1519,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func goToAlbum(button: UIButton) {
-        self.dismissAction()
+        self.clearActions()
         self.dismissViewControllerAnimated(false, completion: {
             completed in
             if(self.musicViewController != nil){
