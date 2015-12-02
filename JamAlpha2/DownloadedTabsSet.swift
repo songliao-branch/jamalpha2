@@ -32,7 +32,7 @@ class DownloadedTabsSet: NSObject {
         self.capo = capo
         self.songId = songId
         self.userName = userName
-        self.updatedAt = updatedAt
+        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updatedAt)
         self.votesScore = votesScore
         self.chordsPreview = chordsPreview
         self.voteStatus = voteStatus

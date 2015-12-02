@@ -366,10 +366,9 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
-				E4D58E3E1BE9BC3F00D54174 /* Utils */,
 				E4CBC0081B9E88D900473FC4 /* CoreData */,
 				E48AE2D01B955BA30044CFDB /* Networking */,
-				E4B6362F1B854A6A00F331A7 /* Extensions */,
+				E4B6362F1B854A6A00F331A7 /* Utils */,
 				E456457C1B3BB14200276287 /* CustomViews */,
 				E44358FC1B1947120091E926 /* Models */,
 				E45F6B231B156CD70018645D /* TableCells */,
@@ -438,16 +437,17 @@
 			name = Models;
 			sourceTree = "<group>";
 		};
-		E4B6362F1B854A6A00F331A7 /* Extensions */ = {
+		E4B6362F1B854A6A00F331A7 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				E4D58E3F1BE9BC4700D54174 /* Constants.swift */,
 				E4B6362D1B854A5900F331A7 /* Colors+.swift */,
 				C84435271B79239200E8823A /* UIImageEffects.swift */,
 				C8F505071B9101920077F508 /* UIWindowEffects.swift */,
 				E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */,
 				E431BA9C1B913AE700E32A0B /* String+Utils.swift */,
 			);
-			name = Extensions;
+			name = Utils;
 			sourceTree = "<group>";
 		};
 		E4CBC0081B9E88D900473FC4 /* CoreData */ = {
@@ -471,14 +471,6 @@
 				E48877441B151628004785D3 /* SearchViewController.swift */,
 			);
 			name = TabItemControllers;
-			sourceTree = "<group>";
-		};
-		E4D58E3E1BE9BC3F00D54174 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				E4D58E3F1BE9BC4700D54174 /* Constants.swift */,
-			);
-			name = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
