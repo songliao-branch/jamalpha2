@@ -11,6 +11,8 @@ import Haneke
 import AWSS3
 import RSKImageCropper
 
+//var tempImage: UIImage = UIImage()
+
 class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var userTable: UITableView!
@@ -22,6 +24,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     var originFileName: String!
     var croppedFileName: String!
+    var profileImage: UIImage = UIImage()
     
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     
@@ -57,6 +60,10 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             error.memory = error1
             print("Creating 'download' directory failed. Error: \(error)")
         }
+        
+//        let imageView: UIImageView = UIImageView(frame: CGRectMake(50, 50, 100, 100))
+//        imageView.image = tempImage
+//        self.view.addSubview(imageView)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -101,7 +108,6 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
        
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("avatarcell", forIndexPath: indexPath) as! AvatarCell
-            
             cell.avatarImageView.layer.cornerRadius = cell.avatarImageView.frame.height/2
             cell.avatarImageView.layer.borderWidth = 1
             cell.avatarImageView.layer.borderColor = UIColor.backgroundGray().CGColor
@@ -112,8 +118,10 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 }
                 self.userEmail = user.email
                 cell.subtitleLabel.text = user.email
-                if let url = user.avatarUrl {
-                    cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
+                if let url = UIImage(data: user.thumbnail!) {//user.avatarUrl {
+                    //cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
+                    //self.profileImage = url
+                    cell.avatarImageView.image = self.profileImage
                 }
             }
             
@@ -170,23 +178,32 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
             refreshAlert.addAction(UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
                 photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
                 
-//                var f: CGRect = photoPicker.view.bounds
-//                f.size.height -= photoPicker.navigationBar.bounds.size.height
-//                let statusBarHeight: CGFloat = UIApplication.sharedApplication().statusBarFrame.size.height
-//                
-//                let barHeight: CGFloat = (f.size.height - f.size.width) / 2 - statusBarHeight
-//                UIGraphicsBeginImageContext(f.size)
-//                
-//                UIColor().colorWithAlphaComponent(0.5)
-//                UIRectFillUsingBlendMode(CGRectMake(statusBarHeight, 0, f.size.width, barHeight), CGBlendMode.Normal)
-//                UIRectFillUsingBlendMode(CGRectMake(0, f.size.height - barHeight, f.size.width, barHeight), CGBlendMode.Normal)
-//                let overlayImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()
-//                UIGraphicsEndImageContext()
-//                
-//                let overlayIV:UIImageView = UIImageView.init(frame: f)
-//                overlayIV.image = overlayImage
-//                photoPicker.cameraOverlayView!.addSubview(overlayIV)
-               
+                //Create camera overlay, make it square
+                let pickerFrame = CGRectMake(0, UIApplication.sharedApplication().statusBarFrame.size.height, photoPicker.view.bounds.width, photoPicker.view.bounds.height - photoPicker.navigationBar.bounds.size.height - photoPicker.toolbar.bounds.size.height - 5)
+                let squareFrame = CGRectMake(pickerFrame.width/2 - self.viewWidth/2, pickerFrame.height/2 - self.viewWidth/2, self.viewWidth, self.viewWidth)
+                UIGraphicsBeginImageContext(pickerFrame.size)
+                
+                let context = UIGraphicsGetCurrentContext()
+                CGContextSaveGState(context)
+                CGContextAddRect(context, CGContextGetClipBoundingBox(context))
+                CGContextMoveToPoint(context, squareFrame.origin.x, squareFrame.origin.y)
+                CGContextAddLineToPoint(context, squareFrame.origin.x + squareFrame.width, squareFrame.origin.y)
+                CGContextAddLineToPoint(context, squareFrame.origin.x + squareFrame.width, squareFrame.origin.y + squareFrame.size.height)
+                CGContextAddLineToPoint(context, squareFrame.origin.x, squareFrame.origin.y + squareFrame.size.height)
+                CGContextAddLineToPoint(context, squareFrame.origin.x, squareFrame.origin.y)
+                CGContextEOClip(context)
+                CGContextMoveToPoint(context, pickerFrame.origin.x, pickerFrame.origin.y)
+                CGContextSetRGBFillColor(context, 0, 0, 0, 1)
+                CGContextFillRect(context, pickerFrame)
+                CGContextRestoreGState(context)
+                
+                let overlayImage = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext();
+                
+                let overlayView = UIImageView(frame: pickerFrame)
+                overlayView.image = overlayImage
+                photoPicker.cameraOverlayView = overlayView
+                
                 self.presentViewController(photoPicker, animated: true, completion: nil)
             }))
         }
@@ -197,9 +214,12 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
         presentViewController(refreshAlert, animated: true, completion: nil)
     }
     
+    
+    
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
         
-        var originImage: UIImage = image
+        // crop the origin image to square image
+        var originImage = image
         let imageSize: CGSize = image.size
         let width : CGFloat = imageSize.width
         let height: CGFloat = imageSize.height
@@ -213,9 +233,9 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
             UIGraphicsEndImageContext()
         }
         
-        self.originFileName = awsS3.addRequestToArray(originImage, style: "origin", userId: self.userEmail)
-        print(self.originFileName)
-        cropImage(image)
+        // add request to upload array
+        self.originFileName = awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.userEmail)
+        cropImage(originImage)
 
         self.dismissViewControllerAnimated(true, completion: nil)
     }
@@ -240,12 +260,18 @@ extension UserProfileViewController: RSKImageCropViewControllerDelegate, RSKImag
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
         
+        // add request to upload array
+        self.croppedFileName = awsS3.addUploadRequestToArray(croppedImage, style: "cropped", email: self.userEmail)
+        
         //sending the cropped image to s3 in here
-        self.croppedFileName = awsS3.addRequestToArray(croppedImage, style: "cropped", userId: self.userEmail)
         for item in awsS3.uploadRequests {
             awsS3.upload(item!)
         }
         awsS3.uploadRequests.removeAll()
+        
+        self.profileImage = croppedImage
+        
+        self.userTable.reloadData()
         
         self.navigationController?.popViewControllerAnimated(true)
     }

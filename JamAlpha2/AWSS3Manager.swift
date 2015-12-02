@@ -17,13 +17,13 @@ class AWSS3Manager: NSObject {
     var downloadRequests: Array<AWSS3TransferManagerDownloadRequest?> = Array<AWSS3TransferManagerDownloadRequest?>()
     var downloadFileURLs: Array<NSURL?> = Array<NSURL?>()
     
-    func addRequestToArray(sender: UIImage, style: String, userId: String) -> String {
+    func addUploadRequestToArray(sender: UIImage, style: String, email: String) -> String {
         let formatter: NSDateFormatter = NSDateFormatter()
         formatter.dateStyle = NSDateFormatterStyle.ShortStyle
         formatter.timeStyle = NSDateFormatterStyle.ShortStyle
         let dateString = formatter.stringFromDate(NSDate()).replace(" ", replacement: "-").replace(":", replacement: "-").replace(",", replacement: "-").replace("/", replacement: "-")
     
-        let fileName = ((randomStringWithLength(4) as String) + "-" + dateString + "-" + userId  + "-" + style).stringByAppendingString(".png")//NSProcessInfo.processInfo().globallyUniqueString.stringByAppendingString(".png")
+        let fileName = ((randomStringWithLength(4) as String) + "-" + dateString + "-" + email  + "-" + style).stringByAppendingString(".png")//NSProcessInfo.processInfo().globallyUniqueString.stringByAppendingString(".png")
         let filePath = ((NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload") as NSString).stringByAppendingPathComponent(fileName)
         let imageData = UIImagePNGRepresentation(sender)
         imageData!.writeToFile(filePath, atomically: true)

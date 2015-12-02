@@ -15,7 +15,10 @@ class User: NSManagedObject {
     @NSManaged var email: String
     @NSManaged var username: String? //this is not required
     @NSManaged var avatarUrl: String?
+    @NSManaged var thumbnailUrl: String?
     @NSManaged var authToken: String
+    @NSManaged var profileImage: NSData?
+    @NSManaged var thumbnail: NSData?
     
     @NSManaged var tabsSets: NSSet
     @NSManaged var lyricsSets: NSSet

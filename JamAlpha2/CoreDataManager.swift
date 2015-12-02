@@ -45,13 +45,16 @@ class CoreDataManager: NSObject {
     //the last two parameters can necessary for facebook logins
     // a normal call to this function only involves initializeUser(id,email,authToken)
     // a call with facebook involves all 5 parameters
-    class func initializeUser(id: Int, email: String, authToken: String, username: String?=nil, avatarUrl: String?=nil) {
+    class func initializeUser(id: Int, email: String, authToken: String, username: String?=nil, avatarUrl: String?=nil, thumbnailUrl: String?=nil, profileImage: NSData?, thumbnail: NSData?) {
         logoutUser()//for testing clear all users
         
         let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
         user.id  = id
         user.email = email
         user.authToken = authToken
+        user.profileImage = profileImage
+        user.thumbnail = thumbnail
+        user.thumbnailUrl = thumbnailUrl
         
         if let name = username {
             user.username = name
