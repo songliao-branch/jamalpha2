@@ -310,7 +310,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
-    
+  
     // MARK: called from SongViewController action sheets
     func goToArtist(theArtist: String) {
         print("we want to go to \(theArtist)")

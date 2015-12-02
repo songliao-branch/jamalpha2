@@ -12,7 +12,9 @@ class DownloadedLyricsSet: NSObject {
 
     var id = -1
     var songId = -1
-    var userId = -1
+    //var userId = -1
+    var userName = "" //TODO: use email for now, will change for username later
+    var updatedAt = "" //TODO: change to a string
     var lyricsPreview = ""
     var numberOfLines = 0
     
@@ -21,10 +23,11 @@ class DownloadedLyricsSet: NSObject {
     var lyrics = [String]()
     var times = [Float]()
     
-    init(id: Int, songId: Int, userId: Int, votesScore: Int, lyricsPreview: String, lines: Int, voteStatus: String) {
+    init(id: Int, songId: Int, userName: String, updatedAt: String, votesScore: Int, lyricsPreview: String, lines: Int, voteStatus: String) {
         self.id = id
         self.songId = songId
-        self.userId = userId
+        self.userName = userName
+        self.updatedAt = updatedAt
         self.votesScore = votesScore
         self.lyricsPreview = lyricsPreview
         self.numberOfLines = lines
