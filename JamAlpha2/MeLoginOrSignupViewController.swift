@@ -273,7 +273,7 @@ class MeLoginOrSignupViewController: UIViewController {
         
         
         self.originFileName = awsS3.addUploadRequestToArray(UIImage(named: "kitten_origin")!, style: "origin", email: email)
-        self.croppedFileName = awsS3.addUploadRequestToArray(UIImage(named: "kitten_profile")!, style: "cropped", email: email)
+        self.croppedFileName = awsS3.addUploadRequestToArray(UIImage(named: "kitten_profile")!, style: "thumbnail", email: email)
         
         for item in awsS3.uploadRequests {
             awsS3.upload(item!)
@@ -364,7 +364,7 @@ class MeLoginOrSignupViewController: UIViewController {
                     self.email = result.valueForKey("email") as! String
                     self.fullName  = result.valueForKey("name") as! String
                     self.userId = result.valueForKey("id") as! String
-                    let avatarUrl = "https://graph.facebook.com/\(self.userId)/picture?height=300&width=300"
+                    let avatarUrl = "https://graph.facebook.com/\(self.userId)/picture?height=320&width=320"
                     self.profileImageData = NSData(contentsOfURL: NSURL(string: avatarUrl)!)!
                     
                     let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: avatarUrl)!)!)!
@@ -395,19 +395,13 @@ extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate {
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
         
-//        var downSizeCroppedImage: UIImage!
-//        if croppedImage.size.width > 35 {
-//            downSizeCroppedImage = croppedImage.resize(0.5)
-//        } else {
-//            downSizeCroppedImage = croppedImage
-//        }
         
         //tempImage = downSizeCroppedImage
         
         self.thumbnailData = UIImagePNGRepresentation(croppedImage)
         
         // add request to upload array
-        self.croppedFileName = awsS3.addUploadRequestToArray(croppedImage, style: "cropped", email: self.email)
+        self.croppedFileName = awsS3.addUploadRequestToArray(croppedImage, style: "thumbnail", email: self.email)
         
         //sending the cropped image to s3 in here
         for item in awsS3.uploadRequests {

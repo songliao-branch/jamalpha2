@@ -147,15 +147,10 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         } else if indexPath.section == 1{
             // my tabs, my lyrics, favorites
             if indexPath.item == 0 {
-                awsS3.addDownloadRequestToArray(self.originFileName)
-                awsS3.download(awsS3.downloadRequests[0]!)
+
             }
             else if indexPath.item == 1{
-                if let downloadFileURL = awsS3.downloadFileURLs[0] {
-                    if let data = NSData(contentsOfURL: downloadFileURL) {
-                        print(downloadFileURL)
-                    }
-                }
+
             }
         } else if indexPath.section == 2 { //settings section
             let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
@@ -198,11 +193,7 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
     
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
-        
         // add request to upload array
-        self.originFileName = awsS3.addUploadRequestToArray(image, style: "origin", email: self.userEmail)
-        self.originImageData = UIImagePNGRepresentation(image)
-
         cropImage(image)
 
         self.dismissViewControllerAnimated(true, completion: nil)
@@ -226,11 +217,16 @@ extension UserProfileViewController: RSKImageCropViewControllerDelegate {
     }
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
+        let originImage: UIImage = croppedImage.resize(250)
+        self.originFileName = awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.userEmail)
+        self.originImageData = UIImagePNGRepresentation(originImage)
         
-        let thumbnailImageData: NSData = UIImagePNGRepresentation(croppedImage)!
+        let thumbnailImage: UIImage = croppedImage.resize(50)
+        
+        let thumbnailImageData: NSData = UIImagePNGRepresentation(thumbnailImage)!
 
         // add request to upload array
-        self.croppedFileName = awsS3.addUploadRequestToArray(croppedImage, style: "cropped", email: self.userEmail)
+        self.croppedFileName = awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: self.userEmail)
         
         //sending the cropped image to s3 in here
         for item in awsS3.uploadRequests {
