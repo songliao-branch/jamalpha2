@@ -294,36 +294,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         backgroundImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.height))
         self.view.addSubview(backgroundImageView)
         //get the image from MPMediaItem
-        if(!isSongNeedPurchase){
-            if let artwork = firstLoadPlayingItem.artwork {
-                currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
-            } else {
-                //TODO: add a placeholder album cover
-                currentImage = UIImage(named: "liwengbg")
-            }
-            self.backgroundImage = currentImage
-
-            self.blurredImage = currentImage!.applyLightEffect()!
-            
-            backgroundImageView.center.x = self.view.center.x
-            backgroundImageView.image = blurredImage
-            chordsTextColor = blurredImage!.averageColor()
-        }else{
-            if let imageURL = songNeedPurchase.artworkUrl100 {
-                let url = NSURL(string: imageURL)!
-                let fetcher = NetworkFetcher<UIImage>(URL: url)
-                let cache = Shared.imageCache
-                cache.fetch(fetcher: fetcher).onSuccess { image in
-                    let blurredImage:UIImage = image.applyLightEffect()!
-                    
-                    self.backgroundImageView.center.x = self.view.center.x
-                    self.backgroundImageView.image = blurredImage
-                    self.chordsTextColor = blurredImage.averageColor()
-                }
-            }
+        if !isSongNeedPurchase{
+          loadBackgroundImageFromMediaItem(firstLoadPlayingItem)
+        } else if self.backgroundImage  == nil { //make sure album cover downloaded from iTunes is not blank
+            currentImage = UIImage(named: "liwengbg")
+            blurredImage = currentImage?.applyLightEffect()!
         }
+        
+        backgroundImageView.center.x = self.view.center.x
+        backgroundImageView.image = blurredImage
+        chordsTextColor = blurredImage!.averageColor()
     }
     
+    func loadBackgroundImageFromMediaItem(item: MPMediaItem) {
+        if let artwork = item.artwork {
+            currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
+        } else {
+            //TODO: add a placeholder album cover
+            currentImage = UIImage(named: "liwengbg")
+        }
+        self.backgroundImage = currentImage
+        self.blurredImage = currentImage!.applyLightEffect()!
+    }
     func setUpTopButtons() {
 
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
@@ -722,7 +714,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.songNameLabel.textAlignment = NSTextAlignment.Center
                     self.artistNameLabel.text = nowPlayingItem!.artist
                     isBlurred = !isBlurred
-                    applyEffectsToBackgroundImage(isNeedanimation: false)
+                    applyEffectsToBackgroundImage(changeSong: true)
        
                     self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
                 }
@@ -1352,7 +1344,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             updateAll(0)
         }
         
-        applyEffectsToBackgroundImage(isNeedanimation: true)
+        applyEffectsToBackgroundImage(changeSong: false)
     }
     
     func lyricsSwitchChanged(uiswitch: UISwitch) {
@@ -1374,38 +1366,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isLyricsShownKey)
         }
         // if the chords base and lyrics base are all hiden, do not blur the image
-        applyEffectsToBackgroundImage(isNeedanimation: true)
+        applyEffectsToBackgroundImage(changeSong: false)
     }
     
-    func applyEffectsToBackgroundImage(isNeedanimation isNeedanimation:Bool) {
+    func applyEffectsToBackgroundImage(changeSong changeSong: Bool) {
+        if changeSong {
+            loadBackgroundImageFromMediaItem(player.nowPlayingItem!)
+        }
+        
         //we blur the image if one of the chord, tabs or lyrics is shown
         if (isChordShown || isTabsShown || isLyricsShown) && !isBlurred {
-            var image:UIImage!
-            if(isSongNeedPurchase){
-                if let imageURL = songNeedPurchase.artworkUrl100 {
-                    let url = NSURL(string: imageURL)!
-                    let fetcher = NetworkFetcher<UIImage>(URL: url)
-                    let cache = Shared.imageCache
-                    cache.fetch(fetcher: fetcher).onSuccess { image in
-                        let blurredImage:UIImage = image.applyLightEffect()!
-                        self.backgroundImageView.image = blurredImage
-                    }
-                }
-                
-            }else{
-                if let artwork = player.nowPlayingItem!.artwork {
-                    image = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
-                } else {
-                    //TODO: change placeholder image
-                    image = UIImage(named: "liwengbg")
-                }
-                let blurredImage = image!.applyLightEffect()!
-                self.backgroundImageView.image = blurredImage
-            }
-            
+        
+            self.backgroundImageView.image = blurredImage
             self.isBlurred = true
             
-            if(isNeedanimation){
+            // we dont' need animation when changing song
+            if !changeSong {
                 UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
                     
                     self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
@@ -1418,30 +1394,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         } else if (!isChordShown && !isTabsShown && !isLyricsShown && isBlurred) { // center the image
             
-            var image:UIImage!
-            if(!isSongNeedPurchase){
-                if let artwork = player.nowPlayingItem!.artwork {
-                    image = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
-                } else {
-                    //TODO: change placeholder image
-                    image = UIImage(named: "liwengbg")
-                }
-                self.backgroundImageView.image = image
-                
-            }else{
-                if let imageURL = songNeedPurchase.artworkUrl100 {
-                    let url = NSURL(string: imageURL)!
-                    let fetcher = NetworkFetcher<UIImage>(URL: url)
-                    let cache = Shared.imageCache
-                    cache.fetch(fetcher: fetcher).onSuccess { image in
-                        self.backgroundImageView.image = image
-                    }
-                }
-
-            }
+            self.backgroundImageView.image = backgroundImage
+           
             self.isBlurred = false
             
-            if(isNeedanimation){
+            // we dont' need animation when changing song
+            if !changeSong {
                 UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
                     
                     self.backgroundImageView.transform = CGAffineTransformMakeScale(self.backgroundScaleFactor, self.backgroundScaleFactor)

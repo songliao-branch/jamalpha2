@@ -181,6 +181,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image
+                        self.searchResults[indexPath.row].image = nil
                         self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
                     }
                 }
@@ -234,14 +235,16 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 songVC.transitioningDelegate = self.animator
                 songVC.isSongNeedPurchase = true
                 songVC.songNeedPurchase = self.searchResults[indexPath.row]
-                songVC.backgroundImage = self.searchResults[indexPath.row].image
-                songVC.blurredImage = self.searchResults[indexPath.row].image!.applyLightEffect()
+                if let img = self.searchResults[indexPath.row].image {
+                    songVC.backgroundImage = img
+                    songVC.blurredImage = img.applyLightEffect()
+                }
+           
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
                     completed in
                     self.reloadMusicTable(false)
                 })
-
             }
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
