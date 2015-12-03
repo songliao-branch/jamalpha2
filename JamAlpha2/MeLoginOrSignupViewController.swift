@@ -297,7 +297,7 @@ class MeLoginOrSignupViewController: UIViewController {
         signUpLoginRequest(parameters, afterRetrievingUser: {
             id, email, authToken in
             
-            CoreDataManager.initializeUser(id, email: email, authToken: authToken, username: self.fullName, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: profileImageData, thumbnail: thumbnailImageData)
+            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: self.fullName, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: profileImageData, thumbnail: thumbnailImageData)
             
         })
     }
@@ -431,14 +431,14 @@ extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate {
             "attempt_login":"facebook",
             "email": self.email,
             "thumbnail": self.croppedFileName,
-            "profileImage": self.originFileName,
+            "originImage": self.originFileName,
             "password": (self.email + facebookLoginSalt).md5()//IMPORTANT: DO NOT MODIFY THIS SALT
         ]
         
         self.signUpLoginRequest(parameters, afterRetrievingUser: {
             id, email, authToken in
             
-            CoreDataManager.initializeUser(id, email: email, authToken: authToken, username: self.fullName, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.profileImageData, thumbnail: self.thumbnailData)
+            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: self.fullName, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.profileImageData, thumbnail: self.thumbnailData)
         })
         
         self.navigationController?.popViewControllerAnimated(true)

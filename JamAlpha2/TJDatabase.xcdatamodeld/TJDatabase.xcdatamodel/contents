@@ -40,11 +40,10 @@
         <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="email" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <attribute name="nickName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nickname" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="profileImage" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="thumbnail" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="thumbnailUrl" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="username" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="lyricsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="LyricsSet" inverseName="user" inverseEntity="LyricsSet" syncable="YES"/>
         <relationship name="tabsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TabsSet" inverseName="user" inverseEntity="TabsSet" syncable="YES"/>
     </entity>
@@ -54,6 +53,6 @@
         <element name="Song" positionX="-54" positionY="27" width="128" height="180"/>
         <element name="Tabs" positionX="-36" positionY="90" width="128" height="105"/>
         <element name="TabsSet" positionX="-45" positionY="72" width="128" height="150"/>
-        <element name="User" positionX="-45" positionY="99" width="128" height="210"/>
+        <element name="User" positionX="-45" positionY="99" width="128" height="195"/>
     </elements>
 </model>

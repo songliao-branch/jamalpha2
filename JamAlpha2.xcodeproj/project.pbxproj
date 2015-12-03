@@ -484,15 +484,6 @@
 			name = TabItemControllers;
 			sourceTree = "<group>";
 		};
-
-		E4D58E3E1BE9BC3F00D54174 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				E4D58E3F1BE9BC4700D54174 /* Constants.swift */,
-			);
-			name = Utils;
-			sourceTree = "<group>";
-		};
 		E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -512,7 +503,6 @@
 			name = Helper;
 			sourceTree = "<group>";
 		};
-
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */

@@ -44,7 +44,7 @@ class UpdateNickNameViewController: UIViewController {
     func setUpNickNameEditTextField() {
 
         nickNameEditTextField.frame = CGRectMake(20, 0, self.viewWidth - 40, 44)
-        if let oldNickName = CoreDataManager.getCurrentUser()?.nickName {
+        if let oldNickName = CoreDataManager.getCurrentUser()?.nickname {
             nickNameEditTextField.placeholder = oldNickName
         }
         nickNameEditTextField.clearButtonMode = UITextFieldViewMode.WhileEditing

@@ -103,7 +103,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             cell.avatarImageView.layer.borderColor = UIColor.backgroundGray().CGColor
             
             if let user = CoreDataManager.getCurrentUser() {
-                if let name = user.username {
+                if let name = user.nickname {
                     cell.titleLabel.text = name
                 }
                 cell.subtitleLabel.text = user.email

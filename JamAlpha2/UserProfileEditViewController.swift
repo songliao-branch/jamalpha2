@@ -95,8 +95,8 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
             contentProfileCell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
             contentProfileCell.titleLabel.text = tableViewContent[indexPath.item]
             contentProfileCell.selectionStyle = UITableViewCellSelectionStyle.None
-            if let nickName = CoreDataManager.getCurrentUser()?.nickName {
-                contentProfileCell.contentLabel.text = nickName
+            if let name = CoreDataManager.getCurrentUser()?.nickname {
+                contentProfileCell.contentLabel.text = name
             }
             return contentProfileCell
         }
