@@ -161,5 +161,4 @@ class MusicManager: NSObject {
             uniqueArtists.append(artist)
         }
     }
-
 }

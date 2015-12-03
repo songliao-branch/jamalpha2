@@ -176,7 +176,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     cell.albumCover.image = nil
                     cell.albumCover.hnk_setImageFromURL(NSURL(string: imageURL)!)
                 }
-            
+               
             }
         } else if !resultSearchController.active && indexPath.section == 0 {//if search is inactive
             // array of search history comes in time ascending order, we need descending order (newest on top)
@@ -218,6 +218,20 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     self.reloadMusicTable()
                 })
                 
+            }else {
+                let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+                
+                songVC.selectedFromTable = true
+                
+                songVC.transitioningDelegate = self.animator
+                songVC.isSongNeedPurchase = true
+                songVC.songNeedPurchase = self.searchResults[indexPath.row]
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: {
+                    completed in
+                    self.reloadMusicTable()
+                })
+
             }
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
@@ -290,6 +304,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if let trackViewUrl = item["trackViewUrl"].string {
                 searchResponse.trackViewUrl = trackViewUrl
             }
+            
+            if let trackTimeMillis = item["trackTimeMillis"].number {
+                searchResponse.trackTimeMillis = "\(trackTimeMillis)"
+            }
             searchResults.append(searchResponse)
         }
 
@@ -325,4 +343,5 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
 }
+
 
