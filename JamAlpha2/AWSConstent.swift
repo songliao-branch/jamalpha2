@@ -12,4 +12,4 @@ import AWSS3
 let CognitoRegionType = AWSRegionType.USEast1  // e.g. AWSRegionType.USEast1
 let DefaultServiceRegionType = AWSRegionType.USEast1 // e.g. AWSRegionType.USEast1
 let CognitoIdentityPoolId = "us-east-1:eb3a9f5f-4c55-4e34-b12b-fd64ba59b8f5"
-let S3BucketName = "twistjambucket"
+let S3BucketName = "userprofileimagebucket"

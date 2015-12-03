@@ -56,6 +56,14 @@ class UserProfileEditViewController: UIViewController {
         self.navigationController?.navigationBar.translucent = false
         self.navigationItem.title = "Profile"
     }
+    
+    func tapOnUserImageView(sender: UITapGestureRecognizer) {
+        if let originImageData: NSData = CoreDataManager.getCurrentUser()?.profileImage {
+            let originImage: UIImage = UIImage(data: originImageData)!
+            
+        }
+        print("tap on image")
+    }
 
 }
 
@@ -86,6 +94,10 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
                 self.userEmail = user.email
                 if let thumbnailData = user.thumbnail {
                     userProfileCell.userImageView.image = UIImage(data: thumbnailData)
+                    userProfileCell.userImageView.userInteractionEnabled = true
+                    let tapOnUserImageView: UITapGestureRecognizer = UITapGestureRecognizer()
+                    tapOnUserImageView.addTarget(self, action: "tapOnUserImageView:")
+                    userProfileCell.userImageView.addGestureRecognizer(tapOnUserImageView)
                 }
             }
             return userProfileCell

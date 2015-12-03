@@ -40,6 +40,8 @@ class MeLoginOrSignupViewController: UIViewController {
     
     var scrollView: UIScrollView!
     //sign up screen
+    var welcomeLabel: UILabel! // welcome label to replace the nick name at sign in screen
+    var nickNameTextField: UITextField! // nick name in sign up screen
     var emailTextField: UITextField! //email in signup screen AND email/user in log in screen
     var orLabel: UILabel! // a label inside the separator from email textfield and facebook button
     var facebookButton: UIButton!
@@ -153,7 +155,26 @@ class MeLoginOrSignupViewController: UIViewController {
         
         //sign in screen
         let verticalMargin: CGFloat = 10
-        emailTextField = UITextField(frame: CGRect(x: 0, y: verticalMargin, width: viewWidth-20, height: 44))
+        welcomeLabel = UILabel(frame: CGRect(x: 0, y: verticalMargin, width: viewWidth - 20, height: 44))
+        welcomeLabel.text = "Welcome Back"
+        welcomeLabel.textAlignment = NSTextAlignment.Center
+        welcomeLabel.textColor = UIColor.mainPinkColor()
+        
+        nickNameTextField = UITextField(frame: CGRect(x: 0, y: verticalMargin, width: viewWidth - 20, height: 44))
+        nickNameTextField.placeholder = "Nick Name"
+        nickNameTextField.textAlignment = .Center
+        nickNameTextField.center.x = self.view.center.x
+        nickNameTextField.tintColor = UIColor.mainPinkColor()
+        nickNameTextField.clearButtonMode = .WhileEditing
+        nickNameTextField.autocapitalizationType = .None
+        nickNameTextField.autocorrectionType = .No
+        scrollView.addSubview(nickNameTextField)
+        
+        let credentialTextFieldUnderline1 = UIView(frame: CGRect(x: nickNameTextField.frame.origin.x, y: CGRectGetMaxY(nickNameTextField.frame), width: nickNameTextField.frame.width, height: 1))
+        credentialTextFieldUnderline1.backgroundColor = UIColor.lightGrayColor()
+        scrollView.addSubview(credentialTextFieldUnderline1)
+        
+        emailTextField = UITextField(frame: CGRect(x: 0, y: CGRectGetMaxY(credentialTextFieldUnderline1.frame)+verticalMargin, width: viewWidth - 20, height: 44))
         emailTextField.placeholder = "Email"
         emailTextField.textAlignment = .Center
         emailTextField.center.x = self.view.center.x
@@ -163,10 +184,7 @@ class MeLoginOrSignupViewController: UIViewController {
         emailTextField.autocorrectionType = .No
         scrollView.addSubview(emailTextField)
         
-        let credentialTextFieldUnderline = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
-        credentialTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
-        scrollView.addSubview(credentialTextFieldUnderline)
-        
+
         //set it at the bottom of the scrollview
         let originY: CGFloat = self.view.frame.height - CGRectGetMaxY(topView.frame) - 44 - 64 - 10
         orLabel = UILabel(frame: CGRect(x: 0, y: originY, width: 50, height: 10))
@@ -190,7 +208,11 @@ class MeLoginOrSignupViewController: UIViewController {
         scrollView.addSubview(facebookButton)
         
         //log in screen
-        passwordTextField = UITextField(frame: CGRect(x: 0, y: CGRectGetMaxY(credentialTextFieldUnderline.frame)+verticalMargin, width: emailTextField.frame.width, height: emailTextField.frame.height))
+        let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
+        credentialTextFieldUnderline2.backgroundColor = UIColor.lightGrayColor()
+        scrollView.addSubview(credentialTextFieldUnderline2)
+        
+        passwordTextField = UITextField(frame: CGRect(x: 0, y: CGRectGetMaxY(credentialTextFieldUnderline2.frame)+verticalMargin, width: emailTextField.frame.width, height: emailTextField.frame.height))
         passwordTextField.secureTextEntry = true
         passwordTextField.placeholder = "Password (Mininum 6 characters)"
         passwordTextField.textAlignment = .Center
@@ -198,7 +220,7 @@ class MeLoginOrSignupViewController: UIViewController {
         passwordTextField.tintColor = UIColor.mainPinkColor()
         scrollView.addSubview(passwordTextField)
         
-        let passwordTextFieldUnderline = UITextField(frame: CGRect(x: credentialTextFieldUnderline.frame.origin.x, y: CGRectGetMaxY(passwordTextField.frame), width: credentialTextFieldUnderline.frame.width, height: 1))
+        let passwordTextFieldUnderline = UITextField(frame: CGRect(x: credentialTextFieldUnderline2.frame.origin.x, y: CGRectGetMaxY(passwordTextField.frame), width: credentialTextFieldUnderline2.frame.width, height: 1))
         passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(passwordTextFieldUnderline)
         
@@ -214,7 +236,12 @@ class MeLoginOrSignupViewController: UIViewController {
     func signUpTabPressed() {
         self.indicatorTriangleView.center.x = self.signUpTabButton.center.x
         self.subtitleLabel.text = "Sign up to upload tabs and save your favorite songs"
+        if isSignUpSelected == false {
+            self.scrollView.addSubview(self.nickNameTextField)
+            self.welcomeLabel.removeFromSuperview()
+        }
         isSignUpSelected = true
+        
         
         self.passwordTextField.placeholder = "Password (Mininum 6 characters)"
         self.submitButton.setTitle("Sign up", forState: .Normal)
@@ -223,18 +250,25 @@ class MeLoginOrSignupViewController: UIViewController {
     func loginTabPressed() {
         self.indicatorTriangleView.center.x = self.loginTabButton.center.x
         self.subtitleLabel.text = "Log in to upload tabs and save your favorite songs"
+        if isSignUpSelected == true {
+            self.nickNameTextField.removeFromSuperview()
+            self.scrollView.addSubview(self.welcomeLabel)
+        }
         isSignUpSelected = false
+        
         
         self.submitButton.setTitle("Log in", forState: .Normal)
         self.passwordTextField.placeholder = "Password"
     }
     
     func topViewTapGesture(sender: UITapGestureRecognizer) {
+        self.nickNameTextField.resignFirstResponder()
         self.emailTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
     }
     
     func scrollViewTapGesture(sender: UITapGestureRecognizer) {
+        self.nickNameTextField.resignFirstResponder()
         self.emailTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
     }
@@ -242,7 +276,12 @@ class MeLoginOrSignupViewController: UIViewController {
     
     func submitPressed() {
 
-        //validate email is not empty
+        //validate nickname, email, password is not empty
+        guard let nickname = nickNameTextField.text where nickNameTextField.text?.characters.count > 0 else {
+            self.showMessage("Nick Name field is empty", message: "", actionTitle: "OK", completion: nil)
+            return
+        }
+        
         guard let email = emailTextField.text where emailTextField.text?.characters.count > 0 else {
             self.showMessage("Email field is empty", message: "", actionTitle: "OK", completion: nil)
             return
@@ -270,6 +309,7 @@ class MeLoginOrSignupViewController: UIViewController {
         
         if isSignUpSelected { //sigup up api
             parameters = [
+                "nickname": nickname,
                 "email": email,
                 "password": password
             ]
