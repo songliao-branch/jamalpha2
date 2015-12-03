@@ -32,7 +32,7 @@ public extension UIImage {
     
 
     public func applyLightEffect() -> UIImage? {
-        return applyBlurWithRadius(12, tintColor: UIColor(white: 0.48, alpha: 0.4), saturationDeltaFactor: 1.8)
+        return applyBlurWithRadius(20, tintColor: UIColor(white: 0.48, alpha: 0.4), saturationDeltaFactor: 1.8)
     }
     
     public func applyActionSheetEffect() -> UIImage? {

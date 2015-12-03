@@ -35,6 +35,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         layer.backgroundColor = UIColor.backgroundGray()
         resultsTableView.backgroundView = layer
         
+        allTabsSets[0] = []
+        allTabsSets[1] = []
         
         ( _, _, _, lastSelectedTabsId) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: false)
         loadLocalData()
@@ -48,8 +50,11 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         }
         if isPullingTabs {
             //must initialize with key
-            allTabsSets[0] = []
-        
+
+            
+            print("allTabsSet 0 has \(allTabsSets[0]?.count)")
+            print("allTabsSet 1 has \(allTabsSets[1]?.count)")
+            
             var chords = [Chord]()
             var tuning = ""
             var capo = -1
@@ -76,7 +81,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     func fetchData() {
         if isPullingTabs {
-            allTabsSets[1] = []
+           
             
             APIManager.downloadTabs(mediaItem, completion: {
                 downloads in
@@ -88,7 +93,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 dispatch_async(dispatch_get_main_queue()) {
                     self.resultsTableView.reloadData()
                     
-                    if self.allTabsSets[0]!.count == 0 && downloads.count < 1 {
+                    // if no local tabs and no downloaded tabs
+                    if self.allTabsSets[0]?.count == 0 && downloads.count < 1 {
                         self.centerButton.hidden = false
                     }
                 }
@@ -228,7 +234,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if isPullingTabs && allTabsSets[section]?.count < 1 {
+        if isPullingTabs && allTabsSets[section]?.count == 0 {
             return 0
         }
         return 22
@@ -236,7 +242,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isPullingTabs {
-            if allTabsSets[section]?.count < 1 {
+            if allTabsSets[section]?.count == 0 {
                 return 0
             }
             return (allTabsSets[section]?.count)!
