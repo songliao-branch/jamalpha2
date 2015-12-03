@@ -87,7 +87,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 
                 dispatch_async(dispatch_get_main_queue()) {
                     self.resultsTableView.reloadData()
-                    if downloads.count < 1 {
+                    
+                    if self.allTabsSets[0]!.count == 0 && downloads.count < 1 {
                         self.centerButton.hidden = false
                     }
                 }
@@ -227,7 +228,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if isPullingTabs && allTabsSets[0]?.count < 1 {
+        if isPullingTabs && allTabsSets[section]?.count < 1 {
             return 0
         }
         return 22
