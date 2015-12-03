@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import AVFoundation
 import Alamofire
 import Haneke
 
@@ -199,6 +200,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var isSongNeedPurchase = false
     var songNeedPurchase:SearchResult!
+    var AVplayer: AVPlayer!
+    var playPreveiwButton:UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -233,6 +236,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
            updateMusicData(firstLoadPlayingItem)
         }else{
             updateMusicData(searchResult:songNeedPurchase)
+            setUpPreviewButton()
         }
         
         
@@ -607,10 +611,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(chordBase)
         
         //add tap gesture to chordbase too
-        if(!isSongNeedPurchase){
-            chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
-            chordBase.addGestureRecognizer(chordBaseTapGesture)
-        }
+        chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        chordBase.addGestureRecognizer(chordBaseTapGesture)
         
         calculateXPoints()
     }
@@ -844,7 +846,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
         panRecognizer.delegate = self
         progressBlockContainer.addGestureRecognizer(panRecognizer)
-        
         progressContainerTapGesture = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
         progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
     }
@@ -1977,24 +1978,26 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func playPause(recognizer: UITapGestureRecognizer) {
-        if player.playbackState == MPMusicPlaybackState.Paused {
-            if countdownOn {
-                //temporarily disable tap gesture to avoid accidental start count down again
-                chordBase.removeGestureRecognizer(chordBaseTapGesture)
-                progressBlockContainer.removeGestureRecognizer(progressContainerTapGesture)
-                countdownView.setNumber(countDownStartSecond)
-                countdownView.hidden = false
-                countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
-                NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
+        if(!isSongNeedPurchase){
+            if player.playbackState == MPMusicPlaybackState.Paused {
+                if countdownOn {
+                    //temporarily disable tap gesture to avoid accidental start count down again
+                    chordBase.removeGestureRecognizer(chordBaseTapGesture)
+                    progressBlockContainer.removeGestureRecognizer(progressContainerTapGesture)
+                    countdownView.setNumber(countDownStartSecond)
+                    countdownView.hidden = false
+                    countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
+                    NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
+                    
+                } else {
+                    
+                    player.play()
+                }
                 
             } else {
-               
-                player.play()
+                //nowPlayingItemSpeed = player.currentPlaybackRate
+                player.pause()
             }
-            
-        } else {
-            //nowPlayingItemSpeed = player.currentPlaybackRate
-            player.pause()
         }
     }
     
@@ -2091,6 +2094,34 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    var isClick = false
+    func setUpPreviewButton(){
+        playPreveiwButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width/2-35,UIScreen.mainScreen().bounds.size.height-bottomViewHeight-90,70,70))
+        playPreveiwButton.setImage((UIImage(named: "playbutton")), forState: UIControlState.Normal)
+        playPreveiwButton.addTarget(self, action: "avPlay", forControlEvents: UIControlEvents.TouchUpInside)
+        self.view.addSubview(playPreveiwButton)
+        let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
+        let playerItem = AVPlayerItem( URL:url)
+        AVplayer = AVPlayer(playerItem:playerItem)
+    }
+    
+    func avPlay(){
+        if(AVplayer.currentTime() == AVplayer.currentItem?.duration){
+            AVplayer = nil
+            let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
+            let playerItem = AVPlayerItem( URL:url)
+            AVplayer = AVPlayer(playerItem:playerItem)
+            isClick = !isClick
+        }
+        if(!isClick){
+            AVplayer.rate = 1.0;
+            AVplayer.play()
+        }else{
+            AVplayer.pause()
+        }
+       isClick = !isClick
+    }
+    
     // MARK: Fix to portrait orientation
     override func shouldAutorotate() -> Bool {
         return false
@@ -2099,4 +2130,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
+    
+    
 }
