@@ -167,6 +167,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
 // upload user profile image
 extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    
     func pressUploadImageButton() {
         let refreshAlert = UIAlertController(title: "Add Photo", message: "Camera or Photo Library", preferredStyle: UIAlertControllerStyle.Alert)
         let photoPicker = UIImagePickerController()
@@ -177,32 +178,9 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
             refreshAlert.addAction(UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
                 photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
-                
                 //Create camera overlay, make it square
-                let pickerFrame = CGRectMake(0, UIApplication.sharedApplication().statusBarFrame.size.height, photoPicker.view.bounds.width, photoPicker.view.bounds.height - photoPicker.navigationBar.bounds.size.height - photoPicker.toolbar.bounds.size.height - 5)
-                let squareFrame = CGRectMake(pickerFrame.width/2 - self.viewWidth/2, pickerFrame.height/2 - self.viewWidth/2, self.viewWidth, self.viewWidth)
-                UIGraphicsBeginImageContext(pickerFrame.size)
-                
-                let context = UIGraphicsGetCurrentContext()
-                CGContextSaveGState(context)
-                CGContextAddRect(context, CGContextGetClipBoundingBox(context))
-                CGContextMoveToPoint(context, squareFrame.origin.x, squareFrame.origin.y)
-                CGContextAddLineToPoint(context, squareFrame.origin.x + squareFrame.width, squareFrame.origin.y)
-                CGContextAddLineToPoint(context, squareFrame.origin.x + squareFrame.width, squareFrame.origin.y + squareFrame.size.height)
-                CGContextAddLineToPoint(context, squareFrame.origin.x, squareFrame.origin.y + squareFrame.size.height)
-                CGContextAddLineToPoint(context, squareFrame.origin.x, squareFrame.origin.y)
-                CGContextEOClip(context)
-                CGContextMoveToPoint(context, pickerFrame.origin.x, pickerFrame.origin.y)
-                CGContextSetRGBFillColor(context, 0, 0, 0, 1)
-                CGContextFillRect(context, pickerFrame)
-                CGContextRestoreGState(context)
-                
-                let overlayImage = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext();
-                
-                let overlayView = UIImageView(frame: pickerFrame)
-                overlayView.image = overlayImage
-                photoPicker.cameraOverlayView = overlayView
+                photoPicker.allowsEditing = true
+                photoPicker.showsCameraControls = true
                 
                 self.presentViewController(photoPicker, animated: true, completion: nil)
             }))
@@ -211,31 +189,18 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
             photoPicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
             self.presentViewController(photoPicker, animated: true, completion: nil)
         }))
+        refreshAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+            self.dismissViewControllerAnimated(false, completion: nil)
+        }))
         presentViewController(refreshAlert, animated: true, completion: nil)
     }
     
     
-    
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
         
-        // crop the origin image to square image
-        var originImage = image
-        let imageSize: CGSize = image.size
-        let width : CGFloat = imageSize.width
-        let height: CGFloat = imageSize.height
-        if (width != height) {
-            let newDimension: CGFloat = min(width, height)
-            let widthOffset: CGFloat = (width - newDimension) / 2;
-            let heightOffset: CGFloat = (height - newDimension) / 2;
-            UIGraphicsBeginImageContextWithOptions(CGSizeMake(newDimension, newDimension), false, 0)
-            originImage.drawAtPoint(CGPointMake(-widthOffset, -heightOffset), blendMode: CGBlendMode.Normal, alpha: 1)
-            originImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-        }
-        
         // add request to upload array
-        self.originFileName = awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.userEmail)
-        cropImage(originImage)
+        self.originFileName = awsS3.addUploadRequestToArray(image, style: "origin", email: self.userEmail)
+        cropImage(image)
 
         self.dismissViewControllerAnimated(true, completion: nil)
     }
