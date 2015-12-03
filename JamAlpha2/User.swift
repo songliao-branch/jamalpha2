@@ -19,6 +19,7 @@ class User: NSManagedObject {
     @NSManaged var authToken: String
     @NSManaged var profileImage: NSData?
     @NSManaged var thumbnail: NSData?
+    @NSManaged var nickName: String?
     
     @NSManaged var tabsSets: NSSet
     @NSManaged var lyricsSets: NSSet

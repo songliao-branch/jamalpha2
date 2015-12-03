@@ -8,8 +8,7 @@
 
 import UIKit
 import Haneke
-import AWSS3
-import RSKImageCropper
+
 
 //var tempImage: UIImage = UIImage()
 
@@ -20,17 +19,12 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
-    var userEmail: String!
-    
-    var originFileName: String!
-    var croppedFileName: String!
-    var originImageData: NSData!
+
     
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     
     // request array
-    var awsS3: AWSS3Manager = AWSS3Manager()
-    var imageName: String!
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,15 +53,13 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             print("Creating 'download' directory failed. Error: \(error)")
         }
         
-//        let imageView: UIImageView = UIImageView(frame: CGRectMake(50, 50, 100, 100))
-//        imageView.image = tempImage
-//        self.view.addSubview(imageView)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
         
         showSignUpLoginScreen()
         userTable.reloadData()
@@ -114,7 +106,6 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 if let name = user.username {
                     cell.titleLabel.text = name
                 }
-                self.userEmail = user.email
                 cell.subtitleLabel.text = user.email
                 if let url = UIImage(data: user.thumbnail!) {//user.avatarUrl {
                     //cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
@@ -142,7 +133,9 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
-            self.pressUploadImageButton()
+            // navigation to user profile edit vc
+            let userProfileVC: UserProfileEditViewController = self.storyboard?.instantiateViewControllerWithIdentifier("userprofileeditVC") as! UserProfileEditViewController
+            self.navigationController?.pushViewController(userProfileVC, animated: true)
             
         } else if indexPath.section == 1{
             // my tabs, my lyrics, favorites
@@ -159,93 +152,4 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }
-
-// upload user profile image
-extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
-    
-    func pressUploadImageButton() {
-        let refreshAlert = UIAlertController(title: "Add Photo", message: "Camera or Photo Library", preferredStyle: UIAlertControllerStyle.Alert)
-        let photoPicker = UIImagePickerController()
-        photoPicker.setEditing(true, animated: true)
-        
-        photoPicker.delegate = self
-        photoPicker.preferredContentSize = CGSize(width: 54, height: 54)
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
-            refreshAlert.addAction(UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-                photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
-                //Create camera overlay, make it square
-                photoPicker.allowsEditing = true
-                photoPicker.showsCameraControls = true
-                
-                self.presentViewController(photoPicker, animated: true, completion: nil)
-            }))
-        }
-        refreshAlert.addAction(UIAlertAction(title: "Photo Library", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-            photoPicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
-            self.presentViewController(photoPicker, animated: true, completion: nil)
-        }))
-        refreshAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-            self.dismissViewControllerAnimated(false, completion: nil)
-        }))
-        presentViewController(refreshAlert, animated: true, completion: nil)
-    }
-    
-    
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
-
-        cropImage(image)
-
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    // download the image
-    func downloadImage() {
-        awsS3.addDownloadRequestToArray(self.originFileName)
-        awsS3.download(awsS3.downloadRequests[0]!)
-    }
-    
-}
-
-// crop the user profile image
-extension UserProfileViewController: RSKImageCropViewControllerDelegate {
-    
-    func cropImage(sender: UIImage) {
-        let imageCropVC: RSKImageCropViewController = RSKImageCropViewController(image: sender, cropMode: RSKImageCropMode.Circle)
-        imageCropVC.delegate = self
-        self.navigationController?.pushViewController(imageCropVC, animated: true)
-    }
-    
-    func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
-        // resize image, add request to upload array
-        let originImage: UIImage = croppedImage.resize(250)
-        self.originFileName = awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.userEmail)
-        self.originImageData = UIImagePNGRepresentation(originImage)
-        
-        // resize image
-        let thumbnailImage: UIImage = croppedImage.resize(50)
-        let thumbnailImageData: NSData = UIImagePNGRepresentation(thumbnailImage)!
-
-        // add request to upload array
-        self.croppedFileName = awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: self.userEmail)
-        
-        //sending the cropped image to s3 in here
-        for item in awsS3.uploadRequests {
-            awsS3.upload(item!)
-        }
-        awsS3.uploadRequests.removeAll()
-        
-        CoreDataManager.updateUserProfileImage(self.userEmail, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.originImageData, thumbnail: thumbnailImageData)
-        
-        self.userTable.reloadData()
-        
-        self.navigationController?.popViewControllerAnimated(true)
-    }
-    
-    func imageCropViewControllerDidCancelCrop(controller: RSKImageCropViewController) {
-        self.navigationController?.popViewControllerAnimated(true)
-    }
-    
-}
-
 

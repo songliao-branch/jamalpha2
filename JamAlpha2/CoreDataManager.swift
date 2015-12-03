@@ -45,7 +45,7 @@ class CoreDataManager: NSObject {
     //the last two parameters can necessary for facebook logins
     // a normal call to this function only involves initializeUser(id,email,authToken)
     // a call with facebook involves all 5 parameters
-    class func initializeUser(id: Int, email: String, authToken: String, username: String?=nil, avatarUrl: String?=nil, thumbnailUrl: String?=nil, profileImage: NSData?, thumbnail: NSData?) {
+    class func initializeUser(id: Int, email: String, authToken: String, username: String? = nil, avatarUrl: String? = nil, thumbnailUrl: String? = nil, profileImage: NSData?, thumbnail: NSData?, nickName: String? = nil) {
         logoutUser()//for testing clear all users
         
         let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
@@ -54,8 +54,13 @@ class CoreDataManager: NSObject {
         user.authToken = authToken
         user.profileImage = profileImage
         user.thumbnail = thumbnail
+        if let url = thumbnailUrl {
+            user.thumbnailUrl = url
+        }
         user.thumbnailUrl = thumbnailUrl
-        
+        if let nick = nickName {
+            user.nickName = nick
+        }
         if let name = username {
             user.username = name
         }
@@ -85,6 +90,26 @@ class CoreDataManager: NSObject {
         }
         return false
     }
+    
+    class func updateUserProfileNickName(userEmail: String, nickName: String) -> Bool {
+        let fetchRequest = NSFetchRequest(entityName: "User")
+        fetchRequest.predicate = NSPredicate(format: "email == '\(userEmail)'")
+        do {
+            if let results = try moc.executeFetchRequest(fetchRequest) as? [User] {
+                for item in results {
+                    let temp: User = item as User
+                    temp.nickName = nickName
+                    SwiftCoreDataHelper.saveManagedObjectContext(moc)
+                    return true
+                }
+            }
+        } catch {
+            fatalError("There was an error fetching tabs on the index \(index)")
+        }
+        return false
+    }
+    
+    
     
 
     //song-related
