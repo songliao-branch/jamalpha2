@@ -23,8 +23,6 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     override func viewDidLoad() {
         super.viewDidLoad()
         artistAllSongs = theArtist.getSongs()
-        
-        //MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
@@ -73,8 +71,14 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let cell = tableView.dequeueReusableCellWithIdentifier("albumsectioncell") as! AlbumSectionCell
-        let image = theArtist.getAlbums()[section].coverImage.imageWithSize(CGSize(width: 85, height: 85))
-        cell.albumImageView.image = image
+        
+        cell.albumImageView.image = nil
+        
+        if let cover = theArtist.getAlbums()[section].coverImage {
+            let image = cover.imageWithSize(CGSize(width: 85, height: 85))
+            cell.albumImageView.image = image
+        }
+        
         cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
         
         if theArtist.getAlbums()[section].yearReleased > 1000 { //album year exist
@@ -112,7 +116,6 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         if MusicManager.sharedInstance.player.nowPlayingItem != nil {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
                 
-                // TODO: change asset icon to pink
                 cell.loudspeakerImage.hidden = false
             }
             else {
@@ -122,15 +125,10 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
             cell.loudspeakerImage.hidden = true
         }
         
-        let trackNumber = song.albumTrackNumber
-        let title = song.title
-        if trackNumber < 1 {
-            cell.trackNumberLabel.hidden = true
-        } else {
-            cell.trackNumberLabel.text = "\(trackNumber)"
-        }
+        cell.titleLabel.text = song.title
         
-        cell.titleLabel.text = title
+        // assign empty string if no track number
+        cell.trackNumberLabel.text = song.albumTrackNumber > 0 ? String(song.albumTrackNumber) : ""
         return cell
     }
     

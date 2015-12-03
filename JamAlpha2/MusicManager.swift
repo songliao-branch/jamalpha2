@@ -123,7 +123,7 @@ class MusicManager: NSObject {
         //start new albums fresh
         var collectionInAlbum = [MPMediaItem]() // a collection of each album's represenstative item
         let albumQuery = MPMediaQuery()
-        albumQuery.groupingType = MPMediaGrouping.Album;
+        albumQuery.groupingType = MPMediaGrouping.Album
         for album in albumQuery.collections!{
             let representativeItem = album.representativeItem!
             
@@ -137,28 +137,32 @@ class MusicManager: NSObject {
     }
     
     //load artist must be called after getting all albums
-    func loadLocalArtist(){
+    func loadLocalArtist() {
         
-        var allArtistRepresentiveSong = [MPMediaItem]() // a list of one song per artist
-        let artistQuery = MPMediaQuery()
-        artistQuery.groupingType = MPMediaGrouping.Artist
-        for artist in artistQuery.collections! {
-            let representativeItem = artist.representativeItem!
-            if representativeItem.playbackDuration < 30 { continue }
-            allArtistRepresentiveSong.append(representativeItem)
+        var artistDictionary = [String: [Album]]() //key is artistName
+        for album in uniqueAlbums {
+            if artistDictionary[album.artistName] == nil {
+                artistDictionary [album.artistName] = []
+            }
+            artistDictionary [album.artistName]?.append(album)
+        }
+        
+        for artist in artistDictionary {
+            let theArtist = Artist(artist: artist.0)
             
-            let artist = Artist(artist: representativeItem.artist!)
-            
-            uniqueAlbums.sortInPlace({ album1, album2 in
+            let albumsByYearDescending = artist.1.sort({ album1, album2 in
                 return album1.yearReleased > album2.yearReleased
             })
             
-            for album in uniqueAlbums {
-                if representativeItem.artistPersistentID == album.artistPersistantId {
-                    artist.addAlbum(album)
-                }
+            for album in albumsByYearDescending {
+                theArtist.addAlbum(album)
             }
-            uniqueArtists.append(artist)
+            uniqueArtists.append(theArtist)
         }
+        //sort by artist name ascending
+        uniqueArtists.sortInPlace({
+            artist1, artist2 in
+            return artist1.artistName < artist2.artistName
+        })
     }
 }

@@ -192,28 +192,40 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             
             let theArtist = artistsByFirstAlphabet[indexPath.section].1[indexPath.row]
             
+            cell.coverImage.image = nil
             
-            let image = theArtist.getAlbums()[0].coverImage.imageWithSize(CGSize(width: 80, height: 80))
+            //get the first album cover
+            for album in theArtist.getAlbums() {
+                if let cover = album.coverImage {
+                    let image = cover.imageWithSize(CGSize(width: 85, height: 85))
+                    cell.coverImage.image = image
+                    cell.imageWidth.constant = 80
+                    cell.imageHeight.constant = 80
+                    
+                    break
+                }
+            }
+            
             cell.loudspeakerImage.hidden = true
-            cell.imageWidth.constant = 80
-            cell.imageHeight.constant = 80
-            cell.coverImage.image = image
-            
+
             let numberOfAlbums = theArtist.getAlbums().count
             let albumPrompt = "album".addPluralSubscript(numberOfAlbums)
             
             let numberOfTracks = theArtist.numberOfTracks
             let trackPrompt = "track".addPluralSubscript(numberOfTracks)
             cell.mainTitle.text = theArtist.artistName
-            cell.subtitle.text = "\(numberOfTracks) \(albumPrompt), \(numberOfTracks) \(trackPrompt)"
+            cell.subtitle.text = "\(numberOfAlbums) \(albumPrompt), \(numberOfTracks) \(trackPrompt)"
             
         } else if pageIndex == 2 {
 
             let theAlbum = albumsByFirstAlphabet[indexPath.section].1[indexPath.row]
-            let image = theAlbum.coverImage.imageWithSize(CGSize(width: 80, height: 80))
-            cell.imageWidth.constant = 80
-            cell.imageHeight.constant = 80
-            cell.coverImage.image = image
+            
+            if let cover = theAlbum.coverImage {
+                cell.imageWidth.constant = 80
+                cell.imageHeight.constant = 80
+                cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
+            }
+            
             cell.loudspeakerImage.hidden = true
             
             let numberOfTracks = theAlbum.numberOfTracks
@@ -297,7 +309,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
-    
+  
     // MARK: called from SongViewController action sheets
     func goToArtist(theArtist: String) {
         print("we want to go to \(theArtist)")
