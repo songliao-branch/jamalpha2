@@ -385,12 +385,11 @@ class MeLoginOrSignupViewController: UIViewController {
 }
 
 // crop the user profile image
-extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate, RSKImageCropViewControllerDataSource {
+extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate {
   
     func cropImage(sender: UIImage) {
         let imageCropVC: RSKImageCropViewController = RSKImageCropViewController(image: sender, cropMode: RSKImageCropMode.Circle)
         imageCropVC.delegate = self
-        imageCropVC.dataSource = self
         self.navigationController?.pushViewController(imageCropVC, animated: true)
     }
     
@@ -436,32 +435,6 @@ extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate, RSK
     func imageCropViewControllerDidCancelCrop(controller: RSKImageCropViewController) {
         self.navigationController?.popViewControllerAnimated(true)
     }
-    
-    func imageCropViewControllerCustomMaskRect(controller: RSKImageCropViewController) -> CGRect {
-        let maskSize: CGSize = CGSizeMake(self.viewWidth, self.viewWidth)
-        let maskRect = CGRectMake(self.viewWidth / 2, self.viewHeight / 2, maskSize.width, maskSize.height)
-        return maskRect
-    }
-    
-    func imageCropViewControllerCustomMaskPath(controller: RSKImageCropViewController) -> UIBezierPath {
-        let rect: CGRect = controller.maskRect
-        let point1: CGPoint = CGPointMake(CGRectGetMinX(rect), CGRectGetMaxY(rect))
-        let point2: CGPoint = CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect))
-        let point3: CGPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect))
-        
-        let triangle: UIBezierPath = UIBezierPath()
-        triangle.moveToPoint(point1)
-        triangle.addLineToPoint(point2)
-        triangle.addLineToPoint(point3)
-        triangle.closePath()
-        
-        return triangle
-    }
-    
-    func imageCropViewControllerCustomMovementRect(controller: RSKImageCropViewController) -> CGRect {
-        return controller.maskRect
-    }
-    
 }
 
 
