@@ -114,8 +114,12 @@ class CoreDataManager: NSObject {
         user.id  = id
         user.email = email
         user.authToken = authToken
-        user.profileImage = profileImage
-        user.thumbnail = thumbnail
+        if let image = profileImage {
+            user.profileImage = image
+        }
+        if let thumb = thumbnail {
+            user.thumbnail = thumb
+        }
         if let url = thumbnailUrl {
             user.thumbnailUrl = url
         }
@@ -135,10 +139,18 @@ class CoreDataManager: NSObject {
             if let results = try moc.executeFetchRequest(fetchRequest) as? [User] {
                 for item in results {
                     let temp: User = item as User
-                    temp.avatarUrl = avatarUrl
-                    temp.thumbnailUrl = thumbnailUrl
-                    temp.profileImage = profileImage
-                    temp.thumbnail = thumbnail
+                    if let ava = avatarUrl {
+                        temp.avatarUrl = ava
+                    }
+                    if let url = thumbnailUrl {
+                        temp.thumbnailUrl = url
+                    }
+                    if let image = profileImage {
+                        temp.profileImage = image
+                    }
+                    if let thumb = thumbnail {
+                        temp.thumbnail = thumb
+                    }
                     SwiftCoreDataHelper.saveManagedObjectContext(moc)
                     return true
                 }

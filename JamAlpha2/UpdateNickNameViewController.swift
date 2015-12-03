@@ -72,7 +72,10 @@ class UpdateNickNameViewController: UIViewController {
             let saveSuccess = CoreDataManager.updateUserProfileNickName((CoreDataManager.getCurrentUser()?.email)!, nickName: name)
             if saveSuccess {
                 let refreshAlert = UIAlertController(title: "Save Nick Name", message: "Save Nick Name Successful", preferredStyle: UIAlertControllerStyle.Alert)
-                refreshAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+                refreshAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                    // update nick name 
+                    //CoreDataManager.getCurrentUser()?.nickname
+                }))
             } else {
                 let refreshAlert = UIAlertController(title: "Save Nick Name", message: "Save Nick Name Error", preferredStyle: UIAlertControllerStyle.Alert)
                 refreshAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))

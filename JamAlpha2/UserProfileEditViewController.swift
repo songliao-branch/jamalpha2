@@ -224,6 +224,11 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
         
         self.tableView.reloadData()
         
+        // update profile image 
+        //CoreDataManager.getCurrentUser()?.avatarUrl // origin url
+        //CoreDataManager.getCurrentUser()?.thumbnailUrl // thumbnail url
+        
+        
         self.navigationController?.popViewControllerAnimated(true)
     }
     

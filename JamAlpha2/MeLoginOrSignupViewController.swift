@@ -454,12 +454,11 @@ extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate {
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
         
         
-        //tempImage = downSizeCroppedImage
-        
-        self.thumbnailData = UIImagePNGRepresentation(croppedImage)
+        let thumbnailImage = croppedImage.resize(80)
+        self.thumbnailData = UIImagePNGRepresentation(thumbnailImage)
         
         // add request to upload array
-        self.croppedFileName = awsS3.addUploadRequestToArray(croppedImage, style: "thumbnail", email: self.email)
+        self.croppedFileName = awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: self.email)
         
         //sending the cropped image to s3 in here
         for item in awsS3.uploadRequests {
