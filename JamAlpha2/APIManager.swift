@@ -18,7 +18,7 @@ class SearchResult {
     var trackName: String?
     var artistName: String?
     var collectionName: String?
-    var trackTimeMillis: String?
+    var trackTimeMillis: Float?
     
     var artworkUrl100: String?//large 100
     var previewUrl: String?
@@ -28,6 +28,8 @@ class SearchResult {
         self.wrapperType = wrapperType
         self.kind = kind
     }
+    
+    var image: UIImage?
 }
 
 

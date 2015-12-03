@@ -174,7 +174,15 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 if let imageURL = searchResults[indexPath.row].artworkUrl100 {
                     cell.albumCover.image = nil
-                    cell.albumCover.hnk_setImageFromURL(NSURL(string: imageURL)!)
+                    
+                    
+                    let url = NSURL(string: imageURL)!
+                    let fetcher = NetworkFetcher<UIImage>(URL: url)
+                    let cache = Shared.imageCache
+                    cache.fetch(fetcher: fetcher).onSuccess { image in
+                        cell.albumCover.image = image
+                        self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                    }
                 }
                
             }
@@ -226,6 +234,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 songVC.transitioningDelegate = self.animator
                 songVC.isSongNeedPurchase = true
                 songVC.songNeedPurchase = self.searchResults[indexPath.row]
+                songVC.backgroundImage = self.searchResults[indexPath.row].image
+                songVC.blurredImage = self.searchResults[indexPath.row].image!.applyLightEffect()
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
                     completed in
@@ -306,7 +316,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             
             if let trackTimeMillis = item["trackTimeMillis"].number {
-                searchResponse.trackTimeMillis = "\(trackTimeMillis)"
+                searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
             }
             searchResults.append(searchResponse)
         }

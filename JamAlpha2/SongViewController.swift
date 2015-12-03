@@ -37,9 +37,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     @IBOutlet weak var playPauseButton: UIButton!
     
-    
     var backgroundImageView: UIImageView!
     var backgroundScaleFactor: CGFloat = 0.4
+    var backgroundImage: UIImage?
+    var blurredImage: UIImage?
     
     var buttonDimension: CGFloat = 50
     var pulldownButton:UIButton!
@@ -199,13 +200,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var isBlurred:Bool = true
     
     var isSongNeedPurchase = false
-    var songNeedPurchase:SearchResult!
+    var songNeedPurchase: SearchResult!
     var AVplayer: AVPlayer!
     var playPreveiwButton:UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
+        
         if(!isSongNeedPurchase){
             player = MusicManager.sharedInstance.player
             self.firstLoadPlayingItem = player.nowPlayingItem
@@ -213,9 +215,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             removeAllObserver()
         }else{
             MusicManager.sharedInstance.player.stop()
-            CoreDataManager.initializeSongToDatabase(searchResult:songNeedPurchase)
+            CoreDataManager.initializeSongToDatabase(songNeedPurchase)
         }
-
+        
         //hide tab bar
         self.tabBarController?.tabBar.hidden = true
         setUpBackgroundImage()
@@ -235,7 +237,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!isSongNeedPurchase){
            updateMusicData(firstLoadPlayingItem)
         }else{
-            updateMusicData(searchResult:songNeedPurchase)
+            updateMusicData(songNeedPurchase)
             setUpPreviewButton()
         }
         
@@ -294,17 +296,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //get the image from MPMediaItem
         if(!isSongNeedPurchase){
             if let artwork = firstLoadPlayingItem.artwork {
-                currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+                currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
             } else {
                 //TODO: add a placeholder album cover
                 currentImage = UIImage(named: "liwengbg")
             }
-            //create blurred image
-            let blurredImage:UIImage = currentImage!.applyLightEffect()!
+            self.backgroundImage = currentImage
+
+            self.blurredImage = currentImage!.applyLightEffect()!
             
             backgroundImageView.center.x = self.view.center.x
             backgroundImageView.image = blurredImage
-            chordsTextColor = blurredImage.averageColor()
+            chordsTextColor = blurredImage!.averageColor()
         }else{
             if let imageURL = songNeedPurchase.artworkUrl100 {
                 let url = NSURL(string: imageURL)!
@@ -496,13 +499,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     
-    func updateMusicData(song: MPMediaItem?=nil, searchResult:SearchResult?=nil) {
-        var tabsFromCoreData:([Chord], String, Int)!
-        if(song != nil){
-            tabsFromCoreData = CoreDataManager.getTabs(song)
-        }else{
-            tabsFromCoreData = CoreDataManager.getTabs(searchResult:searchResult!)
-        }
+    func updateMusicData(song: Findable) {
+   
+        let tabsFromCoreData = CoreDataManager.getTabs(song)
         
         if tabsFromCoreData.0.count > 0 {
             print("chords length: \(tabsFromCoreData.0.count)")
@@ -519,12 +518,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.chords = [Chord]()
         }
         
-        var lyricsFromCoreData:[(String, NSTimeInterval)]!
-        if(song != nil){
-            lyricsFromCoreData = CoreDataManager.getLyrics(song)
-        }else{
-            lyricsFromCoreData = CoreDataManager.getLyrics(searchResult:searchResult!)
-        }
+        let lyricsFromCoreData = CoreDataManager.getLyrics(song)
+        
         if lyricsFromCoreData.count > 0 {
             self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
         } else {
@@ -532,9 +527,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.topLyricLabel.text = ""
             self.bottomLyricLabel.text = ""
         }
-        if(song != nil){
-            setUpTestData(song!)
-        }
+
     }
     
     //for testing
@@ -807,8 +800,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!isSongNeedPurchase){
            progressBarWidth = CGFloat(firstLoadPlayingItem.playbackDuration) * progressWidthMultiplier
         }else{
-           
-            progressBarWidth = CGFloat( NSString(string: songNeedPurchase.trackTimeMillis!).floatValue/1000) * progressWidthMultiplier
+           progressBarWidth = CGFloat(songNeedPurchase.getDuration()) * progressWidthMultiplier
         }
         
         
@@ -833,13 +825,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // this is a flag to determine if the generateSoundWave function will be called
                 isGenerated = false
             }
-        }else{
-            if let soundWaveData = CoreDataManager.getSongWaveFormImage(searchResult:songNeedPurchase) {
-                KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-                print("sound wave data found")
-                KGLOBAL_init_queue.suspended = false
-                isGenerated = true
-            }
+        } else if let soundWaveData = CoreDataManager.getSongWaveFormImage(songNeedPurchase) {
+            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+            print("sound wave data found")
+            KGLOBAL_init_queue.suspended = false
+            isGenerated = true
         }
         
     
@@ -919,7 +909,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(!isSongNeedPurchase){
                KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
             }else{
-                KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(NSString(string: songNeedPurchase.trackTimeMillis!).floatValue/1000))
+                KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(songNeedPurchase.getDuration()))
             }
             
             //258  517
@@ -961,7 +951,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(!isSongNeedPurchase){
                 tempNowPlayingItemDuration = Float(player.nowPlayingItem!.playbackDuration)
             }else{
-                tempNowPlayingItemDuration = NSString(string: songNeedPurchase.trackTimeMillis!).floatValue/1000
+                tempNowPlayingItemDuration = songNeedPurchase.getDuration()
             }
             
             let deltaTime = Float(translation.y)*(freefallTime/Float(chordBase.frame.size.height))
@@ -1028,7 +1018,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         if(isSongNeedPurchase){
-             totalTimeLabel.text = TimeNumber(time: NSString(string: songNeedPurchase.trackTimeMillis!).floatValue/1000).toDisplayString()
+             totalTimeLabel.text = TimeNumber(time: songNeedPurchase.getDuration()).toDisplayString()
         }else{
              totalTimeLabel.text = TimeNumber(time: Float(player.nowPlayingItem!.playbackDuration)).toDisplayString()
         }
@@ -1387,7 +1377,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         applyEffectsToBackgroundImage(isNeedanimation: true)
     }
     
-
     func applyEffectsToBackgroundImage(isNeedanimation isNeedanimation:Bool) {
         //we blur the image if one of the chord, tabs or lyrics is shown
         if (isChordShown || isTabsShown || isLyricsShown) && !isBlurred {
@@ -1698,23 +1687,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KGLOBAL_progressBlock = nil
             }
         }
-        if(!isSongNeedPurchase){
-            if player.playbackState == .Playing {
-                if nowView != nil {
-                    self.nowView.start()
-                }
-            } else {
-                if nowView != nil {
-                    self.nowView.stop()
-                }
+        
+        if isSongNeedPurchase { return }
+        
+        if player.playbackState == .Playing {
+            if nowView != nil {
+                self.nowView.start()
             }
-            
-            if player.playbackState == MPMusicPlaybackState.Playing {
-                player.currentPlaybackRate = 1
+        } else {
+            if nowView != nil {
+                self.nowView.stop()
             }
-            if(isRemoveProgressBlock){
-                NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-            }
+        }
+        
+        if player.playbackState == MPMusicPlaybackState.Playing {
+            player.currentPlaybackRate = 1
+        }
+        if(isRemoveProgressBlock){
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
         }
     }
     
