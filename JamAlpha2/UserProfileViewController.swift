@@ -24,7 +24,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     var originFileName: String!
     var croppedFileName: String!
-    var profileImage: UIImage = UIImage()
+    var originImageData: NSData!
     
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     
@@ -122,7 +122,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                     let imageLayer: CALayer = cell.avatarImageView.layer
                     imageLayer.cornerRadius = 0.5 * cell.avatarImageView.frame.size.width
                     imageLayer.masksToBounds = true
-                    cell.avatarImageView.image = self.profileImage
+                    cell.avatarImageView.image = url
                 }
             }
             
@@ -201,6 +201,8 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
         
         // add request to upload array
         self.originFileName = awsS3.addUploadRequestToArray(image, style: "origin", email: self.userEmail)
+        self.originImageData = UIImagePNGRepresentation(image)
+
         cropImage(image)
 
         self.dismissViewControllerAnimated(true, completion: nil)
@@ -225,6 +227,8 @@ extension UserProfileViewController: RSKImageCropViewControllerDelegate {
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
         
+        let thumbnailImageData: NSData = UIImagePNGRepresentation(croppedImage)!
+
         // add request to upload array
         self.croppedFileName = awsS3.addUploadRequestToArray(croppedImage, style: "cropped", email: self.userEmail)
         
@@ -234,7 +238,7 @@ extension UserProfileViewController: RSKImageCropViewControllerDelegate {
         }
         awsS3.uploadRequests.removeAll()
         
-        self.profileImage = croppedImage
+        CoreDataManager.updateUserProfileImage(self.userEmail, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.originImageData, thumbnail: thumbnailImageData)
         
         self.userTable.reloadData()
         

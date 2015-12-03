@@ -65,6 +65,27 @@ class CoreDataManager: NSObject {
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
+    class func updateUserProfileImage(userEmail: String, avatarUrl: String?=nil, thumbnailUrl: String?=nil, profileImage: NSData?, thumbnail: NSData?) -> Bool{
+        let fetchRequest = NSFetchRequest(entityName: "User")
+        fetchRequest.predicate = NSPredicate(format: "email == '\(userEmail)'")
+        do {
+            if let results = try moc.executeFetchRequest(fetchRequest) as? [User] {
+                for item in results {
+                    let temp: User = item as User
+                    temp.avatarUrl = avatarUrl
+                    temp.thumbnailUrl = thumbnailUrl
+                    temp.profileImage = profileImage
+                    temp.thumbnail = thumbnail
+                    SwiftCoreDataHelper.saveManagedObjectContext(moc)
+                    return true
+                }
+            }
+        } catch {
+            fatalError("There was an error fetching tabs on the index \(index)")
+        }
+        return false
+    }
+    
 
     //song-related
     private class func findSong(item: MPMediaItem) -> Song? {
