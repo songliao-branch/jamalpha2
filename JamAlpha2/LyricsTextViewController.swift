@@ -185,7 +185,11 @@ class LyricsTextViewController: UIViewController {
     
     func pressBackButton(sender: UIButton) {
         tempLyricsTimeTuple.removeAll()
-        self.dismissViewControllerAnimated(true, completion: nil)
+       
+        self.dismissViewControllerAnimated(true, completion: {
+            completed in
+            self.songViewController.player.play()
+        })
     }
     
     func pressDoneButton(sender: UIButton) {

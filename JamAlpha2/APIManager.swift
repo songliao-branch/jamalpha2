@@ -167,8 +167,7 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     print(json)
                     for set in json["tabs_sets"].array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userId: set["user_id"].int!, chordsPreview: set["chords_preview"].string!, voteStatus: set["vote_status"].string!)
-                        
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userName: set["user"]["email"].string!, updatedAt: set["updated_at"].string!, chordsPreview: set["chords_preview"].string!, voteStatus: set["vote_status"].string!)
                         
                         allDownloads.append(t)
                     }
@@ -234,7 +233,8 @@ class APIManager: NSObject {
                     print(json)
                     for set in json["lyrics_sets"].array! {
 
-                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userId: set["user_id"].int!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!, voteStatus: set["vote_status"].string!)
+                        //TODO: Change ["user"]["email"] to ["user"]["email"] once API is completed
+                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userName: set["user"]["email"].string!, updatedAt: set["updated_at"].string!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!, voteStatus: set["vote_status"].string!)
                         allDownloads.append(l)
                     }
                     //after completed, pass everything to the callback

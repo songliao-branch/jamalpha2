@@ -20,7 +20,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         songsInTheAlbum = [MPMediaItem]()
         songsInTheAlbum = theAlbum.songsIntheAlbum
         self.createTransitionAnimation()
-
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
     }
@@ -85,15 +84,10 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
             cell.loudspeakerImage.hidden = true
         }
         
-        let trackNumber = song.albumTrackNumber
-        let title = song.title
+        cell.titleLabel.text = song.title
         
-        if trackNumber < 1 {
-            cell.trackNumberLabel.hidden = true
-        } else {
-            cell.trackNumberLabel.text = "\(trackNumber)"
-        }
-        cell.titleLabel.text = title
+        // assign empty string if no track number
+        cell.trackNumberLabel.text = song.albumTrackNumber > 0 ? String(song.albumTrackNumber) : ""
         return cell
     }
     

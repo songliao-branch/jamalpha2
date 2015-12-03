@@ -63,6 +63,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func setUpLogo(){
         let logo = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSizeMake(self.view.frame.width/2, 22)))
         logo.image = UIImage(named: "logo_bold")
+        
         logo.center = CGPointMake(self.view.center.x, 25) // half of navigation height
         logo.contentMode = UIViewContentMode.ScaleAspectFit
         self.navigationController!.navigationBar.addSubview(logo)

@@ -479,7 +479,10 @@ extension LyricsSyncViewController {
         }
         
         self.lyricsTextViewController.songViewController.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
-        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
+        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated(true, completion: {
+            completed in
+             self.lyricsTextViewController.songViewController.player.play()
+        })
         CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: addedLyricsWithTime.time)
     }
 }

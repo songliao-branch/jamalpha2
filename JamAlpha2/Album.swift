@@ -8,7 +8,7 @@ class Album: NSObject, Sortable{
     
     var albumTitle: String = ""
     var artistPersistantId: CUnsignedLongLong!
-    var coverImage: MPMediaItemArtwork!
+    var coverImage: MPMediaItemArtwork?
     var artistName: String = ""
     var numberOfTracks: Int = 0
     var totalRunningTime: NSTimeInterval = 0.0
@@ -24,7 +24,10 @@ class Album: NSObject, Sortable{
         self.representativeItem = theItem
         self.albumTitle = representativeItem.albumTitle!
         self.artistName = representativeItem.artist!
-        self.coverImage = representativeItem.artwork!
+        
+        if let cover = representativeItem.artwork {
+            self.coverImage = cover
+        }
         
         self.artistPersistantId = representativeItem.artistPersistentID
         let albumPredicate = MPMediaPropertyPredicate(value: albumTitle, forProperty: MPMediaItemPropertyAlbumTitle)
