@@ -215,7 +215,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
                     completed in
-                    self.reloadMusicTable()
+                    self.reloadMusicTable(true)
                 })
                 
             }else {
@@ -229,7 +229,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
                     completed in
-                    self.reloadMusicTable()
+                    self.reloadMusicTable(false)
                 })
 
             }
@@ -326,13 +326,18 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
-    func reloadMusicTable(){
+    func reloadMusicTable(needStart:Bool){
         for tabItemController in (self.tabBarController?.viewControllers)! {
             if tabItemController.isKindOfClass(UINavigationController){
                 for childVC in tabItemController.childViewControllers {
                     if childVC.isKindOfClass(BaseViewController) {
                         let baseVC = childVC as! BaseViewController
-                        baseVC.nowView.start()
+                        if(needStart){
+                            baseVC.nowView.start()
+                        }else{
+                            baseVC.nowView.stop()
+                        }
+                        
                         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                             musicVC.musicTable.reloadData()
                         }
