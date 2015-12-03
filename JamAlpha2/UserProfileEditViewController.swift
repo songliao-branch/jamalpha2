@@ -150,9 +150,6 @@ extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavi
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
             refreshAlert.addAction(UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
                 photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
-                //Create camera overlay, make it square
-                photoPicker.allowsEditing = true
-                photoPicker.showsCameraControls = true
                 
                 self.presentViewController(photoPicker, animated: true, completion: nil)
             }))
