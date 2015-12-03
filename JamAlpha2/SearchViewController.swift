@@ -175,9 +175,18 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 if let imageURL = searchResults[indexPath.row].artworkUrl100 {
                     cell.albumCover.image = nil
-                    cell.albumCover.hnk_setImageFromURL(NSURL(string: imageURL)!)
+                    
+                    
+                    let url = NSURL(string: imageURL)!
+                    let fetcher = NetworkFetcher<UIImage>(URL: url)
+                    let cache = Shared.imageCache
+                    cache.fetch(fetcher: fetcher).onSuccess { image in
+                        cell.albumCover.image = image
+                        self.searchResults[indexPath.row].image = nil
+                        self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                    }
                 }
-            
+               
             }
         } else if !resultSearchController.active && indexPath.section == 0 {//if search is inactive
             // array of search history comes in time ascending order, we need descending order (newest on top)
@@ -216,9 +225,27 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
                     completed in
-                    self.reloadMusicTable()
+                    self.reloadMusicTable(true)
                 })
                 
+            }else {
+                let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+                
+                songVC.selectedFromTable = true
+                
+                songVC.transitioningDelegate = self.animator
+                songVC.isSongNeedPurchase = true
+                songVC.songNeedPurchase = self.searchResults[indexPath.row]
+                if let img = self.searchResults[indexPath.row].image {
+                    songVC.backgroundImage = img
+                    songVC.blurredImage = img.applyLightEffect()
+                }
+           
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: {
+                    completed in
+                    self.reloadMusicTable(false)
+                })
             }
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
@@ -291,6 +318,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if let trackViewUrl = item["trackViewUrl"].string {
                 searchResponse.trackViewUrl = trackViewUrl
             }
+            
+            if let trackTimeMillis = item["trackTimeMillis"].number {
+                searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
+            }
             searchResults.append(searchResponse)
         }
 
@@ -309,13 +340,18 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
-    func reloadMusicTable(){
+    func reloadMusicTable(needStart:Bool){
         for tabItemController in (self.tabBarController?.viewControllers)! {
             if tabItemController.isKindOfClass(UINavigationController){
                 for childVC in tabItemController.childViewControllers {
                     if childVC.isKindOfClass(BaseViewController) {
                         let baseVC = childVC as! BaseViewController
-                        baseVC.nowView.start()
+                        if(needStart){
+                            baseVC.nowView.start()
+                        }else{
+                            baseVC.nowView.stop()
+                        }
+                        
                         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                             musicVC.musicTable.reloadData()
                         }
@@ -326,4 +362,5 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
 }
+
 

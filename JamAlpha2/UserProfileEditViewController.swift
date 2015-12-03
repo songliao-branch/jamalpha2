@@ -84,8 +84,8 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
             userProfileCell.titleLabel.text = "Profile Image"
             if let user = CoreDataManager.getCurrentUser() {
                 self.userEmail = user.email
-                if let url = UIImage(data: user.thumbnail!) {
-                    userProfileCell.userImageView.image = url
+                if let thumbnailData = user.thumbnail {
+                    userProfileCell.userImageView.image = UIImage(data: thumbnailData)
                 }
             }
             return userProfileCell

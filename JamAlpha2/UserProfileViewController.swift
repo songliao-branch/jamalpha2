@@ -107,13 +107,13 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                     cell.titleLabel.text = name
                 }
                 cell.subtitleLabel.text = user.email
-                if let url = UIImage(data: user.thumbnail!) {//user.avatarUrl {
+                if let thumbnailImageData = user.thumbnail {//user.avatarUrl {
                     //cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
                     //self.profileImage = url
                     let imageLayer: CALayer = cell.avatarImageView.layer
                     imageLayer.cornerRadius = 0.5 * cell.avatarImageView.frame.size.width
                     imageLayer.masksToBounds = true
-                    cell.avatarImageView.image = url
+                    cell.avatarImageView.image = UIImage(data: thumbnailImageData)
                 }
             }
             

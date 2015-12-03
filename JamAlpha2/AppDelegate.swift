@@ -52,8 +52,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentVC = topViewController(rootViewController())
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
-            currentSongVC.stopTimer()
-       
+            if(!currentSongVC.isSongNeedPurchase){
+                currentSongVC.stopTimer()
+            }       
             print("Song VC entering background")
         }
         self.suspended = KGLOBAL_init_queue.suspended
@@ -68,7 +69,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.selectedFromTable = false
-            currentSongVC.resumeSong()
+            if(!currentSongVC.isSongNeedPurchase){
+                currentSongVC.resumeSong()
+            }
             print("Song VC entering forground")
         }
         KGLOBAL_queue.suspended = false

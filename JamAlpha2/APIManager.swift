@@ -18,6 +18,7 @@ class SearchResult {
     var trackName: String?
     var artistName: String?
     var collectionName: String?
+    var trackTimeMillis: Float?
     
     var artworkUrl100: String?//large 100
     var previewUrl: String?
@@ -27,6 +28,8 @@ class SearchResult {
         self.wrapperType = wrapperType
         self.kind = kind
     }
+    
+    var image: UIImage?
 }
 
 
@@ -45,7 +48,7 @@ class APIManager: NSObject {
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     //upload tabs
-    class func uploadTabs(mediaItem: MPMediaItem) {
+    class func uploadTabs(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
 
         var title = ""
         var artist = ""
@@ -83,7 +86,7 @@ class APIManager: NSObject {
             "times": timesData,
             "chords": chordsData,
             "tabs": tabsData,
-            "user_id": 1 //TODO: change later
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
         ]
         
         Alamofire.request(.POST, tabsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -91,15 +94,17 @@ class APIManager: NSObject {
                 response in
                 switch response.result {
                 case .Success:
+                    completion(isSuccess: true)
                     print("Tabs uploaded succesfully")
                 case .Failure(let error):
+                    completion(isSuccess: false)
                     print(error)
                 }
         }
     }
     
     //upload lyrics
-    class func uploadLyrics(mediaItem: MPMediaItem) {
+    class func uploadLyrics(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
 
         var title = ""
         var artist = ""
@@ -127,7 +132,7 @@ class APIManager: NSObject {
             
             "times": times,
             "lyrics": lyrics,
-            "user_id": 1 //TODO: change later
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
         ]
     
         Alamofire.request(.POST, lyricsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -136,8 +141,9 @@ class APIManager: NSObject {
                 switch response.result {
                 case .Success:
                     print("Lyrics uploaded succesfully")
+                    completion(isSuccess: true)
                 case .Failure(let error):
-                    print(error)
+                    completion(isSuccess: false)
                 }
         }
     }
@@ -164,8 +170,7 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     print(json)
                     for set in json["tabs_sets"].array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userId: set["user_id"].int!, chordsPreview: set["chords_preview"].string!, voteStatus: set["vote_status"].string!)
-                        
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userName: set["user"]["email"].string!, updatedAt: set["updated_at"].string!, chordsPreview: set["chords_preview"].string!, voteStatus: set["vote_status"].string!)
                         
                         allDownloads.append(t)
                     }
@@ -231,7 +236,8 @@ class APIManager: NSObject {
                     print(json)
                     for set in json["lyrics_sets"].array! {
 
-                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userId: set["user_id"].int!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!, voteStatus: set["vote_status"].string!)
+                        //TODO: Change ["user"]["email"] to ["user"]["email"] once API is completed
+                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userName: set["user"]["email"].string!, updatedAt: set["updated_at"].string!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!, voteStatus: set["vote_status"].string!)
                         allDownloads.append(l)
                     }
                     //after completed, pass everything to the callback
@@ -275,10 +281,6 @@ class APIManager: NSObject {
     //upvote or downvote either tabsSet or lyricsSet
     class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( voteStatus: String, voteScore: Int) -> Void)){
         
-        if CoreDataManager.getCurrentUser() == nil {
-            print("not logged in, cannot vote")
-            return
-        }
         
         let parameters = ["user_id": "\(CoreDataManager.getCurrentUser()!.id)"]
         
@@ -302,7 +304,6 @@ class APIManager: NSObject {
                     print(json)
                 }
             case .Failure(let error):
-                //TODO: show alert dialog cannot update
                 print(error)
             }
         }

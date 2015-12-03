@@ -18,6 +18,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     @IBOutlet weak var resultsTableView: UITableView!
     
+    var localTabsSet: DownloadedTabsSet?
+    var localLyricsSet: DownloadedLyricsSet?
     var downloadedTabsSets = [DownloadedTabsSet]()
     var downloadedLyricsSets = [DownloadedLyricsSet]()
     var mediaItem: MPMediaItem!
@@ -31,8 +33,12 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         let layer = UIView()
         layer.backgroundColor = UIColor.backgroundGray()
         resultsTableView.backgroundView = layer
-       
+        loadLocalData()
         fetchData()
+    }
+    
+    func loadLocalData() {
+        
     }
     
     func fetchData() {
@@ -161,6 +167,32 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 2
+    }
+    
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20))
+        view.backgroundColor = UIColor.backgroundGray()
+        let label = UILabel(frame: CGRect(x: 10, y: 5, width: 100, height: 20))
+        label.textColor = UIColor.silverGray()
+        label.font = UIFont.systemFontOfSize(15)
+        
+        if section == 0 {
+            label.text = isPullingTabs ? "My tabs" : "My lyrics"
+        } else {
+            label.text = isPullingTabs ? "Top tabs" : "Top lyrics"
+        }
+        
+        view.addSubview(label)
+        return view
+    }
+    
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 22
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isPullingTabs {
             return downloadedTabsSets.count
@@ -195,6 +227,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
+            cell.profileName.text = tabsSet.userName
+            cell.dateLabel.text = tabsSet.updatedAt
+            
 
         } else {
             let lyricsSet = downloadedLyricsSets[indexPath.row]
@@ -210,10 +245,12 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
             }
             
-            
             cell.votesLabel.text = String(lyricsSet.votesScore)
             cell.titleLabel.text = lyricsSet.lyricsPreview + "..."
             cell.subtitleLabel.text = "\(lyricsSet.numberOfLines) lines"
+            
+            cell.profileName.text = lyricsSet.userName
+            cell.dateLabel.text = lyricsSet.updatedAt
         }
         
         //add actions for up and down vote buttons
@@ -262,11 +299,12 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func upVoted(button: UIButton) {
-        if CoreDataManager.getCurrentUser() == nil {
-            print("sign in before vote")
-            
+        
+        //show sign up screen if no user found
+        if shouldShowSignUpPage() {
             return
         }
+        
         let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
         
         APIManager.updateVotes(true, isTabs: isPullingTabs, setId: id, completion: {
@@ -290,8 +328,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func downVoted(button: UIButton) {
-        if CoreDataManager.getCurrentUser() == nil {
-            print("sign in before vote")
+        
+        if shouldShowSignUpPage() {
             return
         }
         
@@ -312,6 +350,18 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
         })
         print("down button: \(button.tag) pressed")
+    }
+    
+    
+    func shouldShowSignUpPage() -> Bool {
+        //show sign up screen if no user found
+        if CoreDataManager.getCurrentUser() == nil {
+            let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
+            signUpVC.showCloseButton = true
+            self.presentViewController(signUpVC, animated: true, completion: nil)
+            return true
+        }
+        return false
     }
     
     override func shouldAutorotate() -> Bool {

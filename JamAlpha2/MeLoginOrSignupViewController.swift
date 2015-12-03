@@ -17,8 +17,6 @@ import AWSS3
 import AWSCore
 
 class MeLoginOrSignupViewController: UIViewController {
-
-    
     var email: String = String()
     var fullName: String!
     var userId: String!
@@ -36,6 +34,9 @@ class MeLoginOrSignupViewController: UIViewController {
     var loginTabButton: UIButton!
     var indicatorTriangleView: UIImageView! //indicate whether it's sign up or log in
     var isSignUpSelected = true
+    
+    var showCloseButton = false
+    var closeButton: UIButton! //only visible when this is presented modally
     
     var scrollView: UIScrollView!
     //sign up screen
@@ -126,6 +127,19 @@ class MeLoginOrSignupViewController: UIViewController {
         indicatorTriangleView.image = UIImage(named: "triangle")
         indicatorTriangleView.center.x = signUpTabButton.center.x
         topView.addSubview(indicatorTriangleView)
+        
+        closeButton = UIButton(frame: CGRect(x: 25, y: 25, width: 35, height: 35))
+        closeButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
+        closeButton.addTarget(self, action: "closeButtonPressed", forControlEvents: .TouchUpInside)
+        topView.addSubview(closeButton)
+        
+        if !showCloseButton {
+            closeButton.hidden = true
+        }
+    }
+    
+    func closeButtonPressed() {
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     func setUpViews() {
@@ -307,7 +321,12 @@ class MeLoginOrSignupViewController: UIViewController {
                             
                             afterRetrievingUser(id: userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
                             //go back to user profile view
-                            self.navigationController?.popViewControllerAnimated(false)
+                            
+                            if self.showCloseButton {
+                              self.dismissViewControllerAnimated(true, completion: nil)
+                            } else {
+                              self.navigationController?.popViewControllerAnimated(false)
+                            }
                             
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
                             
@@ -330,7 +349,6 @@ class MeLoginOrSignupViewController: UIViewController {
                 }
         }
     }
-    
     
     //facebook button
     func pressFacebookButton(sender: UIButton) {
