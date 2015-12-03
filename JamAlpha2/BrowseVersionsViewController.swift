@@ -20,6 +20,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     var localTabsSet: DownloadedTabsSet?
     var localLyricsSet: DownloadedLyricsSet?
+    
     var downloadedTabsSets = [DownloadedTabsSet]()
     var downloadedLyricsSets = [DownloadedLyricsSet]()
     var mediaItem: MPMediaItem!
@@ -38,7 +39,18 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func loadLocalData() {
-        
+        if isPullingTabs {
+            
+            var chords = [Chord]()
+            var tuning = ""
+            var capo = -1
+            
+            (chords, tuning, capo) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
+            if chords.count > 2 { //just checking if there is a local tabs, a local tabs must have a tuning
+                //localTabsSet = downloadedTabsSets(
+            }
+        }
+
     }
     
     func fetchData() {
@@ -270,15 +282,15 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             APIManager.downloadTabsSetContent(tabsSet, completion: {
                 download in
                 
-                self.songViewController.updateTuning(tabsSet.tuning)
-                self.songViewController.updateCapo(tabsSet.capo)
-                
-                var chordsToBeUsed = [Chord]()
-                for i in 0..<download.chords.count {
-                    let chord = Chord(tab: Tab(name: download.chords[i], content: download.tabs[i]), time: TimeNumber(time: download.times[i]))
-                    chordsToBeUsed.append(chord)
+                var times = [NSTimeInterval]()
+                for t in download.times {
+                    times.append(NSTimeInterval(t))
                 }
-                self.songViewController.chords = chordsToBeUsed
+                
+                CoreDataManager.saveTabs(self.mediaItem, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
+                
+                self.songViewController.updateMusicData(self.mediaItem)
+                
                 self.dismissViewControllerAnimated(true, completion: nil)
             })
         

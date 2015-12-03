@@ -330,7 +330,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(topViewSeparator)
     }
 
-    func updateTuning(tuning: String) {
+    private func updateTuning(tuning: String) {
         print("current tuning is \(tuning)")
         let tuningArray = tuning.characters.split{$0 == "-"}.map(String.init)
         let tuningToShow = Array(tuningArray.reverse())
@@ -341,7 +341,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
-    func updateCapo(capo: Int) {
+    private func updateCapo(capo: Int) {
         if capo < 1 {
             capoButton.hidden = true
             return
@@ -450,12 +450,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func updateMusicData(song: MPMediaItem) {
         
-        let tabsFromCoreData = CoreDataManager.getTabs(song)
+        let tabsFromCoreData = CoreDataManager.getTabs(song, fetchingLocalOnly: false)
         if tabsFromCoreData.0.count > 0 {
             print("chords length: \(tabsFromCoreData.0.count)")
             if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
                 self.chords = tabsFromCoreData.0
-                
                 updateTuning(tabsFromCoreData.1)
                 updateCapo(tabsFromCoreData.2)
             } else {
