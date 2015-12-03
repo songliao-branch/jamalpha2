@@ -201,6 +201,7 @@ class CoreDataManager: NSObject {
         }
     }
     
+    
     //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
     class func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, tabsSetId: Int?=nil ) {
         
@@ -276,6 +277,7 @@ class CoreDataManager: NSObject {
                     tabsSet.capo = capo
                     tabsSet.lastSelectedDate = NSDate()
                     tabsSet.isLocal = true
+                    tabsSet.id = -1 //this is needed to check which tabs is last selected in the BrowseTable
                 }
             }
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
@@ -284,8 +286,9 @@ class CoreDataManager: NSObject {
 
     
     //if isLocal is true, we get the ONE tabs from the database, otherwise we selected the one last selected
-    class func getTabs(item: MPMediaItem, fetchingLocalOnly: Bool) -> ([Chord], String, Int) { //return chords, tuning and capo
+    class func getTabs(item: MPMediaItem, fetchingLocalOnly: Bool) -> ([Chord], String, Int, Int) { //return chords, tuning and capo, song_id
         
+        //song id is used to determine which tabs
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.tabsSets.count) set of tabs")
             
@@ -307,7 +310,7 @@ class CoreDataManager: NSObject {
             }
             
             if foundTabsSet == nil {
-                return ([Chord](), "", 0)
+                return ([Chord](), "", 0, 0)
             }
             
             let chords = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.chords as! NSData) as! [String]
@@ -321,8 +324,8 @@ class CoreDataManager: NSObject {
                 let timedChord = Chord(tab: singleChord, time: TimeNumber(time: Float(times[i])))
                 chordsToBeUsed.append(timedChord)
             }
-            return (chordsToBeUsed, foundTabsSet.tuning, Int(foundTabsSet.capo))
+            return (chordsToBeUsed, foundTabsSet.tuning, Int(foundTabsSet.capo), Int(foundTabsSet.id))
         }
-        return ([Chord](), "", 0)
+        return ([Chord](), "", 0, 0)
     }
 }

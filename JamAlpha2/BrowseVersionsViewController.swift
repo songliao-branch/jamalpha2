@@ -21,7 +21,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     var downloadedLyricsSets = [DownloadedLyricsSet]()
     
     var allTabsSets = [Int: [DownloadedTabsSet]]()//with a key 0 is local, key 1 is downloaded ones
-    
+    var lastSelectedTabsId = 0
     var mediaItem: MPMediaItem!
     var songId = -1
     
@@ -34,6 +34,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         let layer = UIView()
         layer.backgroundColor = UIColor.backgroundGray()
         resultsTableView.backgroundView = layer
+        
+        
+        ( _, _, _, lastSelectedTabsId) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: false)
         loadLocalData()
         fetchData()
     }
@@ -44,13 +47,15 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             return
         }
         if isPullingTabs {
+            //must initialize with key
             allTabsSets[0] = []
+        
             var chords = [Chord]()
             var tuning = ""
             var capo = -1
-        
-            (chords, tuning, capo) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
             
+            (chords, tuning, capo, _) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
+     
             var preview = ""
             
             for i in 0..<chords.count {
@@ -61,6 +66,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             if chords.count > 2 { //just checking if there is a local tabs, a local tabs must have a tuning
+                
                 let set = DownloadedTabsSet(id: -1, tuning: tuning, capo: capo, songId: -1, votesScore: 0, userName: CoreDataManager.getCurrentUser()!.email, updatedAt: "", chordsPreview: preview, voteStatus: "")
                 allTabsSets[0]?.append(set)
             }
@@ -229,6 +235,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isPullingTabs {
+            if allTabsSets[section]?.count < 1 {
+                return 0
+            }
             return (allTabsSets[section]?.count)!
         }
         return downloadedLyricsSets.count
@@ -249,6 +258,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 tuning = tabsSet.tuning
             }
             
+            
+            
             if tabsSet.voteStatus == "up" {
                   cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
                   cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
@@ -265,6 +276,14 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
             cell.profileName.text = tabsSet.userName
             cell.dateLabel.text = tabsSet.updatedAt
+            
+            if tabsSet.id == lastSelectedTabsId {
+                cell.checkmark.hidden = false
+                cell.previewRightConstraint.constant = 45
+            } else {
+                cell.checkmark.hidden = true
+                cell.previewRightConstraint.constant = 8
+            }
             
         } else {
             let lyricsSet = downloadedLyricsSets[indexPath.row]

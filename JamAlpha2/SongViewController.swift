@@ -450,7 +450,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var chords = [Chord]()
         var tuning = ""
         var capo = 0
-        (chords, tuning, capo) = CoreDataManager.getTabs(song, fetchingLocalOnly: false)
+        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: false)
         if chords.count > 2 {
             self.chords = chords
             updateTuning(tuning)

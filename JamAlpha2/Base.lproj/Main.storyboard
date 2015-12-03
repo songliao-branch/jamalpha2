@@ -284,7 +284,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="125"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G8r-sc-dxH" customClass="BorderdCellView" customModule="JamAlpha2" customModuleProvider="target">
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G8r-sc-dxH" customClass="BorderedCellView" customModule="JamAlpha2" customModuleProvider="target">
                                                     <rect key="frame" x="8" y="8" width="304" height="117"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kU0-NY-rsq">
@@ -338,24 +338,32 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="kitten_profile" translatesAutoresizingMaskIntoConstraints="NO" id="Ioz-2C-MqP">
-                                                            <rect key="frame" x="266" y="79" width="30" height="30"/>
+                                                            <rect key="frame" x="59" y="76" width="30" height="30"/>
                                                             <animations/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="30" id="4et-ny-icm"/>
                                                                 <constraint firstAttribute="width" constant="30" id="ly7-8n-az7"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@guitarkitten" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZQX-sH-xMj">
-                                                            <rect key="frame" x="90" y="81" width="168" height="14.5"/>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="11 · 10 · 2015" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="No9-Hd-vlr">
+                                                            <rect key="frame" x="228" y="95" width="68" height="13.5"/>
                                                             <animations/>
-                                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                                             <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="11 · 10 · 2015" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="No9-Hd-vlr">
-                                                            <rect key="frame" x="10" y="95" width="248" height="13.5"/>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="pink_checkmark" translatesAutoresizingMaskIntoConstraints="NO" id="N5i-hN-qkc">
+                                                            <rect key="frame" x="271" y="29" width="20" height="15"/>
                                                             <animations/>
-                                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="20" id="glP-Nr-Dau"/>
+                                                                <constraint firstAttribute="height" constant="15" id="oq2-lG-XgG"/>
+                                                            </constraints>
+                                                        </imageView>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@guitarkitten" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZQX-sH-xMj">
+                                                            <rect key="frame" x="94" y="83.5" width="76" height="14.5"/>
+                                                            <animations/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                             <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
@@ -368,22 +376,22 @@
                                                         <constraint firstItem="kU0-NY-rsq" firstAttribute="leading" secondItem="G8r-sc-dxH" secondAttribute="leading" constant="10" id="5py-1F-VkN"/>
                                                         <constraint firstAttribute="trailing" secondItem="KMp-Nr-4xb" secondAttribute="trailing" id="9yK-9p-rcT"/>
                                                         <constraint firstItem="KMp-Nr-4xb" firstAttribute="leading" secondItem="G8r-sc-dxH" secondAttribute="leading" constant="58" id="FA6-qn-266"/>
-                                                        <constraint firstAttribute="bottom" secondItem="ZQX-sH-xMj" secondAttribute="bottom" constant="21.5" id="JzD-SM-kez"/>
+                                                        <constraint firstAttribute="bottom" secondItem="ZQX-sH-xMj" secondAttribute="bottom" constant="19" id="JzD-SM-kez"/>
+                                                        <constraint firstItem="ZQX-sH-xMj" firstAttribute="leading" secondItem="Ioz-2C-MqP" secondAttribute="trailing" constant="5" id="KGQ-Fq-5u3"/>
+                                                        <constraint firstItem="Ioz-2C-MqP" firstAttribute="leading" secondItem="Ubs-jq-38x" secondAttribute="trailing" constant="9" id="Pav-eh-B9p"/>
                                                         <constraint firstItem="Mk3-9M-q0n" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="25" id="SgC-7x-4t5"/>
-                                                        <constraint firstItem="Ioz-2C-MqP" firstAttribute="leading" secondItem="ZQX-sH-xMj" secondAttribute="trailing" constant="8" id="Wk4-tu-gqA"/>
-                                                        <constraint firstAttribute="bottom" secondItem="Ioz-2C-MqP" secondAttribute="bottom" constant="8" id="aKw-dS-mon"/>
-                                                        <constraint firstAttribute="trailing" secondItem="Ioz-2C-MqP" secondAttribute="trailing" constant="8" id="cVl-aL-Kh3"/>
+                                                        <constraint firstAttribute="trailing" secondItem="N5i-hN-qkc" secondAttribute="trailing" constant="13" id="Ve3-S0-cCx"/>
                                                         <constraint firstItem="4Gt-4B-ggq" firstAttribute="centerY" secondItem="G8r-sc-dxH" secondAttribute="centerY" id="d0O-Re-lVH"/>
-                                                        <constraint firstItem="No9-Hd-vlr" firstAttribute="leading" secondItem="G8r-sc-dxH" secondAttribute="leading" constant="10" id="e7s-lN-xXH"/>
-                                                        <constraint firstItem="Ioz-2C-MqP" firstAttribute="leading" secondItem="No9-Hd-vlr" secondAttribute="trailing" constant="8" id="gBh-T7-e1e"/>
+                                                        <constraint firstAttribute="trailing" secondItem="No9-Hd-vlr" secondAttribute="trailing" constant="8" id="dFu-85-13a"/>
                                                         <constraint firstItem="0GQ-vh-Kkz" firstAttribute="leading" secondItem="4Gt-4B-ggq" secondAttribute="trailing" constant="4" id="h19-AA-L22"/>
                                                         <constraint firstAttribute="bottom" secondItem="Ubs-jq-38x" secondAttribute="bottom" constant="6" id="h7N-wa-q8O"/>
-                                                        <constraint firstItem="ZQX-sH-xMj" firstAttribute="leading" secondItem="Ubs-jq-38x" secondAttribute="trailing" constant="40" id="hGo-xa-xMh"/>
                                                         <constraint firstItem="Mk3-9M-q0n" firstAttribute="leading" secondItem="kU0-NY-rsq" secondAttribute="trailing" constant="8" id="j14-OR-l3R"/>
                                                         <constraint firstItem="kU0-NY-rsq" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="6" id="mZF-5X-ire"/>
                                                         <constraint firstItem="0GQ-vh-Kkz" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="50" id="n6h-zK-gaz"/>
                                                         <constraint firstItem="4Gt-4B-ggq" firstAttribute="leading" secondItem="G8r-sc-dxH" secondAttribute="leading" constant="5" id="uEa-jM-7pc"/>
                                                         <constraint firstAttribute="trailing" secondItem="Mk3-9M-q0n" secondAttribute="trailing" constant="8" id="udk-Ax-laK"/>
+                                                        <constraint firstItem="N5i-hN-qkc" firstAttribute="top" secondItem="G8r-sc-dxH" secondAttribute="top" constant="29" id="v46-Sm-rjt"/>
+                                                        <constraint firstAttribute="bottom" secondItem="Ioz-2C-MqP" secondAttribute="bottom" constant="11" id="wto-do-0Mf"/>
                                                         <constraint firstItem="KMp-Nr-4xb" firstAttribute="top" secondItem="0GQ-vh-Kkz" secondAttribute="bottom" constant="5" id="xal-LX-iHH"/>
                                                         <constraint firstAttribute="bottom" secondItem="No9-Hd-vlr" secondAttribute="bottom" constant="8.5" id="yKm-cQ-Wht"/>
                                                     </constraints>
@@ -400,8 +408,11 @@
                                         </tableViewCellContentView>
                                         <animations/>
                                         <connections>
+                                            <outlet property="borderedCellView" destination="G8r-sc-dxH" id="mSl-Uh-ifX"/>
+                                            <outlet property="checkmark" destination="N5i-hN-qkc" id="C2n-FP-Cs4"/>
                                             <outlet property="dateLabel" destination="No9-Hd-vlr" id="4zc-0g-ZW0"/>
                                             <outlet property="downVoteButton" destination="Ubs-jq-38x" id="2qg-OA-znu"/>
+                                            <outlet property="previewRightConstraint" destination="udk-Ax-laK" id="30d-Mx-9w0"/>
                                             <outlet property="profileImage" destination="Ioz-2C-MqP" id="wZC-P7-vhW"/>
                                             <outlet property="profileName" destination="ZQX-sH-xMj" id="ki3-MV-j3L"/>
                                             <outlet property="subtitleLabel" destination="0GQ-vh-Kkz" id="FJF-9F-zcy"/>
@@ -804,7 +815,7 @@
                                                     <rect key="frame" x="92" y="23.5" width="190" height="21.5"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -1054,6 +1065,7 @@
         <image name="kitten_profile" width="50" height="50"/>
         <image name="me" width="20" height="25"/>
         <image name="music" width="25" height="25"/>
+        <image name="pink_checkmark" width="21" height="17"/>
         <image name="search" width="23" height="25"/>
         <image name="speaker" width="24" height="19"/>
         <image name="vote_down_gray" width="29" height="20"/>
