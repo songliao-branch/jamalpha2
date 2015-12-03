@@ -193,7 +193,7 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
     
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
-        // add request to upload array
+
         cropImage(image)
 
         self.dismissViewControllerAnimated(true, completion: nil)
@@ -217,12 +217,13 @@ extension UserProfileViewController: RSKImageCropViewControllerDelegate {
     }
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
+        // resize image, add request to upload array
         let originImage: UIImage = croppedImage.resize(250)
         self.originFileName = awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.userEmail)
         self.originImageData = UIImagePNGRepresentation(originImage)
         
+        // resize image
         let thumbnailImage: UIImage = croppedImage.resize(50)
-        
         let thumbnailImageData: NSData = UIImagePNGRepresentation(thumbnailImage)!
 
         // add request to upload array

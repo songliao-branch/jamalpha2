@@ -17,6 +17,7 @@
 		BF4B843C1C0CF94900AF8A2A /* AWSConstent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */; };
 		BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
+		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -117,6 +118,7 @@
 		BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSConstent.swift; sourceTree = "<group>"; };
 		BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeLoginOrSignupViewController.swift; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
+		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 			children = (
 				BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */,
 				E42032E71BFED9E300A5D36D /* UserProfileViewController.swift */,
+				BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */,
 				BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */,
@@ -669,6 +672,7 @@
 				E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */,
 				E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */,
 				E46EA8061BD0CAE8006EAB31 /* Tuning.swift in Sources */,
+				BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */,
 				E42032E81BFED9E300A5D36D /* UserProfileViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E4473CA31BF909E20061D4C9 /* BorderdCellView.swift in Sources */,

@@ -905,7 +905,26 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="414-h9-DKJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="38" y="1510"/>
+            <point key="canvasLocation" x="-222" y="1574"/>
+        </scene>
+        <!--User Profile Edit View Controller-->
+        <scene sceneID="z4t-qA-bgp">
+            <objects>
+                <viewController storyboardIdentifier="userprofileeditVC" id="CAK-OI-Ge9" customClass="UserProfileEditViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="hH5-Y8-Oju"/>
+                        <viewControllerLayoutGuide type="bottom" id="KXN-hc-WSg"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="43H-Yb-b2v">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="McX-Wz-Twh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="170" y="1574"/>
         </scene>
         <!--Me-->
         <scene sceneID="GTS-xl-bjZ">
