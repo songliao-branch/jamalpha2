@@ -165,5 +165,4 @@ class MusicManager: NSObject {
             return artist1.artistName < artist2.artistName
         })
     }
-
 }

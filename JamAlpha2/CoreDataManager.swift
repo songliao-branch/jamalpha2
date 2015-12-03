@@ -16,6 +16,68 @@ extension String {
     }
 }
 
+protocol Findable {
+    func getTitle() -> String
+    func getArtist() -> String
+    func getAlbum() -> String
+    func getDuration() -> Float
+}
+
+extension MPMediaItem: Findable {
+    func getTitle() -> String {
+        if let title = self.title {
+            return title
+        }
+        return ""
+    }
+    func getArtist() -> String {
+        if let artist = self.artist {
+            return artist
+        }
+        return ""
+    }
+    
+    func getAlbum() -> String {
+        if let album = self.albumTitle {
+            return album
+        }
+        return ""
+    }
+    
+    func getDuration() -> Float {
+        return Float(self.playbackDuration)
+    }
+}
+
+extension SearchResult: Findable {
+    func getTitle() -> String {
+        if let title = self.trackName {
+            return title
+        }
+        return ""
+    }
+    func getArtist() -> String {
+        if let artist = self.artistName {
+            return artist
+        }
+        return ""
+    }
+    
+    func getAlbum() -> String {
+        if let album = self.collectionName {
+            return album
+        }
+        return ""
+    }
+    
+    func getDuration() -> Float {
+        if let time = self.trackTimeMillis {
+            return time
+        }
+        return 0.0
+    }
+}
+
 class CoreDataManager: NSObject {
     
     static let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
@@ -64,27 +126,10 @@ class CoreDataManager: NSObject {
     
 
     //song-related
-    private class func findSong(item: MPMediaItem) -> Song? {
-        // TODO: other special characters might corrupt the predicate, needs to check more later
+    private class func findSong(item: Findable) -> Song? {
         
-        // some songs do NOT have all these attributes so we assign them an empty string to prevent optional unwrapping
-        var titleToBeUsed = ""
-        var artistToBeUsed = ""
-        var albumToBeUsed = ""
-        
-        if let title = item.title {
-            titleToBeUsed = title.replaceApostrophe()
-        }
-        if let artist = item.artist {
-            artistToBeUsed = artist.replaceApostrophe()
-        }
-        if let album = item.albumTitle {
-            albumToBeUsed = album.replaceApostrophe()
-        }
-        
-        let predicate: NSPredicate = NSPredicate(format: "(title == '\(titleToBeUsed)') AND (artist == '\(artistToBeUsed)') AND (album == '\(albumToBeUsed)')")
-        //let predicate: NSPredicate = NSPredicate(format: "(title == '\(titleToBeUsed)')")
-        
+        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (album == '\(item.getAlbum().replaceApostrophe())')")
+
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
         if results.count == 0 {
@@ -94,35 +139,22 @@ class CoreDataManager: NSObject {
             return results.lastObject! as? Song
         }
     }
+
     
-    class func initializeSongToDatabase(item: MPMediaItem) {
+    class func initializeSongToDatabase(item: Findable) {
         // if we don't have the song in the database
         if findSong(item) == nil {
             let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
-            
-            // some songs do NOT have all these attributes
-            if let title = item.title {
-                song.title = title
-            }
-            if let artist = item.artist {
-                song.artist = artist
-            }else{
-                song.artist = ""
-            }
-            if let album = item.albumTitle {
-                song.album = album
-            }else{
-                song.artist = ""
-            }
-            
-            song.playbackDuration = Float(item.playbackDuration)
-            
+            song.title = item.getTitle()
+            song.artist = item.getArtist()
+            song.album = item.getAlbum()
+            song.playbackDuration = item.getDuration()
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     
     // MARK: save, retrieve soundwaves
-    class func saveSoundWave(item: MPMediaItem, soundwaveData: NSMutableArray, soundwaveImage: NSData) {
+    class func saveSoundWave(item: Findable, soundwaveData: NSMutableArray, soundwaveImage: NSData) {
         
         if let matchedSong = findSong(item) {
             let data: NSData = NSKeyedArchiver.archivedDataWithRootObject(soundwaveData as AnyObject)
@@ -133,31 +165,33 @@ class CoreDataManager: NSObject {
     }
     
 
-    class func getSongWaveFormData(item: MPMediaItem) -> NSMutableArray? {
+    class func getSongWaveFormData(item: Findable) -> NSMutableArray? {
+        
         if let matchedSong = findSong(item) {
             print("sound wave data found for song")
-            
             return NSKeyedUnarchiver.unarchiveObjectWithData(matchedSong.soundwaveData as! NSData) as? NSMutableArray
         }
         return nil
     }
     
-    class func getSongWaveFormImage(item: MPMediaItem) -> NSData? {
+    class func getSongWaveFormImage(item: Findable) -> NSData? {
+        
         if let matchedSong = findSong(item) {
             print("sound wave image found for song")
             return matchedSong.soundwaveImage
         }
+        
         return nil
 
     }
     
     // MARK: save, retrieve lyrics
-    class func saveLyrics(item: MPMediaItem, lyrics: [String], times: [NSTimeInterval]) {
+    class func saveLyrics(item: Findable, lyrics: [String], times: [NSTimeInterval]) {
         
         if let matchedSong = findSong(item) {
             // TODO: find a better way managing user's lyrics, now just clear existing lyrics
             matchedSong.lyricsSets = NSSet()
-
+            
             let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
             
             let lyricsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(lyrics as AnyObject)
@@ -170,7 +204,8 @@ class CoreDataManager: NSObject {
         }
     }
     
-    class func getLyrics(item: MPMediaItem) -> [(String, NSTimeInterval)] {
+    class func getLyrics(item: Findable) -> [(String, NSTimeInterval)] {
+        
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.lyricsSets.count) set of lyrics")
             if matchedSong.lyricsSets.count > 0 {
@@ -185,11 +220,12 @@ class CoreDataManager: NSObject {
                 return results
             }
         }
+        
         return [(String, NSTimeInterval)]()
     }
     
     //Tabs, TODO: need to store tuning, capo number
-    class func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int) {
+    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int) {
         
         if let matchedSong = findSong(item) {
             // TODO: find a better way managing user's lyrics, now just clear existing lyrics
@@ -209,9 +245,10 @@ class CoreDataManager: NSObject {
             print("just saved tabs")
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
+
     }
     
-    class func getTabs(item: MPMediaItem) -> ([Chord], String, Int) { //return chords, tuning and capo
+    class func getTabs(item: Findable) -> ([Chord], String, Int) { //return chords, tuning and capo
         
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.tabsSets.count) set of tabs")
@@ -233,6 +270,7 @@ class CoreDataManager: NSObject {
                 return (chordsToBeUsed, theSet.tuning, Int(theSet.capo))
             }
         }
+        
         return ([Chord](), "", 0)
     }
     
