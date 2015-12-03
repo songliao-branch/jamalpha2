@@ -2068,6 +2068,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             AVplayer = AVPlayer(playerItem:playerItem)
             isClick = !isClick
         }
+        
         if(!isClick){
             AVplayer.rate = 1.0;
             AVplayer.play()
