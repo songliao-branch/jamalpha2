@@ -220,13 +220,10 @@
 		BFFA248C1BE866F60037D9C0 /* MeViewController */ = {
 			isa = PBXGroup;
 			children = (
+				E4D5EEE81C10DAC0000FA35E /* Helper */,
+				E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */,
 				BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */,
-				E42032E71BFED9E300A5D36D /* UserProfileViewController.swift */,
-				BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */,
-				BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
-				BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */,
-				BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */,
 			);
 			name = MeViewController;
 			sourceTree = "<group>";
@@ -493,6 +490,25 @@
 				E4D58E3F1BE9BC4700D54174 /* Constants.swift */,
 			);
 			name = Utils;
+			sourceTree = "<group>";
+		};
+		E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */ = {
+			isa = PBXGroup;
+			children = (
+				E42032E71BFED9E300A5D36D /* UserProfileViewController.swift */,
+				BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */,
+				BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */,
+			);
+			name = UserProfileViewController;
+			sourceTree = "<group>";
+		};
+		E4D5EEE81C10DAC0000FA35E /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */,
+				BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */,
+			);
+			name = Helper;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
