@@ -446,23 +446,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    
-    
     func updateMusicData(song: MPMediaItem) {
-        
-        let tabsFromCoreData = CoreDataManager.getTabs(song, fetchingLocalOnly: false)
-        if tabsFromCoreData.0.count > 0 {
-            print("chords length: \(tabsFromCoreData.0.count)")
-            if tabsFromCoreData.0.count > 2 { //TODO: needs better validation of tabs
-                self.chords = tabsFromCoreData.0
-                updateTuning(tabsFromCoreData.1)
-                updateCapo(tabsFromCoreData.2)
-            } else {
-                self.chords = [Chord]()
-            }
-            
+        var chords = [Chord]()
+        var tuning = ""
+        var capo = 0
+        (chords, tuning, capo) = CoreDataManager.getTabs(song, fetchingLocalOnly: false)
+        if chords.count > 2 {
+            self.chords = chords
+            updateTuning(tuning)
+            updateCapo(capo)
         } else {
             self.chords = [Chord]()
+           
         }
         
         let lyricsFromCoreData = CoreDataManager.getLyrics(song)
@@ -474,7 +469,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.bottomLyricLabel.text = ""
         }
         
-        setUpTestData(song)
+       // setUpTestData(song)
     }
     
     //for testing

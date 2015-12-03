@@ -61,7 +61,7 @@ class APIManager: NSObject {
         var tuning = ""
         var capo = 0
         
-        (chords, tuning, capo) = CoreDataManager.getTabs(mediaItem, isLocal: true)
+        (chords, tuning, capo) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
         
         var timesData = [Float]()
         var chordsData = [String]()

@@ -188,6 +188,19 @@ class CoreDataManager: NSObject {
     }
     
     
+    class func setLocalTabsMostRecent (item: MPMediaItem) {
+        if let matchedSong = findSong(item) {
+         let savedSets = matchedSong.tabsSets.allObjects as! [TabsSet]
+            
+           let foundLocalSet = savedSets.filter({ $0.isLocal == true }).first
+            if foundLocalSet == nil {
+                return
+            }
+           foundLocalSet?.lastSelectedDate = NSDate()
+           SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
     //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
     class func saveTabs(item: MPMediaItem, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, tabsSetId: Int?=nil ) {
         
@@ -198,7 +211,7 @@ class CoreDataManager: NSObject {
             let tabsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tabs as AnyObject)
             let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
             
-            if let id = tabsSetId { //if downloaded tabs
+            if let id = tabsSetId where id > 0 { //if downloaded tabs
                 var foundDownloadedTabsSet: TabsSet!
                 var found = false
                 

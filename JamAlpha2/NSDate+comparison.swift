@@ -12,6 +12,10 @@ import Foundation
 extension NSDate {
     
     class func convertFromIsoToHumanizedFormat(isoString: String) -> String {
+        //TODO: add an attribute for local tabsSet updatedAt?
+        if isoString == "" {
+            return ""
+        }
         let dateFormatter = NSDateFormatter()
         dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
         dateFormatter.timeZone = NSTimeZone.localTimeZone()
