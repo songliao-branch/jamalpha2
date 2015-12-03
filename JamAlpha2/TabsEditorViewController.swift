@@ -206,7 +206,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         // MARK: add exist chord to tab editor view
-        //self.addChordToEditorView(theSong)
+        self.addChordToEditorView(theSong)
     }
 
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
@@ -1777,12 +1777,13 @@ extension TabsEditorViewController {
     func addChordToEditorView(sender: MPMediaItem) {
         let tabs = CoreDataManager.getTabs(sender)
         let chord: [Chord] = tabs.0
-        
         let tuning: String = tabs.1
         let capo: Int = tabs.2
         
-        addTabsFromCoreDataToMainViewDataArray(chord)
-        addTabsFromCoreDataToMusicControlView(chord)
+        if chord.count > 0 {
+            addTabsFromCoreDataToMainViewDataArray(chord)
+            addTabsFromCoreDataToMusicControlView(chord)
+        }
     }
     
 
