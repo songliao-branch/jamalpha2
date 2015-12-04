@@ -23,11 +23,6 @@ class UpdateNickNameViewController: UIViewController {
         setUpNavigationBar()
         setUpNickNameEditTextField()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     func setUpNavigationBar() {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
@@ -44,9 +39,10 @@ class UpdateNickNameViewController: UIViewController {
     func setUpNickNameEditTextField() {
 
         nickNameEditTextField.frame = CGRectMake(20, 0, self.viewWidth - 40, 44)
-        if let oldNickName = CoreDataManager.getCurrentUser()?.nickname {
-            nickNameEditTextField.placeholder = oldNickName
+        if let oldNickName = CoreDataManager.getCurrentUser()!.nickname {
+            nickNameEditTextField.text = oldNickName
         }
+        
         nickNameEditTextField.clearButtonMode = UITextFieldViewMode.WhileEditing
         nickNameEditTextField.textAlignment = .Center
         nickNameEditTextField.tintColor = UIColor.mainPinkColor()
@@ -63,23 +59,19 @@ class UpdateNickNameViewController: UIViewController {
     func setUpNickNameTitle() {
         let titleLabel: UILabel = UILabel()
         titleLabel.frame = CGRectMake(20, 44, self.viewWidth - 40, 22)
-        titleLabel.text = "Pick a nick name easy to remember"
+        titleLabel.text = "Pick a nick name"
         self.view.addSubview(titleLabel)
     }
     
     func pressSaveButton(sender: UIButton) {
         if let name = nickNameEditTextField.text {
-            let saveSuccess = CoreDataManager.saveUserProfileNickname(name)
-            if saveSuccess {
-                let refreshAlert = UIAlertController(title: "Save Nick Name", message: "Save Nick Name Successful", preferredStyle: UIAlertControllerStyle.Alert)
-                refreshAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-                    // update nick name 
-                    //CoreDataManager.getCurrentUser()?.nickname
-                }))
-            } else {
-                let refreshAlert = UIAlertController(title: "Save Nick Name", message: "Save Nick Name Error", preferredStyle: UIAlertControllerStyle.Alert)
-                refreshAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-            }
+            APIManager.updateUserNickname(name, completion: {
+                completed in
+                if completed {
+                    print("uploaded newest user nickname")
+                }
+            })
+            CoreDataManager.saveUserProfileNickname(name)
         }
         self.navigationController?.popViewControllerAnimated(true)
     }

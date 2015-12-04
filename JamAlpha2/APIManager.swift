@@ -308,4 +308,39 @@ class APIManager: NSObject {
             }
         }
     }
+    
+    
+    //MARK: update user API
+    class func updateUserNickname(nickname: String, completion: ((completed: Bool) -> Void)) {
+        
+        let parameters = ["nickname": nickname]
+        
+        Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)" , parameters: parameters).responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                completion(completed: true)
+            case .Failure(let error):
+                completion(completed: true)
+                print("update user error: \(error)")
+            }
+        }
+    }
+    
+    class func updateUserAvatar(avatarUrlMedium: String, avatarUrlThumbnail: String, completion: ((completed: Bool) -> Void)) {
+        //TODO: check network availability
+        
+        //given a song's title, artist, and duration, we can find all its corresponding tabs
+        let parameters = ["avatar_url_medium": avatarUrlMedium, "avatar_url_thumbnail": avatarUrlThumbnail]
+    
+        Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)" , parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                completion(completed: true)
+            case .Failure(let error):
+                completion(completed: true)
+                print("update user error: \(error)")
+            }
+        }
+    }
 }
