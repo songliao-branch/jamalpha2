@@ -9,9 +9,6 @@
 import UIKit
 import Haneke
 
-
-//var tempImage: UIImage = UIImage()
-
 class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var userTable: UITableView!
@@ -19,7 +16,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
-
+    var settingsVC: SettingsViewController!
     
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     
@@ -144,10 +141,11 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
 
             }
         } else if indexPath.section == 2 { //settings section
-            let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
+            self.settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
             self.showViewController(settingsVC, sender: nil)
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }
+
 

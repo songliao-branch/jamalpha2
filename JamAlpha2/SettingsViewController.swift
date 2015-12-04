@@ -9,10 +9,10 @@
 import UIKit
 import MessageUI
 
-class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate {
     
     let tableViewContent: [String] = ["Contact Us", "About","Logout"]
-    
+ 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpNavigationBar()
@@ -53,25 +53,23 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         self.navigationController?.popViewControllerAnimated(false)
     }
-}
-
-extension SettingsViewController: MFMailComposeViewControllerDelegate {
+    
     func contactUs() {
-        let emailTitle = "Your feed back"
-        let messageBody = "Please tell us what are your suggestions! And if you find bugs, please discribe them with details. Thank you."
+        let emailTitle = "[\(CoreDataManager.getCurrentUser()!.email)]'s feed back"
+        let messageBody = ""
         let toRecipents = ["userfeedback@twistjam.com"]
         let mc: MFMailComposeViewController = MFMailComposeViewController()
         if MFMailComposeViewController.canSendMail() {
-            
+            mc.title = "Feed Back"
             mc.mailComposeDelegate = self
             mc.setSubject(emailTitle)
             mc.setMessageBody(messageBody, isHTML: false)
             mc.setToRecipients(toRecipents)
-        
-            self.presentViewController(mc, animated: true, completion: nil)
+            
+            UIApplication.sharedApplication().keyWindow?.rootViewController?.presentViewController(mc, animated: true, completion: nil)
         }
     }
-
+    
     func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
         switch result.rawValue {
         case MFMailComposeResultCancelled.rawValue:
@@ -85,6 +83,8 @@ extension SettingsViewController: MFMailComposeViewControllerDelegate {
         default:
             break
         }
-        controller.dismissViewControllerAnimated(true, completion: nil)
+        UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
     }
+    
+    
 }

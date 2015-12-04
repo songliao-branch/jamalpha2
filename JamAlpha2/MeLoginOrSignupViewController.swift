@@ -16,7 +16,7 @@ import RSKImageCropper
 import AWSS3
 import AWSCore
 
-class MeLoginOrSignupViewController: UIViewController {
+class MeLoginOrSignupViewController: UIViewController{
     
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
