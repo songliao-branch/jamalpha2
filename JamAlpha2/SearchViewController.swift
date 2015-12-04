@@ -179,6 +179,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     
                     let url = NSURL(string: imageURL)!
                     let fetcher = NetworkFetcher<UIImage>(URL: url)
+                    
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image

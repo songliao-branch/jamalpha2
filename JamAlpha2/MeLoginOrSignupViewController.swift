@@ -17,11 +17,6 @@ import AWSS3
 import AWSCore
 
 class MeLoginOrSignupViewController: UIViewController {
-    var email: String = String()
-    var fullName: String!
-    var userId: String!
-    var profileImageData: NSData!
-    var thumbnailData: NSData!
     
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
@@ -55,9 +50,6 @@ class MeLoginOrSignupViewController: UIViewController {
     
     // AWS S3
     var awsS3: AWSS3Manager = AWSS3Manager()
-    var userEmail: String!
-    var originFileName: String = String()
-    var croppedFileName: String = String()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -324,7 +316,7 @@ class MeLoginOrSignupViewController: UIViewController {
         signUpLoginRequest(parameters, afterRetrievingUser: {
             id, email, authToken in
             
-            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: self.fullName)
+            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: nickname)
             
         })
     }
@@ -385,7 +377,7 @@ class MeLoginOrSignupViewController: UIViewController {
         fbLoginManager.loginBehavior = FBSDKLoginBehavior.Web
         fbLoginManager.defaultAudience = FBSDKDefaultAudience.Friends
         
-        fbLoginManager.logInWithReadPermissions(permissons, fromViewController: self, handler: {
+        fbLoginManager.logInWithReadPermissions(permissons, handler: {
             (result, error) -> Void in
             if error != nil {
                 print("Error connecting with facebook: \(error)")
@@ -406,72 +398,44 @@ class MeLoginOrSignupViewController: UIViewController {
                 
                     print(result)
                     
-                    self.email = result.valueForKey("email") as! String
-                    self.fullName  = result.valueForKey("name") as! String
-                    self.userId = result.valueForKey("id") as! String
-                    let avatarUrl = "https://graph.facebook.com/\(self.userId)/picture?height=320&width=320"
-                    self.profileImageData = NSData(contentsOfURL: NSURL(string: avatarUrl)!)!
+                    let facebookEmail = result.valueForKey("email") as! String
+                    let facebookName  = result.valueForKey("name") as! String
                     
-                    let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: avatarUrl)!)!)!
+                    let userId = result.valueForKey("id") as! String
+                    let facebookAvatarUrl = "https://graph.facebook.com/\(userId)/picture?height=320&width=320"
                     
-                    // add upload request
-                    self.originFileName = self.awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.email)
+                    let profileImageData = NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!
+                    let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!)!
                     
-                    // crop image to circle
-                    self.cropImage(originImage)
+                    let thumbnailImage = originImage.resize(35)
+                    let thumbnailData = UIImagePNGRepresentation(thumbnailImage)!
+                    
+                    // add request to upload array
+                    let thumbnailUrl = self.awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: facebookEmail)
+                    
+                    //sending the cropped image to s3 in here
+                    for item in self.awsS3.uploadRequests {
+                        self.awsS3.upload(item!)
+                    }
+                    self.awsS3.uploadRequests.removeAll()
+                    
+
+                    let parameters = [
+                        "attempt_login":"facebook",
+                        "email": facebookEmail,
+                        "avatar_url_thumbnail": thumbnailUrl,
+                        "avatar_url_medium": facebookAvatarUrl,
+                        "password": (facebookEmail + facebookLoginSalt).md5() //IMPORTANT: DO NOT MODIFY THIS SALT
+                    ]
+                    
+                    self.signUpLoginRequest(parameters, afterRetrievingUser: {
+                        id, email, authToken in
+                        
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, profileImage: profileImageData, thumbnail: thumbnailData)
+                    })
                 }
             })
         }
-    }
-    
-
-    
-    
-}
-
-// crop the user profile image
-extension MeLoginOrSignupViewController: RSKImageCropViewControllerDelegate {
-  
-    func cropImage(sender: UIImage) {
-        let imageCropVC: RSKImageCropViewController = RSKImageCropViewController(image: sender, cropMode: RSKImageCropMode.Circle)
-        imageCropVC.delegate = self
-        self.navigationController?.pushViewController(imageCropVC, animated: true)
-    }
-    
-    func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
-        
-        
-        let thumbnailImage = croppedImage.resize(80)
-        self.thumbnailData = UIImagePNGRepresentation(thumbnailImage)
-        
-        // add request to upload array
-        self.croppedFileName = awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: self.email)
-        
-        //sending the cropped image to s3 in here
-        for item in awsS3.uploadRequests {
-            awsS3.upload(item!)
-        }
-        awsS3.uploadRequests.removeAll()
-        
-        let parameters = [
-            "attempt_login":"facebook",
-            "email": self.email,
-            "thumbnail": self.croppedFileName,
-            "originImage": self.originFileName,
-            "password": (self.email + facebookLoginSalt).md5()//IMPORTANT: DO NOT MODIFY THIS SALT
-        ]
-        
-        self.signUpLoginRequest(parameters, afterRetrievingUser: {
-            id, email, authToken in
-            
-            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: self.fullName, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.profileImageData, thumbnail: self.thumbnailData)
-        })
-        
-        self.navigationController?.popViewControllerAnimated(true)
-    }
-    
-    func imageCropViewControllerDidCancelCrop(controller: RSKImageCropViewController) {
-        self.navigationController?.popViewControllerAnimated(true)
     }
 }
 
