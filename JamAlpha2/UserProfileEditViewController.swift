@@ -92,8 +92,8 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
             userProfileCell.titleLabel.text = "Profile Image"
             if let user = CoreDataManager.getCurrentUser() {
                 self.userEmail = user.email
-                if let thumbnailData = user.thumbnail {
-                    userProfileCell.userImageView.image = UIImage(data: thumbnailData)
+                if let profileData = user.profileImage {
+                    userProfileCell.userImageView.image = UIImage(data: profileData)
                     userProfileCell.userImageView.userInteractionEnabled = true
                     let tapOnUserImageView: UITapGestureRecognizer = UITapGestureRecognizer()
                     tapOnUserImageView.addTarget(self, action: "tapOnUserImageView:")

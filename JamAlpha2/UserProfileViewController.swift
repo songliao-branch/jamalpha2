@@ -107,11 +107,11 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                     cell.titleLabel.text = name
                 }
                 cell.subtitleLabel.text = user.email
-                if let thumbnailImageData = user.thumbnail {
+                if let profileData = user.profileImage {
                     let imageLayer: CALayer = cell.avatarImageView.layer
                     imageLayer.cornerRadius = 0.5 * cell.avatarImageView.frame.size.width
                     imageLayer.masksToBounds = true
-                    cell.avatarImageView.image = UIImage(data: thumbnailImageData)
+                    cell.avatarImageView.image = UIImage(data: profileData)
                 }
             }
             
