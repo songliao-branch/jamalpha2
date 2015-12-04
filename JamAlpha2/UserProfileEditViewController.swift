@@ -220,7 +220,9 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
         }
         awsS3.uploadRequests.removeAll()
         
-        CoreDataManager.updateUserProfileImage(self.userEmail, avatarUrl: self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.originImageData, thumbnail: thumbnailImageData)
+       
+        
+        CoreDataManager.saveUserProfileImage(self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.originImageData, thumbnail: thumbnailImageData)
         
         self.tableView.reloadData()
         

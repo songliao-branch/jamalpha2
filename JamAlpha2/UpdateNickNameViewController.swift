@@ -69,7 +69,7 @@ class UpdateNickNameViewController: UIViewController {
     
     func pressSaveButton(sender: UIButton) {
         if let name = nickNameEditTextField.text {
-            let saveSuccess = CoreDataManager.updateUserProfileNickName((CoreDataManager.getCurrentUser()?.email)!, nickName: name)
+            let saveSuccess = CoreDataManager.saveUserProfileNickname(name)
             if saveSuccess {
                 let refreshAlert = UIAlertController(title: "Save Nick Name", message: "Save Nick Name Successful", preferredStyle: UIAlertControllerStyle.Alert)
                 refreshAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in

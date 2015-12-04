@@ -120,11 +120,12 @@ class CoreDataManager: NSObject {
         if let thumb = thumbnail {
             user.thumbnail = thumb
         }
-        if let url = thumbnailUrl {
-            user.thumbnailUrl = url
-        }
+
         if let name = nickname {
             user.nickname = name
+        }
+        if let url = thumbnailUrl {
+            user.thumbnailUrl = url
         }
         if let url = avatarUrl {
             user.avatarUrl = url
@@ -132,56 +133,39 @@ class CoreDataManager: NSObject {
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
-    class func updateUserProfileImage(userEmail: String, avatarUrl: String?=nil, thumbnailUrl: String?=nil, profileImage: NSData?, thumbnail: NSData?) -> Bool{
-        let fetchRequest = NSFetchRequest(entityName: "User")
-        fetchRequest.predicate = NSPredicate(format: "email == '\(userEmail)'")
-        do {
-            if let results = try moc.executeFetchRequest(fetchRequest) as? [User] {
-                for item in results {
-                    let temp: User = item as User
-                    if let ava = avatarUrl {
-                        temp.avatarUrl = ava
-                    }
-                    if let url = thumbnailUrl {
-                        temp.thumbnailUrl = url
-                    }
-                    if let image = profileImage {
-                        temp.profileImage = image
-                    }
-                    if let thumb = thumbnail {
-                        temp.thumbnail = thumb
-                    }
-                    SwiftCoreDataHelper.saveManagedObjectContext(moc)
-                    return true
-                }
-            }
-        } catch {
-            fatalError("There was an error fetching tabs on the index \(index)")
+    class func saveUserProfileImage(avatarUrl: String?, thumbnailUrl: String?, profileImage: NSData?, thumbnail: NSData?) -> Bool {
+        if CoreDataManager.getCurrentUser() == nil {
+            return false
         }
-        return false
-    }
-    
-    class func updateUserProfileNickName(userEmail: String, nickName: String) -> Bool {
-        let fetchRequest = NSFetchRequest(entityName: "User")
-        fetchRequest.predicate = NSPredicate(format: "email == '\(userEmail)'")
-        do {
-            if let results = try moc.executeFetchRequest(fetchRequest) as? [User] {
-                for item in results {
-                    let temp: User = item as User
-                    temp.nickname = nickName
-                    SwiftCoreDataHelper.saveManagedObjectContext(moc)
-                    return true
-                }
-            }
-        } catch {
-            fatalError("There was an error fetching tabs on the index \(index)")
-        }
-        return false
-    }
-    
-    
-    
+        
+        let currentUser = CoreDataManager.getCurrentUser()!
 
+        if let avatar = avatarUrl {
+           currentUser.avatarUrl = avatar
+        }
+        if let thumbnail = thumbnailUrl {
+            currentUser.thumbnailUrl = thumbnail
+        }
+        if let imageData = profileImage {
+            currentUser.profileImage = imageData
+        }
+        if let thumbnailData = thumbnail {
+            currentUser.thumbnail = thumbnailData
+        }
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        return true
+    }
+    
+    class func saveUserProfileNickname(nickname: String) -> Bool {
+        if CoreDataManager.getCurrentUser() == nil {
+            return false
+        }
+        let currentUser = CoreDataManager.getCurrentUser()!
+        currentUser.nickname = nickname
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        return true
+    }
+    
     //song-related
     private class func findSong(item: Findable) -> Song? {
         

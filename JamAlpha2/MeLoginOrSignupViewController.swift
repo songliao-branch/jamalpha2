@@ -320,10 +320,9 @@ class MeLoginOrSignupViewController: UIViewController {
                 "password": password
             ]
         }
- 
+        
         let thumbnailImageData: NSData = UIImagePNGRepresentation(UIImage(named: "kitten_profile")!)!
         let profileImageData: NSData = UIImagePNGRepresentation(UIImage(named: "kitten_origin")!)!
-        
         
         
         self.originFileName = awsS3.addUploadRequestToArray(UIImage(named: "kitten_origin")!, style: "origin", email: email)
@@ -332,7 +331,7 @@ class MeLoginOrSignupViewController: UIViewController {
         for item in awsS3.uploadRequests {
             awsS3.upload(item!)
         }
-        
+
         
         signUpLoginRequest(parameters, afterRetrievingUser: {
             id, email, authToken in
