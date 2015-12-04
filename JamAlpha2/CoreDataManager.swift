@@ -126,8 +126,8 @@ class CoreDataManager: NSObject {
     
 
     //song-related
+
     private class func findSong(item: Findable) -> Song? {
-        
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (album == '\(item.getAlbum().replaceApostrophe())')")
 
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
@@ -224,56 +224,145 @@ class CoreDataManager: NSObject {
         return [(String, NSTimeInterval)]()
     }
     
-    //Tabs, TODO: need to store tuning, capo number
-    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int) {
+    
+    class func setLocalTabsMostRecent (item: Findable) {
+        if let matchedSong = findSong(item) {
+            let savedSets = matchedSong.tabsSets.allObjects as! [TabsSet]
+            
+            let foundLocalSet = savedSets.filter({ $0.isLocal == true }).first
+            if foundLocalSet == nil {
+                return
+            }
+            foundLocalSet?.lastSelectedDate = NSDate()
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+
+    
+    //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
+    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, tabsSetId: Int?=nil ) {
         
         if let matchedSong = findSong(item) {
-            // TODO: find a better way managing user's lyrics, now just clear existing lyrics
-            matchedSong.tabsSets = NSSet()
             
-            let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
-            
+            let savedSets = matchedSong.tabsSets.allObjects as! [TabsSet]
             let chordsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(chords as AnyObject)
             let tabsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tabs as AnyObject)
             let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
-            tabsSet.chords = chordsData
-            tabsSet.tabs = tabsData
-            tabsSet.times = timesData
-            tabsSet.song = matchedSong
-            tabsSet.tuning = tuning
-            tabsSet.capo = capo
-            print("just saved tabs")
+            
+            if let id = tabsSetId where id > 0 { //if downloaded tabs
+                var foundDownloadedTabsSet: TabsSet!
+                var found = false
+                
+                //find the exisiting downloaded tabs
+                for set in savedSets {
+                    if set.id == id  {
+                        foundDownloadedTabsSet = set
+                        found = true
+                        foundDownloadedTabsSet.chords = chordsData
+                        foundDownloadedTabsSet.tabs = tabsData
+                        foundDownloadedTabsSet.times = timesData
+                        foundDownloadedTabsSet.tuning = tuning
+                        foundDownloadedTabsSet.capo = capo
+                        foundDownloadedTabsSet.lastSelectedDate = NSDate()
+                        break
+                    }
+                }
+                
+                //if the downloaded tabsSet with id is not found, we create a new one
+                if !found {
+                    let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
+                    
+                    tabsSet.chords = chordsData
+                    tabsSet.tabs = tabsData
+                    tabsSet.times = timesData
+                    tabsSet.song = matchedSong
+                    tabsSet.tuning = tuning
+                    tabsSet.capo = capo
+                    tabsSet.lastSelectedDate = NSDate()
+                    tabsSet.id = id
+                    tabsSet.isLocal = false
+                }
+                
+            } else {//if saving local tabs
+                
+                var foundLocalTabsSet: TabsSet!
+                var found = false
+                //if this tabs is already in the core data
+                for set in savedSets {
+                    if set.isLocal {
+                        foundLocalTabsSet = set
+                        found = true
+                        foundLocalTabsSet.chords = chordsData
+                        foundLocalTabsSet.tabs = tabsData
+                        foundLocalTabsSet.times = timesData
+                        foundLocalTabsSet.tuning = tuning
+                        foundLocalTabsSet.capo = capo
+                        foundLocalTabsSet.lastSelectedDate = NSDate()
+                        break
+                    }
+                }
+                
+                //create a new one if none found
+                if !found {
+                    let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
+                   
+                    tabsSet.chords = chordsData
+                    tabsSet.tabs = tabsData
+                    tabsSet.times = timesData
+                    tabsSet.song = matchedSong
+                    tabsSet.tuning = tuning
+                    tabsSet.capo = capo
+                    tabsSet.lastSelectedDate = NSDate()
+                    tabsSet.isLocal = true
+                    tabsSet.id = -1 //this is needed to check which tabs is last selected in the BrowseTable
+                }
+            }
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
-
     }
+
     
-    class func getTabs(item: Findable) -> ([Chord], String, Int) { //return chords, tuning and capo
+    //if isLocal is true, we get the ONE tabs from the database, otherwise we selected the one last selected
+    class func getTabs(item: Findable, fetchingLocalOnly: Bool) -> ([Chord], String, Int, Int) { //return chords, tuning and capo, song_id
         
+        //song id is used to determine which tabs
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.tabsSets.count) set of tabs")
-            if matchedSong.tabsSets.count > 0 {
-                let theSet = matchedSong.tabsSets.allObjects.last as! TabsSet
-                
-                let chords = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.chords as! NSData) as! [String]
-                let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.tabs as! NSData) as! [String]
-                
-                let times = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.times as! NSData) as! [NSTimeInterval]
-                
-                var chordsToBeUsed = [Chord]()
-                
-                for i in 0..<chords.count {
-                    let singleChord = Tab(name: chords[i], content: tabs[i])
-                    let timedChord = Chord(tab: singleChord, time: TimeNumber(time: Float(times[i])))
-                    chordsToBeUsed.append(timedChord)
-                }
-                return (chordsToBeUsed, theSet.tuning, Int(theSet.capo))
+            
+            let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
+            
+            var foundTabsSet: TabsSet!
+            
+            if fetchingLocalOnly {
+                foundTabsSet = sets.filter({ $0.isLocal == true }).first
+            } else {
+                //find the most recently selected tabsSet
+                foundTabsSet = sets.sort({
+                    setA, setB in
+                    if setA.lastSelectedDate.compare(setB.lastSelectedDate) ==  NSComparisonResult.OrderedDescending {
+                        return true
+                    }
+                    return false
+                }).first
             }
+            
+            if foundTabsSet == nil {
+                return ([Chord](), "", 0, 0)
+            }
+            
+            let chords = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.chords as! NSData) as! [String]
+            let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.tabs as! NSData) as! [String]
+            let times = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.times as! NSData) as! [NSTimeInterval]
+            
+            var chordsToBeUsed = [Chord]()
+            
+            for i in 0..<chords.count {
+                let singleChord = Tab(name: chords[i], content: tabs[i])
+                let timedChord = Chord(tab: singleChord, time: TimeNumber(time: Float(times[i])))
+                chordsToBeUsed.append(timedChord)
+            }
+            return (chordsToBeUsed, foundTabsSet.tuning, Int(foundTabsSet.capo), Int(foundTabsSet.id))
         }
-        
-        return ([Chord](), "", 0)
+        return ([Chord](), "", 0, 0)
     }
-    
-    
-    
 }
