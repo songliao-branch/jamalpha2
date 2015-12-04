@@ -231,19 +231,34 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
                 songVC.selectedFromTable = true
+                var searchSong = self.searchResults[indexPath.row]
+                var isReload = true
+                
+                if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
+                    print("\(searchSong.trackName)  \(searchSong.artistName)   \(searchSong.trackTimeMillis)")
+                    if(filteredSongs.count == 0){
+                        MusicManager.sharedInstance.setPlayerQueue([foundItem])
+                    }else{
+                        MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
+                    }
+                    
+                    MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
+                    
+                }else{
+                    songVC.isSongNeedPurchase = true
+                    songVC.songNeedPurchase = self.searchResults[indexPath.row]
+                    if let img = self.searchResults[indexPath.row].image {
+                        songVC.backgroundImage = img
+                        songVC.blurredImage = img.applyLightEffect()
+                    }
+                    isReload = false
+                }
                 
                 songVC.transitioningDelegate = self.animator
-                songVC.isSongNeedPurchase = true
-                songVC.songNeedPurchase = self.searchResults[indexPath.row]
-                if let img = self.searchResults[indexPath.row].image {
-                    songVC.backgroundImage = img
-                    songVC.blurredImage = img.applyLightEffect()
-                }
-           
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
                     completed in
-                    self.reloadMusicTable(false)
+                    self.reloadMusicTable(isReload)
                 })
             }
             
@@ -325,9 +340,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
             }
             
-            if let collectionViewUrl = item["collectionViewUrl"].string {
-                searchResponse.collectionViewUrl = collectionViewUrl
-            }
             searchResults.append(searchResponse)
         }
 

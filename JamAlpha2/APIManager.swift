@@ -20,7 +20,6 @@ class SearchResult {
     var artistName: String?
     var collectionName: String?
     var trackTimeMillis: Float?
-    var collectionViewUrl:String?
     
     
     var artworkUrl100: String?//large 100

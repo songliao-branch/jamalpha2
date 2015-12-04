@@ -242,6 +242,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpStatusView()
         if(!isSongNeedPurchase){
            updateMusicData(firstLoadPlayingItem)
+            print(firstLoadPlayingItem.playbackDuration)
+            print(Int(firstLoadPlayingItem.playbackDuration))
         }else{
             updateMusicData(songNeedPurchase)
             initPurchaseItunsSongItem()
@@ -250,6 +252,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
         loadDisplayMode()
+        
     }
     
     deinit{
@@ -2159,19 +2162,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 if error != nil {
                     print(error)
                 }
-                
         })
         self.presentViewController(storeViewController,
             animated: true, completion: nil)
     }
     
     func goToMusic(){
-        UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.collectionViewUrl!)!)
+        UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl!)!)
     }
     
     
     func productViewControllerDidFinish(viewController: SKStoreProductViewController) {
+        if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(songNeedPurchase.trackName!, artist: songNeedPurchase.artistName!, duration: songNeedPurchase.trackTimeMillis!)){
+            
+        }else{
+              print(songNeedPurchase.trackTimeMillis!)
+        }
+      
         viewController.dismissViewControllerAnimated(true, completion: nil)
+        
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

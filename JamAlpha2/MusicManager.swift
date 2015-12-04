@@ -45,6 +45,24 @@ class MusicManager: NSObject {
         initializePlayer()
     }
     
+    func isNeedReloadCollections(title:String, artist:String, duration:Float) -> MPMediaItem? {
+        loadLocalSongs()
+        let result = uniqueSongs.filter{
+            (song: MPMediaItem) -> Bool in
+            if let tempTitle = song.title, tempArtist = song.artist {
+                return tempTitle == title && tempArtist == artist && abs((Float(song.playbackDuration) - duration))<1
+            }
+            return false
+        }.first
+        if(result != nil){
+            loadLocalAlbums()
+            loadLocalArtist()
+            return result!
+        }
+        return nil
+    }
+    
+    
     func initializePlayer(){
         print("\(_TAG) Initialize Player")
         player = MPMusicPlayerController.systemMusicPlayer()
