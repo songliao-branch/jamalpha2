@@ -15,10 +15,13 @@ class SearchResult {
     var wrapperType: String!
     var kind: String!
     
+    var trackId:Int?
     var trackName: String?
     var artistName: String?
     var collectionName: String?
     var trackTimeMillis: Float?
+    var collectionViewUrl:String?
+    
     
     var artworkUrl100: String?//large 100
     var previewUrl: String?

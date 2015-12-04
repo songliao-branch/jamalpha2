@@ -2151,10 +2151,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func goToItues(){
         let storeViewController = SKStoreProductViewController()
         storeViewController.delegate = self
-        
-        
+
         let parameters = [SKStoreProductParameterITunesItemIdentifier :
-            NSNumber(integer: 1051394215)]
+            NSNumber(integer: songNeedPurchase.trackId!)]
         storeViewController.loadProductWithParameters(parameters,
             completionBlock: {result, error in
                 if error != nil {
@@ -2167,7 +2166,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func goToMusic(){
-        print("goToMusic")
+        UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.collectionViewUrl!)!)
     }
     
     

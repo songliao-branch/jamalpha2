@@ -174,15 +174,15 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 if let imageURL = searchResults[indexPath.row].artworkUrl100 {
                     cell.albumCover.image = nil
-                    
-                    
                     let url = NSURL(string: imageURL)!
                     let fetcher = NetworkFetcher<UIImage>(URL: url)
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image
-                        self.searchResults[indexPath.row].image = nil
-                        self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                        if(indexPath.row < (self.searchResults.count)){
+                            self.searchResults[indexPath.row].image = nil
+                            self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                        }
                     }
                 }
                
@@ -299,6 +299,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         for item in data["results"].array! {
             let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
             
+            if let trackId = item["trackId"].number {
+                searchResponse.trackId = Int(trackId)
+            }
             if let trackName = item["trackName"].string {
                 searchResponse.trackName = trackName
             }
@@ -320,6 +323,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             if let trackTimeMillis = item["trackTimeMillis"].number {
                 searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
+            }
+            
+            if let collectionViewUrl = item["collectionViewUrl"].string {
+                searchResponse.collectionViewUrl = collectionViewUrl
             }
             searchResults.append(searchResponse)
         }
