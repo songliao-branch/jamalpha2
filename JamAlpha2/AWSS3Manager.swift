@@ -51,6 +51,7 @@ class AWSS3Manager: NSObject {
                         case .Cancelled, .Paused:
                             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                                 // reload data
+                                
                             })
                             break;
                             
