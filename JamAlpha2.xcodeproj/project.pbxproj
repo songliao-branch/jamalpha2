@@ -41,7 +41,7 @@
 		E44358FE1B19471B0091E926 /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44358FD1B19471B0091E926 /* Artist.swift */; };
 		E44359021B1947660091E926 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44359011B1947660091E926 /* Album.swift */; };
 		E443B91B1BBBA2F20074A4E1 /* LyricsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */; };
-		E4473CA31BF909E20061D4C9 /* BorderdCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4473CA21BF909E20061D4C9 /* BorderdCellView.swift */; };
+		E4473CA31BF909E20061D4C9 /* BorderedCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4473CA21BF909E20061D4C9 /* BorderedCellView.swift */; };
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
 		E455E7291BA272AD00210BD6 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E7281BA272AD00210BD6 /* Song.swift */; };
 		E455E72B1BA2760300210BD6 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E72A1BA2760300210BD6 /* CoreDataManager.swift */; };
@@ -143,7 +143,7 @@
 		E44358FD1B19471B0091E926 /* Artist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		E44359011B1947660091E926 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsSet.swift; sourceTree = "<group>"; };
-		E4473CA21BF909E20061D4C9 /* BorderdCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BorderdCellView.swift; sourceTree = "<group>"; };
+		E4473CA21BF909E20061D4C9 /* BorderedCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BorderedCellView.swift; sourceTree = "<group>"; };
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		E455E7281BA272AD00210BD6 /* Song.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
 		E455E72A1BA2760300210BD6 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CoreDataManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -309,7 +309,7 @@
 				C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */,
 				C82A4E961B81B668008B6AFC /* VisualizerView.swift */,
 				E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */,
-				E4473CA21BF909E20061D4C9 /* BorderdCellView.swift */,
+				E4473CA21BF909E20061D4C9 /* BorderedCellView.swift */,
 			);
 			name = CustomViews;
 			sourceTree = "<group>";
@@ -686,7 +686,7 @@
 				BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */,
 				E42032E81BFED9E300A5D36D /* UserProfileViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
-				E4473CA31BF909E20061D4C9 /* BorderdCellView.swift in Sources */,
+				E4473CA31BF909E20061D4C9 /* BorderedCellView.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
 				BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */,

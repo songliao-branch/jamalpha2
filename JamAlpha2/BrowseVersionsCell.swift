@@ -23,7 +23,11 @@ class BrowseVersionsCell: UITableViewCell {
     @IBOutlet weak var profileName: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     
+    @IBOutlet weak var previewRightConstraint: NSLayoutConstraint! //when checkmark is shown, constraint goes to 45, otherwise 8
+    @IBOutlet weak var checkmark: UIImageView!
+    @IBOutlet weak var borderedCellView: BorderedCellView!
     //customize cell background view when this is selected. Since this cell looks like a box so when it is selected, the highlight color must be wrapped inside the box
+
     override func layoutSubviews() {
         super.layoutSubviews()
         self.selectedBackgroundView?.backgroundColor = UIColor.backgroundGray()
