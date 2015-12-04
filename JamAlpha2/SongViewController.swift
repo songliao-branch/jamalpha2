@@ -209,6 +209,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var preViewPlayButton:UIButton!
     var goToMusicButton:UIButton!
     var popItuneButton:UIButton!
+    var storeViewController:SKStoreProductViewController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -242,11 +243,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpStatusView()
         if(!isSongNeedPurchase){
            updateMusicData(firstLoadPlayingItem)
-            print(firstLoadPlayingItem.playbackDuration)
-            print(Int(firstLoadPlayingItem.playbackDuration))
         }else{
             updateMusicData(songNeedPurchase)
-            initPurchaseItunsSongItem()
         }
         
         
@@ -479,7 +477,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(previousButton)
         self.view.addSubview(nextButton)
         
-        if(firstLoadPlayingItem == nil){
+        if(isSongNeedPurchase){
             previousButton.hidden = true
             nextButton.hidden = true
         }
@@ -826,11 +824,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // this is a flag to determine if the generateSoundWave function will be called
                 isGenerated = false
             }
-        } else if let soundWaveData = CoreDataManager.getSongWaveFormImage(songNeedPurchase) {
-            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-            print("sound wave data found")
-            KGLOBAL_init_queue.suspended = false
-            isGenerated = true
+        } else{
+            if let soundWaveData = CoreDataManager.getSongWaveFormImage(songNeedPurchase) {
+                KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+                print("sound wave data found")
+                KGLOBAL_init_queue.suspended = false
+                isGenerated = true
+            }else{
+                //if didn't find it then we will generate then waveform later, in the viewdidappear method
+                // this is a flag to determine if the generateSoundWave function will be called
+                isGenerated = false
+            }
         }
         
     
@@ -1102,6 +1106,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
         self.view.addSubview(actionDismissLayerButton)
         actionDismissLayerButton.hidden = true
+        
+        if(isSongNeedPurchase){
+            initPurchaseItunsSongItem()
+        }
 
         // NOTE: we have to call all the embedded action events from the custom views, not in this class.
         guitarActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: actionViewHeight))
@@ -1185,6 +1193,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if(isSongNeedPurchase){
             speedStepper.enabled = false
+            speedStepper.tintColor = UIColor.lightGrayColor()
             speedLabel.enabled = false
         }
         
@@ -2152,7 +2161,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func goToItues(){
-        let storeViewController = SKStoreProductViewController()
+        storeViewController = nil
+        UINavigationBar.appearance().tintColor = UIColor.mainPinkColor()
+        storeViewController = SKStoreProductViewController()
         storeViewController.delegate = self
 
         let parameters = [SKStoreProductParameterITunesItemIdentifier :
@@ -2164,23 +2175,55 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
         })
         self.presentViewController(storeViewController,
-            animated: true, completion: nil)
+            animated: true, completion: {
+                self.dismissAction()
+        })
     }
     
     func goToMusic(){
+        self.dismissAction()
         UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl!)!)
     }
     
     
     func productViewControllerDidFinish(viewController: SKStoreProductViewController) {
         if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(songNeedPurchase.trackName!, artist: songNeedPurchase.artistName!, duration: songNeedPurchase.trackTimeMillis!)){
+                MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
+                MusicManager.sharedInstance.setIndexInTheQueue(0)
+            self.recoverToNormalSongVC()
             
         }else{
-              print(songNeedPurchase.trackTimeMillis!)
+              print("didn't purchase the song")
         }
-      
+        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
         viewController.dismissViewControllerAnimated(true, completion: nil)
         
+    }
+    
+    func recoverToNormalSongVC(){
+        //delete
+        self.previewView = nil
+        self.playPreveiwButton.removeFromSuperview()
+        self.playPreveiwButton = nil
+        self.AVplayer = nil
+        //recover
+        player = MusicManager.sharedInstance.player
+        self.firstLoadPlayingItem = player.nowPlayingItem
+        self.isSongNeedPurchase = false
+        self.removeAllObserver()
+        loadBackgroundImageFromMediaItem(firstLoadPlayingItem)
+        self.registerMediaPlayerNotification()
+        self.resumeSong()
+        if(!isGenerated){
+            generateSoundWave(firstLoadPlayingItem)
+        }
+        shuffleButton.enabled = true
+        othersButton.enabled = true
+        speedStepper.enabled = true
+        speedLabel.enabled = true
+        speedStepper.tintColor = UIColor.mainPinkColor()
+        previousButton.hidden = false
+        nextButton.hidden = false
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
