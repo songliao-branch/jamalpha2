@@ -71,9 +71,14 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             if chords.count > 2 { //just checking if there is a local tabs, a local tabs must have a tuning
+              
+                let currentUser = CoreDataManager.getCurrentUser()!
                 
-                let set = DownloadedTabsSet(id: -1, tuning: tuning, capo: capo, songId: -1, votesScore: 0, userName: CoreDataManager.getCurrentUser()!.email, updatedAt: "", chordsPreview: preview, voteStatus: "")
-                allTabsSets[0]?.append(set)
+                let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
+                //TODO: better way to differentitate this?cell
+                let t = DownloadedTabsSet(id: -1, songId: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+
+                allTabsSets[0]?.append(t)
             }
         }
 
@@ -279,8 +284,12 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-            cell.profileName.text = tabsSet.userName
             cell.dateLabel.text = tabsSet.updatedAt
+            
+            //user section
+            cell.profileName.text = tabsSet.editor.nickname
+            
+            
             
             if tabsSet.id == lastSelectedTabsId {
                 cell.checkmark.hidden = false

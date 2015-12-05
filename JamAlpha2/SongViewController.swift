@@ -241,7 +241,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             setUpPreviewButton()
         }
         
-        
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
         loadDisplayMode()
     }

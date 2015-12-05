@@ -170,7 +170,9 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     print(json)
                     for set in json["tabs_sets"].array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userName: set["user"]["email"].string!, updatedAt: set["updated_at"].string!, chordsPreview: set["chords_preview"].string!, voteStatus: set["vote_status"].string!)
+                        
+                        let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
+                        let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
                         
                         allDownloads.append(t)
                     }
