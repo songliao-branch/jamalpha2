@@ -3,6 +3,7 @@ import MediaPlayer
 import AVFoundation
 import Alamofire
 import Haneke
+import StoreKit
 
 let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
@@ -14,7 +15,7 @@ let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange, used in 
 let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
-class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate, SKStoreProductViewControllerDelegate {
     
     var musicViewController: MusicViewController!
     
@@ -203,6 +204,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var songNeedPurchase: SearchResult!
     var AVplayer: AVPlayer!
     var playPreveiwButton:UIButton!
+    var previewActionViewHeight: CGFloat = 44 * 3 + 2
+    var previewView:UIView!
+    var preViewPlayButton:UIButton!
+    var goToMusicButton:UIButton!
+    var popItuneButton:UIButton!
+    var storeViewController:SKStoreProductViewController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -238,12 +245,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
            updateMusicData(firstLoadPlayingItem)
         }else{
             updateMusicData(songNeedPurchase)
-            setUpPreviewButton()
         }
         
         
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
         loadDisplayMode()
+        
     }
     
     deinit{
@@ -308,7 +315,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func loadBackgroundImageFromMediaItem(item: MPMediaItem) {
         if let artwork = item.artwork {
-            currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height, height: self.view.frame.height))
+            currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
         } else {
             //TODO: add a placeholder album cover
             currentImage = UIImage(named: "liwengbg")
@@ -470,7 +477,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(previousButton)
         self.view.addSubview(nextButton)
         
-        if(firstLoadPlayingItem == nil){
+        if(isSongNeedPurchase){
             previousButton.hidden = true
             nextButton.hidden = true
         }
@@ -817,11 +824,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // this is a flag to determine if the generateSoundWave function will be called
                 isGenerated = false
             }
-        } else if let soundWaveData = CoreDataManager.getSongWaveFormImage(songNeedPurchase) {
-            KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-            print("sound wave data found")
-            KGLOBAL_init_queue.suspended = false
-            isGenerated = true
+        } else{
+            if let soundWaveData = CoreDataManager.getSongWaveFormImage(songNeedPurchase) {
+                KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+                print("sound wave data found")
+                KGLOBAL_init_queue.suspended = false
+                isGenerated = true
+            }else{
+                //if didn't find it then we will generate then waveform later, in the viewdidappear method
+                // this is a flag to determine if the generateSoundWave function will be called
+                isGenerated = false
+            }
         }
         
     
@@ -1093,6 +1106,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
         self.view.addSubview(actionDismissLayerButton)
         actionDismissLayerButton.hidden = true
+        
+        if(isSongNeedPurchase){
+            initPurchaseItunsSongItem()
+        }
 
         // NOTE: we have to call all the embedded action events from the custom views, not in this class.
         guitarActionView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: actionViewHeight))
@@ -1175,8 +1192,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         rowWrappers[5].addSubview(speedLabel)
         
         if(isSongNeedPurchase){
-            speedStepper.hidden = true
-            speedLabel.hidden = true
+            speedStepper.enabled = false
+            speedStepper.tintColor = UIColor.lightGrayColor()
+            speedLabel.enabled = false
         }
         
         // Add navigation out view, all actions are navigated to other viewControllers
@@ -1271,6 +1289,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if self.navigationOutActionView.frame.origin.y < self.view.frame.height - 10 {
                 print("dismiss navigation action")
                 self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.width, self.actionViewHeight)
+            }
+            if(self.previewView != nil){
+                if self.previewView.frame.origin.y < self.view.frame.height - 10 {
+                    print("dismiss navigation action")
+                    self.previewView.frame.origin.y = self.view.frame.height
+                }
             }
 
             self.actionDismissLayerButton.backgroundColor = UIColor.clearColor()
@@ -2049,18 +2073,77 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     var isClick = false
+    func initPurchaseItunsSongItem(){
+        setUpPreviewButton()
+        setUpPreviewActionView()
+    }
+    
     func setUpPreviewButton(){
         playPreveiwButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width/2-35,UIScreen.mainScreen().bounds.size.height-bottomViewHeight-90,70,70))
         playPreveiwButton.setImage((UIImage(named: "playbutton")), forState: UIControlState.Normal)
-        playPreveiwButton.addTarget(self, action: "avPlay", forControlEvents: UIControlEvents.TouchUpInside)
+        playPreveiwButton.addTarget(self, action: "showPreviewActionView", forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(playPreveiwButton)
         let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
         let playerItem = AVPlayerItem( URL:url)
         AVplayer = AVPlayer(playerItem:playerItem)
     }
     
-    func avPlay(){
+    
+    func setUpPreviewActionView(){
+        // NOTE: we have to call all the embedded action events from the custom views, not in this class.
+        self.previewView = UIView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: previewActionViewHeight))
+        previewView.backgroundColor = UIColor.actionGray()
+        self.view.addSubview(previewView)
+        let width = previewView.frame.width
+        
+        var rowWrappers = [UIView]()
+        let rowHeight: CGFloat = 44+1
+        for i in 0..<3 {
+            let row = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i), width: width, height: rowHeight))
+            rowWrappers.append(row)
+            if i < 2 { // give a separator at the the bottom of each row except last line
+                let line = UIView(frame: CGRect(x: 0, y: rowHeight-1, width: width, height: 1))
+                line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+                row.addSubview(line)
+            }
+            previewView.addSubview(row)
+        }
+        let childCenterY = (rowHeight-1)/2
+
+        let names = ["Listen Preview", "Purchase Song", "Listen with Apple Music"]
+        var buttons = [self.previousButton, self.popItuneButton, self.goToMusicButton]
+        let functionName = ["previewPlay","goToItues","goToMusic"]
+        let buttonName = ["Play","Itues","Music"]
+        
+        let sideMargin: CGFloat = 15
+        for i in 0..<3 {
+            let previewNameLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 200, height: 22))
+            previewNameLabel.text = names[i]
+            previewNameLabel.textColor = UIColor.mainPinkColor()
+            previewNameLabel.center.y = childCenterY
+            rowWrappers[i].addSubview(previewNameLabel)
+            buttons[i] = UIButton(frame: CGRect(x: width-CGFloat(sideMargin)-51, y: 0, width: 51, height: 31))
+            buttons[i].addTarget(self, action: Selector(functionName[i]) , forControlEvents: UIControlEvents.TouchUpInside)
+            buttons[i].setTitle(buttonName[i], forState: .Normal)
+            buttons[i].setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+            rowWrappers[i].addSubview(buttons[i])
+        }
+    }
+    
+    func showPreviewActionView(){
+        actionDismissLayerButton.hidden = false
+        UIView.animateWithDuration(0.3, animations: {
+            self.previewView.frame.origin.y = self.view.frame.height-self.previewActionViewHeight
+            self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
+            self.actionDismissLayerButton.alpha = 0.3
+            }, completion: nil)
+    }
+    
+    
+    func previewPlay(){
         if(AVplayer.currentTime() == AVplayer.currentItem?.duration){
             AVplayer = nil
             let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
@@ -2075,8 +2158,76 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }else{
             AVplayer.pause()
         }
-       isClick = !isClick
+        isClick = !isClick
     }
+    
+    func goToItues(){
+        storeViewController = nil
+        UINavigationBar.appearance().tintColor = UIColor.mainPinkColor()
+        storeViewController = SKStoreProductViewController()
+        storeViewController.delegate = self
+
+        let parameters = [SKStoreProductParameterITunesItemIdentifier :
+            NSNumber(integer: songNeedPurchase.trackId!)]
+        storeViewController.loadProductWithParameters(parameters,
+            completionBlock: {result, error in
+                if error != nil {
+                    print(error)
+                }
+        })
+        self.presentViewController(storeViewController,
+            animated: true, completion: {
+                self.dismissAction()
+        })
+    }
+    
+    func goToMusic(){
+        self.dismissAction()
+        UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl!)!)
+    }
+    
+    
+    func productViewControllerDidFinish(viewController: SKStoreProductViewController) {
+        if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(songNeedPurchase.trackName!, artist: songNeedPurchase.artistName!, duration: songNeedPurchase.trackTimeMillis!)){
+                MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
+                MusicManager.sharedInstance.setIndexInTheQueue(0)
+            self.recoverToNormalSongVC()
+            
+        }else{
+              print("didn't purchase the song")
+        }
+        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+        viewController.dismissViewControllerAnimated(true, completion: nil)
+        
+    }
+    
+    func recoverToNormalSongVC(){
+        //delete
+        self.previewView = nil
+        self.playPreveiwButton.removeFromSuperview()
+        self.playPreveiwButton = nil
+        self.AVplayer = nil
+        //recover
+        player = MusicManager.sharedInstance.player
+        self.firstLoadPlayingItem = player.nowPlayingItem
+        self.isSongNeedPurchase = false
+        self.removeAllObserver()
+        loadBackgroundImageFromMediaItem(firstLoadPlayingItem)
+        self.registerMediaPlayerNotification()
+        self.resumeSong()
+        if(!isGenerated){
+            generateSoundWave(firstLoadPlayingItem)
+        }
+        shuffleButton.enabled = true
+        othersButton.enabled = true
+        speedStepper.enabled = true
+        speedLabel.enabled = true
+        speedStepper.tintColor = UIColor.mainPinkColor()
+        previousButton.hidden = false
+        nextButton.hidden = false
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // MARK: Fix to portrait orientation
     override func shouldAutorotate() -> Bool {

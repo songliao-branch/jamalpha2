@@ -174,15 +174,15 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 if let imageURL = searchResults[indexPath.row].artworkUrl100 {
                     cell.albumCover.image = nil
-                    
-                    
                     let url = NSURL(string: imageURL)!
                     let fetcher = NetworkFetcher<UIImage>(URL: url)
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image
-                        self.searchResults[indexPath.row].image = nil
-                        self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                        if(indexPath.row < (self.searchResults.count)){
+                            self.searchResults[indexPath.row].image = nil
+                            self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                        }
                     }
                 }
                
@@ -231,19 +231,34 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
                 songVC.selectedFromTable = true
+                let searchSong = self.searchResults[indexPath.row]
+                var isReload = true
+                
+                if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
+                    print("\(searchSong.trackName)  \(searchSong.artistName)   \(searchSong.trackTimeMillis)")
+                    if(filteredSongs.count == 0){
+                        MusicManager.sharedInstance.setPlayerQueue([foundItem])
+                    }else{
+                        MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
+                    }
+                    
+                    MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
+                    
+                }else{
+                    songVC.isSongNeedPurchase = true
+                    songVC.songNeedPurchase = self.searchResults[indexPath.row]
+                    if let img = self.searchResults[indexPath.row].image {
+                        songVC.backgroundImage = img
+                        songVC.blurredImage = img.applyLightEffect()
+                    }
+                    isReload = false
+                }
                 
                 songVC.transitioningDelegate = self.animator
-                songVC.isSongNeedPurchase = true
-                songVC.songNeedPurchase = self.searchResults[indexPath.row]
-                if let img = self.searchResults[indexPath.row].image {
-                    songVC.backgroundImage = img
-                    songVC.blurredImage = img.applyLightEffect()
-                }
-           
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
                     completed in
-                    self.reloadMusicTable(false)
+                    self.reloadMusicTable(isReload)
                 })
             }
             
@@ -299,6 +314,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         for item in data["results"].array! {
             let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
             
+            if let trackId = item["trackId"].number {
+                searchResponse.trackId = Int(trackId)
+            }
             if let trackName = item["trackName"].string {
                 searchResponse.trackName = trackName
             }
@@ -321,6 +339,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if let trackTimeMillis = item["trackTimeMillis"].number {
                 searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
             }
+            
             searchResults.append(searchResponse)
         }
 
