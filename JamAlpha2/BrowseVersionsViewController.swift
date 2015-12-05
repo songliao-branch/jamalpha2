@@ -27,6 +27,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     var centerButton: UIButton!//to display "Add your own tabs or lyrics if none is found"
     
+    var awsS3: AWSS3Manager = AWSS3Manager()
+    
     override func viewDidLoad() {
 
         setUpHeader()
@@ -289,7 +291,16 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             //user section
             cell.profileName.text = tabsSet.editor.nickname
             
-            
+            cell.profileImage.image = nil
+            awsS3.downloadImage(tabsSet.editor.avatarUrlThumbnail, completion: {
+                image in
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cell.profileImage.image = image
+                        cell.profileImage.layer.cornerRadius = cell.profileImage.frame.height/2
+                        cell.profileImage.layer.masksToBounds = true
+                    }
+                }
+            )
             
             if tabsSet.id == lastSelectedTabsId {
                 cell.checkmark.hidden = false

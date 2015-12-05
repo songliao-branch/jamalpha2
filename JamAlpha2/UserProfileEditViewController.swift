@@ -173,13 +173,7 @@ extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavi
         
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
-//    // download the image
-    func downloadImage() {
-        awsS3.addDownloadRequestToArray(self.originFileName)
-        awsS3.download(awsS3.downloadRequests[0]!)
-    }
-    
+
 }
 
 // crop the user profile image

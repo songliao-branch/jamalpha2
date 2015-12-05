@@ -14,9 +14,6 @@ class AWSS3Manager: NSObject {
     var uploadRequests: Array<AWSS3TransferManagerUploadRequest?> = Array<AWSS3TransferManagerUploadRequest?>()
     var uploadFileURLs: Array<NSURL?> = Array<NSURL?>()
     
-    var downloadRequests: Array<AWSS3TransferManagerDownloadRequest?> = Array<AWSS3TransferManagerDownloadRequest?>()
-    var downloadFileURLs: Array<NSURL?> = Array<NSURL?>()
-    
     func addUploadRequestToArray(sender: UIImage, style: String, email: String) -> String {
         let formatter: NSDateFormatter = NSDateFormatter()
         formatter.dateStyle = NSDateFormatterStyle.ShortStyle
@@ -83,24 +80,26 @@ class AWSS3Manager: NSObject {
         }
     }
     
-    func addDownloadRequestToArray(sender: String) {
-        // Construct the NSURL for the download location.
-        let downloadingFilePath: NSString = ((NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("download") as NSString).stringByAppendingPathComponent(sender)
-        let downloadingFileURL: NSURL = NSURL(fileURLWithPath:downloadingFilePath as String)
-        print(downloadingFileURL)
-        // Construct the download request.
-        let downloadRequest: AWSS3TransferManagerDownloadRequest = AWSS3TransferManagerDownloadRequest()
-        downloadRequest.bucket = S3BucketName
-        downloadRequest.key = sender
-        downloadRequest.downloadingFileURL = downloadingFileURL
-        
-        self.downloadRequests.append(downloadRequest)
-        self.downloadFileURLs.append(nil)
-    }
     
-    func download(downloadRequest: AWSS3TransferManagerDownloadRequest) {
-        let transferManager = AWSS3TransferManager.defaultS3TransferManager()
-        transferManager.download(downloadRequest).continueWithBlock({ (task) -> AnyObject! in
+
+    func downloadImage(url: String, completion: ((image: UIImage) -> Void)) {
+        
+        if url == "" {
+            completion(image: UIImage(named: "kitten_profile")!)
+            return
+        }
+        
+        let request = AWSS3TransferManagerDownloadRequest()
+        request.bucket = S3BucketName
+        request.key = url
+        
+        //TODO: retrieve cached images
+        let l =  NSTemporaryDirectory().stringByAppendingString("download.png")
+        let downloadingFileUrl = NSURL(fileURLWithPath: l)
+        request.downloadingFileURL = downloadingFileUrl
+        
+        AWSS3TransferManager.defaultS3TransferManager().download(request)
+            .continueWithBlock({ (task) -> AnyObject! in
             if let error = task.error {
                 if error.domain == AWSS3TransferManagerErrorDomain as String
                     && AWSS3TransferManagerErrorType(rawValue: error.code) == AWSS3TransferManagerErrorType.Paused {
@@ -111,17 +110,16 @@ class AWSS3Manager: NSObject {
             } else if let exception = task.exception {
                 print("download failed: [\(exception)]")
             } else {
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    if let index = self.indexOfDownloadRequest(self.downloadRequests, downloadRequest: downloadRequest) {
-                        self.downloadRequests[index] = nil
-                        self.downloadFileURLs[index] = downloadRequest.downloadingFileURL
-                    }
-                })
+                
+                print("Download success with fileUrl: \(request.downloadingFileURL)")
+                if let data = NSData(contentsOfURL: request.downloadingFileURL) {
+                    completion(image: UIImage(data: data)!)
+                }
             }
             return nil
         })
     }
-    
+
     func indexOfUploadRequest(array: Array<AWSS3TransferManagerUploadRequest?>, uploadRequest: AWSS3TransferManagerUploadRequest?) -> Int? {
         for (index, object) in array.enumerate() {
             if object == uploadRequest {
@@ -130,16 +128,7 @@ class AWSS3Manager: NSObject {
         }
         return nil
     }
-    
-    func indexOfDownloadRequest(array: Array<AWSS3TransferManagerDownloadRequest?>, downloadRequest: AWSS3TransferManagerDownloadRequest?) -> Int? {
-        for (index, object) in array.enumerate() {
-            if object == downloadRequest {
-                return index
-            }
-        }
-        return nil
-    }
-    
+
     func randomStringWithLength (len : Int) -> NSString {
         let letters : NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         let randomString : NSMutableString = NSMutableString(capacity: len)
@@ -149,18 +138,6 @@ class AWSS3Manager: NSObject {
             randomString.appendFormat("%C", letters.characterAtIndex(Int(rand)))
         }
         return randomString
-    }
-    
-
-    
-    // after download the image then able to get the image
-    func getImage() -> UIImage {
-        if let downloadFileURL = self.downloadFileURLs[0] {
-            if let data = NSData(contentsOfURL: downloadFileURL) {
-                return UIImage(data: data)!
-            }
-        }
-        return UIImage(named: "kitten_profile")!
     }
 
 }

@@ -44,6 +44,6 @@ class DownloadedTabsSet: NSObject {
         self.votesScore = votesScore
         self.voteStatus = voteStatus
         self.editor = editor
-        self.updatedAt = updatedAt
+        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updatedAt)
     }
 }
