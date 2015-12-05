@@ -81,6 +81,7 @@ class AWSS3Manager: NSObject {
             }
             return nil
         }
+        
     }
     
     func addDownloadRequestToArray(sender: String) {

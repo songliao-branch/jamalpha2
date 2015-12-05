@@ -902,6 +902,9 @@
                             <constraint firstItem="FW1-8X-V9S" firstAttribute="top" secondItem="yMw-by-F8B" secondAttribute="top" id="zGo-Od-fj5"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="FW1-8X-V9S" id="D2T-RH-A9g"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="414-h9-DKJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

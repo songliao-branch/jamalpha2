@@ -10,6 +10,7 @@ pod 'CryptoSwift'
 
 pod 'FBSDKCoreKit', '4.2.0'
 pod 'FBSDKLoginKit', '4.1.0'
+pod 'FBSDKShareKit', '4.2.0'
 
 pod 'RSKImageCropper'
 
