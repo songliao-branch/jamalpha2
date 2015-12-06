@@ -14,7 +14,8 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBOutlet weak var tableView: UITableView!
     
-    let tableViewContent: [String] = ["Like us on Facebook", "Rate Twistjam","Contact Us", "About","Logout"]
+    let tableViewContent: [String] = ["Like us on Facebook", "Rate Twistjam","Contact Us"]
+    let tableViewContent2: [String] = ["About","Logout"]
  
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,21 +27,36 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         tableView.registerClass(SettingFBCell.self, forCellReuseIdentifier: "fbcell")
     }
     
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 2
+    }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableViewContent.count
+        if section == 0 {
+            return tableViewContent.count
+        } else {
+            return tableViewContent2.count
+        }
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        if indexPath.item == 0 {
-            let cell: SettingFBCell = self.tableView.dequeueReusableCellWithIdentifier("fbcell") as! SettingFBCell
-            cell.initialCell(self.view.frame.size.width)
-            cell.selectionStyle = UITableViewCellSelectionStyle.None
-            cell.titleLabel.text = tableViewContent[indexPath.item]
-            return cell
+        if indexPath.section == 0 {
+            if indexPath.item == 0 {
+                let cell: SettingFBCell = self.tableView.dequeueReusableCellWithIdentifier("fbcell") as! SettingFBCell
+                cell.initialCell(self.view.frame.size.width)
+                cell.selectionStyle = UITableViewCellSelectionStyle.None
+                cell.titleLabel.text = tableViewContent[indexPath.item]
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
+                cell.textLabel?.text = tableViewContent[indexPath.item]
+                cell.selectionStyle = UITableViewCellSelectionStyle.None
+                cell.selectionStyle = UITableViewCellSelectionStyle.None
+                return cell
+            }
         } else {
             let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
-            cell.textLabel?.text = tableViewContent[indexPath.item]
+            cell.textLabel?.text = tableViewContent2[indexPath.item]
             cell.selectionStyle = UITableViewCellSelectionStyle.None
             cell.selectionStyle = UITableViewCellSelectionStyle.None
             return cell
@@ -49,25 +65,29 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.item == 0 {
-           
-        } else if indexPath.item == 1 {
-            self.rateTwistjam()
-        } else if indexPath.item == 2 {
-            self.contactUs()
-        } else if indexPath.item == 3 {
-            let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
-            self.navigationController?.pushViewController(aboutVC, animated: true)
-        } else if indexPath.item == 4 {
-            let refreshAlert = UIAlertController(title: "Log Out", message: "Are you sure you want to Log Out?", preferredStyle: UIAlertControllerStyle.Alert)
-            refreshAlert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-                self.dismissViewControllerAnimated(false, completion: nil)
-            }))
-            refreshAlert.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-                CoreDataManager.logoutUser()
-                self.navigationController?.popViewControllerAnimated(false)
-            }))
-            presentViewController(refreshAlert, animated: true, completion: nil)
+        if indexPath.section == 0 {
+            if indexPath.item == 0 {
+                
+            } else if indexPath.item == 1 {
+                self.rateTwistjam()
+            } else if indexPath.item == 2 {
+                self.contactUs()
+            }
+        } else {
+            if indexPath.item == 0 {
+                let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
+                self.navigationController?.pushViewController(aboutVC, animated: true)
+            } else if indexPath.item == 4 {
+                let refreshAlert = UIAlertController(title: "Log Out", message: "Are you sure you want to Log Out?", preferredStyle: UIAlertControllerStyle.Alert)
+                refreshAlert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                    self.dismissViewControllerAnimated(false, completion: nil)
+                }))
+                refreshAlert.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                    CoreDataManager.logoutUser()
+                    self.navigationController?.popViewControllerAnimated(false)
+                }))
+                presentViewController(refreshAlert, animated: true, completion: nil)
+            }
         }
     }
     

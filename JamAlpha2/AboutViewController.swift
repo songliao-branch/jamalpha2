@@ -31,11 +31,12 @@ class AboutViewController: UIViewController {
     
     func setUpNavigationBar() {
         self.navigationItem.title = "About"
+        self.view.backgroundColor = UIColor.groupTableViewBackgroundColor()
     }
     
     func setUpVersionView() {
         let imageWidth: CGFloat = 100
-        let logoImageView: UIImageView = UIImageView(frame: CGRectMake((self.viewWidth - imageWidth) / 2, 20, imageWidth, imageWidth))
+        let logoImageView: UIImageView = UIImageView(frame: CGRectMake((self.viewWidth - imageWidth) / 2, 40, imageWidth, imageWidth))
         logoImageView.image = UIImage(named: "splash_logo")
         self.view.addSubview(logoImageView)
         
