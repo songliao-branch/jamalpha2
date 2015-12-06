@@ -115,14 +115,17 @@ class APIManager: NSObject {
         if let a = mediaItem.artist {
             artist = a
         }
+    
+        var lyric = Lyric()
         
-        var data = [(String, NSTimeInterval)]()
-        data = CoreDataManager.getLyrics(mediaItem)
+        (lyric, _) = CoreDataManager.getLyrics(mediaItem, fetchingLocalOnly: true)
+        
         var times = [Float]()
         var lyrics = [String]()
-        for i in 0..<data.count {
-            times.append(Float(data[i].1))
-            lyrics.append(data[i].0)
+        
+        for line in lyric.lyric {
+            times.append(line.time.toDecimalNumer())
+            lyrics.append(line.str)
         }
         
         let parameters = [
@@ -142,7 +145,7 @@ class APIManager: NSObject {
                 case .Success:
                     print("Lyrics uploaded succesfully")
                     completion(isSuccess: true)
-                case .Failure(let error):
+                case .Failure(let _):
                     completion(isSuccess: false)
                 }
         }
@@ -237,9 +240,11 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     print(json)
                     for set in json["lyrics_sets"].array! {
-
-                        //TODO: Change ["user"]["email"] to ["user"]["email"] once API is completed
-                        let l  = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, userName: set["user"]["email"].string!, updatedAt: set["updated_at"].string!, votesScore: set["cached_votes_score"].int!, lyricsPreview: set["lyrics_preview"].string!, lines: set["number_of_lines"].int!, voteStatus: set["vote_status"].string!)
+                        
+                         let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
+                        
+                        let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
+                        
                         allDownloads.append(l)
                     }
                     //after completed, pass everything to the callback

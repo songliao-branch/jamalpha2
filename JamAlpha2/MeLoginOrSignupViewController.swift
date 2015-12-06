@@ -267,9 +267,8 @@ class MeLoginOrSignupViewController: UIViewController {
 
     
     func submitPressed() {
-
-        //validate nickname, email, password is not empty
-        guard let nickname = nickNameTextField.text where nickNameTextField.text?.characters.count > 0 else {
+        
+        if isSignUpSelected && nickNameTextField.text == nil {
             self.showMessage("Nick Name field is empty", message: "", actionTitle: "OK", completion: nil)
             return
         }
@@ -301,7 +300,7 @@ class MeLoginOrSignupViewController: UIViewController {
         
         if isSignUpSelected { //sigup up api
             parameters = [
-                "nickname": nickname,
+                "nickname": nickNameTextField.text!,
                 "email": email,
                 "password": password
             ]
@@ -316,7 +315,7 @@ class MeLoginOrSignupViewController: UIViewController {
         signUpLoginRequest(parameters, afterRetrievingUser: {
             id, email, authToken in
             
-            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: nickname)
+            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: self.nickNameTextField.text!)
             
         })
     }

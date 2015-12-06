@@ -503,10 +503,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
            
         }
         
-        let lyricsFromCoreData = CoreDataManager.getLyrics(song)
-        
-        if lyricsFromCoreData.count > 0 {
-            self.lyric = Lyric(lyricsTimesTuple: lyricsFromCoreData)
+        var lyric = Lyric()
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: false)
+   
+        if lyric.lyric.count > 1 {
+            self.lyric = lyric
         } else {
             self.lyric = Lyric()
             self.topLyricLabel.text = ""
