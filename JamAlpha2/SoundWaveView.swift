@@ -270,7 +270,7 @@ class SoundWaveView: UIView {
     
     
     
-    func generateWaveformImage(asset:AVAsset, color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
+    func generateWaveformImage(color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
         
         
         let ratio:CGFloat = UIScreen.mainScreen().scale
@@ -321,12 +321,10 @@ class SoundWaveView: UIView {
     func generateWaveforms(){
         
         let rect:CGRect = self.bounds
-        if(self.asset != nil){
             
-            self.generatedNormalImage = self.generateWaveformImage(self.asset, color: self.normalColor, size: CGSizeMake(rect.size.width, rect.size.height), antialiasingEnabled: self.antialiasingEnabled)
+            self.generatedNormalImage = self.generateWaveformImage(self.normalColor, size: CGSizeMake(rect.size.width, rect.size.height), antialiasingEnabled: self.antialiasingEnabled)
             self.normalImageView.image = generatedNormalImage
             normalColorDirty = false
-        }
         if(isForTabsEditor){
             self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
             self.progressImageView.image = generatedProgressImage
