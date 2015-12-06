@@ -16,7 +16,7 @@ class SettingFBCell: UITableViewCell {
     var likeControl: FBSDKLikeControl = FBSDKLikeControl()
     
     func initialCell(width: CGFloat) {
-        titleLabel.frame = CGRectMake(20, 0, width / 2, 44)
+        titleLabel.frame = CGRectMake(15, 0, width / 2, 44)
         self.contentView.addSubview(titleLabel)
     
         likeControl.objectType = FBSDKLikeObjectType.Page
