@@ -32,10 +32,13 @@ class SoundWaveView: UIView {
     var generatedProgressImage:UIImage!
     
     var averageSampleBuffer: NSMutableArray?
+    var originalSampleBuffer:NSMutableArray?
     
     let tabEditorSampleRate:CGFloat = 8
     let songVCSampleRate:CGFloat = 1
     let lineWidth:CGFloat = 2.5
+    
+    var isForTabsEditor = false
     
     override init(frame: CGRect)  {
         super.init(frame: frame)
@@ -86,14 +89,14 @@ class SoundWaveView: UIView {
         CGContextStrokePath(context)
     }
     
-     func renderWavefromInContext(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
-        averageSampleBuffer = NSMutableArray()
+     func getSampleDateFromAudio(asset:AVAsset?, size:CGSize){
+        self.averageSampleBuffer = NSMutableArray()
+        self.originalSampleBuffer = NSMutableArray()
         
         if(asset != nil ){
             let pixelRatio:CGFloat = UIScreen.mainScreen().scale
             
             let widthInPixels:CGFloat = size.width*pixelRatio
-            let heightInPixels:CGFloat = size.height*pixelRatio
             
             let reader: AVAssetReader = try! AVAssetReader(asset: asset!)
             
@@ -133,26 +136,20 @@ class SoundWaveView: UIView {
                     }
                 }
                 
-                CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
-                CGContextSetLineWidth(context, lineWidth)
-                CGContextSetStrokeColorWithColor(context, color.CGColor)
-                CGContextSetFillColorWithColor(context, color.CGColor)
-                
                 let bytesPreInputSample:UInt32 = 2 * channelCount
                 let totalSamples: UInt64 = UInt64(asset!.duration.value)
                 var samplesPerPixel:NSInteger = NSInteger(CGFloat(totalSamples)  / widthInPixels)
                 samplesPerPixel = samplesPerPixel < 1 ? 1 : samplesPerPixel
                 
                 reader.startReading()
-                
-                let halfGraphHeight:Float = Float(heightInPixels) / 2
+
                 var bigSample:Double = 0
                 var bigSampleCount:NSInteger = 0
                 var bigSampleforTabAndChord:Double = 0
                 var bigSampleforTabAndChordCount:NSInteger = 0
                 let data:NSMutableData = NSMutableData(length: 32768)!
                 
-                var currentX:CGFloat = 0
+                //var currentX:CGFloat = 0
 
                 while (reader.status == AVAssetReaderStatus.Reading)
                 {
@@ -211,10 +208,7 @@ class SoundWaveView: UIView {
                             
                             if(bigSampleCount == Int(tabEditorSampleRate)*samplesPerPixel){
                                 let averageSample:Double = bigSample / Double(bigSampleCount)
-                                
-                                renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample, x: currentX*tabEditorSampleRate+0.5)
-                                
-                                currentX++
+                                self.originalSampleBuffer!.addObject(averageSample)
                                 bigSample = 0
                                 bigSampleCount = 0
                                 
@@ -223,19 +217,35 @@ class SoundWaveView: UIView {
                         CMSampleBufferInvalidate(sampleBufferRef!)
                     }
                 }
-                
-                bigSample = bigSampleCount > 0 ? bigSample / Double(bigSampleCount) : -50
-                while(currentX < 450){
-                    renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: bigSample, x: currentX*tabEditorSampleRate)
-                    currentX++
-                }
             }
+        }
+    }
+    
+    // render sound wave from the NSMutableArray we saved in SongViewController
+    func renderWavefromForSongVC(context:CGContextRef, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
+        let pixelRatio:CGFloat = UIScreen.mainScreen().scale
+        
+        let heightInPixels:CGFloat = size.height*pixelRatio
+        
+        CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
+        CGContextSetLineWidth(context, lineWidth)
+        CGContextSetStrokeColorWithColor(context, color.CGColor)
+        CGContextSetFillColorWithColor(context, color.CGColor)
+        
+        let halfGraphHeight:Float = Float(heightInPixels) / 2
+        
+        var currentX:CGFloat = 0
+        for averageSample in self.originalSampleBuffer!
+        {
+            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*tabEditorSampleRate+0.5)
+            
+            currentX++
         }
     }
     
     
     // render sound wave from the NSMutableArray we saved in SongViewController
-    func renderWavefromFromStorage(context:CGContextRef, asset:AVAsset?, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
+    func renderWavefromForTab(context:CGContextRef, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
         let pixelRatio:CGFloat = UIScreen.mainScreen().scale
 
         let heightInPixels:CGFloat = size.height*pixelRatio
@@ -248,7 +258,6 @@ class SoundWaveView: UIView {
         let halfGraphHeight:Float = Float(heightInPixels) / 2
 
         var currentX:CGFloat = 0
-
         for averageSample in self.averageSampleBuffer!
         {
             renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*tabEditorSampleRate+0.5)
@@ -260,20 +269,18 @@ class SoundWaveView: UIView {
     /*******************************************************/
     
     
+    
     func generateWaveformImage(asset:AVAsset, color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
         
         
         let ratio:CGFloat = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width * ratio, size.height * ratio), false, 1);
         
-        if(averageSampleBuffer == nil){
-            self.renderWavefromInContext(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
-            //store into coredata
-            
-            
-        }else{
-            self.renderWavefromFromStorage(UIGraphicsGetCurrentContext()!, asset: asset, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
-        }
+            if(self.originalSampleBuffer != nil && !isForTabsEditor){
+                self.renderWavefromForSongVC(UIGraphicsGetCurrentContext()!, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+            }else if(self.averageSampleBuffer != nil){
+                self.renderWavefromForTab(UIGraphicsGetCurrentContext()!, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+            }
         
         let image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
         
@@ -311,7 +318,7 @@ class SoundWaveView: UIView {
         self.progressImageView.image = generatedProgressImage
     }
     
-    func generateWaveforms(isForTabsEditor:Bool){
+    func generateWaveforms(){
         
         let rect:CGRect = self.bounds
         if(self.asset != nil){
@@ -324,6 +331,7 @@ class SoundWaveView: UIView {
             self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
             self.progressImageView.image = generatedProgressImage
         }
+       
     }
     
     func applyProgressToSubviews(){
@@ -366,10 +374,13 @@ class SoundWaveView: UIView {
         self.setNeedsDisplay()
     }
     
+    
     func SetSoundURL(soundURL:NSURL, isForTabsEditor:Bool)
     {
         self.asset = AVURLAsset(URL: soundURL, options: nil)
-        self.generateWaveforms(isForTabsEditor)
+        self.isForTabsEditor = isForTabsEditor
+        let rect:CGRect = self.bounds
+        self.getSampleDateFromAudio(self.asset, size: CGSizeMake(rect.size.width, rect.size.height))
     }
     
     func setProgress(progress:CGFloat)

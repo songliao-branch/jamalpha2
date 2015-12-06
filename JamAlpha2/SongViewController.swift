@@ -862,21 +862,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 op = NSBlockOperation(block: {
                     
                     tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
-                    let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                    
-                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
                     self.isGenerated = true
                     
                     dispatch_async(dispatch_get_main_queue()) {
                         KGLOBAL_operationCache.removeValueForKey(assetURL as! NSURL)
-                        if(tempNowPlayingItem == self.player.nowPlayingItem){
-                            NSOperationQueue.mainQueue().addOperationWithBlock({
+                        NSOperationQueue.mainQueue().addOperationWithBlock({
+                            tempProgressBlock.generateWaveforms()
+                            let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                            CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                            if(tempNowPlayingItem == self.player.nowPlayingItem){
                                 if(KGLOBAL_progressBlock != nil ){
                                     KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                 }
                                 KGLOBAL_init_queue.suspended = false
-                            })
-                        }
+                            }
+                        })
+
                     }
                 })
                 KGLOBAL_operationCache[assetURL as! NSURL] = op

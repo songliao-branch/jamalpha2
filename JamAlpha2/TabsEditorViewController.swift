@@ -1133,6 +1133,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.player.volume = 1
         progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
         self.progressBlock.SetSoundURL(url,isForTabsEditor:true)
+        self.progressBlock.generateWaveforms()
         self.progressBlock!.alpha = 0.5
 
     }
