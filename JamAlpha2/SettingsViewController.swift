@@ -35,11 +35,13 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         if indexPath.item == 0 {
             let cell: SettingFBCell = self.tableView.dequeueReusableCellWithIdentifier("fbcell") as! SettingFBCell
             cell.initialCell(self.view.frame.size.width)
+            cell.selectionStyle = UITableViewCellSelectionStyle.None
             cell.titleLabel.text = tableViewContent[indexPath.item]
             return cell
         } else {
             let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
             cell.textLabel?.text = tableViewContent[indexPath.item]
+            cell.selectionStyle = UITableViewCellSelectionStyle.None
             cell.selectionStyle = UITableViewCellSelectionStyle.None
             return cell
         }
@@ -58,14 +60,14 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             self.navigationController?.pushViewController(aboutVC, animated: true)
         } else if indexPath.item == 4 {
             let refreshAlert = UIAlertController(title: "Log Out", message: "Are you sure you want to Log Out?", preferredStyle: UIAlertControllerStyle.Alert)
+            refreshAlert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                self.dismissViewControllerAnimated(false, completion: nil)
+            }))
             refreshAlert.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
                 CoreDataManager.logoutUser()
                 self.navigationController?.popViewControllerAnimated(false)
             }))
-            refreshAlert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-                self.dismissViewControllerAnimated(false, completion: nil)
-            }))
-            
+            presentViewController(refreshAlert, animated: true, completion: nil)
         }
     }
     

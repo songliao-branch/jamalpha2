@@ -20,7 +20,7 @@
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */; };
 		BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED01C1220E700F26877 /* AboutViewController.swift */; };
-		BFE49ED61C12471200F26877 /* AppIdConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED51C12471200F26877 /* AppIdConstant.swift */; };
+		BFE49ED61C12471200F26877 /* AppConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED51C12471200F26877 /* AppConstant.swift */; };
 		BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
@@ -125,7 +125,7 @@
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateNickNameViewController.swift; sourceTree = "<group>"; };
 		BFE49ED01C1220E700F26877 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
-		BFE49ED51C12471200F26877 /* AppIdConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIdConstant.swift; sourceTree = "<group>"; };
+		BFE49ED51C12471200F26877 /* AppConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConstant.swift; sourceTree = "<group>"; };
 		BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingFBLikeCell.swift; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
@@ -226,7 +226,7 @@
 		BFE49ECF1C1220C200F26877 /* SettingViewController */ = {
 			isa = PBXGroup;
 			children = (
-				BFE49ED51C12471200F26877 /* AppIdConstant.swift */,
+				BFE49ED51C12471200F26877 /* AppConstant.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
 			);
@@ -681,7 +681,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFE49ED61C12471200F26877 /* AppIdConstant.swift in Sources */,
+				BFE49ED61C12471200F26877 /* AppConstant.swift in Sources */,
 				E431BA9D1B913AE700E32A0B /* String+Utils.swift in Sources */,
 				E455E7291BA272AD00210BD6 /* Song.swift in Sources */,
 				E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */,
