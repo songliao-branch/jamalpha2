@@ -9,7 +9,7 @@
 import Foundation
 import MediaPlayer
 import UIKit
-
+import Haneke
 class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var songViewController: SongViewController!
@@ -26,6 +26,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     var songId = -1
     
     var centerButton: UIButton!//to display "Add your own tabs or lyrics if none is found"
+    
+    var awsS3: AWSS3Manager = AWSS3Manager()
     
     override func viewDidLoad() {
 
@@ -71,9 +73,14 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             if chords.count > 2 { //just checking if there is a local tabs, a local tabs must have a tuning
+              
+                let currentUser = CoreDataManager.getCurrentUser()!
                 
-                let set = DownloadedTabsSet(id: -1, tuning: tuning, capo: capo, songId: -1, votesScore: 0, userName: CoreDataManager.getCurrentUser()!.email, updatedAt: "", chordsPreview: preview, voteStatus: "")
-                allTabsSets[0]?.append(set)
+                let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
+                //TODO: better way to differentitate this?cell
+                let t = DownloadedTabsSet(id: -1, songId: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+
+                allTabsSets[0]?.append(t)
             }
         }
 
@@ -265,8 +272,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 tuning = tabsSet.tuning
             }
             
-            
-            
             if tabsSet.voteStatus == "up" {
                   cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
                   cell.downVoteButton.setImage(UIImage(named: "vote_down_gray"), forState: .Normal)
@@ -281,8 +286,21 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-            cell.profileName.text = tabsSet.userName
             cell.dateLabel.text = tabsSet.updatedAt
+            
+            //user section
+            cell.profileName.text = tabsSet.editor.nickname
+            
+            cell.profileImage.image = nil
+            awsS3.downloadImage(tabsSet.editor.avatarUrlThumbnail, completion: {
+                image in
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cell.profileImage.image = image
+                        cell.profileImage.layer.cornerRadius = cell.profileImage.frame.height/2
+                        cell.profileImage.layer.masksToBounds = true
+                    }
+                }
+            )
             
             if tabsSet.id == lastSelectedTabsId {
                 cell.checkmark.hidden = false

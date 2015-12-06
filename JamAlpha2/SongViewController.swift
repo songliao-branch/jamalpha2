@@ -235,12 +235,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpCountdownView()
         setUpStatusView()
         if(!isSongNeedPurchase){
-           updateMusicData(firstLoadPlayingItem)
+            updateMusicData(firstLoadPlayingItem)
         }else{
             updateMusicData(songNeedPurchase)
             setUpPreviewButton()
         }
-        
         
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
         loadDisplayMode()

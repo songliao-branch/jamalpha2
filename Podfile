@@ -7,5 +7,10 @@ pod 'SwiftyJSON', :git => 'https://github.com/SwiftyJSON/SwiftyJSON.git'
 pod 'HanekeSwift'
 
 pod 'CryptoSwift'
-pod 'FBSDKCoreKit'
-pod 'FBSDKLoginKit'
+
+pod 'FBSDKCoreKit', '4.2.0'
+pod 'FBSDKLoginKit', '4.1.0'
+
+pod 'RSKImageCropper'
+
+pod 'AWSS3'

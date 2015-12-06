@@ -170,7 +170,9 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     print(json)
                     for set in json["tabs_sets"].array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int! , songId: set["song_id"].int!, votesScore: set["cached_votes_score"].int!, userName: set["user"]["email"].string!, updatedAt: set["updated_at"].string!, chordsPreview: set["chords_preview"].string!, voteStatus: set["vote_status"].string!)
+                        
+                        let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
+                        let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
                         
                         allDownloads.append(t)
                     }
@@ -305,6 +307,41 @@ class APIManager: NSObject {
                 }
             case .Failure(let error):
                 print(error)
+            }
+        }
+    }
+    
+    
+    //MARK: update user API
+    class func updateUserNickname(nickname: String, completion: ((completed: Bool) -> Void)) {
+        
+        let parameters = ["nickname": nickname]
+        
+        Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)" , parameters: parameters).responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                completion(completed: true)
+            case .Failure(let error):
+                completion(completed: true)
+                print("update user error: \(error)")
+            }
+        }
+    }
+    
+    class func updateUserAvatar(avatarUrlMedium: String, avatarUrlThumbnail: String, completion: ((completed: Bool) -> Void)) {
+        //TODO: check network availability
+        
+        //given a song's title, artist, and duration, we can find all its corresponding tabs
+        let parameters = ["avatar_url_medium": avatarUrlMedium, "avatar_url_thumbnail": avatarUrlThumbnail]
+    
+        Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)" , parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                completion(completed: true)
+            case .Failure(let error):
+                completion(completed: true)
+                print("update user error: \(error)")
             }
         }
     }

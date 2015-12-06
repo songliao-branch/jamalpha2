@@ -50,6 +50,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
         
         navigationItem.titleView = searchBar
         resultSearchController.hidesNavigationBarDuringPresentation = false
@@ -178,6 +179,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     
                     let url = NSURL(string: imageURL)!
                     let fetcher = NetworkFetcher<UIImage>(URL: url)
+                    
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image
