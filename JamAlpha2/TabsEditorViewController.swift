@@ -206,7 +206,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         // MARK: add exist chord to tab editor view
-        //self.addChordToEditorView(theSong)
+        self.addChordToEditorView(theSong)
     }
 
     // MARK: a slider menu that allow user to specify speed, capo number, and six string tuning
@@ -1535,14 +1535,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
             
-            var chords = [Chord]() //([Chord], String, Int)
-            var tuning = ""
-            var capo = 0
-            
-            (chords, tuning, capo) = CoreDataManager.getTabs(theSong)
-            self.songViewController.chords = chords
-            self.songViewController.updateTuning(tuning)
-            self.songViewController.updateCapo(capo)
+            self.songViewController.updateMusicData(theSong)
             
             self.dismissViewControllerAnimated(false, completion: {
                 completed in
@@ -1776,14 +1769,15 @@ extension TabsEditorViewController {
     
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: MPMediaItem) {
-        let tabs = CoreDataManager.getTabs(sender)
+        let tabs = CoreDataManager.getTabs(sender, fetchingLocalOnly: true)
         let chord: [Chord] = tabs.0
-        
         let tuning: String = tabs.1
         let capo: Int = tabs.2
         
-        addTabsFromCoreDataToMainViewDataArray(chord)
-        addTabsFromCoreDataToMusicControlView(chord)
+        if chord.count > 0 {
+            addTabsFromCoreDataToMainViewDataArray(chord)
+            addTabsFromCoreDataToMusicControlView(chord)
+        }
     }
     
 

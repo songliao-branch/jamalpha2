@@ -15,4 +15,8 @@ class LyricsSet: NSManagedObject {
     @NSManaged var user: User
     @NSManaged var lyrics: AnyObject
     @NSManaged var times: AnyObject
+    
+    @NSManaged var id: NSNumber
+    @NSManaged var lastSelectedDate: NSDate
+    @NSManaged var isLocal: Bool
 }

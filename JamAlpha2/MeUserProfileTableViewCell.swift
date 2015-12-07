@@ -9,18 +9,23 @@
 import Foundation
 import UIKit
 class MeUserProfileTableViewCell: UITableViewCell {
-    var userImage: UIImageView = UIImageView()
-    var userNameLabel: UILabel = UILabel()
+    var userImageView: UIImageView = UIImageView()
+    var titleLabel: UILabel = UILabel()
+
     
     func initialTableViewCell(width: CGFloat, height: CGFloat) {
-        let imageWidth: CGFloat = 0.8 * height
-        userImage.frame = CGRectMake(0.1 * width, 0.1 * height, imageWidth, imageWidth)
-        userImage.layer.cornerRadius = 0.5 * imageWidth
-        userImage.layer.borderWidth = 1
-        self.contentView.addSubview(userImage)
+        let imageWidth: CGFloat = 60
+        userImageView.frame = CGRectMake(width - 30 - imageWidth, 12, imageWidth, imageWidth)
+        userImageView.layer.cornerRadius = 0.5 * imageWidth
+        userImageView.layer.borderWidth = 1
+        userImageView.layer.borderColor = UIColor.backgroundGray().CGColor
+        let imageLayer: CALayer = userImageView.layer
+        imageLayer.cornerRadius = 0.5 * imageWidth
+        imageLayer.masksToBounds = true
+        self.contentView.addSubview(userImageView)
         
-        userNameLabel.frame = CGRectMake(0.35 * width, 0.2 * height, 0.4 * width, 0.6 * height)
-        userNameLabel.layer.borderWidth = 1
-        self.contentView.addSubview(userNameLabel)
+        titleLabel.frame = CGRectMake(20, 22, width / 2, 44)
+        self.contentView.addSubview(titleLabel)
+
     }
 }

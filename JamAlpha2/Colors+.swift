@@ -10,7 +10,7 @@ import UIKit
 extension UIColor {
     //Main color for the app
     class func mainPinkColor() -> UIColor {
-        return UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+        return UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//240, 91, 97
     }
     //used for background for chordbase and lyricsbase
     class func baseColor() -> UIColor {
@@ -32,5 +32,9 @@ extension UIColor {
     
     class func facebookBlue() -> UIColor {
         return UIColor(red: 0.231, green: 0.349, blue: 0.596, alpha: 1) /* #3b5998 */
+    }
+    
+    class func borderCellColor() -> UIColor {
+        return UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1)
     }
 }

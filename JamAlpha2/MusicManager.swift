@@ -25,7 +25,6 @@ class MusicManager: NSObject {
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
     
-    
     class var sharedInstance: MusicManager {
         struct Static {
             static var onceToken: dispatch_once_t = 0

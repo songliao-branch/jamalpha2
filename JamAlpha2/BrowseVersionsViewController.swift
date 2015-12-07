@@ -9,7 +9,7 @@
 import Foundation
 import MediaPlayer
 import UIKit
-
+import Haneke
 class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var songViewController: SongViewController!
@@ -18,39 +18,115 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     @IBOutlet weak var resultsTableView: UITableView!
     
-    var localTabsSet: DownloadedTabsSet?
-    var localLyricsSet: DownloadedLyricsSet?
-    var downloadedTabsSets = [DownloadedTabsSet]()
-    var downloadedLyricsSets = [DownloadedLyricsSet]()
+//    var downloadedLyricsSets = [DownloadedLyricsSet]()
+    
+    var allTabsSets = [Int: [DownloadedTabsSet]]()//with a key 0 is local, key 1 is downloaded ones
+    var allLyricsSets = [Int: [DownloadedLyricsSet]]()
+    
+    var lastSelectedSetId = 0
+    
     var mediaItem: MPMediaItem!
     var songId = -1
     
     var centerButton: UIButton!//to display "Add your own tabs or lyrics if none is found"
     
+    var awsS3: AWSS3Manager = AWSS3Manager()
+    
     override func viewDidLoad() {
+
         setUpHeader()
         setUpCenterButton()
         let layer = UIView()
         layer.backgroundColor = UIColor.backgroundGray()
         resultsTableView.backgroundView = layer
+        
+        //initialize dictionary, 0 key means local set, 1 key means downloaded sets
+        allTabsSets[0] = []
+        allTabsSets[1] = []
+        
+        allLyricsSets[0] = []
+        allLyricsSets[1] = []
+        
+        if isPullingTabs {
+            ( _, _, _, lastSelectedSetId) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: false)
+        } else {
+            (_, lastSelectedSetId) = CoreDataManager.getLyrics(mediaItem, fetchingLocalOnly: false)
+        }
+
         loadLocalData()
         fetchData()
     }
     
     func loadLocalData() {
-        
+        if CoreDataManager.getCurrentUser() == nil {
+            print("user not signed in, no local tabs nor lyrics")
+            return
+        }
+        if isPullingTabs {
+            var chords = [Chord]()
+            var tuning = ""
+            var capo = -1
+            
+            (chords, tuning, capo, _) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
+     
+            var preview = ""
+            
+            for i in 0..<chords.count {
+                if i >= 10 {
+                    break
+                }
+                preview += "\(chords[i].tab.name)  "
+            }
+            
+            if chords.count > 2 { //just checking if there is a local tabs, a local tabs must have a tuning
+              
+                let currentUser = CoreDataManager.getCurrentUser()!
+                
+                let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
+                //TODO: better way to differentitate this?cell
+                let t = DownloadedTabsSet(id: -1, songId: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+
+                allTabsSets[0]?.append(t)
+            }
+        } else {
+            
+            var lyric = Lyric()
+            
+            (lyric, _) = CoreDataManager.getLyrics(mediaItem, fetchingLocalOnly: true)
+            
+            var preview = ""
+            for i in 0..<lyric.lyric.count {
+                if i >= 3 {
+                    break
+                }
+                preview += "\(lyric.lyric[i].str)"
+            }
+            
+            if lyric.lyric.count > 1 {
+                let currentUser = CoreDataManager.getCurrentUser()!
+                
+                let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
+                let l = DownloadedLyricsSet(id: -1, songId: -1, lyricsPreview: preview, numberOfLines: lyric.lyric.count, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                allLyricsSets[0]?.append(l)
+            }
+        }
     }
     
     func fetchData() {
         if isPullingTabs {
-            downloadedTabsSets = [DownloadedTabsSet]()
+           
             APIManager.downloadTabs(mediaItem, completion: {
                 downloads in
-                self.downloadedTabsSets = downloads
+                
+                for download in downloads {
+                    self.allTabsSets[1]?.append(download)
+                }
                 
                 dispatch_async(dispatch_get_main_queue()) {
                     self.resultsTableView.reloadData()
-                    if downloads.count < 1 {
+                    
+                    // if no local tabs and no downloaded tabs
+                    if self.allTabsSets[0]?.count == 0 && downloads.count < 1 {
                         self.centerButton.hidden = false
                     }
                 }
@@ -58,11 +134,14 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         } else {
             APIManager.downloadLyrics(mediaItem, completion: {
                 downloads in
-                self.downloadedLyricsSets = downloads
-    
+                for download in downloads {
+                    self.allLyricsSets[1]?.append(download)
+                }
+                
                 dispatch_async(dispatch_get_main_queue()) {
                     self.resultsTableView.reloadData()
-                    if downloads.count < 1 {
+                    
+                    if self.allLyricsSets[0]?.count == 0 && downloads.count < 1 {
                         self.centerButton.hidden = false
                     }
                 }
@@ -190,21 +269,34 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if (isPullingTabs && allTabsSets[section]?.count == 0) || (!isPullingTabs && allLyricsSets[section]?.count == 0 ) {
+            return 0
+        }
         return 22
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isPullingTabs {
-            return downloadedTabsSets.count
+            if allTabsSets[section]?.count == 0 {
+                return 0
+            }
+            return (allTabsSets[section]?.count)!
+        } else {
+            if allLyricsSets[section]?.count == 0 {
+                return 0
+            }
+            return (allLyricsSets[section]?.count)!
         }
-        return downloadedLyricsSets.count
+        
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("browseversionscell", forIndexPath: indexPath) as! BrowseVersionsCell
         
         if isPullingTabs {
-            let tabsSet = downloadedTabsSets[indexPath.row]
+            
+            let tabsInOneSection = allTabsSets[indexPath.section]
+            let tabsSet: DownloadedTabsSet = tabsInOneSection![indexPath.row]
             
             var tuning = ""
             if tabsSet.tuning == "E-B-G-D-A-E-" {
@@ -227,12 +319,34 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-            cell.profileName.text = tabsSet.userName
             cell.dateLabel.text = tabsSet.updatedAt
             
-
+            //user section
+            cell.profileName.text = tabsSet.editor.nickname
+            
+            cell.profileImage.image = nil
+            awsS3.downloadImage(tabsSet.editor.avatarUrlThumbnail, completion: {
+                image in
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cell.profileImage.image = image
+                        cell.profileImage.layer.cornerRadius = cell.profileImage.frame.height/2
+                        cell.profileImage.layer.masksToBounds = true
+                    }
+                }
+            )
+            
+            if tabsSet.id == lastSelectedSetId {
+                cell.checkmark.hidden = false
+                cell.previewRightConstraint.constant = 45
+            } else {
+                cell.checkmark.hidden = true
+                cell.previewRightConstraint.constant = 8
+            }
+            
         } else {
-            let lyricsSet = downloadedLyricsSets[indexPath.row]
+            let lyricsInOneSection = allLyricsSets[indexPath.section]
+            let lyricsSet: DownloadedLyricsSet = lyricsInOneSection![indexPath.row]
+
             
             if lyricsSet.voteStatus == "up" {
                 cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
@@ -249,8 +363,29 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.titleLabel.text = lyricsSet.lyricsPreview + "..."
             cell.subtitleLabel.text = "\(lyricsSet.numberOfLines) lines"
             
-            cell.profileName.text = lyricsSet.userName
+            cell.profileName.text = lyricsSet.editor.nickname
             cell.dateLabel.text = lyricsSet.updatedAt
+            
+        
+            cell.profileImage.image = nil
+            awsS3.downloadImage(lyricsSet.editor.avatarUrlThumbnail, completion: {
+                image in
+                dispatch_async(dispatch_get_main_queue()) {
+                    cell.profileImage.image = image
+                    cell.profileImage.layer.cornerRadius = cell.profileImage.frame.height/2
+                    cell.profileImage.layer.masksToBounds = true
+                }
+                }
+            )
+            
+            if lyricsSet.id == lastSelectedSetId {
+                cell.checkmark.hidden = false
+                cell.previewRightConstraint.constant = 45
+            } else {
+                cell.checkmark.hidden = true
+                cell.previewRightConstraint.constant = 8
+            }
+
         }
         
         //add actions for up and down vote buttons
@@ -266,35 +401,51 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         if isPullingTabs {
-            let tabsSet = downloadedTabsSets[indexPath.row]
-            APIManager.downloadTabsSetContent(tabsSet, completion: {
-                download in
-                
-                self.songViewController.updateTuning(tabsSet.tuning)
-                self.songViewController.updateCapo(tabsSet.capo)
-                
-                var chordsToBeUsed = [Chord]()
-                for i in 0..<download.chords.count {
-                    let chord = Chord(tab: Tab(name: download.chords[i], content: download.tabs[i]), time: TimeNumber(time: download.times[i]))
-                    chordsToBeUsed.append(chord)
-                }
-                self.songViewController.chords = chordsToBeUsed
-                self.dismissViewControllerAnimated(true, completion: nil)
-            })
-        
+            
+            let tabsInOneSection = allTabsSets[indexPath.section]
+            let tabsSet: DownloadedTabsSet = tabsInOneSection![indexPath.row]
+            
+            if indexPath.section == 0 {
+
+                CoreDataManager.setLocalTabsMostRecent(self.mediaItem)
+                self.songViewController.updateMusicData(self.mediaItem)
+                 self.dismissViewControllerAnimated(true, completion: nil)
+            } else {
+                APIManager.downloadTabsSetContent(tabsSet, completion: {
+                    download in
+                    
+                    var times = [NSTimeInterval]()
+                    for t in download.times {
+                        times.append(NSTimeInterval(t))
+                    }
+                    
+                    CoreDataManager.saveTabs(self.mediaItem, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
+                    
+                    self.songViewController.updateMusicData(self.mediaItem)
+                    self.dismissViewControllerAnimated(true, completion: nil)
+                })
+            }
         } else {
-            let lyricsSet = downloadedLyricsSets[indexPath.row]
-            APIManager.downloadLyricsSetContent(lyricsSet, completion: {
-                download in
+            
+            if indexPath.section == 0 {
                 
-                let lyricsToBeUsed = Lyric()
-                for i in 0..<download.times.count {
-                    lyricsToBeUsed.addLine(TimeNumber(time: download.times[i]), str: download.lyrics[i])
-                }
-                
-                self.songViewController.lyric = lyricsToBeUsed
+                CoreDataManager.setLocalLyricsMostRecent(self.mediaItem)
+                self.songViewController.updateMusicData(self.mediaItem)
                 self.dismissViewControllerAnimated(true, completion: nil)
-            })
+                
+            } else {
+                let lyricsInOneSection = allLyricsSets[indexPath.section]
+                let lyricsSet: DownloadedLyricsSet = lyricsInOneSection![indexPath.row]
+                
+                APIManager.downloadLyricsSetContent(lyricsSet, completion: {
+                    download in
+                    
+                    CoreDataManager.saveLyrics(self.mediaItem, lyrics: download.lyrics, times: download.times, lyricsSetId: download.id)
+                    
+                    (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.mediaItem, fetchingLocalOnly: false)
+                    self.dismissViewControllerAnimated(true, completion: nil)
+                })
+            }
         }
     }
     
@@ -305,17 +456,21 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             return
         }
         
-        let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
+        let downloadedTabsSets = allTabsSets[1]
+        
+        let downloadedLyricsSets = allLyricsSets[1]
+        
+        let id = isPullingTabs ? downloadedTabsSets![button.tag].id : downloadedLyricsSets![button.tag].id
         
         APIManager.updateVotes(true, isTabs: isPullingTabs, setId: id, completion: {
             voteStatus, voteScore in
             
             if self.isPullingTabs {
-                self.downloadedTabsSets[button.tag].voteStatus = voteStatus
-                self.downloadedTabsSets[button.tag].votesScore = voteScore
+                downloadedTabsSets![button.tag].voteStatus = voteStatus
+                downloadedTabsSets![button.tag].votesScore = voteScore
             } else {
-                self.downloadedLyricsSets[button.tag].voteStatus = voteStatus
-                self.downloadedLyricsSets[button.tag].votesScore = voteScore
+                downloadedLyricsSets![button.tag].voteStatus = voteStatus
+                downloadedLyricsSets![button.tag].votesScore = voteScore
             }
             
             dispatch_async(dispatch_get_main_queue()) {
@@ -333,16 +488,20 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             return
         }
         
-        let id = isPullingTabs ? downloadedTabsSets[button.tag].id : downloadedLyricsSets[button.tag].id
+        let downloadedTabsSets = allTabsSets[1]
+        
+        let downloadedLyricsSets = allLyricsSets[1]
+        
+        let id = isPullingTabs ? downloadedTabsSets![button.tag].id : downloadedLyricsSets![button.tag].id
         APIManager.updateVotes(false, isTabs: isPullingTabs, setId: id, completion: {
             voteStatus, voteScore in
             
             if self.isPullingTabs {
-                self.downloadedTabsSets[button.tag].voteStatus = voteStatus
-                self.downloadedTabsSets[button.tag].votesScore = voteScore
+                downloadedTabsSets![button.tag].voteStatus = voteStatus
+                downloadedTabsSets![button.tag].votesScore = voteScore
             } else {
-                self.downloadedLyricsSets[button.tag].voteStatus = voteStatus
-                self.downloadedLyricsSets[button.tag].votesScore = voteScore
+                downloadedLyricsSets![button.tag].voteStatus = voteStatus
+                downloadedLyricsSets![button.tag].votesScore = voteScore
             }
             
             dispatch_async(dispatch_get_main_queue()) {

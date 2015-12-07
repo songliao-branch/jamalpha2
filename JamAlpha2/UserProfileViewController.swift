@@ -9,16 +9,58 @@
 import UIKit
 import Haneke
 
+
+//var tempImage: UIImage = UIImage()
+
 class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var userTable: UITableView!
     
+    var viewWidth: CGFloat = CGFloat()
+    var viewHeight: CGFloat = CGFloat()
+    
+
+    
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
+    
+    // request array
+
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.viewWidth = self.view.frame.size.width
+        self.viewHeight = self.view.frame.size.height
+        
+        let error = NSErrorPointer()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'upload' directory failed. Error: \(error)")
+        }
+        
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("download"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'download' directory failed. Error: \(error)")
+        }
+        
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-
+        self.navigationController?.navigationBar.translucent = false
+        
         showSignUpLoginScreen()
         userTable.reloadData()
     }
@@ -56,18 +98,20 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
        
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("avatarcell", forIndexPath: indexPath) as! AvatarCell
-            
             cell.avatarImageView.layer.cornerRadius = cell.avatarImageView.frame.height/2
             cell.avatarImageView.layer.borderWidth = 1
             cell.avatarImageView.layer.borderColor = UIColor.backgroundGray().CGColor
             
             if let user = CoreDataManager.getCurrentUser() {
-                if let name = user.username {
+                if let name = user.nickname {
                     cell.titleLabel.text = name
                 }
                 cell.subtitleLabel.text = user.email
-                if let url = user.avatarUrl {
-                    cell.avatarImageView.hnk_setImageFromURL(NSURL(string: url)!)
+                if let profileData = user.profileImage {
+                    let imageLayer: CALayer = cell.avatarImageView.layer
+                    imageLayer.cornerRadius = 0.5 * cell.avatarImageView.frame.size.width
+                    imageLayer.masksToBounds = true
+                    cell.avatarImageView.image = UIImage(data: profileData)
                 }
             }
             
@@ -86,11 +130,24 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
-        if indexPath.section == 2 { //settings section
+        if indexPath.section == 0 {
+            // navigation to user profile edit vc
+            let userProfileVC: UserProfileEditViewController = self.storyboard?.instantiateViewControllerWithIdentifier("userprofileeditVC") as! UserProfileEditViewController
+            self.navigationController?.pushViewController(userProfileVC, animated: true)
+            
+        } else if indexPath.section == 1{
+            // my tabs, my lyrics, favorites
+            if indexPath.item == 0 {
+
+            }
+            else if indexPath.item == 1{
+
+            }
+        } else if indexPath.section == 2 { //settings section
             let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
             self.showViewController(settingsVC, sender: nil)
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }
+
