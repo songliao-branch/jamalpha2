@@ -391,13 +391,13 @@ class MeLoginOrSignupViewController: UIViewController{
     }
     
     func getFBUserData(){
-        if((FBSDKAccessToken.currentAccessToken()) != nil){
+        if let fbToken = FBSDKAccessToken.currentAccessToken().tokenString
+        {
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
                 (connection, result, error) -> Void in
                 if error == nil {
                 
                     print(result)
-                    
                     let facebookEmail = result.valueForKey("email") as! String
                     let facebookName  = result.valueForKey("name") as! String
                     
@@ -423,6 +423,7 @@ class MeLoginOrSignupViewController: UIViewController{
                     let parameters = [
                         "attempt_login":"facebook",
                         "email": facebookEmail,
+                        "fbToken": fbToken,
                         "avatar_url_thumbnail": thumbnailUrl,
                         "avatar_url_medium": facebookAvatarUrl,
                         "password": (facebookEmail + facebookLoginSalt).md5() //IMPORTANT: DO NOT MODIFY THIS SALT

@@ -107,7 +107,7 @@ class CoreDataManager: NSObject {
     //the last two parameters can necessary for facebook logins
     // a normal call to this function only involves initializeUser(id,email,authToken)
     // a call with facebook involves all 5 parameters
-    class func initializeUser(id: Int, email: String, authToken: String, nickname: String, avatarUrl: String?=nil, thumbnailUrl: String?=nil, profileImage: NSData?=nil, thumbnail: NSData?=nil) {
+    class func initializeUser(id: Int, email: String, authToken: String, nickname: String, avatarUrl: String?=nil, thumbnailUrl: String?=nil, profileImage: NSData?=nil, thumbnail: NSData?=nil, fbToken: String?=nil) {
         logoutUser()//for testing clear all users
         
         let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
@@ -128,6 +128,9 @@ class CoreDataManager: NSObject {
         }
         if let url = avatarUrl {
             user.avatarUrl = url
+        }
+        if let token = fbToken {
+            user.fbToken = token
         }
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
@@ -161,6 +164,16 @@ class CoreDataManager: NSObject {
         }
         let currentUser = CoreDataManager.getCurrentUser()!
         currentUser.nickname = nickname
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        return true
+    }
+    
+    class func saveUserFBToken(fbToken: String) -> Bool {
+        if CoreDataManager.getCurrentUser() == nil {
+            return false
+        }
+        let currentUser = CoreDataManager.getCurrentUser()!
+        currentUser.fbToken = fbToken
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
         return true
     }
