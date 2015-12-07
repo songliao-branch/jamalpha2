@@ -1676,15 +1676,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KGLOBAL_progressBlock.removeFromSuperview()
                 KGLOBAL_progressBlock = nil
             }
+            if isSongNeedPurchase{
+                self.displayLink.paused = true
+                self.displayLink.invalidate()
+                self.displayLink = nil
+                return
+            }
         }
         
-        if isSongNeedPurchase {
-            self.displayLink.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-            self.displayLink.invalidate()
-            self.displayLink = nil
+        if isSongNeedPurchase{
             return
         }
-        
+
         if player.playbackState == .Playing {
             if nowView != nil {
                 self.nowView.start()
@@ -2144,22 +2147,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             button.center.y = childCenterY
             button.addTarget(self, action: Selector(functionName[i]) , forControlEvents: UIControlEvents.TouchUpInside)
             if i == 0{
-                progress = KDCircularProgress(frame: CGRect(x: self.view.frame.width - 65 - 25, y: 7, width: 40, height: 40))
+                progress = KDCircularProgress(frame: CGRect(x: self.view.frame.width - 66 - 25, y: 7, width: 42, height: 42))
                 progress.startAngle = -90
                 progress.angle = 360
                 progress.progressThickness = 0.3
-                progress.trackThickness = 0.6
+                progress.trackThickness = 0.7
                 progress.clockwise = true
                 progress.gradientRotateSpeed = 2
                 progress.roundedCorners = true
                 progress.glowMode = .Forward
                 progress.setColors(UIColor.mainPinkColor())
                 
-                centerView = UIView(frame: CGRect(x: 14, y: 14, width: 12, height: 12))
+                centerView = UIView(frame: CGRect(x: 15, y: 15, width: 12, height: 12))
                 centerView.layer.cornerRadius = 3
                 centerView.backgroundColor = UIColor.mainPinkColor()
-                centerView.layer.borderColor = UIColor.darkGrayColor().CGColor
-                centerView.layer.borderWidth = 1.0
+                centerView.layer.borderColor = UIColor.blackColor().CGColor
+                centerView.layer.borderWidth = 2.0
                 progress.addSubview(centerView)
                 rowWrappers[i].addSubview(progress)
                 
@@ -2246,7 +2249,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func updateSliderProgress(){
-        progress.angle = Int(self.AVplayer.currentTime().seconds * 360/self.AVplayer.currentItem!.duration.seconds)
+        let angle = self.AVplayer.currentTime().seconds * 360/self.AVplayer.currentItem!.duration.seconds
+        if(angle.isFinite && !angle.isNaN){
+            progress.angle = Int(angle)
+        }else{
+            progress.angle = 0
+        }
+        
         if(AVplayer.currentTime() == AVplayer.currentItem!.duration){
             AVplayer.seekToTime(kCMTimeZero)
             UIView.animateWithDuration(0.2, delay: 0.0,

@@ -237,7 +237,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 var isReload = true
                 
                 if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
-                    print("\(searchSong.trackName)  \(searchSong.artistName)   \(searchSong.trackTimeMillis)")
+//                    print("\(searchSong.trackName)  \(searchSong.artistName)   \(searchSong.trackTimeMillis)")
                     MusicManager.sharedInstance.setPlayerQueue([foundItem])
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                 }else{
