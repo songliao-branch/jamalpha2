@@ -204,11 +204,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var songNeedPurchase: SearchResult!
     var AVplayer: AVPlayer!
     var playPreveiwButton:UIButton!
-    var previewActionViewHeight: CGFloat = 44 * 3 + 2
+    var previewActionViewHeight: CGFloat = 54 * 4 + 3
     var previewView:UIView!
-    var preViewPlayButton:UIButton!
-    var goToMusicButton:UIButton!
-    var popItuneButton:UIButton!
+    
     var storeViewController:SKStoreProductViewController!
     
     override func viewDidLoad() {
@@ -495,7 +493,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func dismissController(sender: UIButton) {
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
     
     
     func updateMusicData(song: Findable) {
@@ -1547,6 +1544,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
         browseAllTabsVC.isPullingTabs = true
+        
         browseAllTabsVC.mediaItem = player.nowPlayingItem!
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in
@@ -2101,37 +2099,53 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let width = previewView.frame.width
         
         var rowWrappers = [UIView]()
-        let rowHeight: CGFloat = 44+1
-        for i in 0..<3 {
+        let rowHeight: CGFloat = 54+1
+        for i in 0..<4 {
             let row = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i), width: width, height: rowHeight))
             rowWrappers.append(row)
-            if i < 2 { // give a separator at the the bottom of each row except last line
+            if i < 3 { // give a separator at the the bottom of each row except last line
                 let line = UIView(frame: CGRect(x: 0, y: rowHeight-1, width: width, height: 1))
                 line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
                 row.addSubview(line)
             }
             previewView.addSubview(row)
         }
+        
         let childCenterY = (rowHeight-1)/2
 
-        let names = ["Listen Preview", "Purchase Song", "Listen with Apple Music"]
-        var buttons = [self.previousButton, self.popItuneButton, self.goToMusicButton]
-        let functionName = ["previewPlay","goToItues","goToMusic"]
-        let buttonName = ["Play","Itues","Music"]
+        let names = ["Listen Preview", "Buy from iTunes",  "Apple Music", "Browse other tabs"]
+
+        let functionName = ["previewPlay", "goToiTunes", "goToAppleMusic", "browseTabs:"]
+
+        let sideMargin: CGFloat = 35
         
-        let sideMargin: CGFloat = 15
-        for i in 0..<3 {
-            let previewNameLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 200, height: 22))
-            previewNameLabel.text = names[i]
-            previewNameLabel.textColor = UIColor.mainPinkColor()
-            previewNameLabel.center.y = childCenterY
-            rowWrappers[i].addSubview(previewNameLabel)
-            buttons[i] = UIButton(frame: CGRect(x: width-CGFloat(sideMargin)-51, y: 0, width: 51, height: 31))
-            buttons[i].addTarget(self, action: Selector(functionName[i]) , forControlEvents: UIControlEvents.TouchUpInside)
-            buttons[i].setTitle(buttonName[i], forState: .Normal)
-            buttons[i].setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-            rowWrappers[i].addSubview(buttons[i])
+        for i in 0..<4 {
+            let button = UIButton(frame: CGRect(x: sideMargin, y: 0, width: 200, height: 22))
+            button.setTitle(names[i], forState: .Normal)
+            button.contentHorizontalAlignment = .Left
+            button.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+            button.center.y = childCenterY
+            button.addTarget(self, action: Selector(functionName[i]) , forControlEvents: UIControlEvents.TouchUpInside)
+            
+            if i == 1 {
+                let itunesBadge = UIButton(frame: CGRect(x: self.view.frame.width - 90 - 25, y: 0, width: 90, height: 33))
+                itunesBadge.setImage(UIImage(named: "itunes_badge"), forState: .Normal)
+                itunesBadge.addTarget(self, action: "goToiTunes", forControlEvents: .TouchUpInside)
+                itunesBadge.center.y = childCenterY
+                rowWrappers[i].addSubview(itunesBadge)
+            } else if i == 2 {
+                let appleMusicBadge = UIButton(frame: CGRect(x: self.view.frame.width - 90 - 25, y: 0, width: 90, height: 33))
+                appleMusicBadge.setImage(UIImage(named: "apple_music_badge"), forState: .Normal)
+                appleMusicBadge.addTarget(self, action: "goToAppleMusic", forControlEvents: .TouchUpInside)
+                appleMusicBadge.center.y = childCenterY
+                rowWrappers[i].addSubview(appleMusicBadge)
+            } else if i == 3 {
+                button.center.x = self.view.center.x
+                button.contentHorizontalAlignment = .Center
+            }
+            rowWrappers[i].addSubview(button)
         }
+        
     }
     
     func showPreviewActionView(){
@@ -2162,7 +2176,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         isClick = !isClick
     }
     
-    func goToItues(){
+    func goToiTunes(){
         storeViewController = nil
         UINavigationBar.appearance().tintColor = UIColor.mainPinkColor()
         storeViewController = SKStoreProductViewController()
@@ -2182,7 +2196,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
-    func goToMusic(){
+    func goToAppleMusic(){
         self.dismissAction()
         UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl!)!)
     }
