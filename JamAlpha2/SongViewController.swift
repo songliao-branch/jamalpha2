@@ -1300,6 +1300,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func clearActions() {
         self.guitarActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.height, self.actionViewHeight)
         self.navigationOutActionView.frame = CGRectMake(0, self.view.frame.height, self.view.frame.width, self.actionViewHeight)
+        if(self.previewView != nil){
+            self.previewView.frame.origin.y = self.view.frame.height
+        }
         self.actionDismissLayerButton.backgroundColor = UIColor.clearColor()
         self.actionDismissLayerButton.hidden = true
     }
@@ -1537,7 +1540,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         browseAllTabsVC.songViewController = self
         browseAllTabsVC.isPullingTabs = true
         
-        browseAllTabsVC.mediaItem = player.nowPlayingItem!
+        if isSongNeedPurchase {
+            browseAllTabsVC.findable = self.songNeedPurchase
+        } else {
+            browseAllTabsVC.findable = self.player.nowPlayingItem!
+        }
+  
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in
             self.clearActions()
@@ -1580,7 +1588,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
-    
     func browseLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
@@ -1588,7 +1595,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
         browseAllTabsVC.isPullingTabs = false
-        browseAllTabsVC.mediaItem = player.nowPlayingItem!
+        
+        if isSongNeedPurchase {
+            browseAllTabsVC.findable = self.songNeedPurchase
+        } else {
+            browseAllTabsVC.findable = self.player.nowPlayingItem!
+        }
+  
+        
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
             completed in
             self.clearActions()
