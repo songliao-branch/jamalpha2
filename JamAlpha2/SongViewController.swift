@@ -207,7 +207,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var previewActionViewHeight: CGFloat = 54 * 4 + 3
     var previewView:UIView!
     var displayLink:CADisplayLink!
-    var progress: KDCircularProgress!
+    var previewProgress: KDCircularProgress!
     var centerView:UIView!
     
     var storeViewController:SKStoreProductViewController!
@@ -2147,24 +2147,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             button.center.y = childCenterY
             button.addTarget(self, action: Selector(functionName[i]) , forControlEvents: UIControlEvents.TouchUpInside)
             if i == 0{
-                progress = KDCircularProgress(frame: CGRect(x: self.view.frame.width - 66 - 25, y: 7, width: 42, height: 42))
-                progress.startAngle = -90
-                progress.angle = 360
-                progress.progressThickness = 0.3
-                progress.trackThickness = 0.7
-                progress.clockwise = true
-                progress.gradientRotateSpeed = 2
-                progress.roundedCorners = true
-                progress.glowMode = .Forward
-                progress.setColors(UIColor.mainPinkColor())
+                previewProgress = KDCircularProgress(frame: CGRect(x: self.view.frame.width - 66 - 25, y: 7, width: 42, height: 42))
+                previewProgress.startAngle = -90
+                previewProgress.angle = 360
+                previewProgress.progressThickness = 0.3
+                previewProgress.trackThickness = 0.7
+                previewProgress.clockwise = true
+                previewProgress.gradientRotateSpeed = 2
+                previewProgress.roundedCorners = true
+                previewProgress.glowMode = .Forward
+                previewProgress.setColors(UIColor.mainPinkColor())
                 
                 centerView = UIView(frame: CGRect(x: 15, y: 15, width: 12, height: 12))
                 centerView.layer.cornerRadius = 3
                 centerView.backgroundColor = UIColor.mainPinkColor()
                 centerView.layer.borderColor = UIColor.blackColor().CGColor
                 centerView.layer.borderWidth = 2.0
-                progress.addSubview(centerView)
-                rowWrappers[i].addSubview(progress)
+                previewProgress.addSubview(centerView)
+                rowWrappers[i].addSubview(previewProgress)
                 
             }else if i == 1 {
                 let itunesBadge = UIButton(frame: CGRect(x: self.view.frame.width - 90 - 25, y: 0, width: 90, height: 33))
@@ -2199,7 +2199,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func previewPlay(){
         if(self.AVplayer.rate == 0.0){
-            progress.setColors(UIColor.mainPinkColor() ,UIColor.yellowColor(), UIColor.greenColor())
+            previewProgress.setColors(UIColor.mainPinkColor())
             AVplayer.rate = 1.0;
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
@@ -2251,9 +2251,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func updateSliderProgress(){
         let angle = self.AVplayer.currentTime().seconds * 360/self.AVplayer.currentItem!.duration.seconds
         if(angle.isFinite && !angle.isNaN){
-            progress.angle = Int(angle)
+            previewProgress.angle = Int(angle)
         }else{
-            progress.angle = 0
+            previewProgress.angle = 0
         }
         
         if(AVplayer.currentTime() == AVplayer.currentItem!.duration){
@@ -2264,8 +2264,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.centerView.layer.cornerRadius = 3.0
                 }, completion: {
                     finished in
-                    self.progress.setColors(UIColor.mainPinkColor())
-                    self.progress.angle = 360
+                    self.previewProgress.setColors(UIColor.mainPinkColor())
+                    self.previewProgress.angle = 360
                     self.displayLink.paused = true
             })
         }
