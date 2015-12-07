@@ -15,10 +15,12 @@ class SearchResult {
     var wrapperType: String!
     var kind: String!
     
+    var trackId:Int?
     var trackName: String?
     var artistName: String?
     var collectionName: String?
     var trackTimeMillis: Float?
+    
     
     var artworkUrl100: String?//large 100
     var previewUrl: String?
@@ -152,14 +154,14 @@ class APIManager: NSObject {
     }
     
     //download all tabs sets for one song, the callback return the result
-    class func downloadTabs(mediaItem: MPMediaItem, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
+    class func downloadTabs(findable: Findable, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
         
         var allDownloads = [DownloadedTabsSet]()
         
         //given a song's title, artist, and duration, we can find all its corresponding tabs
         var parameters = [String: AnyObject]()
         
-        parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
         
         //we use user id to determine the vote status of each tabsSet for the current user
         if CoreDataManager.getCurrentUser() != nil {
@@ -220,13 +222,13 @@ class APIManager: NSObject {
     }
     
     //download all lyrics related to one song
-    class func downloadLyrics(mediaItem: MPMediaItem, completion: ( (downloads: [DownloadedLyricsSet])-> Void ) ) {
+    class func downloadLyrics(findable: Findable, completion: ( (downloads: [DownloadedLyricsSet])-> Void ) ) {
         var allDownloads = [DownloadedLyricsSet]()
         
         //given a song's title, artist, and duration, we can find all its corresponding tabs
         var parameters = [String: AnyObject]()
         
-        parameters = ["title": mediaItem.title!, "artist": mediaItem.artist!, "duration": mediaItem.playbackDuration]
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
         
         //we use user id to determine the vote status of each lyricsSet for the current user
         if CoreDataManager.getCurrentUser() != nil {

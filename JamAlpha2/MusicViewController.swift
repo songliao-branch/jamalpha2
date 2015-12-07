@@ -438,14 +438,16 @@ extension MusicViewController {
                             return
                         }
                         tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
-
-                        let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                        CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                        print("Soundwave generated for \(nowPlayingItem.title!) in background")
-                        
                         KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
                         self.incrementSongCountInThread()
-       
+                        dispatch_async(dispatch_get_main_queue()) {
+                                NSOperationQueue.mainQueue().addOperationWithBlock({
+                                    tempProgressBlock.generateWaveforms()
+                                    let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                                    print("Soundwave generated for \(nowPlayingItem.title!) in background")
+                                })
+                        }       
                     })
                     KGLOBAL_init_operationCache[assetURL as! NSURL] = op
                     KGLOBAL_init_queue.addOperation(op!)
