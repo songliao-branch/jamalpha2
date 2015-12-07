@@ -100,7 +100,6 @@ class AWSS3Manager: NSObject {
         } catch _ {
             print("cannot open temporary directory")
         }
-
         
         for file in cachedFiles {
             if file == "\(url)" {
@@ -112,7 +111,6 @@ class AWSS3Manager: NSObject {
             }
         }
         
-        //TODO: retrieve cached images
         let l =  NSTemporaryDirectory().stringByAppendingString("\(url)")
         let downloadingFileUrl = NSURL(fileURLWithPath: l)
         request.downloadingFileURL = downloadingFileUrl

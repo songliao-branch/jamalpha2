@@ -168,9 +168,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             if MusicManager.sharedInstance.player.nowPlayingItem != nil {
                 if song == MusicManager.sharedInstance.player.nowPlayingItem {
+                    cell.titleTrailingConstraint.constant = 50
                     cell.loudspeakerImage.hidden = false
                 }
                 else {
+                    cell.titleTrailingConstraint.constant = 15
                     cell.loudspeakerImage.hidden = true
                 }
             } else {
