@@ -181,7 +181,7 @@ public class KDCircularProgress: UIView {
         glowMode = .Forward
         progressThickness = 0.4
         trackThickness = 0.5
-        trackColor = UIColor.darkGrayColor()
+        trackColor = UIColor.blackColor()
         setColors(UIColor.whiteColor(), UIColor.redColor())
     }
     

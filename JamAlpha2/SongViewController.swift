@@ -2146,17 +2146,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if i == 0{
                 progress = KDCircularProgress(frame: CGRect(x: self.view.frame.width - 65 - 25, y: 7, width: 40, height: 40))
                 progress.startAngle = -90
+                progress.angle = 360
                 progress.progressThickness = 0.3
                 progress.trackThickness = 0.6
                 progress.clockwise = true
                 progress.gradientRotateSpeed = 2
                 progress.roundedCorners = true
                 progress.glowMode = .Forward
-                progress.setColors(UIColor.mainPinkColor() ,UIColor.yellowColor(), UIColor.greenColor())
+                progress.setColors(UIColor.mainPinkColor())
                 
                 centerView = UIView(frame: CGRect(x: 14, y: 14, width: 12, height: 12))
                 centerView.layer.cornerRadius = 3
                 centerView.backgroundColor = UIColor.mainPinkColor()
+                centerView.layer.borderColor = UIColor.darkGrayColor().CGColor
+                centerView.layer.borderWidth = 1.0
                 progress.addSubview(centerView)
                 rowWrappers[i].addSubview(progress)
                 
@@ -2193,6 +2196,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func previewPlay(){
         if(self.AVplayer.rate == 0.0){
+            progress.setColors(UIColor.mainPinkColor() ,UIColor.yellowColor(), UIColor.greenColor())
             AVplayer.rate = 1.0;
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
@@ -2251,7 +2255,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.centerView.layer.cornerRadius = 3.0
                 }, completion: {
                     finished in
-                    self.progress.angle = 0
+                    self.progress.setColors(UIColor.mainPinkColor())
+                    self.progress.angle = 360
                     self.displayLink.paused = true
             })
         }
