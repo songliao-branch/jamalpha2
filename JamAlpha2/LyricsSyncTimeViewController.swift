@@ -24,6 +24,7 @@ class lyricsWithTime {
         self.time = [NSTimeInterval](count: count, repeatedValue: 0)
         self.timeAdded = [Bool](count: count, repeatedValue: false)
     }
+    
     func addExistLyrics(count: Int, lyrics: [String], time: [NSTimeInterval], timeAdded: [Bool]) {
         self.count = count
         self.lyrics = lyrics
@@ -474,16 +475,24 @@ extension LyricsSyncViewController {
     
     func pressDoneButton(sender: UIButton) {
         var lyricsTimesTuple = [(String, NSTimeInterval)]()
+        
         for i in 0..<self.addedLyricsWithTime.lyrics.count {
             lyricsTimesTuple.append((self.addedLyricsWithTime.lyrics[i], self.addedLyricsWithTime.time[i]))
         }
         
         self.lyricsTextViewController.songViewController.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
+        
+        var times = [Float]()
+        for t in addedLyricsWithTime.time {
+            times.append(Float(t))
+        }
+        
+        CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times)
+        
         self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated(true, completion: {
             completed in
              self.lyricsTextViewController.songViewController.player.play()
         })
-        CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: addedLyricsWithTime.time)
     }
 }
 
@@ -513,15 +522,18 @@ extension LyricsSyncViewController {
     }
     
     func addLyricsToEditorView(sender: MPMediaItem) {
-        let lyricsWithTime = CoreDataManager.getLyrics(sender)
-        let count = lyricsWithTime.count
+        
+        var lyric = Lyric()
+        (lyric, _) = CoreDataManager.getLyrics(sender, fetchingLocalOnly: true)
+     
+        let count = lyric.lyric.count
         if count > 0 {
             var lyrics: [String] = [String]()
             var time: [NSTimeInterval] = [NSTimeInterval]()
             var timeAdded: [Bool] = [Bool]()
-            for item in lyricsWithTime {
-                lyrics.append(item.0)
-                time.append(item.1)
+            for line in lyric.lyric {
+                lyrics.append(line.str)
+                time.append(NSTimeInterval(line.time.toDecimalNumer()))
                 timeAdded.append(true)
             }
             self.addedLyricsWithTime.addExistLyrics(count, lyrics: lyrics, time: time, timeAdded: timeAdded)

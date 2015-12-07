@@ -160,17 +160,19 @@ class LyricsTextViewController: UIViewController {
     func addLyricsTextView() {
         self.lyricsTextView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, 27.5 / 31 * self.viewHeight)
         self.lyricsTextView.backgroundColor = UIColor.clearColor()
-        self.lyricsTextView.textAlignment = NSTextAlignment.Left
+        self.lyricsTextView.textAlignment = .Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
         self.lyricsTextView.tintColor = UIColor.mainPinkColor()
         self.lyricsTextView.delegate = self
 
-        let lyricsTimes = CoreDataManager.getLyrics(theSong)
-        if lyricsTimes.count > 0 {
+        var lyric = Lyric()
+        (lyric, _) =  CoreDataManager.getLyrics(theSong, fetchingLocalOnly: true)
+        
+        if lyric.lyric.count > 0 {
             var lyricsToDisplay = ""
-            for line in lyricsTimes {
-                lyricsToDisplay+="\(line.0)\n"
+            for line in lyric.lyric {
+                lyricsToDisplay+="\(line.str)\n"
             }
             self.lyricsTextView.text = lyricsToDisplay
             self.lyricsTextView.textColor = UIColor.whiteColor()
@@ -241,7 +243,6 @@ class LyricsTextViewController: UIViewController {
                 }
             }
         }
-        
         return result
     }
     

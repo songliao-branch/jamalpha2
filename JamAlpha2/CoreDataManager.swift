@@ -226,44 +226,129 @@ class CoreDataManager: NSObject {
     }
     
     // MARK: save, retrieve lyrics
-    class func saveLyrics(item: Findable, lyrics: [String], times: [NSTimeInterval]) {
-        
+    class func saveLyrics(item: Findable, lyrics: [String], times: [Float], lyricsSetId: Int?=nil) {
+
         if let matchedSong = findSong(item) {
-            // TODO: find a better way managing user's lyrics, now just clear existing lyrics
-            matchedSong.lyricsSets = NSSet()
-            
-            let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
+          
+            let savedSets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
             
             let lyricsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(lyrics as AnyObject)
             let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
             
-            lyricsSet.lyrics = lyricsData
-            lyricsSet.times = timesData
-            lyricsSet.song = matchedSong
+            if let id = lyricsSetId where id > 0 { //if downloaded lyrics
+                var foundDownloadedLyricsSet: LyricsSet!
+                var found = false
+                
+                //find the exisiting downloaded lyrics
+                for set in savedSets {
+                    if set.id == id  {
+                        foundDownloadedLyricsSet = set
+                        found = true
+                        foundDownloadedLyricsSet.lyrics = lyricsData
+                        
+                        foundDownloadedLyricsSet.times = timesData
+                        foundDownloadedLyricsSet.lastSelectedDate = NSDate()
+                        break
+                    }
+                }
+                
+                //if the downloaded lyricsSet with id is not found, we create a new one
+                if !found {
+                    let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
+
+                    lyricsSet.lyrics = lyricsData
+                    lyricsSet.times = timesData
+                    lyricsSet.song = matchedSong
+                    
+                    lyricsSet.lastSelectedDate = NSDate()
+                    lyricsSet.id = id
+                    lyricsSet.isLocal = false
+                }
+                
+            } else {//if saving local lyrics
+                
+                var foundLyricsSet: LyricsSet!
+                var found = false
+                //if this lyrics is already in the core data
+                for set in savedSets {
+                    if set.isLocal {
+                        foundLyricsSet = set
+                        found = true
+                        foundLyricsSet.lyrics = lyricsData
+                        foundLyricsSet.times = timesData
+                        foundLyricsSet.lastSelectedDate = NSDate()
+                        break
+                    }
+                }
+                
+                //create a new one if none found
+                if !found {
+                    let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
+                    
+                    lyricsSet.lyrics = lyricsData
+                    lyricsSet.times = timesData
+                    lyricsSet.song = matchedSong
+                    
+                    lyricsSet.lastSelectedDate = NSDate()
+                    lyricsSet.isLocal = true
+                    lyricsSet.id = -1 //this is needed to check which lyrics is last selected in the BrowseTable
+                }
+            }
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     
-    class func getLyrics(item: Findable) -> [(String, NSTimeInterval)] {
+    class func getLyrics(item: Findable, fetchingLocalOnly: Bool) -> (Lyric, Int) {
         
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.lyricsSets.count) set of lyrics")
-            if matchedSong.lyricsSets.count > 0 {
-                var results = [(String, NSTimeInterval)]()
-                let theSet = matchedSong.lyricsSets.allObjects.last as! LyricsSet
-                let lyrics = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.lyrics as! NSData) as! [String]
-                let times = NSKeyedUnarchiver.unarchiveObjectWithData(theSet.times as! NSData) as! [NSTimeInterval]
-                
-                for i in 0..<lyrics.count {
-                    results.append((lyrics[i], times[i]))
-                }
-                return results
-            }
-        }
         
-        return [(String, NSTimeInterval)]()
+            let sets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
+            
+            var foundLyricsSet: LyricsSet!
+            
+            if fetchingLocalOnly {
+                foundLyricsSet = sets.filter({ $0.isLocal == true }).first
+            } else {
+                //find the most recently selected tabsSet
+                foundLyricsSet = sets.sort({
+                    setA, setB in
+                    if setA.lastSelectedDate.compare(setB.lastSelectedDate) ==  NSComparisonResult.OrderedDescending {
+                        return true
+                    }
+                    return false
+                }).first
+            }
+            
+            if foundLyricsSet == nil {
+                return (Lyric(), 0)
+            }
+            
+            let lyrics = NSKeyedUnarchiver.unarchiveObjectWithData(foundLyricsSet.lyrics as! NSData) as! [String]
+            let times = NSKeyedUnarchiver.unarchiveObjectWithData(foundLyricsSet.times as! NSData) as! [Float]
+            
+            let lyric = Lyric()
+            for i in 0..<lyrics.count {
+                lyric.addLine(TimeNumber(time: times[i]), str: lyrics[i])
+            }
+            
+            return (lyric, Int(foundLyricsSet.id))
+        }
+        return (Lyric(), 0)
     }
     
+    class func setLocalLyricsMostRecent(item: Findable) {
+        if let matchedSong = findSong(item) {
+            let savedSets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
+            let foundLocalSet = savedSets.filter({ $0.isLocal == true }).first
+            
+            if foundLocalSet == nil {
+                return
+            }
+            foundLocalSet?.lastSelectedDate = NSDate()
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
     
     class func setLocalTabsMostRecent (item: Findable) {
         if let matchedSong = findSong(item) {

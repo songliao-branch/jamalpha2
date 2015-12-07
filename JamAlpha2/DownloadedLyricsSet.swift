@@ -12,26 +12,27 @@ class DownloadedLyricsSet: NSObject {
 
     var id = -1
     var songId = -1
-    //var userId = -1
-    var userName = "" //TODO: use email for now, will change for username later
-    var updatedAt = "" //TODO: change to a string
     var lyricsPreview = ""
     var numberOfLines = 0
     
     var votesScore = 0
     var voteStatus = "" //up, down, yet, not applicable
+    
+    var editor: Editor!//owner of this tabs
+    var updatedAt = "" //TODO: change to a string
+    
+    //retrieved later when user clicks one of the lyricsSet in the list
     var lyrics = [String]()
     var times = [Float]()
-    
-    init(id: Int, songId: Int, userName: String, updatedAt: String, votesScore: Int, lyricsPreview: String, lines: Int, voteStatus: String) {
+
+    init(id: Int, songId: Int, lyricsPreview: String, numberOfLines: Int, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
         self.id = id
         self.songId = songId
-        self.userName = userName
-        self.updatedAt =  NSDate.convertFromIsoToHumanizedFormat(updatedAt)
-        self.votesScore = votesScore
         self.lyricsPreview = lyricsPreview
-        self.numberOfLines = lines
+        self.numberOfLines = numberOfLines
+        self.votesScore = votesScore
         self.voteStatus = voteStatus
+        self.editor = editor
+        self.updatedAt =  NSDate.convertFromIsoToHumanizedFormat(updatedAt)
     }
-    
 }
