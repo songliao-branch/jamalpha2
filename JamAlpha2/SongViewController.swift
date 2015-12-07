@@ -206,6 +206,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var playPreveiwButton:UIButton!
     var previewActionViewHeight: CGFloat = 54 * 4 + 3
     var previewView:UIView!
+    var displayLink:CADisplayLink!
+    var progress: KDCircularProgress!
+    var centerView:UIView!
     
     var storeViewController:SKStoreProductViewController!
     
@@ -1675,7 +1678,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         
-        if isSongNeedPurchase { return }
+        if isSongNeedPurchase {
+            self.displayLink.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+            self.displayLink.invalidate()
+            self.displayLink = nil
+            return
+        }
         
         if player.playbackState == .Playing {
             if nowView != nil {
@@ -2081,7 +2089,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var isClick = false
     func initPurchaseItunsSongItem(){
         setUpPreviewButton()
         setUpPreviewActionView()
@@ -2095,8 +2102,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
         let playerItem = AVPlayerItem( URL:url)
         AVplayer = AVPlayer(playerItem:playerItem)
+        displayLink = CADisplayLink(target: self, selector: ("updateSliderProgress"))
+        displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+        displayLink.paused = true
+
     }
-    
     
     func setUpPreviewActionView(){
         // NOTE: we have to call all the embedded action events from the custom views, not in this class.
@@ -2127,23 +2137,39 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sideMargin: CGFloat = 35
         
         for i in 0..<4 {
-            let button = UIButton(frame: CGRect(x: sideMargin, y: 0, width: 200, height: 22))
+            let button = UIButton(frame: CGRect(x: sideMargin, y: 0, width: self.view.frame.width - sideMargin, height: 54))
             button.setTitle(names[i], forState: .Normal)
             button.contentHorizontalAlignment = .Left
             button.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
             button.center.y = childCenterY
             button.addTarget(self, action: Selector(functionName[i]) , forControlEvents: UIControlEvents.TouchUpInside)
-            
-            if i == 1 {
+            if i == 0{
+                progress = KDCircularProgress(frame: CGRect(x: self.view.frame.width - 65 - 25, y: 7, width: 40, height: 40))
+                progress.startAngle = -90
+                progress.progressThickness = 0.3
+                progress.trackThickness = 0.6
+                progress.clockwise = true
+                progress.gradientRotateSpeed = 2
+                progress.roundedCorners = true
+                progress.glowMode = .Forward
+                progress.setColors(UIColor.mainPinkColor() ,UIColor.yellowColor(), UIColor.greenColor())
+                
+                centerView = UIView(frame: CGRect(x: 14, y: 14, width: 12, height: 12))
+                centerView.layer.cornerRadius = 3
+                centerView.backgroundColor = UIColor.mainPinkColor()
+                progress.addSubview(centerView)
+                rowWrappers[i].addSubview(progress)
+                
+            }else if i == 1 {
                 let itunesBadge = UIButton(frame: CGRect(x: self.view.frame.width - 90 - 25, y: 0, width: 90, height: 33))
                 itunesBadge.setImage(UIImage(named: "itunes_badge"), forState: .Normal)
-                itunesBadge.addTarget(self, action: "goToiTunes", forControlEvents: .TouchUpInside)
+                itunesBadge.addTarget(self, action: Selector(functionName[i]), forControlEvents: .TouchUpInside)
                 itunesBadge.center.y = childCenterY
                 rowWrappers[i].addSubview(itunesBadge)
             } else if i == 2 {
                 let appleMusicBadge = UIButton(frame: CGRect(x: self.view.frame.width - 90 - 25, y: 0, width: 90, height: 33))
                 appleMusicBadge.setImage(UIImage(named: "apple_music_badge"), forState: .Normal)
-                appleMusicBadge.addTarget(self, action: "goToAppleMusic", forControlEvents: .TouchUpInside)
+                appleMusicBadge.addTarget(self, action: Selector(functionName[i]), forControlEvents: .TouchUpInside)
                 appleMusicBadge.center.y = childCenterY
                 rowWrappers[i].addSubview(appleMusicBadge)
             } else if i == 3 {
@@ -2166,21 +2192,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func previewPlay(){
-        if(AVplayer.currentTime() == AVplayer.currentItem?.duration){
-            AVplayer = nil
-            let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
-            let playerItem = AVPlayerItem( URL:url)
-            AVplayer = AVPlayer(playerItem:playerItem)
-            isClick = !isClick
-        }
-        
-        if(!isClick){
+        if(self.AVplayer.rate == 0.0){
             AVplayer.rate = 1.0;
-            AVplayer.play()
+            UIView.animateWithDuration(0.2, delay: 0.0,
+                options: .CurveEaseOut,
+                animations: {
+                    self.centerView.layer.cornerRadius = CGRectGetHeight(self.centerView.bounds)/2
+                }, completion: {
+                    finished in
+                    self.displayLink.paused = false
+                    self.AVplayer.play()
+            })
         }else{
-            AVplayer.pause()
+            UIView.animateWithDuration(0.2, delay: 0.0,
+                options: .CurveEaseOut,
+                animations: {
+                    self.centerView.layer.cornerRadius = 3.0
+                }, completion: {
+                    finished in
+                    self.displayLink.paused = true
+                    self.AVplayer.pause()
+            })
         }
-        isClick = !isClick
     }
     
     func goToiTunes(){
@@ -2208,6 +2241,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl!)!)
     }
     
+    func updateSliderProgress(){
+        progress.angle = Int(self.AVplayer.currentTime().seconds * 360/self.AVplayer.currentItem!.duration.seconds)
+        if(AVplayer.currentTime() == AVplayer.currentItem!.duration){
+            AVplayer.seekToTime(kCMTimeZero)
+            UIView.animateWithDuration(0.2, delay: 0.0,
+                options: .CurveEaseOut,
+                animations: {
+                    self.centerView.layer.cornerRadius = 3.0
+                }, completion: {
+                    finished in
+                    self.progress.angle = 0
+                    self.displayLink.paused = true
+            })
+        }
+    }
+    
     
     func productViewControllerDidFinish(viewController: SKStoreProductViewController) {
         if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(songNeedPurchase.trackName!, artist: songNeedPurchase.artistName!, duration: songNeedPurchase.trackTimeMillis!)){
@@ -2225,6 +2274,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func recoverToNormalSongVC(){
         //delete
+        self.displayLink.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+        self.displayLink.invalidate()
+        self.displayLink = nil
         self.previewView = nil
         self.playPreveiwButton.removeFromSuperview()
         self.playPreveiwButton = nil
