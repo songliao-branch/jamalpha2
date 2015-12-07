@@ -271,10 +271,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
+            viewDidFullyDisappear = false
             if(!isSongNeedPurchase){
                      resumeSong()
             }
-            viewDidFullyDisappear = false
         }
     }
     
@@ -1955,6 +1955,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 if activelabels[i].ylocation > maxylocation {
                     activelabels[i].ylocation = maxylocation
                 }
+
             }
         }
 
@@ -2009,7 +2010,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func update(){
-        if(viewDidFullyDisappear){
+        if(KGLOBAL_progressBlock == nil){
             return
         }
         if(!isPanning){
