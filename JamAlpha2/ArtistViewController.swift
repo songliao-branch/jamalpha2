@@ -115,10 +115,11 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         if MusicManager.sharedInstance.player.nowPlayingItem != nil {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
-                
+                cell.titleTrailingConstant.constant = 50
                 cell.loudspeakerImage.hidden = false
             }
             else {
+                cell.titleTrailingConstant.constant = 15
                 cell.loudspeakerImage.hidden = true
             }
         } else {

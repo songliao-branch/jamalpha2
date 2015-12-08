@@ -15,4 +15,6 @@ class AlbumTrackCell: UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
 
     @IBOutlet weak var loudspeakerImage: UIImageView!
+    @IBOutlet weak var titleTrailingConstant: NSLayoutConstraint!
+    //50 if loudspeaker is shown, 15 otherwise
 }

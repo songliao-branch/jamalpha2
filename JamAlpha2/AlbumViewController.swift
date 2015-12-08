@@ -74,10 +74,11 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         if MusicManager.sharedInstance.player.nowPlayingItem != nil {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
                 
-                // TODO: change asset icon to pink
+                cell.titleTrailingConstant.constant = 50
                 cell.loudspeakerImage.hidden = false
             }
             else {
+                cell.titleTrailingConstant.constant = 15
                 cell.loudspeakerImage.hidden = true
             }
         } else {

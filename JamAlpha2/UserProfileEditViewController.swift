@@ -14,11 +14,9 @@ class UserProfileEditViewController: UIViewController {
     
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
-    
+
 
     var tableView: UITableView!
-    
-    let tableViewContent: [String] = ["Nick Name"]
     
     var awsS3: AWSS3Manager = AWSS3Manager()
     
@@ -38,11 +36,6 @@ class UserProfileEditViewController: UIViewController {
         setUpNavigationBar()
         setUpTableView()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -58,11 +51,13 @@ class UserProfileEditViewController: UIViewController {
     }
     
     func tapOnUserImageView(sender: UITapGestureRecognizer) {
+        //TODO: see the image fullscreen
+          print("tap on image")
         if let originImageData: NSData = CoreDataManager.getCurrentUser()?.profileImage {
             let originImage: UIImage = UIImage(data: originImageData)!
             
         }
-        print("tap on image")
+      
     }
 
 }
@@ -105,7 +100,7 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
             let contentProfileCell: MeContentProfileTableViewCell = self.tableView.dequeueReusableCellWithIdentifier("contentProfileCell") as! MeContentProfileTableViewCell
             contentProfileCell.initialTableViewCell(self.viewWidth, height: 44)
             contentProfileCell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            contentProfileCell.titleLabel.text = tableViewContent[indexPath.item]
+            contentProfileCell.titleLabel.text = "Display name"
             contentProfileCell.selectionStyle = UITableViewCellSelectionStyle.None
             if let name = CoreDataManager.getCurrentUser()?.nickname {
                 contentProfileCell.contentLabel.text = name
@@ -115,10 +110,7 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
-            return 1
-        }
-        return tableViewContent.count
+       return 1
     }
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -145,12 +137,10 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
             }
         }
     }
-    
 }
 
 // upload user profile image
 extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
     
     func pressUploadImageButton() {
         let refreshAlert = UIAlertController(title: "Add Photo", message: "Camera or Photo Library", preferredStyle: UIAlertControllerStyle.Alert)
@@ -183,13 +173,7 @@ extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavi
         
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
-    // download the image
-    func downloadImage() {
-        awsS3.addDownloadRequestToArray(self.originFileName)
-        awsS3.download(awsS3.downloadRequests[0]!)
-    }
-    
+
 }
 
 // crop the user profile image
@@ -220,15 +204,17 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
         }
         awsS3.uploadRequests.removeAll()
         
-       
+        
+        APIManager.updateUserAvatar(self.originFileName, avatarUrlThumbnail: self.croppedFileName, completion: {
+            completed in
+            if completed {
+                print("uploaded newest avatar")
+            }
+        })
         
         CoreDataManager.saveUserProfileImage(self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.originImageData, thumbnail: thumbnailImageData)
         
         self.tableView.reloadData()
-        
-        // update profile image 
-        //CoreDataManager.getCurrentUser()?.avatarUrl // origin url
-        //CoreDataManager.getCurrentUser()?.thumbnailUrl // thumbnail url
         
         
         self.navigationController?.popViewControllerAnimated(true)

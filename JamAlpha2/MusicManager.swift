@@ -25,7 +25,6 @@ class MusicManager: NSObject {
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
     
-    
     class var sharedInstance: MusicManager {
         struct Static {
             static var onceToken: dispatch_once_t = 0
@@ -44,6 +43,26 @@ class MusicManager: NSObject {
         loadLocalArtist()
         initializePlayer()
     }
+    
+    //check when search a cloud item, if it matches, we use the song we already have
+    func isNeedReloadCollections(title:String, artist:String, duration:Float) -> MPMediaItem? {
+        loadLocalSongs()
+        let result = uniqueSongs.filter{
+            (song: MPMediaItem) -> Bool in
+            if let tempTitle = song.title, tempArtist = song.artist {
+                //print("\(tempTitle)    \(tempArtist)    \((Float(song.playbackDuration) - duration))")
+                return tempTitle == title && tempArtist == artist && abs((Float(song.playbackDuration) - duration))<1.5
+            }
+            return false
+        }.first
+        if(result != nil){
+            loadLocalAlbums()
+            loadLocalArtist()
+            return result!
+        }
+        return nil
+    }
+    
     
     func initializePlayer(){
         print("\(_TAG) Initialize Player")
@@ -112,6 +131,7 @@ class MusicManager: NSObject {
     
     // MARK: get all MPMediaItems
     func loadLocalSongs(){
+        uniqueSongs = [MPMediaItem]()
         let songCollection = MPMediaQuery.songsQuery()
         uniqueSongs = songCollection.items!.filter {
             song in
@@ -120,6 +140,7 @@ class MusicManager: NSObject {
     }
     
     func loadLocalAlbums(){
+        uniqueAlbums = [Album]()
         //start new albums fresh
         var collectionInAlbum = [MPMediaItem]() // a collection of each album's represenstative item
         let albumQuery = MPMediaQuery()
@@ -138,6 +159,7 @@ class MusicManager: NSObject {
     
     //load artist must be called after getting all albums
     func loadLocalArtist() {
+        uniqueArtists = [Artist]()
         
         var artistDictionary = [String: [Album]]() //key is artistName
         for album in uniqueAlbums {

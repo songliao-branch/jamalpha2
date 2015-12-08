@@ -168,9 +168,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             if MusicManager.sharedInstance.player.nowPlayingItem != nil {
                 if song == MusicManager.sharedInstance.player.nowPlayingItem {
+                    cell.titleTrailingConstraint.constant = 50
                     cell.loudspeakerImage.hidden = false
                 }
                 else {
+                    cell.titleTrailingConstraint.constant = 15
                     cell.loudspeakerImage.hidden = true
                 }
             } else {
@@ -438,14 +440,12 @@ extension MusicViewController {
                             return
                         }
                         tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
-
+                        KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
+                        self.incrementSongCountInThread()
+                        tempProgressBlock.generateWaveforms()
                         let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                         CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
                         print("Soundwave generated for \(nowPlayingItem.title!) in background")
-                        
-                        KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
-                        self.incrementSongCountInThread()
-       
                     })
                     KGLOBAL_init_operationCache[assetURL as! NSURL] = op
                     KGLOBAL_init_queue.addOperation(op!)
