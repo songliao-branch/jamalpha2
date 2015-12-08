@@ -50,23 +50,13 @@ class APIManager: NSObject {
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     //upload tabs
-    class func uploadTabs(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
-
-        var title = ""
-        var artist = ""
-        let duration = Float(mediaItem.playbackDuration)
-        if let t = mediaItem.title {
-            title = t
-        }
-        if let a = mediaItem.artist {
-            artist = a
-        }
+    class func uploadTabs(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
         
         var chords = [Chord]() //([Chord], String, Int)
         var tuning = ""
         var capo = 0
         
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
+        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: true)
         
         var timesData = [Float]()
         var chordsData = [String]()
@@ -79,9 +69,9 @@ class APIManager: NSObject {
         }
         
         let parameters = [
-            "title": title,
-            "artist": artist,
-            "duration": duration,
+            "title": song.getTitle(),
+            "artist": song.getArtist(),
+            "duration": song.getDuration(),
             
             "tuning": tuning,
             "capo": capo,
@@ -106,21 +96,11 @@ class APIManager: NSObject {
     }
     
     //upload lyrics
-    class func uploadLyrics(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
+    class func uploadLyrics(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
 
-        var title = ""
-        var artist = ""
-        let duration = Float(mediaItem.playbackDuration)
-        if let t = mediaItem.title {
-            title = t
-        }
-        if let a = mediaItem.artist {
-            artist = a
-        }
-    
         var lyric = Lyric()
         
-        (lyric, _) = CoreDataManager.getLyrics(mediaItem, fetchingLocalOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: true)
         
         var times = [Float]()
         var lyrics = [String]()
@@ -131,9 +111,9 @@ class APIManager: NSObject {
         }
         
         let parameters = [
-            "title": title,
-            "artist": artist,
-            "duration": duration,
+            "title": song.getTitle(),
+            "artist": song.getArtist(),
+            "duration": song.getDuration(),
             
             "times": times,
             "lyrics": lyrics,
@@ -147,7 +127,7 @@ class APIManager: NSObject {
                 case .Success:
                     print("Lyrics uploaded succesfully")
                     completion(isSuccess: true)
-                case .Failure(let _):
+                case .Failure(_):
                     completion(isSuccess: false)
                 }
         }
@@ -221,6 +201,49 @@ class APIManager: NSObject {
         }
     }
     
+    class func downloadMostLikedTabs(findable: Findable, completion: (( downloadWithContent: DownloadedTabsSet) -> Void)) {
+        
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_most_liked_tabs_set", parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    print(json)
+                    if let _ = json["error"].string {
+                        print("no most liked tabs yet")
+                        return
+                    }
+                    let set = json["tabs_set_content"]
+                    
+           
+                    
+                    var theTimes = [Float]()
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
+                    
+                    let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    
+                    t.times = theTimes
+                    t.chords  = set["chords"].arrayObject as! [String]
+                    t.tabs  = set["tabs"].arrayObject as! [String]
+                    
+                    //after completed, pass everything to the callback
+                    completion(downloadWithContent: t)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     //download all lyrics related to one song
     class func downloadLyrics(findable: Findable, completion: ( (downloads: [DownloadedLyricsSet])-> Void ) ) {
         var allDownloads = [DownloadedLyricsSet]()
@@ -286,6 +309,47 @@ class APIManager: NSObject {
             }
         }
     }
+    
+    class func downloadMostLikedLyrics(findable: Findable, completion: (( downloadWithContent: DownloadedLyricsSet) -> Void)) {
+        
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_most_liked_lyrics_set", parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    print(json)
+                    if let _ = json["error"].string {
+                        print("no most liked lyrics yet")
+                        return
+                    }
+                    let set = json["lyrics_set_content"]
+                    
+                    
+                    var theTimes = [Float]()
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
+                    
+                    let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    
+                    l.lyrics = set["lyrics"].arrayObject as! [String]
+                    l.times = theTimes
+                    //after completed, pass everything to the callback
+                    completion(downloadWithContent: l)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     
     //upvote or downvote either tabsSet or lyricsSet
     class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( voteStatus: String, voteScore: Int) -> Void)){

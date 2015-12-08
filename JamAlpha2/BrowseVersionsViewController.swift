@@ -474,7 +474,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             dispatch_async(dispatch_get_main_queue()) {
-                self.resultsTableView.reloadData()
+                let i = NSIndexPath(forRow: button.tag, inSection: 1)
+                self.resultsTableView.reloadRowsAtIndexPaths([i], withRowAnimation: UITableViewRowAnimation.None)
             }
             
         })
@@ -505,7 +506,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             dispatch_async(dispatch_get_main_queue()) {
-                self.resultsTableView.reloadData()
+                let i = NSIndexPath(forRow: button.tag, inSection: 1)
+                self.resultsTableView.reloadRowsAtIndexPaths([i], withRowAnimation: UITableViewRowAnimation.None)
             }
         })
         print("down button: \(button.tag) pressed")
