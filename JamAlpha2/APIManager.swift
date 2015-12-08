@@ -50,23 +50,13 @@ class APIManager: NSObject {
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     //upload tabs
-    class func uploadTabs(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
-
-        var title = ""
-        var artist = ""
-        let duration = Float(mediaItem.playbackDuration)
-        if let t = mediaItem.title {
-            title = t
-        }
-        if let a = mediaItem.artist {
-            artist = a
-        }
+    class func uploadTabs(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
         
         var chords = [Chord]() //([Chord], String, Int)
         var tuning = ""
         var capo = 0
         
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
+        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: true)
         
         var timesData = [Float]()
         var chordsData = [String]()
@@ -79,9 +69,9 @@ class APIManager: NSObject {
         }
         
         let parameters = [
-            "title": title,
-            "artist": artist,
-            "duration": duration,
+            "title": song.getTitle(),
+            "artist": song.getArtist(),
+            "duration": song.getDuration(),
             
             "tuning": tuning,
             "capo": capo,
@@ -106,21 +96,11 @@ class APIManager: NSObject {
     }
     
     //upload lyrics
-    class func uploadLyrics(mediaItem: MPMediaItem, completion: ((isSuccess: Bool) -> Void)) {
+    class func uploadLyrics(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
 
-        var title = ""
-        var artist = ""
-        let duration = Float(mediaItem.playbackDuration)
-        if let t = mediaItem.title {
-            title = t
-        }
-        if let a = mediaItem.artist {
-            artist = a
-        }
-    
         var lyric = Lyric()
         
-        (lyric, _) = CoreDataManager.getLyrics(mediaItem, fetchingLocalOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: true)
         
         var times = [Float]()
         var lyrics = [String]()
@@ -131,9 +111,9 @@ class APIManager: NSObject {
         }
         
         let parameters = [
-            "title": title,
-            "artist": artist,
-            "duration": duration,
+            "title": song.getTitle(),
+            "artist": song.getArtist(),
+            "duration": song.getDuration(),
             
             "times": times,
             "lyrics": lyrics,
@@ -147,7 +127,7 @@ class APIManager: NSObject {
                 case .Success:
                     print("Lyrics uploaded succesfully")
                     completion(isSuccess: true)
-                case .Failure(let _):
+                case .Failure(_):
                     completion(isSuccess: false)
                 }
         }
