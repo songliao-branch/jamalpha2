@@ -206,9 +206,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var playPreveiwButton:UIButton!
     var previewActionViewHeight: CGFloat = 54 * 4 + 3
     var previewView:UIView!
-    var displayLink:CADisplayLink!
+    var displayLink: CADisplayLink!
     var previewProgress: KDCircularProgress!
-    var centerView:UIView!
+    var previewProgressCenterView: UIView!
     
     var storeViewController:SKStoreProductViewController!
     
@@ -2158,12 +2158,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 previewProgress.glowMode = .Forward
                 previewProgress.setColors(UIColor.mainPinkColor())
                 
-                centerView = UIView(frame: CGRect(x: 15, y: 15, width: 12, height: 12))
-                centerView.layer.cornerRadius = 3
-                centerView.backgroundColor = UIColor.mainPinkColor()
-                centerView.layer.borderColor = UIColor.blackColor().CGColor
-                centerView.layer.borderWidth = 2.0
-                previewProgress.addSubview(centerView)
+                previewProgressCenterView = UIView(frame: CGRect(x: 15, y: 15, width: 12, height: 12))
+                previewProgressCenterView.layer.cornerRadius = 0
+                previewProgressCenterView.backgroundColor = UIColor.mainPinkColor()
+                previewProgressCenterView.layer.borderColor = UIColor.blackColor().CGColor
+                previewProgressCenterView.layer.borderWidth = 2.0
+                previewProgress.addSubview(previewProgressCenterView)
                 rowWrappers[i].addSubview(previewProgress)
                 
             }else if i == 1 {
@@ -2204,7 +2204,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
-                    self.centerView.layer.cornerRadius = CGRectGetHeight(self.centerView.bounds)/2
+                    self.previewProgressCenterView.layer.cornerRadius = CGRectGetHeight(self.previewProgressCenterView.bounds)/2
                 }, completion: {
                     finished in
                     self.displayLink.paused = false
@@ -2214,7 +2214,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
-                    self.centerView.layer.cornerRadius = 3.0
+                    self.previewProgressCenterView.layer.cornerRadius = 0
                 }, completion: {
                     finished in
                     self.displayLink.paused = true
@@ -2261,7 +2261,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
-                    self.centerView.layer.cornerRadius = 3.0
+                    self.previewProgressCenterView.layer.cornerRadius = 3.0
                 }, completion: {
                     finished in
                     self.previewProgress.setColors(UIColor.mainPinkColor())
