@@ -168,15 +168,6 @@ class CoreDataManager: NSObject {
         return true
     }
     
-    class func saveUserFBToken(fbToken: String) -> Bool {
-        if CoreDataManager.getCurrentUser() == nil {
-            return false
-        }
-        let currentUser = CoreDataManager.getCurrentUser()!
-        currentUser.fbToken = fbToken
-        SwiftCoreDataHelper.saveManagedObjectContext(moc)
-        return true
-    }
     
     //song-related
     private class func findSong(item: Findable) -> Song? {
