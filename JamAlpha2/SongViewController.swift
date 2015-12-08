@@ -2261,7 +2261,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
-                    self.previewProgressCenterView.layer.cornerRadius = 3.0
+                    self.previewProgressCenterView.layer.cornerRadius = 0
                 }, completion: {
                     finished in
                     self.previewProgress.setColors(UIColor.mainPinkColor())
