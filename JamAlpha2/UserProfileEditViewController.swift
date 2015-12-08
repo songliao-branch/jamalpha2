@@ -212,7 +212,7 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
             }
         })
         
-        CoreDataManager.saveUserProfileImage(self.originFileName, thumbnailUrl: self.croppedFileName, profileImage: self.originImageData, thumbnail: thumbnailImageData)
+        CoreDataManager.saveUserProfileImage(self.originFileName, thumbnailUrl: self.croppedFileName, profileImageData: self.originImageData, thumbnailData: thumbnailImageData)
         
         self.tableView.reloadData()
         

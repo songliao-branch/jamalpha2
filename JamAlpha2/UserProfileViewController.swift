@@ -20,36 +20,35 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     
-    // request array
-
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
         
-        let error = NSErrorPointer()
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtPath(
-                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
-                withIntermediateDirectories: true,
-                attributes: nil)
-        } catch let error1 as NSError {
-            error.memory = error1
-            print("Creating 'upload' directory failed. Error: \(error)")
+    }
+
+    func refreshUserImage() {
+        guard let currentUser = CoreDataManager.getCurrentUser() else {
+            return
         }
         
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtPath(
-                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("download"),
-                withIntermediateDirectories: true,
-                attributes: nil)
-        } catch let error1 as NSError {
-            error.memory = error1
-            print("Creating 'download' directory failed. Error: \(error)")
+        //if not facebook user, means image is stored at s3
+        if let avatarUrl = currentUser.avatarUrl where currentUser.avatarUrl?.characters.count > 5 {
+            if avatarUrl.containsString("facebook") { // if this is stored at facebook and not changed by user
+                let profileImageData = NSData(contentsOfURL: NSURL(string: avatarUrl)!)!
+                CoreDataManager.saveUserProfileImage(profileImageData: profileImageData)
+                self.userTable.reloadData()
+            } else {
+                let awss3Manager = AWSS3Manager()
+                
+                awss3Manager.downloadImage(avatarUrl, completion: {
+                    image in
+                    CoreDataManager.saveUserProfileImage(profileImageData: UIImagePNGRepresentation(image))
+                    self.userTable.reloadData()
+                })
+            }
         }
-        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -66,7 +65,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         //check if there is a user, if not show signup/login screen
         if CoreDataManager.getCurrentUser() == nil {
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
-            
+            signUpVC.userProfileViewController = self
             self.navigationController?.pushViewController(signUpVC, animated: false)
         } else {
             //means we are signed in here, refresh the table
@@ -103,7 +102,9 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 if let name = user.nickname {
                     cell.titleLabel.text = name
                 }
+                
                 cell.subtitleLabel.text = user.email
+                
                 if let profileData = user.profileImage {
                     let imageLayer: CALayer = cell.avatarImageView.layer
                     imageLayer.cornerRadius = 0.5 * cell.avatarImageView.frame.size.width
@@ -135,7 +136,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         } else if indexPath.section == 1{
             // my tabs, my lyrics, favorites
             if indexPath.item == 0 {
-
+                
             }
             else if indexPath.item == 1{
 

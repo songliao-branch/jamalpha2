@@ -18,6 +18,7 @@ import AWSCore
 
 class MeLoginOrSignupViewController: UIViewController{
     
+    var userProfileViewController: UserProfileViewController!
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     var statusAndNavigationBarHeight: CGFloat = CGFloat()
@@ -313,14 +314,13 @@ class MeLoginOrSignupViewController: UIViewController{
         }
         
         signUpLoginRequest(parameters, afterRetrievingUser: {
-            id, email, authToken in
+            id, email, authToken, nickname, avatarUrlMedium, avatarUrlThumbnail in
             
-            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: self.nickNameTextField.text!)
-            
+            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: nickname, avatarUrl: avatarUrlMedium, thumbnailUrl: avatarUrlThumbnail)            
         })
     }
     //used for facebook button too
-    private func signUpLoginRequest(parameters: [String: String],  afterRetrievingUser: (( id: Int, email: String, authToken: String) -> Void)) {
+    private func signUpLoginRequest(parameters: [String: String],  afterRetrievingUser: (( id: Int, email: String, authToken: String, nickname: String, avatarUrlMedium: String, avatarUrlThumbnail: String) -> Void)) {
 
         Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
             {
@@ -333,18 +333,20 @@ class MeLoginOrSignupViewController: UIViewController{
                     if let data = response.result.value {
                         let json = JSON(data)
                         
-                        let userInitialization = json["user_initialization"]
+                        let user = json["user_initialization"]
                         
-                        if userInitialization != nil {
+                        if user != nil {
+
+                            afterRetrievingUser(id: user["id"].int!, email: user["email"].string!, authToken: user["auth_token"].string!, nickname: user["nickname"].string!, avatarUrlMedium: user["avatar_url_medium"].string!, avatarUrlThumbnail: user["avatar_url_thumbnail"].string!)
                             
-                            afterRetrievingUser(id: userInitialization["id"].int!, email: userInitialization["email"].string!, authToken: userInitialization["auth_token"].string!)
                             //go back to user profile view
-                            
                             if self.showCloseButton {
                               self.dismissViewControllerAnimated(true, completion: nil)
                             } else {
                               self.navigationController?.popViewControllerAnimated(false)
                             }
+                            
+                            self.userProfileViewController.refreshUserImage()
                             
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
                             
@@ -403,12 +405,9 @@ class MeLoginOrSignupViewController: UIViewController{
                     let userId = result.valueForKey("id") as! String
                     let facebookAvatarUrl = "https://graph.facebook.com/\(userId)/picture?height=320&width=320"
                     
-                    let profileImageData = NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!
+                    
                     let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!)!
-                    
                     let thumbnailImage = originImage.resize(35)
-                    let thumbnailData = UIImagePNGRepresentation(thumbnailImage)!
-                    
                     // add request to upload array
                     let thumbnailUrl = self.awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: facebookEmail)
                     
@@ -428,9 +427,9 @@ class MeLoginOrSignupViewController: UIViewController{
                     ]
                     
                     self.signUpLoginRequest(parameters, afterRetrievingUser: {
-                        id, email, authToken in
+                         id, email, authToken, _, _, _ in
                         
-                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, profileImage: profileImageData, thumbnail: thumbnailData, fbToken: fbToken)
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, fbToken: fbToken)
                     })
                 }
             })
