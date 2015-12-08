@@ -164,7 +164,6 @@ class CoreDataManager: NSObject {
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
         if results.count == 0 {
-            print("song doesn't exist")
             return nil
         } else {
             return results.lastObject! as? Song
@@ -199,7 +198,7 @@ class CoreDataManager: NSObject {
     class func getSongWaveFormData(item: Findable) -> NSMutableArray? {
         
         if let matchedSong = findSong(item) {
-            print("sound wave data found for song")
+         //   print("sound wave data found for song")
             return NSKeyedUnarchiver.unarchiveObjectWithData(matchedSong.soundwaveData as! NSData) as? NSMutableArray
         }
         return nil
@@ -208,7 +207,7 @@ class CoreDataManager: NSObject {
     class func getSongWaveFormImage(item: Findable) -> NSData? {
         
         if let matchedSong = findSong(item) {
-            print("sound wave image found for song")
+           // print("sound wave image found for song")
             return matchedSong.soundwaveImage
         }
         

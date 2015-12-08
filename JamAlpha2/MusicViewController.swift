@@ -419,7 +419,7 @@ extension MusicViewController {
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                 guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
-                    print("sound url not available")
+                    print("\(nowPlayingItem.title!) does not have a sound url")
                     
                     self.incrementSongCountInThread()
                     return

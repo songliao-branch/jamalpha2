@@ -28,6 +28,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         
     }
 
+    //called after sign in or sign up
     func refreshUserImage() {
         guard let currentUser = CoreDataManager.getCurrentUser() else {
             return

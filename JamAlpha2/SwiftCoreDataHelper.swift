@@ -79,6 +79,4 @@ class SwiftCoreDataHelper: NSObject {
         
         return items
     }
-    
-    
 }
