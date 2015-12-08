@@ -17,15 +17,13 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     var isPullingTabs = true //variable called when this viewcontroller is instantiated, a negative value means we are downloading lyrics
     
     @IBOutlet weak var resultsTableView: UITableView!
-    
-//    var downloadedLyricsSets = [DownloadedLyricsSet]()
-    
+
     var allTabsSets = [Int: [DownloadedTabsSet]]()//with a key 0 is local, key 1 is downloaded ones
     var allLyricsSets = [Int: [DownloadedLyricsSet]]()
     
     var lastSelectedSetId = 0
     
-    var mediaItem: MPMediaItem!
+    var findable: Findable!
     var songId = -1
     
     var centerButton: UIButton!//to display "Add your own tabs or lyrics if none is found"
@@ -48,9 +46,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         allLyricsSets[1] = []
         
         if isPullingTabs {
-            ( _, _, _, lastSelectedSetId) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: false)
+            ( _, _, _, lastSelectedSetId) = CoreDataManager.getTabs(findable, fetchingLocalOnly: false)
         } else {
-            (_, lastSelectedSetId) = CoreDataManager.getLyrics(mediaItem, fetchingLocalOnly: false)
+            (_, lastSelectedSetId) = CoreDataManager.getLyrics(findable, fetchingLocalOnly: false)
         }
 
         loadLocalData()
@@ -67,7 +65,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             var tuning = ""
             var capo = -1
             
-            (chords, tuning, capo, _) = CoreDataManager.getTabs(mediaItem, fetchingLocalOnly: true)
+            (chords, tuning, capo, _) = CoreDataManager.getTabs(findable, fetchingLocalOnly: true)
      
             var preview = ""
             
@@ -92,7 +90,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             
             var lyric = Lyric()
             
-            (lyric, _) = CoreDataManager.getLyrics(mediaItem, fetchingLocalOnly: true)
+            (lyric, _) = CoreDataManager.getLyrics(findable, fetchingLocalOnly: true)
             
             var preview = ""
             for i in 0..<lyric.lyric.count {
@@ -115,7 +113,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     func fetchData() {
         if isPullingTabs {
            
-            APIManager.downloadTabs(mediaItem, completion: {
+            APIManager.downloadTabs(findable, completion: {
                 downloads in
                 
                 for download in downloads {
@@ -132,7 +130,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 }
             })
         } else {
-            APIManager.downloadLyrics(mediaItem, completion: {
+            APIManager.downloadLyrics(findable, completion: {
                 downloads in
                 for download in downloads {
                     self.allLyricsSets[1]?.append(download)
@@ -179,12 +177,12 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         let artistNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 10)))
         artistNameLabel.textAlignment = NSTextAlignment.Center
         
-        let title:String = mediaItem.title!
+        let title:String = findable.getTitle()
         let attributedString = NSMutableAttributedString(string:title)
         songNameLabel.attributedText = attributedString
         songNameLabel.textAlignment = NSTextAlignment.Center
         
-        artistNameLabel.text = mediaItem.artist!
+        artistNameLabel.text = findable.getArtist()
         
         
         songNameLabel.font = UIFont.systemFontOfSize(18)
@@ -407,9 +405,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             
             if indexPath.section == 0 {
 
-                CoreDataManager.setLocalTabsMostRecent(self.mediaItem)
-                self.songViewController.updateMusicData(self.mediaItem)
-                 self.dismissViewControllerAnimated(true, completion: nil)
+                CoreDataManager.setLocalTabsMostRecent(self.findable)
+                self.songViewController.updateMusicData(self.findable)
+                self.dismissViewControllerAnimated(true, completion: nil)
             } else {
                 APIManager.downloadTabsSetContent(tabsSet, completion: {
                     download in
@@ -419,18 +417,20 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                         times.append(NSTimeInterval(t))
                     }
                     
-                    CoreDataManager.saveTabs(self.mediaItem, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
+                    CoreDataManager.saveTabs(self.findable, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
                     
-                    self.songViewController.updateMusicData(self.mediaItem)
+                    self.songViewController.updateMusicData(self.findable)
+                    
                     self.dismissViewControllerAnimated(true, completion: nil)
+                   
                 })
             }
         } else {
             
             if indexPath.section == 0 {
                 
-                CoreDataManager.setLocalLyricsMostRecent(self.mediaItem)
-                self.songViewController.updateMusicData(self.mediaItem)
+                CoreDataManager.setLocalLyricsMostRecent(self.findable)
+                self.songViewController.updateMusicData(self.findable)
                 self.dismissViewControllerAnimated(true, completion: nil)
                 
             } else {
@@ -440,9 +440,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 APIManager.downloadLyricsSetContent(lyricsSet, completion: {
                     download in
                     
-                    CoreDataManager.saveLyrics(self.mediaItem, lyrics: download.lyrics, times: download.times, lyricsSetId: download.id)
+                    CoreDataManager.saveLyrics(self.findable, lyrics: download.lyrics, times: download.times, lyricsSetId: download.id)
                     
-                    (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.mediaItem, fetchingLocalOnly: false)
+                    (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.findable, fetchingLocalOnly: false)
                     self.dismissViewControllerAnimated(true, completion: nil)
                 })
             }
