@@ -423,7 +423,6 @@ class MeLoginOrSignupViewController: UIViewController{
                     let parameters = [
                         "attempt_login":"facebook",
                         "email": facebookEmail,
-                        "fbToken": fbToken,
                         "avatar_url_thumbnail": thumbnailUrl,
                         "avatar_url_medium": facebookAvatarUrl,
                         "password": (facebookEmail + facebookLoginSalt).md5() //IMPORTANT: DO NOT MODIFY THIS SALT
@@ -432,7 +431,7 @@ class MeLoginOrSignupViewController: UIViewController{
                     self.signUpLoginRequest(parameters, afterRetrievingUser: {
                         id, email, authToken in
                         
-                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, profileImage: profileImageData, thumbnail: thumbnailData)
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, profileImage: profileImageData, thumbnail: thumbnailData, fbToken: fbToken)
                     })
                 }
             })

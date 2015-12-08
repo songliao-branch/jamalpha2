@@ -94,7 +94,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     func contactUs() {
         let emailTitle = "[\(CoreDataManager.getCurrentUser()!.email)]'s feed back"
         let messageBody = ""
-        let toRecipents = ["userfeedback@twistjam.com"]
+        let toRecipents = ["jun@twistjam.com"]
         let mc: MFMailComposeViewController = MFMailComposeViewController()
         if MFMailComposeViewController.canSendMail() {
             mc.title = "Feed Back"
@@ -125,7 +125,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     
     func rateTwistjam() {
-        let url = "itms-apps://itunes.apple.com/app/id\(APP_STORE_ID)"
-        UIApplication.sharedApplication().openURL(NSURL(string: url)!)
+//        let url = "itms-apps://itunes.apple.com/app/id\(APP_STORE_ID)"
+//        UIApplication.sharedApplication().openURL(NSURL(string: url)!)
     }
 }

@@ -22,7 +22,7 @@ class SettingFBCell: UITableViewCell {
         likeControl.objectType = FBSDKLikeObjectType.Page
         likeControl.likeControlStyle = FBSDKLikeControlStyle.BoxCount
         likeControl.objectID = FACEBOOK_PAGE_URL
-        likeControl.frame = CGRectMake(width - 15 - 110, 5, 88, 33)
+        likeControl.frame = CGRectMake(width - 15 - 110, 7, 88, 33)
         self.contentView.addSubview(likeControl)
     }
 }
