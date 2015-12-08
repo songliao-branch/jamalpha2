@@ -2288,7 +2288,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func recoverToNormalSongVC(){
         //delete
-        self.displayLink.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+        self.displayLink.paused = true
         self.displayLink.invalidate()
         self.displayLink = nil
         self.previewView = nil
