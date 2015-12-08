@@ -2077,7 +2077,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         if(!isPanning){
-            startTime.addTime(Int(100 / stepPerSecond))
+            if let time:NSTimeInterval = self.player.currentPlaybackTime {
+                 startTime.setTime(Float(time))
+            }else{
+                startTime.addTime(Int(100 / stepPerSecond))
+                print("player cannot find currentPlaybackTime")
+            }
         }
         refreshChordLabel()
         refreshLyrics()
