@@ -497,6 +497,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     private func canFindTabsFromCoreData(song: Findable) -> Bool {
+        self.chords = [Chord]()
+        
         var chords = [Chord]()
         var tuning = ""
         var capo = 0
@@ -510,8 +512,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         return false
     }
     
+    private func canFindLyricsFromCoreData(song: Findable) -> Bool {
+        self.lyric = Lyric()
+        self.topLyricLabel.text = ""
+        self.bottomLyricLabel.text = ""
+        
+        var lyric = Lyric()
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: false)
+        
+        if lyric.lyric.count > 1 {
+            self.lyric = lyric
+            
+            return true
+        }
+        return false
+    }
+    
     func updateMusicData(song: Findable) {
-        self.chords = [Chord]()
+     
         //if nothing in core data, we look up the cloud
         if !canFindTabsFromCoreData(song) {
             APIManager.downloadMostLikedTabs(song, completion: {
@@ -532,16 +550,25 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             })
         }
-
-        var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: false)
-   
-        if lyric.lyric.count > 1 {
-            self.lyric = lyric
-        } else {
-            self.lyric = Lyric()
-            self.topLyricLabel.text = ""
-            self.bottomLyricLabel.text = ""
+        
+        if !canFindLyricsFromCoreData(song) {
+            APIManager.downloadMostLikedLyrics(song, completion: {
+                download in
+                
+                var times = [Float]()
+                for t in download.times {
+                    times.append(Float(t))
+                }
+                CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times)
+                
+                if self.canFindLyricsFromCoreData(song) {
+                    if !self.isSongNeedPurchase {
+                        self.updateAll(Float(self.player.currentPlaybackTime))
+                    }else{
+                        self.updateAll(0)
+                    }
+                }
+            })
         }
     }
     

@@ -242,7 +242,6 @@ class APIManager: NSObject {
                 print(error)
             }
         }
-        
     }
     
     //download all lyrics related to one song
@@ -310,6 +309,47 @@ class APIManager: NSObject {
             }
         }
     }
+    
+    class func downloadMostLikedLyrics(findable: Findable, completion: (( downloadWithContent: DownloadedLyricsSet) -> Void)) {
+        
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_most_liked_lyrics_set", parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    print(json)
+                    if let _ = json["error"].string {
+                        print("no most liked lyrics yet")
+                        return
+                    }
+                    let set = json["lyrics_set_content"]
+                    
+                    
+                    var theTimes = [Float]()
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
+                    
+                    let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    
+                    l.lyrics = set["lyrics"].arrayObject as! [String]
+                    l.times = theTimes
+                    //after completed, pass everything to the callback
+                    completion(downloadWithContent: l)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     
     //upvote or downvote either tabsSet or lyricsSet
     class func updateVotes(isUp: Bool, isTabs: Bool, setId: Int, completion: (( voteStatus: String, voteScore: Int) -> Void)){
