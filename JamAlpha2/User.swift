@@ -19,6 +19,7 @@ class User: NSManagedObject {
     @NSManaged var authToken: String
     @NSManaged var profileImage: NSData?
     @NSManaged var thumbnail: NSData?
+    @NSManaged var fbToken: String? //facebook access token
     
     @NSManaged var tabsSets: NSSet
     @NSManaged var lyricsSets: NSSet

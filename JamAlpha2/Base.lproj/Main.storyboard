@@ -916,10 +916,32 @@
                             <constraint firstItem="FW1-8X-V9S" firstAttribute="top" secondItem="yMw-by-F8B" secondAttribute="top" id="zGo-Od-fj5"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="FW1-8X-V9S" id="D2T-RH-A9g"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="414-h9-DKJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-222" y="1574"/>
+        </scene>
+        <!--About View Controller-->
+        <scene sceneID="2Yn-53-e8w">
+            <objects>
+                <viewController storyboardIdentifier="aboutVC" id="Ovr-vp-avV" customClass="AboutViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="5cP-Zz-2TK"/>
+                        <viewControllerLayoutGuide type="bottom" id="IJP-TE-8Lk"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Vrh-MK-S6i">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="t1S-BY-Oto" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-215" y="2248"/>
         </scene>
         <!--User Profile Edit View Controller-->
         <scene sceneID="z4t-qA-bgp">

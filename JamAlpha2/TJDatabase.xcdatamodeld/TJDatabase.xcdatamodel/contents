@@ -45,6 +45,7 @@
         <attribute name="authToken" attributeType="String" syncable="YES"/>
         <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="email" attributeType="String" syncable="YES"/>
+        <attribute name="fbToken" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="nickname" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="profileImage" optional="YES" attributeType="Binary" syncable="YES"/>
@@ -59,6 +60,6 @@
         <element name="Song" positionX="-54" positionY="27" width="128" height="180"/>
         <element name="Tabs" positionX="-36" positionY="90" width="128" height="105"/>
         <element name="TabsSet" positionX="-45" positionY="72" width="128" height="150"/>
-        <element name="User" positionX="-45" positionY="99" width="128" height="195"/>
+        <element name="User" positionX="-45" positionY="99" width="128" height="210"/>
     </elements>
 </model>

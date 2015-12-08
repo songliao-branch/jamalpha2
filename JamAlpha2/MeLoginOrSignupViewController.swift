@@ -16,7 +16,7 @@ import RSKImageCropper
 import AWSS3
 import AWSCore
 
-class MeLoginOrSignupViewController: UIViewController {
+class MeLoginOrSignupViewController: UIViewController{
     
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
@@ -390,13 +390,13 @@ class MeLoginOrSignupViewController: UIViewController {
     }
     
     func getFBUserData(){
-        if((FBSDKAccessToken.currentAccessToken()) != nil){
+        if let fbToken = FBSDKAccessToken.currentAccessToken().tokenString
+        {
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
                 (connection, result, error) -> Void in
                 if error == nil {
                 
                     print(result)
-                    
                     let facebookEmail = result.valueForKey("email") as! String
                     let facebookName  = result.valueForKey("name") as! String
                     
@@ -430,7 +430,7 @@ class MeLoginOrSignupViewController: UIViewController {
                     self.signUpLoginRequest(parameters, afterRetrievingUser: {
                         id, email, authToken in
                         
-                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, profileImage: profileImageData, thumbnail: thumbnailData)
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, profileImage: profileImageData, thumbnail: thumbnailData, fbToken: fbToken)
                     })
                 }
             })
