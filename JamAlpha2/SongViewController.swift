@@ -496,7 +496,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    func updateMusicData(song: Findable) {
+    private func canFindTabsFromCoreData(song: Findable) -> Bool {
         var chords = [Chord]()
         var tuning = ""
         var capo = 0
@@ -505,10 +505,34 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.chords = chords
             updateTuning(tuning)
             updateCapo(capo)
-        } else {
-            self.chords = [Chord]()
+            return true
         }
-        
+        return false
+    }
+    
+    func updateMusicData(song: Findable) {
+        self.chords = [Chord]()
+        //if nothing in core data, we look up the cloud
+        if !canFindTabsFromCoreData(song) {
+            APIManager.downloadMostLikedTabs(song, completion: {
+                download in
+                
+                var times = [NSTimeInterval]()
+                for t in download.times {
+                    times.append(NSTimeInterval(t))
+                }
+                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
+                
+                if self.canFindTabsFromCoreData(song) {
+                    if !self.isSongNeedPurchase {
+                        self.updateAll(Float(self.player.currentPlaybackTime))
+                    }else{
+                        self.updateAll(0)
+                    }
+                }
+            })
+        }
+
         var lyric = Lyric()
         (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: false)
    
@@ -837,6 +861,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
     }
     
+    
     // to generate sound wave in a nsoperation thread
     func generateSoundWave(nowPlayingItem:MPMediaItem){
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
@@ -869,7 +894,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 KGLOBAL_init_queue.suspended = false
                             }
                         })
-
+                        
                     }
                 })
                 KGLOBAL_operationCache[assetURL as! NSURL] = op

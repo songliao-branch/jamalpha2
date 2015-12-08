@@ -221,6 +221,50 @@ class APIManager: NSObject {
         }
     }
     
+    class func downloadMostLikedTabs(findable: Findable, completion: (( downloadWithContent: DownloadedTabsSet) -> Void)) {
+        
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_most_liked_tabs_set", parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    print(json)
+                    if let _ = json["error"].string {
+                        print("no most liked tabs yet")
+                        return
+                    }
+                    let set = json["tabs_set_content"]
+                    
+           
+                    
+                    var theTimes = [Float]()
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
+                    
+                    let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    
+                    t.times = theTimes
+                    t.chords  = set["chords"].arrayObject as! [String]
+                    t.tabs  = set["tabs"].arrayObject as! [String]
+                    
+                    //after completed, pass everything to the callback
+                    completion(downloadWithContent: t)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+        
+    }
+    
     //download all lyrics related to one song
     class func downloadLyrics(findable: Findable, completion: ( (downloads: [DownloadedLyricsSet])-> Void ) ) {
         var allDownloads = [DownloadedLyricsSet]()
