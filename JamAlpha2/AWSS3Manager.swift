@@ -81,7 +81,6 @@ class AWSS3Manager: NSObject {
     }
     
     
-
     func downloadImage(url: String, completion: ((image: UIImage) -> Void)) {
         
         if url == "" {
@@ -93,8 +92,26 @@ class AWSS3Manager: NSObject {
         request.bucket = S3BucketName
         request.key = url
         
-        //TODO: retrieve cached images
-        let l =  NSTemporaryDirectory().stringByAppendingString("download.png")
+        var cachedFiles = [String]()
+        //get cached files
+        do {
+            cachedFiles = try NSFileManager.defaultManager().contentsOfDirectoryAtPath(NSTemporaryDirectory())
+            
+        } catch _ {
+            print("cannot open temporary directory")
+        }
+        
+        for file in cachedFiles {
+            if file == "\(url)" {
+                let path = NSTemporaryDirectory().stringByAppendingString("\(file)")
+                if let data = NSData(contentsOfURL: NSURL(fileURLWithPath: path)) {
+                    completion(image: UIImage(data: data)!)
+                }
+                return
+            }
+        }
+        
+        let l =  NSTemporaryDirectory().stringByAppendingString("\(url)")
         let downloadingFileUrl = NSURL(fileURLWithPath: l)
         request.downloadingFileURL = downloadingFileUrl
         

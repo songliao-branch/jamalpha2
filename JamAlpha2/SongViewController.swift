@@ -356,7 +356,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
         self.view.addSubview(capoButton)
         
-        let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.35 ))
+        let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.5 ))
         topViewSeparator.backgroundColor = UIColor.baseColor()
         self.view.addSubview(topViewSeparator)
     }

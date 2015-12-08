@@ -180,7 +180,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="speaker" translatesAutoresizingMaskIntoConstraints="NO" id="l6i-W8-1hA">
-                                                    <rect key="frame" x="280" y="22.5" width="25" height="25"/>
+                                                    <rect key="frame" x="280" y="22" width="25" height="25"/>
                                                     <animations/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="25" id="D5H-D7-pwL"/>
@@ -210,6 +210,7 @@
                                             <outlet property="loudspeakerImage" destination="l6i-W8-1hA" id="OQk-NN-Cs4"/>
                                             <outlet property="mainTitle" destination="Z1R-2h-uq0" id="fUl-nS-b5p"/>
                                             <outlet property="subtitle" destination="VXR-6p-k1c" id="u8b-dt-Bmz"/>
+                                            <outlet property="titleTrailingConstraint" destination="2iL-x0-5YK" id="EtG-om-Qjn"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -479,13 +480,6 @@
                                                     <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This song is" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kNe-qL-QWU">
-                                                    <rect key="frame" x="45" y="11" width="260" height="21"/>
-                                                    <animations/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="speaker" translatesAutoresizingMaskIntoConstraints="NO" id="nYo-w0-5cJ">
                                                     <rect key="frame" x="280" y="9.5" width="25" height="25"/>
                                                     <animations/>
@@ -494,6 +488,13 @@
                                                         <constraint firstAttribute="height" constant="25" id="wPq-4W-pFR"/>
                                                     </constraints>
                                                 </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This song is" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kNe-qL-QWU">
+                                                    <rect key="frame" x="45" y="11" width="260" height="21"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <animations/>
                                             <constraints>
@@ -512,6 +513,7 @@
                                         <connections>
                                             <outlet property="loudspeakerImage" destination="nYo-w0-5cJ" id="A8J-yu-BeZ"/>
                                             <outlet property="titleLabel" destination="kNe-qL-QWU" id="nlJ-hJ-vx0"/>
+                                            <outlet property="titleTrailingConstant" destination="jVI-ul-dnO" id="A1n-x6-MJA"/>
                                             <outlet property="trackNumberLabel" destination="agB-RW-TiU" id="3h3-az-AEK"/>
                                         </connections>
                                     </tableViewCell>
@@ -656,6 +658,7 @@
                                         <connections>
                                             <outlet property="loudspeakerImage" destination="Thk-el-uwo" id="jJU-0c-eoP"/>
                                             <outlet property="titleLabel" destination="VhA-Y7-0ob" id="EdG-eA-tPj"/>
+                                            <outlet property="titleTrailingConstant" destination="8dQ-yG-UCM" id="SAU-xV-neg"/>
                                             <outlet property="trackNumberLabel" destination="bJa-Jg-5VE" id="fTh-3d-G3O"/>
                                         </connections>
                                     </tableViewCell>
