@@ -559,7 +559,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 for t in download.times {
                     times.append(Float(t))
                 }
-                CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times)
+                CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, lyricsSetId: download.id)
                 
                 if self.canFindLyricsFromCoreData(song) {
                     if !self.isSongNeedPurchase {
