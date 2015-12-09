@@ -2073,10 +2073,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func update(){
-        if(KGLOBAL_progressBlock == nil){
+        if KGLOBAL_progressBlock == nil {
             return
         }
-        if(!isPanning){
+        
+        if !isPanning && !isSongNeedPurchase {
             if let time:NSTimeInterval = self.player.currentPlaybackTime {
                  startTime.setTime(Float(time))
             }else{

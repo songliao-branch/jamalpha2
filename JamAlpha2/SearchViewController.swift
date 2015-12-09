@@ -345,7 +345,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func filterLocalSongs(searchText: String) {
-
         self.filteredSongs = uniqueSongs.filter({
             (song: MPMediaItem) -> Bool in
             return song.title!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil

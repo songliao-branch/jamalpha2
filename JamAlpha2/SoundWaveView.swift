@@ -419,7 +419,7 @@ extension SoundWaveView{
     }
     
     func endBackgroundTask() {
-        NSLog("Background task ended.")
+        //NSLog("Background task ended.")
         UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
         backgroundTask = UIBackgroundTaskInvalid
     }
