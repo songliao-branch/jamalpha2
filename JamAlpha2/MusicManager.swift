@@ -63,7 +63,7 @@ class MusicManager: NSObject {
     func reloadCollections(){
         let tempCount = uniqueSongs.count
         loadLocalSongs()
-        if(tempCount != uniqueSongs.count){
+        if tempCount != uniqueSongs.count {
             kShouldReloadMusicTable = true
             loadLocalAlbums()
             loadLocalArtist()
