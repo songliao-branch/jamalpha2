@@ -180,6 +180,7 @@ extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavi
         }
         refreshAlert.addAction(UIAlertAction(title: "Photo Library", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
             photoPicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+            photoPicker.navigationBar.tintColor = UIColor.mainPinkColor()
             self.presentViewController(photoPicker, animated: true, completion: nil)
         }))
         refreshAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
