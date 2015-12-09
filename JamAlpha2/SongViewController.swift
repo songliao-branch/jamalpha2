@@ -2334,6 +2334,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(songNeedPurchase.trackName!, artist: songNeedPurchase.artistName!, duration: songNeedPurchase.trackTimeMillis!)){
                 MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
                 MusicManager.sharedInstance.setIndexInTheQueue(0)
+
             self.recoverToNormalSongVC()
             
         }else{

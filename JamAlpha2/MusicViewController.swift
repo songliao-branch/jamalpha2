@@ -29,14 +29,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
         
-        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
-        uniqueArtists = MusicManager.sharedInstance.uniqueArtists
-        uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
-        
-        songsByFirstAlphabet = sort(uniqueSongs)
-        artistsByFirstAlphabet = sort(uniqueArtists)
-        albumsByFirstAlphabet = sort(uniqueAlbums)
-        
+        loadAndSortMusic()
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
         UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
@@ -46,6 +39,16 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
             KEY_isSoundWaveformGeneratingInBackground = true
         }
+    }
+    
+    func loadAndSortMusic() {
+        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+        uniqueArtists = MusicManager.sharedInstance.uniqueArtists
+        uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
+        
+        songsByFirstAlphabet = sort(uniqueSongs)
+        artistsByFirstAlphabet = sort(uniqueArtists)
+        albumsByFirstAlphabet = sort(uniqueAlbums)
     }
     
     deinit{
@@ -60,6 +63,15 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         objc_sync_enter(lock)
         closure()
         objc_sync_exit(lock)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        if kShouldReloadMusicTable { //this is only called after new song is added
+            loadAndSortMusic()
+            musicTable.reloadData()
+            kShouldReloadMusicTable = false
+        }
     }
     
     func currentSongChanged(notification: NSNotification){
