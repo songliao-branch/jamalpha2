@@ -12,6 +12,8 @@ import UIKit
 class ImageZoomAnimation: NSObject, UIViewControllerAnimatedTransitioning {
     var referenceImageView: UIImageView!
     var navigationBarHeight:CGFloat = 0
+    var screenshot:UIImage!
+    var screenshotFrame:CGRect!
     
     init(referenceImageView:UIImageView){
         assert(referenceImageView.contentMode == UIViewContentMode.ScaleAspectFill, "*** referenceImageView must have a UIViewContentModeScaleAspectFill contentMode!")
@@ -51,17 +53,23 @@ class ImageZoomAnimation: NSObject, UIViewControllerAnimatedTransitioning {
         
         //perform the transition using a spring motion effect
         let duration:NSTimeInterval = self.transitionDuration(transitionContext)
+        let tempVC = (((fromViewController as! TabBarController).viewControllers![2] as! UINavigationController).viewControllers[1] as! UserProfileEditViewController)
+        tempVC.userProfile.hidden = true
         
-        UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: .CurveLinear, animations: {
-                fromViewController.view.alpha = 0
-                transitionView.frame = transitionViewFinalFrame
-                transitionView.center = fromViewController.view.center
-            }, completion: { finished in
-                fromViewController.view.alpha = 1
+        UIView.animateWithDuration(duration, animations: {
+            fromViewController.view.alpha = 0.01
+            }, completion: {
+                finished in
                 transitionView.removeFromSuperview()
+                fromViewController.view.alpha = 1
                 transitionContext.containerView()!.addSubview(toViewController.view)
                 transitionContext.completeTransition(true)
         })
+        
+        UIView.animateWithDuration(duration, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: .CurveEaseOut, animations: {
+                transitionView.frame = transitionViewFinalFrame
+                transitionView.center = fromViewController.view.center
+            }, completion: nil)
     }
     
     func animateZoomOutTransition(transitionContext: UIViewControllerContextTransitioning){
@@ -101,17 +109,27 @@ class ImageZoomAnimation: NSObject, UIViewControllerAnimatedTransitioning {
         
         let duration:NSTimeInterval = self.transitionDuration(transitionContext)
         fromViewController.imageView.removeFromSuperview()
+        let tempImageView = UIImageView(frame: fromViewController.view.bounds)
+        tempImageView.image = self.screenshot
+        tempImageView.frame = self.screenshotFrame
+        fromViewController.view.addSubview(tempImageView)
+        tempImageView.alpha = 0
         
-        UIView.animateWithDuration(duration, delay: 0, options: .CurveEaseOut, animations: {
-                toViewController.view.alpha = 1
-                transitionView.frame = transitionViewFinalFrame
-                //transitionView.center = self.referenceImageView.center
+        UIView.animateWithDuration(duration, delay: 0, options: .CurveEaseInOut, animations: {
+            tempImageView.alpha = 1
             }, completion: {
-                finish in
+                finished in
                 transitionView.removeFromSuperview()
                 transitionContext.completeTransition(true)
         })
+        
+        UIView.animateWithDuration(duration, delay: 0, options: .CurveEaseInOut, animations: {
+                toViewController.view.alpha = 1
+                transitionView.frame = transitionViewFinalFrame
+                //transitionView.center = self.referenceImageView.center
+            }, completion: nil)
     }
+    
 }
 
 

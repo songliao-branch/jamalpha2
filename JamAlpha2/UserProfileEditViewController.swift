@@ -61,6 +61,7 @@ class UserProfileEditViewController: UIViewController {
                 sender.view?.layer.cornerRadius = 0
                 }, completion: {
                     finished in
+                    sender.view!.hidden = true
                     let photoDetailVC = self.storyboard?.instantiateViewControllerWithIdentifier("photoviewerVC") as! PhotoViewerViewController
                     let tempImage = self.userProfile.image
                     self.userProfile.image = originImage
@@ -70,6 +71,7 @@ class UserProfileEditViewController: UIViewController {
                         finished in
                         self.userProfile.image = tempImage
                         sender.view?.layer.cornerRadius = tempCornerRadius!
+                        sender.view!.hidden = false
                     })
   
             })
@@ -256,8 +258,17 @@ extension UserProfileEditViewController: UIViewControllerTransitioningDelegate{
     
     func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         if(dismissed.isKindOfClass(PhotoViewerViewController)){
+            self.userProfile.hidden = true
+            UIGraphicsBeginImageContext(self.tabBarController!.view.bounds.size)
+            self.tabBarController!.view.layer.renderInContext(UIGraphicsGetCurrentContext()!)
+            let screenShot = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            self.userProfile.hidden = false
+
             let temp = ImageZoomAnimation(referenceImageView: self.userProfile)
             temp.navigationBarHeight = self.navigationController!.navigationBar.height
+            temp.screenshot = screenShot
+            temp.screenshotFrame = self.tabBarController!.view.frame
             return temp
         }
         return nil

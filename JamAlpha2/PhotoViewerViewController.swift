@@ -19,6 +19,7 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
     var photo:UIImage?
     var photoURL:String!
     
+    
     var panRecognizer:UIPanGestureRecognizer!
     var singleTapRecognizer: UITapGestureRecognizer!
     
@@ -293,6 +294,15 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
     
     func hideStatusView() {
         statusView.hidden = true
+    }
+    
+    // MARK: Fix to portrait orientation
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
+    
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
 }
 
