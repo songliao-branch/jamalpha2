@@ -41,6 +41,12 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
         setUpStatusView()
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        scrollView.addGestureRecognizer(singleTapRecognizer)
+        
+    }
+    
     func setupView() {
         // Visual feedback to the user, so they know we're busy loading an image
         
@@ -76,7 +82,6 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
         singleTapRecognizer.delegate = self
         singleTapRecognizer.numberOfTapsRequired = 1
         singleTapRecognizer.numberOfTouchesRequired = 1
-        scrollView.addGestureRecognizer(singleTapRecognizer)
         
         singleTapRecognizer.requireGestureRecognizerToFail(doubleTapRecognizer)
         
