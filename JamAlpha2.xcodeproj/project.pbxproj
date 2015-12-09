@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1045413F1BCAFBB300A4590B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1045413E1BCAFBB300A4590B /* TabBarController.swift */; };
+		10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */; };
+		10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */; };
 		10E930A01C15753400C1D0C9 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */; };
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
@@ -111,6 +113,8 @@
 
 /* Begin PBXFileReference section */
 		1045413E1BCAFBB300A4590B /* TabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageZoomAnimation.swift; sourceTree = "<group>"; };
+		10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewerViewController.swift; sourceTree = "<group>"; };
 		10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
 		1E225B71031C3EA2120F8192 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A63591A1C3B0728C38D7319 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -216,6 +220,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10CBDB3D1C17FDC800D160C3 /* Animation */ = {
+			isa = PBXGroup;
+			children = (
+				E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */,
+				10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */,
+			);
+			name = Animation;
+			sourceTree = "<group>";
+		};
 		377BBF0A419DDADF3605E109 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -323,7 +336,6 @@
 			children = (
 				E431BA9F1B91718C00E32A0B /* MainScreenViews */,
 				E4399C391B90049600906DBD /* SoundWave */,
-				E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */,
 				C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */,
 				C82A4E961B81B668008B6AFC /* VisualizerView.swift */,
 				E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */,
@@ -399,6 +411,7 @@
 				E4CBC0081B9E88D900473FC4 /* CoreData */,
 				E48AE2D01B955BA30044CFDB /* Networking */,
 				E4B6362F1B854A6A00F331A7 /* Utils */,
+				10CBDB3D1C17FDC800D160C3 /* Animation */,
 				E456457C1B3BB14200276287 /* CustomViews */,
 				E44358FC1B1947120091E926 /* Models */,
 				E45F6B231B156CD70018645D /* TableCells */,
@@ -510,6 +523,7 @@
 				E42032E71BFED9E300A5D36D /* UserProfileViewController.swift */,
 				BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */,
 				BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */,
+				10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */,
 			);
 			name = UserProfileViewController;
 			sourceTree = "<group>";
@@ -751,9 +765,11 @@
 				BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */,
 				BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
+				10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */,
 				E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */,
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
 				E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */,
+				10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */,
 				E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

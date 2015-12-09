@@ -25,6 +25,7 @@ class UserProfileEditViewController: UIViewController {
     var originFileName: String!
     var croppedFileName: String!
     var originImageData: NSData!
+    var userProfile:UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +56,23 @@ class UserProfileEditViewController: UIViewController {
           print("tap on image")
         if let originImageData: NSData = CoreDataManager.getCurrentUser()?.profileImage {
             let originImage: UIImage = UIImage(data: originImageData)!
+            let tempCornerRadius = sender.view?.layer.cornerRadius
+            UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseOut, animations: {
+                sender.view?.layer.cornerRadius = 0
+                }, completion: {
+                    finished in
+                    let photoDetailVC = self.storyboard?.instantiateViewControllerWithIdentifier("photoviewerVC") as! PhotoViewerViewController
+                    let tempImage = self.userProfile.image
+                    self.userProfile.image = originImage
+                    photoDetailVC.photo = self.userProfile.image
+                    photoDetailVC.transitioningDelegate = self
+                    self.presentViewController(photoDetailVC, animated: true, completion: {
+                        finished in
+                        self.userProfile.image = tempImage
+                        sender.view?.layer.cornerRadius = tempCornerRadius!
+                    })
+  
+            })
             
         }
       
@@ -89,6 +107,8 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
                 self.userEmail = user.email
                 if let profileData = user.profileImage {
                     userProfileCell.userImageView.image = UIImage(data: profileData)
+                    self.userProfile = userProfileCell.userImageView
+                    self.userProfile.contentMode = UIViewContentMode.ScaleAspectFill
                     userProfileCell.userImageView.userInteractionEnabled = true
                     let tapOnUserImageView: UITapGestureRecognizer = UITapGestureRecognizer()
                     tapOnUserImageView.addTarget(self, action: "tapOnUserImageView:")
@@ -224,6 +244,24 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
         self.navigationController?.popViewControllerAnimated(true)
     }
     
+}
+
+extension UserProfileEditViewController: UIViewControllerTransitioningDelegate{
+    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if(presented.isKindOfClass(PhotoViewerViewController)){
+            return ImageZoomAnimation(referenceImageView: self.userProfile)
+        }
+        return nil
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if(dismissed.isKindOfClass(PhotoViewerViewController)){
+            let temp = ImageZoomAnimation(referenceImageView: self.userProfile)
+            temp.navigationBarHeight = self.navigationController!.navigationBar.height
+            return temp
+        }
+        return nil
+    }
 }
 
 
