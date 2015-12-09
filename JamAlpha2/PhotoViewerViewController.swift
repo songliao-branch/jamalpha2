@@ -20,6 +20,7 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
     var photoURL:String!
     
     var panRecognizer:UIPanGestureRecognizer!
+    var singleTapRecognizer: UITapGestureRecognizer!
     
     var statusView: UIView!
     var successImage: UIImageView!
@@ -71,7 +72,7 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
         doubleTapRecognizer.numberOfTouchesRequired = 1
         scrollView.addGestureRecognizer(doubleTapRecognizer)
         
-        let singleTapRecognizer = UITapGestureRecognizer(target: self, action: "handleSingTap:")
+        singleTapRecognizer = UITapGestureRecognizer(target: self, action: "handleSingTap:")
         singleTapRecognizer.delegate = self
         singleTapRecognizer.numberOfTapsRequired = 1
         singleTapRecognizer.numberOfTouchesRequired = 1
@@ -170,8 +171,11 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
     func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
         if(self.scrollView.zoomScale > self.scrollView.minimumZoomScale){
             self.view.removeGestureRecognizer(self.panRecognizer)
+            scrollView.removeGestureRecognizer(self.singleTapRecognizer)
+            
         }else if(self.scrollView.zoomScale == self.scrollView.minimumZoomScale){
             self.view.addGestureRecognizer(self.panRecognizer)
+            scrollView.addGestureRecognizer(self.singleTapRecognizer)
         }
     }
     
