@@ -91,7 +91,7 @@ class ImageZoomAnimation: NSObject, UIViewControllerAnimatedTransitioning {
         
         // Compute the final frame for the temporary view based on the reference
         // image view
-        var transitionViewFinalFrame:CGRect = CGRectMake(self.referenceImageView.frame.origin.x, self.referenceImageView.frame.origin.y + 40 + UIApplication.sharedApplication().statusBarFrame.height + self.navigationBarHeight, self.referenceImageView.frame.size.width, self.referenceImageView.frame.size.height)
+        var transitionViewFinalFrame:CGRect = CGRectMake(self.referenceImageView.frame.origin.x, self.referenceImageView.frame.origin.y + 35 + UIApplication.sharedApplication().statusBarFrame.height + self.navigationBarHeight, self.referenceImageView.frame.size.width, self.referenceImageView.frame.size.height)
         
         
         

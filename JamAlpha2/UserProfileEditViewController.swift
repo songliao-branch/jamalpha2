@@ -137,9 +137,9 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 {
-            return 40
+            return 35
         }
-        return 22
+        return 20
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
