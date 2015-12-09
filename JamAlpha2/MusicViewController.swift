@@ -29,14 +29,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
         
-        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
-        uniqueArtists = MusicManager.sharedInstance.uniqueArtists
-        uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
-        
-        songsByFirstAlphabet = sort(uniqueSongs)
-        artistsByFirstAlphabet = sort(uniqueArtists)
-        albumsByFirstAlphabet = sort(uniqueAlbums)
-        
+        loadAndSortMusic()
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
         UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
@@ -46,6 +39,16 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
             KEY_isSoundWaveformGeneratingInBackground = true
         }
+    }
+    
+    func loadAndSortMusic() {
+        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+        uniqueArtists = MusicManager.sharedInstance.uniqueArtists
+        uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
+        
+        songsByFirstAlphabet = sort(uniqueSongs)
+        artistsByFirstAlphabet = sort(uniqueArtists)
+        albumsByFirstAlphabet = sort(uniqueAlbums)
     }
     
     deinit{
@@ -60,6 +63,15 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         objc_sync_enter(lock)
         closure()
         objc_sync_exit(lock)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        if kShouldReloadMusicTable { //this is only called after new song is added
+            loadAndSortMusic()
+            musicTable.reloadData()
+            kShouldReloadMusicTable = false
+        }
     }
     
     func currentSongChanged(notification: NSNotification){
@@ -419,12 +431,12 @@ extension MusicViewController {
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                 guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
-                    print("sound url not available")
+                    print("\(nowPlayingItem.title!) does not have a sound url")
                     
                     self.incrementSongCountInThread()
                     return
                 }
-            
+                
                 var op:NSBlockOperation?
                 op = KGLOBAL_init_operationCache[assetURL as! NSURL]
                 if(op == nil){
@@ -433,7 +445,7 @@ extension MusicViewController {
                     var progressBarWidth:CGFloat!
                     progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
                     let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
-
+                    
                     op = NSBlockOperation(block: {
                         
                         if(op!.cancelled){
@@ -441,11 +453,16 @@ extension MusicViewController {
                         }
                         tempProgressBlock.SetSoundURL(assetURL as! NSURL, isForTabsEditor: false)
                         KGLOBAL_init_operationCache.removeValueForKey(assetURL as! NSURL)
-                        self.incrementSongCountInThread()
-                        tempProgressBlock.generateWaveforms()
-                        let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                        CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                        print("Soundwave generated for \(nowPlayingItem.title!) in background")
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            NSOperationQueue.mainQueue().addOperationWithBlock({
+                                tempProgressBlock.generateWaveforms()
+                                let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                                CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
+                                print("Soundwave generated for \(nowPlayingItem.title!) in background")
+                                self.incrementSongCountInThread()
+                            })
+                        }
                     })
                     KGLOBAL_init_operationCache[assetURL as! NSURL] = op
                     KGLOBAL_init_queue.addOperation(op!)

@@ -559,7 +559,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 for t in download.times {
                     times.append(Float(t))
                 }
-                CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times)
+                CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, lyricsSetId: download.id)
                 
                 if self.canFindLyricsFromCoreData(song) {
                     if !self.isSongNeedPurchase {
@@ -2073,11 +2073,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func update(){
-        if(KGLOBAL_progressBlock == nil){
+        if KGLOBAL_progressBlock == nil {
             return
         }
-        if(!isPanning){
-            startTime.addTime(Int(100 / stepPerSecond))
+        
+        if !isPanning && !isSongNeedPurchase {
+            if let time:NSTimeInterval = self.player.currentPlaybackTime {
+                 startTime.setTime(Float(time))
+            }else{
+                startTime.addTime(Int(100 / stepPerSecond))
+                print("player cannot find currentPlaybackTime")
+            }
         }
         refreshChordLabel()
         refreshLyrics()
@@ -2328,6 +2334,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(songNeedPurchase.trackName!, artist: songNeedPurchase.artistName!, duration: songNeedPurchase.trackTimeMillis!)){
                 MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
                 MusicManager.sharedInstance.setIndexInTheQueue(0)
+
             self.recoverToNormalSongVC()
             
         }else{

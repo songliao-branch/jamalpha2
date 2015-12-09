@@ -39,6 +39,7 @@ class SoundWaveView: UIView {
     let lineWidth:CGFloat = 2.5
     
     var isForTabsEditor = false
+    var backgroundTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
     override init(frame: CGRect)  {
         super.init(frame: frame)
@@ -90,6 +91,7 @@ class SoundWaveView: UIView {
     }
     
      func getSampleDateFromAudio(asset:AVAsset?, size:CGSize){
+        self.registerBackgroundTask()
         self.averageSampleBuffer = NSMutableArray()
         self.originalSampleBuffer = NSMutableArray()
         
@@ -218,6 +220,9 @@ class SoundWaveView: UIView {
                     }
                 }
             }
+        }
+        if backgroundTask != UIBackgroundTaskInvalid {
+                endBackgroundTask()
         }
     }
     
@@ -402,5 +407,22 @@ class SoundWaveView: UIView {
         return self.progressImageView.image!
     }
 
+}
+
+extension SoundWaveView{
+    func registerBackgroundTask() {
+        backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler {
+            [unowned self] in
+            self.endBackgroundTask()
+        }
+        assert(backgroundTask != UIBackgroundTaskInvalid)
+    }
+    
+    func endBackgroundTask() {
+        //NSLog("Background task ended.")
+        UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
+        backgroundTask = UIBackgroundTaskInvalid
+    }
+    
 }
 

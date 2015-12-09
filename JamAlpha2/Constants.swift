@@ -22,3 +22,6 @@ var KGLOBAL_timer:NSTimer!
 var KEY_isSoundWaveformGeneratingInBackground:Bool = false
 
 let facebookLoginSalt = "tJwIa021#1sm" //DO NOT MODIFITY THIS SALT, otherwise facebook user can get back their account created with facebook
+
+//reload music table after detecting new songs are added
+var kShouldReloadMusicTable = false

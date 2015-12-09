@@ -107,7 +107,7 @@ class CoreDataManager: NSObject {
     //the last two parameters can necessary for facebook logins
     // a normal call to this function only involves initializeUser(id,email,authToken)
     // a call with facebook involves all 5 parameters
-    class func initializeUser(id: Int, email: String, authToken: String, nickname: String, avatarUrl: String?=nil, thumbnailUrl: String?=nil, profileImage: NSData?=nil, thumbnail: NSData?=nil, fbToken: String?=nil) {
+    class func initializeUser(id: Int, email: String, authToken: String, nickname: String, avatarUrl: String, thumbnailUrl: String, fbToken: String?=nil) {
         logoutUser()//for testing clear all users
         
         let user: User = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(User), managedObjectConect: moc) as! User
@@ -116,46 +116,33 @@ class CoreDataManager: NSObject {
         user.authToken = authToken
         user.nickname = nickname
         
-        //these are needed when sign up when facebook
-        if let image = profileImage {
-            user.profileImage = image
-        }
-        if let thumb = thumbnail {
-            user.thumbnail = thumb
-        }
-        if let url = thumbnailUrl {
-            user.thumbnailUrl = url
-        }
-        if let url = avatarUrl {
-            user.avatarUrl = url
-        }
+        user.thumbnailUrl = thumbnailUrl
+        user.avatarUrl = avatarUrl
+        
         if let token = fbToken {
             user.fbToken = token
         }
+        
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
     
-    class func saveUserProfileImage(avatarUrl: String?, thumbnailUrl: String?, profileImage: NSData?, thumbnail: NSData?) -> Bool {
-        if CoreDataManager.getCurrentUser() == nil {
-            return false
+    class func saveUserProfileImage(avatarUrl: String?=nil, thumbnailUrl:String?=nil, profileImageData: NSData?=nil, thumbnailData: NSData?=nil){
+        let currentUser = CoreDataManager.getCurrentUser()!
+        
+        if let avatarUrl = avatarUrl {
+            currentUser.avatarUrl = avatarUrl
+        }
+        if let thumbnailUrl = thumbnailUrl {
+            currentUser.thumbnailUrl = thumbnailUrl
         }
         
-        let currentUser = CoreDataManager.getCurrentUser()!
-
-        if let avatar = avatarUrl {
-           currentUser.avatarUrl = avatar
+        if let profile = profileImageData {
+            currentUser.profileImage = profile
         }
-        if let thumbnail = thumbnailUrl {
-            currentUser.thumbnailUrl = thumbnail
-        }
-        if let imageData = profileImage {
-            currentUser.profileImage = imageData
-        }
-        if let thumbnailData = thumbnail {
-            currentUser.thumbnail = thumbnailData
+        if let thumbnail = thumbnailData {
+            currentUser.thumbnail = thumbnail
         }
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
-        return true
     }
     
     class func saveUserProfileNickname(nickname: String) -> Bool {
@@ -177,7 +164,6 @@ class CoreDataManager: NSObject {
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
         if results.count == 0 {
-            print("song doesn't exist")
             return nil
         } else {
             return results.lastObject! as? Song
@@ -212,7 +198,7 @@ class CoreDataManager: NSObject {
     class func getSongWaveFormData(item: Findable) -> NSMutableArray? {
         
         if let matchedSong = findSong(item) {
-            print("sound wave data found for song")
+         //   print("sound wave data found for song")
             return NSKeyedUnarchiver.unarchiveObjectWithData(matchedSong.soundwaveData as! NSData) as? NSMutableArray
         }
         return nil
@@ -221,7 +207,7 @@ class CoreDataManager: NSObject {
     class func getSongWaveFormImage(item: Findable) -> NSData? {
         
         if let matchedSong = findSong(item) {
-            print("sound wave image found for song")
+           // print("sound wave image found for song")
             return matchedSong.soundwaveImage
         }
         
