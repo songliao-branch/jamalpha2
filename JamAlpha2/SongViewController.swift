@@ -93,7 +93,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //var timer: NSTimer?
     var updateInterval: NSTimeInterval = 0 //used to calculate count down reduce
     var currentChordTime:Float = 0
-    var toChordTime:Float = 0
+   // var toChordTime:Float = 0
     
     var topPoints = [CGFloat]()
     var bottomPoints = [CGFloat]()
@@ -489,10 +489,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func previousPressed(button: UIButton){
+        stopTimer()
         player.skipToPreviousItem()
     }
     
     func nextPressed(button: UIButton){
+        stopTimer()
         player.skipToNextItem()
     }
     
@@ -1010,36 +1012,35 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         case UIGestureRecognizerState.Changed:
             var tempNowPlayingItemDuration:Float!
             if(!isSongNeedPurchase){
-                tempNowPlayingItemDuration = Float(player.nowPlayingItem!.playbackDuration)
+                tempNowPlayingItemDuration = Float(self.nowPlayingItemDuration)
             }else{
                 tempNowPlayingItemDuration = songNeedPurchase.getDuration()
             }
             
             let deltaTime = Float(translation.y)*(freefallTime/Float(chordBase.frame.size.height))
-            toChordTime = currentChordTime + deltaTime
+            toTime = currentChordTime + deltaTime
             
-            if toChordTime < 0 {
-                toChordTime = 0
-            } else if (toChordTime > tempNowPlayingItemDuration){
-                toChordTime = tempNowPlayingItemDuration
+            if toTime < 0 {
+                toTime = 0
+            } else if (toTime > tempNowPlayingItemDuration){
+                toTime = tempNowPlayingItemDuration
             }
             
             //update soundwave progress
-            KGLOBAL_progressBlock.setProgress(CGFloat(toChordTime)/CGFloat(tempNowPlayingItemDuration))
+            KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(tempNowPlayingItemDuration))
             
-            updateAll(toChordTime)
+            updateAll(toTime)
             
             break;
         case UIGestureRecognizerState.Ended:
             isPanning = false
             if(!isSongNeedPurchase){
-                player.currentPlaybackTime = NSTimeInterval(toChordTime)
+                player.currentPlaybackTime = NSTimeInterval(toTime)
                 if player.playbackState == MPMusicPlaybackState.Playing {
                     startTimer()
                 }
             }
             currentChordTime = 0
-            toChordTime = 0
             break;
         default:
             break;
@@ -2050,8 +2051,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
                     
                 } else {
-                    
-                    player.play()
+                    //player.play()
+                    player.currentPlaybackRate = self.speed
                 }
                 
             } else {
@@ -2372,6 +2373,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //recover
         player = MusicManager.sharedInstance.player
         self.firstLoadPlayingItem = player.nowPlayingItem
+        self.nowPlayingItemDuration = firstLoadPlayingItem.playbackDuration
         self.isSongNeedPurchase = false
         self.removeAllObserver()
         loadBackgroundImageFromMediaItem(firstLoadPlayingItem)
