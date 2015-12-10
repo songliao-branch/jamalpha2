@@ -266,7 +266,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
             
-            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)
+            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)//////////改这句话
             
             for result in searchHistoryManager.getAllHistory() {
                 print("now we have \(result.term)")
