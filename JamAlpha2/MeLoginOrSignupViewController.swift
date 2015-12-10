@@ -18,7 +18,7 @@ import AWSCore
 
 class MeLoginOrSignupViewController: UIViewController{
     
-    var userProfileViewController: UserProfileViewController!
+    var userProfileViewController: UserProfileViewController?
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     var statusAndNavigationBarHeight: CGFloat = CGFloat()
@@ -346,8 +346,10 @@ class MeLoginOrSignupViewController: UIViewController{
                               self.navigationController?.popViewControllerAnimated(false)
                             }
                             
-                            self.userProfileViewController.refreshUserImage()
-                            
+                            if let userProfileVC = self.userProfileViewController {
+                                userProfileVC.refreshUserImage()
+                            }
+
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
                             
                         } else { //we have an error
