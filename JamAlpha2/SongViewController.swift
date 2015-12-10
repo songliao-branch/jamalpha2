@@ -197,6 +197,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let bottomViewHeight:CGFloat = 40 //this is fixed
     
     var firstLoadPlayingItem: MPMediaItem!
+    var nowPlayingItemDuration:NSTimeInterval!
     var isRemoveProgressBlock = true
     var isBlurred:Bool = true
     
@@ -220,6 +221,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!isSongNeedPurchase){
             player = MusicManager.sharedInstance.player
             self.firstLoadPlayingItem = player.nowPlayingItem
+            self.nowPlayingItemDuration = self.firstLoadPlayingItem.playbackDuration
             CoreDataManager.initializeSongToDatabase(firstLoadPlayingItem)
             removeAllObserver()
         }else{
@@ -703,7 +705,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         pthread_rwlock_wrlock(&self.rwLock)
-    
+            self.stopTimer()
+            self.newPosition = 0
+            self.toTime = 0
             for label in self.tuningLabels {
                 label.hidden = true
             }
@@ -714,19 +718,33 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 return
             }
             
-            let nowPlayingItem = self.player.nowPlayingItem
-            
+            self.firstLoadPlayingItem = self.player.nowPlayingItem
+            self.nowPlayingItemDuration = firstLoadPlayingItem!.playbackDuration
+        
+        
+            // if we are NOT repeating song
+            if self.player.repeatMode != .One {
+                
+                self.songNameLabel.attributedText = NSMutableAttributedString(string: firstLoadPlayingItem!.title!)
+                self.songNameLabel.textAlignment = NSTextAlignment.Center
+                self.artistNameLabel.text = firstLoadPlayingItem!.artist
+                isBlurred = !isBlurred
+                applyEffectsToBackgroundImage(changeSong: true)
+                
+                self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
+            }
+
+        
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
-                CoreDataManager.initializeSongToDatabase(nowPlayingItem!)
-                self.updateMusicData(nowPlayingItem!)
+                CoreDataManager.initializeSongToDatabase(firstLoadPlayingItem!)
+                self.updateMusicData(firstLoadPlayingItem!)
                 
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
                 self.progressBlockViewWidth = nil
         
-                let nowPlayingItemDuration = nowPlayingItem!.playbackDuration
                 //////////////////////////////
                 //remove from superView
                 if(KGLOBAL_progressBlock != nil ){
@@ -741,12 +759,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KGLOBAL_progressBlock.center.y = progressContainerHeight
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
-                if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingItem!) {
+                if let soundWaveData = CoreDataManager.getSongWaveFormImage(firstLoadPlayingItem!) {
                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
                     print("sound wave data found")
                     KGLOBAL_init_queue.suspended = false
                 } else {
-                    self.generateSoundWave(nowPlayingItem!)
+                    self.generateSoundWave(firstLoadPlayingItem!)
                 }
  
                 ////////////////////////////
@@ -758,26 +776,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     print("changeScale")
                     //self.progressBlock!.alpha = 0.5
                 }
-                
-                // if we are NOT repeating song
-                if self.player.repeatMode != .One {
-                    
-                    self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingItem!.title!)
-                    self.songNameLabel.textAlignment = NSTextAlignment.Center
-                    self.artistNameLabel.text = nowPlayingItem!.artist
-                    isBlurred = !isBlurred
-                    applyEffectsToBackgroundImage(changeSong: true)
-       
-                    self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
-                }
-            
+        
             self.speed = 1
+            self.updateAll(0)
             if self.player.playbackState == MPMusicPlaybackState.Playing{
-                self.stopTimer()
                 self.startTimer()
             }
-            
-        self.updateAll(0)
+        
         pthread_rwlock_unlock(&self.rwLock)
     }
     
@@ -932,13 +937,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    var newPosition:CGFloat! = 0
+    var toTime:Float! = 0
+    
     func handleProgressPan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translationInView(self.view)
-        for childview in recognizer.view!.subviews {
-            let child = childview
-            self.isPanning = true
-            
-            var newPosition = progressChangedOrigin + translation.x
+        switch recognizer.state {
+        case UIGestureRecognizerState.Began:
+            //update all chords, lyrics
+            stopTimer()
+            isPanning = true
+            break;
+        case UIGestureRecognizerState.Changed:
+            newPosition = progressChangedOrigin + translation.x
             
             // leftmost point of inner bar cannot be more than half of the view
             if newPosition > self.view.frame.width / 2 {
@@ -946,31 +957,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             // the end of inner bar cannot be smaller left half of view
-            if newPosition + child.frame.width < self.view.frame.width / 2 {
-                newPosition = self.view.frame.width / 2 - child.frame.width
+            if newPosition + KGLOBAL_progressBlock.frame.width < self.view.frame.width / 2 {
+                
+                newPosition = self.view.frame.width / 2 - KGLOBAL_progressBlock.frame.width
             }
-            
-            //update all chords, lyrics
-            stopTimer()
             
             //new Position from 160 to -357
             //-self.view.frame.width /2
             //= from 0 ot -517
             //divide by -2: from 0 to 258
-            let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
+            toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
             if(!isSongNeedPurchase){
-               KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
+                KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.nowPlayingItem!.playbackDuration))
             }else{
                 KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(songNeedPurchase.getDuration()))
             }
             
             //258  517
             updateAll(toTime)
-            
+            break
+        case UIGestureRecognizerState.Ended:
             //child.frame.origin.x = newPosition
-            
             //when finger is lifted
-            if recognizer.state == UIGestureRecognizerState.Ended {
                 progressChangedOrigin = newPosition
                 isPanning = false
                 if(!isSongNeedPurchase){
@@ -979,8 +987,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         startTimer()
                     }
                 }
-                
-            }
+            break
+        default:
+            break
         }
     }
     
@@ -2080,7 +2089,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if !isViewDidAppear{
+            if !isViewDidAppear || startTime.toDecimalNumer() < 5 || startTime.toDecimalNumer() > Float(self.nowPlayingItemDuration ) - 5 || startTime.toDecimalNumer() - toTime < 2{
                 startTime.addTime(Int(100 / stepPerSecond))
             }else{
                 if let time:NSTimeInterval = self.player.currentPlaybackTime {
