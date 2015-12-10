@@ -66,7 +66,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         MusicManager.sharedInstance.reloadCollections()
+        
         let currentVC = topViewController(rootViewController())
+        
+        if kShouldReloadMusicTable {
+            if rootViewController().isKindOfClass(TabBarController) {
+                let tabBarController = rootViewController() as! TabBarController
+                
+                for tabItemController in (tabBarController.viewControllers)! {
+                    if tabItemController.isKindOfClass(UINavigationController){
+                        for childVC in tabItemController.childViewControllers {
+                            if childVC.isKindOfClass(BaseViewController) {
+                                let baseVC = childVC as! BaseViewController
+
+                                for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                                    musicVC.reloadDataAndTable()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.selectedFromTable = false
@@ -93,6 +115,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func rootViewController() -> UIViewController
     {
+        
         return UIApplication.sharedApplication().keyWindow!.rootViewController!
     }
     
