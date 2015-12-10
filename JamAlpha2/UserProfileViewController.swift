@@ -145,7 +145,8 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         } else if indexPath.section == 1{
             // my tabs, my lyrics, favorites
             if indexPath.item == 0 {
-                
+                let myTabsVC: MyTabsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsVC") as! MyTabsViewController
+                self.navigationController?.pushViewController(myTabsVC, animated: true)
             }
             else if indexPath.item == 1{
 
