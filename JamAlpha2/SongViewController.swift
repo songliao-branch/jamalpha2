@@ -548,8 +548,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
                 
                 if self.canFindTabsFromCoreData(song) {
-                    if !self.isSongNeedPurchase {
-                        self.updateAll(Float(self.player.currentPlaybackTime))
+                    if(!self.isSongNeedPurchase){
+                        let tempPlaytime = self.player.currentPlaybackTime
+                        if !tempPlaytime.isNaN {
+                            self.updateAll(Float(tempPlaytime))
+                        } else {
+                            self.updateAll(0)
+                        }
                     }else{
                         self.updateAll(0)
                     }
@@ -568,8 +573,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, lyricsSetId: download.id)
                 
                 if self.canFindLyricsFromCoreData(song) {
-                    if !self.isSongNeedPurchase {
-                        self.updateAll(Float(self.player.currentPlaybackTime))
+                    if(!self.isSongNeedPurchase){
+                        let tempPlaytime = self.player.currentPlaybackTime
+                        if !tempPlaytime.isNaN {
+                            self.updateAll(Float(tempPlaytime))
+                        } else {
+                            self.updateAll(0)
+                        }
                     }else{
                         self.updateAll(0)
                     }
@@ -1422,8 +1432,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             chordBase.hidden = false
         }
+        
         if(!isSongNeedPurchase){
-          updateAll(Float(player.currentPlaybackTime))
+            let tempPlaytime = self.player.currentPlaybackTime
+            if !tempPlaytime.isNaN {
+                self.updateAll(Float(tempPlaytime))
+            } else {
+                self.updateAll(0)
+            }
         }else{
             updateAll(0)
         }
@@ -2092,15 +2108,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if !isPanning && !isSongNeedPurchase {
             if !isViewDidAppear || startTime.toDecimalNumer() < 5 || startTime.toDecimalNumer() > Float(self.nowPlayingItemDuration ) - 5 || startTime.toDecimalNumer() - toTime < 2{
                 startTime.addTime(Int(100 / stepPerSecond))
-            }else{
-                if let time:NSTimeInterval = self.player.currentPlaybackTime {
-                    startTime.setTime(Float(time))
-                }else{
+            } else {
+                let tempPlaytime = self.player.currentPlaybackTime
+                if !tempPlaytime.isNaN {
+                    startTime.setTime(Float(tempPlaytime))
+                } else {
                     startTime.addTime(Int(100 / stepPerSecond))
-                    print("player cannot find currentPlaybackTime")
                 }
             }
         }
+
         refreshChordLabel()
         refreshLyrics()
         refreshProgressBlock()
