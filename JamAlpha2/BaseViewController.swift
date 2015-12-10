@@ -257,6 +257,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         if (index == self.pageTitles.count){
             return nil
         }
+
         return self.viewControllerAtIndex(index)
     }
     
@@ -273,13 +274,18 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.currentPageIndex = index
     }
     
+    func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
+        let nextViewController = pendingViewControllers[0] as! MusicViewController
+        if(nextViewController.pageIndex == 0){
+            nextViewController.musicTable.reloadData()
+        }
+    }
+    
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if(completed){
             
             let lastViewController = pageViewController.viewControllers!.last! as! MusicViewController
-            
             self.currentPageIndex = lastViewController.pageIndex
-            
             changeButtonColorOnScroll()
         }
     }

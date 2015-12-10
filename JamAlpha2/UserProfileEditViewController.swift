@@ -25,6 +25,7 @@ class UserProfileEditViewController: UIViewController {
     var originFileName: String!
     var croppedFileName: String!
     var originImageData: NSData!
+    var userProfile:UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +56,25 @@ class UserProfileEditViewController: UIViewController {
           print("tap on image")
         if let originImageData: NSData = CoreDataManager.getCurrentUser()?.profileImage {
             let originImage: UIImage = UIImage(data: originImageData)!
+            let tempCornerRadius = sender.view?.layer.cornerRadius
+            UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseOut, animations: {
+                sender.view?.layer.cornerRadius = 0
+                }, completion: {
+                    finished in
+                    sender.view!.hidden = true
+                    let photoDetailVC = self.storyboard?.instantiateViewControllerWithIdentifier("photoviewerVC") as! PhotoViewerViewController
+                    let tempImage = self.userProfile.image
+                    self.userProfile.image = originImage
+                    photoDetailVC.photo = self.userProfile.image
+                    photoDetailVC.transitioningDelegate = self
+                    self.presentViewController(photoDetailVC, animated: true, completion: {
+                        finished in
+                        self.userProfile.image = tempImage
+                        sender.view?.layer.cornerRadius = tempCornerRadius!
+                        sender.view!.hidden = false
+                    })
+  
+            })
             
         }
       
@@ -89,6 +109,8 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
                 self.userEmail = user.email
                 if let profileData = user.profileImage {
                     userProfileCell.userImageView.image = UIImage(data: profileData)
+                    self.userProfile = userProfileCell.userImageView
+                    self.userProfile.contentMode = UIViewContentMode.ScaleAspectFill
                     userProfileCell.userImageView.userInteractionEnabled = true
                     let tapOnUserImageView: UITapGestureRecognizer = UITapGestureRecognizer()
                     tapOnUserImageView.addTarget(self, action: "tapOnUserImageView:")
@@ -115,9 +137,9 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 {
-            return 40
+            return 35
         }
-        return 22
+        return 20
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -158,6 +180,7 @@ extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavi
         }
         refreshAlert.addAction(UIAlertAction(title: "Photo Library", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
             photoPicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+            photoPicker.navigationBar.tintColor = UIColor.mainPinkColor()
             self.presentViewController(photoPicker, animated: true, completion: nil)
         }))
         refreshAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
@@ -224,6 +247,33 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
         self.navigationController?.popViewControllerAnimated(true)
     }
     
+}
+
+extension UserProfileEditViewController: UIViewControllerTransitioningDelegate{
+    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if(presented.isKindOfClass(PhotoViewerViewController)){
+            return ImageZoomAnimation(referenceImageView: self.userProfile)
+        }
+        return nil
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if(dismissed.isKindOfClass(PhotoViewerViewController)){
+            self.userProfile.hidden = true
+            UIGraphicsBeginImageContext(self.tabBarController!.view.bounds.size)
+            self.tabBarController!.view.layer.renderInContext(UIGraphicsGetCurrentContext()!)
+            let screenShot = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            self.userProfile.hidden = false
+
+            let temp = ImageZoomAnimation(referenceImageView: self.userProfile)
+            temp.navigationBarHeight = self.navigationController!.navigationBar.height
+            temp.screenshot = screenShot
+            temp.screenshotFrame = self.tabBarController!.view.frame
+            return temp
+        }
+        return nil
+    }
 }
 
 

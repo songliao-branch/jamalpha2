@@ -74,9 +74,17 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return 35
+        }
+        return 20
+    }
+    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 3//one for avatar, one for (tabs,lyris, favoriates), other one for setting
     }
+    
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.section == 0 {

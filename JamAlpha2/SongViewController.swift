@@ -209,6 +209,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var displayLink: CADisplayLink!
     var previewProgress: KDCircularProgress!
     var previewProgressCenterView: UIView!
+    var isViewDidAppear:Bool = false
     
     var storeViewController:SKStoreProductViewController!
     
@@ -293,6 +294,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!isGenerated && !isSongNeedPurchase){
             generateSoundWave(firstLoadPlayingItem)
         }
+        isViewDidAppear = true
     }
     
     func setUpBackgroundImage(){
@@ -2078,11 +2080,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if let time:NSTimeInterval = self.player.currentPlaybackTime {
-                 startTime.setTime(Float(time))
-            }else{
+            if !isViewDidAppear{
                 startTime.addTime(Int(100 / stepPerSecond))
-                print("player cannot find currentPlaybackTime")
+            }else{
+                if let time:NSTimeInterval = self.player.currentPlaybackTime {
+                    startTime.setTime(Float(time))
+                }else{
+                    startTime.addTime(Int(100 / stepPerSecond))
+                    print("player cannot find currentPlaybackTime")
+                }
             }
         }
         refreshChordLabel()

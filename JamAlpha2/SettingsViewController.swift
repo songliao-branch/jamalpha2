@@ -88,13 +88,17 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         let emailTitle = "[\(CoreDataManager.getCurrentUser()!.email)]'s feed back"
         let messageBody = ""
         let toRecipents = ["jun@twistjam.com"]
+        
         let mc: MFMailComposeViewController = MFMailComposeViewController()
+        mc.navigationBar.tintColor = UIColor.mainPinkColor()
+        
         if MFMailComposeViewController.canSendMail() {
             mc.title = "Feed Back"
             mc.mailComposeDelegate = self
             mc.setSubject(emailTitle)
             mc.setMessageBody(messageBody, isHTML: false)
             mc.setToRecipients(toRecipents)
+            
             
             UIApplication.sharedApplication().keyWindow?.rootViewController?.presentViewController(mc, animated: true, completion: nil)
         }
