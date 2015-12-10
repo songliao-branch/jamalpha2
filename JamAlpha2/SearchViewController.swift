@@ -161,9 +161,15 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if indexPath.section == 0 { //local search in section 0
                 let song = filteredSongs[indexPath.row]
                 cell.titleLabel.text = song.title!
-                cell.subtitleLabel.text = song.artist!
+                if(song.artist != nil){
+                    cell.subtitleLabel.text = song.artist!
+                }else{
+                    cell.subtitleLabel.text = "Unknow"
+                }
                 if let artwork = song.artwork {
                     cell.albumCover.image = artwork.imageWithSize(CGSize(width: 54, height: 54))
+                }else{
+                    cell.albumCover.image = UIImage(named: "liweng")
                 }
             } else { //web search in section 1
                 if let track = searchResults[indexPath.row].trackName {
@@ -347,7 +353,12 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     func filterLocalSongs(searchText: String) {
         self.filteredSongs = uniqueSongs.filter({
             (song: MPMediaItem) -> Bool in
-            return song.title!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
+            if(song.albumArtist != nil){
+               return song.title!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || song.albumArtist!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil
+            }else{
+                return song.title!.lowercaseString.rangeOfString(searchText.lowercaseString) != nil 
+            }
+            
         })
         self.searchResultTableView.reloadData()
     }
