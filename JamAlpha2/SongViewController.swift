@@ -2050,8 +2050,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
                     
                 } else {
-                    
-                    player.play()
+                    //player.play()
+                    player.currentPlaybackRate = self.speed
                 }
                 
             } else {
