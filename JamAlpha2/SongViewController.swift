@@ -2373,6 +2373,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //recover
         player = MusicManager.sharedInstance.player
         self.firstLoadPlayingItem = player.nowPlayingItem
+        self.nowPlayingItemDuration = firstLoadPlayingItem.playbackDuration
         self.isSongNeedPurchase = false
         self.removeAllObserver()
         loadBackgroundImageFromMediaItem(firstLoadPlayingItem)
