@@ -44,24 +44,20 @@ class MyTabsViewController: UIViewController {
     }
     
     func pressOptionButton(sender: UIButton) {
-        print(sender.accessibilityIdentifier)
         for item in myTabsArray {
             print(item.3)
         }
-        if sender.accessibilityIdentifier == "unpressed" {
+        print(sender.tag)
+
+        if myTabsArray[sender.tag].3 == "unpressed" || myTabsArray[sender.tag].3 == "" {
             let index: NSIndexPath = NSIndexPath(forItem: sender.tag, inSection: 0)
             deleteRow()
             insertRow(index)
             myTabsArray[sender.tag].3 = "pressed"
         } else {
-            if let index = self.extentionRow {
-                if index.item == sender.tag + 1 {
-                    deleteRow()
-                    self.extentionRow = nil
-                }
-            }
-            myTabsArray[sender.tag].3 = "unpressed"
+            deleteRow()
         }
+
     }
     
     func insertRow(indexPath: NSIndexPath) {
@@ -74,6 +70,7 @@ class MyTabsViewController: UIViewController {
     
     func deleteRow() {
         if selectRow.count > 0 {
+            myTabsArray[selectRow[0].item - 1].3 = "unpressed"
             myTabsArray.removeAtIndex(selectRow[0].item)
             self.tableView.deleteRowsAtIndexPaths(self.selectRow, withRowAnimation: UITableViewRowAnimation.None)
             self.selectRow.removeAll()
