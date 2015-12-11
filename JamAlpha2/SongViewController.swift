@@ -1637,7 +1637,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     
     func uploadTabs(button: UIButton) {
-        print("upload tabs")
+
+        if shouldShowSignUpPage() {
+            return
+        }
+        
+        var chords = [Chord]()
+        (chords, _, _, _) = CoreDataManager.getTabs(player.nowPlayingItem!, fetchingLocalOnly: true)
+        
+        if chords.count < 2 {
+            self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
+            return
+        }
+        
         APIManager.uploadTabs(player.nowPlayingItem!, completion: {
             isSuccess in
             
@@ -1663,6 +1675,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func uploadLyrics(button: UIButton) {
+        if shouldShowSignUpPage() {
+            return
+        }
+        
+        var lyric = Lyric()
+        (lyric, _) = CoreDataManager.getLyrics(player.nowPlayingItem!, fetchingLocalOnly: true)
+        
+        if lyric.lyric.count < 2 {
+            self.lyric = lyric
+            
+             self.showMessage("Your lyrics looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
+            return
+        }
+ 
         APIManager.uploadLyrics(player.nowPlayingItem!, completion: {
             isSuccess in
             
