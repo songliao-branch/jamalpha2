@@ -67,6 +67,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         MusicManager.sharedInstance.reloadCollections()
         
+        if(MusicManager.sharedInstance.player.repeatMode != .All && MusicManager.sharedInstance.player.repeatMode != .One){
+            MusicManager.sharedInstance.player.repeatMode = .All
+        }
+        
+        if( MusicManager.sharedInstance.player.shuffleMode != .Songs &&  MusicManager.sharedInstance.player.shuffleMode != .Off){
+            MusicManager.sharedInstance.player.shuffleMode = .Songs
+        }
+                
         let currentVC = topViewController(rootViewController())
         
         if kShouldReloadMusicTable {
