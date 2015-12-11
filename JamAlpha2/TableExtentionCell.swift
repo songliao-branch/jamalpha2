@@ -39,6 +39,8 @@ class TableExtensionCell: UITableViewCell {
         uploadButton.layer.borderWidth = 1
         uploadButton.layer.cornerRadius = 5
         uploadButton.setTitle("Upload", forState: UIControlState.Normal)
+        uploadButton.titleLabel?.numberOfLines = 0
+        uploadButton.titleLabel?.lineBreakMode = NSLineBreakMode.ByWordWrapping
         uploadButton.titleEdgeInsets = UIEdgeInsetsMake(26, 0, -2, 0)
         let uploadImageView: UIImageView = UIImageView(frame: CGRectMake((buttonWidth - 10) / 2 - 10, 2, 20, 20))
         uploadImageView.image = UIImage(named: "uploaded")

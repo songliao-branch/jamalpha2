@@ -145,11 +145,16 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         } else if indexPath.section == 1{
             // my tabs, my lyrics, favorites
             if indexPath.item == 0 {
-                let myTabsVC: MyTabsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsVC") as! MyTabsViewController
+                let myTabsVC: MyTabsAndLyricsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsandlyricsVC") as! MyTabsAndLyricsViewController
+                myTabsVC.tabsOrLyrics = "tabs"
                 self.navigationController?.pushViewController(myTabsVC, animated: true)
-            }
-            else if indexPath.item == 1{
-
+            } else if indexPath.item == 1{
+                let myLyricsVC: MyTabsAndLyricsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsandlyricsVC") as! MyTabsAndLyricsViewController
+                myLyricsVC.tabsOrLyrics = "lyrics"
+                self.navigationController?.pushViewController(myLyricsVC, animated: true)
+            } else if indexPath.item == 2 {
+                let myFavoritesVC: MyFavoritesViewController = self.storyboard?.instantiateViewControllerWithIdentifier("myfavoritesVC") as! MyFavoritesViewController
+                self.navigationController?.pushViewController(myFavoritesVC, animated: true)
             }
         } else if indexPath.section == 2 { //settings section
             self.settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
