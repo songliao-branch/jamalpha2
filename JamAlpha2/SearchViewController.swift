@@ -268,9 +268,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)//////////改这句话
             
-            for result in searchHistoryManager.getAllHistory() {
-                print("now we have \(result.term)")
-            }
+//            for result in searchHistoryManager.getAllHistory() {
+//                print("now we have \(result.term)")
+//            }
             
         } else if !resultSearchController.active && indexPath.section == 0 {
              // select in search history
