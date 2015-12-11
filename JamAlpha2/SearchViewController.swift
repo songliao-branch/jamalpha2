@@ -84,7 +84,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             return 30
         } else if section == 1 {
-            if searchResults.count == 0 {
+            if searchResults.count == 0 || !resultSearchController.active {
                 return 0
             }
             return 30
@@ -243,7 +243,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 var isReload = true
                 
                 if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
-//                    print("\(searchSong.trackName)  \(searchSong.artistName)   \(searchSong.trackTimeMillis)")
                     MusicManager.sharedInstance.setPlayerQueue([foundItem])
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                 }else{
@@ -268,18 +267,20 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)//////////改这句话
             
-//            for result in searchHistoryManager.getAllHistory() {
-//                print("now we have \(result.term)")
-//            }
+        } else if !resultSearchController.active { //&& indexPath.section == 0 {
             
-        } else if !resultSearchController.active && indexPath.section == 0 {
              // select in search history
             if indexPath.row == searchHistoryManager.getAllHistory().count {
                 searchHistoryManager.clearHistory()
                 tableView.reloadData()
+            } else {
+            
+                let historySearchTerm = searchHistoryManager.getAllHistory().reverse()[indexPath.row].term
+                resultSearchController.searchBar.text = historySearchTerm
+                resultSearchController.searchBar.becomeFirstResponder()
+                tableView.reloadData()
             }
         }
-
     }
     
     // hide keyboard when scroll table view
