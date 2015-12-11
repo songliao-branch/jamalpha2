@@ -19,6 +19,7 @@ class MyFavoritesViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        setUpNavigationBar()
     }
 
     override func didReceiveMemoryWarning() {
@@ -26,8 +27,16 @@ class MyFavoritesViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    func setUpNavigationBar() {
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
+        self.navigationItem.title = "My Favorites"
+    }
 
 }
+
+
 
 extension MyFavoritesViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {

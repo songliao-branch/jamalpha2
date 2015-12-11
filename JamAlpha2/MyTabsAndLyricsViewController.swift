@@ -20,6 +20,7 @@ class MyTabsAndLyricsViewController: UIViewController {
     var tabsOrLyrics: String!
     
     // 0 means need to upload, 1 means already uploaded
+    var myTitle: String!
     var myDataArray: [(String, String, String, String)]!
     
     
@@ -45,13 +46,15 @@ class MyTabsAndLyricsViewController: UIViewController {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-        self.navigationItem.title = "My Tabs"
+        self.navigationItem.title = self.myTitle
     }
     
     func loadData() {
         if tabsOrLyrics == "tabs" {
+            self.myTitle = "My Tabs"
             self.myDataArray = [("一里香", "Jay", "0", "unpressed"), ("二里香", "Jay", "1", "unpressed"), ("三里香", "Jay", "1", "unpressed"), ("四里香", "Jay", "0", "unpressed")] // tabs data
         } else {
+            self.myTitle = "My Lyrics"
             self.myDataArray = [("五里香", "Jay", "0", "unpressed"), ("六里香", "Jay", "1", "unpressed"), ("七里香", "Jay", "1", "unpressed"), ("八里香", "Jay", "0", "unpressed")] // lyrics data
         }
     }

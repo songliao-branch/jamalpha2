@@ -399,8 +399,11 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
         return self.lyricsOrganizedArray.count
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
+        print(self.player.currentTime)
         if indexPath.row == 0 || (addedLyricsWithTime.timeAdded[indexPath.item - 1] && addedLyricsWithTime.time[indexPath.item - 1] < self.player.currentTime) == true {
+            if self.player.playing == false {
+                self.playPause(UITapGestureRecognizer())
+            }
             if self.addedLyricsWithTime.timeAdded[indexPath.item] == false {
                 
                 self.addedLyricsWithTime.time[indexPath.item] = player.currentTime
@@ -519,6 +522,7 @@ extension LyricsSyncViewController {
             self.addedLyricsWithTime.addExistLyrics(tempLyricsTimeTuple.count, lyrics: lyrics, time: time, timeAdded: timeAdded)
         }
         tempLyricsTimeTuple.removeAll()
+        self.player.currentTime = self.addedLyricsWithTime.time.last!
     }
     
     func addLyricsToEditorView(sender: MPMediaItem) {
@@ -538,5 +542,7 @@ extension LyricsSyncViewController {
             }
             self.addedLyricsWithTime.addExistLyrics(count, lyrics: lyrics, time: time, timeAdded: timeAdded)
         }
+        self.player.currentTime = self.addedLyricsWithTime.time.last!
+        
     }
 }
