@@ -26,14 +26,13 @@ class MyTabsCell: UITableViewCell {
         singerNameLabel.frame = CGRectMake(45, 36, width / 2, 20)
         self.contentView.addSubview(singerNameLabel)
         
-        uploadedImageView.frame = CGRectMake(width - 5 - 60 - 10 - 20, 20, 20, 20)
+        uploadedImageView.frame = CGRectMake(width - 5 - 55 - 10 - 30, 15, 30, 30)
         uploadedImageView.image = UIImage(named: "uploaded")
         uploadedImageView.alpha = 0
         self.contentView.addSubview(uploadedImageView)
         
-        optionButton.frame = CGRectMake(width - 5 - 60, 0, 60, 60)
-        optionButton.layer.cornerRadius = 0.5 * 60
-        optionButton.layer.borderWidth = 1
+        optionButton.frame = CGRectMake(width - 5 - 60, 2.5, 55, 55)
+        optionButton.setImage(UIImage(named: "option"), forState: UIControlState.Normal)
         self.contentView.addSubview(optionButton)
     }
 }
