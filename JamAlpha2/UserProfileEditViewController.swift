@@ -34,6 +34,18 @@ class UserProfileEditViewController: UIViewController {
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
         
+        // create temp file path to store upload image
+        let error = NSErrorPointer()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'upload' directory failed. Error: \(error)")
+        }
+        
         setUpNavigationBar()
         setUpTableView()
     }
