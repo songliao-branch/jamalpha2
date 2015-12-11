@@ -58,6 +58,11 @@ class APIManager: NSObject {
         
         (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: true)
         
+        if chords.count < 2 {
+            print("uploading tabs error: tabs count is less than 2")
+            return
+        }
+        
         var timesData = [Float]()
         var chordsData = [String]()
         var tabsData = [String]()
@@ -102,6 +107,11 @@ class APIManager: NSObject {
         
         (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: true)
         
+        if lyric.lyric.count < 2 {
+            print("uploading lyrics error: lyrics count is less than 2")
+            return
+        }
+        
         var times = [Float]()
         var lyrics = [String]()
         
@@ -110,6 +120,7 @@ class APIManager: NSObject {
             lyrics.append(line.str)
         }
         
+
         let parameters = [
             "title": song.getTitle(),
             "artist": song.getArtist(),
