@@ -1637,6 +1637,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     
     func uploadTabs(button: UIButton) {
+        self.isRemoveProgressBlock = false
+        self.selectedFromTable = false
+        self.player.pause()
+        self.clearActions()
 
         if shouldShowSignUpPage() {
             return
@@ -1675,6 +1679,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func uploadLyrics(button: UIButton) {
+        self.isRemoveProgressBlock = false
+        self.selectedFromTable = false
+        self.player.pause()
+        self.clearActions()
+        
         if shouldShowSignUpPage() {
             return
         }
