@@ -91,16 +91,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
-            currentSongVC.selectedFromTable = false
-            if(!currentSongVC.isSongNeedPurchase){
-                currentSongVC.resumeSong()
+            currentSongVC.removeAllObserver()
+            if currentSongVC.player.nowPlayingItem == nil {
+                currentSongVC.dismissViewControllerAnimated(false, completion: {
+                    completed in
+                    KGLOBAL_queue.suspended = false
+                    KGLOBAL_init_queue.suspended = self.suspended
+                })
+            }else{
+                currentSongVC.registerMediaPlayerNotification()
+                currentSongVC.selectedFromTable = false
+                if(!currentSongVC.isSongNeedPurchase){
+                    currentSongVC.resumeSong()
+                }
+                print("Song VC entering forground")
+                KGLOBAL_queue.suspended = false
+                KGLOBAL_init_queue.suspended = self.suspended
             }
-            print("Song VC entering forground")
         }
-        KGLOBAL_queue.suspended = false
-        KGLOBAL_init_queue.suspended = self.suspended
-        print("Go into forground:\(self.suspended)")
+        KGLOBAL_isNeedToCheckIndex = true
+        print("Go into forground")
     }
+   
 
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.

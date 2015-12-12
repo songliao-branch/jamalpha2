@@ -18,6 +18,8 @@ var KGLOBAL_progressBlock: SoundWaveView!
 
 var KGLOBAL_timer:NSTimer!
 
+var KGLOBAL_isNeedToCheckIndex:Bool = false
+
 // value is a BOOL
 var KEY_isSoundWaveformGeneratingInBackground:Bool = false
 
