@@ -119,7 +119,7 @@ class MusicManager: NSObject {
         }
         
         if(KGLOBAL_isNeedToCheckIndex){
-            if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? lastPlayerQueue.indexOf(player.nowPlayingItem!) : -1) != player.indexOfNowPlayingItem {
+            if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? Int(lastPlayerQueue.indexOf(player.nowPlayingItem!)!) : -1) != player.indexOfNowPlayingItem {
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
                 print("\(_TAG) setting a new queue")
