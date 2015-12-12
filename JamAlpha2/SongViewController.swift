@@ -1131,8 +1131,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             }else{
                 player.repeatMode = .All
-                player.shuffleMode = .Songs
-                shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
+                player.shuffleMode = .Off
+                shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
             }
         }else{
             if MusicManager.sharedInstance.player.repeatMode == .All && MusicManager.sharedInstance.player.shuffleMode == .Off {
@@ -1143,8 +1143,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             }else{
                 MusicManager.sharedInstance.player.repeatMode = .All
-                MusicManager.sharedInstance.player.shuffleMode = .Songs
-                shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
+                MusicManager.sharedInstance.player.shuffleMode = .Off
+                shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
             }
         }
        
