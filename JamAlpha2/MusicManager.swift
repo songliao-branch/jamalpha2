@@ -103,7 +103,35 @@ class MusicManager: NSObject {
                 print("\(_TAG) setting up queue of song: \(song.title!)")
             }
         }
+        
+        // after come back from music app
+        if(!queueChanged && player.nowPlayingItem == nil){
+            player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
+            lastPlayerQueue = collection
+            print("\(_TAG) setting a new queue")
+            
+            print(MPMediaItemPropertyReleaseDate)
+            
+            queueChanged = true
+            
+            return
+        }
+        
+        if(KGLOBAL_isNeedToCheckIndex){
+            if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? lastPlayerQueue.indexOf(player.nowPlayingItem!) : -1) != player.indexOfNowPlayingItem {
+                player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
+                lastPlayerQueue = collection
+                print("\(_TAG) setting a new queue")
+                
+                print(MPMediaItemPropertyReleaseDate)
+                
+                queueChanged = true
+            }
+            KGLOBAL_isNeedToCheckIndex = false
+        }
     }
+    
+    
     
     func setIndexInTheQueue(selectedIndex: Int){
         // player.stop()

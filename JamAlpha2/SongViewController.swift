@@ -731,6 +731,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             self.firstLoadPlayingItem = self.player.nowPlayingItem
+            // if come back from Music app then this block will be called
+            if(firstLoadPlayingItem == nil){
+                self.dismissViewControllerAnimated(true, completion: nil)
+                return
+            }
             self.nowPlayingItemDuration = firstLoadPlayingItem!.playbackDuration
         
         
@@ -1124,6 +1129,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
             } else if player.repeatMode == .All && player.shuffleMode == .Songs {
                 shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
+            }else{
+                player.repeatMode = .All
+                player.shuffleMode = .Songs
+                shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             }
         }else{
             if MusicManager.sharedInstance.player.repeatMode == .All && MusicManager.sharedInstance.player.shuffleMode == .Off {
@@ -1131,6 +1140,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             } else if MusicManager.sharedInstance.player.repeatMode == .One && MusicManager.sharedInstance.player.shuffleMode == .Off {
                 shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[1]), forState: UIControlState.Normal)
             } else if MusicManager.sharedInstance.player.repeatMode == .All && MusicManager.sharedInstance.player.shuffleMode == .Songs {
+                shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
+            }else{
+                MusicManager.sharedInstance.player.repeatMode = .All
+                MusicManager.sharedInstance.player.shuffleMode = .Songs
                 shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[2]), forState: UIControlState.Normal)
             }
         }

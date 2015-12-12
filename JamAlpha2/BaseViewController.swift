@@ -54,7 +54,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             print("now it starts again")
             nowView.start()
         } else  {
-            
             nowView.stop()
         }
     }
