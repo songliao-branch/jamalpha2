@@ -31,6 +31,8 @@ class MeLoginOrSignupViewController: UIViewController{
     var indicatorTriangleView: UIImageView! //indicate whether it's sign up or log in
     var isSignUpSelected = true
     
+    var suspended:Bool = false
+    
     var showCloseButton = false
     var closeButton: UIButton! //only visible when this is presented modally
     
@@ -396,6 +398,9 @@ class MeLoginOrSignupViewController: UIViewController{
     func getFBUserData(){
         if let fbToken = FBSDKAccessToken.currentAccessToken().tokenString
         {
+            self.suspended = KGLOBAL_init_queue.suspended
+            KGLOBAL_queue.suspended = true
+            KGLOBAL_init_queue.suspended = true
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
                 (connection, result, error) -> Void in
                 if error == nil {
@@ -429,9 +434,13 @@ class MeLoginOrSignupViewController: UIViewController{
                     ]
                     
                     self.signUpLoginRequest(parameters, afterRetrievingUser: {
-                         id, email, authToken, _, _, _ in
+                         id, email, authToken, nickname, avatarUrlMedium, avatarUrlThumbnail in
                         
-                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, fbToken: fbToken)
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: (nickname.isEmpty ? facebookName : nickname), avatarUrl: (avatarUrlMedium.isEmpty ? facebookAvatarUrl : avatarUrlMedium), thumbnailUrl: (thumbnailUrl.isEmpty ? thumbnailUrl : avatarUrlThumbnail), fbToken: fbToken)
+                        
+                        
+                        KGLOBAL_queue.suspended = false
+                        KGLOBAL_init_queue.suspended = self.suspended
                     })
                 }
             })

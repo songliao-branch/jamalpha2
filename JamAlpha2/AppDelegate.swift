@@ -97,7 +97,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     completed in
                     KGLOBAL_queue.suspended = false
                     KGLOBAL_init_queue.suspended = self.suspended
-                    KGLOBAL_isNeedToCheckIndex = true
                 })
             }else{
                 currentSongVC.registerMediaPlayerNotification()
@@ -108,9 +107,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Song VC entering forground")
                 KGLOBAL_queue.suspended = false
                 KGLOBAL_init_queue.suspended = self.suspended
-                KGLOBAL_isNeedToCheckIndex = true
             }
         }
+        KGLOBAL_isNeedToCheckIndex = true
         print("Go into forground")
     }
    
