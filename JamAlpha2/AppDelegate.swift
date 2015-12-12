@@ -91,16 +91,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
+            currentSongVC.removeAllObserver()
             if currentSongVC.player.nowPlayingItem == nil {
-                currentSongVC.player.endGeneratingPlaybackNotifications()
                 currentSongVC.dismissViewControllerAnimated(false, completion: {
                     completed in
                     KGLOBAL_queue.suspended = false
                     KGLOBAL_init_queue.suspended = self.suspended
                     KGLOBAL_isNeedToCheckIndex = true
-                    currentSongVC.player.beginGeneratingPlaybackNotifications()
                 })
             }else{
+                currentSongVC.registerMediaPlayerNotification()
                 currentSongVC.selectedFromTable = false
                 if(!currentSongVC.isSongNeedPurchase){
                     currentSongVC.resumeSong()
@@ -111,7 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 KGLOBAL_isNeedToCheckIndex = true
             }
         }
-         print("Go into forground")
+        print("Go into forground")
     }
    
 
