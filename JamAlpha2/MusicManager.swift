@@ -104,28 +104,25 @@ class MusicManager: NSObject {
             }
         }
         
-        // after come back from music app
+        // after come back from music app which the current playing item is set to nil, we set the collection
         if(!queueChanged && player.nowPlayingItem == nil){
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
-            print("\(_TAG) setting a new queue")
-            
-            print(MPMediaItemPropertyReleaseDate)
-            
+            print("Coming from Music app with no playing item \(_TAG) setting a new queue")
+        
             queueChanged = true
             KGLOBAL_isNeedToCheckIndex = false
             
             return
         }
         
+        //coming from music app to twistjam, if the queue is different, we reset the queue to newly selected queue
         if(KGLOBAL_isNeedToCheckIndex){
             if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? Int(lastPlayerQueue.indexOf(player.nowPlayingItem!)!) : -1) != player.indexOfNowPlayingItem {
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
-                print("\(_TAG) setting a new queue")
-                
-                print(MPMediaItemPropertyReleaseDate)
-                
+                print("Queue is different,  now reset queue")
+
                 queueChanged = true
             }
             KGLOBAL_isNeedToCheckIndex = false
