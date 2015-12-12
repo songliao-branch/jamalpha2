@@ -113,6 +113,7 @@ class MusicManager: NSObject {
             print(MPMediaItemPropertyReleaseDate)
             
             queueChanged = true
+            KGLOBAL_isNeedToCheckIndex = false
             
             return
         }
