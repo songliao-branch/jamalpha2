@@ -82,7 +82,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 
                 let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
                 //TODO: better way to differentitate this?cell
-                let t = DownloadedTabsSet(id: -1, songId: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                let t = DownloadedTabsSet(id: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
 
                 allTabsSets[0]?.append(t)
             }
@@ -104,7 +104,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 let currentUser = CoreDataManager.getCurrentUser()!
                 
                 let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
-                let l = DownloadedLyricsSet(id: -1, songId: -1, lyricsPreview: preview, numberOfLines: lyric.lyric.count, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                let l = DownloadedLyricsSet(id: -1, lyricsPreview: preview, numberOfLines: lyric.lyric.count, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
                 allLyricsSets[0]?.append(l)
             }
         }

@@ -18,8 +18,6 @@ struct Editor {
 class DownloadedTabsSet: NSObject {
     var id = -1
     //these varibles are required for showing the array of DownloadedTabs in the browse tableview
-    
-    var songId = -1
     var tuning = ""
     var capo = 0
     var chordsPreview = ""
@@ -30,14 +28,18 @@ class DownloadedTabsSet: NSObject {
     var editor: Editor!//owner of this tabs
     var updatedAt = "" //TODO: change to a string
     
+ 
     //these variables are downloaded again when a single tabsSet is selected
     var chords = [String]()
     var tabs = [String]()
     var times = [Float]()
     
-    init(id: Int, songId: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
+    //only needed when this comes in a buck list for a user
+    var title = ""
+    var artist = ""
+    
+    init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
         self.id = id
-        self.songId = songId
         self.tuning = tuning
         self.capo = capo
         self.chordsPreview = chordsPreview
