@@ -92,12 +92,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
-            if currentSongVC.player.nowPlayingItem == nil {
-                currentSongVC.dismissViewControllerAnimated(false, completion: {
-                    completed in
+            if MusicManager.sharedInstance.player.nowPlayingItem == nil {
+                if (!currentSongVC.isSongNeedPurchase){
+                    currentSongVC.dismissViewControllerAnimated(true, completion: {
+                        completed in
+                        KGLOBAL_queue.suspended = false
+                        KGLOBAL_init_queue.suspended = self.suspended
+                    })
+                }else{
                     KGLOBAL_queue.suspended = false
                     KGLOBAL_init_queue.suspended = self.suspended
-                })
+                    
+                }
             }else{
                 currentSongVC.registerMediaPlayerNotification()
                 currentSongVC.selectedFromTable = false

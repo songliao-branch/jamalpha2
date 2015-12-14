@@ -261,9 +261,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func removeAllObserver(){
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-        player.endGeneratingPlaybackNotifications()
+        if(!isSongNeedPurchase){
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+            player.endGeneratingPlaybackNotifications()
+        }
     }
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -705,15 +707,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func registerMediaPlayerNotification(){
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
-        
-        player.beginGeneratingPlaybackNotifications()
+        if(!isSongNeedPurchase){
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+            
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
+            
+            player.beginGeneratingPlaybackNotifications()
+        }
     }
 
     func currentSongChanged(notification: NSNotification){
         if(viewDidFullyDisappear){
+            return
+        }
+        if(self.player == nil || (self.player.currentPlaybackTime.isNaN && KGLOBAL_queue.suspended
+            && KGLOBAL_init_queue.suspended)){
             return
         }
         pthread_rwlock_wrlock(&self.rwLock)
@@ -805,6 +813,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playbackStateChanged(notification: NSNotification){
         if(viewDidFullyDisappear){
+            return
+        }
+        if(self.player == nil || (self.player.currentPlaybackTime.isNaN && KGLOBAL_queue.suspended
+            && KGLOBAL_init_queue.suspended)){
             return
         }
         let playbackState = player.playbackState
