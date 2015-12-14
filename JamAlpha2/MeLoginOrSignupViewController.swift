@@ -113,7 +113,7 @@ class MeLoginOrSignupViewController: UIViewController{
         signUpTabButton.addTarget(self, action: "signUpTabPressed", forControlEvents: .TouchUpInside)
         topView.addSubview(signUpTabButton)
         
-        loginTabButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: signUpTabButton.frame.origin.y, width: 120, height: 50))
+        loginTabButton = UIButton(frame: CGRect(x: viewWidth/2, y: signUpTabButton.frame.origin.y, width: viewWidth/2, height: 50))
         loginTabButton.setTitle("Log In", forState: .Normal)
         loginTabButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
         loginTabButton.addTarget(self, action: "loginTabPressed", forControlEvents: .TouchUpInside)
