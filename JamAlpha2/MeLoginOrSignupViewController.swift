@@ -113,7 +113,7 @@ class MeLoginOrSignupViewController: UIViewController{
         signUpTabButton.addTarget(self, action: "signUpTabPressed", forControlEvents: .TouchUpInside)
         topView.addSubview(signUpTabButton)
         
-        loginTabButton = UIButton(frame: CGRect(x: viewWidth/2, y: signUpTabButton.frame.origin.y, width: viewWidth/2, height: 50))
+        loginTabButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: signUpTabButton.frame.origin.y, width: 120, height: 50))
         loginTabButton.setTitle("Log In", forState: .Normal)
         loginTabButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
         loginTabButton.addTarget(self, action: "loginTabPressed", forControlEvents: .TouchUpInside)
@@ -144,6 +144,7 @@ class MeLoginOrSignupViewController: UIViewController{
         scrollView = UIScrollView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: viewWidth, height: viewHeight))
         scrollView.showsVerticalScrollIndicator = false
         scrollView.contentSize.height = self.scrollView.frame.size.height + 15
+        scrollView.delegate = self
         let scrollViewTapGesture = UITapGestureRecognizer(target: self, action: "scrollViewTapGesture:")
         scrollView.addGestureRecognizer(scrollViewTapGesture)
         self.view.addSubview(self.scrollView)
@@ -163,6 +164,8 @@ class MeLoginOrSignupViewController: UIViewController{
         nickNameTextField.clearButtonMode = .WhileEditing
         nickNameTextField.autocapitalizationType = .None
         nickNameTextField.autocorrectionType = .No
+        nickNameTextField.delegate = self
+        nickNameTextField.tag = 0
         scrollView.addSubview(nickNameTextField)
         
         let credentialTextFieldUnderline1 = UIView(frame: CGRect(x: nickNameTextField.frame.origin.x, y: CGRectGetMaxY(nickNameTextField.frame), width: nickNameTextField.frame.width, height: 1))
@@ -177,6 +180,8 @@ class MeLoginOrSignupViewController: UIViewController{
         emailTextField.clearButtonMode = .WhileEditing
         emailTextField.autocapitalizationType = .None
         emailTextField.autocorrectionType = .No
+        emailTextField.delegate = self
+        emailTextField.tag = 1
         scrollView.addSubview(emailTextField)
         
 
@@ -213,13 +218,15 @@ class MeLoginOrSignupViewController: UIViewController{
         passwordTextField.textAlignment = .Center
         passwordTextField.clearButtonMode = .WhileEditing
         passwordTextField.tintColor = UIColor.mainPinkColor()
+        passwordTextField.delegate = self
+        passwordTextField.tag = 2
         scrollView.addSubview(passwordTextField)
         
         let passwordTextFieldUnderline = UITextField(frame: CGRect(x: credentialTextFieldUnderline2.frame.origin.x, y: CGRectGetMaxY(passwordTextField.frame), width: credentialTextFieldUnderline2.frame.width, height: 1))
         passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(passwordTextFieldUnderline)
         
-        submitButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: viewWidth, height: 44))
+        submitButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: 120, height: 44))
         submitButton.setTitle("Sign Up", forState: .Normal)
         submitButton.addTarget(self, action: "submitPressed", forControlEvents: .TouchUpInside)
         submitButton.titleLabel?.textAlignment = .Center
@@ -260,12 +267,18 @@ class MeLoginOrSignupViewController: UIViewController{
         self.nickNameTextField.resignFirstResponder()
         self.emailTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
     
     func scrollViewTapGesture(sender: UITapGestureRecognizer) {
         self.nickNameTextField.resignFirstResponder()
         self.emailTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
 
     
@@ -449,4 +462,29 @@ class MeLoginOrSignupViewController: UIViewController{
 }
 
 
-
+extension MeLoginOrSignupViewController: UIScrollViewDelegate,UITextFieldDelegate{
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        self.nickNameTextField.resignFirstResponder()
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
+    }
+    
+    func textFieldDidBeginEditing(textField: UITextField) {
+        if(textField.tag == 0){
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+                }, completion: nil)
+        }else if (textField.tag == 1){
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 42)
+                }, completion: nil)
+        }else if (textField.tag == 2){
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 94)
+                }, completion: nil)
+        }
+    }
+}
