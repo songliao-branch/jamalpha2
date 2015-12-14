@@ -107,7 +107,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // key is the stepper value ranging from 0.7 to 1.3 in step of 0.1
     // value is the real speed the song is playing
     let speedMatcher = [0.7: 0.50, 0.8:0.67 ,0.9: 0.79,  1.0:1.00 ,1.1: 1.25  ,1.2 :1.50, 1.3: 2.00]
-    
+    let speedLabels = [0.7: "0.5x", 0.8: "0.65x" ,0.9: "0.8x",  1.0: "1.0x" ,1.1: "1.25x"  ,1.2 : "1.5x", 1.3: "2x"]
     //Lyric
     var lyricbase: UIView!
     
@@ -1213,6 +1213,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let sliderMargin: CGFloat = 35
         //(rowHeight-1)/2 is the center y without the extra separator line
         volumeView = MPVolumeView(frame: CGRect(x: sliderMargin, y: 14, width: width-sliderMargin*2, height: rowHeight))
+        volumeView.setVolumeThumbImage(UIImage(named: "knob"), forState: .Normal)
         rowWrappers[0].addSubview(volumeView)
         
         for subview in volumeView.subviews {
@@ -1221,6 +1222,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 slider.minimumTrackTintColor = UIColor.mainPinkColor()
             }
         }
+        
         let names = ["Chords", "Tabs", "Lyrics", "Countdown"]
         
         let sideMargin: CGFloat = 15
@@ -1622,7 +1624,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.speed = adjustedSpeed
         self.player.currentPlaybackRate = adjustedSpeed
         self.startTimer()
-        self.speedLabel.text = "Speed: \(adjustedSpeed)x"
+        
+        self.speedLabel.text = "Speed: \(speedLabels[roundedValue]!)"
         print("stepper value:\(stepper.value) and value \(speedMatcher[roundedValue])")
     }
     
