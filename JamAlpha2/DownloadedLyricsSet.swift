@@ -26,8 +26,10 @@ class DownloadedLyricsSet: NSObject {
     var times = [Float]()
 
     //only needed when in buck list for a user 
+    var song_id = -1
     var title = ""
     var artist = ""
+    var duration: Float = 0
     
     init(id: Int, lyricsPreview: String, numberOfLines: Int, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
         self.id = id
@@ -37,5 +39,22 @@ class DownloadedLyricsSet: NSObject {
         self.voteStatus = voteStatus
         self.editor = editor
         self.updatedAt =  NSDate.convertFromIsoToHumanizedFormat(updatedAt)
+    }
+    
+    override init() {
+        // perform some initialization here
+    }
+    
+    func initialLyricsSet(id: Int, cached_votes_score: Int, number_of_lines: Int, lyrics_preview: String, vote_status: String, updated_at: String, song_id: Int, title: String, artist: String, duration: Float) {
+        self.id = id
+        self.votesScore = cached_votes_score
+        self.numberOfLines = number_of_lines
+        self.lyricsPreview = lyrics_preview
+        self.voteStatus = vote_status
+        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updated_at)
+        self.id = song_id
+        self.title = title
+        self.artist = artist
+        self.duration = duration
     }
 }

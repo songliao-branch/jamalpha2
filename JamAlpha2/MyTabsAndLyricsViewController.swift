@@ -49,6 +49,9 @@ class MyTabsAndLyricsViewController: UIViewController {
     }
     
     func loadData() {
+        let currentUserId = CoreDataManager.getCurrentUser()?.id
+        
+        
         
         if tabsOrLyrics == "tabs" {
             self.myTitle = "My Tabs"

@@ -388,6 +388,76 @@ class APIManager: NSObject {
         }
     }
     
+    // get userInfo API
+    
+    class func getUserLyricsInfo(userId: Int, completion: ((downloadWithContent: [DownloadedLyricsSet]) -> Void)) {
+        
+        Alamofire.request(.GET, jamBaseURL + "/users/\(userId)").responseJSON { response in
+            var myLyricsSet: [DownloadedLyricsSet] = [DownloadedLyricsSet]()
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    print(json)
+                    var editor: Editor = Editor()
+                    editor.userId = json["id"].int!
+                    editor.nickname = json["nickname"].string!
+                    editor.avatarUrlMedium = json["avatar_url_medium"].string!
+                    editor.avatarUrlThumbnail = json["avatar_url_thumbnail"].string!
+                    
+                    let set = json["lyric_sets"]
+                    for lyrics in set {
+                        let mylyrics: DownloadedLyricsSet = DownloadedLyricsSet()
+                        mylyrics.initialLyricsSet(lyrics.1["id"].int!, cached_votes_score: lyrics.1["cached_votes_score"].int!, number_of_lines: lyrics.1["number_of_lines"].int!, lyrics_preview: lyrics.1["lyrics_preview"].string!, vote_status: lyrics.1["vote_status"].string!, updated_at: lyrics.1["updated_at"].string!, song_id: lyrics.1["song"]["id"].int!, title: lyrics.1["song"]["title"].string!, artist: lyrics.1["song"]["artist"].string!, duration: lyrics.1["song"]["duration"].float!)
+                        myLyricsSet.append(mylyrics)
+                    }
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                                        //after completed, pass everything to the callback
+                    completion(downloadWithContent: myLyricsSet)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+
+    }
+    
+    class func getUserTabsInfo(userId: Int, completion: ((downloadWithContent: [DownloadedTabsSet]) -> Void)) {
+        
+        Alamofire.request(.GET, jamBaseURL + "/users/\(userId)").responseJSON { response in
+            var myTabsSet: [DownloadedTabsSet] = [DownloadedTabsSet]()
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    print(json)
+                    var editor: Editor = Editor()
+                    editor.userId = json["id"].int!
+                    editor.nickname = json["nickname"].string!
+                    editor.avatarUrlMedium = json["avatar_url_medium"].string!
+                    editor.avatarUrlThumbnail = json["avatar_url_thumbnail"].string!
+                    
+                    let set = json["tabs_sets"]
+                    for tabs in set {
+                        let mytab: DownloadedTabsSet = DownloadedTabsSet()
+                        mytab.initialTabSet(tabs.1["id"].int!, tuning: tabs.1["tuning"].string!, capo: tabs.1["capo"].int!, cached_votes_score: tabs.1["cached_votes_score"].int!, chords_preview: tabs.1["chords_preview"].string!, vote_status: tabs.1["vote_status"].string!, updated_at: tabs.1["updated_at"].string!, song_id: tabs.1["song"]["id"].int!, title: tabs.1["song"]["title"].string!, artist: tabs.1["song"]["artist"].string!, duration: tabs.1["song"]["duration"].float!)
+                        myTabsSet.append(mytab)
+                    }
+                    
+                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                    //after completed, pass everything to the callback
+                    completion(downloadWithContent: myTabsSet)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+        
+    }
+
     
     //MARK: update user API
     class func updateUserNickname(nickname: String, completion: ((completed: Bool) -> Void)) {
