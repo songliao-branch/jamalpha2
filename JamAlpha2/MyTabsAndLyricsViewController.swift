@@ -19,7 +19,6 @@ class MyTabsAndLyricsViewController: UIViewController {
     
     var tabsOrLyrics: String!
     
-    // 0 means need to upload, 1 means already uploaded
     var myTitle: String!
     var myDataArray: [(String, String, String, String)]!
     
@@ -50,11 +49,14 @@ class MyTabsAndLyricsViewController: UIViewController {
     }
     
     func loadData() {
+        
         if tabsOrLyrics == "tabs" {
             self.myTitle = "My Tabs"
+            // 0 means need to upload, 1 means already uploaded
             self.myDataArray = [("一里香", "Jay", "0", "unpressed"), ("二里香", "Jay", "1", "unpressed"), ("三里香", "Jay", "1", "unpressed"), ("四里香", "Jay", "0", "unpressed")] // tabs data
         } else {
             self.myTitle = "My Lyrics"
+            // 0 means need to upload, 1 means already uploaded
             self.myDataArray = [("五里香", "Jay", "0", "unpressed"), ("六里香", "Jay", "1", "unpressed"), ("七里香", "Jay", "1", "unpressed"), ("八里香", "Jay", "0", "unpressed")] // lyrics data
         }
     }
@@ -130,6 +132,7 @@ extension MyTabsAndLyricsViewController: UITableViewDelegate, UITableViewDataSou
             if self.selectRow[0].item == indexPath.item {
                 let cell: TableExtensionCell = self.tableView.dequeueReusableCellWithIdentifier("extensioncell", forIndexPath: self.selectRow[0]) as! TableExtensionCell
                 cell.initialCell(self.viewWidth)
+                cell.selectionStyle = UITableViewCellSelectionStyle.None
                 if myDataArray[indexPath.item - 1].2 == "1" {
                     cell.uploadButton.setTitle("Remove Upload", forState: UIControlState.Normal)
                     cell.uploadButton.titleLabel?.font = UIFont.systemFontOfSize(12)

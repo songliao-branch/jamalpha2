@@ -83,7 +83,7 @@ class LyricsSyncViewController: UIViewController  {
         setUpCountdownView()
         if tempLyricsTimeTuple.count > 0 {
             addUnfinishedLyrivsAndTime()
-        }else{
+        } else {
             self.addLyricsToEditorView(theSong)
         }
     }
@@ -399,7 +399,6 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
         return self.lyricsOrganizedArray.count
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        print(self.player.currentTime)
         if indexPath.row == 0 || (addedLyricsWithTime.timeAdded[indexPath.item - 1] && addedLyricsWithTime.time[indexPath.item - 1] < self.player.currentTime) == true {
             if self.player.playing == false {
                 self.playPause(UITapGestureRecognizer())
@@ -531,18 +530,33 @@ extension LyricsSyncViewController {
         (lyric, _) = CoreDataManager.getLyrics(sender, fetchingLocalOnly: true)
      
         let count = lyric.lyric.count
-        if count > 0 {
+        var i = 0
+        if count > 0 && count <= self.lyricsOrganizedArray.count {
             var lyrics: [String] = [String]()
             var time: [NSTimeInterval] = [NSTimeInterval]()
             var timeAdded: [Bool] = [Bool]()
             for line in lyric.lyric {
-                lyrics.append(line.str)
-                time.append(NSTimeInterval(line.time.toDecimalNumer()))
-                timeAdded.append(true)
+                print(line.str)
+                print(self.lyricsOrganizedArray[i])
+                if line.str == self.lyricsOrganizedArray[i] {
+                    lyrics.append(line.str)
+                    time.append(NSTimeInterval(line.time.toDecimalNumer()))
+                    timeAdded.append(true)
+                    i++
+                } else {
+                    break
+                }
+            }
+            if i < self.lyricsOrganizedArray.count {
+                for var j = i; j < self.lyricsOrganizedArray.count; j++ {
+                    lyrics.append(self.lyricsOrganizedArray[i])
+                    time.append(self.addedLyricsWithTime.time[i])
+                    timeAdded.append(self.addedLyricsWithTime.timeAdded[i])
+                }
             }
             self.addedLyricsWithTime.addExistLyrics(count, lyrics: lyrics, time: time, timeAdded: timeAdded)
+            
         }
-        self.player.currentTime = self.addedLyricsWithTime.time.last!
-        
+        self.player.currentTime = self.addedLyricsWithTime.time[i - 1]
     }
 }

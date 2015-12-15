@@ -321,7 +321,7 @@ class MeLoginOrSignupViewController: UIViewController{
     }
     //used for facebook button too
     private func signUpLoginRequest(parameters: [String: String],  afterRetrievingUser: (( id: Int, email: String, authToken: String, nickname: String, avatarUrlMedium: String, avatarUrlThumbnail: String) -> Void)) {
-
+        
         Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
             {
                 response in
