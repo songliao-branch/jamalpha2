@@ -261,6 +261,12 @@ class MeLoginOrSignupViewController: UIViewController{
         
         self.submitButton.setTitle("Log in", forState: .Normal)
         self.passwordTextField.placeholder = "Password"
+        
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
     
     func topViewTapGesture(sender: UITapGestureRecognizer) {
