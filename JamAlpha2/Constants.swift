@@ -27,3 +27,7 @@ let facebookLoginSalt = "tJwIa021#1sm" //DO NOT MODIFITY THIS SALT, otherwise fa
 
 //reload music table after detecting new songs are added
 var kShouldReloadMusicTable = false
+
+let KPlayLocalSoundsKey  = "KPlayLocalSoundsKey"
+
+let K_songNames = ["Ed Sheeran - Thinking Out Loud","Rolling In The Deep","02 Morning"]

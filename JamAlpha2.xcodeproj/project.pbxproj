@@ -11,6 +11,9 @@
 		10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */; };
 		10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */; };
 		10E930A01C15753400C1D0C9 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */; };
+		10F3CFC01C1FDF6D00CC5E43 /* Ed Sheeran - Thinking Out Loud.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 10F3CFBF1C1FDF6D00CC5E43 /* Ed Sheeran - Thinking Out Loud.mp3 */; };
+		10F3CFC21C2096A600CC5E43 /* Rolling In The Deep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 10F3CFC11C2096A600CC5E43 /* Rolling In The Deep.mp3 */; };
+		10F3CFC41C209E8500CC5E43 /* 02 Morning.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 10F3CFC31C209E8500CC5E43 /* 02 Morning.mp3 */; };
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
@@ -116,6 +119,9 @@
 		10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageZoomAnimation.swift; sourceTree = "<group>"; };
 		10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewerViewController.swift; sourceTree = "<group>"; };
 		10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
+		10F3CFBF1C1FDF6D00CC5E43 /* Ed Sheeran - Thinking Out Loud.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Ed Sheeran - Thinking Out Loud.mp3"; sourceTree = "<group>"; };
+		10F3CFC11C2096A600CC5E43 /* Rolling In The Deep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Rolling In The Deep.mp3"; sourceTree = "<group>"; };
+		10F3CFC31C209E8500CC5E43 /* 02 Morning.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "02 Morning.mp3"; sourceTree = "<group>"; };
 		1E225B71031C3EA2120F8192 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A63591A1C3B0728C38D7319 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		5491F35DF2FB90338EBDC0CC /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -227,6 +233,16 @@
 				10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */,
 			);
 			name = Animation;
+			sourceTree = "<group>";
+		};
+		10F3CFBE1C1FDF5500CC5E43 /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				10F3CFBF1C1FDF6D00CC5E43 /* Ed Sheeran - Thinking Out Loud.mp3 */,
+				10F3CFC11C2096A600CC5E43 /* Rolling In The Deep.mp3 */,
+				10F3CFC31C209E8500CC5E43 /* 02 Morning.mp3 */,
+			);
+			name = Music;
 			sourceTree = "<group>";
 		};
 		377BBF0A419DDADF3605E109 /* Pods */ = {
@@ -408,6 +424,7 @@
 		E488773F1B151628004785D3 /* JamAlpha2 */ = {
 			isa = PBXGroup;
 			children = (
+				10F3CFBE1C1FDF5500CC5E43 /* Music */,
 				E4CBC0081B9E88D900473FC4 /* CoreData */,
 				E48AE2D01B955BA30044CFDB /* Networking */,
 				E4B6362F1B854A6A00F331A7 /* Utils */,
@@ -595,7 +612,7 @@
 						DevelopmentTeam = 978SMNLLT3;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
-								enabled = 0;
+								enabled = 1;
 							};
 						};
 					};
@@ -630,9 +647,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10F3CFC41C209E8500CC5E43 /* 02 Morning.mp3 in Resources */,
+				10F3CFC01C1FDF6D00CC5E43 /* Ed Sheeran - Thinking Out Loud.mp3 in Resources */,
 				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
 				E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */,
 				E488774C1B151628004785D3 /* Images.xcassets in Resources */,
+				10F3CFC21C2096A600CC5E43 /* Rolling In The Deep.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

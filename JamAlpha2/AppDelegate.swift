@@ -17,6 +17,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var suspended:Bool = false
     
+    func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        // it is important to registerDefaults as soon as possible,
+        // because it can change so much of how your app behaves
+        //
+        var defaultsDictionary: [String : AnyObject] = [:]
+        
+        // by default we track the user location while in the background
+        defaultsDictionary[KPlayLocalSoundsKey] = true
+        
+        NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
+        
+        return true
+    }
+
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
         // Universal setting
@@ -81,6 +96,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                                 for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                                     musicVC.reloadDataAndTable()
+                                    if(!musicVC.uniqueSongs.isEmpty){
+                                        musicVC.songCount = 0
+                                        musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+                                    }
                                 }
                             }
                         }
@@ -92,7 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
-            if MusicManager.sharedInstance.player.nowPlayingItem == nil {
+            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil {
                 if (!currentSongVC.isSongNeedPurchase){
                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                         completed in

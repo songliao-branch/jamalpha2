@@ -13,6 +13,7 @@ class MusicManager: NSObject {
     
     let _TAG = "MusicManager"
     var player: MPMusicPlayerController!
+    var localPlayer:AVQueuePlayer!
     
     // A queue that keep tracks the last queue to the player
     // this should never be accessed outside MusicManager
@@ -24,6 +25,9 @@ class MusicManager: NSObject {
     var uniqueSongs : [MPMediaItem]!
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
+    
+    var localSongs: [AVPlayerItem]!
+    var lastLocalPlayerQueue = [AVPlayerItem]()
     
     class var sharedInstance: MusicManager {
         struct Static {
@@ -71,19 +75,50 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-        print("\(_TAG) Initialize Player")
-        player = MPMusicPlayerController.systemMusicPlayer()
+            print("\(_TAG) Initialize Player")
+            player = MPMusicPlayerController.systemMusicPlayer()
+            
+            player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
+            // 暂时解决方法 App每次start就是先停下来
+            
+            player.repeatMode = .All
+            player.shuffleMode = .Off
+            self.setPlayerQueue(uniqueSongs)
         
-        player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
-        // 暂时解决方法 App每次start就是先停下来
+        //initialize AVQueuePlayer
+            self.localPlayer = AVQueuePlayer()
+            self.localPlayer.actionAtItemEnd = .Advance
+            self.setSessionActiveWithMixing(false)
+    }
+    
+    //for playing mode and background mode
+    private func setSessionActiveWithMixing(duckIfOtherAucioIsPlaying: Bool) {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: .MixWithOthers)
+        } catch _ {
+        }
         
-        player.repeatMode = .All
-        player.shuffleMode = .Off
+        if AVAudioSession.sharedInstance().otherAudioPlaying && duckIfOtherAucioIsPlaying {
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: [.MixWithOthers, .DuckOthers])
+            } catch _ {
+            }
+        }
         
-        self.setPlayerQueue(uniqueSongs)
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch _ {
+        }
     }
     
     private var queueChanged = false
+    
+    func setLocalSongItem(collection: [AVPlayerItem], selectedIndex:Int){
+        if(localPlayer.currentItem == nil || localPlayer.currentItem != collection[selectedIndex]){
+            localPlayer.removeAllItems()
+            localPlayer.insertItem(collection[selectedIndex], afterItem: nil)
+        }
+    }
 
     func setPlayerQueue(collection: [MPMediaItem]){
 
@@ -129,7 +164,7 @@ class MusicManager: NSObject {
         }
     }
     
-    
+
     
     func setIndexInTheQueue(selectedIndex: Int){
         // player.stop()
@@ -168,6 +203,10 @@ class MusicManager: NSObject {
         uniqueSongs = songCollection.items!.filter {
             song in
             song.playbackDuration > 30
+        }
+        
+        localSongs = K_songNames.map {
+            AVPlayerItem(URL: NSBundle.mainBundle().URLForResource($0, withExtension: "mp3")!)
         }
     }
     

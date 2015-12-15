@@ -5,13 +5,15 @@ import MediaPlayer
 class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
 
     @IBOutlet weak var tableView: UITableView!
-    private var uniqueSongs = [MPMediaItem]()
+    var uniqueSongs = [MPMediaItem]()
     private var uniqueArtists = [Artist]()
     private var uniqueAlbums = [Album]()
+    private var localSongs = [AVPlayerItem]()
     
     private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
     private var artistsByFirstAlphabet = [(String, [Artist])]()
     private var albumsByFirstAlphabet = [(String, [Album])]()
+    private var localSongsByFirstAlphabet = [(String, [AVPlayerItem])]()
     
     private var rwLock = pthread_rwlock_t()
     
@@ -23,7 +25,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     var animator: CustomTransitionAnimation?
     var nowView: VisualizerView!
     
-    private  var songCount: Int64 = 0
+    var songCount: Int64 = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,10 +49,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
+        localSongs = MusicManager.sharedInstance.localSongs
         
         songsByFirstAlphabet = sort(uniqueSongs)
         artistsByFirstAlphabet = sort(uniqueArtists)
         albumsByFirstAlphabet = sort(uniqueAlbums)
+        localSongsByFirstAlphabet = sort(localSongs)
     }
     
     deinit{
@@ -59,6 +63,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 
     func registerMusicPlayerNotificationForSongChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
+        
+        // NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: AVPlayerItemDidPlayToEndTimeNotification, object: MusicManager.sharedInstance.localPlayer)
     }
     
     func synced(lock: AnyObject, closure: () -> ()) {
@@ -82,13 +88,15 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     func currentSongChanged(notification: NSNotification){
         synced(self) {
-            let player = MusicManager.sharedInstance.player
-            if player.repeatMode == .One {
-                return
-            }
-            
-            if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                self.musicTable.reloadData()
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                let player = MusicManager.sharedInstance.player
+                if player.repeatMode == .One {
+                    return
+                }
+                
+                if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                    self.musicTable.reloadData()
+                }
             }
         }
     }
@@ -107,57 +115,95 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
     }
+    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         if pageIndex == 0  {
-            return songsByFirstAlphabet.count
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                return songsByFirstAlphabet.count
+            }else{
+                return localSongsByFirstAlphabet.count
+            }
+            
         }
         else if pageIndex == 1 {
-            return artistsByFirstAlphabet.count
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                return artistsByFirstAlphabet.count
+            }
         }
-        else {
-            return albumsByFirstAlphabet.count
+        else if pageIndex == 2 {
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                return albumsByFirstAlphabet.count
+            }
         }
+        
+        return 0
     }
     
     // populate the index titles on the right side of screen
     func sectionIndexTitlesForTableView(tableView: UITableView) -> [String]? {
         var titles = [String]()
         if pageIndex == 0 {
-            for (firstAlphabet, _) in songsByFirstAlphabet {
-                titles.append(firstAlphabet)
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                for (firstAlphabet, _) in songsByFirstAlphabet {
+                    titles.append(firstAlphabet)
+                }
+                return titles
+            }else{
+                for (firstAlphabet, _) in localSongsByFirstAlphabet {
+                    titles.append(firstAlphabet)
+                }
+                return titles
             }
-            return titles
+            
         } else if pageIndex == 1 {
-            for (firstAlphabet, _) in artistsByFirstAlphabet {
-                titles.append(firstAlphabet)
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                for (firstAlphabet, _) in artistsByFirstAlphabet {
+                    titles.append(firstAlphabet)
+                }
+                return titles
             }
-            return titles
-        } else {
-            for (firstAlphabet, _) in albumsByFirstAlphabet {
-                titles.append(firstAlphabet)
+        } else if pageIndex == 2{
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                for (firstAlphabet, _) in albumsByFirstAlphabet {
+                    titles.append(firstAlphabet)
+                }
+                return titles
             }
-            return titles
         }
+        return [""]
     }
     
     // scroll to the current section
     func tableView(tableView: UITableView, sectionForSectionIndexTitle title: String, atIndex index: Int) -> Int {
         if pageIndex == 0 {
-            for i in 0..<songsByFirstAlphabet.count {
-                if title == songsByFirstAlphabet[i].0 {
-                    return i
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                for i in 0..<songsByFirstAlphabet.count {
+                    if title == songsByFirstAlphabet[i].0 {
+                        return i
+                    }
+                }
+            }else{
+                for i in 0..<localSongsByFirstAlphabet.count {
+                    if title == localSongsByFirstAlphabet[i].0 {
+                        return i
+                    }
                 }
             }
+            
         } else if pageIndex == 1 {
-            for i in 0..<artistsByFirstAlphabet.count {
-                if title == artistsByFirstAlphabet[i].0 {
-                    return i
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                for i in 0..<artistsByFirstAlphabet.count {
+                    if title == artistsByFirstAlphabet[i].0 {
+                        return i
+                    }
                 }
             }
-        } else {
-            for i in 0..<albumsByFirstAlphabet.count {
-                if title == albumsByFirstAlphabet[i].0 {
-                    return i
+        } else if pageIndex == 2 {
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                for i in 0..<albumsByFirstAlphabet.count {
+                    if title == albumsByFirstAlphabet[i].0 {
+                        return i
+                    }
                 }
             }
         }
@@ -166,14 +212,26 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
-            return songsByFirstAlphabet[section].1.count
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                return songsByFirstAlphabet[section].1.count
+            }else{
+                return localSongsByFirstAlphabet[section].1.count
+            }
         }
         else if pageIndex == 1 {
-            return artistsByFirstAlphabet[section].1.count
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                return artistsByFirstAlphabet[section].1.count
+            }else{
+                return 0
+            }
         }
         else
         {
-            return albumsByFirstAlphabet[section].1.count
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                return albumsByFirstAlphabet[section].1.count
+            }else{
+                return 0
+            }
         }
     }
    
@@ -182,32 +240,57 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
 
         if pageIndex == 0 {
-            
-            let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
-            if MusicManager.sharedInstance.player.nowPlayingItem != nil {
-                if song == MusicManager.sharedInstance.player.nowPlayingItem {
-                    cell.titleTrailingConstraint.constant = 50
-                    cell.loudspeakerImage.hidden = false
-                }
-                else {
-                    cell.titleTrailingConstraint.constant = 15
+            if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
+                if MusicManager.sharedInstance.player.nowPlayingItem != nil {
+                    if song == MusicManager.sharedInstance.player.nowPlayingItem {
+                        cell.titleTrailingConstraint.constant = 50
+                        cell.loudspeakerImage.hidden = false
+                    }
+                    else {
+                        cell.titleTrailingConstraint.constant = 15
+                        cell.loudspeakerImage.hidden = true
+                    }
+                } else {
                     cell.loudspeakerImage.hidden = true
                 }
-            } else {
-                cell.loudspeakerImage.hidden = true
+                // some song does not have an album cover
+                if let cover = song.artwork {
+                    let image = cover.imageWithSize(CGSize(width: 54, height: 54))
+                    cell.coverImage.image = image
+                } else {
+                    //TODO: add a placeholder cover
+                    cell.coverImage.image = UIImage(named: "liweng")
+                }
+                
+                cell.mainTitle.text = song.title
+                cell.subtitle.text = song.artist
+            }else{
+                let song = localSongsByFirstAlphabet[indexPath.section].1[indexPath.row]
+                if MusicManager.sharedInstance.localPlayer.currentItem != nil {
+                    if song == MusicManager.sharedInstance.localPlayer.currentItem {
+                        cell.titleTrailingConstraint.constant = 50
+                        cell.loudspeakerImage.hidden = false
+                    }
+                    else {
+                        cell.titleTrailingConstraint.constant = 15
+                        cell.loudspeakerImage.hidden = true
+                    }
+                } else {
+                    cell.loudspeakerImage.hidden = true
+                }
+                // some song does not have an album cover
+                if let cover = song.getArtWork() {
+                    let image = cover.imageWithSize(CGSize(width: 54, height: 54))
+                    cell.coverImage.image = image
+                } else {
+                    //TODO: add a placeholder cover
+                    cell.coverImage.image = UIImage(named: "liweng")
+                }
+                
+                cell.mainTitle.text = song.getTitle()
+                cell.subtitle.text = song.getArtist()
             }
-            // some song does not have an album cover
-            if let cover = song.artwork {
-                let image = cover.imageWithSize(CGSize(width: 54, height: 54))
-                cell.coverImage.image = image
-            } else {
-                //TODO: add a placeholder cover
-                cell.coverImage.image = UIImage(named: "liweng")
-            }
-            
-            cell.mainTitle.text = song.title
-            cell.subtitle.text = song.artist
-            
         } else if pageIndex == 1  {
             
             let theArtist = artistsByFirstAlphabet[indexPath.section].1[indexPath.row]
@@ -282,14 +365,20 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if pageIndex == 0 {
             KGLOBAL_init_queue.suspended = true
-            
-            let allSongsSorted = getAllSortedItems(songsByFirstAlphabet)
-            MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
-            
-            let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
-            MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
-
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+            
+            if (!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+                let allSongsSorted = getAllSortedItems(songsByFirstAlphabet)
+                MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
+                
+                let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
+                MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+            }else{
+                    let allSongsSorted = getAllSortedItems(localSongsByFirstAlphabet)
+                    let indexToBePlayed = findIndexToBePlayed(localSongsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
+                    MusicManager.sharedInstance.setLocalSongItem(allSongsSorted, selectedIndex:indexToBePlayed)
+                    songVC.selectedRow = indexPath.row
+            }
             songVC.selectedFromTable = true
             
             songVC.transitioningDelegate = self.animator
@@ -427,7 +516,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 
 extension MusicViewController {
     
-    func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
+    func generateWaveFormInBackEnd(nowPlayingItem: Findable){
         
         CoreDataManager.initializeSongToDatabase(nowPlayingItem)
         
@@ -436,8 +525,8 @@ extension MusicViewController {
             self.incrementSongCountInThread()
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
-                    print("\(nowPlayingItem.title!) does not have a sound url")
+                guard let assetURL = nowPlayingItem.getURL() else {
+                    print("\(nowPlayingItem.getTitle()) does not have a sound url")
                     
                     self.incrementSongCountInThread()
                     return
@@ -449,7 +538,7 @@ extension MusicViewController {
                     // have to use the temp value to do the nsoperation, cannot use (self.) do that.
                     let tempNowPlayingItem = nowPlayingItem
                     var progressBarWidth:CGFloat!
-                    progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
+                    progressBarWidth = CGFloat(nowPlayingItem.getDuration()) * progressWidthMultiplier
                     let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
                     
                     op = NSBlockOperation(block: {
@@ -465,7 +554,7 @@ extension MusicViewController {
                                 tempProgressBlock.generateWaveforms()
                                 let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                                 CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                                print("Soundwave generated for \(nowPlayingItem.title!) in background")
+                                print("Soundwave generated for \(nowPlayingItem.getTitle()) in background")
                                 self.incrementSongCountInThread()
                             })
                         }
