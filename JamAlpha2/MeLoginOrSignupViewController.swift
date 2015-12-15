@@ -247,6 +247,12 @@ class MeLoginOrSignupViewController: UIViewController{
         
         self.passwordTextField.placeholder = "Password (Mininum 6 characters)"
         self.submitButton.setTitle("Sign up", forState: .Normal)
+        
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
     
     func loginTabPressed() {
