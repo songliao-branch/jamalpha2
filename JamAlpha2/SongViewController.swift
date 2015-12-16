@@ -1967,6 +1967,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
         tabsEditorVC.songViewController = self
+        tabsEditorVC.isPlayingLocalSong = self.isPlayingLocalSong
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
