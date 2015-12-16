@@ -336,8 +336,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 
                     MusicManager.sharedInstance.setDemoSongQueue(demoSongs, selectedIndex: indexPath.row)
                     songVC.selectedRow = indexPath.row
-//                    self.selectedRow = indexPath.row
-                    MusicManager.sharedInstance.player.pause()
+                    MusicManager.sharedInstance.player.stop()
                     songVC.isDemoSong = true
                     
                 } else {
@@ -345,6 +344,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section-1, currentRow: indexPath.row)
                     MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
                     MusicManager.sharedInstance.avPlayer.pause()
+                    MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 }
                 
             } else {
@@ -352,6 +352,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
                 MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
                 MusicManager.sharedInstance.avPlayer.pause()
+                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             }
             
             songVC.selectedFromTable = true
@@ -366,29 +367,25 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             })
         }
         else if pageIndex == 1 {
-
-            let allArtistsSorted = getAllSortedItems(artistsByFirstAlphabet)
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
             artistVC.nowView = self.nowView
-            artistVC.theArtist = allArtistsSorted[indexToBePlayed]
+            artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
             
         }
         else if pageIndex == 2 {
             
-            let allAlbumsSorted = getAllSortedItems(albumsByFirstAlphabet)
             let indexToBePlayed = findIndexToBePlayed(albumsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.musicViewController = self
             albumVC.nowView = self.nowView
-            albumVC.theAlbum = allAlbumsSorted[indexToBePlayed]
+            albumVC.theAlbum = albumsSorted[indexToBePlayed]
             
             self.showViewController(albumVC, sender: self)
-            
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
