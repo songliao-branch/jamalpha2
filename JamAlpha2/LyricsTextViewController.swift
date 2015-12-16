@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import MediaPlayer
 
 class LyricsTextViewController: UIViewController {
     
@@ -15,8 +14,7 @@ class LyricsTextViewController: UIViewController {
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
-    var theSong: MPMediaItem!
-    var allLocalSong: [MPMediaItem] = [MPMediaItem]()
+    var theSong: Findable!
     
     var lyricsTextView: UITextView = UITextView()
     
@@ -94,7 +92,7 @@ class LyricsTextViewController: UIViewController {
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
         var image:UIImage!
-        if let artwork = theSong!.artwork {
+        if let artwork = theSong!.getArtWork() {
             image = artwork.imageWithSize(size)
         } else {
             //TODO: add a placeholder album cover
@@ -190,7 +188,11 @@ class LyricsTextViewController: UIViewController {
        
         self.dismissViewControllerAnimated(true, completion: {
             completed in
-            self.songViewController.player.play()
+            if self.songViewController.isPlayingLocalSong {
+                self.songViewController.localPlayer.play()
+            } else {
+                self.songViewController.player.play()
+            }
         })
     }
     

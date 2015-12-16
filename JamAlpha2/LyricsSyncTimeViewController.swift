@@ -53,7 +53,7 @@ class LyricsSyncViewController: UIViewController  {
     var viewWidth = CGFloat()
     var viewHeight  = CGFloat()
     
-    var theSong: MPMediaItem!
+    var theSong: Findable!
     
     var lyricsOrganizedArray: [String]!
 
@@ -102,7 +102,7 @@ class LyricsSyncViewController: UIViewController  {
     
     // MARK: set up views
     func setUpSong() {
-        let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
+        let url: NSURL = theSong.getURL() as! NSURL
         self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.player.volume = 1
         self.player.enableRate = true
@@ -158,7 +158,7 @@ class LyricsSyncViewController: UIViewController  {
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
         var image:UIImage!
-        if let artwork = theSong!.artwork {
+        if let artwork = theSong.getArtWork() {
             image = artwork.imageWithSize(size)
         } else {
             //TODO: add a placeholder album cover
@@ -186,7 +186,7 @@ class LyricsSyncViewController: UIViewController  {
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
 
-        self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.playbackDuration) * 2, soundwaveHeight))
+        self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.getDuration()) * 2, soundwaveHeight))
         
         if let soundWaveData = CoreDataManager.getSongWaveFormImage(theSong) {
             progressBlock.setWaveFormFromData(soundWaveData)
@@ -234,7 +234,7 @@ class LyricsSyncViewController: UIViewController  {
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         
-        totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
+        totalTimeLabel.text = TimeNumber(time: Float(theSong.getDuration())).toDisplayString()
         totalTimeLabel.textAlignment = .Right
         self.view.addSubview(totalTimeLabel)
     }
@@ -521,7 +521,7 @@ extension LyricsSyncViewController {
         tempLyricsTimeTuple.removeAll()
     }
     
-    func addLyricsToEditorView(sender: MPMediaItem) {
+    func addLyricsToEditorView(sender: Findable) {
         
         var lyric = Lyric()
         (lyric, _) = CoreDataManager.getLyrics(sender, fetchingLocalOnly: true)

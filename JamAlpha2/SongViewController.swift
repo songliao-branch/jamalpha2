@@ -1952,7 +1952,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
-        self.player.pause()
+        if !isPlayingLocalSong{
+            self.player.pause()
+        }else{
+            self.localPlayer.pause()
+        }
+        
         self.clearActions()
         
         if shouldShowSignUpPage() {
@@ -1960,7 +1965,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-        tabsEditorVC.theSong = self.player.nowPlayingItem!
+        tabsEditorVC.theSong = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
         tabsEditorVC.songViewController = self
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
@@ -2019,7 +2024,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
-        self.player.pause()
+        
+        if !isPlayingLocalSong{
+            self.player.pause()
+        }else{
+            self.localPlayer.pause()
+        }
+        
         self.clearActions()
         
         if shouldShowSignUpPage() {
@@ -2028,7 +2039,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
-        lyricsEditor.theSong = self.player.nowPlayingItem
+        lyricsEditor.theSong = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
 
         self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }

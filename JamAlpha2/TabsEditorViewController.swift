@@ -36,7 +36,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     //MARK: decide the progress block width
     let tabsEditorProgressWidthMultiplier: CGFloat = 10
     var progressBlock: SoundWaveView!
-    var theSong: MPMediaItem!
+    var theSong: Findable!
     var currentTime: NSTimeInterval = NSTimeInterval()
     var player: AVAudioPlayer = AVAudioPlayer()
     var duration: NSTimeInterval = NSTimeInterval()
@@ -169,7 +169,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         backgroundImage.frame = CGRectMake(0, 0, self.trueWidth, self.trueWidth)
         let size: CGSize = CGSizeMake(self.trueWidth, self.trueWidth)
         var image:UIImage!
-        if let artwork = theSong!.artwork {
+        if let artwork = theSong.getArtWork() {
             image = artwork.imageWithSize(size)
         } else {
             //TODO: add a placeholder album cover
@@ -989,7 +989,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         totalTimeLabel.center.y = wrapper.center.y
-        totalTimeLabel.text = TimeNumber(time: Float(theSong.playbackDuration)).toDisplayString()
+        totalTimeLabel.text = TimeNumber(time: Float(theSong.getDuration())).toDisplayString()
         totalTimeLabel.sizeToFit()
         totalTimeLabel.center = CGPoint(x: wrapper.center.x+totalTimeLabel.frame.width/2+2, y: wrapper.center.y)
         musicControlView.addSubview(totalTimeLabel)
@@ -1014,7 +1014,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTime = self.player.currentTime
         let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
         self.progressBlock.setProgress(persent)
-        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.playbackDuration * Double(tabsEditorProgressWidthMultiplier)))
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
 
         self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
         // find the current tab according to the current time and make the current tab view to yellow
@@ -1120,12 +1120,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
 
     func createSoundWave() {
-        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.playbackDuration), 6 / 20 * self.trueHeight)
+        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
         self.progressBlock = SoundWaveView(frame: frame)
         if(theSong == nil){
             print("the song is empty")
         }
-        let url: NSURL = theSong.valueForProperty(MPMediaItemPropertyAssetURL) as! NSURL
+        let url: NSURL = theSong.getURL() as! NSURL
         self.player = try! AVAudioPlayer(contentsOfURL: url)
         self.duration = self.player.duration
         self.player.enableRate = true
@@ -1151,7 +1151,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         //MARK: progessBlock width
-        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration) * tabsEditorProgressWidthMultiplier)
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
         
         self.findCurrentTabView()
 
@@ -1341,7 +1341,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             print("back to song view controller")
             self.dismissViewControllerAnimated(false, completion: {
                 completed in
-                self.songViewController.player.play()
+                if self.songViewController.isPlayingLocalSong {
+                    self.songViewController.localPlayer.play()
+                } else {
+                    self.songViewController.player.play()
+                }
             })
         }
     }
@@ -1751,7 +1755,7 @@ extension TabsEditorViewController {
                     //refresh progress block
                     let presentPosition = CGFloat(self.currentTime / self.duration)
                     self.progressBlock.setProgress(presentPosition)
-                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.playbackDuration) * tabsEditorProgressWidthMultiplier)
+                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
                     
                     let returnValue = addTabViewOnMusicControlView(i)
                     
@@ -1768,7 +1772,7 @@ extension TabsEditorViewController {
 
     
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
-    func addChordToEditorView(sender: MPMediaItem) {
+    func addChordToEditorView(sender: Findable) {
         let tabs = CoreDataManager.getTabs(sender, fetchingLocalOnly: true)
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
