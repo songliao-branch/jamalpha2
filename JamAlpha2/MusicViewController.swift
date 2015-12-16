@@ -336,7 +336,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 
                     MusicManager.sharedInstance.setDemoSongQueue(demoSongs, selectedIndex: indexPath.row)
                     songVC.selectedRow = indexPath.row
-                    MusicManager.sharedInstance.player.stop()
+                    MusicManager.sharedInstance.player.pause()
+                    MusicManager.sharedInstance.player.currentPlaybackTime = 0
                     songVC.isDemoSong = true
                     
                 } else {
