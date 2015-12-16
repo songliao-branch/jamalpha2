@@ -25,7 +25,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var isGenerated:Bool = true
     
     //time for chords to fall from top to bottom of chordbase
-    var freefallTime:Float = 3.2
+    var freefallTime:Float = 3.0
     var minfont: CGFloat = 15
     
     var nowView: VisualizerView!
