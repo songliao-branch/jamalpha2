@@ -38,7 +38,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var progressBlock: SoundWaveView!
     var theSong: MPMediaItem!
     var currentTime: NSTimeInterval = NSTimeInterval()
-    var player: AVAudioPlayer = AVAudioPlayer()
+    var player: AVAudioPlayer = AVAudioPlayer() // change to mpmeidaplayer
+    // sample song using avplayer
     var duration: NSTimeInterval = NSTimeInterval()
     var musicControlView: UIView = UIView()
     

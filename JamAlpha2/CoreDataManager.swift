@@ -435,7 +435,10 @@ class CoreDataManager: NSObject {
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
-
+    
+//    class func getAllTabs() -> ([DownloadedTabsSet]) {
+//        
+//    }
     
     //if isLocal is true, we get the ONE tabs from the database, otherwise we selected the one last selected
     class func getTabs(item: Findable, fetchingLocalOnly: Bool) -> ([Chord], String, Int, Int) { //return chords, tuning and capo, song_id

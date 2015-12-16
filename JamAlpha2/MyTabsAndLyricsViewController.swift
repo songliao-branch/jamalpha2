@@ -20,8 +20,7 @@ class MyTabsAndLyricsViewController: UIViewController {
     var tabsOrLyrics: String!
     
     var myTitle: String!
-    var myDataArray: [(String, String, String, String)]!
-    
+    var myDataArray: [(String, String, String, String, Int)] = [(String, String, String, String, Int)]()
     
 
     override func viewDidLoad() {
@@ -32,8 +31,6 @@ class MyTabsAndLyricsViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         loadData()
-        setUpNavigationBar()
-        setUpTableView()
     }
 
     override func didReceiveMemoryWarning() {
@@ -49,19 +46,40 @@ class MyTabsAndLyricsViewController: UIViewController {
     }
     
     func loadData() {
-        let currentUserId = CoreDataManager.getCurrentUser()?.id
-        
-        
-        
+        let currentUserId = CoreDataManager.getCurrentUser()?.id as! Int
+        let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+        activityIndicator.center =  CGPointMake(self.view.bounds.size.width / 2.0, self.view.bounds.size.height / 2.0)
+        self.view.addSubview(activityIndicator)
         if tabsOrLyrics == "tabs" {
             self.myTitle = "My Tabs"
-            // 0 means need to upload, 1 means already uploaded
-            self.myDataArray = [("一里香", "Jay", "0", "unpressed"), ("二里香", "Jay", "1", "unpressed"), ("三里香", "Jay", "1", "unpressed"), ("四里香", "Jay", "0", "unpressed")] // tabs data
+            activityIndicator.startAnimating()
+            APIManager.getUserTabsInfo(currentUserId, completion: {
+                downloadedTabSets in
+                for temp in downloadedTabSets {
+                    let set = temp as DownloadedTabsSet
+                    self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id))// 1 means already uploaded
+                }
+                activityIndicator.stopAnimating()
+                self.initialTheView()
+            
+            })
         } else {
             self.myTitle = "My Lyrics"
-            // 0 means need to upload, 1 means already uploaded
-            self.myDataArray = [("五里香", "Jay", "0", "unpressed"), ("六里香", "Jay", "1", "unpressed"), ("七里香", "Jay", "1", "unpressed"), ("八里香", "Jay", "0", "unpressed")] // lyrics data
+            APIManager.getUserLyricsInfo(currentUserId, completion: {
+                downloadedLyricsSets in
+                for set in downloadedLyricsSets {
+                    self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id))
+                }
+                activityIndicator.stopAnimating()
+                self.initialTheView()
+            })
         }
+    }
+    
+    func initialTheView() {
+        self.setUpNavigationBar()
+        self.setUpTableView()
+    
     }
     
     func pressOptionButton(sender: UIButton) {
@@ -78,7 +96,7 @@ class MyTabsAndLyricsViewController: UIViewController {
     
     func insertRow(indexPath: NSIndexPath) {
         let addIndexPath: NSIndexPath = NSIndexPath(forItem: indexPath.item + 1, inSection: 0)
-        myDataArray.insert(("", "", "", ""), atIndex: indexPath.item + 1)
+        myDataArray.insert(("", "", "", "", -1), atIndex: indexPath.item + 1)
         self.selectRow.append(addIndexPath)
         self.tableView.insertRowsAtIndexPaths(self.selectRow, withRowAnimation: UITableViewRowAnimation.Automatic)
     }
@@ -153,15 +171,15 @@ extension MyTabsAndLyricsViewController: UITableViewDelegate, UITableViewDataSou
         cell.initialCell(self.viewWidth)
         if self.selectRow.count > 0 {
             if indexPath.item > self.selectRow[0].item {
-                cell.numberLabel.text = "\(indexPath.item - 1)"
+                cell.numberLabel.text = "\(indexPath.item)"
                 cell.optionButton.tag = indexPath.item - 1
             }
         } else {
-            cell.numberLabel.text = "\(indexPath.item)"
+            cell.numberLabel.text = "\(indexPath.item + 1)"
             cell.optionButton.tag = indexPath.item
         }
-        cell.songNameLabel.text = myDataArray[indexPath.item].0
-        cell.singerNameLabel.text = myDataArray[indexPath.item].1
+        cell.songNameLabel.text = myDataArray[indexPath.item].0 as String
+        cell.singerNameLabel.text = myDataArray[indexPath.item].1 as String
         cell.uploadedImageView.alpha = 0
         if myDataArray[indexPath.item].2 == "1" {
             cell.uploadedImageView.alpha = 1

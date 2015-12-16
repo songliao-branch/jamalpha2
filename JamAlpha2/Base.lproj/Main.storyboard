@@ -858,7 +858,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="60" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="gUb-aW-Cee">
-                                <rect key="frame" x="-4" y="0.0" width="328" height="568"/>
+                                <rect key="frame" x="-4" y="0.0" width="328" height="480"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" id="cUT-kz-7Jk">
@@ -926,7 +926,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="alD-Ck-5Oe" firstAttribute="top" secondItem="gUb-aW-Cee" secondAttribute="bottom" id="4cJ-x9-f4c"/>
+                            <constraint firstItem="alD-Ck-5Oe" firstAttribute="top" secondItem="gUb-aW-Cee" secondAttribute="bottom" constant="88" id="4cJ-x9-f4c"/>
                             <constraint firstItem="gUb-aW-Cee" firstAttribute="leading" secondItem="5KT-HN-5RM" secondAttribute="leadingMargin" constant="-20" id="Miv-Zv-E1e"/>
                             <constraint firstItem="gUb-aW-Cee" firstAttribute="top" secondItem="5KT-HN-5RM" secondAttribute="topMargin" id="azT-vB-7V4"/>
                             <constraint firstAttribute="trailingMargin" secondItem="gUb-aW-Cee" secondAttribute="trailing" constant="-20" id="rKQ-Kx-EvB"/>

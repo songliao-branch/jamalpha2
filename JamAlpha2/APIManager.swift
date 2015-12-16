@@ -153,7 +153,7 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
+
                     for set in json["tabs_sets"].array! {
                         
                         let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
@@ -184,7 +184,6 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     let set = json["tabs_set_content"]
                     
-                    print(json)
                     var theTimes = [Float]()
                     
                     //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
@@ -217,7 +216,6 @@ class APIManager: NSObject {
                 if let data = response.result.value {
                     let json = JSON(data)
                     
-                    print(json)
                     if let _ = json["error"].string {
                         print("no most liked tabs yet")
                         return
@@ -267,7 +265,7 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
+
                     for set in json["lyrics_sets"].array! {
                         
                          let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
@@ -296,7 +294,6 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     let set = json["lyrics_set_content"]
                     
-                    print(json)
                     var theTimes = [Float]()
                     
                     //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
@@ -327,8 +324,6 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    
-                    print(json)
                     if let _ = json["error"].string {
                         print("no most liked lyrics yet")
                         return
@@ -398,15 +393,7 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    
-                    print(json)
-                    var editor: Editor = Editor()
-                    editor.userId = json["id"].int!
-                    editor.nickname = json["nickname"].string!
-                    editor.avatarUrlMedium = json["avatar_url_medium"].string!
-                    editor.avatarUrlThumbnail = json["avatar_url_thumbnail"].string!
-                    
-                    let set = json["lyric_sets"]
+                    let set = json["user"]["lyrics_sets"]
                     for lyrics in set {
                         let mylyrics: DownloadedLyricsSet = DownloadedLyricsSet()
                         mylyrics.initialLyricsSet(lyrics.1["id"].int!, cached_votes_score: lyrics.1["cached_votes_score"].int!, number_of_lines: lyrics.1["number_of_lines"].int!, lyrics_preview: lyrics.1["lyrics_preview"].string!, vote_status: lyrics.1["vote_status"].string!, updated_at: lyrics.1["updated_at"].string!, song_id: lyrics.1["song"]["id"].int!, title: lyrics.1["song"]["title"].string!, artist: lyrics.1["song"]["artist"].string!, duration: lyrics.1["song"]["duration"].float!)
@@ -432,15 +419,7 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    
-                    print(json)
-                    var editor: Editor = Editor()
-                    editor.userId = json["id"].int!
-                    editor.nickname = json["nickname"].string!
-                    editor.avatarUrlMedium = json["avatar_url_medium"].string!
-                    editor.avatarUrlThumbnail = json["avatar_url_thumbnail"].string!
-                    
-                    let set = json["tabs_sets"]
+                    let set = json["user"]["tabs_sets"]
                     for tabs in set {
                         let mytab: DownloadedTabsSet = DownloadedTabsSet()
                         mytab.initialTabSet(tabs.1["id"].int!, tuning: tabs.1["tuning"].string!, capo: tabs.1["capo"].int!, cached_votes_score: tabs.1["cached_votes_score"].int!, chords_preview: tabs.1["chords_preview"].string!, vote_status: tabs.1["vote_status"].string!, updated_at: tabs.1["updated_at"].string!, song_id: tabs.1["song"]["id"].int!, title: tabs.1["song"]["title"].string!, artist: tabs.1["song"]["artist"].string!, duration: tabs.1["song"]["duration"].float!)

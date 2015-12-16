@@ -70,34 +70,5 @@ class DownloadedTabsSet: NSObject {
     }
 }
 
-class MyTab: NSObject {
-    var id: Int!
-    var tuning: String!
-    var capo: Int!
-    var cached_votes_score: Int!
-    var chords_preview: String!
-    var vote_status: String!
-    var updated_at: String!
-    var song_id: Int!
-    var title: String!
-    var artist: String!
-    var duration: Float!
-    var editor: Editor!
-    init(id: Int, tuning: String, capo: Int, cached_votes_score: Int, chords_preview: String, vote_status: String, updated_at: String, song_id: Int, title: String, artist: String, duration: Float, editor: Editor) {
-        self.id = id
-        self.tuning = tuning
-        self.capo = capo
-        self.cached_votes_score = cached_votes_score
-        self.chords_preview = chords_preview
-        self.vote_status = vote_status
-        self.updated_at = NSDate.convertFromIsoToHumanizedFormat(updated_at)
-        self.song_id = song_id
-        self.title = title
-        self.artist = artist
-        self.duration = duration
-        self.editor = editor
-    }
-}
-
 
 
