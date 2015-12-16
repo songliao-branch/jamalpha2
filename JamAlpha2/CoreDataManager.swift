@@ -436,9 +436,41 @@ class CoreDataManager: NSObject {
         }
     }
     
-//    class func getAllTabs() -> ([DownloadedTabsSet]) {
-//        
-//    }
+    class func getAllLocalTabs() -> [LocalTabSet] {
+        let predicate: NSPredicate = NSPredicate(format: "(isLocal == true)")
+        
+
+        do {
+            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc)
+            var tabSets: [LocalTabSet] = [LocalTabSet]()
+            for result in results {
+                let temp = result as! TabsSet
+                let tabSet: LocalTabSet = LocalTabSet(id: temp.id as Int, song: temp.song)
+                tabSets.append(tabSet)
+            }
+            return tabSets
+        } catch {
+            fatalError("There was an error fetching all new tabs")
+        }
+    }
+    
+    class func getAllLocalLyrics() -> [LocalLyrics] {
+        let predicate: NSPredicate = NSPredicate(format: "(isLocal == true)")
+        
+        
+        do {
+            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: predicate, managedObjectContext: moc)
+            var lyricsSets: [LocalLyrics] = [LocalLyrics]()
+            for result in results {
+                let temp = result as! LyricsSet
+                let lyricsSet: LocalLyrics = LocalLyrics(id: temp.id as Int, song: temp.song)
+                lyricsSets.append(lyricsSet)
+            }
+            return lyricsSets
+        } catch {
+            fatalError("There was an error fetching all new tabs")
+        }
+    }
     
     //if isLocal is true, we get the ONE tabs from the database, otherwise we selected the one last selected
     class func getTabs(item: Findable, fetchingLocalOnly: Bool) -> ([Chord], String, Int, Int) { //return chords, tuning and capo, song_id

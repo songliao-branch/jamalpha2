@@ -40,6 +40,8 @@ class DownloadedTabsSet: NSObject {
     var artist = ""
     var duration: Float = 0
     
+    var localSong: Song!
+    
     init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
         self.id = id
         self.tuning = tuning
@@ -67,6 +69,18 @@ class DownloadedTabsSet: NSObject {
         self.title = title
         self.artist = artist
         self.duration = duration
+    }
+    
+
+}
+
+class LocalTabSet {
+    var id = -1
+    var localSong: Song!
+    
+    init(id: Int, song: Song) {
+        self.id = id
+        self.localSong = song
     }
 }
 

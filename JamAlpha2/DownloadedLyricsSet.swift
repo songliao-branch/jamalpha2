@@ -58,3 +58,14 @@ class DownloadedLyricsSet: NSObject {
         self.duration = duration
     }
 }
+
+class LocalLyrics {
+    var id = -1
+    var localSong: Song!
+    
+    init(id: Int, song: Song) {
+        self.id = id
+        self.localSong = song
+    }
+}
+

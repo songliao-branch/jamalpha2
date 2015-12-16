@@ -20,7 +20,7 @@ class MyTabsAndLyricsViewController: UIViewController {
     var tabsOrLyrics: String!
     
     var myTitle: String!
-    var myDataArray: [(String, String, String, String, Int)] = [(String, String, String, String, Int)]()
+    var myDataArray: [(String, String, String, String, Int, Int)] = [(String, String, String, String, Int, Int)]()
     
 
     override func viewDidLoad() {
@@ -57,7 +57,11 @@ class MyTabsAndLyricsViewController: UIViewController {
                 downloadedTabSets in
                 for temp in downloadedTabSets {
                     let set = temp as DownloadedTabsSet
-                    self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id))// 1 means already uploaded
+                    self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id, set.id))// 1 means already uploaded, the last two para is songId and tabsetId
+                }
+                let localLyricsSets: [LocalLyrics] = CoreDataManager.getAllLocalLyrics()
+                for temp in localLyricsSets {
+                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", -1, temp.id))
                 }
                 activityIndicator.stopAnimating()
                 self.initialTheView()
@@ -68,7 +72,11 @@ class MyTabsAndLyricsViewController: UIViewController {
             APIManager.getUserLyricsInfo(currentUserId, completion: {
                 downloadedLyricsSets in
                 for set in downloadedLyricsSets {
-                    self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id))
+                    self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id, set.id))
+                }
+                let localTabSets: [LocalTabSet] = CoreDataManager.getAllLocalTabs()
+                for temp in localTabSets {
+                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", -1, temp.id))
                 }
                 activityIndicator.stopAnimating()
                 self.initialTheView()
@@ -96,7 +104,7 @@ class MyTabsAndLyricsViewController: UIViewController {
     
     func insertRow(indexPath: NSIndexPath) {
         let addIndexPath: NSIndexPath = NSIndexPath(forItem: indexPath.item + 1, inSection: 0)
-        myDataArray.insert(("", "", "", "", -1), atIndex: indexPath.item + 1)
+        myDataArray.insert(("", "", "", "", -1, -1), atIndex: indexPath.item + 1)
         self.selectRow.append(addIndexPath)
         self.tableView.insertRowsAtIndexPaths(self.selectRow, withRowAnimation: UITableViewRowAnimation.Automatic)
     }
