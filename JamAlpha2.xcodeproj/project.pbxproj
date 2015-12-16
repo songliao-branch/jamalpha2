@@ -58,7 +58,7 @@
 		E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */; };
 		E46EA8061BD0CAE8006EAB31 /* Tuning.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EA8051BD0CAE8006EAB31 /* Tuning.swift */; };
 		E46F39E51BCCB816004B36EB /* TabsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46F39E41BCCB816004B36EB /* TabsSet.swift */; };
-		E47531171C2206D40072E791 /* Go.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E47531161C2206D40072E791 /* Go.mp3 */; };
+		E475311B1C2228360072E791 /* Go.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E475311A1C2228360072E791 /* Go.mp3 */; };
 		E48877431B151628004785D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877421B151628004785D3 /* AppDelegate.swift */; };
 		E48877451B151628004785D3 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877441B151628004785D3 /* SearchViewController.swift */; };
 		E48877471B151628004785D3 /* MusicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877461B151628004785D3 /* MusicViewController.swift */; };
@@ -169,7 +169,7 @@
 		E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTransitionAnimation.swift; sourceTree = "<group>"; };
 		E46EA8051BD0CAE8006EAB31 /* Tuning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tuning.swift; sourceTree = "<group>"; };
 		E46F39E41BCCB816004B36EB /* TabsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsSet.swift; sourceTree = "<group>"; };
-		E47531161C2206D40072E791 /* Go.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Go.mp3; sourceTree = "<group>"; };
+		E475311A1C2228360072E791 /* Go.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Go.mp3; sourceTree = "<group>"; };
 		E488773D1B151628004785D3 /* JamAlpha2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamAlpha2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48877411B151628004785D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E48877421B151628004785D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -238,7 +238,7 @@
 		10F3CFBE1C1FDF5500CC5E43 /* Music */ = {
 			isa = PBXGroup;
 			children = (
-				E47531161C2206D40072E791 /* Go.mp3 */,
+				E475311A1C2228360072E791 /* Go.mp3 */,
 			);
 			name = Music;
 			sourceTree = "<group>";
@@ -647,8 +647,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E475311B1C2228360072E791 /* Go.mp3 in Resources */,
 				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
-				E47531171C2206D40072E791 /* Go.mp3 in Resources */,
 				E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */,
 				E488774C1B151628004785D3 /* Images.xcassets in Resources */,
 			);

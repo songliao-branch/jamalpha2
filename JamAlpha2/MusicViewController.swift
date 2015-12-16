@@ -219,15 +219,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     song = songsByFirstAlphabet[indexPath.section-1].1[indexPath.row]
                 }
                 
-                cell.titleTrailingConstraint.constant = 15
-                cell.loudspeakerImage.hidden = true
-                
             } else {
                 song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
-                
-                if MusicManager.sharedInstance.player.nowPlayingItem != nil {
-                    let item = song as! MPMediaItem
-                    
+            }
+            
+            if MusicManager.sharedInstance.player.nowPlayingItem != nil {
+                if let item = song as? MPMediaItem {
                     if item == MusicManager.sharedInstance.player.nowPlayingItem {
                         cell.titleTrailingConstraint.constant = 50
                         cell.loudspeakerImage.hidden = false
@@ -239,9 +236,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 } else {
                     cell.titleTrailingConstraint.constant = 15
                     cell.loudspeakerImage.hidden = true
-                }
+                }               
+            } else {
+                cell.titleTrailingConstraint.constant = 15
+                cell.loudspeakerImage.hidden = true
             }
-
+            
             // some song does not have an album cover
             if let cover = song.getArtWork() {
                 let image = cover.imageWithSize(CGSize(width: 54, height: 54))
