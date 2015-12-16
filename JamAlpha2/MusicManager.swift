@@ -87,22 +87,15 @@ class MusicManager: NSObject {
         
         //initialize AVQueuePlayer
             self.localPlayer = AVQueuePlayer()
-            self.localPlayer.actionAtItemEnd = .Advance
-            self.setSessionActiveWithMixing(false)
+            self.localPlayer.actionAtItemEnd = .None
+            self.setSessionActiveWithMixing()
     }
     
     //for playing mode and background mode
-    private func setSessionActiveWithMixing(duckIfOtherAucioIsPlaying: Bool) {
+    private func setSessionActiveWithMixing() {
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: .MixWithOthers)
         } catch _ {
-        }
-        
-        if AVAudioSession.sharedInstance().otherAudioPlaying && duckIfOtherAucioIsPlaying {
-            do {
-                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: [.MixWithOthers, .DuckOthers])
-            } catch _ {
-            }
         }
         
         do {

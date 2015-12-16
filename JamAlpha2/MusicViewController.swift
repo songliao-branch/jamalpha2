@@ -13,11 +13,13 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
     private var artistsByFirstAlphabet = [(String, [Artist])]()
     private var albumsByFirstAlphabet = [(String, [Album])]()
-    private var localSongsByFirstAlphabet = [(String, [AVPlayerItem])]()
+    var localSongsByFirstAlphabet = [(String, [AVPlayerItem])]()
     
     private var rwLock = pthread_rwlock_t()
     
     var pageIndex = 0
+    
+    var selectedRow:Int! = 0
     
     @IBOutlet weak var musicTable: UITableView!
     
@@ -60,11 +62,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     deinit{
         pthread_rwlock_destroy(&rwLock)
     }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: MusicManager.sharedInstance.localPlayer.currentItem)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "currentSongChanged:", name: AVPlayerItemDidPlayToEndTimeNotification, object: MusicManager.sharedInstance.localPlayer.currentItem)
+        print("appear~~~~~~~~~~")
+    }
 
     func registerMusicPlayerNotificationForSongChanged(){
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
-        
-        // NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: AVPlayerItemDidPlayToEndTimeNotification, object: MusicManager.sharedInstance.localPlayer)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "currentSongChanged:", name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
     }
     
     func synced(lock: AnyObject, closure: () -> ()) {
@@ -97,6 +105,23 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
                     self.musicTable.reloadData()
                 }
+            }else{
+                MusicManager.sharedInstance.localPlayer.seekToTime(kCMTimeZero)
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: MusicManager.sharedInstance.localPlayer.currentItem)
+                let rate = MusicManager.sharedInstance.localPlayer.rate
+                self.selectedRow = self.selectedRow + 1
+                if(self.selectedRow == self.localSongsByFirstAlphabet.count){
+                    self.selectedRow = 0
+                }
+                let allSongsSorted = self.getAllSortedItems(self.localSongsByFirstAlphabet)
+                let indexToBePlayed = self.findIndexToBePlayed(self.localSongsByFirstAlphabet, section: 0, currentRow: self.selectedRow)
+                MusicManager.sharedInstance.setLocalSongItem(allSongsSorted, selectedIndex:indexToBePlayed)
+                MusicManager.sharedInstance.localPlayer.seekToTime(kCMTimeZero)
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: AVPlayerItemDidPlayToEndTimeNotification, object: MusicManager.sharedInstance.localPlayer.currentItem)
+                if(rate > 0){
+                    MusicManager.sharedInstance.localPlayer.play()
+                }
+                self.musicTable.reloadData()
             }
         }
     }
@@ -110,10 +135,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func popToCurrentSong(){
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.selectedFromTable = false
+        songVC.selectedRow = self.selectedRow
+        songVC.nowView = self.nowView
         songVC.musicViewController = self
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
+        if(!NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
+            MusicManager.sharedInstance.localPlayer.pause()
+        }else{
+            MusicManager.sharedInstance.player.pause()
+        }
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -373,11 +405,14 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 
                 let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
                 MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+                MusicManager.sharedInstance.localPlayer.pause()
             }else{
                     let allSongsSorted = getAllSortedItems(localSongsByFirstAlphabet)
                     let indexToBePlayed = findIndexToBePlayed(localSongsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
                     MusicManager.sharedInstance.setLocalSongItem(allSongsSorted, selectedIndex:indexToBePlayed)
-                    songVC.selectedRow = indexPath.row
+                    songVC.selectedRow = indexToBePlayed
+                    self.selectedRow = indexToBePlayed
+                    MusicManager.sharedInstance.player.pause()
             }
             songVC.selectedFromTable = true
             
@@ -573,6 +608,7 @@ extension MusicViewController {
         }
         pthread_rwlock_unlock(&self.rwLock)
     }
+    
 }
 
 

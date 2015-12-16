@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import UIKit
 
 let KGLOBAL_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_operationCache = [NSURL:NSBlockOperation]()
@@ -31,3 +31,5 @@ var kShouldReloadMusicTable = false
 let KPlayLocalSoundsKey  = "KPlayLocalSoundsKey"
 
 let K_songNames = ["Ed Sheeran - Thinking Out Loud","Rolling In The Deep","02 Morning"]
+
+var KGLOBAL_closeDemoButton:UIButton!

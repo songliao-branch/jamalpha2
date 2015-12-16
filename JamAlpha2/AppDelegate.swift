@@ -111,8 +111,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
-            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil {
-                if (!currentSongVC.isSongNeedPurchase){
+            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isPlayingLocalSong {
+                if (!currentSongVC.isSongNeedPurchase) {
                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                         completed in
                         KGLOBAL_queue.suspended = false

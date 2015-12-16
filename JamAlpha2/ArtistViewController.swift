@@ -154,6 +154,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         MusicManager.sharedInstance.setPlayerQueue(artistAllSongs)
         MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+        MusicManager.sharedInstance.localPlayer.pause()
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         songVC.selectedFromTable = true

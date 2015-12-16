@@ -14,7 +14,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBOutlet weak var tableView: UITableView!
     
-    let firstSectionContent: [String] = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us"]
+    let firstSectionContent: [String] = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Reopen Demo Mode"]
  
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,13 +48,14 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             } else {
                 let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
                 cell.textLabel?.text = firstSectionContent[indexPath.item]
-                cell.selectionStyle = UITableViewCellSelectionStyle.None
+    
                 return cell
             }
         } else {
             let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
-            cell.textLabel?.text = "Logout"
-            cell.selectionStyle = UITableViewCellSelectionStyle.None
+            cell.textLabel?.text = "Log out"
+            cell.textLabel!.textAlignment = .Center
+            cell.accessoryType = .None
             return cell
         }
         
@@ -69,6 +70,9 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
                 self.rateTwistjam()
             } else if indexPath.item == 3 {
                 self.contactUs()
+            } else if indexPath.item == 4 {
+                let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                self.navigationController?.pushViewController(demoVC, animated: true)
             }
         } else {
             
@@ -82,6 +86,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             }))
             self.presentViewController(refreshAlert, animated: true, completion: nil)
         }
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     func contactUs() {

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1045413F1BCAFBB300A4590B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1045413E1BCAFBB300A4590B /* TabBarController.swift */; };
+		10AC35A41C21509D00749744 /* DemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10AC35A31C21509D00749744 /* DemoViewController.swift */; };
+		10AC35A61C215BE300749744 /* DemoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10AC35A51C215BE300749744 /* DemoCell.swift */; };
 		10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */; };
 		10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */; };
 		10E930A01C15753400C1D0C9 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */; };
@@ -116,6 +118,8 @@
 
 /* Begin PBXFileReference section */
 		1045413E1BCAFBB300A4590B /* TabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		10AC35A31C21509D00749744 /* DemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoViewController.swift; sourceTree = "<group>"; };
+		10AC35A51C215BE300749744 /* DemoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoCell.swift; sourceTree = "<group>"; };
 		10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageZoomAnimation.swift; sourceTree = "<group>"; };
 		10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewerViewController.swift; sourceTree = "<group>"; };
 		10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
@@ -260,6 +264,7 @@
 				BFE49ED51C12471200F26877 /* AppConstant.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
+				10AC35A31C21509D00749744 /* DemoViewController.swift */,
 			);
 			name = SettingViewController;
 			sourceTree = "<group>";
@@ -383,6 +388,7 @@
 				BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */,
 				E4A9A5541BF05289000E5F1C /* BrowseVersionsCell.swift */,
 				E42032EB1BFEF31E00A5D36D /* AvatarCell.swift */,
+				10AC35A51C215BE300749744 /* DemoCell.swift */,
 				BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */,
 			);
 			name = TableCells;
@@ -762,7 +768,9 @@
 				E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* CoreDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
+				10AC35A61C215BE300749744 /* DemoCell.swift in Sources */,
 				BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */,
+				10AC35A41C21509D00749744 /* DemoViewController.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
