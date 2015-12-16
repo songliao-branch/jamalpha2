@@ -99,7 +99,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
        
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
         MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
-        MusicManager.sharedInstance.localPlayer.pause()
+        MusicManager.sharedInstance.avPlayer.pause()
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
 

@@ -13,7 +13,8 @@ class MusicManager: NSObject {
     
     let _TAG = "MusicManager"
     var player: MPMusicPlayerController!
-    var localPlayer:AVQueuePlayer!
+    
+    var avPlayer: AVQueuePlayer!
     
     // A queue that keep tracks the last queue to the player
     // this should never be accessed outside MusicManager
@@ -26,7 +27,7 @@ class MusicManager: NSObject {
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
     
-    var localSongs: [AVPlayerItem]!
+    var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
     
     class var sharedInstance: MusicManager {
@@ -43,6 +44,7 @@ class MusicManager: NSObject {
     override init() {
         super.init()
         loadLocalSongs()
+        loadDemoSongs()
         loadLocalAlbums()
         loadLocalArtist()
         initializePlayer()
@@ -86,8 +88,8 @@ class MusicManager: NSObject {
             self.setPlayerQueue(uniqueSongs)
         
         //initialize AVQueuePlayer
-            self.localPlayer = AVQueuePlayer()
-            self.localPlayer.actionAtItemEnd = .None
+            self.avPlayer = AVQueuePlayer()
+            self.avPlayer.actionAtItemEnd = .None
             self.setSessionActiveWithMixing()
     }
     
@@ -106,10 +108,10 @@ class MusicManager: NSObject {
     
     private var queueChanged = false
     
-    func setLocalSongItem(collection: [AVPlayerItem], selectedIndex:Int){
-        if(localPlayer.currentItem == nil || localPlayer.currentItem != collection[selectedIndex]){
-            localPlayer.removeAllItems()
-            localPlayer.insertItem(collection[selectedIndex], afterItem: nil)
+    func setDemoSongQueue(collection: [AVPlayerItem], selectedIndex:Int){
+        if(avPlayer.currentItem == nil || avPlayer.currentItem != collection[selectedIndex]){
+            avPlayer.removeAllItems()
+            avPlayer.insertItem(collection[selectedIndex], afterItem: nil)
         }
     }
 
@@ -205,8 +207,11 @@ class MusicManager: NSObject {
             song in
             song.playbackDuration > 30
         }
-        
-        localSongs = K_songNames.map {
+    }
+    
+    func loadDemoSongs() {
+        //we have one demo song so far
+        demoSongs = kSongNames.map {
             AVPlayerItem(URL: NSBundle.mainBundle().URLForResource($0, withExtension: "mp3")!)
         }
     }
