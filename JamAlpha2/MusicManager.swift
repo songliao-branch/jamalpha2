@@ -142,12 +142,13 @@ class MusicManager: NSObject {
         
             queueChanged = true
             KGLOBAL_isNeedToCheckIndex = false
-            
             return
         }
         
         //coming from music app to twistjam, if the queue is different, we reset the queue to newly selected queue
-        if(KGLOBAL_isNeedToCheckIndex){
+
+        if KGLOBAL_isNeedToCheckIndex {
+
             let repeatMode = player.repeatMode
             let shuffleMode = player.shuffleMode
             player.repeatMode = .All
@@ -158,7 +159,7 @@ class MusicManager: NSObject {
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
                 print("Queue is different,  now reset queue")
-
+                
                 queueChanged = true
             }
             KGLOBAL_isNeedToCheckIndex = false
@@ -166,8 +167,6 @@ class MusicManager: NSObject {
             player.shuffleMode = shuffleMode
         }
     }
-    
-
     
     func setIndexInTheQueue(selectedIndex: Int){
         // player.stop()
