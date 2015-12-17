@@ -138,7 +138,10 @@ class MeLoginOrSignupViewController: UIViewController{
         
         if !showCloseButton {
             closeButton.hidden = true
-            settingsButton.hidden = false
+        }
+        
+        if showCloseButton {
+            settingsButton.hidden = true
         }
     }
     
