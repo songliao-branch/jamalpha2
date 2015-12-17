@@ -1084,7 +1084,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     var isPanning: Bool = false
-    
+    var toTime: NSTimeInterval = 0
     // pan on music control view to change music time and progressblock time
     func panOnMusicControlView(sender: UIPanGestureRecognizer) {
         if sender.state == .Began {
@@ -1096,24 +1096,29 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             startTime.setTime(Float(self.currentTime))
             if isPlayingLocalSong! {
                 self.localPlayer.currentTime = self.currentTime
+                if self.localPlayer.playing {
+                    startTimer()
+                }
             } else {
                 self.musicPlayer.currentPlaybackTime = self.currentTime
+                if self.musicPlayer.playbackState == .Playing {
+                    startTimer()
+                }
             }
-            if self.musicPlayer.playbackState == .Playing {
-                startTimer()
-            }
+            
         } else if sender.state == .Changed {
             let translation = sender.translationInView(self.view)
             sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
             sender.setTranslation(CGPointZero, inView: self.view)
             if self.currentTime >= 0 && self.currentTime <= self.duration {
                 let timeChange = NSTimeInterval(-translation.x / 10)
-                self.currentTime = self.currentTime + timeChange
-                if self.currentTime < 0 {
-                    self.currentTime = 0
-                } else if self.currentTime > self.duration {
-                    self.currentTime = self.duration
+                self.toTime = self.currentTime + timeChange
+                if self.toTime < 0 {
+                    self.toTime = 0
+                } else if self.toTime > self.duration {
+                    self.toTime = self.duration
                 }
+                self.currentTime = self.toTime
                 startTime.setTime(Float(self.currentTime))
                 let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
                 self.progressBlock.setProgress(persent)
@@ -1130,6 +1135,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func startTimer() {
         if !timer.valid {
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+        
         }
     }
 
@@ -1142,17 +1148,20 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
-            if isPlayingLocalSong! {
-                localPlayer.play()
-                self.currentTime = localPlayer.currentTime
-                self.localPlayer.rate = self.speed
-            } else {
-                musicPlayer.play()
-                self.currentTime = musicPlayer.currentPlaybackTime
-                self.musicPlayer.currentPlaybackRate = self.speed
-            }
             startTimer()
-            //self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            if isPlayingLocalSong! {
+                print("play local")
+                if !self.localPlayer.playing {
+                    self.localPlayer.play()
+                }
+            } else {
+                print("play music")
+                if self.musicPlayer.playbackState != .Playing {
+                    self.musicPlayer.play()
+                }
+            }
+            countdownTimer.invalidate()
+            countdownTimer = NSTimer()
         }
     }
 
@@ -1261,9 +1270,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func update() {
-        //
+
         if !isPanning {
-            if startTime.toDecimalNumer() - Float(self.currentTime) < 2 {
+            if startTime.toDecimalNumer() - Float(self.toTime) < 2 {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
                 let tempPlaytime = !isPlayingLocalSong ? self.musicPlayer.currentPlaybackTime : self.localPlayer.currentTime
@@ -1274,7 +1283,18 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }
             }
         }
-        
+        if startTime.toDecimalNumer() > Float(self.duration) {
+            if isPlayingLocalSong! {
+                self.localPlayer.pause()
+            } else {
+                self.musicPlayer.pause()
+            }
+            timer.invalidate()
+            timer = NSTimer()
+            startTime.setTime(0)
+            self.currentTime = 0
+        }
+        self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
         //
         //refresh current time label
         self.currentTimeLabel.text = TimeNumber(time: startTime.toDecimalNumer()).toDisplayString()

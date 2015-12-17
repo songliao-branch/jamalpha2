@@ -151,8 +151,6 @@ class MusicManager: NSObject {
             player.repeatMode = .All
             player.shuffleMode = .Off
             if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? Int(lastPlayerQueue.indexOf(player.nowPlayingItem!)!) : -1) != player.indexOfNowPlayingItem {
-                print(lastPlayerQueue.indexOf(player.nowPlayingItem!))
-                print(player.indexOfNowPlayingItem)
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
                 print("Queue is different,  now reset queue")

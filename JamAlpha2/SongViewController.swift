@@ -2052,7 +2052,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
         lyricsEditor.theSong = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
-
+        lyricsEditor.isPlayingLocalSong = isPlayingLocalSong
         self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }
     

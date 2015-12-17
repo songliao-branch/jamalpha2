@@ -11,7 +11,7 @@ import MediaPlayer
 import AVFoundation
 
 class LyricsTextViewController: UIViewController {
-    
+    var isPlayingLocalSong: Bool!
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
     var songViewController: SongViewController! //used to parse synced lyrics from LyricsSyncViewController
@@ -218,6 +218,7 @@ class LyricsTextViewController: UIViewController {
         }
         lyricsSyncViewController.theSong  = self.theSong
         lyricsSyncViewController.recoverMode = self.recoverMode
+        lyricsSyncViewController.isPlayingLocalSong = isPlayingLocalSong
         self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
 
@@ -226,8 +227,7 @@ class LyricsTextViewController: UIViewController {
         let lineArray: [String] = lyric.characters.split{$0 == "\n"}.map { String($0) }
         let letterOrnumber = NSCharacterSet.alphanumericCharacterSet()
         var result: [String] = [String]()
-        
-        for j in 0...(lineArray.count-1) {
+        for var j = 0; j < lineArray.count; j++ {
             var str = lineArray[j].stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()).unicodeScalars
             if str.count == 0{
                 continue

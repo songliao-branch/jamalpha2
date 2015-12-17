@@ -36,6 +36,13 @@ class lyricsWithTime {
 
 class LyricsSyncViewController: UIViewController  {
 
+    var currentTime: NSTimeInterval = 0
+    var isPlayingLocalSong: Bool!
+    
+    var stepPerSecond: Float = 100
+    var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
+    var speed: Float = 1
+    
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
     var lyricsTextViewController: LyricsTextViewController! //used to call dismiss function on it to go back to SongViewController
@@ -60,9 +67,10 @@ class LyricsSyncViewController: UIViewController  {
     
     var lyricsOrganizedArray: [String]!
 
-    var player = AVAudioPlayer()
+    var localPlayer: AVAudioPlayer!
+    var musicPlayer: MPMusicPlayerController!
+    
     var updateTimer = NSTimer()
-    let updateInterval: NSTimeInterval = 0.1
     var playingSpeed: Float = 1
     
     // count down section
@@ -78,6 +86,7 @@ class LyricsSyncViewController: UIViewController  {
         self.addedLyricsWithTime = lyricsWithTime(count: self.lyricsOrganizedArray.count)
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
+        checkConverToMPMediaItem()
         setUpSong()
         setUpHeaderView()
         setUpLyricsTableView()
@@ -103,13 +112,56 @@ class LyricsSyncViewController: UIViewController  {
         return UIStatusBarStyle.LightContent;
     }
     
+    
+    // MARK: Notification
+    func registerNotification() {
+        if musicPlayer != nil {
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
+            musicPlayer.beginGeneratingPlaybackNotifications()
+        }
+    }
+    
+    func removeNotification() {
+        if musicPlayer != nil {
+            musicPlayer.endGeneratingPlaybackNotifications()
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
+        }
+    }
+    
+    func playbackStateChanged(sender: NSNotification) {
+        if musicPlayer.playbackState == .Playing {
+            startUpdateTimer()
+            self.currentTime = musicPlayer.currentPlaybackTime
+            self.startTime.setTime(Float(self.currentTime))
+            self.musicPlayer.currentPlaybackRate = self.speed
+            self.progressBlock.alpha = 1
+        } else if musicPlayer.playbackState == .Paused {
+            updateTimer.invalidate()
+            updateTimer = NSTimer()
+            self.progressBlock.alpha = 0.5
+        }
+    }
+    
+    var duration: NSTimeInterval!
+    // MARK: check theSong can convert to MPMediaItem
+    func checkConverToMPMediaItem() {
+        if !self.isPlayingLocalSong {
+            musicPlayer = MusicManager.sharedInstance.player
+            registerNotification()
+            self.duration = musicPlayer.nowPlayingItem?.playbackDuration
+        } else {
+            localPlayer = AVAudioPlayer()
+            self.duration = localPlayer.duration
+        }
+    }
+    
     // MARK: set up views
     func setUpSong() {
         let url: NSURL = theSong.getURL() as! NSURL
-        self.player = try! AVAudioPlayer(contentsOfURL: url)
-        self.player.volume = 1
-        self.player.enableRate = true
-        self.player.rate = self.playingSpeed
+        self.localPlayer = try! AVAudioPlayer(contentsOfURL: url)
+        self.localPlayer.volume = 1
+        self.localPlayer.enableRate = true
+        self.localPlayer.rate = self.playingSpeed
     }
     
     func setUpHeaderView() {
@@ -253,7 +305,7 @@ class LyricsSyncViewController: UIViewController  {
     var currentSelectIndex: Int = 0
     
     func playPause(sender: UITapGestureRecognizer) {
-        if !self.player.playing {
+        if self.isPlayingLocalSong! ? !localPlayer.playing : (musicPlayer.playbackState != .Playing) {
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
             progressBlockContainer.removeGestureRecognizer(tapGesture)
@@ -267,15 +319,20 @@ class LyricsSyncViewController: UIViewController  {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
                 }, completion: nil)
-            self.player.pause()
+            if isPlayingLocalSong! {
+                self.localPlayer.pause()
+            } else {
+                self.musicPlayer.pause()
+            }
             self.updateTimer.invalidate()
            
         }
     }
 
     func startUpdateTimer() {
+
         if !updateTimer.valid {
-            updateTimer = NSTimer.scheduledTimerWithTimeInterval(updateInterval, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            updateTimer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             
             // make sure the timer is not interfered by scrollview scrolling
             NSRunLoop.mainRunLoop().addTimer(updateTimer, forMode: NSRunLoopCommonModes)
@@ -291,67 +348,100 @@ class LyricsSyncViewController: UIViewController  {
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
-            player.play()
-            startUpdateTimer()
-            
+            countdownTimer = NSTimer()
             // animate up the soundwave
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
+            UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
+                self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
-                    
-                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                        self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
-                        }, completion: nil)
-                    
-            })
-
+                    if self.isPlayingLocalSong! {
+                        if !self.localPlayer.playing {
+                            self.localPlayer.play()
+                        }
+                    } else {
+                        if self.musicPlayer.playbackState != .Playing {
+                            self.musicPlayer.play()
+                        }
+                    }
+                    self.startUpdateTimer()
+                }
+            )
         }
     }
-    var isPanning = false
     
-    func handleProgressPan(recognizer: UIPanGestureRecognizer) {
-        let translation = recognizer.translationInView(self.view)
-        for childview in recognizer.view!.subviews {
-            let child = childview
+    var isPanning = false
+    var toTime: NSTimeInterval = 0
+    
+    func handleProgressPan(sender: UIPanGestureRecognizer) {
+        if sender.state == .Began {
             self.isPanning = true
-            
-            var newPosition = progressChangedOrigin + translation.x
-            
-            // leftmost point of inner bar cannot be more than half of the view
-            if newPosition > self.view.frame.width / 2 {
-                newPosition = self.view.frame.width / 2
-            }
-            
-            // the end of inner bar cannot be smaller left half of view
-            if newPosition + child.frame.width < self.view.frame.width / 2 {
-                newPosition = self.view.frame.width / 2 - child.frame.width
-            }
-            
-            //update all chords, lyrics
-            updateTimer.invalidate()
-            let toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
-            self.progressBlock.setProgress(CGFloat(toTime)/CGFloat(player.duration))
-            
-            refreshTimeLabel(NSTimeInterval(toTime))
-            refreshProgressBlock(NSTimeInterval(toTime))
-
-            //when finger is lifted
-            if recognizer.state == UIGestureRecognizerState.Ended {
-                progressChangedOrigin = newPosition
-                isPanning = false
-                
-                player.currentTime = NSTimeInterval(toTime)
-                if player.playing {
+            self.updateTimer.invalidate()
+            self.updateTimer = NSTimer()
+        } else if sender.state == .Ended {
+            self.isPanning = false
+            startTime.setTime(Float(self.currentTime))
+            if isPlayingLocalSong! {
+                self.localPlayer.currentTime = self.currentTime
+                if self.localPlayer.playing {
                     startUpdateTimer()
                 }
+            } else {
+                self.musicPlayer.currentPlaybackTime = self.currentTime
+                if self.musicPlayer.playbackState == .Playing {
+                    startUpdateTimer()
+                }
+            }
+            
+        } else if sender.state == .Changed {
+            let translation = sender.translationInView(self.view)
+            sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
+            sender.setTranslation(CGPointZero, inView: self.view)
+            if self.currentTime >= 0 && self.currentTime <= self.duration {
+                let timeChange = NSTimeInterval(-translation.x / 10)
+                self.toTime = self.currentTime + timeChange
+                if self.toTime < 0 {
+                    self.toTime = 0
+                } else if self.toTime > self.duration {
+                    self.toTime = self.duration
+                }
+                self.currentTime = self.toTime
+                startTime.setTime(Float(self.currentTime))
+                let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
+                self.progressBlock.setProgress(persent)
+                self.progressBlock.frame.origin.x = 0.5 * self.view.frame.size.width - persent * (CGFloat(theSong.getDuration() * Float(progressWidthMultiplier)))
+                
+                self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
             }
         }
     }
 
     func update() {
-        refreshProgressBlock(player.currentTime)
-        refreshTimeLabel(player.currentTime)
+        if !isPanning {
+            if startTime.toDecimalNumer() - Float(self.toTime) < 2 {
+                startTime.addTime(Int(100 / stepPerSecond))
+            } else {
+                let tempPlaytime = !isPlayingLocalSong ? self.musicPlayer.currentPlaybackTime : self.localPlayer.currentTime
+                if !tempPlaytime.isNaN {
+                    startTime.setTime(Float(tempPlaytime))
+                } else {
+                    startTime.addTime(Int(100 / stepPerSecond))
+                }
+            }
+        }
+        if startTime.toDecimalNumer() > Float(self.duration) {
+            if isPlayingLocalSong! {
+                self.localPlayer.pause()
+            } else {
+                self.musicPlayer.pause()
+            }
+            updateTimer.invalidate()
+            updateTimer = NSTimer()
+            startTime.setTime(0)
+            self.currentTime = 0
+        }
+        self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
+        refreshProgressBlock(NSTimeInterval(startTime.toDecimalNumer()))
+        refreshTimeLabel(NSTimeInterval(startTime.toDecimalNumer()))
     }
   
     func refreshProgressBlock(time: NSTimeInterval){
@@ -403,15 +493,19 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        if indexPath.row == 0 || (addedLyricsWithTime.timeAdded[indexPath.item - 1] && addedLyricsWithTime.time[indexPath.item - 1] < self.player.currentTime) == true {
+        if indexPath.row == 0 || (addedLyricsWithTime.timeAdded[indexPath.item - 1] && addedLyricsWithTime.time[indexPath.item - 1] < self.currentTime) == true {
             if self.addedLyricsWithTime.timeAdded[indexPath.item] == false {
                 
-                self.addedLyricsWithTime.time[indexPath.item] = player.currentTime
+                self.addedLyricsWithTime.time[indexPath.item] = self.currentTime
                 self.addedLyricsWithTime.lyrics[indexPath.item] = lyricsOrganizedArray[indexPath.item]
                 self.addedLyricsWithTime.timeAdded[indexPath.item] = true
                 lyricsTableView.reloadData()
             }else {
-                player.currentTime = self.addedLyricsWithTime.time[indexPath.item]
+                if isPlayingLocalSong! {
+                    localPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item]
+                } else {
+                    musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item]
+                }
                 //  self.currentTime = player.currentTime
             }
         } else {
@@ -439,10 +533,18 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
             }
             lyricsTableView.reloadData()
             if indexPath.row == 0 {
-                player.currentTime = 0
+                if isPlayingLocalSong! {
+                    localPlayer.currentTime = 0
+                } else {
+                    musicPlayer.currentPlaybackTime = 0
+                }
                 //  self.currentTime = 0
             } else {
-                player.currentTime = self.addedLyricsWithTime.time[indexPath.item - 1]
+                if isPlayingLocalSong! {
+                    localPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item - 1]
+                } else {
+                    musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item - 1]
+                }
                 // self.currentTime = player.currentTime
             }
         }
@@ -455,19 +557,19 @@ extension LyricsSyncViewController {
     func pressSpeedUpButton(sender: UIButton) {
         if self.playingSpeed < 1.95 {
             self.playingSpeed = self.playingSpeed + 0.15
-            self.player.rate = self.playingSpeed
+            self.localPlayer.rate = self.playingSpeed
         }
     }
     
     func pressSpeedDownButton(sender: UIButton) {
         if self.playingSpeed > 0.55 {
             self.playingSpeed = self.playingSpeed - 0.15
-            self.player.rate = self.playingSpeed
+            self.localPlayer.rate = self.playingSpeed
         }
     }
     
     func pressBackButton(sender: UIButton) {
-        self.player.stop()
+        self.localPlayer.stop()
         for i in 0..<self.addedLyricsWithTime.lyrics.count {
             if self.addedLyricsWithTime.timeAdded[i] == true {
                 tempLyricsTimeTuple.append((self.addedLyricsWithTime.lyrics[i], self.addedLyricsWithTime.time[i]))
