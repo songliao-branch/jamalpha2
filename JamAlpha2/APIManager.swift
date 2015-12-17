@@ -451,4 +451,21 @@ class APIManager: NSObject {
             }
         }
     }
+    
+    class func getFavorites() {
+        Alamofire.request(.GET, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_songs").responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    print(json)
+                }
+            case .Failure(let error):
+                print("favorite song error: \(error)")
+            }
+        }
+    }
 }
+
+

@@ -157,7 +157,6 @@ class CoreDataManager: NSObject {
     
     
     //song-related
-
     private class func findSong(item: Findable) -> Song? {
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (album == '\(item.getAlbum().replaceApostrophe())')")
 
@@ -170,7 +169,6 @@ class CoreDataManager: NSObject {
         }
     }
 
-    
     class func initializeSongToDatabase(item: Findable) {
         // if we don't have the song in the database
         if findSong(item) == nil {
@@ -479,5 +477,27 @@ class CoreDataManager: NSObject {
             return (chordsToBeUsed, foundTabsSet.tuning, Int(foundTabsSet.capo), Int(foundTabsSet.id))
         }
         return ([Chord](), "", 0, 0)
+    }
+
+    
+    //favorite/unfavorite a song
+    class func favoriteTheSong(item: Findable, shouldFavorite: Bool) {
+        if let matchedSong = findSong(item) {
+            matchedSong.isFavorited = shouldFavorite
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    class func isFavorited(item: Findable) -> Bool {
+        if let matchedSong = findSong(item) {
+            return matchedSong.isFavorited
+        }
+        return false
+    }
+    
+    //when user first logged in
+    class func initializeFavoriteSongs() {
+        
+       
     }
 }

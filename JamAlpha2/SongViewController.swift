@@ -247,8 +247,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpStatusView()
         if(!isSongNeedPurchase){
             updateMusicData(firstLoadPlayingItem)
+            updateFavoriteStatus(firstLoadPlayingItem)
         }else{
             updateMusicData(songNeedPurchase)
+            updateFavoriteStatus(songNeedPurchase)
         }
         
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
@@ -764,7 +766,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // if they are not equal, i.e. not the same song
                 CoreDataManager.initializeSongToDatabase(firstLoadPlayingItem!)
                 self.updateMusicData(firstLoadPlayingItem!)
-                
+        
+                self.updateFavoriteStatus(firstLoadPlayingItem!)
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
@@ -1130,8 +1133,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //TODO: Add glowing effect when pressed
         //divide view width into eigth to distribute center x for each of four buttons
         favoriateButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
+        //default is not favorited
         favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
-        favoriateButton.sizeToFit()
         favoriateButton.addTarget(self, action: "favoriteButtonPressed", forControlEvents: .TouchUpInside)
         
         shuffleButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
@@ -1371,8 +1374,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         APIManager.favoriteTheSong(findable, completion: {
             result in
             if result == "liked" {
+                CoreDataManager.favoriteTheSong(findable, shouldFavorite: true)
                 self.favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
             } else  {
+                CoreDataManager.favoriteTheSong(findable, shouldFavorite: false)
                 self.favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
             }
         })
@@ -2494,6 +2499,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         nextButton.hidden = false
     }
     
+    func updateFavoriteStatus(item: Findable) {
+        //first check online
+        if CoreDataManager.isFavorited(item) && CoreDataManager.getCurrentUser() != nil {
+            favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
+        } else {
+            favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
+        }
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // MARK: Fix to portrait orientation
