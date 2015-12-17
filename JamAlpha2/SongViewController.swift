@@ -243,6 +243,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         } else {
             MusicManager.sharedInstance.player.stop()
+            if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+                MusicManager.sharedInstance.avPlayer.pause()
+                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                MusicManager.sharedInstance.avPlayer.removeAllItems()
+            }
+           let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
+            for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                self.musicViewController = musicVC
+            }
+            self.nowView = baseVC.nowView
+            self.nowView.stop()
             CoreDataManager.initializeSongToDatabase(songNeedPurchase)
         }
         
@@ -506,7 +517,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(previousButton)
         self.view.addSubview(nextButton)
         
-        if(isSongNeedPurchase){
+        if(isSongNeedPurchase || isDemoSong){
             previousButton.hidden = true
             nextButton.hidden = true
         }
@@ -536,32 +547,33 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func changeLocalSong(){
-//        localPlayer.seekToTime(kCMTimeZero)
-//        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
-//        localPlayer.removeObserver(self, forKeyPath: "rate")
-//        let rate = localPlayer.rate
-//        if(isNext){
-//            self.selectedRow = self.selectedRow + 1
-//            if(self.selectedRow == self.musicViewController.localSongsByFirstAlphabet.count){
-//                self.selectedRow = 0
-//            }
-//        }else{
-//            self.selectedRow = self.selectedRow - 1
-//            if(self.selectedRow == -1){
-//                self.selectedRow = self.musicViewController.localSongsByFirstAlphabet.count - 1
-//            }
-//        }
-//        
-//        let allSongsSorted = self.musicViewController.getAllSortedItems(self.musicViewController.localSongsByFirstAlphabet)
-//        let indexToBePlayed = self.musicViewController.findIndexToBePlayed(self.musicViewController.localSongsByFirstAlphabet, section: 0, currentRow: self.selectedRow)
-//        
-//        MusicManager.sharedInstance.setLocalSongItem(allSongsSorted, selectedIndex:indexToBePlayed)
-//        localPlayer.seekToTime(kCMTimeZero)
-//        self.currentLocalSongChanged(rate)
-//        self.localPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
-//        if(isDemoSong){
-//            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeLocalSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
-//        }
+        localPlayer.seekToTime(kCMTimeZero)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
+        if(!viewDidFullyDisappear){
+            localPlayer.removeObserver(self, forKeyPath: "rate")
+        }
+        let rate = localPlayer.rate
+        if(isNext){
+            self.selectedRow = self.selectedRow + 1
+            if(self.selectedRow == self.musicViewController.demoSongs.count){
+                self.selectedRow = 0
+            }
+        }else{
+            self.selectedRow = self.selectedRow - 1
+            if(self.selectedRow == -1){
+                self.selectedRow = self.musicViewController.demoSongs.count - 1
+            }
+        }
+        
+        MusicManager.sharedInstance.setDemoSongQueue(self.musicViewController.demoSongs, selectedIndex:selectedRow)
+        localPlayer.seekToTime(kCMTimeZero)
+        if(!viewDidFullyDisappear){
+            self.currentLocalSongChanged(rate)
+            self.localPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
+        }
+        if(isDemoSong){
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeLocalSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
+        }
     }
     
     
@@ -780,6 +792,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                  player.beginGeneratingPlaybackNotifications()
             }
             if(isDemoSong){
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
                 NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeLocalSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
             }
         }
@@ -2129,9 +2142,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if(isRemoveProgressBlock){
             NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-            if(isDemoSong){
-                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
-            }
         }
         
         if(isDemoSong){

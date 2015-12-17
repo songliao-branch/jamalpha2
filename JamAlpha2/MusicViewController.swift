@@ -10,7 +10,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var uniqueArtists = [Artist]()
     private var uniqueAlbums = [Album]()
     
-    private var demoSongs = [AVPlayerItem]()
+    var demoSongs = [AVPlayerItem]()
     
     private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
     private var artistsByFirstAlphabet = [(String, [Artist])]()
