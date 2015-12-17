@@ -265,20 +265,16 @@ class MusicManager: NSObject {
         let previousRepeatMode: MPMusicRepeatMode = player.repeatMode
         let previousShuffleMode: MPMusicShuffleMode = player.shuffleMode
         let previousPlayingTime: NSTimeInterval = player.currentPlaybackTime
-        player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
         player.repeatMode = .One
         player.shuffleMode = .Off
-        player.nowPlayingItem = collection[0]
         player.currentPlaybackTime = 0
         
         return (previousRepeatMode, previousShuffleMode, previousPlayingTime)
     }
     // back to song view controller recover queue
     func setRecoverCollection(sender: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval), currentSong: MPMediaItem) {
-        player.setQueueWithItemCollection(MPMediaItemCollection(items: lastPlayerQueue))
         player.repeatMode = sender.0
         player.shuffleMode = sender.1
-        player.nowPlayingItem = currentSong
         player.currentPlaybackTime = sender.2
     }
 }
