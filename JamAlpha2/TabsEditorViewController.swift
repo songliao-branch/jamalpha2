@@ -1051,14 +1051,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             sender.setTranslation(CGPointZero, inView: self.view)
             let timeChange = NSTimeInterval(-translation.x / 10)
             self.currentTime = self.currentTime + timeChange
- 
+            if self.currentTime >= 0 {
             let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
-            self.progressBlock.setProgress(persent)
-            self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
-            
-            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
-            // find the current tab according to the current time and make the current tab view to yellow
-            self.findCurrentTabView()
+                self.progressBlock.setProgress(persent)
+                self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
+                
+                self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+                // find the current tab according to the current time and make the current tab view to yellow
+                self.findCurrentTabView()
+            }
         }
         
     }
@@ -1338,10 +1339,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // press the note button to add the tab in music line
     func pressMainViewNoteButton(sender: UIButton) {
         if self.removeAvaliable == false {
+            var inserted: Bool = false
             let index = sender.tag
             let returnValue = addTabViewOnMusicControlView(index)
-            
-            self.allTabsOnMusicLine.append(returnValue.1)
+            for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
+                if self.currentTime <= self.allTabsOnMusicLine[0].time {
+                    print("insert")
+                    self.allTabsOnMusicLine.insert(returnValue.1, atIndex: 0)
+                    inserted = true
+                    break
+                } else if self.currentTime > self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i + 1].time {
+                    self.allTabsOnMusicLine.insert(returnValue.1, atIndex: i + 1)
+                    inserted = true
+                    break
+                }
+            }
+            if !inserted {
+                self.allTabsOnMusicLine.append(returnValue.1)
+            }
             self.progressBlock.addSubview(returnValue.0)
         } else {
             let fretNumber = Int(noteButtonWithTabArray[sender.tag].tab.index) - Int(noteButtonWithTabArray[sender.tag].tab.index) / 100 * 100
@@ -1710,10 +1725,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             findCurrentTabView()
             if isPlayingLocalSong! {
                 self.localPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                 self.currentTime = self.localPlayer.currentTime
             } else {
                 self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.currentTime = self.musicPlayer.currentPlaybackTime
             }
-            self.currentTime = self.localPlayer.currentTime
+           
         } else if self.allTabsOnMusicLine.count == 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
