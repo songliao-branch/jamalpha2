@@ -18,6 +18,7 @@ class lyricsWithTime {
     var time: [NSTimeInterval]!
     var timeAdded: [Bool]!
     
+    
     init(count: Int) {
         self.count = count
         self.lyrics = [String](count: count, repeatedValue: "")
@@ -35,6 +36,8 @@ class lyricsWithTime {
 
 class LyricsSyncViewController: UIViewController  {
 
+    var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
+    
     var lyricsTextViewController: LyricsTextViewController! //used to call dismiss function on it to go back to SongViewController
     // MARK: UI elements
     var lyricsTableView: UITableView = UITableView()
@@ -491,7 +494,12 @@ extension LyricsSyncViewController {
         
         self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated(true, completion: {
             completed in
-             self.lyricsTextViewController.songViewController.player.play()
+            if self.lyricsTextViewController.songViewController.isPlayingLocalSong {
+                self.lyricsTextViewController.songViewController.localPlayer.play()
+            } else {
+                MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                self.lyricsTextViewController.songViewController.player.play()
+            }
         })
     }
 }

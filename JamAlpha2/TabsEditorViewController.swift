@@ -1646,7 +1646,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             self.dismissViewControllerAnimated(false, completion: {
                 completed in
-                self.songViewController.player.play()
+                if self.songViewController.isPlayingLocalSong {
+                    self.songViewController.localPlayer.play()
+                } else {
+                    MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                    self.songViewController.player.play()
+                }
             })
         }
         self.currentSelectedSpecificTab = nil

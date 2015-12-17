@@ -7,8 +7,12 @@
 //
 
 import UIKit
+import MediaPlayer
+import AVFoundation
 
 class LyricsTextViewController: UIViewController {
+    
+    var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
     var songViewController: SongViewController! //used to parse synced lyrics from LyricsSyncViewController
     var viewWidth: CGFloat = CGFloat()
@@ -39,6 +43,9 @@ class LyricsTextViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
+        
+        self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
+        
         addObjectsOnMainView()
         
     }
@@ -191,6 +198,7 @@ class LyricsTextViewController: UIViewController {
             if self.songViewController.isPlayingLocalSong {
                 self.songViewController.localPlayer.play()
             } else {
+                MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                 self.songViewController.player.play()
             }
         })
@@ -209,6 +217,7 @@ class LyricsTextViewController: UIViewController {
             lyricsSyncViewController.lyricsOrganizedArray = self.lyricsReorganizedArray
         }
         lyricsSyncViewController.theSong  = self.theSong
+        lyricsSyncViewController.recoverMode = self.recoverMode
         self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
 
