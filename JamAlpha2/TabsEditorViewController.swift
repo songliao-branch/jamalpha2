@@ -630,7 +630,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func addObjectsOnEditView() {
         self.specificTabsScrollView.frame = CGRectMake(0.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 20 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
-        self.specificTabsScrollView.contentSize = CGSizeMake(self.trueWidth, 2.5 / 20 * self.trueHeight)
+        self.specificTabsScrollView.contentSize = CGSizeMake(self.trueWidth / 2, 2.5 / 20 * self.trueHeight)
         self.specificTabsScrollView.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
         self.specificTabsScrollView.layer.cornerRadius = 3
         self.editView.addSubview(specificTabsScrollView)
@@ -801,6 +801,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.specificTabSets = self.tabsDataManager.getTabsSets(index)
         let buttonHeight: CGFloat = 2 / 20 * self.trueHeight
         let buttonWidth: CGFloat = 3 / 20 * self.trueHeight
+        
+        // change specific tab button scrollview content frame
+        let scrollviewWidth = (buttonWidth + 1 / 20 * self.trueWidth) * CGFloat(self.specificTabSets.count)
+        if scrollviewWidth > self.specificTabsScrollView.contentSize.width {
+            self.specificTabsScrollView.contentSize = CGSizeMake(scrollviewWidth, 2.5 / 20 * self.trueHeight)
+        }
+        
         for var i = 0; i < self.specificTabSets.count; i++ {
             if self.specificTabSets[i].content != "" {
                 let specificButton: UIButton = UIButton()
@@ -1052,7 +1059,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             sender.setTranslation(CGPointZero, inView: self.view)
             let timeChange = NSTimeInterval(-translation.x / 10)
             self.currentTime = self.currentTime + timeChange
-            if self.currentTime >= 0 {
+            if self.currentTime >= 0 && self.currentTime <= self.duration {
             let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
                 self.progressBlock.setProgress(persent)
                 self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
