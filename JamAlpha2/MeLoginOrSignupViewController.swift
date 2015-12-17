@@ -30,6 +30,7 @@ class MeLoginOrSignupViewController: UIViewController{
     var loginTabButton: UIButton!
     var indicatorTriangleView: UIImageView! //indicate whether it's sign up or log in
     var isSignUpSelected = true
+    var settingsButton: UIButton!
     
     var suspended:Bool = false
     
@@ -130,13 +131,24 @@ class MeLoginOrSignupViewController: UIViewController{
         closeButton.addTarget(self, action: "closeButtonPressed", forControlEvents: .TouchUpInside)
         topView.addSubview(closeButton)
         
+        settingsButton = UIButton(frame: CGRect(x: self.view.frame.width-25-25, y: 25, width: 25, height: 25))
+        settingsButton.setImage(UIImage(named: "settings_icon"), forState: .Normal)
+        settingsButton.addTarget(self, action: "settingsButtonPressed", forControlEvents: .TouchUpInside)
+        topView.addSubview(settingsButton)
+        
         if !showCloseButton {
             closeButton.hidden = true
+            settingsButton.hidden = false
         }
     }
     
     func closeButtonPressed() {
         self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    func settingsButtonPressed() {
+        let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
+        self.showViewController(settingsVC, sender: nil)
     }
     
     func setUpViews() {
@@ -206,6 +218,10 @@ class MeLoginOrSignupViewController: UIViewController{
         facebookButton.center.x = self.view.center.x
         facebookButton.addTarget(self, action: "pressFacebookButton:", forControlEvents: UIControlEvents.TouchUpInside)
         scrollView.addSubview(facebookButton)
+        
+        //TODO: hide facebook in beta mode
+        facebookButton.hidden = true
+        orLabel.hidden = true
         
         //log in screen
         let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
