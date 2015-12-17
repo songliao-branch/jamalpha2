@@ -71,7 +71,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
         let song = theAlbum.songsIntheAlbum[indexPath.row]
 
-        if MusicManager.sharedInstance.player.nowPlayingItem != nil {
+        if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.rate == 0 {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
                 
                 cell.titleTrailingConstant.constant = 50
@@ -82,6 +82,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                 cell.loudspeakerImage.hidden = true
             }
         } else {
+            cell.titleTrailingConstant.constant = 15
             cell.loudspeakerImage.hidden = true
         }
         

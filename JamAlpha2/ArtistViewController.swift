@@ -113,7 +113,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         let song = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
         
-        if MusicManager.sharedInstance.player.nowPlayingItem != nil {
+        if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.rate == 0 {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
                 cell.titleTrailingConstant.constant = 50
                 cell.loudspeakerImage.hidden = false
@@ -123,6 +123,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                 cell.loudspeakerImage.hidden = true
             }
         } else {
+            cell.titleTrailingConstant.constant = 15
             cell.loudspeakerImage.hidden = true
         }
         

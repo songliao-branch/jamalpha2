@@ -27,8 +27,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     @IBOutlet weak var musicTable: UITableView!
     
-    var isShowingDemo = false
-    
     //for transition view animator
     var animator: CustomTransitionAnimation?
     var nowView: VisualizerView!
@@ -186,7 +184,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
-            
             if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
                 if section == 0 {
                     return demoSongs.count
@@ -226,7 +223,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             }
             
-            if MusicManager.sharedInstance.player.nowPlayingItem != nil && !isShowingDemo {
+            if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.rate == 0 {
                 if let item = song as? MPMediaItem {
                     if item == MusicManager.sharedInstance.player.nowPlayingItem {
                         cell.titleTrailingConstraint.constant = 50
@@ -329,17 +326,14 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        isShowingDemo = false
         
         if pageIndex == 0 {
             KGLOBAL_init_queue.suspended = true
-           
             
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
  
             if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
                 if indexPath.section == 0 {
-                    isShowingDemo = true
                     MusicManager.sharedInstance.setDemoSongQueue(demoSongs, selectedIndex: indexPath.row)
                     songVC.selectedRow = indexPath.row
                     MusicManager.sharedInstance.player.pause()
