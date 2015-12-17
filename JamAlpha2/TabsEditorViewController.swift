@@ -636,7 +636,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.editView.addSubview(specificTabsScrollView)
         
         self.tabNameTextField.frame = CGRectMake(23.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 7 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
-        self.tabNameTextField.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+        self.tabNameTextField.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(1)
         self.tabNameTextField.layer.cornerRadius = 3
         self.tabNameTextField.autocorrectionType = UITextAutocorrectionType.No
         self.editView.addSubview(tabNameTextField)
@@ -694,7 +694,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     let buttonWidth = 7 / 60 * self.trueHeight
                     noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
                     noteButton.layer.cornerRadius = 0.5 * buttonWidth
-                    noteButton.layer.borderWidth = 1
+                    noteButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+                    noteButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
                     noteButton.tag = (indexString + 1) * 100 + indexFret
                     noteButton.addTarget(self, action: "pressNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
                     let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
@@ -804,7 +805,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if self.specificTabSets[i].content != "" {
                 let specificButton: UIButton = UIButton()
                 specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
-                specificButton.layer.borderWidth = 1
+                specificButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
                 specificButton.layer.cornerRadius = 4
                 specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
                 specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
