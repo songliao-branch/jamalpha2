@@ -1132,6 +1132,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         favoriateButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
         favoriateButton.sizeToFit()
+        favoriateButton.addTarget(self, action: "favoriteButtonPressed", forControlEvents: .TouchUpInside)
         
         shuffleButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         if(!isSongNeedPurchase){
@@ -1353,6 +1354,28 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             navigationOutActionView.addSubview(line)
         }
+    }
+    
+    
+    func favoriteButtonPressed() {
+        
+        if shouldShowSignUpPage() {
+            self.isRemoveProgressBlock = false
+            self.selectedFromTable = false
+            self.player.pause()
+            return
+        }
+        
+        let findable: Findable = isSongNeedPurchase ? songNeedPurchase : player.nowPlayingItem!
+        
+        APIManager.favoriteTheSong(findable, completion: {
+            result in
+            if result == "liked" {
+                self.favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
+            } else  {
+                self.favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
+            }
+        })
     }
     
     func toggleShuffle(button: UIButton){
