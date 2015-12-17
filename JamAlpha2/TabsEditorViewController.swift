@@ -1025,27 +1025,41 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.addSubview(countdownView)
     }
     
+    var isPanning: Bool = false
+    
     // pan on music control view to change music time and progressblock time
     func panOnMusicControlView(sender: UIPanGestureRecognizer) {
-        
-        let translation = sender.translationInView(self.view)
-        sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
-        sender.setTranslation(CGPointZero, inView: self.view)
-        let timeChange = NSTimeInterval(-translation.x / 10)
-        if isPlayingLocalSong! {
-            self.localPlayer.currentTime = self.currentTime + timeChange
-            self.currentTime = self.localPlayer.currentTime
-        } else {
-            self.musicPlayer.currentPlaybackTime = self.currentTime + timeChange
-            self.currentTime = self.musicPlayer.currentPlaybackTime
+        if sender.state == .Began {
+            self.isPanning = true
+            self.timer.invalidate()
+            self.timer = NSTimer()
+        } else if sender.state == .Ended {
+            self.isPanning = false
+            if isPlayingLocalSong! {
+                self.localPlayer.currentTime = self.currentTime
+                //self.currentTime = self.localPlayer.currentTime
+            } else {
+                self.musicPlayer.currentPlaybackTime = self.currentTime
+                //self.currentTime = self.musicPlayer.currentPlaybackTime
+            }
+            if self.musicPlayer.playbackState == .Playing {
+                startTimer()
+            }
+        } else if sender.state == .Changed {
+            let translation = sender.translationInView(self.view)
+            sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
+            sender.setTranslation(CGPointZero, inView: self.view)
+            let timeChange = NSTimeInterval(-translation.x / 10)
+            self.currentTime = self.currentTime + timeChange
+ 
+            let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
+            self.progressBlock.setProgress(persent)
+            self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
+            
+            self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+            // find the current tab according to the current time and make the current tab view to yellow
+            self.findCurrentTabView()
         }
-        let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
-        self.progressBlock.setProgress(persent)
-        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
-
-        self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
-        // find the current tab according to the current time and make the current tab view to yellow
-        self.findCurrentTabView()
         
     }
     
@@ -1066,16 +1080,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             countDownStartSecond = 3
             if isPlayingLocalSong! {
                 localPlayer.play()
-            } else {
-                musicPlayer.play()
-            }
-            startTimer()
-            if isPlayingLocalSong! {
                 self.currentTime = localPlayer.currentTime
             } else {
+                musicPlayer.play()
                 self.currentTime = musicPlayer.currentPlaybackTime
             }
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            startTimer()
+            //self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         }
     }
 
