@@ -12,6 +12,11 @@ import AVFoundation
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate {
     
+    //
+    var stepPerSecond: Float = 100
+    var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
+    var speed: Float = 1
+    
     var songViewController: SongViewController!
     // collection view
     var collectionView: UICollectionView!
@@ -155,6 +160,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         return true
     }
     
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeNotification()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -218,10 +228,42 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         // MARK: add exist chord to tab editor view
         self.addChordToEditorView(theSong)
     }
+    
+    // MARK: Notification
+    func registerNotification() {
+        if musicPlayer != nil {
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
+            musicPlayer.beginGeneratingPlaybackNotifications()
+        }
+    }
+    
+    func removeNotification() {
+        if musicPlayer != nil {
+            musicPlayer.endGeneratingPlaybackNotifications()
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
+        }
+    }
+    
+    func playbackStateChanged(sender: NSNotification) {
+        if musicPlayer.playbackState == .Playing {
+            startTimer()
+            self.currentTime = musicPlayer.currentPlaybackTime
+            self.startTime.setTime(Float(self.currentTime))
+            self.musicPlayer.currentPlaybackRate = self.speed
+            self.progressBlock.alpha = 1
+        } else if musicPlayer.playbackState == .Paused {
+            timer.invalidate()
+            timer = NSTimer()
+            self.progressBlock.alpha = 0.5
+        }
+    }
+    
+    
     // MARK: check theSong can convert to MPMediaItem
     func checkConverToMPMediaItem() {
         if !self.isPlayingLocalSong {
             musicPlayer = MusicManager.sharedInstance.player
+            registerNotification()
         } else {
             localPlayer = AVAudioPlayer()
         }
@@ -334,13 +376,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func speedStepperValueChanged(stepper: UIStepper) {
         self.speedLabel.text = "Speed: \(stepper.value)x"
         if self.isPlayingLocalSong! {
-            self.localPlayer.rate = Float(stepper.value)
+            if self.localPlayer.playing {
+                self.localPlayer.rate = Float(stepper.value)
+            } else {
+                self.speed = Float(stepper.value)
+            }
         } else {
-            self.musicPlayer.currentPlaybackRate = Float(stepper.value)
-            if self.musicPlayer.playbackState == .Stopped {
-                self.musicPlayer.stop()
-            } else if self.musicPlayer.playbackState == .Paused {
-                self.musicPlayer.pause()
+            if self.musicPlayer.playbackState == .Playing {
+                self.musicPlayer.currentPlaybackRate = Float(stepper.value)
+            } else {
+                self.speed = Float(stepper.value)
             }
         }
     }
@@ -1048,12 +1093,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.timer = NSTimer()
         } else if sender.state == .Ended {
             self.isPanning = false
+            startTime.setTime(Float(self.currentTime))
             if isPlayingLocalSong! {
                 self.localPlayer.currentTime = self.currentTime
-                //self.currentTime = self.localPlayer.currentTime
             } else {
                 self.musicPlayer.currentPlaybackTime = self.currentTime
-                //self.currentTime = self.musicPlayer.currentPlaybackTime
             }
             if self.musicPlayer.playbackState == .Playing {
                 startTimer()
@@ -1062,10 +1106,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let translation = sender.translationInView(self.view)
             sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
             sender.setTranslation(CGPointZero, inView: self.view)
-            let timeChange = NSTimeInterval(-translation.x / 10)
-            self.currentTime = self.currentTime + timeChange
             if self.currentTime >= 0 && self.currentTime <= self.duration {
-            let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
+                let timeChange = NSTimeInterval(-translation.x / 10)
+                self.currentTime = self.currentTime + timeChange
+                if self.currentTime < 0 {
+                    self.currentTime = 0
+                } else if self.currentTime > self.duration {
+                    self.currentTime = self.duration
+                }
+                startTime.setTime(Float(self.currentTime))
+                let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
                 self.progressBlock.setProgress(persent)
                 self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
                 
@@ -1079,7 +1129,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func startTimer() {
         if !timer.valid {
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         }
     }
 
@@ -1095,9 +1145,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if isPlayingLocalSong! {
                 localPlayer.play()
                 self.currentTime = localPlayer.currentTime
+                self.localPlayer.rate = self.speed
             } else {
                 musicPlayer.play()
                 self.currentTime = musicPlayer.currentPlaybackTime
+                self.musicPlayer.currentPlaybackRate = self.speed
             }
             startTimer()
             //self.timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("update"), userInfo: nil, repeats: true)
@@ -1209,15 +1261,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func update() {
-        if isPlayingLocalSong! {
-            self.currentTime = self.localPlayer.currentTime
-        } else {
-            self.currentTime = self.musicPlayer.currentPlaybackTime
+        //
+        if !isPanning {
+            if startTime.toDecimalNumer() - Float(self.currentTime) < 2 {
+                startTime.addTime(Int(100 / stepPerSecond))
+            } else {
+                let tempPlaytime = !isPlayingLocalSong ? self.musicPlayer.currentPlaybackTime : self.localPlayer.currentTime
+                if !tempPlaytime.isNaN {
+                    startTime.setTime(Float(tempPlaytime))
+                } else {
+                    startTime.addTime(Int(100 / stepPerSecond))
+                }
+            }
         }
+        
+        //
         //refresh current time label
-        self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+        self.currentTimeLabel.text = TimeNumber(time: startTime.toDecimalNumer()).toDisplayString()
         //refresh progress block
-        let presentPosition = CGFloat(self.currentTime / self.duration)
+        let presentPosition = CGFloat(startTime.toDecimalNumer() / Float(self.duration))
         self.progressBlock.setProgress(presentPosition)
         
         
@@ -1424,9 +1486,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.view.userInteractionEnabled = true
         } else {
             print("back to song view controller")
-            self.dismissViewControllerAnimated(false, completion: {
+            tuningMenu.hidden = true
+            self.progressBlock.hidden = true
+            if self.isPlayingLocalSong! {
+                self.localPlayer.pause()
+            } else {
+                self.musicPlayer.pause()
+            }
+            
+            self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.songViewController.isPlayingLocalSong {
+                if self.isPlayingLocalSong! {
                     self.songViewController.localPlayer.play()
                 } else {
                     MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
@@ -1644,9 +1714,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             self.songViewController.updateMusicData(theSong)
             
-            self.dismissViewControllerAnimated(false, completion: {
+            tuningMenu.hidden = true
+            self.progressBlock.hidden = true
+            if self.isPlayingLocalSong! {
+                self.localPlayer.pause()
+            } else {
+                self.musicPlayer.pause()
+            }
+            
+            self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.songViewController.isPlayingLocalSong {
+                if self.isPlayingLocalSong! {
                     self.songViewController.localPlayer.play()
                 } else {
                     MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)

@@ -492,8 +492,7 @@ extension LyricsSyncViewController {
         
         CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times)
         
-        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated(true, completion: {
-            completed in
+        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: { completed in            
             if self.lyricsTextViewController.songViewController.isPlayingLocalSong {
                 self.lyricsTextViewController.songViewController.localPlayer.play()
             } else {

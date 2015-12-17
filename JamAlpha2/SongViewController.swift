@@ -793,6 +793,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             && KGLOBAL_init_queue.suspended)){
             return
         }
+        if self.player.nowPlayingItem == firstLoadPlayingItem {
+            return
+        }
         pthread_rwlock_wrlock(&self.rwLock)
             self.stopTimer()
             self.newPosition = 0
@@ -1030,16 +1033,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             updateAll(Float(player.currentPlaybackTime))
             startTimer()
             //bring up the soundwave, give it a little jump animation
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                    KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
-                    KGLOBAL_progressBlock!.alpha = 1.0
-                }, completion: { finished in
-                    
-                    UIView.animateWithDuration(0.15, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-                            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
-                        }, completion: nil)
-                    
-            })
+            UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
+                KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                KGLOBAL_progressBlock!.alpha = 1.0
+                }, completion: nil
+            )
         }
     }
 
@@ -1952,10 +1950,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
+        viewDidFullyDisappear = true
         if !isPlayingLocalSong{
             self.player.pause()
+            stopTimer()
+            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+            KGLOBAL_progressBlock!.alpha = 0.5
         }else{
             self.localPlayer.pause()
+            stopTimer()
+            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+            KGLOBAL_progressBlock!.alpha = 0.5
         }
         
         self.clearActions()
@@ -2028,8 +2033,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if !isPlayingLocalSong{
             self.player.pause()
+            stopTimer()
+            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+            KGLOBAL_progressBlock!.alpha = 0.5
         }else{
             self.localPlayer.pause()
+            stopTimer()
+            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+            KGLOBAL_progressBlock!.alpha = 0.5
         }
         
         self.clearActions()
