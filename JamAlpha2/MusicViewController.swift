@@ -211,7 +211,9 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
-
+        
+        cell.demoImage.hidden = true
+        
         if pageIndex == 0 {
     
             var song: Findable!
@@ -219,6 +221,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
                 if indexPath.section == 0 {
                     song = demoSongs[indexPath.row]
+                    cell.demoImage.hidden = false
                 } else {
                     //section starts at 1 if we have demo songs
                     song = songsByFirstAlphabet[indexPath.section-1].1[indexPath.row]
@@ -228,7 +231,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             }
             
-//            MusicManager.sharedInstance.avPlayer
             if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
                 if let item = song as? MPMediaItem {
                     if item == MusicManager.sharedInstance.player.nowPlayingItem {

@@ -14,7 +14,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBOutlet weak var tableView: UITableView!
     
-    let firstSectionContent: [String] = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Reopen Demo Mode"]
+    let firstSectionContent: [String] = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo Mode"]
  
     override func viewDidLoad() {
         super.viewDidLoad()
