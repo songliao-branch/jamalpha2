@@ -569,16 +569,32 @@ extension LyricsSyncViewController {
     }
     
     func pressBackButton(sender: UIButton) {
-        self.localPlayer.stop()
+        removeNotification()
+        if isPlayingLocalSong! {
+            localPlayer.pause()
+        } else {
+            musicPlayer.pause()
+        }
+        updateTimer.invalidate()
+        updateTimer = NSTimer()
         for i in 0..<self.addedLyricsWithTime.lyrics.count {
             if self.addedLyricsWithTime.timeAdded[i] == true {
                 tempLyricsTimeTuple.append((self.addedLyricsWithTime.lyrics[i], self.addedLyricsWithTime.time[i]))
             }
         }
+        
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     func pressDoneButton(sender: UIButton) {
+        removeNotification()
+        if isPlayingLocalSong! {
+            localPlayer.pause()
+        } else {
+            musicPlayer.pause()
+        }
+        updateTimer.invalidate()
+        updateTimer = NSTimer()
         var lyricsTimesTuple = [(String, NSTimeInterval)]()
         
         for i in 0..<self.addedLyricsWithTime.lyrics.count {

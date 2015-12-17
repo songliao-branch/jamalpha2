@@ -160,11 +160,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         return true
     }
     
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        removeNotification()
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -1508,12 +1503,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             print("back to song view controller")
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
+            removeNotification()
             if self.isPlayingLocalSong! {
                 self.localPlayer.pause()
             } else {
                 self.musicPlayer.pause()
             }
-            
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
                 if self.isPlayingLocalSong! {
@@ -1736,6 +1731,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
+            removeNotification()
             if self.isPlayingLocalSong! {
                 self.localPlayer.pause()
             } else {
