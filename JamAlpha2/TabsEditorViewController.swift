@@ -337,6 +337,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.localPlayer.rate = Float(stepper.value)
         } else {
             self.musicPlayer.currentPlaybackRate = Float(stepper.value)
+            if self.musicPlayer.playbackState == .Stopped {
+                self.musicPlayer.stop()
+            } else if self.musicPlayer.playbackState == .Paused {
+                self.musicPlayer.pause()
+            }
         }
     }
     
@@ -1447,7 +1452,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func pressTuningButton(sender: UIButton) {
         print("press tuning button")
         self.view.userInteractionEnabled = false
-        self.actionDismissLayerButton.hidden = false
+        self.backToMainView()
+        self.view.userInteractionEnabled = true
+        if removeAvaliable {
+            changeRemoveButtonStatus(self.removeButton)
+        }
+        self.view.userInteractionEnabled = false
+        self.actionDismissLayerButton.hidden = false // what is this button?
         UIView.animateWithDuration(0.3, animations: {
             self.tuningMenu.frame = CGRect(x: 0, y: 0, width: self.tuningMenu.frame.width, height: self.trueHeight)
             self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
