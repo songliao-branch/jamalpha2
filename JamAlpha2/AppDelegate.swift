@@ -10,12 +10,17 @@ import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
 import AWSS3
+import MediaPlayer
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var suspended:Bool = false
+    
+    var nowPlayingItem: MPMediaItem!
+    var currentTime: NSTimeInterval!
     
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
@@ -71,6 +76,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 currentSongVC.stopTimer()
             }       
             print("Song VC entering background")
+            if(currentVC.presentedViewController != nil){
+                let presentVC = currentVC.presentedViewController!
+                if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
+                    var isPlayingLocalSong:Bool = false
+                    if presentVC.isKindOfClass(TabsEditorViewController) {
+                        isPlayingLocalSong = (presentVC as! TabsEditorViewController).isPlayingLocalSong
+                    }else if presentVC.isKindOfClass(LyricsTextViewController){
+                        isPlayingLocalSong = (presentVC as! LyricsTextViewController).isPlayingLocalSong
+                    }
+                    
+                    if(!isPlayingLocalSong){
+                        MusicManager.sharedInstance.player.pause()
+                        self.nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
+                        self.currentTime = MusicManager.sharedInstance.player.currentPlaybackTime
+                    }
+                }
+            }
         }
         self.suspended = KGLOBAL_init_queue.suspended
         KGLOBAL_queue.suspended = true
@@ -132,6 +154,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Song VC entering forground")
                 KGLOBAL_queue.suspended = false
                 KGLOBAL_init_queue.suspended = self.suspended
+            }
+            
+            if(currentVC.presentedViewController != nil){
+                let presentVC = currentVC.presentedViewController!
+                if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
+                    var isPlayingLocalSong:Bool = false
+                    if presentVC.isKindOfClass(TabsEditorViewController) {
+                        isPlayingLocalSong = (presentVC as! TabsEditorViewController).isPlayingLocalSong
+                    }else if presentVC.isKindOfClass(LyricsTextViewController){
+                        isPlayingLocalSong = (presentVC as! LyricsTextViewController).isPlayingLocalSong
+                    }
+                    
+                    if(!isPlayingLocalSong){
+                        if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != self.nowPlayingItem){
+                            MusicManager.sharedInstance.player.stop()
+                            MusicManager.sharedInstance.player.repeatMode = .All
+                            MusicManager.sharedInstance.player.shuffleMode = .Off
+                            MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                            MusicManager.sharedInstance.player.nowPlayingItem = self.nowPlayingItem
+                            MusicManager.sharedInstance.player.repeatMode = .One
+                            MusicManager.sharedInstance.player.shuffleMode = .Off
+                            MusicManager.sharedInstance.player.currentPlaybackTime = self.currentTime
+                        }
+                    }
+                }
             }
         }
         KGLOBAL_isNeedToCheckIndex = true
