@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MediaPlayer
 
 
 class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
@@ -45,7 +46,6 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
             cell.demoSwith.onTintColor = UIColor.mainPinkColor()
             cell.demoSwith.addTarget(self, action: "switchChanged:", forControlEvents: .ValueChanged)
             cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong)
-            cell.imfoLabel.text = "Show Demo"
             cell.selectionStyle = UITableViewCellSelectionStyle.None
             return cell
     }
@@ -56,12 +56,16 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 musicVC.reloadDataAndTable()
             }
-            //KGLOBAL_closeDemoButton.hidden = false
         }else{
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 musicVC.reloadDataAndTable()
             }
-            //KGLOBAL_closeDemoButton.hidden = true
+        }
+        if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+            MusicManager.sharedInstance.avPlayer.pause()
+            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+            MusicManager.sharedInstance.avPlayer.removeAllItems()
+            self.baseVC.nowView.stop()
         }
     }
 }

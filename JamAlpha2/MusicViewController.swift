@@ -116,6 +116,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     func popToCurrentSong(){
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        
+        if MusicManager.sharedInstance.avPlayer.currentItem != nil {
+            songVC.isDemoSong = true
+        }
+      
         songVC.selectedFromTable = false
         songVC.musicViewController = self
         songVC.transitioningDelegate = self.animator
@@ -223,7 +228,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             }
             
-            if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.rate == 0 {
+//            MusicManager.sharedInstance.avPlayer
+            if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
                 if let item = song as? MPMediaItem {
                     if item == MusicManager.sharedInstance.player.nowPlayingItem {
                         cell.titleTrailingConstraint.constant = 50
@@ -346,6 +352,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
                     MusicManager.sharedInstance.avPlayer.pause()
                     MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                    MusicManager.sharedInstance.avPlayer.removeAllItems()
+                    
                 }
                 
             } else {
@@ -354,6 +362,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
                 MusicManager.sharedInstance.avPlayer.pause()
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                MusicManager.sharedInstance.avPlayer.removeAllItems()
             }
             
             songVC.selectedFromTable = true
