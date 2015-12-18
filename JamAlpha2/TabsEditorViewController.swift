@@ -1292,7 +1292,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
 
         if !isPanning {
-            if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) {
+            if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {
                 startTime.addTime(Int(100 / stepPerSecond))
                 self.currentTime = NSTimeInterval(startTime.toDecimalNumer()) - 0.01
             } else {
