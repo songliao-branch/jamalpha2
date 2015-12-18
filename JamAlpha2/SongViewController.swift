@@ -1881,8 +1881,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
         stopTimer()
-        let roundedValue = Double(round(10*stepper.value)/10)
-        let adjustedSpeed = Float(speedMatcher[roundedValue]!)
+        let speedKey = Double(round(10*stepper.value)/10)
+        let adjustedSpeed = Float(speedMatcher[speedKey]!)
         self.speed = adjustedSpeed
         if isDemoSong {
             self.avPlayer.rate = adjustedSpeed
@@ -1892,8 +1892,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
        
         self.startTimer()
         
-        self.speedLabel.text = "Speed: \(speedLabels[roundedValue]!)"
-        print("stepper value:\(stepper.value) and value \(speedMatcher[roundedValue])")
+        self.speedLabel.text = "Speed: \(speedLabels[speedKey]!)"
+        print("stepper value:\(stepper.value) and value \(speedMatcher[speedKey])")
     }
     
     

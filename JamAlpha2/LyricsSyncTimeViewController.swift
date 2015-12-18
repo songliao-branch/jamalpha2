@@ -71,7 +71,6 @@ class LyricsSyncViewController: UIViewController  {
     var musicPlayer: MPMusicPlayerController!
     
     var updateTimer = NSTimer()
-    var playingSpeed: Float = 1
     
     // count down section
     var countdownTimer = NSTimer()
@@ -80,6 +79,9 @@ class LyricsSyncViewController: UIViewController  {
     
     // MARK: UIGestures
     var addedLyricsWithTime: lyricsWithTime!
+    
+    let speedMatcher = ["0.7": 0.50, "0.8" :0.67 , "0.9": 0.79,  "1.0" :1.00 , "1.1": 1.25  , "1.2" :1.50, "1.3" : 2.00]
+    var speedKey = 1.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -153,7 +155,7 @@ class LyricsSyncViewController: UIViewController  {
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
             self.avPlayer.volume = 1
             self.avPlayer.enableRate = true
-            self.avPlayer.rate = self.playingSpeed
+            self.avPlayer.rate = 1
             
         } else {
             musicPlayer = MusicManager.sharedInstance.player
@@ -192,15 +194,15 @@ class LyricsSyncViewController: UIViewController  {
         
         let speedUpButton: UIButton = UIButton()
         speedUpButton.frame = CGRectMake(15 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
-        speedUpButton.setTitle("U", forState: UIControlState.Normal)
+        speedUpButton.setTitle("+", forState: UIControlState.Normal)
         //speedUpButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         speedUpButton.addTarget(self, action: "pressSpeedUpButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        titleView.addSubview(speedUpButton)
         
+        titleView.addSubview(speedUpButton)
         
         let speedDownButton: UIButton = UIButton()
         speedDownButton.frame = CGRectMake(3 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
-        speedDownButton.setTitle("D", forState: UIControlState.Normal)
+        speedDownButton.setTitle("-", forState: UIControlState.Normal)
         //speedDownButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         speedDownButton.addTarget(self, action: "pressSpeedDownButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(speedDownButton)
@@ -552,19 +554,39 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
 
 // top view button reaction function 
 extension LyricsSyncViewController {
-    
+
     func pressSpeedUpButton(sender: UIButton) {
-        if self.playingSpeed < 1.95 {
-            self.playingSpeed = self.playingSpeed + 0.15
-            self.avPlayer.rate = self.playingSpeed
+        if speedKey >= 1.3{
+            return
         }
+        speedKey += 0.1
+        let stringSpeedKey = NSString(format: "%.1f", speedKey) as String
+        let adjustedSpeed = Float(speedMatcher[stringSpeedKey]!)
+        changeSpeed(adjustedSpeed)
     }
     
     func pressSpeedDownButton(sender: UIButton) {
-        if self.playingSpeed > 0.55 {
-            self.playingSpeed = self.playingSpeed - 0.15
-            self.avPlayer.rate = self.playingSpeed
+        if speedKey <= 0.71 {
+            return
         }
+        speedKey -= 0.1
+        let stringSpeedKey = NSString(format: "%.1f", speedKey) as String
+        let adjustedSpeed = Float(speedMatcher[stringSpeedKey]!)
+        
+        changeSpeed(adjustedSpeed)
+    }
+    
+    func changeSpeed(newSpeed: Float) {
+        if isDemoSong  {
+            if avPlayer.playing {
+                avPlayer.rate = newSpeed
+            }
+        } else {
+            if musicPlayer.playbackState == .Playing {
+                musicPlayer.currentPlaybackRate = newSpeed
+            }
+        }
+        self.speed = newSpeed
     }
     
     func pressBackButton(sender: UIButton) {

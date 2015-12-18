@@ -292,7 +292,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let sideMargin: CGFloat = 10
         
         //SECTION: add speed label, stepper
-        speedLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 100, height: 25))
+        speedLabel = UILabel(frame: CGRect(x: sideMargin, y: 0, width: 120, height: 25))
         speedLabel.textColor = UIColor.mainPinkColor()
         speedLabel.text = "Speed: 1.0x"
         speedLabel.center.y = rowHeight/2
@@ -376,20 +376,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let speedKey = Double(round(10*stepper.value)/10)
         let adjustedSpeed = Float(speedMatcher[speedKey]!)
         self.speedLabel.text = "Speed: \(speedLabels[speedKey]!)"
-
         if isDemoSong {
             if self.avPlayer.playing {
                 self.avPlayer.rate = adjustedSpeed
-            } else {
-                self.speed = adjustedSpeed
-            }
+            }            
         } else {
             if self.musicPlayer.playbackState == .Playing {
                 self.musicPlayer.currentPlaybackRate = adjustedSpeed
-            } else {
-                self.speed = adjustedSpeed
             }
         }
+        self.speed = adjustedSpeed
     }
     
     func capoStepperValueChanged(stepper: UIStepper) {
