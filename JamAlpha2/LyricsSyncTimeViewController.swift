@@ -37,7 +37,7 @@ class lyricsWithTime {
 class LyricsSyncViewController: UIViewController  {
 
     var currentTime: NSTimeInterval = 0
-    var isDemoSong: Bool!
+    var isDemoSong = false
     
     var stepPerSecond: Float = 100
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
@@ -67,7 +67,7 @@ class LyricsSyncViewController: UIViewController  {
     
     var lyricsOrganizedArray: [String]!
 
-    var localPlayer: AVAudioPlayer!
+    var avPlayer: AVAudioPlayer!
     var musicPlayer: MPMusicPlayerController!
     
     var updateTimer = NSTimer()
@@ -86,8 +86,7 @@ class LyricsSyncViewController: UIViewController  {
         self.addedLyricsWithTime = lyricsWithTime(count: self.lyricsOrganizedArray.count)
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
-        checkConverToMPMediaItem()
-        setUpSong()
+        setUpPlayer()
         setUpHeaderView()
         setUpLyricsTableView()
         setUpProgressBlock()
@@ -144,25 +143,25 @@ class LyricsSyncViewController: UIViewController  {
     
     var duration: NSTimeInterval!
     // MARK: check theSong can convert to MPMediaItem
-    func checkConverToMPMediaItem() {
-        if !self.isDemoSong {
+    
+    func setUpPlayer() {
+        if isDemoSong {
+            avPlayer = AVAudioPlayer()
+            self.duration = NSTimeInterval(MusicManager.sharedInstance.avPlayer.currentItem!.getDuration())
+            
+            let url: NSURL = theSong.getURL() as! NSURL
+            self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
+            self.avPlayer.volume = 1
+            self.avPlayer.enableRate = true
+            self.avPlayer.rate = self.playingSpeed
+            
+        } else {
             musicPlayer = MusicManager.sharedInstance.player
             registerNotification()
             self.duration = musicPlayer.nowPlayingItem?.playbackDuration
-        } else {
-            localPlayer = AVAudioPlayer()
-            self.duration = localPlayer.duration
         }
     }
-    
-    // MARK: set up views
-    func setUpSong() {
-        let url: NSURL = theSong.getURL() as! NSURL
-        self.localPlayer = try! AVAudioPlayer(contentsOfURL: url)
-        self.localPlayer.volume = 1
-        self.localPlayer.enableRate = true
-        self.localPlayer.rate = self.playingSpeed
-    }
+
     
     func setUpHeaderView() {
         let titleView: UIView = UIView()
@@ -305,7 +304,7 @@ class LyricsSyncViewController: UIViewController  {
     var currentSelectIndex: Int = 0
     
     func playPause(sender: UITapGestureRecognizer) {
-        if self.isDemoSong! ? !localPlayer.playing : (musicPlayer.playbackState != .Playing) {
+        if self.isDemoSong ? !avPlayer.playing : (musicPlayer.playbackState != .Playing) {
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
             progressBlockContainer.removeGestureRecognizer(tapGesture)
@@ -319,8 +318,8 @@ class LyricsSyncViewController: UIViewController  {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
                 }, completion: nil)
-            if isDemoSong! {
-                self.localPlayer.pause()
+            if isDemoSong {
+                self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
             }
@@ -354,9 +353,9 @@ class LyricsSyncViewController: UIViewController  {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
-                    if self.isDemoSong! {
-                        if !self.localPlayer.playing {
-                            self.localPlayer.play()
+                    if self.isDemoSong {
+                        if !self.avPlayer.playing {
+                            self.avPlayer.play()
                         }
                     } else {
                         if self.musicPlayer.playbackState != .Playing {
@@ -380,9 +379,9 @@ class LyricsSyncViewController: UIViewController  {
         } else if sender.state == .Ended {
             self.isPanning = false
             startTime.setTime(Float(self.currentTime))
-            if isDemoSong! {
-                self.localPlayer.currentTime = self.currentTime
-                if self.localPlayer.playing {
+            if isDemoSong {
+                self.avPlayer.currentTime = self.currentTime
+                if self.avPlayer.playing {
                     startUpdateTimer()
                 }
             } else {
@@ -420,7 +419,7 @@ class LyricsSyncViewController: UIViewController  {
             if startTime.toDecimalNumer() - Float(self.toTime) < 2 {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
-                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.localPlayer.currentTime
+                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                 } else {
@@ -429,8 +428,8 @@ class LyricsSyncViewController: UIViewController  {
             }
         }
         if startTime.toDecimalNumer() > Float(self.duration) {
-            if isDemoSong! {
-                self.localPlayer.pause()
+            if isDemoSong {
+                self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
             }
@@ -501,8 +500,8 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
                 self.addedLyricsWithTime.timeAdded[indexPath.item] = true
                 lyricsTableView.reloadData()
             }else {
-                if isDemoSong! {
-                    localPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item]
+                if isDemoSong {
+                    avPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item]
                 } else {
                     musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item]
                 }
@@ -533,15 +532,15 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
             }
             lyricsTableView.reloadData()
             if indexPath.row == 0 {
-                if isDemoSong! {
-                    localPlayer.currentTime = 0
+                if isDemoSong {
+                    avPlayer.currentTime = 0
                 } else {
                     musicPlayer.currentPlaybackTime = 0
                 }
-                //  self.currentTime = 0
+
             } else {
-                if isDemoSong! {
-                    localPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item - 1]
+                if isDemoSong {
+                    avPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item - 1]
                 } else {
                     musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item - 1]
                 }
@@ -557,21 +556,21 @@ extension LyricsSyncViewController {
     func pressSpeedUpButton(sender: UIButton) {
         if self.playingSpeed < 1.95 {
             self.playingSpeed = self.playingSpeed + 0.15
-            self.localPlayer.rate = self.playingSpeed
+            self.avPlayer.rate = self.playingSpeed
         }
     }
     
     func pressSpeedDownButton(sender: UIButton) {
         if self.playingSpeed > 0.55 {
             self.playingSpeed = self.playingSpeed - 0.15
-            self.localPlayer.rate = self.playingSpeed
+            self.avPlayer.rate = self.playingSpeed
         }
     }
     
     func pressBackButton(sender: UIButton) {
         removeNotification()
-        if isDemoSong! {
-            localPlayer.pause()
+        if isDemoSong {
+            avPlayer.pause()
         } else {
             musicPlayer.pause()
         }
@@ -588,8 +587,8 @@ extension LyricsSyncViewController {
     
     func pressDoneButton(sender: UIButton) {
         removeNotification()
-        if isDemoSong! {
-            localPlayer.pause()
+        if isDemoSong {
+            avPlayer.pause()
         } else {
             musicPlayer.pause()
         }

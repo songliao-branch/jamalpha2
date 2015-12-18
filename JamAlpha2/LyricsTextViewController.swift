@@ -44,7 +44,9 @@ class LyricsTextViewController: UIViewController {
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
         
-        self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
+        if !isDemoSong {
+            self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
+        }
         
         addObjectsOnMainView()
         
