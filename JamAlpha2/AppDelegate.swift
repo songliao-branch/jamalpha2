@@ -140,10 +140,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             currentSongVC.removeAllObserver()
             if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
                 if (!currentSongVC.isSongNeedPurchase) {
+                    currentSongVC.viewDidDisappear(false)
                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                         completed in
                         KGLOBAL_queue.suspended = false
                         KGLOBAL_init_queue.suspended = self.suspended
+                        MusicManager.sharedInstance.initializePlayer()
                     })
                 }else{
                     KGLOBAL_queue.suspended = false

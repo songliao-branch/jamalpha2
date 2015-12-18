@@ -132,6 +132,7 @@ class MusicManager: NSObject {
             for song in collection {
                 print("\(_TAG) setting up queue of song: \(song.title!)")
             }
+            return
         }
         
         // after come back from music app which the current playing item is set to nil, we set the collection
@@ -183,6 +184,8 @@ class MusicManager: NSObject {
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
                 player.prepareToPlay()
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
+                print(selectedIndex)
+                print(lastPlayerQueue[selectedIndex].albumTitle)
             } else {
                 if queueChanged { // if we selected the same song from a different queue this time
                     let lastPlaybackTime = player.currentPlaybackTime
