@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 @objc(Song)
 class Song: NSManagedObject {
-
+    @NSManaged var id: NSNumber?
     @NSManaged var title: String
     @NSManaged var artist: String
     @NSManaged var album: String

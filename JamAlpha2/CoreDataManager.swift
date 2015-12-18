@@ -175,6 +175,9 @@ class CoreDataManager: NSObject {
         // if we don't have the song in the database
         if findSong(item) == nil {
             let song: Song = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Song), managedObjectConect: moc) as! Song
+            if let id = song.id {
+
+            }
             song.title = item.getTitle()
             song.artist = item.getArtist()
             song.album = item.getAlbum()
