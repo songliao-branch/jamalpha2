@@ -806,9 +806,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             && KGLOBAL_init_queue.suspended)){
             return
         }
-        if self.player.nowPlayingItem == nowPlayingMediaItem {
-            return
-        }
         pthread_rwlock_wrlock(&self.rwLock)
             self.stopTimer()
             self.newPosition = 0
@@ -820,6 +817,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if self.player.repeatMode == .One {
                 print("\(self.player.nowPlayingItem!.title) is repeating")
                 self.updateAll(0)
+                if self.player.playbackState == MPMusicPlaybackState.Playing{
+                    self.startTimer()
+                }
                 return
             }
             

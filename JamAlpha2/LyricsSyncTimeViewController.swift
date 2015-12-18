@@ -689,7 +689,11 @@ extension LyricsSyncViewController {
             self.addedLyricsWithTime.addExistLyrics(tempLyricsTimeTuple.count, lyrics: lyrics, time: time, timeAdded: timeAdded)
         }
         tempLyricsTimeTuple.removeAll()
-        self.player.currentTime = self.addedLyricsWithTime.time.last!
+        if isDemoSong {
+            self.avPlayer.currentTime = self.addedLyricsWithTime.time.last!
+        } else {
+            self.musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time.last!
+        }
     }
     
     func addLyricsToEditorView(sender: Findable) {
@@ -725,7 +729,10 @@ extension LyricsSyncViewController {
             self.addedLyricsWithTime.addExistLyrics(count, lyrics: lyrics, time: time, timeAdded: timeAdded)
             
         }
-        
-        self.player.currentTime = self.addedLyricsWithTime.time[i - 1]
+        if isDemoSong {
+            self.avPlayer.currentTime = self.addedLyricsWithTime.time[i - 1]
+        } else {
+            self.musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[i - 1]
+        }
     }
 }

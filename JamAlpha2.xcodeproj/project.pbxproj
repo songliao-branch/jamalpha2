@@ -25,6 +25,7 @@
 		BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */; };
 		BF4B843C1C0CF94900AF8A2A /* AWSConstent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */; };
 		BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */; };
+		BF8192C01C24BA9A003481A7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF8192BE1C24BA9A003481A7 /* Main.storyboard */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */; };
@@ -71,7 +72,6 @@
 		E488775B1B151628004785D3 /* JamAlpha2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E488775A1B151628004785D3 /* JamAlpha2Tests.swift */; };
 		E48877681B151E2B004785D3 /* MusicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877671B151E2B004785D3 /* MusicCell.swift */; };
 		E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48877691B1520A0004785D3 /* SongViewController.swift */; };
-		E488776F1B152742004785D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E488776D1B152742004785D3 /* Main.storyboard */; };
 		E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48AE2D11B955BB40044CFDB /* APIManager.swift */; };
 		E48F22671BF5924000F24962 /* DownloadedTabsSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */; };
 		E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49AF0961B2699C800DD3342 /* BaseViewController.swift */; };
@@ -140,6 +140,7 @@
 		BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSS3Manager.swift; sourceTree = "<group>"; };
 		BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSConstent.swift; sourceTree = "<group>"; };
 		BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeLoginOrSignupViewController.swift; sourceTree = "<group>"; };
+		BF8192BF1C24BA9A003481A7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateNickNameViewController.swift; sourceTree = "<group>"; };
@@ -190,7 +191,6 @@
 		E488775A1B151628004785D3 /* JamAlpha2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamAlpha2Tests.swift; sourceTree = "<group>"; };
 		E48877671B151E2B004785D3 /* MusicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
 		E48877691B1520A0004785D3 /* SongViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SongViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		E488776E1B152742004785D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E48AE2D11B955BB40044CFDB /* APIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = APIManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadedTabsSet.swift; sourceTree = "<group>"; };
 		E49AF0961B2699C800DD3342 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
@@ -463,7 +463,7 @@
 				E48877641B151A58004785D3 /* Controllers */,
 				E48877421B151628004785D3 /* AppDelegate.swift */,
 				E488774B1B151628004785D3 /* Images.xcassets */,
-				E488776D1B152742004785D3 /* Main.storyboard */,
+				BF8192BE1C24BA9A003481A7 /* Main.storyboard */,
 				E488774D1B151628004785D3 /* LaunchScreen.xib */,
 				E48877401B151628004785D3 /* Supporting Files */,
 				BF4B84361C09938900AF8A2A /* JamAlpha2-Bridging-Header.h */,
@@ -677,9 +677,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E475311B1C2228360072E791 /* Go.mp3 in Resources */,
-				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
 				E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */,
 				E488774C1B151628004785D3 /* Images.xcassets in Resources */,
+				BF8192C01C24BA9A003481A7 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -859,20 +859,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		BF8192BE1C24BA9A003481A7 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BF8192BF1C24BA9A003481A7 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		E488774D1B151628004785D3 /* LaunchScreen.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E488774E1B151628004785D3 /* Base */,
 			);
 			name = LaunchScreen.xib;
-			sourceTree = "<group>";
-		};
-		E488776D1B152742004785D3 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E488776E1B152742004785D3 /* Base */,
-			);
-			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

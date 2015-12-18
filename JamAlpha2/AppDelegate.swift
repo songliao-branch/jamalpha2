@@ -144,6 +144,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         completed in
                         KGLOBAL_queue.suspended = false
                         KGLOBAL_init_queue.suspended = self.suspended
+                        MusicManager.sharedInstance.initializePlayer()
                     })
                 }else{
                     KGLOBAL_queue.suspended = false
