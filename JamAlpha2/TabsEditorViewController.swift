@@ -248,8 +248,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func playbackStateChanged(sender: NSNotification) {
         if musicPlayer.playbackState == .Playing {
-            musicPlayer.currentPlaybackTime = currentTime
             if(!isPlaying){
+                musicPlayer.currentPlaybackTime = currentTime
                 self.startTimer()
                 isPlaying = true
             }
