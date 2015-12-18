@@ -175,8 +175,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //var navigationOutActionViewHeight: CGFloat = 44 * 4 + 4 //4 rows of height + 4 lines
     var actionDismissLayerButton: UIButton!
     
-    var chordsTextColor: UIColor!
-
     //background images
     var currentImage:UIImage?
     
@@ -349,7 +347,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         backgroundImageView.center.x = self.view.center.x
         backgroundImageView.image = blurredImage
-        chordsTextColor = blurredImage!.averageColor()
     }
     
     func loadBackgroundImageFromMediaItem(item: Findable) {
@@ -2512,7 +2509,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let chordNameLabel = UILabel(frame: CGRectMake(0, 0, 40, 0))
         
         chordNameLabel.text = name
-        chordNameLabel.textColor = UIColor.blackColor()
+        chordNameLabel.textColor = UIColor.whiteColor()
         chordNameLabel.sizeToFit()
         chordNameLabel.textAlignment = NSTextAlignment.Center
         chordNameLabel.font = UIFont.systemFontOfSize(minfont)
@@ -2549,13 +2546,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     private func dealWithLabelofChordName(chordLabel:UILabel) {
+        //both chord and tab is shown
         if isChordShown && isTabsShown {
             //make the text glow
-            chordLabel.textColor = self.chordsTextColor
+            chordLabel.textColor = UIColor.whiteColor()
             chordLabel.font = UIFont.systemFontOfSize(17)
 
+        //showing only chord in the center
         } else if isChordShown && !isTabsShown {
-            //make the text glow
+          
             chordLabel.textColor = UIColor.silverGray()
             chordLabel.font = UIFont.systemFontOfSize(20)
             chordLabel.sizeToFit()
