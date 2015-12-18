@@ -877,7 +877,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
  
                 ////////////////////////////
                 
-                    KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 
                 if self.player.playbackState == MPMusicPlaybackState.Paused{
                     KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -886,6 +886,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
         
             self.speed = 1
+            self.speedLabel.text = "Speed: 1.0x"
+            self.speedStepper.value = 1.0
             self.updateAll(0)
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.startTimer()
@@ -965,6 +967,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         self.speed = 1
+        self.speedLabel.text = "Speed: 1.0x"
+        self.speedStepper.value = 1.0
         self.updateAll(0)
         if rate > 0{
             self.startTimer()
@@ -2144,6 +2148,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 player.currentPlaybackRate = 1
             }
         }
+        
+        self.speedLabel.text = "Speed: 1.0x"
+        self.speedStepper.value = 1.0
         
         if(isRemoveProgressBlock){
             NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
