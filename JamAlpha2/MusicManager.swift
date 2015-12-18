@@ -96,7 +96,7 @@ class MusicManager: NSObject {
     //for playing mode and background mode
     private func setSessionActiveWithMixing() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: .MixWithOthers)
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: .DefaultToSpeaker)
         } catch _ {
         }
         
