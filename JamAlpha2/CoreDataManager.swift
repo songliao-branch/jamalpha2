@@ -558,4 +558,18 @@ class CoreDataManager: NSObject {
         }
         return ([Chord](), "", 0, 0)
     }
+    
+    class func saveSongId(findable: Findable, id: Int) {
+        if let matchedSong = findSong(findable) {
+            matchedSong.id = id
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    class func getSongId(findable: Findable) -> Int {
+        if let matchedSong = findSong(findable) {
+            return  Int(matchedSong.id)
+        }
+        return 0 //should not reach here
+    }
 }

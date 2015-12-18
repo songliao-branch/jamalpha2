@@ -427,4 +427,30 @@ class APIManager: NSObject {
             }
         }
     }
+    
+    
+    class func getSongId(findable: Findable) {
+        //if we already have song id
+        if CoreDataManager.getSongId(findable) > 0 {
+            return
+        } //otherwise request it
+        
+        //given a song's title, artist, and duration, we can find all its corresponding tabs
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+    
+        Alamofire.request(.GET, jamBaseURL + "/get_song_id", parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                
+                    CoreDataManager.saveSongId(findable, id: json["song_id"].int!)
+                }
+            case .Failure(let error):
+                print("get song id request error: \(error)")
+            }
+        }
+    }
 }
