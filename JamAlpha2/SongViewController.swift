@@ -25,7 +25,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var isGenerated:Bool = true
     
     //time for chords to fall from top to bottom of chordbase
-    var freefallTime:Float = 3.2
+    var freefallTime:Float = 3.0
     var minfont: CGFloat = 15
     
     var nowView: VisualizerView!
@@ -35,7 +35,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var viewDidFullyDisappear = true
     
     var player: MPMusicPlayerController!
-    var localPlayer:AVQueuePlayer!
+    var avPlayer:AVQueuePlayer!
     
     @IBOutlet weak var playPauseButton: UIButton!
     
@@ -197,7 +197,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //constant
     let bottomViewHeight:CGFloat = 40 //this is fixed
     
-    var firstLoadPlayingItem: MPMediaItem!
+    var nowPlayingMediaItem: MPMediaItem!
     var nowPlayingItemDuration:NSTimeInterval!
     var isRemoveProgressBlock = true
     var isBlurred:Bool = true
@@ -215,9 +215,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var storeViewController:SKStoreProductViewController!
     
-    var isPlayingLocalSong = NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)
-    var firstLoadLocalPlayingItem:AVPlayerItem!
-    var nowLocalPlayingItemDuration:Float!
+    var isDemoSong = false
+    
+    var demoItem:AVPlayerItem!
+    var demoItemDuration:Float!
     var selectedRow:Int!
 
     
@@ -226,21 +227,33 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         pthread_rwlock_init(&rwLock, nil)
         
         if(!isSongNeedPurchase){
-            if(!isPlayingLocalSong){
-                player = MusicManager.sharedInstance.player
-                self.firstLoadPlayingItem = player.nowPlayingItem
-                self.nowPlayingItemDuration = self.firstLoadPlayingItem.playbackDuration
-                CoreDataManager.initializeSongToDatabase(firstLoadPlayingItem)
+            if isDemoSong {
+                avPlayer = MusicManager.sharedInstance.avPlayer
+                self.demoItem = avPlayer.currentItem
+                self.demoItemDuration = self.demoItem.getDuration()
+                CoreDataManager.initializeSongToDatabase(demoItem)
                 removeAllObserver()
-            }else{
-                localPlayer = MusicManager.sharedInstance.localPlayer
-                self.firstLoadLocalPlayingItem = localPlayer.currentItem
-                self.nowLocalPlayingItemDuration = self.firstLoadLocalPlayingItem.getDuration()
-                CoreDataManager.initializeSongToDatabase(firstLoadLocalPlayingItem)
+            } else {
+                player = MusicManager.sharedInstance.player
+                self.nowPlayingMediaItem = player.nowPlayingItem
+                self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
+                CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
                 removeAllObserver()
             }
-        }else{
+            
+        } else {
             MusicManager.sharedInstance.player.stop()
+            if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+                MusicManager.sharedInstance.avPlayer.pause()
+                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                MusicManager.sharedInstance.avPlayer.removeAllItems()
+            }
+           let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
+            for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                self.musicViewController = musicVC
+            }
+            self.nowView = baseVC.nowView
+            self.nowView.stop()
             CoreDataManager.initializeSongToDatabase(songNeedPurchase)
         }
         
@@ -261,7 +274,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpCountdownView()
         setUpStatusView()
         if(!isSongNeedPurchase){
-            updateMusicData(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem)
+            updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
         }else{
             updateMusicData(songNeedPurchase)
         }
@@ -300,8 +313,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(!isSongNeedPurchase){
                      resumeSong()
             }
-            if(isPlayingLocalSong){
-                self.localPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
+            if(isDemoSong){
+                self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
             }
         }
     }
@@ -316,7 +329,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         if(!isGenerated && !isSongNeedPurchase){
-            generateSoundWave(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem)
+            generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
         }
         isViewDidAppear = true
     }
@@ -328,7 +341,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(backgroundImageView)
         //get the image from MPMediaItem
         if !isSongNeedPurchase{
-            loadBackgroundImageFromMediaItem(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem)
+            loadBackgroundImageFromMediaItem(isDemoSong ? demoItem : nowPlayingMediaItem )
         } else if self.backgroundImage  == nil { //make sure album cover downloaded from iTunes is not blank
             currentImage = UIImage(named: "liwengbg")
             blurredImage = currentImage?.applyLightEffect()!
@@ -447,10 +460,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         var title:String!
         if(!isSongNeedPurchase){
-            
-            title = !isPlayingLocalSong ? firstLoadPlayingItem.title! :firstLoadLocalPlayingItem.getTitle()
-            artistNameLabel.text = !isPlayingLocalSong ? firstLoadPlayingItem.artist : firstLoadLocalPlayingItem .getArtist()
-        }else{
+            title = isDemoSong ? demoItem.getTitle() : nowPlayingMediaItem.title!
+            artistNameLabel.text = isDemoSong ? demoItem .getArtist() : nowPlayingMediaItem.artist
+        } else {
             if let track = songNeedPurchase.trackName {
                 title = track
             }
@@ -504,7 +516,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(previousButton)
         self.view.addSubview(nextButton)
         
-        if(isSongNeedPurchase){
+        if(isSongNeedPurchase || isDemoSong){
             previousButton.hidden = true
             nextButton.hidden = true
         }
@@ -515,53 +527,53 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func previousPressed(button: UIButton){
         stopTimer()
-        if(!isPlayingLocalSong){
-            player.skipToPreviousItem()
-        }else{
+        if isDemoSong {
             isNext = false
-            changeLocalSong()
+            changeDemoSong()
+          
+        }else{
+           player.skipToPreviousItem()
         }
     }
     
     func nextPressed(button: UIButton){
         stopTimer()
-        if(!isPlayingLocalSong){
-            player.skipToNextItem()
-        }else{
+        if isDemoSong {
             isNext = true
-            changeLocalSong()
+            changeDemoSong()
+        } else {
+            player.skipToNextItem()
         }
-        
     }
     
-    func changeLocalSong(){
-        localPlayer.seekToTime(kCMTimeZero)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
-        localPlayer.removeObserver(self, forKeyPath: "rate")
-        let rate = localPlayer.rate
+    func changeDemoSong(){
+        avPlayer.seekToTime(kCMTimeZero)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
+        if(!viewDidFullyDisappear){
+            avPlayer.removeObserver(self, forKeyPath: "rate")
+        }
+        let rate = avPlayer.rate
         if(isNext){
             self.selectedRow = self.selectedRow + 1
-            if(self.selectedRow == self.musicViewController.localSongsByFirstAlphabet.count){
+            if(self.selectedRow == self.musicViewController.demoSongs.count){
                 self.selectedRow = 0
             }
         }else{
             self.selectedRow = self.selectedRow - 1
             if(self.selectedRow == -1){
-                self.selectedRow = self.musicViewController.localSongsByFirstAlphabet.count - 1
+                self.selectedRow = self.musicViewController.demoSongs.count - 1
             }
         }
         
-        let allSongsSorted = self.musicViewController.getAllSortedItems(self.musicViewController.localSongsByFirstAlphabet)
-        let indexToBePlayed = self.musicViewController.findIndexToBePlayed(self.musicViewController.localSongsByFirstAlphabet, section: 0, currentRow: self.selectedRow)
-        
-        MusicManager.sharedInstance.setLocalSongItem(allSongsSorted, selectedIndex:indexToBePlayed)
-        localPlayer.seekToTime(kCMTimeZero)
-        self.currentLocalSongChanged(rate)
-        self.localPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
-        if(isPlayingLocalSong){
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeLocalSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
+        MusicManager.sharedInstance.setDemoSongQueue(self.musicViewController.demoSongs, selectedIndex:selectedRow)
+        avPlayer.seekToTime(kCMTimeZero)
+        if(!viewDidFullyDisappear){
+            self.currentLocalSongChanged(rate)
+            self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
         }
-
+        if(isDemoSong){
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeDemoSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
+        }
     }
     
     
@@ -616,7 +628,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 if self.canFindTabsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
-                        let tempPlaytime = !self.isPlayingLocalSong ? self.player.currentPlaybackTime : self.localPlayer.currentTime().seconds
+                        let tempPlaytime = self.isDemoSong ?  self.avPlayer.currentTime().seconds
+                            : self.player.currentPlaybackTime
                         if !tempPlaytime.isNaN {
                             self.updateAll(Float(tempPlaytime))
                         } else {
@@ -641,7 +654,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 if self.canFindLyricsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
-                        let tempPlaytime = !self.isPlayingLocalSong ? self.player.currentPlaybackTime : self.localPlayer.currentTime().seconds
+                        let tempPlaytime = self.isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
                         if !tempPlaytime.isNaN {
                             self.updateAll(Float(tempPlaytime))
                         } else {
@@ -779,8 +792,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(player != nil){
                  player.beginGeneratingPlaybackNotifications()
             }
-            if(isPlayingLocalSong){
-                NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeLocalSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
+            if(isDemoSong){
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeDemoSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
             }
         }
     }
@@ -793,7 +807,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             && KGLOBAL_init_queue.suspended)){
             return
         }
-        if self.player.nowPlayingItem == firstLoadPlayingItem {
+        if self.player.nowPlayingItem == nowPlayingMediaItem {
             return
         }
         pthread_rwlock_wrlock(&self.rwLock)
@@ -810,21 +824,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 return
             }
             
-            self.firstLoadPlayingItem = self.player.nowPlayingItem
+            self.nowPlayingMediaItem = self.player.nowPlayingItem
             // if come back from Music app then this block will be called
-            if(firstLoadPlayingItem == nil){
+            if(nowPlayingMediaItem == nil){
                 self.dismissViewControllerAnimated(true, completion: nil)
                 return
             }
-            self.nowPlayingItemDuration = firstLoadPlayingItem!.playbackDuration
+            self.nowPlayingItemDuration = nowPlayingMediaItem!.playbackDuration
         
         
             // if we are NOT repeating song
             if self.player.repeatMode != .One {
                 
-                self.songNameLabel.attributedText = NSMutableAttributedString(string: firstLoadPlayingItem!.title!)
+                self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingMediaItem!.title!)
                 self.songNameLabel.textAlignment = NSTextAlignment.Center
-                self.artistNameLabel.text = firstLoadPlayingItem!.artist
+                self.artistNameLabel.text = nowPlayingMediaItem!.artist
                 isBlurred = !isBlurred
                 applyEffectsToBackgroundImage(changeSong: true)
                 
@@ -834,8 +848,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
-                CoreDataManager.initializeSongToDatabase(firstLoadPlayingItem!)
-                self.updateMusicData(firstLoadPlayingItem!)
+                CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem!)
+                self.updateMusicData(nowPlayingMediaItem!)
                 
                 // The following won't run when selected from table
                 // update the progressblockWidth
@@ -856,12 +870,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KGLOBAL_progressBlock.center.y = progressContainerHeight
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
-                if let soundWaveData = CoreDataManager.getSongWaveFormImage(firstLoadPlayingItem!) {
+                if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem!) {
                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
                     print("sound wave data found")
                     KGLOBAL_init_queue.suspended = false
                 } else {
-                    self.generateSoundWave(firstLoadPlayingItem!)
+                    self.generateSoundWave(nowPlayingMediaItem!)
                 }
  
                 ////////////////////////////
@@ -887,13 +901,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(viewDidFullyDisappear){
             return
         }
-        if(self.localPlayer == nil ){
+        if(self.avPlayer == nil ){
                 return
         }
         pthread_rwlock_wrlock(&self.rwLock)
         self.stopTimer()
         if rate == 0{
-            localPlayer.pause()
+            avPlayer.pause()
         }
         self.newPosition = 0
         self.toTime = 0
@@ -901,34 +915,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             label.hidden = true
         }
         
-//        if self.player.repeatMode == .One {
-//            print("\(self.player.nowPlayingItem!.title) is repeating")
-//            self.updateAll(0)
-//            return
-//        }
-        
-        self.firstLoadLocalPlayingItem = self.localPlayer.currentItem
+        self.demoItem = self.avPlayer.currentItem
     
-        self.nowLocalPlayingItemDuration = firstLoadLocalPlayingItem!.getDuration()
+        self.demoItemDuration = demoItem!.getDuration()
+    
+        self.songNameLabel.attributedText = NSMutableAttributedString(string: demoItem!.getTitle())
+        self.songNameLabel.textAlignment = NSTextAlignment.Center
+        self.artistNameLabel.text = demoItem.getArtist()
+        isBlurred = !isBlurred
+        applyEffectsToBackgroundImage(changeSong: true)
         
-        
-        // if we are NOT repeating song
-//        if self.player.repeatMode != .One {
-        
-            self.songNameLabel.attributedText = NSMutableAttributedString(string: firstLoadLocalPlayingItem!.getTitle())
-            self.songNameLabel.textAlignment = NSTextAlignment.Center
-            self.artistNameLabel.text = firstLoadLocalPlayingItem.getArtist()
-            isBlurred = !isBlurred
-            applyEffectsToBackgroundImage(changeSong: true)
-            
-            self.totalTimeLabel.text = TimeNumber(time: Float(nowLocalPlayingItemDuration)).toDisplayString()
-//        }
-        
+        self.totalTimeLabel.text = TimeNumber(time: Float(demoItemDuration)).toDisplayString()
         
         // use current item's playbackduration to validate nowPlayingItem duration
         // if they are not equal, i.e. not the same song
-        CoreDataManager.initializeSongToDatabase(firstLoadLocalPlayingItem!)
-        self.updateMusicData(firstLoadLocalPlayingItem!)
+        CoreDataManager.initializeSongToDatabase(demoItem!)
+        self.updateMusicData(demoItem!)
         
         // The following won't run when selected from table
         // update the progressblockWidth
@@ -944,17 +946,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         // get a new progressBlock
         var progressBarWidth:CGFloat!
-        progressBarWidth = CGFloat(nowLocalPlayingItemDuration) * progressWidthMultiplier
+        progressBarWidth = CGFloat(demoItemDuration) * progressWidthMultiplier
         KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
-        if let soundWaveData = CoreDataManager.getSongWaveFormImage(firstLoadLocalPlayingItem!) {
+        if let soundWaveData = CoreDataManager.getSongWaveFormImage(demoItem!) {
             KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
             KGLOBAL_init_queue.suspended = false
         } else {
-            self.generateSoundWave(firstLoadLocalPlayingItem!)
+            self.generateSoundWave(demoItem!)
         }
         
         ////////////////////////////
@@ -983,7 +985,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         if keyPath == "rate"{
-            if self.localPlayer.rate == 0 {
+            if self.avPlayer.rate == 0 {
                 stopTimer()
                 //fade down the soundwave
                 UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
@@ -991,7 +993,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     KGLOBAL_progressBlock!.alpha = 0.5
                     }, completion: nil)
             }else{
-                updateAll(Float(localPlayer.currentTime().seconds))
+                updateAll(Float(avPlayer.currentTime().seconds))
                 startTimer()
                 //bring up the soundwave, give it a little jump animation
                 UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
@@ -1043,14 +1045,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     func resumeSong() {
         if selectedFromTable {
-            if(!isPlayingLocalSong){
-                 player.play()
+            if isDemoSong {
+                avPlayer.play()
             }else{
-                localPlayer.play()
+                player.play()
             }
             startTimer()
         } else { // selected from now view button
-            if(!isPlayingLocalSong){
+            if isDemoSong {
+                if avPlayer.rate > 0 {
+                    startTimer()
+                    startTime.setTime(Float(avPlayer.currentTime().seconds))
+                    updateAll(startTime.toDecimalNumer())
+                }
+                else if avPlayer.rate == 0 {
+                    stopTimer()
+                    // progress bar should be lowered
+                    KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+                    KGLOBAL_progressBlock!.alpha = 0.5
+                    self.speed = 1  //restore to original speed
+                }
+            } else {
                 if player.playbackState == MPMusicPlaybackState.Playing {
                     startTimer()
                     startTime.setTime(Float(player.currentPlaybackTime))
@@ -1063,19 +1078,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     KGLOBAL_progressBlock!.alpha = 0.5
                     self.speed = 1  //restore to original speed
                 }
-            }else{
-                if localPlayer.rate > 0 {
-                    startTimer()
-                    startTime.setTime(Float(localPlayer.currentTime().seconds))
-                    updateAll(startTime.toDecimalNumer())
-                }
-                else if localPlayer.rate == 0 {
-                    stopTimer()
-                    // progress bar should be lowered
-                    KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-                    KGLOBAL_progressBlock!.alpha = 0.5
-                    self.speed = 1  //restore to original speed
-                }
+                
             }
         }
     }
@@ -1090,7 +1093,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var progressBarWidth:CGFloat!
 
         if(!isSongNeedPurchase){
-            progressBarWidth = CGFloat(!isPlayingLocalSong ? self.nowPlayingItemDuration: self.nowLocalPlayingItemDuration) * progressWidthMultiplier
+            progressBarWidth = CGFloat(isDemoSong ? self.demoItemDuration :  self.nowPlayingItemDuration) * progressWidthMultiplier
         }else{
            progressBarWidth = CGFloat(songNeedPurchase.getDuration()) * progressWidthMultiplier
         }
@@ -1107,7 +1110,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //if there is soundwave in the coredata then we load the image in viewdidload
         if(!isSongNeedPurchase){
-            if let soundWaveData = CoreDataManager.getSongWaveFormImage(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem) {
+            if let soundWaveData = CoreDataManager.getSongWaveFormImage(isDemoSong ? demoItem : nowPlayingMediaItem ) {
                 KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
                 print("sound wave data found")
                 KGLOBAL_init_queue.suspended = false
@@ -1164,22 +1167,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                             tempProgressBlock.generateWaveforms()
                             let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                             CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                            if(!self.isPlayingLocalSong){
+                            if self.isDemoSong {
+                                if((tempNowPlayingItem as! AVPlayerItem) == self.avPlayer.currentItem){
+                                    if(KGLOBAL_progressBlock != nil ){
+                                        KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                    }
+                                    if(!KGLOBAL_queue.suspended){
+                                        KGLOBAL_init_queue.suspended = false
+                                    }
+                                }
+                            }else{
                                 if((tempNowPlayingItem as! MPMediaItem) == self.player.nowPlayingItem){
                                     if(KGLOBAL_progressBlock != nil ){
                                         KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                     }
                                     if(!KGLOBAL_queue.suspended){
-                                         KGLOBAL_init_queue.suspended = false
-                                    }
-                                }
-                            }else{
-                                if((tempNowPlayingItem as! AVPlayerItem) == self.localPlayer.currentItem){
-                                    if(KGLOBAL_progressBlock != nil ){
-                                        KGLOBAL_progressBlock.setWaveFormFromData(data!)
-                                    }
-                                    if(!KGLOBAL_queue.suspended){
-                                       KGLOBAL_init_queue.suspended = false
+                                        KGLOBAL_init_queue.suspended = false
                                     }
                                 }
                             }
@@ -1225,7 +1228,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //divide by -2: from 0 to 258
             toTime = Float(newPosition - self.view.frame.width / 2) / -(Float(progressWidthMultiplier))
             if(!isSongNeedPurchase){
-                KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(!isPlayingLocalSong ? nowPlayingItemDuration : nowLocalPlayingItemDuration))
+                KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(isDemoSong ? demoItemDuration : nowPlayingItemDuration))
             }else{
                 KGLOBAL_progressBlock.setProgress(CGFloat(toTime)/CGFloat(songNeedPurchase.getDuration()))
             }
@@ -1239,18 +1242,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 progressChangedOrigin = newPosition
                 isPanning = false
                 if(!isSongNeedPurchase){
-                    if(!isPlayingLocalSong){
+                    if isDemoSong {
+                        avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
+                        if avPlayer.rate > 0 {
+                            startTimer()
+                        }
+                    } else {
                         player.currentPlaybackTime = NSTimeInterval(toTime)
                         if player.playbackState == .Playing {
                             startTimer()
                         }
- 
-                    }else{
-                        localPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
-                        if localPlayer.rate > 0 {
-                            startTimer()
-                        }
-
                     }
                 }
             break
@@ -1276,7 +1277,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         case UIGestureRecognizerState.Changed:
             var tempNowPlayingItemDuration:Float!
             if(!isSongNeedPurchase){
-                tempNowPlayingItemDuration = Float(!isPlayingLocalSong ? nowPlayingItemDuration : nowLocalPlayingItemDuration)
+                tempNowPlayingItemDuration = Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration)
             }else{
                 tempNowPlayingItemDuration = songNeedPurchase.getDuration()
             }
@@ -1299,15 +1300,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         case UIGestureRecognizerState.Ended:
             isPanning = false
             if(!isSongNeedPurchase){
-                if(!isPlayingLocalSong){
-                    player.currentPlaybackTime = NSTimeInterval(toTime)
-                    if player.playbackState == .Playing {
+                if isDemoSong {
+                    avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
+                    if avPlayer.rate > 0 {
                         startTimer()
                     }
-                    
-                }else{
-                    localPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
-                    if localPlayer.rate > 0 {
+                } else {
+                    player.currentPlaybackTime = NSTimeInterval(toTime)
+                    if player.playbackState == .Playing {
                         startTimer()
                     }
                     
@@ -1353,9 +1353,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         if(isSongNeedPurchase){
-             totalTimeLabel.text = TimeNumber(time: songNeedPurchase.getDuration()).toDisplayString()
+            totalTimeLabel.text = TimeNumber(time: songNeedPurchase.getDuration()).toDisplayString()
         }else{
-            totalTimeLabel.text = TimeNumber(time: Float(!isPlayingLocalSong ? self.nowPlayingItemDuration : self.nowLocalPlayingItemDuration)).toDisplayString()
+            totalTimeLabel.text = TimeNumber(time: Float(isDemoSong ? self.demoItemDuration : self.nowPlayingItemDuration )).toDisplayString()
         }
        
         totalTimeLabel.textAlignment = .Right
@@ -1381,7 +1381,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         shuffleButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         if(!isSongNeedPurchase){
-            if(!isPlayingLocalSong){
+            if isDemoSong {
+                 shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
+            } else {
+                
                 if player.repeatMode == .All && player.shuffleMode == .Off {
                     shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
                 } else if player.repeatMode == .One && player.shuffleMode == .Off {
@@ -1393,8 +1396,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     player.shuffleMode = .Off
                     shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
                 }
-            }else{
-                shuffleButton.setImage(UIImage(named: shuffleButtonImageNames[0]), forState: UIControlState.Normal)
             }
             
         }else{
@@ -1411,7 +1412,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
        
-        if(!isPlayingLocalSong){
+        if(!isDemoSong){
             shuffleButton.addTarget(self, action: "toggleShuffle:", forControlEvents: .TouchUpInside)
         }
         
@@ -1713,7 +1714,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if(!isSongNeedPurchase){
-            let tempPlaytime = !isPlayingLocalSong ? self.player.currentPlaybackTime : self.localPlayer.currentTime().seconds
+            let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
             if !tempPlaytime.isNaN {
                 self.updateAll(Float(tempPlaytime))
             } else {
@@ -1750,7 +1751,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func applyEffectsToBackgroundImage(changeSong changeSong: Bool) {
         if changeSong {
-            loadBackgroundImageFromMediaItem(!isPlayingLocalSong ? player.nowPlayingItem! : localPlayer.currentItem!)
+            loadBackgroundImageFromMediaItem(isDemoSong ? avPlayer.currentItem! : player.nowPlayingItem! )
         }
         
         //we blur the image if one of the chord, tabs or lyrics is shown
@@ -1886,10 +1887,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let roundedValue = Double(round(10*stepper.value)/10)
         let adjustedSpeed = Float(speedMatcher[roundedValue]!)
         self.speed = adjustedSpeed
-        if(!isPlayingLocalSong){
+        if isDemoSong {
+            self.avPlayer.rate = adjustedSpeed
+        } else {
             self.player.currentPlaybackRate = adjustedSpeed
-        }else{
-             self.localPlayer.rate = adjustedSpeed
         }
        
         self.startTimer()
@@ -1911,7 +1912,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isSongNeedPurchase {
             browseAllTabsVC.findable = self.songNeedPurchase
         } else {
-            browseAllTabsVC.findable = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
+            browseAllTabsVC.findable = isDemoSong ? demoItem : nowPlayingMediaItem 
         }
   
         self.presentViewController(browseAllTabsVC, animated: true, completion: {
@@ -1932,14 +1933,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         var chords = [Chord]()
-        (chords, _, _, _) = CoreDataManager.getTabs(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem, fetchingLocalOnly: true)
+        (chords, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalOnly: true)
         
         if chords.count < 2 {
             self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
             return
         }
         
-        APIManager.uploadTabs(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem, completion: {
+        APIManager.uploadTabs(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
             isSuccess in
             
             self.showStatusView(isSuccess)
@@ -1951,13 +1952,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
         viewDidFullyDisappear = true
-        if !isPlayingLocalSong{
-            self.player.pause()
+        if isDemoSong{
+            self.avPlayer.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
-        }else{
-            self.localPlayer.pause()
+        } else {
+            self.player.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
@@ -1970,9 +1971,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-        tabsEditorVC.theSong = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
+        tabsEditorVC.theSong = isDemoSong ? demoItem : nowPlayingMediaItem 
         tabsEditorVC.songViewController = self
-        tabsEditorVC.isPlayingLocalSong = self.isPlayingLocalSong
+        tabsEditorVC.isDemoSong = self.isDemoSong
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
     }
     
@@ -1987,7 +1988,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem, fetchingLocalOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalOnly: true)
         
         if lyric.lyric.count < 2 {
             self.lyric = lyric
@@ -1996,7 +1997,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
  
-        APIManager.uploadLyrics(!isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem, completion: {
+        APIManager.uploadLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
             isSuccess in
             
             self.showStatusView(isSuccess)
@@ -2015,7 +2016,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isSongNeedPurchase {
             browseAllTabsVC.findable = self.songNeedPurchase
         } else {
-            browseAllTabsVC.findable = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
+            browseAllTabsVC.findable = isDemoSong ? demoItem : nowPlayingMediaItem 
         }
   
         
@@ -2031,13 +2032,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
         
-        if !isPlayingLocalSong{
-            self.player.pause()
+        if isDemoSong{
+            self.avPlayer.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
-        }else{
-            self.localPlayer.pause()
+        } else {
+            self.player.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
@@ -2051,8 +2052,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
         as! LyricsTextViewController
         lyricsEditor.songViewController = self
-        lyricsEditor.theSong = !isPlayingLocalSong ? firstLoadPlayingItem : firstLoadLocalPlayingItem
-        lyricsEditor.isPlayingLocalSong = isPlayingLocalSong
+        lyricsEditor.theSong = isDemoSong ? demoItem : nowPlayingMediaItem 
+        lyricsEditor.isDemoSong = isDemoSong
         self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }
     
@@ -2061,10 +2062,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(false, completion: {
             completed in
             if(self.musicViewController != nil){
-                if(!self.isPlayingLocalSong){
+                if(!self.isDemoSong){
                     self.musicViewController.goToArtist(self.player.nowPlayingItem!.artist!)
-                }else{
-                    ////////////////////////////
                 }
             }
         })
@@ -2075,10 +2074,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.dismissViewControllerAnimated(false, completion: {
             completed in
             if(self.musicViewController != nil){
-                if(!self.isPlayingLocalSong){
+                if(!self.isDemoSong){
                     self.musicViewController.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
-                }else{
-                    ////////////////////////////
                 }
             }
             
@@ -2120,7 +2117,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isSongNeedPurchase{
             return
         }
-        if(!isPlayingLocalSong){
+        if isDemoSong {
+            if avPlayer.rate > 0 {
+                if nowView != nil {
+                    self.nowView.start()
+                }
+            } else {
+                if nowView != nil {
+                    self.nowView.stop()
+                }
+            }
+            
+            if avPlayer.rate > 0 {
+                avPlayer.rate = 1
+            }
+            
+        }else{
             if player.playbackState == .Playing {
                 if nowView != nil {
                     self.nowView.start()
@@ -2134,31 +2146,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if player.playbackState == MPMusicPlaybackState.Playing {
                 player.currentPlaybackRate = 1
             }
-        }else{
-            if localPlayer.rate > 0 {
-                if nowView != nil {
-                    self.nowView.start()
-                }
-            } else {
-                if nowView != nil {
-                    self.nowView.stop()
-                }
-            }
-            
-            if localPlayer.rate > 0 {
-                localPlayer.rate = 1
-            }
         }
         
         if(isRemoveProgressBlock){
             NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
-            if(isPlayingLocalSong){
-                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.localPlayer.currentItem)
-            }
         }
         
-        if(isPlayingLocalSong){
-            localPlayer.removeObserver(self, forKeyPath: "rate")
+        if(isDemoSong){
+            avPlayer.removeObserver(self, forKeyPath: "rate")
         }
     }
     
@@ -2432,7 +2427,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func playPause(recognizer: UITapGestureRecognizer) {
         if(!isSongNeedPurchase){
-            if !isPlayingLocalSong ? player.playbackState == MPMusicPlaybackState.Paused : localPlayer.rate == 0 {
+            if isDemoSong ? avPlayer.rate == 0 : player.playbackState == MPMusicPlaybackState.Paused  {
                 if countdownOn {
                     //temporarily disable tap gesture to avoid accidental start count down again
                     chordBase.removeGestureRecognizer(chordBaseTapGesture)
@@ -2443,21 +2438,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
                     
                 } else {
-                    //player.play()
-                    if(!isPlayingLocalSong){
+                    if isDemoSong {
+                        avPlayer.rate = self.speed
+                       
+                    } else {
                         player.currentPlaybackRate = self.speed
-                    }else{
-                        localPlayer.rate = self.speed
                     }
                     
                 }
                 
             } else {
-                //nowPlayingItemSpeed = player.currentPlaybackRate
-                if(!isPlayingLocalSong){
-                    player.pause()
+               
+                if isDemoSong {
+                    avPlayer.pause()
+                    
                 }else{
-                    localPlayer.pause()
+                    player.pause()
                 }
             }
         }
@@ -2491,10 +2487,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if !isViewDidAppear || startTime.toDecimalNumer() < 5 || startTime.toDecimalNumer() > Float(!isPlayingLocalSong ? nowPlayingItemDuration : nowLocalPlayingItemDuration) - 5 || startTime.toDecimalNumer() - toTime < 2{
+            if !isViewDidAppear || startTime.toDecimalNumer() < 5 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 5 || startTime.toDecimalNumer() - toTime < 2{
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
-                let tempPlaytime = !isPlayingLocalSong ? self.player.currentPlaybackTime : self.localPlayer.currentTime().seconds
+                let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                 } else {
@@ -2774,15 +2770,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.AVplayer = nil
         //recover
         player = MusicManager.sharedInstance.player
-        self.firstLoadPlayingItem = player.nowPlayingItem
-        self.nowPlayingItemDuration = firstLoadPlayingItem.playbackDuration
+        self.nowPlayingMediaItem = player.nowPlayingItem
+        self.nowPlayingItemDuration = nowPlayingMediaItem.playbackDuration
         self.isSongNeedPurchase = false
         self.removeAllObserver()
-        loadBackgroundImageFromMediaItem(firstLoadPlayingItem)
+        loadBackgroundImageFromMediaItem(nowPlayingMediaItem)
         self.registerMediaPlayerNotification()
         self.resumeSong()
         if(!isGenerated){
-            generateSoundWave(firstLoadPlayingItem)
+            generateSoundWave(nowPlayingMediaItem)
         }
         shuffleButton.enabled = true
         othersButton.enabled = true

@@ -18,7 +18,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var suspended:Bool = false
-    
     var nowPlayingItem: MPMediaItem!
     var currentTime: NSTimeInterval!
     
@@ -29,13 +28,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var defaultsDictionary: [String : AnyObject] = [:]
         
         // by default we track the user location while in the background
-        defaultsDictionary[KPlayLocalSoundsKey] = true
+        defaultsDictionary[kShowDemoSong] = true
         
         NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
-        
+                
         return true
     }
-
+    
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
@@ -79,14 +78,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if(currentVC.presentedViewController != nil){
                 let presentVC = currentVC.presentedViewController!
                 if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
-                    var isPlayingLocalSong:Bool = false
+                    var isDemoSong:Bool = false
                     if presentVC.isKindOfClass(TabsEditorViewController) {
-                        isPlayingLocalSong = (presentVC as! TabsEditorViewController).isPlayingLocalSong
+                        isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
-                        isPlayingLocalSong = (presentVC as! LyricsTextViewController).isPlayingLocalSong
+                        isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
                     
-                    if(!isPlayingLocalSong){
+                    if(!isDemoSong){
                         MusicManager.sharedInstance.player.pause()
                         self.nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
                         self.currentTime = MusicManager.sharedInstance.player.currentPlaybackTime
@@ -94,6 +93,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
+        
         self.suspended = KGLOBAL_init_queue.suspended
         KGLOBAL_queue.suspended = true
         KGLOBAL_init_queue.suspended = true
@@ -118,6 +118,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                                 for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                                     musicVC.reloadDataAndTable()
+                                    
                                     if(!musicVC.uniqueSongs.isEmpty){
                                         musicVC.songCount = 0
                                         musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
@@ -133,7 +134,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
-            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isPlayingLocalSong {
+            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
                 if (!currentSongVC.isSongNeedPurchase) {
                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                         completed in
@@ -159,14 +160,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if(currentVC.presentedViewController != nil){
                 let presentVC = currentVC.presentedViewController!
                 if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
-                    var isPlayingLocalSong:Bool = false
+                    var isDemoSong:Bool = false
                     if presentVC.isKindOfClass(TabsEditorViewController) {
-                        isPlayingLocalSong = (presentVC as! TabsEditorViewController).isPlayingLocalSong
+                        isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
-                        isPlayingLocalSong = (presentVC as! LyricsTextViewController).isPlayingLocalSong
+                        isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
                     
-                    if(!isPlayingLocalSong){
+                    if(!isDemoSong){
                         if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != self.nowPlayingItem){
                             MusicManager.sharedInstance.player.stop()
                             MusicManager.sharedInstance.player.repeatMode = .All

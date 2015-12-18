@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
@@ -174,6 +174,9 @@
                                                         <constraint firstAttribute="height" constant="25" id="aJT-Qk-WGn"/>
                                                     </constraints>
                                                 </imageView>
+                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="demo_icon" translatesAutoresizingMaskIntoConstraints="NO" id="R4C-Sk-k3T">
+                                                    <rect key="frame" x="264" y="26" width="41" height="17"/>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="centerY" secondItem="VXR-6p-k1c" secondAttribute="top" id="2dw-sN-eQH"/>
@@ -183,6 +186,8 @@
                                                 <constraint firstAttribute="centerY" secondItem="Z1R-2h-uq0" secondAttribute="bottom" id="CJG-4b-irN"/>
                                                 <constraint firstAttribute="centerY" secondItem="l6i-W8-1hA" secondAttribute="centerY" id="Ocd-So-xLn"/>
                                                 <constraint firstAttribute="trailing" secondItem="l6i-W8-1hA" secondAttribute="trailing" constant="15" id="Zmi-V4-ajT"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="R4C-Sk-k3T" secondAttribute="trailing" constant="7" id="iMr-ta-NJx"/>
+                                                <constraint firstItem="R4C-Sk-k3T" firstAttribute="centerY" secondItem="02W-lP-F99" secondAttribute="centerY" id="pXu-lN-O6A"/>
                                                 <constraint firstAttribute="trailing" secondItem="VXR-6p-k1c" secondAttribute="trailing" constant="15" id="r1E-9r-Idd"/>
                                                 <constraint firstItem="Fr8-BH-Ncz" firstAttribute="leading" secondItem="02W-lP-F99" secondAttribute="leading" constant="15" id="w34-XI-AEg"/>
                                                 <constraint firstAttribute="centerY" secondItem="Fr8-BH-Ncz" secondAttribute="centerY" id="xyh-34-A7o"/>
@@ -190,6 +195,7 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="coverImage" destination="Fr8-BH-Ncz" id="hsJ-x8-QgD"/>
+                                            <outlet property="demoImage" destination="R4C-Sk-k3T" id="9C5-gq-8xE"/>
                                             <outlet property="imageHeight" destination="ko5-ea-bU7" id="0Oq-Z7-THq"/>
                                             <outlet property="imageWidth" destination="aFw-se-8ZS" id="idl-dr-kaZ"/>
                                             <outlet property="loudspeakerImage" destination="l6i-W8-1hA" id="OQk-NN-Cs4"/>
@@ -1090,8 +1096,8 @@
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NLO-1u-1FY">
                                                     <rect key="frame" x="253" y="6" width="51" height="31"/>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Demo Mode Closed" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xec-YD-a3g">
-                                                    <rect key="frame" x="18" y="8" width="151" height="26"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show Demo" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xec-YD-a3g">
+                                                    <rect key="frame" x="8" y="11" width="92" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
@@ -1099,7 +1105,8 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailingMargin" secondItem="NLO-1u-1FY" secondAttribute="trailing" constant="10" id="Bh7-op-x6L"/>
-                                                <constraint firstItem="xec-YD-a3g" firstAttribute="leading" secondItem="Jnf-lN-pX3" secondAttribute="leadingMargin" constant="10" id="TWq-BS-VqX"/>
+                                                <constraint firstItem="xec-YD-a3g" firstAttribute="centerY" secondItem="Jnf-lN-pX3" secondAttribute="centerY" id="aJN-dN-g4d"/>
+                                                <constraint firstAttribute="leadingMargin" secondItem="xec-YD-a3g" secondAttribute="leading" id="sHQ-HV-wyG"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
@@ -1132,6 +1139,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="demo_icon" width="43" height="19"/>
         <image name="kitten_profile" width="50" height="50"/>
         <image name="me" width="20" height="25"/>
         <image name="music" width="25" height="25"/>

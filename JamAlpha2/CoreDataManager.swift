@@ -104,10 +104,9 @@ extension SearchResult: Findable {
     }
 }
 
-extension AVPlayerItem: Findable, Sortable{
+extension AVPlayerItem: Findable {
     func getTitle() -> String {
         if let title = self.asset.commonMetadata[0].stringValue {
-            print(title)
             return title
         }
         return ""
@@ -123,7 +122,6 @@ extension AVPlayerItem: Findable, Sortable{
     
     func getAlbum() -> String {
         if let album = self.asset.commonMetadata[3].stringValue {
-            print(album)
             return album
         }
         return ""
@@ -144,10 +142,6 @@ extension AVPlayerItem: Findable, Sortable{
         }
         // return the NSURL
         return (currentPlayerAsset as! AVURLAsset).URL
-    }
-    
-    func getSortableName() -> String {
-        return self.getTitle()
     }
     
     func getArtWork() -> MPMediaItemArtwork?{

@@ -37,7 +37,7 @@ class lyricsWithTime {
 class LyricsSyncViewController: UIViewController  {
 
     var currentTime: NSTimeInterval = 0
-    var isPlayingLocalSong: Bool!
+    var isDemoSong: Bool!
     
     var stepPerSecond: Float = 100
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
@@ -145,7 +145,7 @@ class LyricsSyncViewController: UIViewController  {
     var duration: NSTimeInterval!
     // MARK: check theSong can convert to MPMediaItem
     func checkConverToMPMediaItem() {
-        if !self.isPlayingLocalSong {
+        if !self.isDemoSong {
             musicPlayer = MusicManager.sharedInstance.player
             registerNotification()
             self.duration = musicPlayer.nowPlayingItem?.playbackDuration
@@ -305,7 +305,7 @@ class LyricsSyncViewController: UIViewController  {
     var currentSelectIndex: Int = 0
     
     func playPause(sender: UITapGestureRecognizer) {
-        if self.isPlayingLocalSong! ? !localPlayer.playing : (musicPlayer.playbackState != .Playing) {
+        if self.isDemoSong! ? !localPlayer.playing : (musicPlayer.playbackState != .Playing) {
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
             progressBlockContainer.removeGestureRecognizer(tapGesture)
@@ -319,7 +319,7 @@ class LyricsSyncViewController: UIViewController  {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
                 }, completion: nil)
-            if isPlayingLocalSong! {
+            if isDemoSong! {
                 self.localPlayer.pause()
             } else {
                 self.musicPlayer.pause()
@@ -354,7 +354,7 @@ class LyricsSyncViewController: UIViewController  {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 self.progressBlock!.alpha = 1.0
                 }, completion: { finished in
-                    if self.isPlayingLocalSong! {
+                    if self.isDemoSong! {
                         if !self.localPlayer.playing {
                             self.localPlayer.play()
                         }
@@ -380,7 +380,7 @@ class LyricsSyncViewController: UIViewController  {
         } else if sender.state == .Ended {
             self.isPanning = false
             startTime.setTime(Float(self.currentTime))
-            if isPlayingLocalSong! {
+            if isDemoSong! {
                 self.localPlayer.currentTime = self.currentTime
                 if self.localPlayer.playing {
                     startUpdateTimer()
@@ -420,7 +420,7 @@ class LyricsSyncViewController: UIViewController  {
             if startTime.toDecimalNumer() - Float(self.toTime) < 2 {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
-                let tempPlaytime = !isPlayingLocalSong ? self.musicPlayer.currentPlaybackTime : self.localPlayer.currentTime
+                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.localPlayer.currentTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                 } else {
@@ -429,7 +429,7 @@ class LyricsSyncViewController: UIViewController  {
             }
         }
         if startTime.toDecimalNumer() > Float(self.duration) {
-            if isPlayingLocalSong! {
+            if isDemoSong! {
                 self.localPlayer.pause()
             } else {
                 self.musicPlayer.pause()
@@ -501,7 +501,7 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
                 self.addedLyricsWithTime.timeAdded[indexPath.item] = true
                 lyricsTableView.reloadData()
             }else {
-                if isPlayingLocalSong! {
+                if isDemoSong! {
                     localPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item]
                 } else {
                     musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item]
@@ -533,14 +533,14 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
             }
             lyricsTableView.reloadData()
             if indexPath.row == 0 {
-                if isPlayingLocalSong! {
+                if isDemoSong! {
                     localPlayer.currentTime = 0
                 } else {
                     musicPlayer.currentPlaybackTime = 0
                 }
                 //  self.currentTime = 0
             } else {
-                if isPlayingLocalSong! {
+                if isDemoSong! {
                     localPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item - 1]
                 } else {
                     musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item - 1]
@@ -570,7 +570,7 @@ extension LyricsSyncViewController {
     
     func pressBackButton(sender: UIButton) {
         removeNotification()
-        if isPlayingLocalSong! {
+        if isDemoSong! {
             localPlayer.pause()
         } else {
             musicPlayer.pause()
@@ -588,7 +588,7 @@ extension LyricsSyncViewController {
     
     func pressDoneButton(sender: UIButton) {
         removeNotification()
-        if isPlayingLocalSong! {
+        if isDemoSong! {
             localPlayer.pause()
         } else {
             musicPlayer.pause()
@@ -611,8 +611,8 @@ extension LyricsSyncViewController {
         CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times)
         
         self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: { completed in            
-            if self.lyricsTextViewController.songViewController.isPlayingLocalSong {
-                self.lyricsTextViewController.songViewController.localPlayer.play()
+            if self.lyricsTextViewController.songViewController.isDemoSong {
+                self.lyricsTextViewController.songViewController.avPlayer.play()
             } else {
                 MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                 self.lyricsTextViewController.songViewController.player.play()

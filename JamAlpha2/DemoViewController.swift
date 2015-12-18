@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MediaPlayer
 
 
 class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
@@ -20,17 +21,6 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
         setUpNavigationBar()
         findMusicVC()
         
-    }
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        if(cell != nil){
-            cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)
-            if(cell.demoSwith.on){
-                cell.imfoLabel.text = "Demo Mode Opened"
-            }else{
-                cell.imfoLabel.text = "Demo Mode Closed"
-            }
-        }
     }
     
     func findMusicVC(){
@@ -51,38 +41,31 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
             cell = tableView.dequeueReusableCellWithIdentifier("demoCell") as! DemoCell
             cell.demoSwith.tintColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             cell.demoSwith.onTintColor = UIColor.mainPinkColor()
             cell.demoSwith.addTarget(self, action: "switchChanged:", forControlEvents: .ValueChanged)
-            cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)
-            if(cell.demoSwith.on){
-                cell.imfoLabel.text = "Demo Mode Opened"
-            }else{
-                cell.imfoLabel.text = "Demo Mode Closed"
-            }
+            cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong)
             cell.selectionStyle = UITableViewCellSelectionStyle.None
             return cell
     }
     
     func switchChanged(uiswitch: UISwitch){
-        NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: KPlayLocalSoundsKey)
+        NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowDemoSong)
         if(uiswitch.on){
-            (uiswitch.superview!.superview as! DemoCell).imfoLabel.text = "Demo Mode Opened"
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 musicVC.reloadDataAndTable()
             }
-            KGLOBAL_closeDemoButton.hidden = false
         }else{
-            (uiswitch.superview!.superview as! DemoCell).imfoLabel.text = "Demo Mode Closed"
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 musicVC.reloadDataAndTable()
             }
-            KGLOBAL_closeDemoButton.hidden = true
         }
-        
-        
+        if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+            MusicManager.sharedInstance.avPlayer.pause()
+            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+            MusicManager.sharedInstance.avPlayer.removeAllItems()
+            self.baseVC.nowView.stop()
+        }
     }
-    
 }

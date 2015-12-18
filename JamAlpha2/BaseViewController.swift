@@ -30,7 +30,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     override func viewDidLoad() {
         super.viewDidLoad()
         player = MusicManager.sharedInstance.player
-        localPlayer = MusicManager.sharedInstance.localPlayer
+        localPlayer = MusicManager.sharedInstance.avPlayer
         setUpLogo()
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         //change status bar text to light
@@ -38,7 +38,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         setUpNowView()
-        setUpCloseDemoButton()
         setupSegmentButtons()
         setUpSelector()//the horizontal bar that moves with button tapped
         setUpPageViewController()
@@ -79,14 +78,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.navigationController!.navigationBar.addSubview(nowView)
     }
     
-    func setUpCloseDemoButton(){
-        KGLOBAL_closeDemoButton = UIButton(frame: CGRectMake(10 ,15 ,50 , 25))
-        KGLOBAL_closeDemoButton.setTitle("Close", forState: .Normal)
-        KGLOBAL_closeDemoButton.addTarget(self, action: "hideDemo", forControlEvents: .TouchUpInside)
-        KGLOBAL_closeDemoButton.hidden = !NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)
-        self.navigationController!.navigationBar.addSubview(KGLOBAL_closeDemoButton)
-    }
-    
     func setUpPageViewController(){
         self.pageTitles = ["Song","Album","Artist"]
         self.pageViewController = self.storyboard?.instantiateViewControllerWithIdentifier("pageviewcontroller") as! UIPageViewController
@@ -117,27 +108,10 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.currentPageIndex = 0
     }
     
-    func hideDemo(){
-        let alert = UIAlertController(title: "Close", message:
-            "Demo Mode will be closed! If you want to reopen the Demo Mode, please go to Me -> SignIn -> Settings", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: { action in
-            NSUserDefaults.standardUserDefaults().setBool(false, forKey: KPlayLocalSoundsKey)
-            for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
-                musicViewController.musicTable.reloadData()
-            }
-            KGLOBAL_closeDemoButton.hidden = !NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)
-        }))
-        self.presentViewController(alert, animated: true, completion: nil)
-    }
-    
-    func goToNowPlaying() {
+    func goToNowPlaying() { //tell me when it kicks in
         for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
-            if player.nowPlayingItem != nil && !NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey){
+            if player.nowPlayingItem != nil {
                 musicViewController.popToCurrentSong()
-            }
-            if(localPlayer.currentItem != nil && NSUserDefaults.standardUserDefaults().boolForKey(KPlayLocalSoundsKey)){
-                 musicViewController.popToCurrentSong()
             }
         }
     }
