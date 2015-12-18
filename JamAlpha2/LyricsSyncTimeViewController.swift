@@ -135,7 +135,7 @@ class LyricsSyncViewController: UIViewController  {
     func playbackStateChanged(sender: NSNotification) {
         if musicPlayer.playbackState == .Playing {
             if(!isPlaying){
-                musicPlayer.currentPlaybackTime = currentTime
+                //musicPlayer.currentPlaybackTime = currentTime
                 startUpdateTimer()
                 isPlaying = true
             }
@@ -443,7 +443,11 @@ class LyricsSyncViewController: UIViewController  {
             startTime.setTime(0)
             self.currentTime = 0
             self.progressBlock.alpha = 0.5
-            musicPlayer.currentPlaybackTime = currentTime
+            if isDemoSong {
+                avPlayer.currentTime = currentTime
+            }else{
+                musicPlayer.currentPlaybackTime = currentTime
+            }
         }
         if !isPanning {
             if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {

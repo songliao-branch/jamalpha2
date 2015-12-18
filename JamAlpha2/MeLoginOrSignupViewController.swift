@@ -19,6 +19,9 @@ import AWSCore
 class MeLoginOrSignupViewController: UIViewController{
     
     var userProfileViewController: UserProfileViewController?
+    var songViewController:SongViewController?
+    var isGoToTabEditor:Bool = false
+    var isGoToLyricEditor:Bool = false
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     var statusAndNavigationBarHeight: CGFloat = CGFloat()
@@ -146,7 +149,7 @@ class MeLoginOrSignupViewController: UIViewController{
     }
     
     func closeButtonPressed() {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismissViewControllerAnimated(true, completion: nil )
     }
     
     func settingsButtonPressed() {
@@ -223,8 +226,8 @@ class MeLoginOrSignupViewController: UIViewController{
         scrollView.addSubview(facebookButton)
         
         //TODO: hide facebook in beta mode
-        facebookButton.hidden = true
-        orLabel.hidden = true
+//        facebookButton.hidden = true
+//        orLabel.hidden = true
         
         //log in screen
         let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
@@ -387,7 +390,26 @@ class MeLoginOrSignupViewController: UIViewController{
                             
                             //go back to user profile view
                             if self.showCloseButton {
-                              self.dismissViewControllerAnimated(true, completion: nil)
+                                self.dismissViewControllerAnimated(false, completion: {
+                                    completed in
+                                    if(self.songViewController != nil){
+                                        if(self.isGoToTabEditor){
+                                            if CoreDataManager.getCurrentUser() != nil {
+                                                self.songViewController!.showTabsEditor()
+                                                self.songViewController!.speed = 1
+                                                self.songViewController!.speedLabel.text = "Speed: 1.0x"
+                                                self.songViewController!.speedStepper.value = 1.0
+                                            }
+                                        }else if(self.isGoToLyricEditor){
+                                            if CoreDataManager.getCurrentUser() != nil {
+                                                self.songViewController!.showLyricsEditor()
+                                                self.songViewController!.speed = 1
+                                                self.songViewController!.speedLabel.text = "Speed: 1.0x"
+                                                self.songViewController!.speedStepper.value = 1.0
+                                            }
+                                        }
+                                    }
+                                })
                             } else {
                               self.navigationController?.popViewControllerAnimated(false)
                             }
@@ -518,4 +540,14 @@ extension MeLoginOrSignupViewController: UIScrollViewDelegate,UITextFieldDelegat
                 }, completion: nil)
         }
     }
+    
+    // MARK: Fix to portrait orientation
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
+    
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
+    }
+    
 }

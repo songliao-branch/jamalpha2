@@ -25,7 +25,6 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
-        
     }
 
     //called after sign in or sign up

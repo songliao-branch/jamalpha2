@@ -249,7 +249,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func playbackStateChanged(sender: NSNotification) {
         if musicPlayer.playbackState == .Playing {
             if(!isPlaying){
-                musicPlayer.currentPlaybackTime = currentTime
+                //musicPlayer.currentPlaybackTime = currentTime
                 self.startTimer()
                 isPlaying = true
             }
@@ -1288,7 +1288,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             startTime.setTime(0)
             self.currentTime = 0
             self.progressBlock.alpha = 0.5
-            musicPlayer.currentPlaybackTime = currentTime
+            if isDemoSong {
+                avPlayer.currentTime = currentTime
+            }else{
+                 musicPlayer.currentPlaybackTime = currentTime
+            }
         }
 
         if !isPanning {
