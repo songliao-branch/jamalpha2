@@ -15,3 +15,5 @@ pod 'FBSDKShareKit', '4.2.0'
 pod 'RSKImageCropper'
 
 pod 'AWSS3'
+pod 'Fabric'
+pod 'Crashlytics'

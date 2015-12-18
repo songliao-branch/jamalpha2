@@ -9,7 +9,10 @@ PODS:
   - Bolts/AppLinks (1.5.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.5.0)
+  - Crashlytics (3.4.1):
+    - Fabric (~> 1.6.0)
   - CryptoSwift (0.1.1)
+  - Fabric (1.6.1)
   - FBSDKCoreKit (4.2.0):
     - Bolts (~> 1.1)
     - FBSDKCoreKit/arc (= 4.2.0)
@@ -30,7 +33,9 @@ PODS:
 DEPENDENCIES:
   - Alamofire (~> 3.0)
   - AWSS3
+  - Crashlytics
   - CryptoSwift
+  - Fabric
   - FBSDKCoreKit (= 4.2.0)
   - FBSDKLoginKit (= 4.1.0)
   - FBSDKShareKit (= 4.2.0)
@@ -52,7 +57,9 @@ SPEC CHECKSUMS:
   AWSCore: c2f69975fd2caf38a10736961de28a0105cdb00c
   AWSS3: 9ac201e7a4ad8be0b68348c77acfd100027b97af
   Bolts: 722ab9a4f8b50fc4ed1b9998a5a7a2b3f16d80b4
+  Crashlytics: 41574a245bc6ae10c55d57f385ebd2004e5bee05
   CryptoSwift: c11640d3d66107efc8333e4131a5173f072b1d61
+  Fabric: bf0ceb04e7c924090efc5f8c55e4fbcca189e0a0
   FBSDKCoreKit: 84b3616a361801f190e43a9909caead7bb6087c7
   FBSDKLoginKit: ff6224762732e3698f30942e4544321b8c7a23e6
   FBSDKShareKit: 931746fdf8fb95efd6e12310ec14b2b3295e2aec
