@@ -279,9 +279,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
         loadDisplayMode()
-        
     }
-    
+
     deinit{
         pthread_rwlock_destroy(&rwLock)
     }
