@@ -8,15 +8,17 @@
 
 import UIKit
 import MediaPlayer
+import AVFoundation
 
 class LyricsTextViewController: UIViewController {
+    var isDemoSong: Bool!
+    var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
     var songViewController: SongViewController! //used to parse synced lyrics from LyricsSyncViewController
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
-    var theSong: MPMediaItem!
-    var allLocalSong: [MPMediaItem] = [MPMediaItem]()
+    var theSong: Findable!
     
     var lyricsTextView: UITextView = UITextView()
     
@@ -41,6 +43,11 @@ class LyricsTextViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         self.viewWidth = self.view.frame.width
         self.viewHeight = self.view.frame.height
+        
+        if !isDemoSong {
+            self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
+        }
+        
         addObjectsOnMainView()
         
     }
@@ -94,7 +101,7 @@ class LyricsTextViewController: UIViewController {
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
         var image:UIImage!
-        if let artwork = theSong!.artwork {
+        if let artwork = theSong!.getArtWork() {
             image = artwork.imageWithSize(size)
         } else {
             //TODO: add a placeholder album cover
@@ -190,7 +197,12 @@ class LyricsTextViewController: UIViewController {
        
         self.dismissViewControllerAnimated(true, completion: {
             completed in
-            self.songViewController.player.play()
+            if self.songViewController.isDemoSong {
+                self.songViewController.avPlayer.play()
+            } else {
+                MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                self.songViewController.player.play()
+            }
         })
     }
     
@@ -207,6 +219,8 @@ class LyricsTextViewController: UIViewController {
             lyricsSyncViewController.lyricsOrganizedArray = self.lyricsReorganizedArray
         }
         lyricsSyncViewController.theSong  = self.theSong
+        lyricsSyncViewController.recoverMode = self.recoverMode
+        lyricsSyncViewController.isDemoSong = isDemoSong
         self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
 
@@ -215,8 +229,7 @@ class LyricsTextViewController: UIViewController {
         let lineArray: [String] = lyric.characters.split{$0 == "\n"}.map { String($0) }
         let letterOrnumber = NSCharacterSet.alphanumericCharacterSet()
         var result: [String] = [String]()
-        
-        for j in 0...(lineArray.count-1) {
+        for var j = 0; j < lineArray.count; j++ {
             var str = lineArray[j].stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()).unicodeScalars
             if str.count == 0{
                 continue

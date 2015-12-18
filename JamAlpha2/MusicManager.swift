@@ -14,6 +14,8 @@ class MusicManager: NSObject {
     let _TAG = "MusicManager"
     var player: MPMusicPlayerController!
     
+    var avPlayer: AVQueuePlayer!
+    
     // A queue that keep tracks the last queue to the player
     // this should never be accessed outside MusicManager
     // a current collection is always passed in from function
@@ -24,6 +26,9 @@ class MusicManager: NSObject {
     var uniqueSongs : [MPMediaItem]!
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
+    
+    var demoSongs: [AVPlayerItem]!
+    var lastLocalPlayerQueue = [AVPlayerItem]()
     
     class var sharedInstance: MusicManager {
         struct Static {
@@ -39,6 +44,7 @@ class MusicManager: NSObject {
     override init() {
         super.init()
         loadLocalSongs()
+        loadDemoSongs()
         loadLocalAlbums()
         loadLocalArtist()
         initializePlayer()
@@ -71,19 +77,43 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-        print("\(_TAG) Initialize Player")
-        player = MPMusicPlayerController.systemMusicPlayer()
+            print("\(_TAG) Initialize Player")
+            player = MPMusicPlayerController.systemMusicPlayer()
+            
+            player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
+            // 暂时解决方法 App每次start就是先停下来
+            
+            player.repeatMode = .All
+            player.shuffleMode = .Off
+            self.setPlayerQueue(uniqueSongs)
         
-        player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
-        // 暂时解决方法 App每次start就是先停下来
+        //initialize AVQueuePlayer
+            self.avPlayer = AVQueuePlayer()
+            self.avPlayer.actionAtItemEnd = .None
+            self.setSessionActiveWithMixing()
+    }
+    
+    //for playing mode and background mode
+    private func setSessionActiveWithMixing() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: .MixWithOthers)
+        } catch _ {
+        }
         
-        player.repeatMode = .All
-        player.shuffleMode = .Off
-        
-        self.setPlayerQueue(uniqueSongs)
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch _ {
+        }
     }
     
     private var queueChanged = false
+    
+    func setDemoSongQueue(collection: [AVPlayerItem], selectedIndex:Int){
+        if(avPlayer.currentItem == nil || avPlayer.currentItem != collection[selectedIndex]){
+            avPlayer.removeAllItems()
+            avPlayer.insertItem(collection[selectedIndex], afterItem: nil)
+        }
+    }
 
     func setPlayerQueue(collection: [MPMediaItem]){
 
@@ -116,16 +146,14 @@ class MusicManager: NSObject {
         }
         
         //coming from music app to twistjam, if the queue is different, we reset the queue to newly selected queue
+
         if KGLOBAL_isNeedToCheckIndex {
-            
-            //this logic doesn't work with shuffle mode, so we purposely save the mode first
+
             let repeatMode = player.repeatMode
             let shuffleMode = player.shuffleMode
             player.repeatMode = .All
             player.shuffleMode = .Off
             if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? Int(lastPlayerQueue.indexOf(player.nowPlayingItem!)!) : -1) != player.indexOfNowPlayingItem {
-                print(lastPlayerQueue.indexOf(player.nowPlayingItem!))
-                print(player.indexOfNowPlayingItem)
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
                 print("Queue is different,  now reset queue")
@@ -178,6 +206,13 @@ class MusicManager: NSObject {
         }
     }
     
+    func loadDemoSongs() {
+        //we have one demo song so far
+        demoSongs = kSongNames.map {
+            AVPlayerItem(URL: NSBundle.mainBundle().URLForResource($0, withExtension: "mp3")!)
+        }
+    }
+    
     func loadLocalAlbums(){
         uniqueAlbums = [Album]()
         //start new albums fresh
@@ -225,5 +260,23 @@ class MusicManager: NSObject {
             artist1, artist2 in
             return artist1.artistName < artist2.artistName
         })
+    }
+
+    // go to tab and lyrics editor set queue
+    func setSingleCollection(collection: [MPMediaItem]) -> (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval) {
+        let previousRepeatMode: MPMusicRepeatMode = player.repeatMode
+        let previousShuffleMode: MPMusicShuffleMode = player.shuffleMode
+        let previousPlayingTime: NSTimeInterval = player.currentPlaybackTime
+        player.repeatMode = .One
+        player.shuffleMode = .Off
+        player.currentPlaybackTime = 0
+        
+        return (previousRepeatMode, previousShuffleMode, previousPlayingTime)
+    }
+    // back to song view controller recover queue
+    func setRecoverCollection(sender: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval), currentSong: MPMediaItem) {
+        player.repeatMode = sender.0
+        player.shuffleMode = sender.1
+        player.currentPlaybackTime = sender.2
     }
 }

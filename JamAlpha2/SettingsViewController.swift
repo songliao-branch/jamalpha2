@@ -14,8 +14,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBOutlet weak var tableView: UITableView!
     
-    let firstSectionContent: [String] = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us"]
- 
+    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo Mode"]
+    
+    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpNavigationBar()
@@ -27,10 +29,17 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        if CoreDataManager.getCurrentUser() == nil {
+            return 1
+        }
         return 2
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        if CoreDataManager.getCurrentUser() == nil {
+            return contentsNotLoggedIn.count
+        }
         if section == 0 {
             return firstSectionContent.count
         }
@@ -38,23 +47,29 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+       
         if indexPath.section == 0 {
             if indexPath.item == 1 {
                 let cell: SettingFBCell = self.tableView.dequeueReusableCellWithIdentifier("fbcell") as! SettingFBCell
                 cell.initialCell(self.view.frame.size.width)
                 cell.selectionStyle = UITableViewCellSelectionStyle.None
-                cell.titleLabel.text = firstSectionContent[indexPath.item]
+                cell.titleLabel.text = "Like us on facebook"
                 return cell
             } else {
-                let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
-                cell.textLabel?.text = firstSectionContent[indexPath.item]
-                cell.selectionStyle = UITableViewCellSelectionStyle.None
+                let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath:
+                    indexPath)
+                
+                var contents = CoreDataManager.getCurrentUser() == nil ? contentsNotLoggedIn : firstSectionContent
+                cell.textLabel?.text = contents[indexPath.item]
+    
                 return cell
             }
         } else {
             let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath: indexPath)
-            cell.textLabel?.text = "Logout"
-            cell.selectionStyle = UITableViewCellSelectionStyle.None
+            cell.textLabel?.text = "Log out"
+            cell.textLabel!.textAlignment = .Center
+            cell.accessoryType = .None
             return cell
         }
         
@@ -62,13 +77,18 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
+            
+            let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 3 : 4
             if indexPath.item == 0 {
                 let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
                 self.navigationController?.pushViewController(aboutVC, animated: true)
             } else if indexPath.item == 2 {
                 self.rateTwistjam()
-            } else if indexPath.item == 3 {
+            } else if indexPath.item == 3 && CoreDataManager.getCurrentUser() != nil {
                 self.contactUs()
+            } else if indexPath.item == indexofDemoMode {
+                let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                self.navigationController?.pushViewController(demoVC, animated: true)
             }
         } else {
             
@@ -82,6 +102,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             }))
             self.presentViewController(refreshAlert, animated: true, completion: nil)
         }
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     func contactUs() {

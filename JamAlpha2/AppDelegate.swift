@@ -10,12 +10,31 @@ import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
 import AWSS3
+import MediaPlayer
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var suspended:Bool = false
+    var nowPlayingItem: MPMediaItem!
+    var currentTime: NSTimeInterval!
+    
+    func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        // it is important to registerDefaults as soon as possible,
+        // because it can change so much of how your app behaves
+        //
+        var defaultsDictionary: [String : AnyObject] = [:]
+        
+        // by default we track the user location while in the background
+        defaultsDictionary[kShowDemoSong] = true
+        
+        NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
+                
+        return true
+    }
+    
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
@@ -56,7 +75,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 currentSongVC.stopTimer()
             }       
             print("Song VC entering background")
+            if(currentVC.presentedViewController != nil){
+                let presentVC = currentVC.presentedViewController!
+                if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
+                    var isDemoSong:Bool = false
+                    if presentVC.isKindOfClass(TabsEditorViewController) {
+                        isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
+                    }else if presentVC.isKindOfClass(LyricsTextViewController){
+                        isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
+                    }
+                    
+                    if(!isDemoSong){
+                        MusicManager.sharedInstance.player.pause()
+                        self.nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
+                        self.currentTime = MusicManager.sharedInstance.player.currentPlaybackTime
+                    }
+                }
+            }
         }
+        
         self.suspended = KGLOBAL_init_queue.suspended
         KGLOBAL_queue.suspended = true
         KGLOBAL_init_queue.suspended = true
@@ -81,6 +118,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                                 for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                                     musicVC.reloadDataAndTable()
+                                    
+                                    if(!musicVC.uniqueSongs.isEmpty){
+                                        musicVC.songCount = 0
+                                        musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+                                    }
                                 }
                             }
                         }
@@ -92,8 +134,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
-            if MusicManager.sharedInstance.player.nowPlayingItem == nil {
-                if (!currentSongVC.isSongNeedPurchase){
+            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
+                if (!currentSongVC.isSongNeedPurchase) {
                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                         completed in
                         KGLOBAL_queue.suspended = false
@@ -113,6 +155,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Song VC entering forground")
                 KGLOBAL_queue.suspended = false
                 KGLOBAL_init_queue.suspended = self.suspended
+            }
+            
+            if(currentVC.presentedViewController != nil){
+                let presentVC = currentVC.presentedViewController!
+                if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
+                    var isDemoSong:Bool = false
+                    if presentVC.isKindOfClass(TabsEditorViewController) {
+                        isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
+                    }else if presentVC.isKindOfClass(LyricsTextViewController){
+                        isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
+                    }
+                    
+                    if(!isDemoSong){
+                        if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != self.nowPlayingItem){
+                            MusicManager.sharedInstance.player.stop()
+                            MusicManager.sharedInstance.player.repeatMode = .All
+                            MusicManager.sharedInstance.player.shuffleMode = .Off
+                            MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                            MusicManager.sharedInstance.player.nowPlayingItem = self.nowPlayingItem
+                            MusicManager.sharedInstance.player.repeatMode = .One
+                            MusicManager.sharedInstance.player.shuffleMode = .Off
+                            MusicManager.sharedInstance.player.currentPlaybackTime = self.currentTime
+                        }
+                    }
+                }
             }
         }
         KGLOBAL_isNeedToCheckIndex = true
