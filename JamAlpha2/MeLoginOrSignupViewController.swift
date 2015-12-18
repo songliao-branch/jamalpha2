@@ -30,6 +30,9 @@ class MeLoginOrSignupViewController: UIViewController{
     var loginTabButton: UIButton!
     var indicatorTriangleView: UIImageView! //indicate whether it's sign up or log in
     var isSignUpSelected = true
+    var settingsButton: UIButton!
+    
+    var suspended:Bool = false
     
     var showCloseButton = false
     var closeButton: UIButton! //only visible when this is presented modally
@@ -128,8 +131,17 @@ class MeLoginOrSignupViewController: UIViewController{
         closeButton.addTarget(self, action: "closeButtonPressed", forControlEvents: .TouchUpInside)
         topView.addSubview(closeButton)
         
+        settingsButton = UIButton(frame: CGRect(x: self.view.frame.width-25-25, y: 25, width: 25, height: 25))
+        settingsButton.setImage(UIImage(named: "settings_icon"), forState: .Normal)
+        settingsButton.addTarget(self, action: "settingsButtonPressed", forControlEvents: .TouchUpInside)
+        topView.addSubview(settingsButton)
+        
         if !showCloseButton {
             closeButton.hidden = true
+        }
+        
+        if showCloseButton {
+            settingsButton.hidden = true
         }
     }
     
@@ -137,11 +149,17 @@ class MeLoginOrSignupViewController: UIViewController{
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+    func settingsButtonPressed() {
+        let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
+        self.showViewController(settingsVC, sender: nil)
+    }
+    
     func setUpViews() {
         
         scrollView = UIScrollView(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame), width: viewWidth, height: viewHeight))
         scrollView.showsVerticalScrollIndicator = false
         scrollView.contentSize.height = self.scrollView.frame.size.height + 15
+        scrollView.delegate = self
         let scrollViewTapGesture = UITapGestureRecognizer(target: self, action: "scrollViewTapGesture:")
         scrollView.addGestureRecognizer(scrollViewTapGesture)
         self.view.addSubview(self.scrollView)
@@ -161,6 +179,8 @@ class MeLoginOrSignupViewController: UIViewController{
         nickNameTextField.clearButtonMode = .WhileEditing
         nickNameTextField.autocapitalizationType = .None
         nickNameTextField.autocorrectionType = .No
+        nickNameTextField.delegate = self
+        nickNameTextField.tag = 0
         scrollView.addSubview(nickNameTextField)
         
         let credentialTextFieldUnderline1 = UIView(frame: CGRect(x: nickNameTextField.frame.origin.x, y: CGRectGetMaxY(nickNameTextField.frame), width: nickNameTextField.frame.width, height: 1))
@@ -175,6 +195,8 @@ class MeLoginOrSignupViewController: UIViewController{
         emailTextField.clearButtonMode = .WhileEditing
         emailTextField.autocapitalizationType = .None
         emailTextField.autocorrectionType = .No
+        emailTextField.delegate = self
+        emailTextField.tag = 1
         scrollView.addSubview(emailTextField)
         
 
@@ -200,6 +222,10 @@ class MeLoginOrSignupViewController: UIViewController{
         facebookButton.addTarget(self, action: "pressFacebookButton:", forControlEvents: UIControlEvents.TouchUpInside)
         scrollView.addSubview(facebookButton)
         
+        //TODO: hide facebook in beta mode
+        facebookButton.hidden = true
+        orLabel.hidden = true
+        
         //log in screen
         let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
         credentialTextFieldUnderline2.backgroundColor = UIColor.lightGrayColor()
@@ -211,13 +237,15 @@ class MeLoginOrSignupViewController: UIViewController{
         passwordTextField.textAlignment = .Center
         passwordTextField.clearButtonMode = .WhileEditing
         passwordTextField.tintColor = UIColor.mainPinkColor()
+        passwordTextField.delegate = self
+        passwordTextField.tag = 2
         scrollView.addSubview(passwordTextField)
         
         let passwordTextFieldUnderline = UITextField(frame: CGRect(x: credentialTextFieldUnderline2.frame.origin.x, y: CGRectGetMaxY(passwordTextField.frame), width: credentialTextFieldUnderline2.frame.width, height: 1))
         passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(passwordTextFieldUnderline)
         
-        submitButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: viewWidth, height: 44))
+        submitButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: 120, height: 44))
         submitButton.setTitle("Sign Up", forState: .Normal)
         submitButton.addTarget(self, action: "submitPressed", forControlEvents: .TouchUpInside)
         submitButton.titleLabel?.textAlignment = .Center
@@ -238,6 +266,12 @@ class MeLoginOrSignupViewController: UIViewController{
         
         self.passwordTextField.placeholder = "Password (Mininum 6 characters)"
         self.submitButton.setTitle("Sign up", forState: .Normal)
+        
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
     
     func loginTabPressed() {
@@ -252,18 +286,30 @@ class MeLoginOrSignupViewController: UIViewController{
         
         self.submitButton.setTitle("Log in", forState: .Normal)
         self.passwordTextField.placeholder = "Password"
+        
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
     
     func topViewTapGesture(sender: UITapGestureRecognizer) {
         self.nickNameTextField.resignFirstResponder()
         self.emailTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
     
     func scrollViewTapGesture(sender: UITapGestureRecognizer) {
         self.nickNameTextField.resignFirstResponder()
         self.emailTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
     }
 
     
@@ -396,6 +442,9 @@ class MeLoginOrSignupViewController: UIViewController{
     func getFBUserData(){
         if let fbToken = FBSDKAccessToken.currentAccessToken().tokenString
         {
+            self.suspended = KGLOBAL_init_queue.suspended
+            KGLOBAL_queue.suspended = true
+            KGLOBAL_init_queue.suspended = true
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
                 (connection, result, error) -> Void in
                 if error == nil {
@@ -429,9 +478,13 @@ class MeLoginOrSignupViewController: UIViewController{
                     ]
                     
                     self.signUpLoginRequest(parameters, afterRetrievingUser: {
-                         id, email, authToken, _, _, _ in
+                         id, email, authToken, nickname, avatarUrlMedium, avatarUrlThumbnail in
                         
-                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: facebookName, avatarUrl: facebookAvatarUrl, thumbnailUrl: thumbnailUrl, fbToken: fbToken)
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: (nickname.isEmpty ? facebookName : nickname), avatarUrl: (avatarUrlMedium.isEmpty ? facebookAvatarUrl : avatarUrlMedium), thumbnailUrl: (thumbnailUrl.isEmpty ? thumbnailUrl : avatarUrlThumbnail), fbToken: fbToken)
+                        
+                        
+                        KGLOBAL_queue.suspended = false
+                        KGLOBAL_init_queue.suspended = self.suspended
                     })
                 }
             })
@@ -440,4 +493,29 @@ class MeLoginOrSignupViewController: UIViewController{
 }
 
 
-
+extension MeLoginOrSignupViewController: UIScrollViewDelegate,UITextFieldDelegate{
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        self.nickNameTextField.resignFirstResponder()
+        self.emailTextField.resignFirstResponder()
+        self.passwordTextField.resignFirstResponder()
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            }, completion: nil)
+    }
+    
+    func textFieldDidBeginEditing(textField: UITextField) {
+        if(textField.tag == 0){
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+                }, completion: nil)
+        }else if (textField.tag == 1){
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 42)
+                }, completion: nil)
+        }else if (textField.tag == 2){
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 94)
+                }, completion: nil)
+        }
+    }
+}

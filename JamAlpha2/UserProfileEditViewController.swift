@@ -33,7 +33,19 @@ class UserProfileEditViewController: UIViewController {
         // Do any additional setup after loading the view.
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
+        self.createAWSS3FilePath()
+        setUpNavigationBar()
+        setUpTableView()
+    }
+    
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         
+        self.tableView.reloadData()
+    }
+    
+    func createAWSS3FilePath(){
         // create temp file path to store upload image
         let error = NSErrorPointer()
         do {
@@ -45,15 +57,6 @@ class UserProfileEditViewController: UIViewController {
             error.memory = error1
             print("Creating 'upload' directory failed. Error: \(error)")
         }
-        
-        setUpNavigationBar()
-        setUpTableView()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        self.tableView.reloadData()
     }
     
     func setUpNavigationBar() {

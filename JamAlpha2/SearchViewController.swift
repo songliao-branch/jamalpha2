@@ -17,6 +17,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var musicRequest: Request?
     var animator: CustomTransitionAnimation?
     
+    
+    var searchBackgroundIcon = UIImageView()
+    var searchBackgroundLabel = UILabel()
+    
     var searchHistoryManager =  SearchHistoryManager()
 
     @IBOutlet weak var searchResultTableView: UITableView!
@@ -28,7 +32,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         self.automaticallyAdjustsScrollViewInsets = false
         searchResults = [SearchResult]()
         setUpSearchBar()
-        
+        setUpSearchPromptBackground()
     }
     
     func createTransitionAnimation(){
@@ -37,13 +41,28 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
 
+    func setUpSearchPromptBackground() {
+        searchBackgroundIcon = UIImageView(frame: CGRect(x: 0, y: 0, width: 222, height: 244))
+        searchBackgroundIcon.image = UIImage(named: "big_search")
+        searchBackgroundIcon.center = CGPoint(x: self.view.center.x, y: self.view.center.y-44-20)
+        self.view.addSubview(searchBackgroundIcon)
+        
+        searchBackgroundLabel = UILabel(frame: CGRect(x: 0, y: CGRectGetMaxY(searchBackgroundIcon.frame)+20, width: 0.7*self.view.frame.width, height: 50))
+        searchBackgroundLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 15)
+        searchBackgroundLabel.numberOfLines = 0
+        searchBackgroundLabel.text = "Find your favorite songs,\n artists, jams here"
+        searchBackgroundLabel.textAlignment = .Center
+        searchBackgroundLabel.textColor = UIColor.silverGray()
+        searchBackgroundLabel.center.x = self.view.center.x
+        self.view.addSubview(searchBackgroundLabel)
+    }
+
     func setUpSearchBar(){
         self.resultSearchController = UISearchController(searchResultsController: nil)
         self.resultSearchController.searchResultsUpdater = self
         self.resultSearchController.dimsBackgroundDuringPresentation = false
         self.resultSearchController.searchBar.sizeToFit()
         self.searchResultTableView.tableHeaderView = self.resultSearchController.searchBar
-        
         
         let searchBar = resultSearchController.searchBar
         
@@ -56,7 +75,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         resultSearchController.hidesNavigationBarDuringPresentation = false
         searchBar.searchBarStyle = UISearchBarStyle.Minimal
         definesPresentationContext = true
-        
         
         if let searchTextField = searchBar.valueForKey("searchField") as? UITextField {
             
@@ -84,7 +102,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             return 30
         } else if section == 1 {
-            if searchResults.count == 0 {
+            if searchResults.count == 0 || !resultSearchController.active {
                 return 0
             }
             return 30
@@ -133,9 +151,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         }
         return nil
     }
-    
+
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if resultSearchController.active {
+            searchBackgroundLabel.hidden = true
+            searchBackgroundIcon.hidden = true
             if section == 0 {
                 tableView.hidden = false
                 return filteredSongs.count
@@ -144,9 +164,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
               return searchResults.count
             }
         } else if !resultSearchController.active && section == 0 && searchHistoryManager.getAllHistory().count > 0 {
+            searchBackgroundLabel.hidden = true
+            searchBackgroundIcon.hidden = true
             tableView.hidden = false
             return searchHistoryManager.getAllHistory().count + 1 // 1 for clear recent searches
         }
+        
+        searchBackgroundLabel.hidden = false
+        searchBackgroundIcon.hidden = false
         tableView.hidden = true
         return 0
     }
@@ -243,7 +268,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 var isReload = true
                 
                 if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
-//                    print("\(searchSong.trackName)  \(searchSong.artistName)   \(searchSong.trackTimeMillis)")
                     MusicManager.sharedInstance.setPlayerQueue([foundItem])
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                 }else{
@@ -268,18 +292,20 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)//////////改这句话
             
-            for result in searchHistoryManager.getAllHistory() {
-                print("now we have \(result.term)")
-            }
+        } else if !resultSearchController.active { //&& indexPath.section == 0 {
             
-        } else if !resultSearchController.active && indexPath.section == 0 {
              // select in search history
             if indexPath.row == searchHistoryManager.getAllHistory().count {
                 searchHistoryManager.clearHistory()
                 tableView.reloadData()
+            } else {
+            
+                let historySearchTerm = searchHistoryManager.getAllHistory().reverse()[indexPath.row].term
+                resultSearchController.searchBar.text = historySearchTerm
+                resultSearchController.searchBar.becomeFirstResponder()
+                tableView.reloadData()
             }
         }
-
     }
     
     // hide keyboard when scroll table view

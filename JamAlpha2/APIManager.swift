@@ -58,6 +58,11 @@ class APIManager: NSObject {
         
         (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: true)
         
+        if chords.count < 2 {
+            print("uploading tabs error: tabs count is less than 2")
+            return
+        }
+        
         var timesData = [Float]()
         var chordsData = [String]()
         var tabsData = [String]()
@@ -102,6 +107,11 @@ class APIManager: NSObject {
         
         (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: true)
         
+        if lyric.lyric.count < 2 {
+            print("uploading lyrics error: lyrics count is less than 2")
+            return
+        }
+        
         var times = [Float]()
         var lyrics = [String]()
         
@@ -110,6 +120,7 @@ class APIManager: NSObject {
             lyrics.append(line.str)
         }
         
+
         let parameters = [
             "title": song.getTitle(),
             "artist": song.getArtist(),
@@ -468,6 +479,32 @@ class APIManager: NSObject {
             case .Failure(let error):
                 completion(completed: true)
                 print("update user error: \(error)")
+            }
+        }
+    }
+    
+    
+    class func getSongId(findable: Findable) {
+        //if we already have song id
+        if CoreDataManager.getSongId(findable) > 0 {
+            return
+        } //otherwise request it
+        
+        //given a song's title, artist, and duration, we can find all its corresponding tabs
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+    
+        Alamofire.request(.GET, jamBaseURL + "/get_song_id", parameters: parameters).responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                
+                    CoreDataManager.saveSongId(findable, id: json["song_id"].int!)
+                }
+            case .Failure(let error):
+                print("get song id request error: \(error)")
             }
         }
     }

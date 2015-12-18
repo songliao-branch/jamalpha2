@@ -45,8 +45,10 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 
                 awss3Manager.downloadImage(avatarUrl, completion: {
                     image in
-                    CoreDataManager.saveUserProfileImage(profileImageData: UIImagePNGRepresentation(image))
-                    self.userTable.reloadData()
+                    dispatch_async(dispatch_get_main_queue()) {
+                        CoreDataManager.saveUserProfileImage(profileImageData: UIImagePNGRepresentation(image))
+                        self.userTable.reloadData()
+                    }
                 })
             }
         }

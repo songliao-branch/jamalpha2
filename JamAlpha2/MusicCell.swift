@@ -12,6 +12,7 @@ class MusicCell: UITableViewCell {
 
     @IBOutlet weak var loudspeakerImage: UIImageView!
 
+    @IBOutlet weak var demoImage: UIImageView!
     @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
     //50 if loudspeaker is shown, otherwise 15
     override func awakeFromNib() {

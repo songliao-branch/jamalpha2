@@ -6,6 +6,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     
     var player: MPMusicPlayerController! // set to singleton in MusicManager
+    var localPlayer:AVQueuePlayer!
     
     var musicViewController: MusicViewController!
 
@@ -29,6 +30,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     override func viewDidLoad() {
         super.viewDidLoad()
         player = MusicManager.sharedInstance.player
+        localPlayer = MusicManager.sharedInstance.avPlayer
         setUpLogo()
         self.automaticallyAdjustsScrollViewInsets = false  //align tableview to top
         //change status bar text to light
@@ -54,7 +56,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
             print("now it starts again")
             nowView.start()
         } else  {
-            
             nowView.stop()
         }
     }
@@ -75,7 +76,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         nowView.addGestureRecognizer(tapRecognizer)
         self.navigationController!.navigationBar.addSubview(nowView)
-
     }
     
     func setUpPageViewController(){
@@ -108,7 +108,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         self.currentPageIndex = 0
     }
     
-    func goToNowPlaying() {
+    func goToNowPlaying() { //tell me when it kicks in
         for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
             if player.nowPlayingItem != nil {
                 musicViewController.popToCurrentSong()
@@ -277,6 +277,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
         let nextViewController = pendingViewControllers[0] as! MusicViewController
         if(nextViewController.pageIndex == 0){
+            nextViewController.musicTable.reloadData()
+        }
+        else if(nextViewController.pageIndex == 1){
+            nextViewController.musicTable.reloadData()
+        }
+        else if(nextViewController.pageIndex == 2){
             nextViewController.musicTable.reloadData()
         }
     }

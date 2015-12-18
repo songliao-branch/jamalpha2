@@ -13,7 +13,8 @@ class MyTabsAndLyricsViewController: UIViewController {
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
-    var tableView: UITableView!
+
+    @IBOutlet weak var tableView: UITableView!
     
     var selectRow: [NSIndexPath] = [NSIndexPath]()
     
