@@ -14,7 +14,7 @@ class MyTabsAndLyricsViewController: UIViewController {
     var viewHeight: CGFloat = CGFloat()
     
 
-    @IBOutlet weak var tableView: UITableView!
+    var tableView: UITableView = UITableView()
     
     var selectRow: [NSIndexPath] = [NSIndexPath]()
     
@@ -62,11 +62,10 @@ class MyTabsAndLyricsViewController: UIViewController {
                 }
                 let localLyricsSets: [LocalLyrics] = CoreDataManager.getAllLocalLyrics()
                 for temp in localLyricsSets {
-                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", -1, temp.id))
+                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as Int, temp.id))
                 }
                 activityIndicator.stopAnimating()
                 self.initialTheView()
-            
             })
         } else {
             self.myTitle = "My Lyrics"
@@ -77,7 +76,7 @@ class MyTabsAndLyricsViewController: UIViewController {
                 }
                 let localTabSets: [LocalTabSet] = CoreDataManager.getAllLocalTabs()
                 for temp in localTabSets {
-                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", -1, temp.id))
+                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as Int, temp.id))
                 }
                 activityIndicator.stopAnimating()
                 self.initialTheView()
@@ -145,7 +144,7 @@ class MyTabsAndLyricsViewController: UIViewController {
 
 extension MyTabsAndLyricsViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpTableView() {
-        self.tableView = UITableView(frame: CGRectMake(0, 0, self.viewWidth, self.viewHeight), style: UITableViewStyle.Plain)
+        self.tableView = UITableView(frame: CGRectMake(0, 0, self.viewWidth, self.viewHeight - 49 - 64), style: UITableViewStyle.Plain)
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.registerClass(MyTabsCell.self, forCellReuseIdentifier: "cell")
