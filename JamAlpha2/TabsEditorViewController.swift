@@ -45,7 +45,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentTime: NSTimeInterval = NSTimeInterval()
     var avPlayer: AVAudioPlayer!
     var musicPlayer: MPMusicPlayerController!
-    var isDemoSong: Bool!
+    var isDemoSong = false
     var duration: NSTimeInterval = NSTimeInterval()
     var musicControlView: UIView = UIView()
     
@@ -111,6 +111,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var countDownStartSecond = 3 //will countdown from 3 to 1
 
     var countdownView: CountdownView!
+    
+    // key is the stepper value ranging from 0.7 to 1.3 in step of 0.1
+    // value is the real speed the song is playing
+    let speedMatcher = [0.7: 0.50, 0.8:0.67 ,0.9: 0.79,  1.0:1.00 ,1.1: 1.25  ,1.2 :1.50, 1.3: 2.00]
+    let speedLabels = [0.7: "0.5x", 0.8: "0.65x" ,0.9: "0.8x",  1.0: "1.0x" ,1.1: "1.25x"  ,1.2 : "1.5x", 1.3: "2x"]
     
     // data array
     var specificTabSets: [NormalTabs] = [NormalTabs]()
@@ -296,8 +301,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         speedStepper = UIStepper(frame: CGRect(x: tuningMenu.frame.width-94-sideMargin, y: 0, width: 94, height: 29))
         speedStepper.center.y = rowHeight/2
         speedStepper.tintColor = UIColor.mainPinkColor()
-        speedStepper.minimumValue = 0.2 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
-        speedStepper.maximumValue = 2.0
+        speedStepper.minimumValue = 0.7 //these are arbitrary numbers just so that the stepper can go down 3 times and go up 3 times
+        speedStepper.maximumValue = 1.3
         speedStepper.stepValue = 0.1
         speedStepper.value = 1.0 //default
         speedStepper.addTarget(self, action: "speedStepperValueChanged:", forControlEvents: .ValueChanged)
@@ -368,18 +373,21 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func speedStepperValueChanged(stepper: UIStepper) {
-        self.speedLabel.text = "Speed: \(stepper.value)x"
-        if self.isDemoSong! {
+        let speedKey = Double(round(10*stepper.value)/10)
+        let adjustedSpeed = Float(speedMatcher[speedKey]!)
+        self.speedLabel.text = "Speed: \(speedLabels[speedKey]!)"
+
+        if isDemoSong {
             if self.avPlayer.playing {
-                self.avPlayer.rate = Float(stepper.value)
+                self.avPlayer.rate = adjustedSpeed
             } else {
-                self.speed = Float(stepper.value)
+                self.speed = adjustedSpeed
             }
         } else {
             if self.musicPlayer.playbackState == .Playing {
-                self.musicPlayer.currentPlaybackRate = Float(stepper.value)
+                self.musicPlayer.currentPlaybackRate = adjustedSpeed
             } else {
-                self.speed = Float(stepper.value)
+                self.speed = adjustedSpeed
             }
         }
     }
@@ -1088,7 +1096,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         } else if sender.state == .Ended {
             self.isPanning = false
             startTime.setTime(Float(self.currentTime))
-            if isDemoSong! {
+            if isDemoSong {
                 self.avPlayer.currentTime = self.currentTime
                 if self.avPlayer.playing {
                     startTimer()
@@ -1143,7 +1151,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             countdownView.hidden = true
             countDownStartSecond = 3
             startTimer()
-            if isDemoSong! {
+            if isDemoSong {
                 print("play local")
                 if !self.avPlayer.playing {
                     self.avPlayer.play()
@@ -1163,7 +1171,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer) {
         
-        if self.isDemoSong! ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
+        if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
             
             //animate down progress block
             self.view.userInteractionEnabled = false
@@ -1172,7 +1180,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }, completion: nil)
             
             //pause music and stop timer
-            if self.isDemoSong! {
+            if self.isDemoSong {
                 avPlayer.pause()
             } else {
                 musicPlayer.pause()
@@ -1245,7 +1253,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if(theSong == nil){
             print("the song is empty")
         }
-        if isDemoSong! {
+        if isDemoSong {
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
             self.duration = self.avPlayer.duration
@@ -1278,7 +1286,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
         }
         if startTime.toDecimalNumer() > Float(self.duration) {
-            if isDemoSong! {
+            if isDemoSong {
                 self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
@@ -1503,14 +1511,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
             removeNotification()
-            if self.isDemoSong! {
+            if self.isDemoSong {
                 self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
             }
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong! {
+                if self.isDemoSong {
                     self.songViewController.avPlayer.play()
                 } else {
                     MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
@@ -1573,7 +1581,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.allTabsOnMusicLine.removeAll()
                 })
             self.view.userInteractionEnabled = true
-            if self.isDemoSong! {
+            if self.isDemoSong {
                 self.avPlayer.currentTime = 0
             } else {
                 self.musicPlayer.currentPlaybackTime = 0
@@ -1592,7 +1600,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func pressAddButton(sender: UIButton) {
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
-        if isDemoSong! {
+        if isDemoSong {
             self.avPlayer.pause()
         } else {
             self.musicPlayer.pause()
@@ -1699,7 +1707,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
             }
         } else {
-            if isDemoSong! {
+            if isDemoSong {
                 self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
@@ -1731,7 +1739,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
             removeNotification()
-            if self.isDemoSong! {
+            if self.isDemoSong {
                 self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
@@ -1739,7 +1747,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong! {
+                if self.isDemoSong {
                     self.songViewController.avPlayer.play()
                 } else {
                     MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
@@ -1840,7 +1848,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
             self.currentTabViewIndex = self.currentTabViewIndex--
             findCurrentTabView()
-            if isDemoSong! {
+            if isDemoSong {
                 self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
                  self.currentTime = self.avPlayer.currentTime
             } else {
@@ -1852,14 +1860,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
             self.currentTabViewIndex = 0
-            if isDemoSong! {
+            if isDemoSong {
                 self.avPlayer.currentTime = 0
             } else {
                 self.musicPlayer.currentPlaybackTime = 0
             }
             self.currentTime = 0
         } else {
-            if isDemoSong! {
+            if isDemoSong {
                 self.avPlayer.currentTime = 0
             } else {
                 self.musicPlayer.currentPlaybackTime = 0
@@ -1981,7 +1989,7 @@ extension TabsEditorViewController {
             
         }
         let current = NSTimeInterval(sender[sender.count - 1].time.toDecimalNumer()) + 0.1
-        if isDemoSong! {
+        if isDemoSong {
             self.avPlayer.currentTime = current
         } else {
             self.musicPlayer.currentPlaybackTime = current
