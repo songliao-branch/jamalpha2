@@ -665,4 +665,20 @@ class CoreDataManager: NSObject {
             
         })
     }
+    
+    class func downloadMyLyricsFromDatabase(sender: Findable) -> DownloadedLyricsSet {
+        let download: DownloadedLyricsSet = DownloadedLyricsSet()
+        let allLyrics = CoreDataManager.getAllLocalLyrics()
+        for item in allLyrics {
+            if item.localSong.title == sender.getTitle() && item.localSong.artist == sender.getArtist() && (item.localSong.playbackDuration as Float) <= sender.getDuration() + 1 && (item.localSong.playbackDuration as Float) >= sender.getDuration() - 1 {
+                download.id = item.id
+            }
+        }
+        APIManager.downloadLyricsSetContent(download, completion: {
+            downloadWithContent in
+            return download
+        })
+        return download
+    }
+
 }

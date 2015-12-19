@@ -719,15 +719,16 @@ extension LyricsSyncViewController {
                     break
                 }
             }
-            if i < self.lyricsOrganizedArray.count {
-                for var j = i; j < self.lyricsOrganizedArray.count; j++ {
-                    lyrics.append(self.lyricsOrganizedArray[i])
-                    time.append(self.addedLyricsWithTime.time[i])
-                    timeAdded.append(self.addedLyricsWithTime.timeAdded[i])
-                }
+            for var j = i; j < self.lyricsOrganizedArray.count; j++ {
+                lyrics.append(self.lyricsOrganizedArray[i])
+                time.append(self.addedLyricsWithTime.time[i])
+                timeAdded.append(self.addedLyricsWithTime.timeAdded[i])
             }
             self.addedLyricsWithTime.addExistLyrics(count, lyrics: lyrics, time: time, timeAdded: timeAdded)
             
+        }
+        if i == 0 {
+            i = 1 // if don't have the same line of lyrics, make the time equals to 0
         }
         if isDemoSong {
             self.avPlayer.currentTime = self.addedLyricsWithTime.time[i - 1]

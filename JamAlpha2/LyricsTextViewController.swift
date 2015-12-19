@@ -24,7 +24,9 @@ class LyricsTextViewController: UIViewController {
     
     var textViewBottomLayoutGuideConstraint: NSLayoutConstraint!
     
-    var lyricsReorganizedArray: [String] = ["1~~~~~~~~~", "2~~~~~~~~~" ,"3~~~~~~~~~", "4~~~~~~~~~", "5~~~~~~~~~", "6~~~~~~~~~" ,"7~~~~~~~~~", "8~~~~~~~~~", "9~~~~~~~~~", "10~~~~~~~~~", "11~~~~~~~~~", "12~~~~~~~~~", "13~~~~~~~~~", "14~~~~~~~~~"]
+    var lyricsReorganizedArray: [String] = [String]()
+    
+    var timeArray: [Float]!
     
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
@@ -47,9 +49,8 @@ class LyricsTextViewController: UIViewController {
         if !isDemoSong {
             self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
         }
-        
         addObjectsOnMainView()
-        
+        //self.getLyrics(theSong)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -179,7 +180,7 @@ class LyricsTextViewController: UIViewController {
         if lyric.lyric.count > 0 {
             var lyricsToDisplay = ""
             for line in lyric.lyric {
-                lyricsToDisplay+="\(line.str)\n"
+                lyricsToDisplay += "\(line.str)\n"
             }
             self.lyricsTextView.text = lyricsToDisplay
             self.lyricsTextView.textColor = UIColor.whiteColor()
@@ -288,13 +289,14 @@ class LyricsTextViewController: UIViewController {
     
     func array2String(sender: [String]) -> String {
         var tempString: String = String()
-        for var index = 0; index < self.lyricsReorganizedArray.count; index++ {
-            tempString += self.lyricsReorganizedArray[index]
+        for var index = 0; index < sender.count; index++ {
+            tempString += sender[index]
             tempString += "\n"
         }
         return tempString
     }
 }
+
 extension LyricsTextViewController: UITextViewDelegate {
     //when user begins editing, if it has the placeholder(having a gray text color)
     //clear the text
@@ -304,26 +306,10 @@ extension LyricsTextViewController: UITextViewDelegate {
             textView.textColor = UIColor.whiteColor()
         }
     }
-    
-    func downloadMyLyrics(sender: Findable) {
-        let download: DownloadedLyricsSet = DownloadedLyricsSet()
-        let userId = CoreDataManager.getCurrentUser()?.id as! Int
-//        APIManager.getUserLyricsInfo(userId, completion: {
-//            downloadedLyricsSets in
-//            for set in downloadedLyricsSets {
-//                self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id, set.id))
-//            }
-//            let localTabSets: [LocalTabSet] = CoreDataManager.getAllLocalTabs()
-//            for temp in localTabSets {
-//                self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as Int, temp.id)) // 0 means didn't upload, and the last para is songId and tabsetId
-//            }
-//            activityIndicator.stopAnimating()
-//            self.initialTheView()
-//        })
-        APIManager.downloadLyricsSetContent(download, completion: {
-            downloadWithContent in
-            
-        })
-    }
+}
+
+// download exist lyrcis from database if the user uploaded it
+extension LyricsTextViewController {
+
 }
 
