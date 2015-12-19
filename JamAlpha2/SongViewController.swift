@@ -219,6 +219,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var demoItemDuration:Float!
     var selectedRow:Int!
 
+    var isChangedSpeed:Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -803,9 +804,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             && KGLOBAL_init_queue.suspended)){
             return
         }
-        if self.player.nowPlayingItem == nowPlayingMediaItem {
-            return
-        }
+
         pthread_rwlock_wrlock(&self.rwLock)
             self.stopTimer()
             self.newPosition = 0
@@ -817,6 +816,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if self.player.repeatMode == .One {
                 print("\(self.player.nowPlayingItem!.title) is repeating")
                 self.updateAll(0)
+                if self.player.playbackState == MPMusicPlaybackState.Playing{
+                    self.startTimer()
+                }
                 return
             }
             
@@ -884,9 +886,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     //self.progressBlock!.alpha = 0.5
                 }
         
-            self.speed = 1
-            self.speedLabel.text = "Speed: 1.0x"
-            self.speedStepper.value = 1.0
+            resumeNormalSpeed()
             self.updateAll(0)
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.startTimer()
@@ -965,9 +965,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
         }
         
-        self.speed = 1
-        self.speedLabel.text = "Speed: 1.0x"
-        self.speedStepper.value = 1.0
+        resumeNormalSpeed()
         self.updateAll(0)
         if rate > 0{
             self.startTimer()
@@ -1899,11 +1897,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         print("stepper value:\(stepper.value) and value \(speedMatcher[speedKey])")
     }
     
+    func resumeNormalSpeed() {
+        self.speed = 1
+        self.speedLabel.text = "Speed: 1.0x"
+        self.speedStepper.value = 1.0
+    }
     
     // MARK: functions used in NavigationOutView
     func browseTabs(button: UIButton) {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
+        self.isChangedSpeed = false
         
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
@@ -1925,10 +1929,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func uploadTabs(button: UIButton) {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
-        self.player.pause()
-        self.clearActions()
-
-        if shouldShowSignUpPage() {
+        if shouldShowSignUpPage("") {
             return
         }
         
@@ -1951,6 +1952,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
+        
+        if shouldShowSignUpPage("goToTabsEditor") {
+            return
+        }
+        
+       self.showTabsEditor()
+    }
+    
+    func showTabsEditor(){
+        self.isRemoveProgressBlock = false
+        self.selectedFromTable = false
         viewDidFullyDisappear = true
         if isDemoSong{
             self.avPlayer.pause()
@@ -1963,15 +1975,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
         }
-        
-        self.clearActions()
-        
-        if shouldShowSignUpPage() {
-            return
-        }
-        
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-        tabsEditorVC.theSong = isDemoSong ? demoItem : nowPlayingMediaItem 
+        tabsEditorVC.theSong = isDemoSong ? demoItem : nowPlayingMediaItem
         tabsEditorVC.songViewController = self
         tabsEditorVC.isDemoSong = self.isDemoSong
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
@@ -1980,10 +1985,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func uploadLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
-        self.player.pause()
-        self.clearActions()
         
-        if shouldShowSignUpPage() {
+        if shouldShowSignUpPage("") {
             return
         }
         
@@ -1991,8 +1994,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalOnly: true)
         
         if lyric.lyric.count < 2 {
-            self.lyric = lyric
-            
              self.showMessage("Your lyrics looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
             return
         }
@@ -2008,7 +2009,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func browseLyrics(button: UIButton) {
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
-        
+        self.isChangedSpeed = false
         let browseAllTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("browseversionsviewcontroller") as! BrowseVersionsViewController
         browseAllTabsVC.songViewController = self
         browseAllTabsVC.isPullingTabs = false
@@ -2026,12 +2027,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
         
     }
+    
     func goToLyricsEditor() {
         //show sign up screen if no user found
-
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
         
+        if shouldShowSignUpPage("goToLyricsEditor") {
+            return
+        }
+        self.showLyricsEditor()
+    }
+    
+    func showLyricsEditor(){
+        self.isRemoveProgressBlock = false
+        self.selectedFromTable = false
+        viewDidFullyDisappear = true
         if isDemoSong{
             self.avPlayer.pause()
             stopTimer()
@@ -2043,22 +2054,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
         }
-        
-        self.clearActions()
-        
-        if shouldShowSignUpPage() {
-            return
+        if isDemoSong{
+            self.avPlayer.pause()
+            stopTimer()
+            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+            KGLOBAL_progressBlock!.alpha = 0.5
+        } else {
+            self.player.pause()
+            stopTimer()
+            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
+            KGLOBAL_progressBlock!.alpha = 0.5
         }
+        self.clearActions()
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
-        as! LyricsTextViewController
+            as! LyricsTextViewController
         lyricsEditor.songViewController = self
-        lyricsEditor.theSong = isDemoSong ? demoItem : nowPlayingMediaItem 
+        lyricsEditor.theSong = isDemoSong ? demoItem : nowPlayingMediaItem
         lyricsEditor.isDemoSong = isDemoSong
         self.presentViewController(lyricsEditor, animated: true, completion: nil)
     }
     
     func goToArtist(button: UIButton) {
-        self.clearActions()
         self.dismissViewControllerAnimated(false, completion: {
             completed in
             if(self.musicViewController != nil){
@@ -2070,7 +2086,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func goToAlbum(button: UIButton) {
-        self.clearActions()
         self.dismissViewControllerAnimated(false, completion: {
             completed in
             if(self.musicViewController != nil){
@@ -2082,14 +2097,26 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         })
     }
     
-    func shouldShowSignUpPage() -> Bool {
+    func shouldShowSignUpPage(key:String) -> Bool {
         //show sign up screen if no user found
         if CoreDataManager.getCurrentUser() == nil {
+            self.isChangedSpeed = false
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
             signUpVC.showCloseButton = true
-            self.presentViewController(signUpVC, animated: true, completion: nil)
+            signUpVC.songViewController = self
+            
+            if !key.isEmpty && key == "goToLyricsEditor" {
+                signUpVC.isGoToLyricEditor = true
+            } else if !key.isEmpty && key == "goToTabsEditor" {
+                signUpVC.isGoToTabEditor = true
+            }
+            
+            self.presentViewController(signUpVC, animated: true, completion: {
+                completet in  self.clearActions()
+            })
             return true
         }
+        self.clearActions()
         return false
     }
     
@@ -2129,7 +2156,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             if avPlayer.rate > 0 {
-                avPlayer.rate = 1
+                if(isChangedSpeed){
+                     avPlayer.rate = 1
+                }
             }
             
         }else{
@@ -2144,12 +2173,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             if player.playbackState == MPMusicPlaybackState.Playing {
-                player.currentPlaybackRate = 1
+                if(isChangedSpeed){
+                     player.currentPlaybackRate = 1
+                }
             }
         }
+        if(isChangedSpeed){
+            resumeNormalSpeed()
+        }else{
+            isChangedSpeed = true
+        }
         
-        self.speedLabel.text = "Speed: 1.0x"
-        self.speedStepper.value = 1.0
         
         if(isRemoveProgressBlock){
             NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
@@ -2490,7 +2524,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if !isViewDidAppear || startTime.toDecimalNumer() < 5 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 5 || startTime.toDecimalNumer() - toTime < 2{
+            if !isViewDidAppear || startTime.toDecimalNumer() < 3 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 3 || startTime.toDecimalNumer() - toTime < (1 * speed) {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
                 let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime

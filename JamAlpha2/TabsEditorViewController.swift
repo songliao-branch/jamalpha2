@@ -104,6 +104,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var tuningValueLabels = [UILabel]()
     var tunings = [Tuning]()
     
+    var isPlaying:Bool = false
     
     // count down section
     
@@ -232,6 +233,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func registerNotification() {
         if musicPlayer != nil {
             NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: musicPlayer)
             musicPlayer.beginGeneratingPlaybackNotifications()
         }
     }
@@ -240,20 +242,28 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if musicPlayer != nil {
             musicPlayer.endGeneratingPlaybackNotifications()
             NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
+             NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: musicPlayer)
         }
     }
     
     func playbackStateChanged(sender: NSNotification) {
         if musicPlayer.playbackState == .Playing {
-            startTimer()
-            self.currentTime = musicPlayer.currentPlaybackTime
-            self.startTime.setTime(Float(self.currentTime))
-            self.musicPlayer.currentPlaybackRate = self.speed
+            if(!isPlaying){
+                self.startTimer()
+                isPlaying = true
+            }
             self.progressBlock.alpha = 1
         } else if musicPlayer.playbackState == .Paused {
+            isPlaying = false
             timer.invalidate()
             timer = NSTimer()
             self.progressBlock.alpha = 0.5
+        }
+    }
+    
+    func currentSongChanged(sender: NSNotification){
+        if musicPlayer.playbackState == .Playing {
+            musicPlayer.currentPlaybackRate = self.speed
         }
     }
     
@@ -1127,13 +1137,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.findCurrentTabView()
             }
         }
-        
     }
     
     func startTimer() {
         if !timer.valid {
+            if(isDemoSong){
+                self.avPlayer.rate = speed
+            }else{
+                self.musicPlayer.currentPlaybackRate = speed
+            }
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
-        
         }
     }
 
@@ -1146,18 +1159,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
-            startTimer()
             if isDemoSong {
-                print("play local")
-                if !self.avPlayer.playing {
-                    self.avPlayer.play()
-                }
+                self.avPlayer.play()
             } else {
-                print("play music")
-                if self.musicPlayer.playbackState != .Playing {
-                    self.musicPlayer.play()
-                }
+                self.musicPlayer.play()
             }
+            toTime = self.duration + 1
+            startTimer()
             countdownTimer.invalidate()
             countdownTimer = NSTimer()
         }
@@ -1165,10 +1173,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
 
     // pause the music or restart it, and count down
-    func singleTapOnMusicControlView(sender: UITapGestureRecognizer) {
+    func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
         
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
-            
+            self.isPlaying = false
             //animate down progress block
             self.view.userInteractionEnabled = false
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
@@ -1184,7 +1192,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer.invalidate()
             self.view.userInteractionEnabled = true
         } else {
-            
+            self.isPlaying = true
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
             self.view.userInteractionEnabled = false
             UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
@@ -1257,7 +1265,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.avPlayer.rate = 1.0
             self.avPlayer.volume = 1
         } else {
-            self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
+            self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
             self.duration = (theSong as! MPMediaItem).playbackDuration
         }
         progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
@@ -1268,20 +1276,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func update() {
-
-        if !isPanning {
-            if startTime.toDecimalNumer() - Float(self.toTime) < 2 {
-                startTime.addTime(Int(100 / stepPerSecond))
-            } else {
-                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
-                if !tempPlaytime.isNaN {
-                    startTime.setTime(Float(tempPlaytime))
-                } else {
-                    startTime.addTime(Int(100 / stepPerSecond))
-                }
-            }
-        }
-        if startTime.toDecimalNumer() > Float(self.duration) {
+        if startTime.toDecimalNumer() > Float(self.duration)-0.15 {
             if isDemoSong {
                 self.avPlayer.pause()
             } else {
@@ -1291,13 +1286,34 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer = NSTimer()
             startTime.setTime(0)
             self.currentTime = 0
+            self.progressBlock.alpha = 0.5
+            if isDemoSong {
+                avPlayer.currentTime = currentTime
+            }else{
+                 musicPlayer.currentPlaybackTime = currentTime
+            }
         }
-        self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
+
+        if !isPanning {
+            if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {
+                startTime.addTime(Int(100 / stepPerSecond))
+                self.currentTime = NSTimeInterval(startTime.toDecimalNumer()) - 0.01
+            } else {
+                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
+                if !tempPlaytime.isNaN {
+                    startTime.setTime(Float(tempPlaytime))
+                    self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
+                } else {
+                    startTime.addTime(Int(100 / stepPerSecond))
+                    self.currentTime = NSTimeInterval(startTime.toDecimalNumer()) - 0.01
+                }
+            }
+        }
         //
         //refresh current time label
-        self.currentTimeLabel.text = TimeNumber(time: startTime.toDecimalNumer()).toDisplayString()
+        self.currentTimeLabel.text = TimeNumber(time: Float(currentTime)).toDisplayString()
         //refresh progress block
-        let presentPosition = CGFloat(startTime.toDecimalNumer() / Float(self.duration))
+        let presentPosition = CGFloat(Float(currentTime) / Float(self.duration))
         self.progressBlock.setProgress(presentPosition)
         
         
@@ -1517,7 +1533,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 if self.isDemoSong {
                     self.songViewController.avPlayer.play()
                 } else {
-                    MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                     self.songViewController.player.play()
                 }
             })
@@ -1746,7 +1762,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 if self.isDemoSong {
                     self.songViewController.avPlayer.play()
                 } else {
-                    MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                     self.songViewController.player.play()
                 }
             })

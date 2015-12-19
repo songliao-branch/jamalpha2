@@ -21,14 +21,14 @@ public extension UIWindow {
 
     public func snapShot(itemCount:CGFloat, buttonHeight:CGFloat,cancelButtonHeight:CGFloat, addedHeightForRunningMan:CGFloat, needRunningManSlider:Bool) -> UIImage{
         var imageSize:CGSize = CGSizeZero
-        var orientation:UIInterfaceOrientation = UIApplication.sharedApplication().statusBarOrientation
+        let orientation:UIInterfaceOrientation = UIApplication.sharedApplication().statusBarOrientation
         if UIInterfaceOrientationIsPortrait(orientation) {
             imageSize = UIScreen.mainScreen().bounds.size
         }else{
             imageSize = CGSizeMake(UIScreen.mainScreen().bounds.size.height, UIScreen.mainScreen().bounds.size.width)
         }
         UIGraphicsBeginImageContextWithOptions(imageSize, false, 0)
-        var context:CGContextRef = UIGraphicsGetCurrentContext()!
+        let context:CGContextRef = UIGraphicsGetCurrentContext()!
         CGContextSaveGState(context)
         CGContextTranslateCTM(context, self.center.x, self.center.y)
         CGContextConcatCTM(context, self.transform)
@@ -47,7 +47,7 @@ public extension UIWindow {
     
         self.drawViewHierarchyInRect(self.bounds, afterScreenUpdates: true)
         CGContextRestoreGState(context)
-        var image:UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        let image:UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         var croprect:CGRect!
         if(needRunningManSlider){
@@ -59,10 +59,10 @@ public extension UIWindow {
         
         
         // Draw new image in current graphics context
-        var imageRef:CGImageRef = CGImageCreateWithImageInRect(image.CGImage, croprect!)!;
+        let imageRef:CGImageRef = CGImageCreateWithImageInRect(image.CGImage, croprect!)!;
         
         // Create new cropped UIImage
-        var croppedImage:UIImage = UIImage(CGImage: imageRef)
+        let croppedImage:UIImage = UIImage(CGImage: imageRef)
         
         return croppedImage
     }
