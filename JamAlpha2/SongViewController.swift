@@ -1993,8 +1993,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalOnly: true)
         
         if lyric.lyric.count < 2 {
-            self.lyric = lyric
-            
              self.showMessage("Your lyrics looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
             return
         }
