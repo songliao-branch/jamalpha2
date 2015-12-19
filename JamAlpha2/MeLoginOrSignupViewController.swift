@@ -76,6 +76,12 @@ class MeLoginOrSignupViewController: UIViewController{
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBarHidden = true
+        if self.userProfileViewController != nil {
+            if CoreDataManager.getCurrentUser() != nil {
+                self.navigationController?.navigationBarHidden = false
+                self.navigationController?.popViewControllerAnimated(false)
+            }
+        }
     }
     
     override func viewWillDisappear(animated: Bool) {
