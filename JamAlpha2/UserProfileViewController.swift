@@ -18,18 +18,27 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     var settingsVC: SettingsViewController!
     
+    var isCalledViewDidLoad:Bool = false
+    
     var cellTitles = ["My tabs", "My lyrics", "Favorites"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
+        isCalledViewDidLoad = true
+        refreshUserImage()
     }
-
+    
     //called after sign in or sign up
     func refreshUserImage() {
         guard let currentUser = CoreDataManager.getCurrentUser() else {
+            self.isCalledViewDidLoad = false
+            return
+        }
+        if currentUser.profileImage != nil {
+            self.userTable.reloadData()
+            self.isCalledViewDidLoad = false
             return
         }
         
@@ -39,6 +48,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 let profileImageData = NSData(contentsOfURL: NSURL(string: avatarUrl)!)!
                 CoreDataManager.saveUserProfileImage(profileImageData: profileImageData)
                 self.userTable.reloadData()
+                self.isCalledViewDidLoad = false
             } else {
                 let awss3Manager = AWSS3Manager()
                 
@@ -47,6 +57,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                     dispatch_async(dispatch_get_main_queue()) {
                         CoreDataManager.saveUserProfileImage(profileImageData: UIImagePNGRepresentation(image))
                         self.userTable.reloadData()
+                        self.isCalledViewDidLoad = false
                     }
                 })
             }
@@ -67,11 +78,13 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         //check if there is a user, if not show signup/login screen
         if CoreDataManager.getCurrentUser() == nil {
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
-            signUpVC.userProfileViewController = self
             self.navigationController?.pushViewController(signUpVC, animated: false)
+            signUpVC.userProfileViewController = self
         } else {
             //means we are signed in here, refresh the table
-            userTable.reloadData()
+            if(!isCalledViewDidLoad){
+                refreshUserImage()
+            }
         }
     }
     
