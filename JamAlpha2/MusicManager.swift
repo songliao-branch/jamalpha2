@@ -30,6 +30,12 @@ class MusicManager: NSObject {
     var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
     
+    //in case mediaItem was changed outside the app when exit to background from Editor screen
+    //we save these two so that when we come back we always have the correct item
+    var lastPlayingItem: MPMediaItem!
+    var lastPlayingTime: NSTimeInterval!
+
+    
     class var sharedInstance: MusicManager {
         struct Static {
             static var onceToken: dispatch_once_t = 0

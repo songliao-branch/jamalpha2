@@ -20,9 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var suspended:Bool = false
-    var nowPlayingItem: MPMediaItem!
-    var currentTime: NSTimeInterval!
-    
+      
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
         // because it can change so much of how your app behaves
@@ -79,6 +77,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 currentSongVC.stopTimer()
             }       
             print("Song VC entering background")
+            
+            // save music state if exit Twistjam when in Editor mode
             if(currentVC.presentedViewController != nil){
                 let presentVC = currentVC.presentedViewController!
                 if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
@@ -91,8 +91,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     if(!isDemoSong){
                         MusicManager.sharedInstance.player.pause()
-                        self.nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
-                        self.currentTime = MusicManager.sharedInstance.player.currentPlaybackTime
+                        
+                        MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
+                        MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
                     }
                 }
             }
@@ -110,6 +111,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let currentVC = topViewController(rootViewController())
         
+        // if the collection is different i.e. new songs are added/old songs are removed
+        // we manually reload MusicViewController table
         if kShouldReloadMusicTable {
             if rootViewController().isKindOfClass(TabBarController) {
                 let tabBarController = rootViewController() as! TabBarController
@@ -139,6 +142,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
             if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
+                
+                // if go outside Twistjam and close Music App, nowPlayingItem is set to nil
+                // we force to dismiss SongViewController and re-initialize player
                 if (!currentSongVC.isSongNeedPurchase) {
                     currentSongVC.viewDidDisappear(false)
                     currentSongVC.dismissViewControllerAnimated(true, completion: {
@@ -163,6 +169,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 KGLOBAL_init_queue.suspended = self.suspended
             }
             
+            //check if the viewController is Tabs Editor or lyrics SyncEditor
+            //in case mediaItem was changed outside the app, if changed, we used 
+            //the last playing item and time
             if(currentVC.presentedViewController != nil){
                 let presentVC = currentVC.presentedViewController!
                 if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
@@ -174,16 +183,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                     
                     if(!isDemoSong){
-                        if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != self.nowPlayingItem){
+                        let lastPlayingItem = MusicManager.sharedInstance.lastPlayingItem
+                        if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != lastPlayingItem){
                             MusicManager.sharedInstance.player.stop()
                             MusicManager.sharedInstance.player.repeatMode = .All
                             MusicManager.sharedInstance.player.shuffleMode = .Off
                             MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
-                            MusicManager.sharedInstance.player.nowPlayingItem = self.nowPlayingItem
+                            MusicManager.sharedInstance.player.nowPlayingItem = lastPlayingItem
                             MusicManager.sharedInstance.player.repeatMode = .One
                             MusicManager.sharedInstance.player.shuffleMode = .Off
-                            MusicManager.sharedInstance.player.currentPlaybackTime = self.currentTime
-                        }
+                            MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime                     }
                     }
                 }
             }
@@ -192,7 +201,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("Go into forground")
     }
    
-
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         
