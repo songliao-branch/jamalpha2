@@ -274,8 +274,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpStatusView()
         if(!isSongNeedPurchase){
             updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
+            updateFavoriteStatus(isDemoSong ? demoItem : nowPlayingMediaItem)
         }else{
             updateMusicData(songNeedPurchase)
+            updateFavoriteStatus(songNeedPurchase)
         }
         
         movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
@@ -846,9 +848,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
+
+        
                 CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem!)
                 self.updateMusicData(nowPlayingMediaItem!)
-                
+                self.updateFavoriteStatus(nowPlayingMediaItem!)
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
@@ -1374,8 +1378,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //TODO: Add glowing effect when pressed
         //divide view width into eigth to distribute center x for each of four buttons
         favoriateButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
+        //default is not favorited
         favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
-        favoriateButton.sizeToFit()
+        favoriateButton.addTarget(self, action: "favoriteButtonPressed", forControlEvents: .TouchUpInside)
         
         shuffleButton = UIButton(frame: CGRect(origin: CGPointZero, size: bottomButtonSize))
         if(!isSongNeedPurchase){
@@ -1604,6 +1609,36 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             line.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             navigationOutActionView.addSubview(line)
         }
+    }
+    
+    
+    func favoriteButtonPressed() {
+        
+        if shouldShowSignUpPage("") {
+            self.isRemoveProgressBlock = false
+            self.selectedFromTable = false
+            
+            if isDemoSong {
+                self.avPlayer.pause()
+            } else {
+                self.player.pause()
+            }
+
+            return
+        }
+        
+        let findable: Findable = isSongNeedPurchase ? songNeedPurchase : player.nowPlayingItem!
+        
+        APIManager.favoriteTheSong(findable, completion: {
+            result in
+            if result == "liked" {
+                CoreDataManager.favoriteTheSong(findable, shouldFavorite: true)
+                self.favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
+            } else  {
+                CoreDataManager.favoriteTheSong(findable, shouldFavorite: false)
+                self.favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
+            }
+        })
     }
     
     func toggleShuffle(button: UIButton){
@@ -2828,6 +2863,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         nextButton.hidden = false
     }
     
+    func updateFavoriteStatus(item: Findable) {
+        //check core data only
+        if CoreDataManager.isFavorited(item) && CoreDataManager.getCurrentUser() != nil {
+            favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
+        } else {
+            favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
+        }
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // MARK: Fix to portrait orientation

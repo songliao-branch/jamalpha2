@@ -163,7 +163,10 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             }
             else if indexPath.item == 1{
 
+            } else if indexPath.item == 2 {
+                APIManager.getFavorites()
             }
+            
         } else if indexPath.section == 2 { //settings section
             self.settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
             self.showViewController(settingsVC, sender: nil)
