@@ -60,7 +60,6 @@ class MeLoginOrSignupViewController: UIViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.navigationController?.navigationBarHidden = true
         //TODO: check if user is signed in already.
         self.viewWidth = self.view.frame.size.width
@@ -76,6 +75,12 @@ class MeLoginOrSignupViewController: UIViewController{
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBarHidden = true
+        if self.userProfileViewController != nil {
+            if CoreDataManager.getCurrentUser() != nil {
+                self.navigationController?.navigationBarHidden = false
+                self.navigationController?.popViewControllerAnimated(false)
+            }
+        }
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -405,7 +410,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                                 self.songViewController!.showLyricsEditor()
                                                 self.songViewController!.speed = 1
                                                 self.songViewController!.speedLabel.text = "Speed: 1.0x"
-                                                self.songViewController!.speedStepper.value = 1.0
+                                                self.songViewController!.speedStepper.value = 1.0                                               
                                             }
                                         }
                                     }
