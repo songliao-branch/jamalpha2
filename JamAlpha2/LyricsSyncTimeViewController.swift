@@ -658,7 +658,7 @@ extension LyricsSyncViewController {
             if self.lyricsTextViewController.songViewController.isDemoSong {
                 self.lyricsTextViewController.songViewController.avPlayer.play()
             } else {
-                MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                 self.lyricsTextViewController.songViewController.player.play()
             }
         })

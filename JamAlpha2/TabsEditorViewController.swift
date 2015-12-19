@@ -1265,7 +1265,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.avPlayer.rate = 1.0
             self.avPlayer.volume = 1
         } else {
-            self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
+            self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
             self.duration = (theSong as! MPMediaItem).playbackDuration
         }
         progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
@@ -1533,7 +1533,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 if self.isDemoSong {
                     self.songViewController.avPlayer.play()
                 } else {
-                    MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                     self.songViewController.player.play()
                 }
             })
@@ -1762,7 +1762,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 if self.isDemoSong {
                     self.songViewController.avPlayer.play()
                 } else {
-                    MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                     self.songViewController.player.play()
                 }
             })

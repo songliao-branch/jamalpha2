@@ -886,9 +886,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     //self.progressBlock!.alpha = 0.5
                 }
         
-            self.speed = 1
-            self.speedLabel.text = "Speed: 1.0x"
-            self.speedStepper.value = 1.0
+            resumeNormalSpeed()
             self.updateAll(0)
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.startTimer()
@@ -967,9 +965,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             KGLOBAL_progressBlock.transform = CGAffineTransformMakeScale(1.0, 0.5)
         }
         
-        self.speed = 1
-        self.speedLabel.text = "Speed: 1.0x"
-        self.speedStepper.value = 1.0
+        resumeNormalSpeed()
         self.updateAll(0)
         if rate > 0{
             self.startTimer()
@@ -1901,6 +1897,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         print("stepper value:\(stepper.value) and value \(speedMatcher[speedKey])")
     }
     
+    func resumeNormalSpeed() {
+        self.speed = 1
+        self.speedLabel.text = "Speed: 1.0x"
+        self.speedStepper.value = 1.0
+    }
     
     // MARK: functions used in NavigationOutView
     func browseTabs(button: UIButton) {
@@ -2103,9 +2104,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let signUpVC = self.storyboard?.instantiateViewControllerWithIdentifier("meloginVC") as! MeLoginOrSignupViewController
             signUpVC.showCloseButton = true
             signUpVC.songViewController = self
+            
             if !key.isEmpty && key == "goToLyricsEditor" {
                 signUpVC.isGoToLyricEditor = true
-            }else if !key.isEmpty && key == "goToTabsEditor" {
+            } else if !key.isEmpty && key == "goToTabsEditor" {
                 signUpVC.isGoToTabEditor = true
             }
             
@@ -2177,9 +2179,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         if(isChangedSpeed){
-            self.speed = 1
-            self.speedLabel.text = "Speed: 1.0x"
-            self.speedStepper.value = 1.0
+            resumeNormalSpeed()
         }else{
             isChangedSpeed = true
         }

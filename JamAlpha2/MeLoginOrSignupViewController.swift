@@ -398,23 +398,20 @@ class MeLoginOrSignupViewController: UIViewController{
                             if self.showCloseButton {
                                 self.dismissViewControllerAnimated(false, completion: {
                                     completed in
-                                    if(self.songViewController != nil){
-                                        if(self.isGoToTabEditor){
-                                            if CoreDataManager.getCurrentUser() != nil {
-                                                self.songViewController!.showTabsEditor()
-                                                self.songViewController!.speed = 1
-                                                self.songViewController!.speedLabel.text = "Speed: 1.0x"
-                                                self.songViewController!.speedStepper.value = 1.0
-                                            }
-                                        }else if(self.isGoToLyricEditor){
-                                            if CoreDataManager.getCurrentUser() != nil {
-                                                self.songViewController!.showLyricsEditor()
-                                                self.songViewController!.speed = 1
-                                                self.songViewController!.speedLabel.text = "Speed: 1.0x"
-                                                self.songViewController!.speedStepper.value = 1.0
-                                            }
-                                        }
+                                    
+                                    if self.songViewController == nil {
+                                        return
                                     }
+                                    
+                                    if self.isGoToTabEditor {
+                                        self.songViewController!.showTabsEditor()
+                                        self.songViewController!.resumeNormalSpeed()
+                                    } else if(self.isGoToLyricEditor){
+
+                                        self.songViewController!.showLyricsEditor()
+                                        self.songViewController!.resumeNormalSpeed()
+                                    }
+                                    
                                 })
                             } else {
                               self.navigationController?.popViewControllerAnimated(false)
