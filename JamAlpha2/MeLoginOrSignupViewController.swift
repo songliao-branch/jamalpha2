@@ -419,6 +419,7 @@ class MeLoginOrSignupViewController: UIViewController{
                             }
 
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
+                            CoreDataManager.downloadUsersAllTabsLyricsSetToCoreData((CoreDataManager.getCurrentUser()?.id)!)
                             
                         } else { //we have an error
                             var errorMessage = ""

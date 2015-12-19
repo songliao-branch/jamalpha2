@@ -692,12 +692,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func addObjectsOnEditView() {
         self.specificTabsScrollView.frame = CGRectMake(0.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 20 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
         self.specificTabsScrollView.contentSize = CGSizeMake(self.trueWidth / 2, 2.5 / 20 * self.trueHeight)
-        self.specificTabsScrollView.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+        self.specificTabsScrollView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
         self.specificTabsScrollView.layer.cornerRadius = 3
         self.editView.addSubview(specificTabsScrollView)
         
         self.tabNameTextField.frame = CGRectMake(23.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 7 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
-        self.tabNameTextField.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(1)
+        self.tabNameTextField.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(1)
         self.tabNameTextField.layer.cornerRadius = 3
         self.tabNameTextField.autocorrectionType = UITextAutocorrectionType.No
         self.editView.addSubview(tabNameTextField)
@@ -1864,10 +1864,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.currentTabViewIndex = self.currentTabViewIndex--
             findCurrentTabView()
             if isDemoSong {
-                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                  self.currentTime = self.avPlayer.currentTime
             } else {
-                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.musicPlayer.currentPlaybackTime
             }
            

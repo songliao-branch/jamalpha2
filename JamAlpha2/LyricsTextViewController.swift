@@ -304,5 +304,26 @@ extension LyricsTextViewController: UITextViewDelegate {
             textView.textColor = UIColor.whiteColor()
         }
     }
+    
+    func downloadMyLyrics(sender: Findable) {
+        let download: DownloadedLyricsSet = DownloadedLyricsSet()
+        let userId = CoreDataManager.getCurrentUser()?.id as! Int
+//        APIManager.getUserLyricsInfo(userId, completion: {
+//            downloadedLyricsSets in
+//            for set in downloadedLyricsSets {
+//                self.myDataArray.append((set.title, set.artist, "1", "unpressed", set.song_id, set.id))
+//            }
+//            let localTabSets: [LocalTabSet] = CoreDataManager.getAllLocalTabs()
+//            for temp in localTabSets {
+//                self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as Int, temp.id)) // 0 means didn't upload, and the last para is songId and tabsetId
+//            }
+//            activityIndicator.stopAnimating()
+//            self.initialTheView()
+//        })
+        APIManager.downloadLyricsSetContent(download, completion: {
+            downloadWithContent in
+            
+        })
+    }
 }
 

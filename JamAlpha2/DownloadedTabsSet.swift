@@ -40,7 +40,7 @@ class DownloadedTabsSet: NSObject {
     var artist = ""
     var duration: Float = 0
     
-    var localSong: Song!
+//    var localSong: Song!
     
     init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
         self.id = id
