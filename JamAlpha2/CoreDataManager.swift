@@ -21,6 +21,8 @@ protocol Findable {
     func getArtist() -> String
     func getAlbum() -> String
     func getDuration() -> Float
+     func getURL() -> AnyObject?
+    func getArtWork() -> MPMediaItemArtwork?
 }
 
 extension MPMediaItem: Findable {
@@ -47,6 +49,22 @@ extension MPMediaItem: Findable {
     func getDuration() -> Float {
         return Float(self.playbackDuration)
     }
+    
+    func getURL() -> AnyObject? {
+        if let url = self.valueForProperty(MPMediaItemPropertyAssetURL){
+            return url
+        }else{
+            return nil
+        }
+    }
+    
+    func getArtWork() -> MPMediaItemArtwork? {
+        if let artwork = self.artwork{
+            return artwork
+        }
+        return nil
+    }
+
 }
 
 extension SearchResult: Findable {
@@ -75,6 +93,66 @@ extension SearchResult: Findable {
             return time
         }
         return 0.0
+    }
+    
+    func getURL() -> AnyObject? {
+        return nil
+    }
+    
+    func getArtWork() -> MPMediaItemArtwork? {
+        return nil
+    }
+}
+
+extension AVPlayerItem: Findable {
+    func getTitle() -> String {
+        if let title = self.asset.commonMetadata[0].stringValue {
+            return title
+        }
+        return ""
+    }
+    func getArtist() -> String {
+        for item in self.asset.commonMetadata {
+            if item.commonKey  == "artist" {
+                return item.stringValue!
+            }
+        }
+        return ""
+    }
+    
+    func getAlbum() -> String {
+        if let album = self.asset.commonMetadata[3].stringValue {
+            return album
+        }
+        return ""
+    }
+    
+    func getDuration() -> Float {
+        if let time:Float = Float(self.asset.duration.seconds) {
+            return time
+        }
+        return 0.0
+    }
+
+    func getURL() -> AnyObject? {
+        let currentPlayerAsset = self.asset
+        
+        if (!currentPlayerAsset.isKindOfClass(AVURLAsset)) {
+            return nil
+        }
+        // return the NSURL
+        return (currentPlayerAsset as! AVURLAsset).URL
+    }
+    
+    func getArtWork() -> MPMediaItemArtwork?{
+        for item in self.asset.commonMetadata {
+                if item.commonKey  == "artwork" {
+                    if let audioImage = UIImage(data: item.value as! NSData) {
+                        return MPMediaItemArtwork(image: audioImage)
+                    }
+                }
+        }
+        return nil
     }
 }
 

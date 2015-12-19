@@ -14,6 +14,8 @@ class MusicManager: NSObject {
     let _TAG = "MusicManager"
     var player: MPMusicPlayerController!
     
+    var avPlayer: AVQueuePlayer!
+    
     // A queue that keep tracks the last queue to the player
     // this should never be accessed outside MusicManager
     // a current collection is always passed in from function
@@ -24,6 +26,15 @@ class MusicManager: NSObject {
     var uniqueSongs : [MPMediaItem]!
     var uniqueAlbums = [Album]()
     var uniqueArtists = [Artist]()
+    
+    var demoSongs: [AVPlayerItem]!
+    var lastLocalPlayerQueue = [AVPlayerItem]()
+    
+    //in case mediaItem was changed outside the app when exit to background from Editor screen
+    //we save these two so that when we come back we always have the correct item
+    var lastPlayingItem: MPMediaItem!
+    var lastPlayingTime: NSTimeInterval!
+
     
     class var sharedInstance: MusicManager {
         struct Static {
@@ -39,6 +50,7 @@ class MusicManager: NSObject {
     override init() {
         super.init()
         loadLocalSongs()
+        loadDemoSongs()
         loadLocalAlbums()
         loadLocalArtist()
         initializePlayer()
@@ -71,19 +83,44 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-        print("\(_TAG) Initialize Player")
-        player = MPMusicPlayerController.systemMusicPlayer()
+            print("\(_TAG) Initialize Player")
+            player = MPMusicPlayerController.systemMusicPlayer()
+            
+            player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
+            // 暂时解决方法 App每次start就是先停下来
+            
+            player.repeatMode = .All
+            player.shuffleMode = .Off
+            self.setPlayerQueue(uniqueSongs)
         
-        player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
-        // 暂时解决方法 App每次start就是先停下来
+        //initialize AVQueuePlayer
+            self.avPlayer = AVQueuePlayer()
+            self.avPlayer.actionAtItemEnd = .None
+            self.setSessionActiveWithMixing()
+    }
+    
+    //for playing mode and background mode
+    private func setSessionActiveWithMixing() {
+        do {
+            //set option DefaultToSpeaker so that demo song will not lag while soundwave is generating in the background
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: .DefaultToSpeaker)
+        } catch _ {
+        }
         
-        player.repeatMode = .All
-        player.shuffleMode = .Off
-        
-        self.setPlayerQueue(uniqueSongs)
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch _ {
+        }
     }
     
     private var queueChanged = false
+    
+    func setDemoSongQueue(collection: [AVPlayerItem], selectedIndex:Int){
+        if(avPlayer.currentItem == nil || avPlayer.currentItem != collection[selectedIndex]){
+            avPlayer.removeAllItems()
+            avPlayer.insertItem(collection[selectedIndex], afterItem: nil)
+        }
+    }
 
     func setPlayerQueue(collection: [MPMediaItem]){
 
@@ -102,6 +139,7 @@ class MusicManager: NSObject {
             for song in collection {
                 print("\(_TAG) setting up queue of song: \(song.title!)")
             }
+            return
         }
         
         // after come back from music app which the current playing item is set to nil, we set the collection
@@ -116,16 +154,14 @@ class MusicManager: NSObject {
         }
         
         //coming from music app to twistjam, if the queue is different, we reset the queue to newly selected queue
+
         if KGLOBAL_isNeedToCheckIndex {
-            
-            //this logic doesn't work with shuffle mode, so we purposely save the mode first
+
             let repeatMode = player.repeatMode
             let shuffleMode = player.shuffleMode
             player.repeatMode = .All
             player.shuffleMode = .Off
             if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? Int(lastPlayerQueue.indexOf(player.nowPlayingItem!)!) : -1) != player.indexOfNowPlayingItem {
-                print(lastPlayerQueue.indexOf(player.nowPlayingItem!))
-                print(player.indexOfNowPlayingItem)
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
                 print("Queue is different,  now reset queue")
@@ -141,7 +177,6 @@ class MusicManager: NSObject {
     func setIndexInTheQueue(selectedIndex: Int){
         // player.stop()
         // 如果单曲循环的话 切出去 再换一首歌的话 还是之前那个首歌
-
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
@@ -175,6 +210,13 @@ class MusicManager: NSObject {
         uniqueSongs = songCollection.items!.filter {
             song in
             song.playbackDuration > 30
+        }
+    }
+    
+    func loadDemoSongs() {
+        //we have one demo song so far
+        demoSongs = kSongNames.map {
+            AVPlayerItem(URL: NSBundle.mainBundle().URLForResource($0, withExtension: "mp3")!)
         }
     }
     
@@ -225,5 +267,25 @@ class MusicManager: NSObject {
             artist1, artist2 in
             return artist1.artistName < artist2.artistName
         })
+    }
+
+    // we manually set the repeat mode to one before going to tabs or lyrics Editor
+    // we save the shuffle, repeat, currentPlaying time state so that when we come back from editors we can resume correctly
+    func saveMusicPlayerState(collection: [MPMediaItem]) -> (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval) {
+        let previousRepeatMode: MPMusicRepeatMode = player.repeatMode
+        let previousShuffleMode: MPMusicShuffleMode = player.shuffleMode
+        let previousPlayingTime: NSTimeInterval = player.currentPlaybackTime
+        player.repeatMode = .One
+        player.shuffleMode = .Off
+        player.currentPlaybackTime = 0
+        
+        return (previousRepeatMode, previousShuffleMode, previousPlayingTime)
+    }
+    
+    // back to song view controller recover queue
+    func recoverMusicPlayerState(sender: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval), currentSong: MPMediaItem) {
+        player.repeatMode = sender.0
+        player.shuffleMode = sender.1
+        player.currentPlaybackTime = sender.2
     }
 }

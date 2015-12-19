@@ -5,13 +5,21 @@ import MediaPlayer
 class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
 
     @IBOutlet weak var tableView: UITableView!
-    private var uniqueSongs = [MPMediaItem]()
+    
+    var uniqueSongs = [MPMediaItem]()
     private var uniqueArtists = [Artist]()
     private var uniqueAlbums = [Album]()
+    
+    var demoSongs = [AVPlayerItem]()
     
     private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
     private var artistsByFirstAlphabet = [(String, [Artist])]()
     private var albumsByFirstAlphabet = [(String, [Album])]()
+    
+    //a single array (sorted by alphabets) used for didSelectRow
+    private var songsSorted = [MPMediaItem] ()
+    private var artistsSorted = [Artist]()
+    private var albumsSorted = [Album]()
     
     private var rwLock = pthread_rwlock_t()
     
@@ -23,12 +31,13 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     var animator: CustomTransitionAnimation?
     var nowView: VisualizerView!
     
-    private  var songCount: Int64 = 0
-
+    var songCount: Int64 = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
         
+        print("musicVC shouldShowDemoSong: \(NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong))")
         loadAndSortMusic()
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
@@ -47,10 +56,16 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
+
+        demoSongs = MusicManager.sharedInstance.demoSongs
         
         songsByFirstAlphabet = sort(uniqueSongs)
         artistsByFirstAlphabet = sort(uniqueArtists)
         albumsByFirstAlphabet = sort(uniqueAlbums)
+        
+        songsSorted = getAllSortedItems(songsByFirstAlphabet)
+        artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
+        albumsSorted = getAllSortedItems(albumsByFirstAlphabet)
     }
     
     deinit{
@@ -101,6 +116,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     func popToCurrentSong(){
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        
+        if MusicManager.sharedInstance.avPlayer.currentItem != nil {
+            songVC.isDemoSong = true
+        }
+      
         songVC.selectedFromTable = false
         songVC.musicViewController = self
         songVC.transitioningDelegate = self.animator
@@ -109,6 +129,9 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         if pageIndex == 0  {
+            if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
+                return 1 + songsByFirstAlphabet.count
+            }
             return songsByFirstAlphabet.count
         }
         else if pageIndex == 1 {
@@ -166,6 +189,13 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if pageIndex == 0  {
+            if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
+                if section == 0 {
+                    return demoSongs.count
+                } else {
+                    return songsByFirstAlphabet[section-1].1.count
+                }
+            }
             return songsByFirstAlphabet[section].1.count
         }
         else if pageIndex == 1 {
@@ -176,28 +206,52 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             return albumsByFirstAlphabet[section].1.count
         }
     }
-   
+
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
-
+        
+        cell.demoImage.hidden = true
+        
         if pageIndex == 0 {
+    
+            var song: Findable!
             
-            let song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
-            if MusicManager.sharedInstance.player.nowPlayingItem != nil {
-                if song == MusicManager.sharedInstance.player.nowPlayingItem {
-                    cell.titleTrailingConstraint.constant = 50
-                    cell.loudspeakerImage.hidden = false
+            if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
+                if indexPath.section == 0 {
+                    song = demoSongs[indexPath.row]
+                    cell.demoImage.hidden = false
+                } else {
+                    //section starts at 1 if we have demo songs
+                    song = songsByFirstAlphabet[indexPath.section-1].1[indexPath.row]
                 }
-                else {
+                
+            } else {
+                song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
+            }
+            
+            if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
+                if let item = song as? MPMediaItem {
+                    if item == MusicManager.sharedInstance.player.nowPlayingItem {
+                        cell.titleTrailingConstraint.constant = 50
+                        cell.loudspeakerImage.hidden = false
+                    }
+                    else {
+                        cell.titleTrailingConstraint.constant = 15
+                        cell.loudspeakerImage.hidden = true
+                    }
+                } else {
                     cell.titleTrailingConstraint.constant = 15
                     cell.loudspeakerImage.hidden = true
-                }
+                }               
             } else {
+                cell.titleTrailingConstraint.constant = 15
                 cell.loudspeakerImage.hidden = true
             }
+            
             // some song does not have an album cover
-            if let cover = song.artwork {
+            if let cover = song.getArtWork() {
                 let image = cover.imageWithSize(CGSize(width: 54, height: 54))
                 cell.coverImage.image = image
             } else {
@@ -205,8 +259,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 cell.coverImage.image = UIImage(named: "liweng")
             }
             
-            cell.mainTitle.text = song.title
-            cell.subtitle.text = song.artist
+            cell.mainTitle.text = song.getTitle()
+            cell.subtitle.text = song.getArtist()
             
         } else if pageIndex == 1  {
             
@@ -280,52 +334,70 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
         if pageIndex == 0 {
             KGLOBAL_init_queue.suspended = true
             
-            let allSongsSorted = getAllSortedItems(songsByFirstAlphabet)
-            MusicManager.sharedInstance.setPlayerQueue(allSongsSorted)
-            
-            let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
-            MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
-
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-            songVC.selectedFromTable = true
+ 
+            if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
+                if indexPath.section == 0 {
+                    MusicManager.sharedInstance.setDemoSongQueue(demoSongs, selectedIndex: indexPath.row)
+                    songVC.selectedRow = indexPath.row
+                    MusicManager.sharedInstance.player.pause()
+                    MusicManager.sharedInstance.player.currentPlaybackTime = 0
+                    songVC.isDemoSong = true
+                    
+                } else {
+                    MusicManager.sharedInstance.setPlayerQueue(songsSorted)
+                    let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section-1, currentRow: indexPath.row)
+                    MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+                    MusicManager.sharedInstance.avPlayer.pause()
+                    MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                    MusicManager.sharedInstance.avPlayer.removeAllItems()
+                    
+                }
+                
+            } else {
+                MusicManager.sharedInstance.setPlayerQueue(songsSorted)
+                let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
+                MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
+                MusicManager.sharedInstance.avPlayer.pause()
+                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                MusicManager.sharedInstance.avPlayer.removeAllItems()
+            }
             
+            songVC.selectedFromTable = true
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             songVC.musicViewController = self //for goToArtist and goToAlbum from here
             songVC.nowView = self.nowView
-                self.presentViewController(songVC, animated: true, completion: {
+            self.presentViewController(songVC, animated: true, completion: {
                 completed in
                 //reload table to show loudspeaker icon on current selected row
                 tableView.reloadData()
             })
         }
         else if pageIndex == 1 {
-
-            let allArtistsSorted = getAllSortedItems(artistsByFirstAlphabet)
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
             artistVC.nowView = self.nowView
-            artistVC.theArtist = allArtistsSorted[indexToBePlayed]
+            artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
             
         }
         else if pageIndex == 2 {
             
-            let allAlbumsSorted = getAllSortedItems(albumsByFirstAlphabet)
             let indexToBePlayed = findIndexToBePlayed(albumsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.musicViewController = self
             albumVC.nowView = self.nowView
-            albumVC.theAlbum = allAlbumsSorted[indexToBePlayed]
+            albumVC.theAlbum = albumsSorted[indexToBePlayed]
             
             self.showViewController(albumVC, sender: self)
-            
         }
         self.musicTable.deselectRowAtIndexPath(indexPath, animated: true)
     }
@@ -359,7 +431,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
         }
     }
-    
     
     // MARK: functions using generics to sort the array into sections sorted by first alphabet
     let characters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]

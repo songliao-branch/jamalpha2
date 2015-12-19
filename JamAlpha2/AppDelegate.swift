@@ -10,15 +10,36 @@ import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
 import AWSS3
+import MediaPlayer
+import AVFoundation
+import Fabric
+import Crashlytics
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var suspended:Bool = false
+      
+    func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        // it is important to registerDefaults as soon as possible,
+        // because it can change so much of how your app behaves
+        //
+        var defaultsDictionary: [String : AnyObject] = [:]
+        
+        // by default we track the user location while in the background
+        defaultsDictionary[kShowDemoSong] = true
+        
+        NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
+                
+        return true
+    }
+    
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
+        Fabric.with([Crashlytics.self])
+
         // Universal setting
         UINavigationBar.appearance().tintColor = UIColor.whiteColor()
         
@@ -56,7 +77,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 currentSongVC.stopTimer()
             }       
             print("Song VC entering background")
+            
+            // save music state if exit Twistjam when in Editor mode
+            if(currentVC.presentedViewController != nil){
+                let presentVC = currentVC.presentedViewController!
+                if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
+                    var isDemoSong:Bool = false
+                    if presentVC.isKindOfClass(TabsEditorViewController) {
+                        isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
+                    }else if presentVC.isKindOfClass(LyricsTextViewController){
+                        isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
+                    }
+                    
+                    if(!isDemoSong){
+                        MusicManager.sharedInstance.player.pause()
+                        
+                        MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
+                        MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
+                    }
+                }
+            }
         }
+        
         self.suspended = KGLOBAL_init_queue.suspended
         KGLOBAL_queue.suspended = true
         KGLOBAL_init_queue.suspended = true
@@ -69,6 +111,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let currentVC = topViewController(rootViewController())
         
+        // if the collection is different i.e. new songs are added/old songs are removed
+        // we manually reload MusicViewController table
         if kShouldReloadMusicTable {
             if rootViewController().isKindOfClass(TabBarController) {
                 let tabBarController = rootViewController() as! TabBarController
@@ -81,6 +125,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                                 for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                                     musicVC.reloadDataAndTable()
+                                    
+                                    if(!musicVC.uniqueSongs.isEmpty){
+                                        musicVC.songCount = 0
+                                        musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+                                    }
                                 }
                             }
                         }
@@ -92,12 +141,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
-            if MusicManager.sharedInstance.player.nowPlayingItem == nil {
-                if (!currentSongVC.isSongNeedPurchase){
+            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
+                
+                // if go outside Twistjam and close Music App, nowPlayingItem is set to nil
+                // we force to dismiss SongViewController and re-initialize player
+                if (!currentSongVC.isSongNeedPurchase) {
+                    currentSongVC.viewDidDisappear(false)
                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                         completed in
                         KGLOBAL_queue.suspended = false
                         KGLOBAL_init_queue.suspended = self.suspended
+                        MusicManager.sharedInstance.initializePlayer()
                     })
                 }else{
                     KGLOBAL_queue.suspended = false
@@ -114,12 +168,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 KGLOBAL_queue.suspended = false
                 KGLOBAL_init_queue.suspended = self.suspended
             }
+            
+            //check if the viewController is Tabs Editor or lyrics SyncEditor
+            //in case mediaItem was changed outside the app, if changed, we used 
+            //the last playing item and time
+            if(currentVC.presentedViewController != nil){
+                let presentVC = currentVC.presentedViewController!
+                if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
+                    var isDemoSong:Bool = false
+                    if presentVC.isKindOfClass(TabsEditorViewController) {
+                        isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
+                    }else if presentVC.isKindOfClass(LyricsTextViewController){
+                        isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
+                    }
+                    
+                    if(!isDemoSong){
+                        let lastPlayingItem = MusicManager.sharedInstance.lastPlayingItem
+                        if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != lastPlayingItem){
+                            MusicManager.sharedInstance.player.stop()
+                            MusicManager.sharedInstance.player.repeatMode = .All
+                            MusicManager.sharedInstance.player.shuffleMode = .Off
+                            MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                            MusicManager.sharedInstance.player.nowPlayingItem = lastPlayingItem
+                            MusicManager.sharedInstance.player.repeatMode = .One
+                            MusicManager.sharedInstance.player.shuffleMode = .Off
+                            MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime                     }
+                    }
+                }
+            }
         }
         KGLOBAL_isNeedToCheckIndex = true
         print("Go into forground")
     }
    
-
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         

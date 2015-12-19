@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import UIKit
 
 let KGLOBAL_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_operationCache = [NSURL:NSBlockOperation]()
@@ -27,3 +27,9 @@ let facebookLoginSalt = "tJwIa021#1sm" //DO NOT MODIFITY THIS SALT, otherwise fa
 
 //reload music table after detecting new songs are added
 var kShouldReloadMusicTable = false
+
+let kShowDemoSong  = "showDemoSong"
+
+let kSongNames = ["Go"]
+
+//var KGLOBAL_closeDemoButton:UIButton!
