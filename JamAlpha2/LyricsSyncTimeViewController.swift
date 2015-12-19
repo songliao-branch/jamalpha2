@@ -135,7 +135,6 @@ class LyricsSyncViewController: UIViewController  {
     func playbackStateChanged(sender: NSNotification) {
         if musicPlayer.playbackState == .Playing {
             if(!isPlaying){
-                //musicPlayer.currentPlaybackTime = currentTime
                 startUpdateTimer()
                 isPlaying = true
             }

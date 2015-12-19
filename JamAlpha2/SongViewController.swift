@@ -804,9 +804,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             && KGLOBAL_init_queue.suspended)){
             return
         }
-//        if self.player.nowPlayingItem == nowPlayingMediaItem {
-//            return
-//        }
+
         pthread_rwlock_wrlock(&self.rwLock)
             self.stopTimer()
             self.newPosition = 0
@@ -2528,7 +2526,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if !isViewDidAppear || startTime.toDecimalNumer() < 5 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 5 || startTime.toDecimalNumer() - toTime < 2{
+            if !isViewDidAppear || startTime.toDecimalNumer() < 3 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 3 || startTime.toDecimalNumer() - toTime < (1 * speed) {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
                 let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
