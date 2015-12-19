@@ -573,9 +573,10 @@ class CoreDataManager: NSObject {
         return false
     }
     
-    //when user first logged in
+    //when user first logged in, we initialize everything
     class func initializeFavoriteSongs() {
+       //TODO: finish this with a tableview in userProfileviewcontroller
         
-       
     }
 }
+

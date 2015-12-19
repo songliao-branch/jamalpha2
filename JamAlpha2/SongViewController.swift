@@ -2864,7 +2864,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func updateFavoriteStatus(item: Findable) {
-        //first check online
+        //check core data only
         if CoreDataManager.isFavorited(item) && CoreDataManager.getCurrentUser() != nil {
             favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
         } else {
