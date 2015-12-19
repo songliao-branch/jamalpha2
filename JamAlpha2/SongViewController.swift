@@ -1826,7 +1826,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
-            player.play()
+            if isDemoSong {
+               avPlayer.play()
+            } else  {
+               player.play()
+            }
         }
     }
     
@@ -1923,11 +1927,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     
     func uploadTabs(button: UIButton) {
-        self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
-        self.player.pause()
-        self.clearActions()
-
         if shouldShowSignUpPage() {
             return
         }
@@ -1978,11 +1977,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func uploadLyrics(button: UIButton) {
-        self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
-        self.player.pause()
-        self.clearActions()
-        
         if shouldShowSignUpPage() {
             return
         }
