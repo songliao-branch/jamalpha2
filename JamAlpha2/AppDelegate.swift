@@ -182,8 +182,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
                     
+                    let lastPlayingItem = MusicManager.sharedInstance.lastPlayingItem
+                    
                     if(!isDemoSong){
-                        let lastPlayingItem = MusicManager.sharedInstance.lastPlayingItem
+                        
                         if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != lastPlayingItem){
                             MusicManager.sharedInstance.player.stop()
                             MusicManager.sharedInstance.player.repeatMode = .All
@@ -193,6 +195,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             MusicManager.sharedInstance.player.repeatMode = .One
                             MusicManager.sharedInstance.player.shuffleMode = .Off
                             MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime                     }
+                    } else if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.player.nowPlayingItem == lastPlayingItem {
+                        MusicManager.sharedInstance.player.repeatMode = .One
+                        MusicManager.sharedInstance.player.shuffleMode = .Off
+                        MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
                     }
                 }
             }
