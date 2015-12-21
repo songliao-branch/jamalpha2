@@ -824,7 +824,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         noteButton.addGestureRecognizer(longPressGesture)
         if(originalPosition != nil){
             let duration:NSTimeInterval = NSTimeInterval(sqrt(2.0*(buttonString-original)/9.8)/3)
-            UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity:0.6, options: .CurveEaseInOut, animations: {
+            UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: CGFloat(0.6/duration), initialSpringVelocity:CGFloat(0.6/duration), options: .CurveEaseInOut, animations: {
                     noteButton.alpha = 1
                     noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
                 }, completion: nil)
