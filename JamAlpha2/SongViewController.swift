@@ -593,6 +593,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.chords = chords
             updateTuning(tuning)
             updateCapo(capo)
+            self.addTabsPrompt.hidden = true
             return true
         }
         return false
@@ -608,14 +609,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if lyric.lyric.count > 1 {
             self.lyric = lyric
-            
+            self.addLyricsPrompt.hidden = true
             return true
         }
         return false
     }
     
     func updateMusicData(song: Findable) {
-        
         //if nothing in core data, we look up the cloud
         if !canFindTabsFromCoreData(song) {
             APIManager.downloadMostLikedTabs(song, completion: {
@@ -626,6 +626,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.addTabsPrompt.hidden = false
                     return
                 }
+                self.addTabsPrompt.hidden = true
+                
                 var times = [NSTimeInterval]()
                 for t in download.times {
                     times.append(NSTimeInterval(t))
@@ -653,10 +655,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 found, download in
                 //if still not found, we show a prompt
                 if !found {
-                    
                     self.addLyricsPrompt.hidden = false
                     return
                 }
+                self.addLyricsPrompt.hidden = true
                 
                 var times = [Float]()
                 for t in download.times {
