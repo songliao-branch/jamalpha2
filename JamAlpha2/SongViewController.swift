@@ -334,6 +334,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
         }
         isViewDidAppear = true
+        
+        if NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial) {
+            showTutorial()
+        }
+    }
+    
+    func showTutorial() {
+        //show tutorial
+        if isDemoSong {
+            avPlayer.pause()
+        } else {
+            player.pause()
+        }
+        
+        let tutorialVC = self.storyboard?.instantiateViewControllerWithIdentifier("songtutorialpageviewcontroller") as! SongTutorialPageViewController
+        self.presentViewController(tutorialVC, animated: true, completion: nil)
     }
     
     func setUpBackgroundImage(){

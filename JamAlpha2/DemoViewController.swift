@@ -9,27 +9,42 @@
 import UIKit
 import MediaPlayer
 
-
+//This view controller is used for both demo and tutorials
 class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
+    
+    var isDemo = true //false means we are showing tutorial
     
     @IBOutlet weak var demoTable: UITableView!
     var cell:DemoCell!
     var baseVC:BaseViewController!
     
+    var showTutorial = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpNavigationBar()
         findMusicVC()
-        
     }
     
     func findMusicVC(){
         baseVC = self.parentViewController!.parentViewController?.childViewControllers[0].childViewControllers[0] as! BaseViewController
     }
-
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        //come back from MusicViewController to DemoViewController should refresh this variable
+        if !isDemo {
+            showTutorial = NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial)
+            demoTable.reloadData()
+        }
+    }
+
     func setUpNavigationBar() {
-        self.navigationItem.title = "Demo"
+        if isDemo {
+            self.navigationItem.title = "Demo"
+        } else {
+            self.navigationItem.title = "Tutorial"
+        }
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -45,27 +60,41 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
             cell.demoSwith.tintColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             cell.demoSwith.onTintColor = UIColor.mainPinkColor()
             cell.demoSwith.addTarget(self, action: "switchChanged:", forControlEvents: .ValueChanged)
+        
+        
+        if isDemo {
+            cell.imfoLabel.text = "Show Demo"
             cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong)
-            cell.selectionStyle = UITableViewCellSelectionStyle.None
-            return cell
+        } else {
+            cell.imfoLabel.text = "Show Tutorial"
+            cell.demoSwith.on = showTutorial
+        }
+
+        cell.selectionStyle = UITableViewCellSelectionStyle.None
+        return cell
     }
     
     func switchChanged(uiswitch: UISwitch){
-        NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowDemoSong)
-        if(uiswitch.on){
-            for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                musicVC.reloadDataAndTable()
+        if isDemo {
+            NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowDemoSong)
+            if(uiswitch.on){
+                for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                    musicVC.reloadDataAndTable()
+                }
+            }else{
+                for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                    musicVC.reloadDataAndTable()
+                }
             }
-        }else{
-            for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                musicVC.reloadDataAndTable()
+            if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+                MusicManager.sharedInstance.avPlayer.pause()
+                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                MusicManager.sharedInstance.avPlayer.removeAllItems()
+                self.baseVC.nowView.stop()
             }
+        } else {
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: kShowTutorial)
         }
-        if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
-            MusicManager.sharedInstance.avPlayer.pause()
-            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
-            MusicManager.sharedInstance.avPlayer.removeAllItems()
-            self.baseVC.nowView.stop()
-        }
+
     }
 }
