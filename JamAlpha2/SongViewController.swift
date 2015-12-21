@@ -63,10 +63,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var basesHeight: CGFloat!
     let marginBetweenBases: CGFloat = 15
     
+    //buttons in center of chordbase/lyricsBase to prompt users to add tabs/lyrics
+    var addTabsPrompt: UIButton!
+    var addLyricsPrompt: UIButton!
+    
     var chordBaseTapGesture: UITapGestureRecognizer!
     //MARK: progress Container
-    //var progressBlock: SoundWaveView!
-    
     var progressBlockViewWidth:CGFloat?
     var progressBlockContainer:UIView!
     var progressChangedOrigin:CGFloat!
@@ -613,12 +615,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func updateMusicData(song: Findable) {
-     
+        
         //if nothing in core data, we look up the cloud
         if !canFindTabsFromCoreData(song) {
             APIManager.downloadMostLikedTabs(song, completion: {
-                download in
+                found, download in
                 
+                 //if still not found, we show a prompt
+                if !found {
+                    self.addTabsPrompt.hidden = false
+                    return
+                }
                 var times = [NSTimeInterval]()
                 for t in download.times {
                     times.append(NSTimeInterval(t))
@@ -643,7 +650,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if !canFindLyricsFromCoreData(song) {
             APIManager.downloadMostLikedLyrics(song, completion: {
-                download in
+                found, download in
+                //if still not found, we show a prompt
+                if !found {
+                    
+                    self.addLyricsPrompt.hidden = false
+                    return
+                }
                 
                 var times = [Float]()
                 for t in download.times {
@@ -688,6 +701,40 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
+    func setUpChordBase(){
+        let marginToTopView: CGFloat = 20
+        let marginToProgressContainer: CGFloat = 10
+        
+        basesHeight = self.view.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
+        
+        chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
+        chordBase.center.x = self.view.center.x
+        chordBase.backgroundColor = UIColor.clearColor()
+        
+        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
+        panRecognizer.delaysTouchesEnded = true
+        
+        panRecognizer.delegate = self
+        chordBase.addGestureRecognizer(panRecognizer)
+        
+        self.view.addSubview(chordBase)
+        
+        //add tap gesture to chordbase too
+        chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        chordBase.addGestureRecognizer(chordBaseTapGesture)
+        
+        addTabsPrompt = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(chordBase.frame)-30, width: 200, height: 25))
+        addTabsPrompt.setTitle("Add tabs here", forState: .Normal)
+        addTabsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
+        addTabsPrompt.center.x = self.view.center.x
+        addTabsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
+        addTabsPrompt.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
+        addTabsPrompt.hidden = true
+        self.view.addSubview(addTabsPrompt)
+        
+        calculateXPoints()
+    }
+    
     func setUpLyricsBase(){
         //Lyric labels
         currentLyricsIndex = -1
@@ -719,33 +766,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         bottomLyricLabel.lineBreakMode = .ByWordWrapping
         bottomLyricLabel.textColor = UIColor.silverGray()
         lyricbase.addSubview(bottomLyricLabel)
+        
+        
+        addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
+        addLyricsPrompt.setTitle("Add lyrics here", forState: .Normal)
+        addLyricsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
+        addLyricsPrompt.center = lyricbase.center
+        addLyricsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
+        addLyricsPrompt.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
+        addLyricsPrompt.hidden = true
+        self.view.addSubview(addLyricsPrompt)
     }
     
-
-    func setUpChordBase(){
-        let marginToTopView: CGFloat = 20
-        let marginToProgressContainer: CGFloat = 10
-        
-        basesHeight = self.view.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
-        
-        chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
-        chordBase.center.x = self.view.center.x
-        chordBase.backgroundColor = UIColor.clearColor()
-        
-        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
-        panRecognizer.delaysTouchesEnded = true
-        
-        panRecognizer.delegate = self
-        chordBase.addGestureRecognizer(panRecognizer)
-        
-        self.view.addSubview(chordBase)
-        
-        //add tap gesture to chordbase too
-        chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
-        chordBase.addGestureRecognizer(chordBaseTapGesture)
-        
-        calculateXPoints()
-    }
     
     func loadDisplayMode() {
         // zero means never been set before, 1 means true, 2 means false
