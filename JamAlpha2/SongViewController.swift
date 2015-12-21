@@ -725,14 +725,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
         chordBase.addGestureRecognizer(chordBaseTapGesture)
         
-        addTabsPrompt = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(chordBase.frame)-30, width: 200, height: 25))
+        addTabsPrompt = UIButton(frame: CGRect(x: 0, y: chordBase.frame.height-30, width: 200, height: 25))
         addTabsPrompt.setTitle("Add tabs here", forState: .Normal)
         addTabsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
-        addTabsPrompt.center.x = self.view.center.x
+        addTabsPrompt.center.x = chordBase.frame.width/2
         addTabsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
         addTabsPrompt.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
         addTabsPrompt.hidden = true
-        self.view.addSubview(addTabsPrompt)
+        chordBase.addSubview(addTabsPrompt)
         
         calculateXPoints()
     }
@@ -769,15 +769,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         bottomLyricLabel.textColor = UIColor.silverGray()
         lyricbase.addSubview(bottomLyricLabel)
         
-        
         addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
         addLyricsPrompt.setTitle("Add lyrics here", forState: .Normal)
         addLyricsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
-        addLyricsPrompt.center = lyricbase.center
+        addLyricsPrompt.center = CGPoint(x: lyricbase.frame.width/2, y: lyricbase.frame.height/2)
         addLyricsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
         addLyricsPrompt.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
         addLyricsPrompt.hidden = true
-        self.view.addSubview(addLyricsPrompt)
+        lyricbase.addSubview(addLyricsPrompt)
     }
     
     
