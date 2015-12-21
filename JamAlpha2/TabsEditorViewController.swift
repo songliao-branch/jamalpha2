@@ -463,6 +463,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         var indexFret: Int = Int()
         var indexString: Int = Int()
         let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
+        var original:CGFloat = 0
         let location = sender.locationInView(self.collectionView)
         // get the tap position for fret number and string number
         for var index = 0; index < self.string3FretPosition.count; index++ {
@@ -476,14 +477,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var index = 0; index < self.string3Position.count; index++ {
             if location.y >= self.string3Position[index] - string3Height && location.y <= self.string3Position[index] + string3Height {
                 indexString = index + 3
+                original = string3Height  - self.string3Position[index]
             }
         }
         // open the editor view and add note button
-        self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString)
+        self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
     }
     
     
-    func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int) {
+    func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int, original:CGFloat?=nil) {
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
         if isDemoSong {
@@ -503,9 +505,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.intoEditView = true
         
         self.addNewTab = true
-        self.addNoteButton(indexFret, indexString: indexString)
-        
-        UIView.animateWithDuration(0.3, animations: {
+        self.addNoteButton(indexFret, indexString: indexString, originalPosition: original)
+        self.completeStringView.contentOffset = self.collectionView.contentOffset
+        UIView.animateWithDuration(0.2, animations: {
             self.completeStringView.alpha = 1
             self.specificTabsScrollView.alpha = 1
             self.tabNameTextField.alpha = 1
@@ -789,12 +791,21 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     // add note button to view 
-    func addNoteButton(indexFret: Int, indexString: Int) {
+    func addNoteButton(indexFret: Int, indexString: Int, originalPosition:CGFloat?=nil) {
+        
         let noteButton: UIButton = UIButton()
         let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
         let buttonString = self.string6Position[indexString]
         let buttonWidth = 7 / 60 * self.trueHeight
-        noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
+        
+        var original:CGFloat = 0
+        if(originalPosition != nil){
+            original = 6 / 20 * self.trueHeight - originalPosition! - buttonWidth / 2
+        }else{
+            original = buttonString
+        }
+        
+        noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, original - buttonWidth / 2, buttonWidth, buttonWidth)
         noteButton.layer.cornerRadius = 0.5 * buttonWidth
         noteButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
         noteButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
@@ -806,15 +817,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentBaseButton = noteButton
         self.noteButtonOnCompeteScrollView = noteButton
         self.completeStringView.addSubview(noteButton)
-        noteButton.alpha = 0
+        noteButton.alpha = 1
         
         let longPressGesture: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
         longPressGesture.addTarget(self, action: "startJiggling:")
         noteButton.addGestureRecognizer(longPressGesture)
-        
-        UIView.animateWithDuration(0.1, animations: {
-            noteButton.alpha = 1
-        })
+        if(originalPosition != nil){
+            let duration:NSTimeInterval = NSTimeInterval(sqrt(2.0*(buttonString-original)/9.8)/3)
+            UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity:0.6, options: .CurveEaseInOut, animations: {
+                    noteButton.alpha = 1
+                    noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
+                }, completion: nil)
+            
+        }else{
+            UIView.animateWithDuration(0.3, animations: {
+                noteButton.alpha = 1
+                noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
+            })
+        }
         
         self.addSpecificTabButton(noteButton.tag)
         self.createEditFingerPoint(noteButton.tag)
@@ -1421,6 +1441,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.musicControlView.alpha = 1
             self.progressBlock.alpha = 1
             self.completeStringView.alpha = 0
+            self.collectionView.contentOffset = self.completeStringView.contentOffset
             self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
             self.collectionView.alpha = 1
             }, completion:  {
@@ -1704,7 +1725,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.collectionView.alpha = 0
         self.statusLabel.image = UIImage(named: "addNewTab")
         self.intoEditView = true
-        
+        self.completeStringView.contentOffset = self.collectionView.contentOffset
         UIView.animateWithDuration(0.3, animations: {
             self.completeStringView.alpha = 1
             self.specificTabsScrollView.alpha = 1
@@ -2011,16 +2032,22 @@ extension TabsEditorViewController {
 
     func startJiggling(sender: UILongPressGestureRecognizer) {
         let randomInt: UInt32  = arc4random_uniform(500)
-        let r:Double = (Double(randomInt) / 500.0) + 10
+        let r:Double = (Double(randomInt) / 500.0) + 15
     
         let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
         let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
-    
-    sender.view?.transform = leftWobble;  // starting point
-    sender.view?.layer.anchorPoint = CGPointMake(0.5, 0.5)
+        let originalX = sender.view!.center.x
+        sender.view?.center.x = originalX-1
+        sender.view?.transform = leftWobble;  // starting point
+        sender.view?.layer.anchorPoint = CGPointMake(0.5, 0.5)
+        
+       
+       
         UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
                 UIView.setAnimationRepeatCount(Float(NSNotFound))
+                sender.view?.center.x = originalX+1
                 sender.view?.transform = rightWobble
+            
             }, completion: nil)
     }
     func stopJiggling(sender: UILongPressGestureRecognizer) {
