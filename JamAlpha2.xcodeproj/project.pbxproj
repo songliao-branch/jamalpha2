@@ -26,6 +26,7 @@
 		BF4B843C1C0CF94900AF8A2A /* AWSConstent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */; };
 		BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */; };
 		BF8192C01C24BA9A003481A7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF8192BE1C24BA9A003481A7 /* Main.storyboard */; };
+		BF8192C21C256AFA003481A7 /* LocalSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF8192C11C256AFA003481A7 /* LocalSong.swift */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */; };
@@ -141,6 +142,7 @@
 		BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSConstent.swift; sourceTree = "<group>"; };
 		BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeLoginOrSignupViewController.swift; sourceTree = "<group>"; };
 		BF8192BF1C24BA9A003481A7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		BF8192C11C256AFA003481A7 /* LocalSong.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalSong.swift; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateNickNameViewController.swift; sourceTree = "<group>"; };
@@ -522,6 +524,7 @@
 			children = (
 				E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */,
 				E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */,
+				BF8192C11C256AFA003481A7 /* LocalSong.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -774,6 +777,7 @@
 				E42032EC1BFEF31E00A5D36D /* AvatarCell.swift in Sources */,
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
+				BF8192C21C256AFA003481A7 /* LocalSong.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				BF045E261C1B6B2400C993BA /* MyFavoritesViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,

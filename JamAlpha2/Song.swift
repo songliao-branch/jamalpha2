@@ -19,6 +19,6 @@ class Song: NSManagedObject {
     @NSManaged var soundwaveImage: NSData //used for image in SongViewController
     @NSManaged var tabsSets: NSSet
     @NSManaged var lyricsSets: NSSet
-    @NSManaged var id: NSNumber //retrieved from cloud
+    @NSManaged var id: NSNumber? //retrieved from cloud
     
 }

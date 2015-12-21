@@ -409,8 +409,7 @@ class APIManager: NSObject {
                         let mylyrics: DownloadedLyricsSet = DownloadedLyricsSet()
                         mylyrics.initialLyricsSet(lyrics.1["id"].int!, cached_votes_score: lyrics.1["cached_votes_score"].int!, number_of_lines: lyrics.1["number_of_lines"].int!, lyrics_preview: lyrics.1["lyrics_preview"].string!, vote_status: lyrics.1["vote_status"].string!, updated_at: lyrics.1["updated_at"].string!, song_id: lyrics.1["song"]["id"].int!, title: lyrics.1["song"]["title"].string!, artist: lyrics.1["song"]["artist"].string!, duration: lyrics.1["song"]["duration"].float!)
                         myLyricsSet.append(mylyrics)
-                    }
-                    
+                    } 
                     //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                                         //after completed, pass everything to the callback
                     completion(downloadWithContent: myLyricsSet)

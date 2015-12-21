@@ -21,5 +21,4 @@ class TabsSet: NSManagedObject {
     @NSManaged var tuning: String
     @NSManaged var lastSelectedDate: NSDate//everytime when this is saved
     @NSManaged var isLocal: Bool
-
 }

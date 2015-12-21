@@ -174,13 +174,14 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.tintColor = UIColor.mainPinkColor()
         self.lyricsTextView.delegate = self
 
-        var lyric = Lyric()
-        (lyric, _) =  CoreDataManager.getLyrics(theSong, fetchingLocalOnly: true)
-        
-        if lyric.lyric.count > 0 {
+        var lyrics: Lyric = Lyric()
+        (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingLocalOnly: false)
+
+        if lyrics.lyric.count > 0 {
             var lyricsToDisplay = ""
-            for line in lyric.lyric {
-                lyricsToDisplay += "\(line.str)\n"
+            for line in lyrics.lyric {
+                lyricsToDisplay += line.str
+                lyricsToDisplay += "\n"
             }
             self.lyricsTextView.text = lyricsToDisplay
             self.lyricsTextView.textColor = UIColor.whiteColor()
@@ -188,8 +189,7 @@ class LyricsTextViewController: UIViewController {
             self.lyricsTextView.text = "Put your lyrics here"
             self.lyricsTextView.textColor = UIColor.lightGrayColor()
         }
-        
-        
+
         self.view.addSubview(self.lyricsTextView)
     }
     

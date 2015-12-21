@@ -59,9 +59,9 @@ class MyTabsAndLyricsViewController: UIViewController {
                 for temp in downloadedTabSets {
                     self.myDataArray.append((temp.title, temp.artist, "1", "unpressed", temp.song_id, temp.id))// 1 means already uploaded, the last two para is songId and tabsetId
                 }
-                let localLyricsSets: [LocalLyrics] = CoreDataManager.getAllLocalLyrics()
-                for temp in localLyricsSets {
-                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as Int, temp.id))
+                let localTabSets: [LocalTabSet] = CoreDataManager.getAllLocalTabs()
+                for temp in localTabSets {
+                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as! Int, temp.id))
                 }
                 activityIndicator.stopAnimating()
                 self.initialTheView()
@@ -73,9 +73,9 @@ class MyTabsAndLyricsViewController: UIViewController {
                 for temp in downloadedLyricsSets {
                     self.myDataArray.append((temp.title, temp.artist, "1", "unpressed", temp.song_id, temp.id))
                 }
-                let localTabSets: [LocalTabSet] = CoreDataManager.getAllLocalTabs()
-                for temp in localTabSets {
-                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as Int, temp.id)) // 0 means didn't upload, and the last para is songId and tabsetId
+                let localLyricsSets: [LocalLyrics] = CoreDataManager.getAllLocalLyrics()
+                for temp in localLyricsSets {
+                    self.myDataArray.append((temp.localSong.title, temp.localSong.artist, "0", "unpressed", temp.localSong.id as! Int, temp.id)) // 0 means didn't upload, and the last para is songId and tabsetId
                 }
                 activityIndicator.stopAnimating()
                 self.initialTheView()

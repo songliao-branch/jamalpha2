@@ -21,7 +21,7 @@ protocol Findable {
     func getArtist() -> String
     func getAlbum() -> String
     func getDuration() -> Float
-     func getURL() -> AnyObject?
+    func getURL() -> AnyObject?
     func getArtWork() -> MPMediaItemArtwork?
 }
 
@@ -156,16 +156,63 @@ extension AVPlayerItem: Findable {
     }
 }
 
+extension LocalSong: Findable {
+    func getTitle() -> String {
+        if let title = self.title {
+            return title
+        }
+        return ""
+    }
+    func getArtist() -> String {
+        if let artist = self.artist {
+            return artist
+        }
+        return ""
+    }
+    
+    func getAlbum() -> String {
+        if let album = self.album {
+            return album
+        }
+        return ""
+    }
+    
+    func getDuration() -> Float {
+        if let time = self.duration {
+            return time as Float
+        }
+        return 0.0
+    }
+    
+    func getURL() -> AnyObject? {
+        return nil
+    }
+    
+    func getArtWork() -> MPMediaItemArtwork? {
+        return nil
+    }
+}
+
+
+
 class CoreDataManager: NSObject {
     
     static let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
     //User-related
     class func logoutUser() {
-        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
+        let userResults = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
+        let lyricsSetResults = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: nil, managedObjectContext: moc)
+        let tabsSetResults = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: nil, managedObjectContext: moc)
         
         //delete all user objects just to make sure we have none left
-        for o in results {
+        for o in userResults {
+            moc.deleteObject(o as! NSManagedObject)
+        }
+        for o in lyricsSetResults {
+            moc.deleteObject(o as! NSManagedObject)
+        }
+        for o in tabsSetResults {
             moc.deleteObject(o as! NSManagedObject)
         }
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
@@ -237,13 +284,14 @@ class CoreDataManager: NSObject {
     //song-related
 
     private class func findSong(item: Findable) -> Song? {
-        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (album == '\(item.getAlbum().replaceApostrophe())')")
+        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (playbackDuration <= '\(item.getDuration() + 1)') AND (playbackDuration >= '\(item.getDuration() - 1)')")
 
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
         if results.count == 0 {
             return nil
         } else {
+            print("find the song in coredata: \((results.lastObject as! Song).title)")
             return results.lastObject! as? Song
         }
     }
@@ -330,7 +378,7 @@ class CoreDataManager: NSObject {
                     
                     lyricsSet.lastSelectedDate = NSDate()
                     lyricsSet.id = id
-                    lyricsSet.isLocal = false
+                    lyricsSet.isLocal = true
                 }
                 
             } else {//if saving local lyrics
@@ -431,6 +479,39 @@ class CoreDataManager: NSObject {
         }
     }
 
+    class func saveMyTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, tabsSetId: Int?=nil, id: Int) {
+        if let matchedSong = findSong(item) {
+            let chordsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(chords as AnyObject)
+            let tabsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tabs as AnyObject)
+            let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
+            let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
+            
+            tabsSet.chords = chordsData
+            tabsSet.tabs = tabsData
+            tabsSet.times = timesData
+            tabsSet.song = matchedSong
+            tabsSet.tuning = tuning
+            tabsSet.capo = capo
+            tabsSet.lastSelectedDate = NSDate()
+            tabsSet.id = id
+            tabsSet.isLocal = true
+        }
+        SwiftCoreDataHelper.saveManagedObjectContext(moc)
+    }
+    
+    class func saveMyLyrics(item: Findable, lyrics: [String], times: [Float], lyricsSetId: Int?=nil, id: Int ) {
+        if let matchedSong = findSong(item) {
+            let lyricsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(lyrics as AnyObject)
+            let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
+            let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
+            lyricsSet.lyrics = lyricsData
+            lyricsSet.times = timesData
+            lyricsSet.song = matchedSong
+            lyricsSet.lastSelectedDate = NSDate()
+            lyricsSet.id = id
+            lyricsSet.isLocal = true
+        }
+    }
     
     //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
     class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, tabsSetId: Int?=nil ) {
@@ -546,26 +627,26 @@ class CoreDataManager: NSObject {
         }
     }
     
-    class func getAllLocalSongs() -> [Song] {
+    class func getAllLocalSongs() -> [LocalSong] {
         do {
-            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: nil, managedObjectContext: moc)
-            var songs: [Song] = [Song]()
+            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: nil, managedObjectContext: moc)
+            var localSongs: [LocalSong] = [LocalSong]()
             for result in results {
                 let temp = result as! Song
-                let song: Song = Song()
+                let song: LocalSong = LocalSong()
                 song.id = temp.id
                 song.title = temp.title
                 song.artist = temp.artist
                 song.album = temp.album
-                song.playbackDuration = temp.playbackDuration
+                song.duration = temp.playbackDuration
                 song.soundwaveData = temp.soundwaveData
                 song.albumCover = temp.albumCover
                 song.soundwaveImage = temp.soundwaveImage
                 song.tabsSets = temp.tabsSets
                 song.lyricsSets = temp.lyricsSets
-                songs.append(song)
+                localSongs.append(song)
             }
-            return songs
+            return localSongs
         } catch {
             fatalError("There was an error fetching all new tabs")
         }
@@ -624,26 +705,65 @@ class CoreDataManager: NSObject {
     
     class func getSongId(findable: Findable) -> Int {
         if let matchedSong = findSong(findable) {
-            return  Int(matchedSong.id)
+            return  Int(matchedSong.id!)
         }
         return 0 //should not reach here
     }
     
     class func downloadUsersAllTabsLyricsSetToCoreData(id: NSNumber) {
         let currentUserId: Int = id as Int
+        let localSongs: [LocalSong] = CoreDataManager.getAllLocalSongs()
         APIManager.getUserTabsInfo(currentUserId, completion: {
             downloadedTabSets in
-            let localLyricsSets: [LocalLyrics] = CoreDataManager.getAllLocalLyrics()
+            let locaTabSets: [LocalLyrics] = CoreDataManager.getAllLocalLyrics()
+            print("local tab sets: \(locaTabSets.count)")
+            print("download tab sets: \(downloadedTabSets.count)")
             for temp in downloadedTabSets {
-                for item in localLyricsSets {
-                    if item.localSong.title == temp.title && item.localSong.artist == temp.artist && (item.localSong.playbackDuration as Float) <= temp.duration + 1 && (item.localSong.playbackDuration as Float) >= temp.duration - 1 {
+                if locaTabSets.count > 0 {
+                    for item in locaTabSets {
+                        if item.localSong.title == temp.title && item.localSong.artist == temp.artist && (item.localSong.playbackDuration as Float) <= temp.duration + 1 && (item.localSong.playbackDuration as Float) >= temp.duration - 1 {
                             break
-                    } else {
-                        let times: [NSTimeInterval] = temp.times.map{(Float time) -> NSTimeInterval in
-                            let output: NSTimeInterval = NSTimeInterval(time)
-                            return output
+                        } else {
+                            let local: LocalSong = LocalSong()
+                            local.title = item.localSong.title
+                            local.artist = item.localSong.artist
+                            local.album = item.localSong.album
+                            local.duration = item.localSong.playbackDuration
+                            local.soundwaveData = item.localSong.soundwaveData
+                            local.albumCover = item.localSong.albumCover
+                            local.soundwaveImage = item.localSong.soundwaveImage
+                            local.tabsSets = item.localSong.tabsSets
+                            local.lyricsSets = item.localSong.lyricsSets
+                            local.id = -1
+                            let downloadTabsContent: DownloadedTabsSet = DownloadedTabsSet()
+                            downloadTabsContent.id = temp.id
+                            APIManager.downloadTabsSetContent(downloadTabsContent, completion: {
+                                downloadWithContent in
+                                let times: [NSTimeInterval] = downloadTabsContent.times.map{(Float time) -> NSTimeInterval in
+                                    let output: NSTimeInterval = NSTimeInterval(time)
+                                    return output
+                                }
+                                CoreDataManager.saveMyTabs(local as Findable, chords: downloadTabsContent.chords, tabs: temp.tabs, times: times, tuning: temp.tuning, capo: temp.capo, id: temp.id)
+                                print("tabs save to core data: \(item.localSong.title)")
+                            })
+                            
                         }
-                        CoreDataManager.saveTabs(item.localSong as! Findable, chords: temp.chords, tabs: temp.tabs, times: times, tuning: temp.tuning, capo: temp.capo)
+                    }
+                } else {
+                    for item in localSongs {
+                        if item.title == temp.title && item.artist == temp.artist && (item.duration as Float) <= temp.duration + 1 && (item.duration as Float) >= temp.duration - 1 {
+                            let downloadTabsContent: DownloadedTabsSet = DownloadedTabsSet()
+                            downloadTabsContent.id = temp.id
+                            APIManager.downloadTabsSetContent(downloadTabsContent, completion: {
+                                downloadWithContent in
+                                let times: [NSTimeInterval] = downloadTabsContent.times.map{(Float time) -> NSTimeInterval in
+                                    let output: NSTimeInterval = NSTimeInterval(time)
+                                    return output
+                                }
+                                CoreDataManager.saveMyTabs(item as Findable, chords: temp.chords, tabs: temp.tabs, times: times, tuning: temp.tuning, capo: temp.capo, id: temp.id)
+                                print("tabs save to core data: \(item.title)")
+                            })
+                        }
                     }
                 }
             }
@@ -651,13 +771,49 @@ class CoreDataManager: NSObject {
         })
         APIManager.getUserLyricsInfo(currentUserId, completion: {
             downloadedLyricsSets in
-            let localLyricsSets: [LocalTabSet] = CoreDataManager.getAllLocalTabs()
+            let localLyricsSets: [LocalLyrics] = CoreDataManager.getAllLocalLyrics()
+            print("local tabssets: \(localLyricsSets.count)")
+            print("downloaded lyrics set: \(downloadedLyricsSets.count)")
             for temp in downloadedLyricsSets {
-                for item in localLyricsSets {
-                    if item.localSong.title == temp.title && item.localSong.artist == temp.artist && (item.localSong.playbackDuration as Float) <= temp.duration + 1 && (item.localSong.playbackDuration as Float) >= temp.duration - 1 {
-                        break
-                    } else {
-                        CoreDataManager.saveLyrics(item.localSong as! Findable, lyrics: temp.lyrics, times: temp.times)
+                if localLyricsSets.count > 0 {
+                    for item in localLyricsSets {
+                        if item.localSong.title == temp.title && item.localSong.artist == temp.artist && (item.localSong.playbackDuration as Float) <= temp.duration + 1 && (item.localSong.playbackDuration as Float) >= temp.duration - 1 {
+                            break
+                        } else {
+                            let local: LocalSong = LocalSong()
+                            local.title = item.localSong.title
+                            local.artist = item.localSong.artist
+                            local.album = item.localSong.album
+                            local.duration = item.localSong.playbackDuration
+                            local.soundwaveData = item.localSong.soundwaveData
+                            local.albumCover = item.localSong.albumCover
+                            local.soundwaveImage = item.localSong.soundwaveImage
+                            local.tabsSets = item.localSong.tabsSets
+                            local.lyricsSets = item.localSong.lyricsSets
+                            local.id = -1
+                            
+                            let downloadLyricsContent: DownloadedLyricsSet = DownloadedLyricsSet()
+                            downloadLyricsContent.id = temp.id
+                            APIManager.downloadLyricsSetContent(downloadLyricsContent, completion: {
+                                downloadWithContent in
+                                CoreDataManager.saveMyLyrics(local as Findable, lyrics: downloadLyricsContent.lyrics, times: downloadLyricsContent.times, id: temp.id)
+                                print("lyrics save to core data: \(item.localSong.title)")
+                            })
+                            
+                        }
+                    }
+                } else {
+                    for item in localSongs {
+                        if item.title == temp.title && item.artist == temp.artist && (item.duration as Float) <= temp.duration + 1 && (item.duration as Float) >= temp.duration - 1 {
+                            let downloadLyricsContent: DownloadedLyricsSet = DownloadedLyricsSet()
+                            downloadLyricsContent.id = temp.id
+                            APIManager.downloadLyricsSetContent(downloadLyricsContent, completion: {
+                                downloadWithContent in
+                                CoreDataManager.saveMyLyrics(item as Findable, lyrics: temp.lyrics, times: temp.times, id: temp.id)
+                                print("lyrics save to core data: \(item.title)")
+                            })
+
+                        }
                     }
                 }
                 

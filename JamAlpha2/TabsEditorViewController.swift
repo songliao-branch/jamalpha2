@@ -269,8 +269,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             musicPlayer.currentPlaybackRate = self.speed
         }
     }
-    
-    
+
     // MARK: check theSong can convert to MPMediaItem
     func checkConverToMPMediaItem() {
         if !self.isDemoSong {
@@ -455,9 +454,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         calculateBorders()
         let gesture = UILongPressGestureRecognizer(target: self,
             action: "handleGesture:")
+        let tapGesture = UITapGestureRecognizer(target: self, action: "singleTapOnCollectionView:")
+        collectionView.addGestureRecognizer(tapGesture)
         gesture.minimumPressDuration = 0.2
         gesture.delegate = self
         collectionView.addGestureRecognizer(gesture)
+    }
+    
+    func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
+        
     }
 
     func calculateBorders() {

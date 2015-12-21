@@ -52,7 +52,7 @@ class DownloadedLyricsSet: NSObject {
         self.lyricsPreview = lyrics_preview
         self.voteStatus = vote_status
         self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updated_at)
-        self.id = song_id
+        self.song_id = song_id
         self.title = title
         self.artist = artist
         self.duration = duration
