@@ -145,8 +145,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
     }
-    
-    
+
     func rateTwistjam() {
 //        let url = "itms-apps://itunes.apple.com/app/id\(APP_STORE_ID)"
 //        UIApplication.sharedApplication().openURL(NSURL(string: url)!)

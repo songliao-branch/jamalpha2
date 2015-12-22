@@ -18,7 +18,7 @@ class SongTutorialPageViewController: UIViewController, UIPageViewControllerData
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor.greenColor().colorWithAlphaComponent(0.2)
+        self.view.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.5)
         setUpPageViewController()
         
     }
@@ -50,6 +50,8 @@ class SongTutorialPageViewController: UIViewController, UIPageViewControllerData
         self.view.addSubview(pageViewController!.view)
         pageViewController.didMoveToParentViewController(self)
         
+        UIPageControl.appearance().pageIndicatorTintColor = UIColor.grayColor()
+        UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.whiteColor()
     }
     
     func viewControllerAtIndex(index: Int) -> SongTutorialPageItemViewController {

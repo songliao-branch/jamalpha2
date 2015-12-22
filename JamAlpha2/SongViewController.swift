@@ -46,9 +46,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var buttonDimension: CGFloat = 50
     var pulldownButton:UIButton!
-    var tuningButton:UIButton!
     var tuningLabels = [UILabel]() //6 labels for each string
     var capoButton: UIButton!
+    var capoLabel: UILabel!
     
     var songNameLabel: MarqueeLabel!
     var artistNameLabel: UILabel!
@@ -393,24 +393,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         topView.addSubview(pulldownButton)
         
-        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
-        tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
-        tuningButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
-        tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
-        topView.addSubview(tuningButton)
-        
-        let capoCircleDimension: CGFloat = 16
-        capoButton = UIButton(frame: CGRect(x: 0, y: 0, width: capoCircleDimension, height: capoCircleDimension))
-        capoButton.backgroundColor = UIColor.whiteColor()
-        capoButton.layer.cornerRadius = capoButton.frame.height/2
-        capoButton.center = CGPoint(x: tuningButton.center.x+capoCircleDimension/2, y: tuningButton.center.y+capoCircleDimension/2)
-        capoButton.hidden = true
-        //its touch event is same as tuningButton because this view blocks part of tuning button,
-        //so I set the same touch event
+        capoButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
+        capoButton.setImage(UIImage(named: "pullDown"), forState: .Normal)
         capoButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
-        capoButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
-        self.view.addSubview(capoButton)
+        capoButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
+        topView.addSubview(capoButton)
+        
+        capoLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
+        capoLabel.textColor = UIColor.whiteColor()
+        capoLabel.font = UIFont.systemFontOfSize(16)
+        capoLabel.center = capoButton.center
+        capoLabel.userInteractionEnabled = false
+        capoLabel.textAlignment = .Center
+        capoLabel.text = "C"
+        topView.addSubview(capoLabel)
         
         let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.5 ))
         topViewSeparator.backgroundColor = UIColor.baseColor()
@@ -429,13 +425,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     private func updateCapo(capo: Int) {
-        if capo < 1 {
-            capoButton.hidden = true
-            return
-        }
-        capoButton.hidden = false
-        capoButton.setTitle(String(capo), forState: .Normal)
-        capoButton.titleLabel?.sizeToFit()
+        capoLabel.text = "\(capo)"
     }
 
     
@@ -446,7 +436,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             tuningLabel.font = UIFont.systemFontOfSize(minfont-5)
             tuningLabel.textAlignment = .Center
             tuningLabel.center = CGPoint(x: topPoints[i]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
-            tuningLabel.hidden = true
             self.view.addSubview(tuningLabel)
             tuningLabels.append(tuningLabel)
         }
@@ -458,7 +447,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 label.hidden = false
             }
         } else {
-            
             for label in tuningLabels {
                 label.hidden = true
             }
