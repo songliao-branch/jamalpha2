@@ -937,9 +937,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 fingerButton.accessibilityIdentifier = "grayButton"
             }
             self.fingerPoint.append(fingerButton)
-            if i < sender / 100 - 1 {
-                self.completeStringView.addSubview(fingerButton)
-            }
+            self.completeStringView.addSubview(fingerButton)
+//            if i < sender / 100 - 1 {
+//                self.completeStringView.addSubview(fingerButton)
+//            }
             
         }
     }
