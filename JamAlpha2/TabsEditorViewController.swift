@@ -884,10 +884,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.currentBaseButton.removeFromSuperview()
                 self.addNoteButton(indexFret, indexString: indexString)
                 self.completeStringView.addSubview(self.fingerPoint[6 - indexString])
+                self.fingerPoint[6 - (indexString + 1)].hidden = true
                 self.addedNoteButtonOnCompleteView = true
                 self.addNewTab = true
             }
-            if (indexString + 1) <= self.currentBaseButton.tag / 100 {
+            if (indexString + 1) < self.currentBaseButton.tag / 100 {
                 moveFingerPoint(indexFret, indexString: indexString)
             }
         } else {
@@ -903,8 +904,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func moveFingerPoint(indexFret: Int, indexString: Int) {
         print("move finger point")
         self.view.userInteractionEnabled = false
-        let noteString = self.currentBaseButton.tag / 100 - 1
-        if indexString != noteString {
+        //let noteString = self.currentBaseButton.tag / 100 - 1
+       // if indexString != noteString {
             let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
             let buttonX = (string6FretPosition[indexFret] + string6FretPosition[indexFret + 1]) / 2 - buttonWidth / 2
             let buttonY = string6Position[indexString] - buttonWidth / 2
@@ -917,7 +918,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             })
             self.view.userInteractionEnabled = true
             self.tabFingerPointChanged = true
-        }
+        //}
     }
     
     var addedNoteButtonOnCompleteView: Bool = false
@@ -953,10 +954,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.fingerPoint.append(fingerButton)
             self.completeStringView.addSubview(fingerButton)
-//            if i < sender / 100 - 1 {
-//                self.completeStringView.addSubview(fingerButton)
-//            }
-            
         }
     }
     
@@ -2254,13 +2251,17 @@ extension TabsEditorViewController {
                 let buttonWidth = 9 / 60 * self.trueHeight
                 sender.view?.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
                 let noteButton = sender.view as! UIButton
+                let oldNoteButtonTag = noteButton.tag
                 noteButton.tag = (indexString + 1) * 100 + indexFret
                 let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
                 noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
+                self.moveFingerPoint(indexFret, indexString: indexString)
+                self.fingerPoint[6 - (indexString + 1)].hidden = true
                 self.currentNoteButton = noteButton
                 self.currentBaseButton = noteButton
                 self.noteButtonOnCompeteScrollView = noteButton
                 self.addSpecificTabButton(noteButton.tag)
+                self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag)
             } else {
                 sender.view?.center = self.originalCenter
             }
@@ -2270,7 +2271,26 @@ extension TabsEditorViewController {
         }
     }
     
-    func checkTheFingerPoint(indexString: Int) {
+    func checkTheFingerPoint(newTag: Int, oldTag: Int) {
+        for item in self.fingerPoint {
+            print(item.tag)
+        }
+        let indexString = newTag / 100
+        if indexString > oldTag / 100 {
+            self.fingerPoint[6 - (indexString - 1)].hidden = false
+            if indexString == 6 {
+                self.fingerPoint[6 - (indexString - 2)].hidden = false
+            }
+        } else {
+            self.moveFingerPoint(0, indexString: indexString - 1)
+            self.fingerPoint[6 - indexString].hidden = true
+            if indexString == 4 {
+                //self.fingerPoint[6 - (indexString + 1)].removeFromSuperview()
+                self.moveFingerPoint(0, indexString: indexString)
+                self.fingerPoint[6 - (indexString + 1)].hidden = true
+            }
+        }
+        
         
     }
     
