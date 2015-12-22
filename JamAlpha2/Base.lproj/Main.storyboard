@@ -246,43 +246,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D84-uR-1Md" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2059" y="36"/>
-        </scene>
-        <!--Song Tutorial Page View Controller-->
-        <scene sceneID="goH-qR-PPw">
-            <objects>
-                <viewController storyboardIdentifier="songtutorialpageviewcontroller" modalPresentationStyle="overCurrentContext" id="Hp4-QW-cUq" customClass="SongTutorialPageViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="jXm-RZ-UK7"/>
-                        <viewControllerLayoutGuide type="bottom" id="CNq-me-bzJ"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="z11-DF-aKc">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="sZs-fp-Gge" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2434" y="36"/>
-        </scene>
-        <!--Song Tutorial Page Item View Controller-->
-        <scene sceneID="81t-TE-Hlb">
-            <objects>
-                <viewController storyboardIdentifier="songtutorialpageitemviewcontroller" id="tH4-an-Ths" customClass="SongTutorialPageItemViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="M0b-gI-Wya"/>
-                        <viewControllerLayoutGuide type="bottom" id="fNk-L1-MS5"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Jbk-oS-hnq">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="X9b-kO-qfI" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2795" y="41"/>
+            <point key="canvasLocation" x="2059" y="37"/>
         </scene>
         <!--Photo Viewer View Controller-->
         <scene sceneID="Rdw-P5-M8x">
@@ -1135,7 +1099,7 @@
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show Demo" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xec-YD-a3g">
                                                     <rect key="frame" x="8" y="11" width="92" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>

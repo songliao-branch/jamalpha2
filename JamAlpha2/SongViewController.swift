@@ -39,6 +39,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     @IBOutlet weak var playPauseButton: UIButton!
     
+    var tutorialScrollView: UIScrollView!
+
     var backgroundImageView: UIImageView!
     var backgroundScaleFactor: CGFloat = 0.4
     var backgroundImage: UIImage?
@@ -274,6 +276,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpActionViews()
         setUpCountdownView()
         setUpStatusView()
+        
         if(!isSongNeedPurchase){
             updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
             updateFavoriteStatus(isDemoSong ? demoItem : nowPlayingMediaItem)
@@ -312,8 +315,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
             viewDidFullyDisappear = false
-            if(!isSongNeedPurchase){
-                     resumeSong()
+            if !isSongNeedPurchase {
+                resumeSong()
             }
             if(isDemoSong){
                 self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
@@ -334,22 +337,49 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
         }
         isViewDidAppear = true
-        
-        if NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial) {
-            showTutorial()
-        }
     }
     
     func showTutorial() {
-        //show tutorial
         if isDemoSong {
             avPlayer.pause()
         } else {
             player.pause()
         }
         
-        let tutorialVC = self.storyboard?.instantiateViewControllerWithIdentifier("songtutorialpageviewcontroller") as! SongTutorialPageViewController
-        self.presentViewController(tutorialVC, animated: true, completion: nil)
+        tutorialScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        tutorialScrollView.backgroundColor = UIColor.clearColor()
+        self.view.addSubview(tutorialScrollView)
+
+        tutorialScrollView.bounces = false
+        tutorialScrollView.pagingEnabled = true
+        
+        for i in 0...4 {
+            
+            let tutorialImage = UIImageView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: view.frame.height))
+            tutorialImage.image = UIImage(named: "tutorial_\(i+1)_iPhone6")
+            
+            tutorialScrollView.addSubview(tutorialImage)
+            
+            if i == 4 {
+                let startButton = UIButton(frame: CGRect(x: 0, y: 0, width: 101, height: 43))
+                startButton.center = CGPoint(x: 4.5 * self.view.frame.width, y: self.view.center.y-100)
+                startButton.setImage(UIImage(named: "start_button"), forState: .Normal)
+                startButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
+                tutorialScrollView.addSubview(startButton)
+            }
+        }
+        tutorialScrollView.contentSize = CGSize(width: 5 * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
+    }
+    
+    func hideTutorial() {
+        tutorialScrollView.hidden = true
+        if isDemoSong {
+            avPlayer.play()
+        } else {
+            player.play()
+        }
+        
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTutorial)
     }
     
     func setUpBackgroundImage(){
@@ -394,7 +424,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topView.addSubview(pulldownButton)
         
         capoButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
-        capoButton.setImage(UIImage(named: "pullDown"), forState: .Normal)
+        capoButton.setImage(UIImage(named: "blankCircle"), forState: .Normal)
         capoButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
         capoButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
         topView.addSubview(capoButton)
@@ -405,7 +435,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         capoLabel.center = capoButton.center
         capoLabel.userInteractionEnabled = false
         capoLabel.textAlignment = .Center
-        capoLabel.text = "C"
+        capoLabel.text = "0"
         topView.addSubview(capoLabel)
         
         let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.5 ))
@@ -427,7 +457,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     private func updateCapo(capo: Int) {
         capoLabel.text = "\(capo)"
     }
-
     
     func setUpTuningLabels() {
         for i in 1..<topPoints.count{
@@ -525,7 +554,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             previousButton.hidden = true
             nextButton.hidden = true
         }
-
     }
     
     var isNext = true
@@ -1084,12 +1112,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     func resumeSong() {
         if selectedFromTable {
-            if isDemoSong {
-                avPlayer.play()
-            }else{
-                player.play()
+            if isDemoSong && NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial) {
+                showTutorial()
+            } else {
+                if isDemoSong {
+                    avPlayer.play()
+                }else{
+                    player.play()
+                }
+                startTimer()
             }
-            startTimer()
         } else { // selected from now view button
             if isDemoSong {
                 if avPlayer.rate > 0 {

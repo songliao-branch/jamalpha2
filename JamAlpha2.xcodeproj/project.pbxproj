@@ -86,8 +86,6 @@
 		E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */; };
 		E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */; };
 		E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3F1BE9BC4700D54174 /* Constants.swift */; };
-		E4D7A0F51C28B0EC007132FF /* SongTutorialPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D7A0F41C28B0EC007132FF /* SongTutorialPageViewController.swift */; };
-		E4D7A0F71C28B0FA007132FF /* SongTutorialPageItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D7A0F61C28B0FA007132FF /* SongTutorialPageItemViewController.swift */; };
 		E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */; };
 		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
 		E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */; };
@@ -203,8 +201,6 @@
 		E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
 		E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuspendThreadViewController.swift; sourceTree = "<group>"; };
 		E4D58E3F1BE9BC4700D54174 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		E4D7A0F41C28B0EC007132FF /* SongTutorialPageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongTutorialPageViewController.swift; sourceTree = "<group>"; };
-		E4D7A0F61C28B0FA007132FF /* SongTutorialPageItemViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongTutorialPageItemViewController.swift; sourceTree = "<group>"; };
 		E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownView.swift; sourceTree = "<group>"; };
 		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
 		E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
@@ -395,7 +391,6 @@
 		E47FF6861BAD1AC500028F2D /* SongViewController */ = {
 			isa = PBXGroup;
 			children = (
-				E4D7A0F31C28B0DE007132FF /* Tutorials */,
 				E48877691B1520A0004785D3 /* SongViewController.swift */,
 				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
 				E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */,
@@ -557,15 +552,6 @@
 				BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */,
 			);
 			name = Helper;
-			sourceTree = "<group>";
-		};
-		E4D7A0F31C28B0DE007132FF /* Tutorials */ = {
-			isa = PBXGroup;
-			children = (
-				E4D7A0F41C28B0EC007132FF /* SongTutorialPageViewController.swift */,
-				E4D7A0F61C28B0FA007132FF /* SongTutorialPageItemViewController.swift */,
-			);
-			name = Tutorials;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -786,7 +772,6 @@
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
 				E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */,
-				E4D7A0F51C28B0EC007132FF /* SongTutorialPageViewController.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* CoreDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				10AC35A61C215BE300749744 /* DemoCell.swift in Sources */,
@@ -810,7 +795,6 @@
 				E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */,
-				E4D7A0F71C28B0FA007132FF /* SongTutorialPageItemViewController.swift in Sources */,
 				E44359021B1947660091E926 /* Album.swift in Sources */,
 				BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */,
 				BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */,
