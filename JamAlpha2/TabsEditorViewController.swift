@@ -16,8 +16,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var isJiggling: Bool = false
     let jigglingPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
     let jigglingTapGesture: UITapGestureRecognizer = UITapGestureRecognizer()
+    let jigglingLongPressGesture : UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     var originalCenter: CGPoint!
     var deleteView:UIImageView = UIImageView()
+    var scrollingTimer: NSTimer!
+    var startScrolling: Bool = false
     
     var stepPerSecond: Float = 100
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
@@ -832,6 +835,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         jigglingTapGesture.addTarget(self, action: "startJiggling:")
         noteButton.addGestureRecognizer(jigglingTapGesture)
+        self.jigglingTapGesture.requireGestureRecognizerToFail(self.jigglingLongPressGesture)
+        
+        jigglingLongPressGesture.addTarget(self, action: "startJiggling:")
+        noteButton.addGestureRecognizer(jigglingLongPressGesture)
+        jigglingLongPressGesture.minimumPressDuration = 0.2
         
         if(originalPosition != nil){
             let duration:NSTimeInterval = NSTimeInterval(sqrt(2.0*(buttonString-original)/9.8)/3)
@@ -883,6 +891,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if (indexString + 1) >= self.currentBaseButton.tag / 100 && indexString >= 3 && indexString <= 5{
                 self.currentBaseButton.removeFromSuperview()
                 self.addNoteButton(indexFret, indexString: indexString)
+                self.tabNameTextField.text = ""
                 self.completeStringView.addSubview(self.fingerPoint[6 - indexString])
                 self.fingerPoint[6 - (indexString + 1)].hidden = true
                 self.addedNoteButtonOnCompleteView = true
@@ -1233,7 +1242,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
         } else if sender.state == .Changed {
             let translation = sender.translationInView(self.view)
-            sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
+            self.currentBaseButton.center = CGPointMake(self.currentBaseButton.center.x, self.currentBaseButton.center.y)
             sender.setTranslation(CGPointZero, inView: self.view)
             if self.currentTime >= 0 && self.currentTime <= self.duration {
                 let timeChange = NSTimeInterval(-translation.x / 10)
@@ -2166,69 +2175,93 @@ extension TabsEditorViewController {
 extension TabsEditorViewController {
     func degreesToRadians(x: Double) -> Double { return M_PI * (x) / 180.0 }
     
-    func startJiggling(sender: UITapGestureRecognizer) {
+    func startJiggling(sender: UIGestureRecognizer) {
+        if sender.isKindOfClass(UITapGestureRecognizer) {
+            self.jigglingChanged()
+        }else if sender.isKindOfClass(UILongPressGestureRecognizer) {
+            let tempSender = sender as! UILongPressGestureRecognizer
+            if tempSender.state == .Began {
+                self.jigglingChanged()
+            }
+        }
+    }
+    
+    func jigglingChanged(){
         self.isJiggling = true
         let buttonWidth = 9 / 60 * self.trueHeight
-        let center = sender.view!.center
+        let center = self.currentBaseButton.center
         
-        sender.view?.frame = CGRectMake(sender.view!.frame.origin.x, sender.view!.frame.origin.y, buttonWidth, buttonWidth)
-        sender.view!.center = center
-        sender.view?.layer.cornerRadius = 0.5 * buttonWidth
+        self.currentBaseButton.frame = CGRectMake(self.currentBaseButton.frame.origin.x, self.currentBaseButton.frame.origin.y, buttonWidth, buttonWidth)
+        self.currentBaseButton.center = center
+        self.currentBaseButton.layer.cornerRadius = 0.5 * buttonWidth
         let randomInt: UInt32  = arc4random_uniform(500)
         let r:Double = (Double(randomInt) / 500.0) + 5
         
         let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
         let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
-        let originalX = sender.view!.center.x
-        sender.view?.center.x = originalX - 1
-        sender.view?.transform = leftWobble;  // starting point
-        sender.view?.layer.anchorPoint = CGPointMake(0.5, 0.5)
-        let a:CGFloat = CGFloat((1 - sqrt(2.0))/2.0) * (sender.view!.frame.size.width/2.0) + (2/3)*(sender.view!.frame.size.width/4.0 - sender.view!.frame.size.width/6.0)
+        let originalX = self.currentBaseButton.center.x
+        self.currentBaseButton.center.x = originalX - 1
+        self.currentBaseButton.transform = leftWobble;  // starting point
+        self.currentBaseButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
+        let a:CGFloat = CGFloat((1 - sqrt(2.0))/2.0) * (self.currentBaseButton.frame.size.width/2.0) + (2/3)*(self.currentBaseButton.frame.size.width/4.0 - self.currentBaseButton.frame.size.width/6.0)
         
-        deleteView.frame = CGRectMake( a ,  a, sender.view!.frame.size.width/3, sender.view!.frame.size.width/3)
+        deleteView.frame = CGRectMake( a ,  a, self.currentBaseButton.frame.size.width/3, self.currentBaseButton.frame.size.width/3)
         
         let image =  UIImage(named: "deleteX")
         deleteView.image = image
         
-        sender.view?.addSubview(deleteView)
+        self.currentBaseButton.addSubview(deleteView)
         
         UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
             UIView.setAnimationRepeatCount(Float(NSNotFound))
-            sender.view?.center.x = originalX+1
-            sender.view?.transform = rightWobble
+            self.currentBaseButton.center.x = originalX+1
+            self.currentBaseButton.transform = rightWobble
             
             }, completion: nil)
         self.jigglingPanGesture.addTarget(self, action: "handleCurrentBaseButtonPan:")
-        sender.view?.addGestureRecognizer(self.jigglingPanGesture)
-        sender.view?.removeGestureRecognizer(self.jigglingTapGesture)
+        self.currentBaseButton.addGestureRecognizer(self.jigglingPanGesture)
+        self.currentBaseButton.removeGestureRecognizer(self.jigglingTapGesture)
+        self.currentBaseButton.removeGestureRecognizer(self.jigglingLongPressGesture)
     }
     
-    func stopJiggling(sender: UITapGestureRecognizer) {
-        sender.view?.addGestureRecognizer(self.jigglingTapGesture)
+    func stopJiggling(sender: UIGestureRecognizer) {
+        self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
+        self.currentBaseButton.addGestureRecognizer(self.jigglingLongPressGesture)
         deleteView.removeFromSuperview()
-        sender.view?.layer.removeAllAnimations()
-        sender.view?.transform = CGAffineTransformIdentity
+        self.currentBaseButton.layer.removeAllAnimations()
+        self.currentBaseButton.transform = CGAffineTransformIdentity
         let buttonWidth = 7 / 60 * self.trueHeight
-        let center = sender.view!.center
-        sender.view?.frame = CGRectMake(sender.view!.frame.origin.x, sender.view!.frame.origin.y, buttonWidth, buttonWidth)
-        sender.view!.center = center
-        sender.view?.layer.cornerRadius = 0.5 * buttonWidth
+        let center = self.currentBaseButton.center
+        self.currentBaseButton.frame = CGRectMake(self.currentBaseButton.frame.origin.x, self.currentBaseButton.frame.origin.y, buttonWidth, buttonWidth)
+        self.currentBaseButton.layer.cornerRadius = 0.5 * buttonWidth
+        self.currentBaseButton.center = CGPoint(x: center.x-1, y: center.y)
         self.isJiggling = false
+        
+        
     }
     
-//    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-//        return true
-//    }
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
     
     func handleCurrentBaseButtonPan(sender: UIPanGestureRecognizer) {
         let transfer = sender.translationInView(self.completeStringView)
         if sender.state == .Began {
-            sender.view?.alpha = 0.5
-            self.originalCenter = sender.view?.center
+            self.currentBaseButton.alpha = 0.5
+            self.originalCenter = self.currentBaseButton.center
         } else if sender.state == .Changed {
-            sender.view?.center = CGPointMake(originalCenter!.x + transfer.x, originalCenter!.y + transfer.y)
+//            let location = sender.locationInView(self.completeStringView)
+//            if self.startScrolling == false {
+//                if location.x > CGRectGetMaxX(self.completeStringView.frame) - CGFloat(20) {
+//                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToRight:", userInfo: nil, repeats: true)
+//                    self.startScrolling = true
+//                } else if location.x < CGRectGetMinX(self.completeStringView.frame) + CGFloat(20) {
+//                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToLeft:", userInfo: nil, repeats: true)
+//                }
+//            }
+            self.currentBaseButton.center = CGPointMake(originalCenter!.x + transfer.x, originalCenter!.y + transfer.y)
         } else if sender.state == .Ended {
-            sender.view?.alpha = 0.8
+            self.currentBaseButton.alpha = 0.8
             var indexFret: Int = Int()
             var indexString: Int = Int()
             let location = sender.locationInView(self.completeStringView)
@@ -2249,12 +2282,13 @@ extension TabsEditorViewController {
                 let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
                 let buttonString = self.string6Position[indexString]
                 let buttonWidth = 9 / 60 * self.trueHeight
-                sender.view?.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
+                self.currentBaseButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
                 let noteButton = sender.view as! UIButton
                 let oldNoteButtonTag = noteButton.tag
                 noteButton.tag = (indexString + 1) * 100 + indexFret
                 let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
                 noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
+                self.tabNameTextField.text = ""
                 self.moveFingerPoint(indexFret, indexString: indexString)
                 self.fingerPoint[6 - (indexString + 1)].hidden = true
                 self.currentNoteButton = noteButton
@@ -2263,11 +2297,11 @@ extension TabsEditorViewController {
                 self.addSpecificTabButton(noteButton.tag)
                 self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag)
             } else {
-                sender.view?.center = self.originalCenter
+                self.currentBaseButton.center = self.originalCenter
             }
-            sender.view?.addGestureRecognizer(self.jigglingTapGesture)
+            self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
             self.stopJiggling(self.jigglingTapGesture)
-            sender.view?.removeGestureRecognizer(sender)
+            self.currentBaseButton.removeGestureRecognizer(sender)
         }
     }
     
@@ -2285,15 +2319,19 @@ extension TabsEditorViewController {
             self.moveFingerPoint(0, indexString: indexString - 1)
             self.fingerPoint[6 - indexString].hidden = true
             if indexString == 4 {
-                //self.fingerPoint[6 - (indexString + 1)].removeFromSuperview()
                 self.moveFingerPoint(0, indexString: indexString)
                 self.fingerPoint[6 - (indexString + 1)].hidden = true
             }
         }
-        
-        
     }
     
+//    func autoScrollingOnEdgeToRight(sender: NSTimer) {
+//        self.completeStringView.contentOffset = CGPointMake(3, 0)
+//    }
+//    
+//    func autoScrollingOnEdgeToLeft(sender: NSTimer) {
+//        self.completeStringView.contentOffset = CGPointMake(-3, 0)
+//    }
 }
 
 
