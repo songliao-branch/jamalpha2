@@ -219,7 +219,6 @@ class CoreDataManager: NSObject {
     }
     
     class func getCurrentUser() -> User? {
-        
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
         
         if results.count == 1 {
@@ -280,9 +279,7 @@ class CoreDataManager: NSObject {
         return true
     }
     
-    
     //song-related
-
     private class func findSong(item: Findable) -> Song? {
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (playbackDuration <= '\(item.getDuration() + 1)') AND (playbackDuration >= '\(item.getDuration() - 1)')")
 
@@ -296,7 +293,6 @@ class CoreDataManager: NSObject {
         }
     }
 
-    
     class func initializeSongToDatabase(item: Findable) {
         // if we don't have the song in the database
         if findSong(item) == nil {
@@ -695,6 +691,24 @@ class CoreDataManager: NSObject {
         }
         return ([Chord](), "", 0, 0)
     }
+
+    
+    
+    //favorite/unfavorite a song
+    class func favoriteTheSong(item: Findable, shouldFavorite: Bool) {
+        if let matchedSong = findSong(item) {
+            matchedSong.isFavorited = shouldFavorite
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    class func isFavorited(item: Findable) -> Bool {
+        if let matchedSong = findSong(item) {
+            return matchedSong.isFavorited
+        }
+        return false
+    
+    }
     
     class func saveSongId(findable: Findable, id: Int) {
         if let matchedSong = findSong(findable) {
@@ -702,6 +716,7 @@ class CoreDataManager: NSObject {
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
+
     
     class func getSongId(findable: Findable) -> Int {
         if let matchedSong = findSong(findable) {
@@ -709,6 +724,7 @@ class CoreDataManager: NSObject {
         }
         return 0 //should not reach here
     }
+
     
     class func downloadUsersAllTabsLyricsSetToCoreData(id: NSNumber) {
         let currentUserId: Int = id as Int
@@ -836,5 +852,8 @@ class CoreDataManager: NSObject {
         })
         return download
     }
-
 }
+
+
+
+

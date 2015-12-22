@@ -20,5 +20,5 @@ class Song: NSManagedObject {
     @NSManaged var tabsSets: NSSet
     @NSManaged var lyricsSets: NSSet
     @NSManaged var id: NSNumber? //retrieved from cloud
-    
+    @NSManaged var isFavorited: Bool
 }

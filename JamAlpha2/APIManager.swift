@@ -483,6 +483,47 @@ class APIManager: NSObject {
     }
     
     
+    
+    
+    //favorite a song
+    class func favoriteTheSong(findable: Findable, completion: ((completed: String) -> Void)) {
+        //given a song's title, artist, and duration, we can find all its corresponding tabs
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+        
+        //user/:id/favorite_a_song body: {"title":"", "artist": "", "duration": ""}
+        Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_a_song" , parameters: parameters).responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    let result = json["result"].string!
+                    completion(completed: result) //either "liked" or "disliked"
+                }
+                
+            case .Failure(let error):
+                print("favorite song error: \(error)")
+            }
+        }
+    }
+    
+    class func getFavorites() {
+        Alamofire.request(.GET, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_songs").responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    print(json)
+                }
+            case .Failure(let error):
+                print("favorite song error: \(error)")
+            }
+        }
+    }
+    
     class func getSongId(findable: Findable) {
         //if we already have song id
         if CoreDataManager.getSongId(findable) > 0 {
@@ -493,13 +534,13 @@ class APIManager: NSObject {
         var parameters = [String: AnyObject]()
         
         parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
-    
+        
         Alamofire.request(.GET, jamBaseURL + "/get_song_id", parameters: parameters).responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                
+                    
                     CoreDataManager.saveSongId(findable, id: json["song_id"].int!)
                 }
             case .Failure(let error):
@@ -508,3 +549,5 @@ class APIManager: NSObject {
         }
     }
 }
+
+

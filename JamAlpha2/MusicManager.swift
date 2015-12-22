@@ -30,6 +30,12 @@ class MusicManager: NSObject {
     var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
     
+    //in case mediaItem was changed outside the app when exit to background from Editor screen
+    //we save these two so that when we come back we always have the correct item
+    var lastPlayingItem: MPMediaItem!
+    var lastPlayingTime: NSTimeInterval!
+
+    
     class var sharedInstance: MusicManager {
         struct Static {
             static var onceToken: dispatch_once_t = 0
@@ -96,6 +102,7 @@ class MusicManager: NSObject {
     //for playing mode and background mode
     private func setSessionActiveWithMixing() {
         do {
+            //set option DefaultToSpeaker so that demo song will not lag while soundwave is generating in the background
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: .DefaultToSpeaker)
         } catch _ {
         }
@@ -132,6 +139,7 @@ class MusicManager: NSObject {
             for song in collection {
                 print("\(_TAG) setting up queue of song: \(song.title!)")
             }
+            return
         }
         
         // after come back from music app which the current playing item is set to nil, we set the collection
@@ -169,7 +177,6 @@ class MusicManager: NSObject {
     func setIndexInTheQueue(selectedIndex: Int){
         // player.stop()
         // 如果单曲循环的话 切出去 再换一首歌的话 还是之前那个首歌
-
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
@@ -262,8 +269,9 @@ class MusicManager: NSObject {
         })
     }
 
-    // go to tab and lyrics editor set queue
-    func setSingleCollection(collection: [MPMediaItem]) -> (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval) {
+    // we manually set the repeat mode to one before going to tabs or lyrics Editor
+    // we save the shuffle, repeat, currentPlaying time state so that when we come back from editors we can resume correctly
+    func saveMusicPlayerState(collection: [MPMediaItem]) -> (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval) {
         let previousRepeatMode: MPMusicRepeatMode = player.repeatMode
         let previousShuffleMode: MPMusicShuffleMode = player.shuffleMode
         let previousPlayingTime: NSTimeInterval = player.currentPlaybackTime
@@ -273,8 +281,9 @@ class MusicManager: NSObject {
         
         return (previousRepeatMode, previousShuffleMode, previousPlayingTime)
     }
+    
     // back to song view controller recover queue
-    func setRecoverCollection(sender: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval), currentSong: MPMediaItem) {
+    func recoverMusicPlayerState(sender: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval), currentSong: MPMediaItem) {
         player.repeatMode = sender.0
         player.shuffleMode = sender.1
         player.currentPlaybackTime = sender.2

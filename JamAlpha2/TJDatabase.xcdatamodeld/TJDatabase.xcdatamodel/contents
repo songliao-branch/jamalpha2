@@ -17,6 +17,7 @@
         <attribute name="albumCover" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="artist" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="isFavorited" optional="YES" attributeType="Boolean" defaultValueString="NotCalled" syncable="YES"/>
         <attribute name="playbackDuration" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="soundwaveData" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="soundwaveImage" optional="YES" attributeType="Transformable" syncable="YES"/>

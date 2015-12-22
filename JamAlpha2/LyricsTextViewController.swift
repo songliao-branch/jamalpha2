@@ -47,7 +47,7 @@ class LyricsTextViewController: UIViewController {
         self.viewHeight = self.view.frame.height
         
         if !isDemoSong {
-            self.recoverMode = MusicManager.sharedInstance.setSingleCollection([theSong as! MPMediaItem])
+            self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
         }
         addObjectsOnMainView()
         //self.getLyrics(theSong)
@@ -201,7 +201,7 @@ class LyricsTextViewController: UIViewController {
             if self.songViewController.isDemoSong {
                 self.songViewController.avPlayer.play()
             } else {
-                MusicManager.sharedInstance.setRecoverCollection(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
                 self.songViewController.player.play()
             }
         })
