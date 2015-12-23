@@ -652,15 +652,15 @@ extension LyricsSyncViewController {
             times.append(Float(t))
         }
         
-        CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times)
+        CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times, userId: Int(CoreDataManager.getCurrentUser()!.id), lyricsSetId: kLocalSetId )
         
-        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: { completed in            
-            if self.lyricsTextViewController.songViewController.isDemoSong {
-                self.lyricsTextViewController.songViewController.avPlayer.play()
-            } else {
-                MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                self.lyricsTextViewController.songViewController.player.play()
-            }
+        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: { completed in
+        if self.lyricsTextViewController.songViewController.isDemoSong {
+            self.lyricsTextViewController.songViewController.avPlayer.play()
+        } else {
+            MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+            self.lyricsTextViewController.songViewController.player.play()
+        }
         })
     }
 }
@@ -698,7 +698,7 @@ extension LyricsSyncViewController {
     func addLyricsToEditorView(sender: Findable) {
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(sender, fetchingLocalOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(sender, fetchingLocalUserOnly: true)
      
         let count = lyric.lyric.count
         var i = 0

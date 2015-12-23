@@ -588,7 +588,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var chords = [Chord]()
         var tuning = ""
         var capo = 0
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: false)
+        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: false)
         if chords.count > 2 {
             self.chords = chords
             updateTuning(tuning)
@@ -604,7 +604,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.bottomLyricLabel.text = ""
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: false)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: false)
         
         if lyric.lyric.count > 1 {
             self.lyric = lyric
@@ -625,7 +625,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 for t in download.times {
                     times.append(NSTimeInterval(t))
                 }
-                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
+                
+                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
                 
                 if self.canFindTabsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
@@ -651,7 +652,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 for t in download.times {
                     times.append(Float(t))
                 }
-                CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, lyricsSetId: download.id)
+                CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, userId: download.editor.userId, lyricsSetId: download.id)
                 
                 if self.canFindLyricsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
@@ -1970,7 +1971,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         var chords = [Chord]()
-        (chords, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalOnly: true)
+        (chords, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
         
         if chords.count < 2 {
             self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
@@ -2027,7 +2028,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
         
         if lyric.lyric.count < 2 {
              self.showMessage("Your lyrics looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)

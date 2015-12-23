@@ -175,7 +175,7 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.delegate = self
 
         var lyrics: Lyric = Lyric()
-        (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingLocalOnly: false)
+        (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingLocalUserOnly: true)
 
         if lyrics.lyric.count > 0 {
             var lyricsToDisplay = ""

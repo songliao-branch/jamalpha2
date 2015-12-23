@@ -2,12 +2,11 @@
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15C50" minimumToolsVersion="Xcode 4.3">
     <entity name="LyricsSet" representedClassName="LyricsSet" syncable="YES">
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
-        <attribute name="isLocal" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="lastSelectedDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="lyrics" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="times" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <relationship name="song" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="lyricsSets" inverseEntity="Song" syncable="YES"/>
-        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="lyricsSets" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="SearchHistory" representedClassName="SearchHistory" syncable="YES">
         <attribute name="term" attributeType="String" syncable="YES"/>
@@ -35,13 +34,12 @@
         <attribute name="capo" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="chords" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
-        <attribute name="isLocal" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="lastSelectedDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="tabs" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="times" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="tuning" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <relationship name="song" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song" inverseName="tabsSets" inverseEntity="Song" syncable="YES"/>
-        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="tabsSets" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="User" representedClassName="User" syncable="YES">
         <attribute name="authToken" attributeType="String" syncable="YES"/>
@@ -53,15 +51,15 @@
         <attribute name="profileImage" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="thumbnail" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="thumbnailUrl" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="lyricsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="LyricsSet" inverseName="user" inverseEntity="LyricsSet" syncable="YES"/>
-        <relationship name="tabsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TabsSet" inverseName="user" inverseEntity="TabsSet" syncable="YES"/>
+        <relationship name="lyricsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="LyricsSet" syncable="YES"/>
+        <relationship name="tabsSets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TabsSet" syncable="YES"/>
     </entity>
     <elements>
-        <element name="LyricsSet" positionX="-27" positionY="81" width="128" height="150"/>
+        <element name="LyricsSet" positionX="-27" positionY="81" width="128" height="135"/>
         <element name="SearchHistory" positionX="-54" positionY="27" width="128" height="60"/>
         <element name="Song" positionX="-54" positionY="27" width="128" height="195"/>
         <element name="Tabs" positionX="-36" positionY="90" width="128" height="105"/>
-        <element name="TabsSet" positionX="-45" positionY="72" width="128" height="195"/>
+        <element name="TabsSet" positionX="-45" positionY="72" width="128" height="180"/>
         <element name="User" positionX="-45" positionY="99" width="128" height="210"/>
     </elements>
 </model>

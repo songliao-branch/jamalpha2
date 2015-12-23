@@ -350,11 +350,11 @@
 			isa = PBXGroup;
 			children = (
 				E455E7281BA272AD00210BD6 /* Song.swift */,
+				E46F39E41BCCB816004B36EB /* TabsSet.swift */,
 				E443B91A1BBBA2F20074A4E1 /* LyricsSet.swift */,
 				E43DA1281B9FDCE1003180FB /* SearchHistory.swift */,
 				E4FCACEE1BC5A7C3000E3661 /* Tabs.swift */,
 				BFC080D41BCAED9D009CD755 /* NormalTab.swift */,
-				E46F39E41BCCB816004B36EB /* TabsSet.swift */,
 				E42032E51BFE90CB00A5D36D /* User.swift */,
 			);
 			name = Models;

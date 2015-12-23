@@ -194,7 +194,6 @@ extension LocalSong: Findable {
 }
 
 
-
 class CoreDataManager: NSObject {
     
     static let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
@@ -288,7 +287,6 @@ class CoreDataManager: NSObject {
         if results.count == 0 {
             return nil
         } else {
-            print("find the song in coredata: \((results.lastObject as! Song).title)")
             return results.lastObject! as? Song
         }
     }
@@ -337,8 +335,8 @@ class CoreDataManager: NSObject {
 
     }
     
-    // MARK: save, retrieve lyrics
-    class func saveLyrics(item: Findable, lyrics: [String], times: [Float], lyricsSetId: Int?=nil) {
+    // MARK: save, retrieve lyrics, userId can be either localuserId or downloaded lyricsSet's user id
+    class func saveLyrics(item: Findable, lyrics: [String], times: [Float], userId: Int, lyricsSetId: Int) {
 
         if let matchedSong = findSong(item) {
           
@@ -347,70 +345,42 @@ class CoreDataManager: NSObject {
             let lyricsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(lyrics as AnyObject)
             let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
             
-            if let id = lyricsSetId where id > 0 { //if downloaded lyrics
-                var foundDownloadedLyricsSet: LyricsSet!
-                var found = false
-                
-                //find the exisiting downloaded lyrics
-                for set in savedSets {
-                    if set.id == id  {
-                        foundDownloadedLyricsSet = set
-                        found = true
-                        foundDownloadedLyricsSet.lyrics = lyricsData
-                        
-                        foundDownloadedLyricsSet.times = timesData
-                        foundDownloadedLyricsSet.lastSelectedDate = NSDate()
-                        break
-                    }
+            //if let id = lyricsSetId where id > 0 { //if downloaded lyrics
+            var foundDownloadedLyricsSet: LyricsSet!
+            var found = false
+            
+            for set in savedSets {
+                if set.id == lyricsSetId {
+                    foundDownloadedLyricsSet = set
+                    found = true
+                    foundDownloadedLyricsSet.lyrics = lyricsData
+                    
+                    foundDownloadedLyricsSet.times = timesData
+                    foundDownloadedLyricsSet.lastSelectedDate = NSDate()
+                    break
                 }
+            }
                 
                 //if the downloaded lyricsSet with id is not found, we create a new one
-                if !found {
-                    let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
+            if !found {
+                let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
 
-                    lyricsSet.lyrics = lyricsData
-                    lyricsSet.times = timesData
-                    lyricsSet.song = matchedSong
-                    
-                    lyricsSet.lastSelectedDate = NSDate()
-                    lyricsSet.id = id
-                    lyricsSet.isLocal = true
-                }
+                lyricsSet.lyrics = lyricsData
+                lyricsSet.times = timesData
+                lyricsSet.song = matchedSong
                 
-            } else {//if saving local lyrics
-                
-                var foundLyricsSet: LyricsSet!
-                var found = false
-                //if this lyrics is already in the core data
-                for set in savedSets {
-                    if set.isLocal {
-                        foundLyricsSet = set
-                        found = true
-                        foundLyricsSet.lyrics = lyricsData
-                        foundLyricsSet.times = timesData
-                        foundLyricsSet.lastSelectedDate = NSDate()
-                        break
-                    }
-                }
-                
-                //create a new one if none found
-                if !found {
-                    let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
-                    
-                    lyricsSet.lyrics = lyricsData
-                    lyricsSet.times = timesData
-                    lyricsSet.song = matchedSong
-                    
-                    lyricsSet.lastSelectedDate = NSDate()
-                    lyricsSet.isLocal = true
-                    lyricsSet.id = -1 //this is needed to check which lyrics is last selected in the BrowseTable
-                }
+                lyricsSet.lastSelectedDate = NSDate()
+                lyricsSet.id = lyricsSetId
+                lyricsSet.userId = userId
             }
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     
-    class func getLyrics(item: Findable, fetchingLocalOnly: Bool) -> (Lyric, Int) {
+    //if fetchingLocalUserOnly true, will get the currently locally saved lyrics,
+    //otherwise we will retrieve all lyricsSet(both local user's and downloaded) and select the most 
+    //recently selected one
+    class func getLyrics(item: Findable, fetchingLocalUserOnly: Bool) -> (Lyric, Int) {
         
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.lyricsSets.count) set of lyrics")
@@ -419,8 +389,9 @@ class CoreDataManager: NSObject {
             
             var foundLyricsSet: LyricsSet!
             
-            if fetchingLocalOnly {
-                foundLyricsSet = sets.filter({ $0.isLocal == true }).first
+            if fetchingLocalUserOnly {
+                let localUserId = CoreDataManager.getCurrentUser()!.id
+                foundLyricsSet = sets.filter({ $0.userId == localUserId }).first
             } else {
                 //find the most recently selected tabsSet
                 foundLyricsSet = sets.sort({
@@ -452,7 +423,7 @@ class CoreDataManager: NSObject {
     class func setLocalLyricsMostRecent(item: Findable) {
         if let matchedSong = findSong(item) {
             let savedSets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
-            let foundLocalSet = savedSets.filter({ $0.isLocal == true }).first
+            let foundLocalSet = savedSets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
             
             if foundLocalSet == nil {
                 return
@@ -466,7 +437,7 @@ class CoreDataManager: NSObject {
         if let matchedSong = findSong(item) {
             let savedSets = matchedSong.tabsSets.allObjects as! [TabsSet]
             
-            let foundLocalSet = savedSets.filter({ $0.isLocal == true }).first
+            let foundLocalSet = savedSets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
             if foundLocalSet == nil {
                 return
             }
@@ -475,42 +446,8 @@ class CoreDataManager: NSObject {
         }
     }
 
-    class func saveMyTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, tabsSetId: Int?=nil, id: Int) {
-        if let matchedSong = findSong(item) {
-            let chordsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(chords as AnyObject)
-            let tabsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tabs as AnyObject)
-            let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
-            let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
-            
-            tabsSet.chords = chordsData
-            tabsSet.tabs = tabsData
-            tabsSet.times = timesData
-            tabsSet.song = matchedSong
-            tabsSet.tuning = tuning
-            tabsSet.capo = capo
-            tabsSet.lastSelectedDate = NSDate()
-            tabsSet.id = id
-            tabsSet.isLocal = true
-        }
-        SwiftCoreDataHelper.saveManagedObjectContext(moc)
-    }
-    
-    class func saveMyLyrics(item: Findable, lyrics: [String], times: [Float], lyricsSetId: Int?=nil, id: Int ) {
-        if let matchedSong = findSong(item) {
-            let lyricsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(lyrics as AnyObject)
-            let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
-            let lyricsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(LyricsSet), managedObjectConect: moc) as! LyricsSet
-            lyricsSet.lyrics = lyricsData
-            lyricsSet.times = timesData
-            lyricsSet.song = matchedSong
-            lyricsSet.lastSelectedDate = NSDate()
-            lyricsSet.id = id
-            lyricsSet.isLocal = true
-        }
-    }
-    
     //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
-    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, tabsSetId: Int?=nil ) {
+    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, userId: Int, tabsSetId: Int) {
         
         if let matchedSong = findSong(item) {
             
@@ -519,74 +456,38 @@ class CoreDataManager: NSObject {
             let tabsData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tabs as AnyObject)
             let timesData: NSData = NSKeyedArchiver.archivedDataWithRootObject(times as AnyObject)
             
-            if let id = tabsSetId where id > 0 { //if downloaded tabs
-                var foundDownloadedTabsSet: TabsSet!
-                var found = false
-                
-                //find the exisiting downloaded tabs
-                for set in savedSets {
-                    if set.id == id  {
-                        foundDownloadedTabsSet = set
-                        found = true
-                        foundDownloadedTabsSet.chords = chordsData
-                        foundDownloadedTabsSet.tabs = tabsData
-                        foundDownloadedTabsSet.times = timesData
-                        foundDownloadedTabsSet.tuning = tuning
-                        foundDownloadedTabsSet.capo = capo
-                        foundDownloadedTabsSet.lastSelectedDate = NSDate()
-                        break
-                    }
-                }
-                
-                //if the downloaded tabsSet with id is not found, we create a new one
-                if !found {
-                    let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
-                    
-                    tabsSet.chords = chordsData
-                    tabsSet.tabs = tabsData
-                    tabsSet.times = timesData
-                    tabsSet.song = matchedSong
-                    tabsSet.tuning = tuning
-                    tabsSet.capo = capo
-                    tabsSet.lastSelectedDate = NSDate()
-                    tabsSet.id = id
-                    tabsSet.isLocal = false
-                }
-                
-            } else {//if saving local tabs
-                
-                var foundLocalTabsSet: TabsSet!
-                var found = false
-                //if this tabs is already in the core data
-                for set in savedSets {
-                    if set.isLocal {
-                        foundLocalTabsSet = set
-                        found = true
-                        foundLocalTabsSet.chords = chordsData
-                        foundLocalTabsSet.tabs = tabsData
-                        foundLocalTabsSet.times = timesData
-                        foundLocalTabsSet.tuning = tuning
-                        foundLocalTabsSet.capo = capo
-                        foundLocalTabsSet.lastSelectedDate = NSDate()
-                        break
-                    }
-                }
-                
-                //create a new one if none found
-                if !found {
-                    let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
-                   
-                    tabsSet.chords = chordsData
-                    tabsSet.tabs = tabsData
-                    tabsSet.times = timesData
-                    tabsSet.song = matchedSong
-                    tabsSet.tuning = tuning
-                    tabsSet.capo = capo
-                    tabsSet.lastSelectedDate = NSDate()
-                    tabsSet.isLocal = true
-                    tabsSet.id = -1 //this is needed to check which tabs is last selected in the BrowseTable
+            var foundDownloadedTabsSet: TabsSet!
+            var found = false
+
+            for set in savedSets {
+                if set.id == tabsSetId  {
+                    foundDownloadedTabsSet = set
+                    found = true
+                    foundDownloadedTabsSet.chords = chordsData
+                    foundDownloadedTabsSet.tabs = tabsData
+                    foundDownloadedTabsSet.times = timesData
+                    foundDownloadedTabsSet.tuning = tuning
+                    foundDownloadedTabsSet.capo = capo
+                    foundDownloadedTabsSet.lastSelectedDate = NSDate()
+                    break
                 }
             }
+            
+            //if the downloaded tabsSet with id is not found, we create a new one
+            if !found {
+                let tabsSet = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(TabsSet), managedObjectConect: moc) as! TabsSet
+                
+                tabsSet.chords = chordsData
+                tabsSet.tabs = tabsData
+                tabsSet.times = timesData
+                tabsSet.song = matchedSong
+                tabsSet.tuning = tuning
+                tabsSet.capo = capo
+                tabsSet.lastSelectedDate = NSDate()
+                tabsSet.id = tabsSetId
+                tabsSet.userId = userId
+            }
+
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
@@ -648,8 +549,10 @@ class CoreDataManager: NSObject {
         }
     }
     
-    //if isLocal is true, we get the ONE tabs from the database, otherwise we selected the one last selected
-    class func getTabs(item: Findable, fetchingLocalOnly: Bool) -> ([Chord], String, Int, Int) { //return chords, tuning and capo, song_id
+    //if fetchingLocalUserOnly true, will get the currently locally saved tabs,
+    //otherwise we will retrieve all tabsSets(both local user's and downloaded) and select the most
+    //recently selected one
+    class func getTabs(item: Findable, fetchingLocalUserOnly: Bool) -> ([Chord], String, Int, Int) { //return chords, tuning and capo, song_id
         
         //song id is used to determine which tabs
         if let matchedSong = findSong(item) {
@@ -659,8 +562,8 @@ class CoreDataManager: NSObject {
             
             var foundTabsSet: TabsSet!
             
-            if fetchingLocalOnly {
-                foundTabsSet = sets.filter({ $0.isLocal == true }).first
+            if fetchingLocalUserOnly {
+                foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
             } else {
                 //find the most recently selected tabsSet
                 foundTabsSet = sets.sort({
@@ -759,7 +662,7 @@ class CoreDataManager: NSObject {
                                     let output: NSTimeInterval = NSTimeInterval(time)
                                     return output
                                 }
-                                CoreDataManager.saveMyTabs(local as Findable, chords: downloadTabsContent.chords, tabs: temp.tabs, times: times, tuning: temp.tuning, capo: temp.capo, id: temp.id)
+//                                CoreDataManager.saveMyTabs(local as Findable, chords: downloadTabsContent.chords, tabs: temp.tabs, times: times, tuning: temp.tuning, capo: temp.capo, id: temp.id)
                                 print("tabs save to core data: \(item.localSong.title)")
                             })
                             
@@ -776,7 +679,7 @@ class CoreDataManager: NSObject {
                                     let output: NSTimeInterval = NSTimeInterval(time)
                                     return output
                                 }
-                                CoreDataManager.saveMyTabs(item as Findable, chords: temp.chords, tabs: temp.tabs, times: times, tuning: temp.tuning, capo: temp.capo, id: temp.id)
+//                                CoreDataManager.saveMyTabs(item as Findable, chords: temp.chords, tabs: temp.tabs, times: times, tuning: temp.tuning, capo: temp.capo, id: temp.id)
                                 print("tabs save to core data: \(item.title)")
                             })
                         }
@@ -812,7 +715,7 @@ class CoreDataManager: NSObject {
                             downloadLyricsContent.id = temp.id
                             APIManager.downloadLyricsSetContent(downloadLyricsContent, completion: {
                                 downloadWithContent in
-                                CoreDataManager.saveMyLyrics(local as Findable, lyrics: downloadLyricsContent.lyrics, times: downloadLyricsContent.times, id: temp.id)
+//                                CoreDataManager.saveMyLyrics(local as Findable, lyrics: downloadLyricsContent.lyrics, times: downloadLyricsContent.times, id: temp.id)
                                 print("lyrics save to core data: \(item.localSong.title)")
                             })
                             
@@ -825,16 +728,13 @@ class CoreDataManager: NSObject {
                             downloadLyricsContent.id = temp.id
                             APIManager.downloadLyricsSetContent(downloadLyricsContent, completion: {
                                 downloadWithContent in
-                                CoreDataManager.saveMyLyrics(item as Findable, lyrics: temp.lyrics, times: temp.times, id: temp.id)
+//                                CoreDataManager.saveMyLyrics(item as Findable, lyrics: temp.lyrics, times: temp.times, id: temp.id)
                                 print("lyrics save to core data: \(item.title)")
                             })
-
                         }
                     }
                 }
-                
             }
-            
         })
     }
     

@@ -32,4 +32,5 @@ let kShowDemoSong  = "showDemoSong"
 
 let kSongNames = ["Go"]
 
-//var KGLOBAL_closeDemoButton:UIButton!
+//used in core data to refer to a locally created tabsSet/lyricsSet
+let kLocalSetId = -1

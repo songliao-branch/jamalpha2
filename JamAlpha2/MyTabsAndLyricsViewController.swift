@@ -31,7 +31,7 @@ class MyTabsAndLyricsViewController: UIViewController {
         self.viewHeight = self.view.frame.size.height
 
         // Do any additional setup after loading the view.
-        loadData()
+        //loadData()
     }
 
     override func didReceiveMemoryWarning() {

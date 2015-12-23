@@ -56,7 +56,7 @@ class APIManager: NSObject {
         var tuning = ""
         var capo = 0
         
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: true)
+        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: true)
         
         if chords.count < 2 {
             print("uploading tabs error: tabs count is less than 2")
@@ -105,7 +105,7 @@ class APIManager: NSObject {
 
         var lyric = Lyric()
         
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: true)
         
         if lyric.lyric.count < 2 {
             print("uploading lyrics error: lyrics count is less than 2")
@@ -242,7 +242,8 @@ class APIManager: NSObject {
                         theTimes.append(Float(time)!)
                     }
                     
-                    let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
+                    let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
                     
                     t.times = theTimes
                     t.chords  = set["chords"].arrayObject as! [String]
@@ -349,7 +350,8 @@ class APIManager: NSObject {
                         theTimes.append(Float(time)!)
                     }
                     
-                    let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
+                    let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
                     
                     l.lyrics = set["lyrics"].arrayObject as! [String]
                     l.times = theTimes
@@ -430,6 +432,7 @@ class APIManager: NSObject {
                 if let data = response.result.value {
                     let json = JSON(data)
                     let set = json["user"]["tabs_sets"]
+                    
                     for tabs in set {
                         let mytab: DownloadedTabsSet = DownloadedTabsSet()
                         mytab.initialTabSet(tabs.1["id"].int!, tuning: tabs.1["tuning"].string!, capo: tabs.1["capo"].int!, cached_votes_score: tabs.1["cached_votes_score"].int!, chords_preview: tabs.1["chords_preview"].string!, vote_status: tabs.1["vote_status"].string!, updated_at: tabs.1["updated_at"].string!, song_id: tabs.1["song"]["id"].int!, title: tabs.1["song"]["title"].string!, artist: tabs.1["song"]["artist"].string!, duration: tabs.1["song"]["duration"].float!)
@@ -444,7 +447,6 @@ class APIManager: NSObject {
                 print(error)
             }
         }
-        
     }
 
     
