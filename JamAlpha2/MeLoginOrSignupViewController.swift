@@ -421,8 +421,24 @@ class MeLoginOrSignupViewController: UIViewController{
                                 userProfileVC.refreshUserImage()
                             }
 
+                            
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
 //                            CoreDataManager.downloadUsersAllTabsLyricsSetToCoreData((CoreDataManager.getCurrentUser()?.id)!)
+                            
+                            APIManager.downloadCurrentUserTabsAndLyrics({
+                                tabsSets, lyricsSets in
+                                
+                                for set in tabsSets {
+                                    
+//                                    CoreDataManager.saveTabs(<#T##item: Findable##Findable#>, chords: <#T##[String]#>, tabs: <#T##[String]#>, times: <#T##[NSTimeInterval]#>, tuning: <#T##String#>, capo: <#T##Int#>, userId: <#T##Int#>, tabsSetId: <#T##Int#>)
+                                    
+                                }
+
+                                
+                                print("user has \(tabsSets.count) tabs and \(lyricsSets.count) lyrics")
+                            })
+                            
+                            APIManager.getFavorites()
                             
                         } else { //we have an error
                             var errorMessage = ""

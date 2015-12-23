@@ -230,14 +230,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 avPlayer = MusicManager.sharedInstance.avPlayer
                 self.demoItem = avPlayer.currentItem
                 self.demoItemDuration = self.demoItem.getDuration()
-                CoreDataManager.initializeSongToDatabase(demoItem)
                 APIManager.getSongId(demoItem)
                 removeAllObserver()
             } else {
                 player = MusicManager.sharedInstance.player
                 self.nowPlayingMediaItem = player.nowPlayingItem
                 self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
-                CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
                 APIManager.getSongId(nowPlayingMediaItem)
                 removeAllObserver()
             }
@@ -851,8 +849,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // use current item's playbackduration to validate nowPlayingItem duration
             // if they are not equal, i.e. not the same song
 
-        
-                CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem!)
                 self.updateMusicData(nowPlayingMediaItem!)
                 self.updateFavoriteStatus(nowPlayingMediaItem!)
                 // The following won't run when selected from table
@@ -933,7 +929,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         // use current item's playbackduration to validate nowPlayingItem duration
         // if they are not equal, i.e. not the same song
-        CoreDataManager.initializeSongToDatabase(demoItem!)
         self.updateMusicData(demoItem!)
         
         // The following won't run when selected from table

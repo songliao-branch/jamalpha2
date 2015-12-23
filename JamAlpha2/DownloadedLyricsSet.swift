@@ -41,31 +41,27 @@ class DownloadedLyricsSet: NSObject {
         self.updatedAt =  NSDate.convertFromIsoToHumanizedFormat(updatedAt)
     }
     
-    override init() {
-        // perform some initialization here
-    }
-    
-    func initialLyricsSet(id: Int, cached_votes_score: Int, number_of_lines: Int, lyrics_preview: String, vote_status: String, updated_at: String, song_id: Int, title: String, artist: String, duration: Float) {
-        self.id = id
-        self.votesScore = cached_votes_score
-        self.numberOfLines = number_of_lines
-        self.lyricsPreview = lyrics_preview
-        self.voteStatus = vote_status
-        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updated_at)
-        self.song_id = song_id
-        self.title = title
-        self.artist = artist
-        self.duration = duration
-    }
+//    func initialLyricsSet(id: Int, cached_votes_score: Int, number_of_lines: Int, lyrics_preview: String, vote_status: String, updated_at: String, song_id: Int, title: String, artist: String, duration: Float) {
+//        self.id = id
+//        self.votesScore = cached_votes_score
+//        self.numberOfLines = number_of_lines
+//        self.lyricsPreview = lyrics_preview
+//        self.voteStatus = vote_status
+//        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updated_at)
+//        self.song_id = song_id
+//        self.title = title
+//        self.artist = artist
+//        self.duration = duration
+//    }
 }
-
-class LocalLyrics {
-    var id = -1
-    var localSong: Song!
-    
-    init(id: Int, song: Song) {
-        self.id = id
-        self.localSong = song
-    }
-}
-
+//
+//class LocalLyrics {
+//    var id = -1
+//    var localSong: Song!
+//    
+//    init(id: Int, song: Song) {
+//        self.id = id
+//        self.localSong = song
+//    }
+//}
+//

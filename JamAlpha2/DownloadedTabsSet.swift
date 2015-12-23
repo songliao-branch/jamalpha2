@@ -35,12 +35,11 @@ class DownloadedTabsSet: NSObject {
     var times = [Float]()
     
     //only needed when this comes in a buck list for a user
+    //when first signed in and initialized all tabs of the user, we need to match this with current database
     var song_id = -1
     var title = ""
     var artist = ""
     var duration: Float = 0
-    
-//    var localSong: Song!
     
     init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
         self.id = id
@@ -52,37 +51,39 @@ class DownloadedTabsSet: NSObject {
         self.editor = editor
         self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updatedAt)
     }
-
-    override init() {
-        // perform some initialization here
+    
+    func findSongInCoreData(findable: Findable) -> Bool {
+        if self.title == findable.getTitle() && artist == findable.getArtist() && abs(self.duration-findable.getDuration()) < 1 {
+            return true
+        }
+        return false
     }
     
-    func initialTabSet(id: Int, tuning: String, capo: Int, cached_votes_score: Int, chords_preview: String, vote_status: String, updated_at: String, song_id: Int, title: String, artist: String, duration: Float) {
-        self.id = id
-        self.tuning = tuning
-        self.capo = capo
-        self.votesScore = cached_votes_score
-        self.chordsPreview = chords_preview
-        self.voteStatus = vote_status
-        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updated_at)
-        self.song_id = song_id
-        self.title = title
-        self.artist = artist
-        self.duration = duration
-    }
-    
+//    func initialTabSet(id: Int, tuning: String, capo: Int, cached_votes_score: Int, chords_preview: String, vote_status: String, updated_at: String, song_id: Int, title: String, artist: String, duration: Float) {
+//        self.id = id
+//        self.tuning = tuning
+//        self.capo = capo
+//        self.votesScore = cached_votes_score
+//        self.chordsPreview = chords_preview
+//        self.voteStatus = vote_status
+//        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updated_at)
+//        self.song_id = song_id
+//        self.title = title
+//        self.artist = artist
+//        self.duration = duration
+//    }
 
 }
-
-class LocalTabSet {
-    var id = -1
-    var localSong: Song!
-    
-    init(id: Int, song: Song) {
-        self.id = id
-        self.localSong = song
-    }
-}
+//
+//class LocalTabSet {
+//    var id = -1
+//    var localSong: Song!
+//    
+//    init(id: Int, song: Song) {
+//        self.id = id
+//        self.localSong = song
+//    }
+//}
 
 
 
