@@ -14,6 +14,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // define jiggling gesture recognizer for base note button
     var isJiggling: Bool = false
+    var longPressX:CGFloat = 0
+    var longPressY:CGFloat = 0
+    var oldTagString4:Int = 0
+    var oldTagString5:Int = 0
     let jigglingPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
     let jigglingTapGesture: UITapGestureRecognizer = UITapGestureRecognizer()
     let jigglingLongPressGesture : UILongPressGestureRecognizer = UILongPressGestureRecognizer()
@@ -865,6 +869,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.fingerPoint[i].hidden = false
             }
         }
+        self.oldTagString4 = 0
+        self.oldTagString5 = 0
     }
     
 
@@ -889,19 +895,21 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }
             }
             if (indexString + 1) >= self.currentBaseButton.tag / 100 && indexString >= 3 && indexString <= 5{
-                self.currentBaseButton.removeFromSuperview()
-                self.addNoteButton(indexFret, indexString: indexString)
-                self.tabNameTextField.text = ""
-                self.completeStringView.addSubview(self.fingerPoint[6 - indexString])
-                self.fingerPoint[6 - (indexString + 1)].hidden = true
-                self.addedNoteButtonOnCompleteView = true
-                self.addNewTab = true
+               if !(((indexString + 1) == self.currentBaseButton.tag / 100)&&(indexFret == self.currentBaseButton.tag%100)) || (!self.addedNoteButtonOnCompleteView && !self.addNewTab){
+                    self.currentBaseButton.removeFromSuperview()
+                    self.addNoteButton(indexFret, indexString: indexString)
+                    self.tabNameTextField.text = ""
+                    self.completeStringView.addSubview(self.fingerPoint[6 - indexString])
+                    self.fingerPoint[6 - (indexString + 1)].hidden = true
+                    self.addedNoteButtonOnCompleteView = true
+                    self.addNewTab = true
+                }
             }
             if (indexString + 1) < self.currentBaseButton.tag / 100 {
                 moveFingerPoint(indexFret, indexString: indexString)
             }
         } else {
-            self.stopJiggling(self.jigglingTapGesture)
+            self.stopJiggling()
             
             
         }
@@ -1132,6 +1140,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.specificTabSets.removeAll(keepCapacity: false)
                 self.addNewTab = false
                 self.removeAvaliable = false
+                self.oldTagString4 = 0
+                self.oldTagString5 = 0
             }
         )
 
@@ -1488,6 +1498,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for item in self.fingerPoint {
             item.removeFromSuperview()
         }
+        self.oldTagString4 = 0
+        self.oldTagString5 = 0
         self.isJiggling = false
         self.addedNoteButtonOnCompleteView = false
         self.currentBaseButton.tag = 400
@@ -2178,11 +2190,14 @@ extension TabsEditorViewController {
     func startJiggling(sender: UIGestureRecognizer) {
         if sender.isKindOfClass(UITapGestureRecognizer) {
             self.jigglingChanged()
+            self.currentBaseButton.removeGestureRecognizer(self.jigglingLongPressGesture)
         }else if sender.isKindOfClass(UILongPressGestureRecognizer) {
             let tempSender = sender as! UILongPressGestureRecognizer
             if tempSender.state == .Began {
                 self.jigglingChanged()
             }
+            
+            handleCurrentBaseButtonLongPress(tempSender)
         }
     }
     
@@ -2218,13 +2233,12 @@ extension TabsEditorViewController {
             self.currentBaseButton.transform = rightWobble
             
             }, completion: nil)
+        self.currentBaseButton.removeGestureRecognizer(self.jigglingTapGesture)
         self.jigglingPanGesture.addTarget(self, action: "handleCurrentBaseButtonPan:")
         self.currentBaseButton.addGestureRecognizer(self.jigglingPanGesture)
-        self.currentBaseButton.removeGestureRecognizer(self.jigglingTapGesture)
-        self.currentBaseButton.removeGestureRecognizer(self.jigglingLongPressGesture)
     }
     
-    func stopJiggling(sender: UIGestureRecognizer) {
+    func stopJiggling() {
         self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
         self.currentBaseButton.addGestureRecognizer(self.jigglingLongPressGesture)
         deleteView.removeFromSuperview()
@@ -2240,9 +2254,6 @@ extension TabsEditorViewController {
         
     }
     
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
-    }
     
     func handleCurrentBaseButtonPan(sender: UIPanGestureRecognizer) {
         let transfer = sender.translationInView(self.completeStringView)
@@ -2264,7 +2275,7 @@ extension TabsEditorViewController {
             self.currentBaseButton.alpha = 0.8
             var indexFret: Int = Int()
             var indexString: Int = Int()
-            let location = sender.locationInView(self.completeStringView)
+            let location = self.currentBaseButton.center
             for var index = 0; index < self.string6FretPosition.count; index++ {
                 if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
                     if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
@@ -2290,38 +2301,148 @@ extension TabsEditorViewController {
                 noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
                 self.tabNameTextField.text = ""
                 self.moveFingerPoint(indexFret, indexString: indexString)
+                
                 self.fingerPoint[6 - (indexString + 1)].hidden = true
+                
                 self.currentNoteButton = noteButton
                 self.currentBaseButton = noteButton
                 self.noteButtonOnCompeteScrollView = noteButton
                 self.addSpecificTabButton(noteButton.tag)
-                self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag)
+                self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
             } else {
                 self.currentBaseButton.center = self.originalCenter
             }
             self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
-            self.stopJiggling(self.jigglingTapGesture)
+            self.currentBaseButton.addGestureRecognizer(self.jigglingLongPressGesture)
+            self.stopJiggling()
             self.currentBaseButton.removeGestureRecognizer(sender)
         }
     }
     
-    func checkTheFingerPoint(newTag: Int, oldTag: Int) {
-        for item in self.fingerPoint {
-            print(item.tag)
+    func handleCurrentBaseButtonLongPress(sender: UILongPressGestureRecognizer) {
+        let transfer:CGPoint = sender.locationInView(self.completeStringView)
+        if sender.state == .Began {
+            self.currentBaseButton.alpha = 0.5
+            self.originalCenter = self.currentBaseButton.center
+            self.longPressX = transfer.x - originalCenter.x
+            self.longPressY = transfer.y - originalCenter.y
+          
+        } else if sender.state == .Changed {
+            //            let location = sender.locationInView(self.completeStringView)
+            //            if self.startScrolling == false {
+            //                if location.x > CGRectGetMaxX(self.completeStringView.frame) - CGFloat(20) {
+            //                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToRight:", userInfo: nil, repeats: true)
+            //                    self.startScrolling = true
+            //                } else if location.x < CGRectGetMinX(self.completeStringView.frame) + CGFloat(20) {
+            //                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToLeft:", userInfo: nil, repeats: true)
+            //                }
+            //            }
+            
+            self.currentBaseButton.center = CGPointMake(transfer.x - longPressX, transfer.y - longPressY)
+        } else if sender.state == .Ended {
+            self.currentBaseButton.alpha = 0.8
+            var indexFret: Int = Int()
+            var indexString: Int = Int()
+            let location = self.currentBaseButton.center
+            for var index = 0; index < self.string6FretPosition.count; index++ {
+                if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
+                    if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
+                        indexFret = index
+                        break
+                    }
+                }
+            }
+            for var index = 0; index < 6; index++ {
+                if CGRectContainsPoint(self.string6View[index].frame, location) {
+                    indexString = index
+                }
+            }
+            var oldNoteButtonTag:Int = 0
+            if indexString >= 3 {
+                self.stopJiggling()
+                let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
+                let buttonString = self.string6Position[indexString]
+                let buttonWidth = 9 / 60 * self.trueHeight
+                self.currentBaseButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
+                self.currentBaseButton.layer.cornerRadius = buttonWidth/2
+                let noteButton = self.currentBaseButton
+                oldNoteButtonTag = noteButton.tag
+                noteButton.tag = (indexString + 1) * 100 + indexFret
+                let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
+                noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
+                self.tabNameTextField.text = ""
+                self.fingerPoint[6 - (indexString + 1)].hidden = true
+                
+                self.currentNoteButton = noteButton
+                self.currentBaseButton = noteButton
+                self.noteButtonOnCompeteScrollView = noteButton
+                self.addSpecificTabButton(noteButton.tag)
+                self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
+            } else {
+                self.currentBaseButton.center = self.originalCenter
+            }
+            self.currentBaseButton.removeGestureRecognizer(jigglingLongPressGesture)
+            self.jigglingChanged()
+            if abs(location.x - currentBaseButton.center.x) > 5 || abs(location.y - currentBaseButton.center.y) > 5 || oldNoteButtonTag != currentBaseButton.tag {
+                self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
+                self.stopJiggling()
+                self.currentBaseButton.removeGestureRecognizer(jigglingPanGesture)
+            }
+            
         }
+    }
+
+    
+    func checkTheFingerPoint(newTag: Int, oldTag: Int, oldTagString4:Int, oldTagString5:Int) {
         let indexString = newTag / 100
         if indexString > oldTag / 100 {
-            self.fingerPoint[6 - (indexString - 1)].hidden = false
-            if indexString == 6 {
-                self.fingerPoint[6 - (indexString - 2)].hidden = false
+            if(!self.fingerPoint[3].hidden){
+                if(self.fingerPoint[2].hidden){
+                    self.moveFingerPoint(oldTagString4, indexString: 3)
+                }
+                self.fingerPoint[2].hidden = false
+                if indexString == 6 {
+                    self.fingerPoint[1].hidden = false
+                    self.moveFingerPoint(oldTagString5, indexString: 4)
+                }
             }
+            self.moveFingerPoint(newTag%100, indexString: indexString-1)
         } else {
-            self.moveFingerPoint(0, indexString: indexString - 1)
-            self.fingerPoint[6 - indexString].hidden = true
-            if indexString == 4 {
-                self.moveFingerPoint(0, indexString: indexString)
-                self.fingerPoint[6 - (indexString + 1)].hidden = true
+            
+            if(indexString == 4){
+                if(oldTag/100 != newTag/100){
+                    self.oldTagString4 = fingerPoint[2].tag
+                    if(!fingerPoint[1].hidden){
+                        self.oldTagString5 = fingerPoint[1].tag
+                    }
+                    print(oldTagString4)
+                    print(oldTagString5)
+                }
+                self.moveFingerPoint(newTag%100, indexString: indexString-1)
+                self.moveFingerPoint(0, indexString: 4)
+                self.moveFingerPoint(0, indexString: 5)
+                self.fingerPoint[0].hidden = true
+                self.fingerPoint[1].hidden = true
+                self.fingerPoint[2].hidden = true
+            }else if (indexString == 5){
+                if(oldTag/100 != newTag/100){
+                    self.oldTagString4 = fingerPoint[2].tag
+                    self.oldTagString5 = fingerPoint[1].tag
+                }
+                self.moveFingerPoint(newTag%100, indexString: indexString-1)
+                self.moveFingerPoint(0, indexString: 5)
+                self.fingerPoint[0].hidden = true
+                self.fingerPoint[1].hidden = true
+            }else if(indexString == 6){
+                if(oldTag/100 != newTag/100){
+                    self.oldTagString5 = fingerPoint[1].tag
+                }
+                 self.moveFingerPoint(newTag%100, indexString: indexString-1)
+                self.fingerPoint[0].hidden = true
             }
+        }
+        for item in self.fingerPoint {
+            print(item.tag)
         }
     }
     
