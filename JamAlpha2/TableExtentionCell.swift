@@ -43,7 +43,7 @@ class TableExtensionCell: UITableViewCell {
         uploadButton.titleLabel?.lineBreakMode = NSLineBreakMode.ByWordWrapping
         uploadButton.titleEdgeInsets = UIEdgeInsetsMake(26, 0, -2, 0)
         let uploadImageView: UIImageView = UIImageView(frame: CGRectMake((buttonWidth - 10) / 2 - 10, 2, 20, 20))
-        uploadImageView.image = UIImage(named: "uploaded")
+        uploadImageView.image = UIImage(named: "upload")
         uploadButton.addSubview(uploadImageView)
         uploadButton.setTitleColor(UIColor.mainPinkColor(), forState: UIControlState.Normal)
         

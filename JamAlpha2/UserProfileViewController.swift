@@ -160,11 +160,11 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             // my tabs, my lyrics, favorites
             if indexPath.item == 0 {
                 let myTabsVC: MyTabsAndLyricsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsandlyricsVC") as! MyTabsAndLyricsViewController
-                myTabsVC.tabsOrLyrics = "tabs"
+                myTabsVC.isViewingTabs = true
                 self.navigationController?.pushViewController(myTabsVC, animated: true)
             } else if indexPath.item == 1{
                 let myLyricsVC: MyTabsAndLyricsViewController = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsandlyricsVC") as! MyTabsAndLyricsViewController
-                myLyricsVC.tabsOrLyrics = "lyrics"
+                myLyricsVC.isViewingTabs = false
                 self.navigationController?.pushViewController(myLyricsVC, animated: true)
             } else if indexPath.item == 2 {
                 

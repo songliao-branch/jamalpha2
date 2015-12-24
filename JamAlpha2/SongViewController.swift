@@ -474,9 +474,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let attributedString = NSMutableAttributedString(string:title)
         songNameLabel.attributedText = attributedString
         songNameLabel.textAlignment = NSTextAlignment.Center
-            
-        
-        
         
         songNameLabel!.font = UIFont.systemFontOfSize(18)
         artistNameLabel!.font = UIFont.systemFontOfSize(12)
@@ -1557,7 +1554,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         navigationOutActionView.addSubview(addTabsButton)
         
         uploadTabsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: 0, width: buttonDimension, height: buttonDimension))
-        uploadTabsButton.setImage(UIImage(named: "uploaded"), forState: .Normal)
+        uploadTabsButton.setImage(UIImage(named: "upload"), forState: .Normal)
         uploadTabsButton.addTarget(self, action: "uploadTabs:", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(uploadTabsButton)
         
@@ -1569,7 +1566,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         navigationOutActionView.addSubview(addLyricsButton)
         
         uploadLyricsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: rowHeight, width: buttonDimension, height: buttonDimension))
-        uploadLyricsButton.setImage(UIImage(named: "uploaded"), forState: .Normal)
+        uploadLyricsButton.setImage(UIImage(named: "upload"), forState: .Normal)
         uploadLyricsButton.addTarget(self, action: "uploadLyrics:", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(uploadLyricsButton)
         

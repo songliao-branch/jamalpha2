@@ -16,15 +16,23 @@ class MyTabsCell: UITableViewCell {
     var uploadedImageView: UIImageView = UIImageView()
     var optionButton: UIButton = UIButton()
     
-    func initialCell(width: CGFloat) {
+    func initialCell(frame frame: CGRect) {
         
-        numberLabel.frame = CGRectMake(15, 19, 22, 22)
+        numberLabel = UILabel(frame: CGRect(x: 15, y: 0, width: 30, height: 18))
+        numberLabel.textColor = UIColor.grayColor()
+        numberLabel.font = UIFont.systemFontOfSize(15)
+        numberLabel.center.y = frame.height/2
         self.contentView.addSubview(numberLabel)
         
-        songNameLabel.frame = CGRectMake(42, 4, width / 2, 36)
+        let labelHeight: CGFloat = 25
+        songNameLabel.frame = CGRectMake(CGRectGetMaxX(numberLabel.frame), 0, frame.width - CGRectGetMaxX(numberLabel.frame) - 50, 25)
+        songNameLabel.font = UIFont.systemFontOfSize(17)
+        songNameLabel.center.y = frame.height/2 - labelHeight
         self.contentView.addSubview(songNameLabel)
         
         singerNameLabel.frame = CGRectMake(45, 36, width / 2, 20)
+        singerNameLabel.textColor = UIColor.darkGrayColor()
+        singerNameLabel.font = UIFont.systemFontOfSize(15)
         self.contentView.addSubview(singerNameLabel)
         
         uploadedImageView.frame = CGRectMake(width - 5 - 55 - 10 - 30, 15, 30, 30)

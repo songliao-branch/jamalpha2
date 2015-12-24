@@ -81,6 +81,8 @@
 		E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B6362D1B854A5900F331A7 /* Colors+.swift */; };
 		E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */; };
 		E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */; };
+		E4BF925F1C2BE89B00979508 /* UserTabsLyricsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BF925E1C2BE89B00979508 /* UserTabsLyricsCell.swift */; };
+		E4BF92611C2BEBC800979508 /* OptionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BF92601C2BEBC800979508 /* OptionsCell.swift */; };
 		E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */; };
 		E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */; };
 		E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF61B9E88A600473FC4 /* FretCell.swift */; };
@@ -201,6 +203,8 @@
 		E4B6362D1B854A5900F331A7 /* Colors+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Colors+.swift"; sourceTree = "<group>"; };
 		E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumSectionCell.swift; sourceTree = "<group>"; };
 		E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumTrackCell.swift; sourceTree = "<group>"; };
+		E4BF925E1C2BE89B00979508 /* UserTabsLyricsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserTabsLyricsCell.swift; sourceTree = "<group>"; };
+		E4BF92601C2BEBC800979508 /* OptionsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionsCell.swift; sourceTree = "<group>"; };
 		E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+comparison.swift"; sourceTree = "<group>"; };
 		E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsDataManager.swift; sourceTree = "<group>"; };
 		E4CBBFF61B9E88A600473FC4 /* FretCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FretCell.swift; sourceTree = "<group>"; };
@@ -414,6 +418,8 @@
 				BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */,
 				BF045E1B1C1A1FFB00C993BA /* MyTabsCell.swift */,
 				BF045E1D1C1A202E00C993BA /* TableExtentionCell.swift */,
+				E4BF925E1C2BE89B00979508 /* UserTabsLyricsCell.swift */,
+				E4BF92601C2BEBC800979508 /* OptionsCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -778,6 +784,7 @@
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				BF8192C21C256AFA003481A7 /* LocalSong.swift in Sources */,
+				E4BF925F1C2BE89B00979508 /* UserTabsLyricsCell.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				BF045E261C1B6B2400C993BA /* MyFavoritesViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
@@ -838,6 +845,7 @@
 				E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */,
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
 				E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */,
+				E4BF92611C2BEBC800979508 /* OptionsCell.swift in Sources */,
 				BF045E1E1C1A202E00C993BA /* TableExtentionCell.swift in Sources */,
 				10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */,
 				E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */,
