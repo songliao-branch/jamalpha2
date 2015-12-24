@@ -535,6 +535,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.changeRemoveButtonStatus(self.removeButton)
         }
         self.view.userInteractionEnabled = true
+        self.addedNoteButtonOnCompleteView = true
+        self.addNewTab = true
     }
 
 
@@ -897,12 +899,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if (indexString + 1) >= self.currentBaseButton.tag / 100 && indexString >= 3 && indexString <= 5{
                if !(((indexString + 1) == self.currentBaseButton.tag / 100)&&(indexFret == self.currentBaseButton.tag%100)) || (!self.addedNoteButtonOnCompleteView && !self.addNewTab){
                     self.currentBaseButton.removeFromSuperview()
+                    self.addedNoteButtonOnCompleteView = true
+                    self.addNewTab = true
                     self.addNoteButton(indexFret, indexString: indexString)
                     self.tabNameTextField.text = ""
                     self.completeStringView.addSubview(self.fingerPoint[6 - indexString])
                     self.fingerPoint[6 - (indexString + 1)].hidden = true
-                    self.addedNoteButtonOnCompleteView = true
-                    self.addNewTab = true
+                    self.fingerPoint[6 - (indexString + 1)].accessibilityIdentifier = "grayButton"
+                    self.fingerPoint[6 - (indexString + 1)].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
                 }
             }
             if (indexString + 1) < self.currentBaseButton.tag / 100 {
@@ -2300,10 +2304,7 @@ extension TabsEditorViewController {
                 let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
                 noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
                 self.tabNameTextField.text = ""
-                self.moveFingerPoint(indexFret, indexString: indexString)
-                
                 self.fingerPoint[6 - (indexString + 1)].hidden = true
-                
                 self.currentNoteButton = noteButton
                 self.currentBaseButton = noteButton
                 self.noteButtonOnCompeteScrollView = noteButton
@@ -2396,6 +2397,8 @@ extension TabsEditorViewController {
     func checkTheFingerPoint(newTag: Int, oldTag: Int, oldTagString4:Int, oldTagString5:Int) {
         let indexString = newTag / 100
         if indexString > oldTag / 100 {
+            self.moveFingerPoint(newTag%100, indexString: indexString-1)
+            self.fingerPoint[6 - indexString].hidden = true
             if(!self.fingerPoint[3].hidden){
                 if(self.fingerPoint[2].hidden){
                     self.moveFingerPoint(oldTagString4, indexString: 3)
@@ -2406,7 +2409,6 @@ extension TabsEditorViewController {
                     self.moveFingerPoint(oldTagString5, indexString: 4)
                 }
             }
-            self.moveFingerPoint(newTag%100, indexString: indexString-1)
         } else {
             
             if(indexString == 4){
@@ -2424,6 +2426,10 @@ extension TabsEditorViewController {
                 self.fingerPoint[0].hidden = true
                 self.fingerPoint[1].hidden = true
                 self.fingerPoint[2].hidden = true
+                self.fingerPoint[1].accessibilityIdentifier = "grayButton"
+                self.fingerPoint[2].accessibilityIdentifier = "grayButton"
+                self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
+                self.fingerPoint[2].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
             }else if (indexString == 5){
                 if(oldTag/100 != newTag/100){
                     self.oldTagString4 = fingerPoint[2].tag
@@ -2433,11 +2439,13 @@ extension TabsEditorViewController {
                 self.moveFingerPoint(0, indexString: 5)
                 self.fingerPoint[0].hidden = true
                 self.fingerPoint[1].hidden = true
+                self.fingerPoint[1].accessibilityIdentifier = "grayButton"
+                self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
             }else if(indexString == 6){
                 if(oldTag/100 != newTag/100){
                     self.oldTagString5 = fingerPoint[1].tag
                 }
-                 self.moveFingerPoint(newTag%100, indexString: indexString-1)
+                self.moveFingerPoint(newTag%100, indexString: indexString-1)
                 self.fingerPoint[0].hidden = true
             }
         }
