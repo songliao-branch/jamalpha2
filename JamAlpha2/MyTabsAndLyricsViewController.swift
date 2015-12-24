@@ -13,7 +13,6 @@ class MyTabsAndLyricsViewController: UIViewController {
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
-
     var tableView: UITableView = UITableView()
     
     var selectRow: [NSIndexPath] = [NSIndexPath]()
@@ -21,23 +20,19 @@ class MyTabsAndLyricsViewController: UIViewController {
     var tabsOrLyrics: String!
     
     var myTitle: String!
+    
     var myDataArray: [(String, String, String, String, Int, Int)] = [(String, String, String, String, Int, Int)]()
     
-
+    var allTabsSets = [DownloadedTabsSet]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
-
-        // Do any additional setup after loading the view.
-        //loadData()
+        loadData()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     func setUpNavigationBar() {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
@@ -47,13 +42,22 @@ class MyTabsAndLyricsViewController: UIViewController {
     }
     
     func loadData() {
-        let currentUserId = CoreDataManager.getCurrentUser()?.id as! Int
-        let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
-        activityIndicator.center =  CGPointMake(self.view.bounds.size.width / 2.0, self.view.bounds.size.height / 2.0)
-        self.view.addSubview(activityIndicator)
+      //  let currentUserId = CoreDataManager.getCurrentUser()?.id as! Int
+        
+//        let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+//        activityIndicator.center =  CGPointMake(self.view.bounds.size.width / 2.0, self.view.bounds.size.height / 2.0)
+//        self.view.addSubview(activityIndicator)
+        
         if tabsOrLyrics == "tabs" {
             self.myTitle = "My Tabs"
-            activityIndicator.startAnimating()
+            
+            self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
+            self.tableView.reloadData()
+            for t in CoreDataManager.getAllUserTabsOnDisk() {
+                print("USER TABS: \(t.title)  and  chords are \(t.chords[0])")
+            }
+            
+//            activityIndicator.startAnimating()
 //            APIManager.getUserTabsInfo(currentUserId, completion: {
 //                downloadedTabSets in
 //                for temp in downloadedTabSets {
@@ -86,7 +90,6 @@ class MyTabsAndLyricsViewController: UIViewController {
     func initialTheView() {
         self.setUpNavigationBar()
         self.setUpTableView()
-    
     }
     
     func pressOptionButton(sender: UIButton) {
@@ -136,9 +139,6 @@ class MyTabsAndLyricsViewController: UIViewController {
             self.tableView.reloadData()
         }
     }
-    
-    
-
 }
 
 extension MyTabsAndLyricsViewController: UITableViewDelegate, UITableViewDataSource {
@@ -149,10 +149,6 @@ extension MyTabsAndLyricsViewController: UITableViewDelegate, UITableViewDataSou
         self.tableView.registerClass(MyTabsCell.self, forCellReuseIdentifier: "cell")
         self.tableView.registerClass(TableExtensionCell.self, forCellReuseIdentifier: "extensioncell")
         self.view.addSubview(self.tableView)
-    }
-    
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {

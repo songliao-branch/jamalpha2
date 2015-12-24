@@ -506,6 +506,9 @@ class APIManager: NSObject {
                         t.tabs = set["tabs"].arrayObject as! [String]
                         
                         var tTimes = [Float]()
+                        t.title = set["song"]["title"].string!
+                        t.artist = set["song"]["artist"].string!
+                        t.duration = set["song"]["duration"].float!
                         
                         //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                         for time in set["times"].arrayObject as! [String] {
@@ -528,6 +531,9 @@ class APIManager: NSObject {
                         }
                         
                         l.times = tTimes
+                        l.title = set["song"]["title"].string!
+                        l.artist = set["song"]["artist"].string!
+                        l.duration = set["song"]["duration"].float!
                         myLyricsSets.append(l)
                     }
                    completion(downloadedTabsSets: myTabsSets, downloadedLyricsSets: myLyricsSets)
@@ -562,7 +568,7 @@ class APIManager: NSObject {
         }
     }
     
-    class func getFavorites() {
+    class func getFavorites(completion: (( songs: [LocalSong]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_songs").responseJSON { response in
             print(response)
             switch response.result {
@@ -570,6 +576,12 @@ class APIManager: NSObject {
                 if let data = response.result.value {
                     let json = JSON(data)
                     print(json)
+                    var songs = [LocalSong]()
+                    for song in json["users"].array! {
+                        let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
+                        songs.append(s)
+                    }
+                    completion(songs: songs)
                 }
             case .Failure(let error):
                 print("favorite song error: \(error)")

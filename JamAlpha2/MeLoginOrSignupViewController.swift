@@ -423,22 +423,42 @@ class MeLoginOrSignupViewController: UIViewController{
 
                             
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
-//                            CoreDataManager.downloadUsersAllTabsLyricsSetToCoreData((CoreDataManager.getCurrentUser()?.id)!)
-                            
+
+                            //TODO: maybe put this in a background thread?
                             APIManager.downloadCurrentUserTabsAndLyrics({
                                 tabsSets, lyricsSets in
                                 
                                 for set in tabsSets {
-                                    
-//                                    CoreDataManager.saveTabs(<#T##item: Findable##Findable#>, chords: <#T##[String]#>, tabs: <#T##[String]#>, times: <#T##[NSTimeInterval]#>, tuning: <#T##String#>, capo: <#T##Int#>, userId: <#T##Int#>, tabsSetId: <#T##Int#>)
-                                    
-                                }
 
+                                    let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
+                                    //initialize the song just in case we don't find it in existing core data
+                                    CoreDataManager.initializeSongToDatabase(localSong)
+                                    
+                                    var times = [NSTimeInterval]()
+                                    for t in set.times {
+                                        times.append(NSTimeInterval(t))
+                                    }
+                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id)
+                                }
+                                
+                                for set in lyricsSets {
+                                    let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
+                                    //initialize the song just in case we don't find it in
+                                    CoreDataManager.initializeSongToDatabase(localSong)
+
+                                    CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id)
+                                }
                                 
                                 print("user has \(tabsSets.count) tabs and \(lyricsSets.count) lyrics")
                             })
                             
-                            APIManager.getFavorites()
+                            //mark all the user's favorite songs in the core data
+                            APIManager.getFavorites({
+                                songs in
+                                for song in songs {
+                                    CoreDataManager.favoriteTheSong(song, shouldFavorite: true)
+                                }
+                            })
                             
                         } else { //we have an error
                             var errorMessage = ""

@@ -17,6 +17,7 @@ class MyTabsCell: UITableViewCell {
     var optionButton: UIButton = UIButton()
     
     func initialCell(width: CGFloat) {
+        
         numberLabel.frame = CGRectMake(15, 19, 22, 22)
         self.contentView.addSubview(numberLabel)
         

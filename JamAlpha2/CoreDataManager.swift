@@ -158,30 +158,19 @@ extension AVPlayerItem: Findable {
 
 extension LocalSong: Findable {
     func getTitle() -> String {
-        if let title = self.title {
-            return title
-        }
-        return ""
+        return title
     }
+    
     func getArtist() -> String {
-        if let artist = self.artist {
-            return artist
-        }
-        return ""
+        return artist
     }
     
     func getAlbum() -> String {
-        if let album = self.album {
-            return album
-        }
         return ""
     }
     
     func getDuration() -> Float {
-        if let time = self.duration {
-            return time as Float
-        }
-        return 0.0
+        return self.duration
     }
     
     func getURL() -> AnyObject? {
@@ -298,7 +287,7 @@ class CoreDataManager: NSObject {
             return results.lastObject! as? Song
         }
     }
-
+    
     class func initializeSongToDatabase(item: Findable) {
         // if we don't have the song in the database
         if findSong(item) == nil {
@@ -466,7 +455,7 @@ class CoreDataManager: NSObject {
             
             var foundDownloadedTabsSet: TabsSet!
             var found = false
-
+            
             for set in savedSets {
                 if set.id == tabsSetId  {
                     foundDownloadedTabsSet = set
@@ -499,6 +488,37 @@ class CoreDataManager: NSObject {
         }
     }
     
+    class func getAllUserTabsOnDisk() -> [DownloadedTabsSet] {
+        
+        var sets = [DownloadedTabsSet]()
+        let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
+        
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc)
+        for result in results {
+            let temp = result as! TabsSet
+            let t = DownloadedTabsSet(id: Int(temp.id), tuning: temp.tuning, capo: Int(temp.capo), chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+            
+            let chords = NSKeyedUnarchiver.unarchiveObjectWithData(temp.chords as! NSData) as! [String]
+            let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(temp.tabs as! NSData) as! [String]
+            let times = NSKeyedUnarchiver.unarchiveObjectWithData(temp.times as! NSData) as! [NSTimeInterval]
+            
+            t.chords = chords 
+            t.tabs = tabs
+            
+            var theTimes = [Float]()
+            for t in times {
+                theTimes.append(Float(t))
+            }
+            t.times = theTimes
+            
+            //used to display in the table
+            t.title = temp.song.title
+            t.artist = temp.song.artist
+            t.duration = Float(temp.song.playbackDuration)
+            sets.append(t)
+        }
+        return sets
+    }
     
 //    class func getAllLocalTabs() -> [LocalTabSet] {
 //        let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
@@ -533,30 +553,30 @@ class CoreDataManager: NSObject {
 //        }
 //    }
     
-    class func getAllLocalSongs() -> [LocalSong] {
-        do {
-            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: nil, managedObjectContext: moc)
-            var localSongs: [LocalSong] = [LocalSong]()
-            for result in results {
-                let temp = result as! Song
-                let song: LocalSong = LocalSong()
-                song.id = temp.id
-                song.title = temp.title
-                song.artist = temp.artist
-                song.album = temp.album
-                song.duration = temp.playbackDuration
-                song.soundwaveData = temp.soundwaveData
-                song.albumCover = temp.albumCover
-                song.soundwaveImage = temp.soundwaveImage
-                song.tabsSets = temp.tabsSets
-                song.lyricsSets = temp.lyricsSets
-                localSongs.append(song)
-            }
-            return localSongs
-        } catch {
-            fatalError("There was an error fetching all new tabs")
-        }
-    }
+//    class func getAllLocalSongs() -> [LocalSong] {
+//        do {
+//            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: nil, managedObjectContext: moc)
+//            var localSongs: [LocalSong] = [LocalSong]()
+//            for result in results {
+//                let temp = result as! Song
+//                let song: LocalSong = LocalSong()
+//                song.id = temp.id
+//                song.title = temp.title
+//                song.artist = temp.artist
+//                song.album = temp.album
+//                song.duration = temp.playbackDuration
+//                song.soundwaveData = temp.soundwaveData
+//                song.albumCover = temp.albumCover
+//                song.soundwaveImage = temp.soundwaveImage
+//                song.tabsSets = temp.tabsSets
+//                song.lyricsSets = temp.lyricsSets
+//                localSongs.append(song)
+//            }
+//            return localSongs
+//        } catch {
+//            fatalError("There was an error fetching all new tabs")
+//        }
+//    }
     
     //if fetchingLocalUserOnly true, will get the currently locally saved tabs,
     //otherwise we will retrieve all tabsSets(both local user's and downloaded) and select the most

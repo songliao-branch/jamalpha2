@@ -167,8 +167,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 myLyricsVC.tabsOrLyrics = "lyrics"
                 self.navigationController?.pushViewController(myLyricsVC, animated: true)
             } else if indexPath.item == 2 {
-                 APIManager.getFavorites()
-            
+                
             }
             
         } else if indexPath.section == 2 { //settings section
