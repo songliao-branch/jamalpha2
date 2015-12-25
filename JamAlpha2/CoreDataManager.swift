@@ -520,63 +520,32 @@ class CoreDataManager: NSObject {
         return sets
     }
     
-//    class func getAllLocalTabs() -> [LocalTabSet] {
-//        let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
-//        do {
-//            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc)
-//            var tabSets: [LocalTabSet] = [LocalTabSet]()
-//            for result in results {
-//                let temp = result as! TabsSet
-//                let tabSet: LocalTabSet = LocalTabSet(id: temp.id as Int, song: temp.song)
-//                tabSets.append(tabSet)
-//            }
-//            return tabSets
-//        } catch {
-//            fatalError("There was an error fetching all new tabs")
-//        }
-//    }
-//    
-//    
-//    class func getAllLocalLyrics() -> [LocalLyrics] {
-//        let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
-//        do {
-//            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: predicate, managedObjectContext: moc)
-//            var lyricsSets: [LocalLyrics] = [LocalLyrics]()
-//            for result in results {
-//                let temp = result as! LyricsSet
-//                let lyricsSet: LocalLyrics = LocalLyrics(id: temp.id as Int, song: temp.song)
-//                lyricsSets.append(lyricsSet)
-//            }
-//            return lyricsSets
-//        } catch {
-//            fatalError("There was an error fetching all new tabs")
-//        }
-//    }
-    
-//    class func getAllLocalSongs() -> [LocalSong] {
-//        do {
-//            let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: nil, managedObjectContext: moc)
-//            var localSongs: [LocalSong] = [LocalSong]()
-//            for result in results {
-//                let temp = result as! Song
-//                let song: LocalSong = LocalSong()
-//                song.id = temp.id
-//                song.title = temp.title
-//                song.artist = temp.artist
-//                song.album = temp.album
-//                song.duration = temp.playbackDuration
-//                song.soundwaveData = temp.soundwaveData
-//                song.albumCover = temp.albumCover
-//                song.soundwaveImage = temp.soundwaveImage
-//                song.tabsSets = temp.tabsSets
-//                song.lyricsSets = temp.lyricsSets
-//                localSongs.append(song)
-//            }
-//            return localSongs
-//        } catch {
-//            fatalError("There was an error fetching all new tabs")
-//        }
-//    }
+    class func getAllUserLyricsOnDisk() -> [DownloadedLyricsSet] {
+        
+        var sets = [DownloadedLyricsSet]()
+        let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
+        
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: predicate, managedObjectContext: moc)
+        for result in results {
+            let temp = result as! LyricsSet
+            
+            let l = DownloadedLyricsSet(id: Int(temp.id), lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+            
+            let lyrics = NSKeyedUnarchiver.unarchiveObjectWithData(temp.lyrics as! NSData) as! [String]
+            let times = NSKeyedUnarchiver.unarchiveObjectWithData(temp.times as! NSData) as! [Float]
+            
+            l.lyrics = lyrics
+            l.times = times
+            
+            //used to display in the table
+            l.title = temp.song.title
+            l.artist = temp.song.artist
+            l.duration = Float(temp.song.playbackDuration)
+            sets.append(l)
+        }
+        return sets
+    }
+
     
     //if fetchingLocalUserOnly true, will get the currently locally saved tabs,
     //otherwise we will retrieve all tabsSets(both local user's and downloaded) and select the most

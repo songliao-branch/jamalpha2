@@ -25,7 +25,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     var lastInsertedRow = -1
     let optionPlaceHolderTitle = "optionPlaceHolderTitle"//used to identify a placeholder inserted to songs to instantiate an options cell
     var allTabsSets = [DownloadedTabsSet]()
-       
+    var allLyricsSets = [DownloadedLyricsSet]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpNavigationBar()
@@ -50,24 +51,21 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             self.navigationItem.title = "My Tabs"
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             self.tableView.reloadData()
-            for t in CoreDataManager.getAllUserTabsOnDisk() {
-                
+            for t in self.allTabsSets {
                 let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
-                
                 songs.append(song)
-                
-                
-                print("USER TABS: \(t.title)  and  chords are \(t.chords[0])")
-                
             }
         } else {
-             self.navigationItem.title = "My Lyrics"
+            self.navigationItem.title = "My Lyrics"
+            self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
+            for l in self.allLyricsSets {
+                let song = LocalSong(title: l.title, artist: l.artist, duration: l.duration)
+                songs.append(song)
+            }
         }
     }
 
     func optionsButtonPressed(sender: UIButton) {
-        print("last inserted row is: \(lastInsertedRow), current pressed is \(sender.tag)")
-        
         //TODO: UI bug: open last row's option, then this row
         
         //if an options cell is open
@@ -152,11 +150,20 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             
             cell.optionsButton.tag = indexPath.row
             
-            if allTabsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
-                cell.uploadedImage.hidden = true
+            if isViewingTabs {
+                if allTabsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
+                    cell.uploadedImage.hidden = true
+                } else {
+                    cell.uploadedImage.hidden = false
+                }
             } else {
-                cell.uploadedImage.hidden = false
+                if allLyricsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
+                    cell.uploadedImage.hidden = true
+                } else {
+                    cell.uploadedImage.hidden = false
+                }
             }
+
             
             cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
             
@@ -180,8 +187,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
+        //TODO: fix this crash bug
+        // songVC.transitioningDelegate = self.animator
+        // self.animator!.attachToViewController(songVC)
         
         if let item = mediaItem {
             print("item found title:\(item.title!)")
@@ -191,9 +199,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             MusicManager.sharedInstance.avPlayer.removeAllItems()
         } else {
-            //search the song first..
+            //TODO: search the song first..
             
-        }
+        }// TODO: if demo song
         
         self.presentViewController(songVC, animated: true, completion: nil)
     }
