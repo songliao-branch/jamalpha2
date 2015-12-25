@@ -1972,9 +1972,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         APIManager.uploadTabs(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-            isSuccess in
+            cloudId in
             
-            self.showStatusView(isSuccess)
+            CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
+            self.showStatusView(true)
             self.startHideStatusViewTimer()
         })
     }
@@ -2029,9 +2030,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
  
         APIManager.uploadLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-            isSuccess in
+            cloudId in
             
-            self.showStatusView(isSuccess)
+            CoreDataManager.saveCloudIdToLyrics(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
+            self.showStatusView(true)
             self.startHideStatusViewTimer()
         })
     }

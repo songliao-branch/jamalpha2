@@ -50,7 +50,7 @@ class APIManager: NSObject {
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     //upload tabs
-    class func uploadTabs(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
+    class func uploadTabs(song: Findable, completion: ((cloudId: Int) -> Void)) {
         
         var chords = [Chord]() //([Chord], String, Int)
         var tuning = ""
@@ -91,17 +91,21 @@ class APIManager: NSObject {
                 response in
                 switch response.result {
                 case .Success:
-                    completion(isSuccess: true)
-                    print("Tabs uploaded succesfully")
+                    if let data = response.result.value {
+                        let json = JSON(data)
+                        //we get an ID, successfully created or updated
+                        completion(cloudId: json["tabs_set"]["id"].int!)
+                        print("Tabs uploaded succesfully")
+                    }
                 case .Failure(let error):
-                    completion(isSuccess: false)
+                    print("upload tabs failed")
                     print(error)
                 }
         }
     }
     
     //upload lyrics
-    class func uploadLyrics(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
+    class func uploadLyrics(song: Findable, completion: ((cloudId: Int) -> Void)) {
 
         var lyric = Lyric()
         
@@ -136,14 +140,38 @@ class APIManager: NSObject {
                 response in
                 switch response.result {
                 case .Success:
-                    print("Lyrics uploaded succesfully")
-                    completion(isSuccess: true)
+                    if let data = response.result.value {
+                        let json = JSON(data)
+                        //we get an ID, successfully created or updated
+                        completion(cloudId: json["lyrics_set"]["id"].int!)
+                        print("Lyrics uploaded succesfully")
+                    }
                 case .Failure(_):
-                    completion(isSuccess: false)
+                    print("Lyrics upload failed")
                 }
         }
     }
     
+    class func deleteSet(isTabs isTabs: Bool, id: Int) {
+        let url = isTabs ? tabsSetURL : lyricsSetURL
+        Alamofire.request(.DELETE, url + "/\(id)").responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    if json["result"].string! == "successfully destroyed"{
+                        print("successfully destroyed")
+                    } else {
+                        print("delete request sent, but cannot delete")
+                    }
+                }
+            case .Failure(let error):
+                print("Cannot delete network error")
+                print(error)
+            }
+        }
+    }
+
     //download all tabs sets for one song, the callback return the result
     class func downloadTabs(findable: Findable, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
         

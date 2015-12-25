@@ -27,11 +27,20 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     var allTabsSets = [DownloadedTabsSet]()
     var allLyricsSets = [DownloadedLyricsSet]()
     
+    
+    //status view pop up
+    var statusView: UIView!
+    var successImage: UIImageView!
+    var failureImage: UIImageView!
+    var statusLabel: UILabel!
+    var hideStatusViewTimer = NSTimer()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpNavigationBar()
         createTransitionAnimation()
         loadData()
+        setUpStatusView()
     }
     
     func createTransitionAnimation(){
@@ -41,28 +50,33 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func setUpNavigationBar() {
+        self.navigationItem.title = isViewingTabs ? "My Tabs" : "My Lyrics"
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
     }
     
+    //also called when a set is deleted
     func loadData() {
+        songs = [LocalSong]()
         if isViewingTabs {
-            self.navigationItem.title = "My Tabs"
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
-            self.tableView.reloadData()
             for t in self.allTabsSets {
                 let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
+                song.findMediaItem(song.title, artist: song.artist, duration: song.duration)
                 songs.append(song)
             }
         } else {
-            self.navigationItem.title = "My Lyrics"
             self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
             for l in self.allLyricsSets {
                 let song = LocalSong(title: l.title, artist: l.artist, duration: l.duration)
+                song.findMediaItem(song.title, artist: song.artist, duration: song.duration)
                 songs.append(song)
             }
         }
+        
+        lastInsertedRow = -1 //reset the insertedRow because all cells have been reset
+        self.tableView.reloadData()
     }
 
     func optionsButtonPressed(sender: UIButton) {
@@ -88,6 +102,13 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         }
     }
     
+    func removeOptionRowAtIndex()
+    {
+        songs.removeAtIndex(lastInsertedRow)
+        self.tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: lastInsertedRow, inSection: 0)], withRowAnimation: .Automatic)
+        lastInsertedRow = -1
+    }
+    
     
     func insertOptionsRow(indexPath: NSIndexPath) {
         //remove last options row
@@ -101,28 +122,73 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     func pressEditButton(sender: UIButton) {
         // go to edit tab vc,
+        let song = songs[sender.tag-1]
+
+        
+        if isViewingTabs {
+//            let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
+//            
+//            tabsEditorVC.theSong = mediaItem
+//            tabsEditorVC.isDemoSong = false
+//            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
+            
+        }
     }
     
     func pressUploadButton(sender: UIButton) {
-        // upload the tab
-       // changeUploadUnUpload()
+        
+        let song = songs[sender.tag-1]
+        guard let item = song.mediaItem else {
+            print("no media item found for \(song.title)")
+            return
+        }
+        
+        if isViewingTabs {
+            APIManager.uploadTabs(item, completion: {
+                cloudId in
+                
+                CoreDataManager.saveCloudIdToTabs(item, cloudId: cloudId)
+                self.showStatusView(true)
+                self.startHideStatusViewTimer()
+                self.removeOptionRowAtIndex()
+                self.loadData()
+            })
+        } else {
+            APIManager.uploadLyrics(item, completion: {
+                cloudId in
+                
+                CoreDataManager.saveCloudIdToLyrics(item, cloudId: cloudId)
+                self.showStatusView(true)
+                self.startHideStatusViewTimer()
+                self.removeOptionRowAtIndex()
+                self.loadData()
+            })
+        }
     }
     
     func pressDeleteButton(sender: UIButton) {
-        // upload the tab
-        // changeUploadUnUpload()
+        
+        let song = songs[sender.tag-1]
+        guard let item = song.mediaItem else {
+            print("no media item found for \(song.title)")
+            return
+        }
+        
+        let id = isViewingTabs ? allTabsSets[sender.tag-1].id : allLyricsSets[sender.tag-1].id
+        
+        //delete local core data first
+        if isViewingTabs {
+            CoreDataManager.deleteLocalTab(item)
+        } else {
+            CoreDataManager.deleteLocalLyrics(item)
+        }
+        
+        self.loadData()
+        
+        if id > 0 { //if this is cloud saved set, delete the cloud too
+            APIManager.deleteSet(isTabs: isViewingTabs, id: id)
+        }
     }
-    
-//    func changeUploadUnUpload() {
-//        if selectRow.count > 0 {
-//            if myDataArray[selectRow[0].item - 1].2 == "0" {
-//                myDataArray[selectRow[0].item - 1].2 = "1"
-//            } else {
-//                myDataArray[selectRow[0].item - 1].2 = "0"
-//            }
-//            self.tableView.reloadData()
-//        }
-//    }
 
     //MARK: tableview delegate methods
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -133,7 +199,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             let cell = tableView.dequeueReusableCellWithIdentifier("OptionsCell", forIndexPath: indexPath) as! OptionsCell
             cell.editButton.tag = indexPath.row
             cell.editButton.addTarget(self, action: "pressEditButton:", forControlEvents: .TouchUpInside)
-           
             cell.uploadButton.tag = indexPath.row
             cell.uploadButton.addTarget(self, action: "pressUploadButton:", forControlEvents: .TouchUpInside)
             
@@ -163,7 +228,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                     cell.uploadedImage.hidden = false
                 }
             }
-
             
             cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
             
@@ -176,14 +240,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
 
         let song = songs[indexPath.row]
         
-        let mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
-            item in
-            if let itemTitle = item.title, itemArtist = item.artist {
-                return itemTitle == song.title && itemArtist == song.artist && abs((Float(item.playbackDuration) - song.duration)) < 1
-            }
-            return false
-            }.first
-        
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
@@ -191,7 +247,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         // songVC.transitioningDelegate = self.animator
         // self.animator!.attachToViewController(songVC)
         
-        if let item = mediaItem {
+        if let item = song.mediaItem {
             print("item found title:\(item.title!)")
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
@@ -213,4 +269,54 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         return self.cellHeight
     }
     
+    
+    func setUpStatusView() {
+        statusView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        statusView.backgroundColor = UIColor(red: 114/255, green: 114/255, blue: 114/255, alpha: 0.80)
+        statusView.hidden = true
+        statusView.center = self.view.center
+        statusView.layer.cornerRadius = 20
+        self.view.addSubview(statusView)
+        
+        successImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 40, height: 30))
+        successImage.image = UIImage(named: "check")
+        successImage.center.x = statusView.frame.width/2
+        successImage.hidden = true
+        statusView.addSubview(successImage)
+        
+        failureImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 35, height: 35))
+        failureImage.image = UIImage(named: "closebutton")
+        failureImage.center.x = statusView.frame.width/2
+        failureImage.hidden = true
+        statusView.addSubview(failureImage)
+        
+        statusLabel = UILabel(frame: CGRect(x: 0, y: 55, width: 100, height: 35))
+        statusLabel.textColor = UIColor.whiteColor()
+        statusLabel.textAlignment = .Center
+        statusLabel.font = UIFont.systemFontOfSize(16)
+        statusLabel.center.x = statusView.frame.width/2
+        statusView.addSubview(statusLabel)
+    }
+    
+    func showStatusView(isSucess: Bool) {
+        if isSucess {
+            statusView.hidden = false
+            successImage.hidden = false
+            failureImage.hidden = true
+            statusLabel.text = "Uploaded"
+        } else {
+            statusView.hidden = false
+            successImage.hidden = true
+            failureImage.hidden = false
+            statusLabel.text = "Upload failed"
+        }
+    }
+    
+    func startHideStatusViewTimer() {
+        hideStatusViewTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: Selector("hideStatusView"), userInfo: nil, repeats: false)
+    }
+    
+    func hideStatusView() {
+        statusView.hidden = true
+    }
 }

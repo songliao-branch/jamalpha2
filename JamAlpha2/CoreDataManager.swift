@@ -592,8 +592,69 @@ class CoreDataManager: NSObject {
         }
         return ([Chord](), "", 0, 0)
     }
-
-
+    
+    
+    class func deleteLocalTab(findable: Findable) {
+        if let matchedSong = findSong(findable) {
+            let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
+            
+            var foundTabsSet: TabsSet!
+            
+            foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
+            
+            if foundTabsSet != nil {
+                moc.deleteObject(foundTabsSet)
+                SwiftCoreDataHelper.saveManagedObjectContext(moc)
+            }
+        }
+    }
+    
+    class func deleteLocalLyrics(findable: Findable) {
+        if let matchedSong = findSong(findable) {
+            let sets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
+            
+            var foundLyricsSet: LyricsSet!
+            
+            foundLyricsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
+            
+            if foundLyricsSet != nil {
+                moc.deleteObject(foundLyricsSet)
+                SwiftCoreDataHelper.saveManagedObjectContext(moc)
+            }
+        }
+    }
+    
+    //a local tabs that has never been uploaded will have an id -1, once it's uploaded, the retrieved cloud id will overwrite -1
+    class func saveCloudIdToTabs(findable: Findable, cloudId: Int) {
+        if let matchedSong = findSong(findable) {
+            let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
+            
+            var foundTabsSet: TabsSet!
+            
+            foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
+            
+            if foundTabsSet != nil {
+                foundTabsSet.id = cloudId
+                SwiftCoreDataHelper.saveManagedObjectContext(moc)
+            }
+        }
+    }
+    
+    class func saveCloudIdToLyrics(findable: Findable, cloudId: Int) {
+        if let matchedSong = findSong(findable) {
+            let sets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
+            
+            var foundLyricsSet: LyricsSet!
+            
+            foundLyricsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
+            
+            if foundLyricsSet != nil {
+                foundLyricsSet.id = cloudId
+                SwiftCoreDataHelper.saveManagedObjectContext(moc)
+            }
+        }
+    }
+    
     //favorite/unfavorite a song
     class func favoriteTheSong(item: Findable, shouldFavorite: Bool) {
         if let matchedSong = findSong(item) {
