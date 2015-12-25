@@ -645,8 +645,8 @@ extension LyricsSyncViewController {
             lyricsTimesTuple.append((self.addedLyricsWithTime.lyrics[i], self.addedLyricsWithTime.time[i]))
         }
         
-        self.lyricsTextViewController.songViewController.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
         
+
         var times = [Float]()
         for t in addedLyricsWithTime.time {
             times.append(Float(t))
@@ -654,13 +654,19 @@ extension LyricsSyncViewController {
         
         CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times, userId: Int(CoreDataManager.getCurrentUser()!.id), lyricsSetId: kLocalSetId )
         
-        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: { completed in
-        if self.lyricsTextViewController.songViewController.isDemoSong {
-            self.lyricsTextViewController.songViewController.avPlayer.play()
-        } else {
-            MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-            self.lyricsTextViewController.songViewController.player.play()
-        }
+        self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: {
+            
+            completed in
+            
+            if let songVC = self.lyricsTextViewController.songViewController {
+                songVC.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
+                if songVC.isDemoSong {
+                    songVC.avPlayer.play()
+                } else {
+                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                    songVC.player.play()
+                }
+            }
         })
     }
 }

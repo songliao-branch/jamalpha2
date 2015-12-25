@@ -2075,17 +2075,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
         viewDidFullyDisappear = true
-        if isDemoSong{
-            self.avPlayer.pause()
-            stopTimer()
-            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-            KGLOBAL_progressBlock!.alpha = 0.5
-        } else {
-            self.player.pause()
-            stopTimer()
-            KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
-            KGLOBAL_progressBlock!.alpha = 0.5
-        }
+
         if isDemoSong{
             self.avPlayer.pause()
             stopTimer()

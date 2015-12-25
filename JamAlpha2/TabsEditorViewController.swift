@@ -17,7 +17,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     var speed: Float = 1
     
-    var songViewController: SongViewController!
+    var songViewController: SongViewController?
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -1537,11 +1537,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
                 }
             })
         }
@@ -1754,8 +1757,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
                 Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId)
             
-            self.songViewController.updateMusicData(theSong)
-            
+            if let songVC = self.songViewController {
+               songVC.updateMusicData(theSong)
+            }
+
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
             removeNotification()
@@ -1767,11 +1772,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
+                    
                 }
             })
         }

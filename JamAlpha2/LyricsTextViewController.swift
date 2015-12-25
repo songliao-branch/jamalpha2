@@ -11,10 +11,10 @@ import MediaPlayer
 import AVFoundation
 
 class LyricsTextViewController: UIViewController {
-    var isDemoSong: Bool!
+    var isDemoSong = false
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
-    var songViewController: SongViewController! //used to parse synced lyrics from LyricsSyncViewController
+    var songViewController: SongViewController? //used to parse synced lyrics from LyricsSyncViewController
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
     
@@ -198,11 +198,13 @@ class LyricsTextViewController: UIViewController {
        
         self.dismissViewControllerAnimated(true, completion: {
             completed in
-            if self.songViewController.isDemoSong {
-                self.songViewController.avPlayer.play()
-            } else {
-                MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                self.songViewController.player.play()
+            if let songVC = self.songViewController {
+                if songVC.isDemoSong {
+                    songVC.avPlayer.play()
+                } else {
+                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                    songVC.player.play()
+                }
             }
         })
     }

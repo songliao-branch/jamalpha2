@@ -102,14 +102,14 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         }
     }
     
-    func removeOptionRowAtIndex()
-    {
-        songs.removeAtIndex(lastInsertedRow)
-        self.tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: lastInsertedRow, inSection: 0)], withRowAnimation: .Automatic)
-        lastInsertedRow = -1
+    func removeInsertedRow() {
+        if lastInsertedRow > 0 {
+            songs.removeAtIndex(lastInsertedRow)
+            self.tableView.reloadData()
+            lastInsertedRow = -1
+        }
     }
-    
-    
+
     func insertOptionsRow(indexPath: NSIndexPath) {
         //remove last options row
         
@@ -123,15 +123,35 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func pressEditButton(sender: UIButton) {
         // go to edit tab vc,
         let song = songs[sender.tag-1]
-
+        guard let item = song.mediaItem else {
+            print("no media item found for \(song.title)")
+            return
+        }
+        
+        if let nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem {
+            MusicManager.sharedInstance.player.pause()
+        }
         
         if isViewingTabs {
-//            let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
-//            
-//            tabsEditorVC.theSong = mediaItem
-//            tabsEditorVC.isDemoSong = false
-//            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
+            let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
             
+            tabsEditorVC.theSong = item
+            
+            //  tabsEditorVC.isDemoSong = false
+            self.presentViewController(tabsEditorVC, animated: true, completion: {
+                completed in
+                self.removeInsertedRow()
+            })
+            
+            
+        } else {
+            let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
+                as! LyricsTextViewController
+            lyricsEditor.theSong = item
+            self.presentViewController(lyricsEditor, animated: true, completion: {
+                completed in
+                self.removeInsertedRow()
+            })
         }
     }
     
@@ -150,7 +170,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                 CoreDataManager.saveCloudIdToTabs(item, cloudId: cloudId)
                 self.showStatusView(true)
                 self.startHideStatusViewTimer()
-                self.removeOptionRowAtIndex()
                 self.loadData()
             })
         } else {
@@ -160,7 +179,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                 CoreDataManager.saveCloudIdToLyrics(item, cloudId: cloudId)
                 self.showStatusView(true)
                 self.startHideStatusViewTimer()
-                self.removeOptionRowAtIndex()
                 self.loadData()
             })
         }
@@ -259,8 +277,12 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             
         }// TODO: if demo song
         
-        self.presentViewController(songVC, animated: true, completion: nil)
+        self.presentViewController(songVC, animated: true, completion: {
+            completed in
+            self.removeInsertedRow()
+        })
     }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.songs.count
     }
