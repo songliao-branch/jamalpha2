@@ -9,22 +9,29 @@
 import UIKit
 import MediaPlayer
 
-class MyFavoritesViewController: UIViewController {
+class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
     
-    private var uniqueSongs = [MPMediaItem]()
-
+    var songs = [LocalSong]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        loadData()
         setUpNavigationBar()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func loadData() {
+        //TODO: fix this, it should come from core data
+        APIManager.getFavorites({
+            favorites in
+            
+            for fav in favorites {
+                fav.findMediaItem()
+            }
+            self.songs = favorites
+            self.tableView.reloadData()
+        })
     }
     
     func setUpNavigationBar() {
@@ -34,22 +41,42 @@ class MyFavoritesViewController: UIViewController {
         self.navigationItem.title = "My Favorites"
     }
 
-}
-
-
-
-extension MyFavoritesViewController: UITableViewDelegate, UITableViewDataSource {
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return songs.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: UITableViewCell = self.tableView.dequeueReusableCellWithIdentifier("cell")! as UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("MyFavoritesCell", forIndexPath: indexPath) as! MyFavoritesCell
+        let song = songs[indexPath.row]
+        cell.numberLabel.text = "\(indexPath.row+1)."
+        cell.titleLabel.text = song.title
+        cell.artistLabel.text = song.artist
         
         return cell
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return uniqueSongs.count
+
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let song = songs[indexPath.row]
+        
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        
+        songVC.selectedFromTable = true
+        // TODO: fix this crash bug
+        // songVC.transitioningDelegate = self.animator
+        // self.animator!.attachToViewController(songVC)
+        if let item = song.mediaItem {
+            MusicManager.sharedInstance.setPlayerQueue([item])  //TODO: for a selection?
+            MusicManager.sharedInstance.setIndexInTheQueue(0)
+            MusicManager.sharedInstance.avPlayer.pause()
+            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+            MusicManager.sharedInstance.avPlayer.removeAllItems()
+        } else {
+            //TODO: search the song first..
+        }// TODO: if demo song
+        
+        self.presentViewController(songVC, animated: true, completion: nil)
+        self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }

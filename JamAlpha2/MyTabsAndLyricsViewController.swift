@@ -63,14 +63,14 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             for t in self.allTabsSets {
                 let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
-                song.findMediaItem(song.title, artist: song.artist, duration: song.duration)
+                song.findMediaItem()
                 songs.append(song)
             }
         } else {
             self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
             for l in self.allLyricsSets {
                 let song = LocalSong(title: l.title, artist: l.artist, duration: l.duration)
-                song.findMediaItem(song.title, artist: song.artist, duration: song.duration)
+                song.findMediaItem()
                 songs.append(song)
             }
         }
@@ -128,7 +128,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             return
         }
         
-        if let nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem {
+        if let _ = MusicManager.sharedInstance.player.nowPlayingItem {
             MusicManager.sharedInstance.player.pause()
         }
         
@@ -281,6 +281,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             completed in
             self.removeInsertedRow()
         })
+        
+        self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

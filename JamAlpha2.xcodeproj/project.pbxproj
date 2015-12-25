@@ -17,8 +17,6 @@
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
 		BF045E1A1C1A1E7100C993BA /* MyTabsAndLyricsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF045E191C1A1E7100C993BA /* MyTabsAndLyricsViewController.swift */; };
-		BF045E1C1C1A1FFB00C993BA /* MyTabsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF045E1B1C1A1FFB00C993BA /* MyTabsCell.swift */; };
-		BF045E1E1C1A202E00C993BA /* TableExtentionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF045E1D1C1A202E00C993BA /* TableExtentionCell.swift */; };
 		BF045E261C1B6B2400C993BA /* MyFavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF045E251C1B6B2400C993BA /* MyFavoritesViewController.swift */; };
 		BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */; };
 		BF4B83E51BFA776200AF8A2A /* MeUserProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */; };
@@ -83,6 +81,7 @@
 		E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */; };
 		E4BF925F1C2BE89B00979508 /* UserTabsLyricsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BF925E1C2BE89B00979508 /* UserTabsLyricsCell.swift */; };
 		E4BF92611C2BEBC800979508 /* OptionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BF92601C2BEBC800979508 /* OptionsCell.swift */; };
+		E4BF92631C2DF90800979508 /* MyFavoritesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BF92621C2DF90800979508 /* MyFavoritesCell.swift */; };
 		E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */; };
 		E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */; };
 		E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF61B9E88A600473FC4 /* FretCell.swift */; };
@@ -134,8 +133,6 @@
 		842DB0241B55EA8B00B4E165 /* TimeNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeNumber.swift; sourceTree = "<group>"; };
 		84DA61A31B4E211100979A42 /* Lyric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lyric.swift; sourceTree = "<group>"; };
 		BF045E191C1A1E7100C993BA /* MyTabsAndLyricsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyTabsAndLyricsViewController.swift; sourceTree = "<group>"; };
-		BF045E1B1C1A1FFB00C993BA /* MyTabsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyTabsCell.swift; sourceTree = "<group>"; };
-		BF045E1D1C1A202E00C993BA /* TableExtentionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableExtentionCell.swift; sourceTree = "<group>"; };
 		BF045E251C1B6B2400C993BA /* MyFavoritesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFavoritesViewController.swift; sourceTree = "<group>"; };
 		BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeContentProfileTableViewCell.swift; sourceTree = "<group>"; };
 		BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeUserProfileTableViewCell.swift; sourceTree = "<group>"; };
@@ -205,6 +202,7 @@
 		E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumTrackCell.swift; sourceTree = "<group>"; };
 		E4BF925E1C2BE89B00979508 /* UserTabsLyricsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserTabsLyricsCell.swift; sourceTree = "<group>"; };
 		E4BF92601C2BEBC800979508 /* OptionsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionsCell.swift; sourceTree = "<group>"; };
+		E4BF92621C2DF90800979508 /* MyFavoritesCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFavoritesCell.swift; sourceTree = "<group>"; };
 		E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+comparison.swift"; sourceTree = "<group>"; };
 		E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsDataManager.swift; sourceTree = "<group>"; };
 		E4CBBFF61B9E88A600473FC4 /* FretCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FretCell.swift; sourceTree = "<group>"; };
@@ -416,10 +414,9 @@
 				E42032EB1BFEF31E00A5D36D /* AvatarCell.swift */,
 				10AC35A51C215BE300749744 /* DemoCell.swift */,
 				BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */,
-				BF045E1B1C1A1FFB00C993BA /* MyTabsCell.swift */,
-				BF045E1D1C1A202E00C993BA /* TableExtentionCell.swift */,
 				E4BF925E1C2BE89B00979508 /* UserTabsLyricsCell.swift */,
 				E4BF92601C2BEBC800979508 /* OptionsCell.swift */,
+				E4BF92621C2DF90800979508 /* MyFavoritesCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -818,6 +815,7 @@
 				10AC35A61C215BE300749744 /* DemoCell.swift in Sources */,
 				BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */,
 				10AC35A41C21509D00749744 /* DemoViewController.swift in Sources */,
+				E4BF92631C2DF90800979508 /* MyFavoritesCell.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
@@ -829,7 +827,6 @@
 				E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */,
 				E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */,
 				BF4B83E51BFA776200AF8A2A /* MeUserProfileTableViewCell.swift in Sources */,
-				BF045E1C1C1A1FFB00C993BA /* MyTabsCell.swift in Sources */,
 				E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */,
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
@@ -846,7 +843,6 @@
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
 				E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */,
 				E4BF92611C2BEBC800979508 /* OptionsCell.swift in Sources */,
-				BF045E1E1C1A202E00C993BA /* TableExtentionCell.swift in Sources */,
 				10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */,
 				E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */,
 			);

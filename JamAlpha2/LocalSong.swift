@@ -23,7 +23,7 @@ class LocalSong: NSObject {
         self.duration = duration
     }
     
-    func findMediaItem(title: String, artist: String, duration: Float) {
+    func findMediaItem() {
         self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
             item in
             if let itemTitle = item.title, itemArtist = item.artist {

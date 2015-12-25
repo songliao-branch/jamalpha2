@@ -230,14 +230,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 avPlayer = MusicManager.sharedInstance.avPlayer
                 self.demoItem = avPlayer.currentItem
                 self.demoItemDuration = self.demoItem.getDuration()
-                APIManager.getSongId(demoItem)
+//                APIManager.getSongId(demoItem)
                 removeAllObserver()
             } else {
                 player = MusicManager.sharedInstance.player
                 print("VIEWDIDLOAD: \(player.nowPlayingItem!.title!)")
                 self.nowPlayingMediaItem = player.nowPlayingItem
                 self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
-                APIManager.getSongId(nowPlayingMediaItem)
+//                APIManager.getSongId(nowPlayingMediaItem)
                 removeAllObserver()
             }
             
