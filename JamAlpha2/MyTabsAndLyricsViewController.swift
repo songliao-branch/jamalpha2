@@ -7,11 +7,13 @@
 //
 
 import UIKit
+import MediaPlayer
 
 class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var isViewingTabs = true //false means lyrics
 
+    var animator: CustomTransitionAnimation?
     @IBOutlet weak var tableView: UITableView!
     
     let cellHeight: CGFloat = 60
@@ -19,14 +21,22 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     //var myDataArray: [(String, String, String, String, Int, Int)] = [(String, String, String, String, Int, Int)]()
   
     var songs = [LocalSong]()//for showing title and artist for the tableview
+    
     var lastInsertedRow = -1
-    let optionPlaceHolderTitle = "..optionPlaceHolderTitle"//used to identify a placeholder inserted to songs to instantiate an options cell
+    let optionPlaceHolderTitle = "optionPlaceHolderTitle"//used to identify a placeholder inserted to songs to instantiate an options cell
     var allTabsSets = [DownloadedTabsSet]()
        
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpNavigationBar()
+        createTransitionAnimation()
         loadData()
+    }
+    
+    func createTransitionAnimation(){
+        if(animator == nil){
+            self.animator = CustomTransitionAnimation()
+        }
     }
     
     func setUpNavigationBar() {
@@ -41,10 +51,14 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             self.tableView.reloadData()
             for t in CoreDataManager.getAllUserTabsOnDisk() {
+                
                 let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
+                
                 songs.append(song)
+                
+                
                 print("USER TABS: \(t.title)  and  chords are \(t.chords[0])")
-
+                
             }
         } else {
              self.navigationItem.title = "My Lyrics"
@@ -96,6 +110,11 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
        // changeUploadUnUpload()
     }
     
+    func pressDeleteButton(sender: UIButton) {
+        // upload the tab
+        // changeUploadUnUpload()
+    }
+    
 //    func changeUploadUnUpload() {
 //        if selectRow.count > 0 {
 //            if myDataArray[selectRow[0].item - 1].2 == "0" {
@@ -114,6 +133,15 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         if song.title == optionPlaceHolderTitle {
             let cell = tableView.dequeueReusableCellWithIdentifier("OptionsCell", forIndexPath: indexPath) as! OptionsCell
+            cell.editButton.tag = indexPath.row
+            cell.editButton.addTarget(self, action: "pressEditButton:", forControlEvents: .TouchUpInside)
+           
+            cell.uploadButton.tag = indexPath.row
+            cell.uploadButton.addTarget(self, action: "pressUploadButton:", forControlEvents: .TouchUpInside)
+            
+            cell.deleteButton.tag = indexPath.row
+            cell.deleteButton.addTarget(self, action: "pressDeleteButton:", forControlEvents: .TouchUpInside)
+            
             return cell
         } else {
             let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
@@ -123,22 +151,56 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             cell.artistLabel.text = song.artist
             
             cell.optionsButton.tag = indexPath.row
+            
+            if allTabsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
+                cell.uploadedImage.hidden = true
+            } else {
+                cell.uploadedImage.hidden = false
+            }
+            
             cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
             
             return cell
         }
-
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
-        
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+
+        let song = songs[indexPath.row]
+        
+        let mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
+            item in
+            if let itemTitle = item.title, itemArtist = item.artist {
+                return itemTitle == song.title && itemArtist == song.artist && abs((Float(item.playbackDuration) - song.duration)) < 1
+            }
+            return false
+            }.first
+        
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        
+        songVC.selectedFromTable = true
+        songVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(songVC)
+        
+        if let item = mediaItem {
+            print("item found title:\(item.title!)")
+            MusicManager.sharedInstance.setPlayerQueue([item])
+            MusicManager.sharedInstance.setIndexInTheQueue(0)
+            MusicManager.sharedInstance.avPlayer.pause()
+            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+            MusicManager.sharedInstance.avPlayer.removeAllItems()
+        } else {
+            //search the song first..
+            
+        }
+        
+        self.presentViewController(songVC, animated: true, completion: nil)
     }
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.songs.count
     }
-    
+
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return self.cellHeight
     }
