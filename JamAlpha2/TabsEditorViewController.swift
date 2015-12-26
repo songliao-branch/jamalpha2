@@ -25,6 +25,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var deleteView:UIImageView = UIImageView()
     var scrollingTimer: NSTimer!
     var startScrolling: Bool = false
+    var stopEdgeStartTime:Double = -1
+    var rightEdgeTimer:NSTimer?
+    var leftEdgeTimer:NSTimer?
     
     var stepPerSecond: Float = 100
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
@@ -2370,22 +2373,25 @@ extension TabsEditorViewController {
     
     
     func handleCurrentBaseButtonPan(sender: UIPanGestureRecognizer) {
-        let transfer = sender.translationInView(self.completeStringView)
+        let transfer:CGPoint = sender.locationInView(self.completeStringView)
         if sender.state == .Began {
+            self.currentBaseButton.removeGestureRecognizer(jigglingLongPressGesture)
             self.currentBaseButton.alpha = 0.5
             self.originalCenter = self.currentBaseButton.center
+            self.longPressX = transfer.x - originalCenter.x
+            self.longPressY = transfer.y - originalCenter.y
         } else if sender.state == .Changed {
-//            let location = sender.locationInView(self.completeStringView)
-//            if self.startScrolling == false {
-//                if location.x > CGRectGetMaxX(self.completeStringView.frame) - CGFloat(20) {
-//                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToRight:", userInfo: nil, repeats: true)
-//                    self.startScrolling = true
-//                } else if location.x < CGRectGetMinX(self.completeStringView.frame) + CGFloat(20) {
-//                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToLeft:", userInfo: nil, repeats: true)
-//                }
-//            }
-            self.currentBaseButton.center = CGPointMake(originalCenter!.x + transfer.x, originalCenter!.y + transfer.y)
+            self.currentBaseButton.center = CGPointMake(transfer.x - longPressX, transfer.y - longPressY)
+            if(self.currentBaseButton.center.x > self.completeStringView.contentOffset.x + self.trueWidth/2){
+                stopLeftEdgeTimer()
+                startRightEdgeTimer()
+            }else{
+                stopRightEdgeTimer()
+                startLeftEdgeTimer()
+            }
         } else if sender.state == .Ended || sender.state == .Cancelled {
+            stopLeftEdgeTimer()
+            stopRightEdgeTimer()
             self.currentBaseButton.alpha = 0.8
             var indexFret: Int = Int()
             var indexString: Int = Int()
@@ -2433,24 +2439,25 @@ extension TabsEditorViewController {
     func handleCurrentBaseButtonLongPress(sender: UILongPressGestureRecognizer) {
         let transfer:CGPoint = sender.locationInView(self.completeStringView)
         if sender.state == .Began {
+            self.currentBaseButton.removeGestureRecognizer(jigglingPanGesture)
             self.currentBaseButton.alpha = 0.5
             self.originalCenter = self.currentBaseButton.center
             self.longPressX = transfer.x - originalCenter.x
             self.longPressY = transfer.y - originalCenter.y
           
         } else if sender.state == .Changed {
-            //            let location = sender.locationInView(self.completeStringView)
-            //            if self.startScrolling == false {
-            //                if location.x > CGRectGetMaxX(self.completeStringView.frame) - CGFloat(20) {
-            //                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToRight:", userInfo: nil, repeats: true)
-            //                    self.startScrolling = true
-            //                } else if location.x < CGRectGetMinX(self.completeStringView.frame) + CGFloat(20) {
-            //                    self.scrollingTimer = NSTimer(timeInterval: 0.1, target: self, selector: "autoScrollingOnEdgeToLeft:", userInfo: nil, repeats: true)
-            //                }
-            //            }
-            
             self.currentBaseButton.center = CGPointMake(transfer.x - longPressX, transfer.y - longPressY)
+            if(self.currentBaseButton.center.x > self.completeStringView.contentOffset.x + self.trueWidth/2){
+                stopLeftEdgeTimer()
+                startRightEdgeTimer()
+            }else{
+                stopRightEdgeTimer()
+                startLeftEdgeTimer()
+            }
         } else if sender.state == .Ended || sender.state == .Cancelled {
+            stopLeftEdgeTimer()
+            stopRightEdgeTimer()
+            
             self.currentBaseButton.alpha = 0.8
             var indexFret: Int = Int()
             var indexString: Int = Int()
@@ -2498,10 +2505,43 @@ extension TabsEditorViewController {
                 self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
                 self.stopJiggling()
                 self.currentBaseButton.removeGestureRecognizer(jigglingPanGesture)
+            }else{
+                self.currentBaseButton.addGestureRecognizer(jigglingPanGesture)
             }
             
         }
     }
+    
+    func startRightEdgeTimer(){
+        if rightEdgeTimer == nil {
+            rightEdgeTimer = NSTimer()
+            rightEdgeTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("autoScrollingOnEdgeToRight"), userInfo: nil, repeats: true)
+        }
+    }
+    
+    func stopRightEdgeTimer(){
+        if(rightEdgeTimer != nil){
+            rightEdgeTimer!.invalidate()
+            rightEdgeTimer = nil
+        }
+    }
+    
+    func startLeftEdgeTimer(){
+        if leftEdgeTimer == nil {
+            leftEdgeTimer = NSTimer()
+            leftEdgeTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("autoScrollingOnEdgeToLeft"), userInfo: nil, repeats: true)
+        }
+    }
+    
+    func stopLeftEdgeTimer(){
+        if(leftEdgeTimer != nil){
+            leftEdgeTimer!.invalidate()
+            leftEdgeTimer = nil
+        }
+    }
+
+    
+
 
     
     func checkTheFingerPoint(newTag: Int, oldTag: Int, oldTagString4:Int, oldTagString5:Int) {
@@ -2612,13 +2652,60 @@ extension TabsEditorViewController {
         })
     }
     
-//    func autoScrollingOnEdgeToRight(sender: NSTimer) {
-//        self.completeStringView.contentOffset = CGPointMake(3, 0)
-//    }
-//    
-//    func autoScrollingOnEdgeToLeft(sender: NSTimer) {
-//        self.completeStringView.contentOffset = CGPointMake(-3, 0)
-//    }
+    func autoScrollingOnEdgeToRight() {
+        let currentCenter:CGPoint = self.currentBaseButton.center
+        let buttonWidth = 9 / 60 * self.trueHeight
+        if currentCenter.x - buttonWidth/2 > self.completeStringView.contentOffset.x+self.trueWidth - 1.2*buttonWidth {
+            if(self.completeStringView.contentOffset.x + self.trueWidth >= 5 * self.trueWidth - 10){
+                self.stopEdgeStartTime = -1
+                return
+            }
+            if(self.stopEdgeStartTime == -1){
+                self.stopEdgeStartTime = CACurrentMediaTime()
+            }
+            let nowTime = CACurrentMediaTime()
+            if(nowTime - self.stopEdgeStartTime >= 0.8){
+                self.stopEdgeStartTime = -1
+                UIView.animateWithDuration(0.5, delay: 0, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {
+                    self.completeStringView.contentOffset.x = self.completeStringView.contentOffset.x + self.trueWidth
+                    self.currentBaseButton.center.x = currentCenter.x + self.trueWidth
+                    }, completion: {
+                        completed in
+                        self.stopEdgeStartTime = -1
+                })
+            }
+        }else{
+            self.stopEdgeStartTime = -1
+        }
+    }
+    
+    func autoScrollingOnEdgeToLeft() {
+        let currentCenter:CGPoint = self.currentBaseButton.center
+        let buttonWidth = 9 / 60 * self.trueHeight
+        if currentCenter.x + buttonWidth/2 < self.completeStringView.contentOffset.x + 1.2*buttonWidth {
+            if(self.completeStringView.contentOffset.x < 10){
+                self.stopEdgeStartTime = -1
+                return
+            }
+            if(self.stopEdgeStartTime == -1){
+                self.stopEdgeStartTime = CACurrentMediaTime()
+            }
+            let nowTime = CACurrentMediaTime()
+            if(nowTime - self.stopEdgeStartTime >= 0.8){
+                self.stopEdgeStartTime = -1
+                UIView.animateWithDuration(0.5, delay: 0, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {
+                    self.completeStringView.contentOffset.x = self.completeStringView.contentOffset.x - self.trueWidth
+                    self.currentBaseButton.center.x = currentCenter.x - self.trueWidth
+                    }, completion: {
+                        completed in
+                        self.stopEdgeStartTime = -1
+                })
+            }
+        }else{
+            self.stopEdgeStartTime = -1
+        }
+
+    }
 }
 
 
