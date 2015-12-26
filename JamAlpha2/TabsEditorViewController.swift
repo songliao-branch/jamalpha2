@@ -521,8 +521,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.intoEditView = true
         
         self.addNewTab = true
+        self.addedNoteButtonOnCompleteView = true
         self.addNoteButton(indexFret, indexString: indexString, originalPosition: original)
-        self.createEditFingerPoint((indexString + 1) * 100)
         self.completeStringView.contentOffset = self.collectionView.contentOffset
         UIView.animateWithDuration(0.2, animations: {
             self.completeStringView.alpha = 1
@@ -535,8 +535,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.changeRemoveButtonStatus(self.removeButton)
         }
         self.view.userInteractionEnabled = true
-        self.addedNoteButtonOnCompleteView = true
-        self.addNewTab = true
+
     }
 
 
@@ -731,8 +730,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         backButton.setImage(UIImage(named: "icon-back"), forState: UIControlState.Normal)
         menuView.addSubview(backButton)
         
-        statusLabel.frame = CGRectMake(5 / 31 * self.trueWidth, 0.25 / 20 * self.trueWidth, 8 / 31 * self.trueWidth, buttonWidth * 0.65)
-        statusLabel.text = "Tabs Editor"
+        statusLabel.frame = CGRectMake(2 / 31 * self.trueWidth, 0.25 / 20 * self.trueWidth, 14 / 31 * self.trueWidth, buttonWidth * 0.65)
+        self.statusLabel.text = "Tabs Editor"
         statusLabel.textColor = UIColor.whiteColor()
         statusLabel.textAlignment = NSTextAlignment.Center
         menuView.addSubview(statusLabel)
@@ -779,10 +778,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         self.tabNameTextField.frame = CGRectMake(23.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 7 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
         self.tabNameTextField.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+        self.tabNameTextField.textColor = UIColor.whiteColor()
+        self.tabNameTextField.tintColor = UIColor.whiteColor()
         self.tabNameTextField.layer.cornerRadius = 3
         self.tabNameTextField.autocorrectionType = UITextAutocorrectionType.No
         self.tabNameTextField.delegate = self
+        self.tabNameTextField.attributedPlaceholder = NSAttributedString(string:"Input Name",
+            attributes:[NSForegroundColorAttributeName: UIColor(white: 0.8, alpha: 1), NSFontAttributeName: UIFont.boldSystemFontOfSize(17)])
+        self.tabNameTextField.textAlignment = .Center
         self.editView.addSubview(tabNameTextField)
+        self.tabNameTextField.addTarget(self, action: "textFieldTextChanged:", forControlEvents: UIControlEvents.EditingChanged)
         
         self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
         self.completeStringView.contentSize = CGSizeMake(5 * self.trueWidth, 15 / 20 * self.trueHeight)
@@ -806,6 +811,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     // hide the keyboard
+    var isTextChanged = false
     func tapOnEditView(sender: UITapGestureRecognizer) {
         self.tabNameTextField.resignFirstResponder()
     }
@@ -813,6 +819,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     //textfeild delege
     let tempTapView:UIView = UIView()
     func textFieldDidBeginEditing(textField: UITextField) {
+        self.tabFingerPointChanged = true
         tempTapView.frame = self.completeStringView.frame
         tempTapView.backgroundColor = UIColor.clearColor()
         self.editView.addSubview(self.tempTapView)
@@ -820,11 +827,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func textFieldDidEndEditing(textField: UITextField) {
         tempTapView.removeFromSuperview()
-        if (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel)){
+        if (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel) && !isTextChanged){
             self.removeObjectsOnSpecificTabsScrollView()
             self.tabNameTextField.text = ""
+        }else if pressDoneButton && !isTextChanged {
+            self.tabNameTextField.text = ""
+        }
+        pressDoneButton = false
+        isTextChanged = false
+    }
+    
+    func textFieldTextChanged(textField : UITextField){
+        let tempString = self.tabNameTextField.text?.replace(" ", replacement: "")
+        if tempString != self.currentBaseButton.titleLabel!.text {
+            isTextChanged = true
+        }else{
+            isTextChanged = false
         }
     }
+    
     
     // add note button to view 
     func addNoteButton(indexFret: Int, indexString: Int, originalPosition:CGFloat?=nil) {
@@ -862,7 +883,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         jigglingLongPressGesture.addTarget(self, action: "startJiggling:")
         noteButton.addGestureRecognizer(jigglingLongPressGesture)
-        jigglingLongPressGesture.minimumPressDuration = 0.2
+        jigglingLongPressGesture.minimumPressDuration = 0.01
         
         if(originalPosition != nil){
             let duration:NSTimeInterval = NSTimeInterval(sqrt(2.0*(buttonString-original)/9.8)/3)
@@ -883,11 +904,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if addedNoteButtonOnCompleteView == true {
             self.createEditFingerPoint(noteButton.tag)
         }
-        if(originalPosition == nil){
-            for var i = 6 - indexString; i <= 5; i++ {
-                self.fingerPoint[i].hidden = false
-            }
+        for var i = 6 - indexString; i <= 5; i++ {
+            self.fingerPoint[i].hidden = false
         }
+        
         self.oldTagString4 = 0
         self.oldTagString5 = 0
     }
@@ -916,14 +936,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if (indexString + 1) >= self.currentBaseButton.tag / 100 && indexString >= 3 && indexString <= 5{
                if !(((indexString + 1) == self.currentBaseButton.tag / 100)&&(indexFret == self.currentBaseButton.tag%100)) || (!self.addedNoteButtonOnCompleteView && !self.addNewTab){
                     self.currentBaseButton.removeFromSuperview()
-                    self.addedNoteButtonOnCompleteView = true
-                    self.addNewTab = true
                     self.addNoteButton(indexFret, indexString: indexString)
                     self.tabNameTextField.text = ""
                     self.completeStringView.addSubview(self.fingerPoint[6 - indexString])
                     self.fingerPoint[6 - (indexString + 1)].hidden = true
                     self.fingerPoint[6 - (indexString + 1)].accessibilityIdentifier = "grayButton"
                     self.fingerPoint[6 - (indexString + 1)].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
+                    self.addedNoteButtonOnCompleteView = true
+                    self.addNewTab = true
                 }
             }
             if (indexString + 1) < self.currentBaseButton.tag / 100 {
@@ -997,7 +1017,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // add tabs on specific scrol view
     func addSpecificTabButton(sender: Int) {
-        self.statusLabel.text = "Press Red Button"
         self.view.userInteractionEnabled = false
         let index: NSNumber = NSNumber(integer: sender)
         self.specificTabSets.removeAll()
@@ -1026,7 +1045,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
                         specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
                         specificButton.tag = i
-                        specificButton.alpha = 0.1
+                        specificButton.alpha = 0
+                        specificButton.transform = CGAffineTransformMakeScale(0.6,0.6)
                         if self.specificTabSets[i].isOriginal == true {
                             specificButton.accessibilityIdentifier = "isOriginal"
                         } else {
@@ -1037,20 +1057,30 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 }
                 
-                UIView.animateWithDuration(0.1, animations: {
+                var delay:NSTimeInterval = -0.05
                     for item in self.specificTabsScrollView.subviews {
-                        if item.isMemberOfClass(UIButton) {
-                            item.alpha = 1
-                        }
+                        delay = delay+0.05
+                        UIView.animateWithDuration(0.2, delay: delay, options: .CurveEaseInOut, animations: {
+                            if item.isMemberOfClass(UIButton) {
+                                item.transform = CGAffineTransformMakeScale(1,1)
+                                item.alpha = 1
+                            }
+                            }, completion: nil)
                     }
-                })
+                if (self.specificTabsScrollView.subviews.count == 0){
+                    self.statusLabel.text = "Input Chord Name"
+                }else{
+                    self.statusLabel.text = "Choose Or input Chord Name"
+                }
             }
         )
+        
         self.view.userInteractionEnabled = true
     }
     
     // choose specific tabs, and generate the finger point for this tab
     func pressSpecificTabButton(sender: UIButton) {
+        self.tabNameTextField.resignFirstResponder()
         self.currentSelectedSpecificTab = self.specificTabSets[sender.tag]
         self.tabNameTextField.text = self.currentSelectedSpecificTab.name
         if self.removeAvaliable == false {
@@ -1088,6 +1118,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
         var buttonX = string6FretPosition[1] - buttonWidth / 2
         var buttonY = string6Position[5] - buttonWidth / 2
+        var miniButtonX:CGFloat = CGFloat.infinity
+        var maxButtonX:CGFloat = -1
         for var i = 11; i >= 0; i = i - 2 {
             let startIndex = content.startIndex.advancedBy(11 - i)
             let endIndex = content.startIndex.advancedBy(11 - i + 2)
@@ -1107,7 +1139,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 buttonX = (string6FretPosition[temp] + string6FretPosition[temp + 1]) / 2 - buttonWidth / 2
                 buttonY = string6Position[i / 2] - buttonWidth / 2
                 fingerButton.accessibilityIdentifier = "grayButton"
+                //find mini and max button x
+                if(buttonX < miniButtonX){
+                    miniButtonX = buttonX
+                }
+                if(buttonX > maxButtonX){
+                    maxButtonX = buttonX + buttonWidth
+                }
             }
+            
             fingerButton.addTarget(self, action: "pressEditFingerButton:", forControlEvents: UIControlEvents.TouchUpInside)
             let stringNumber = Int(self.specificTabSets[sender].index) / 100
             fingerButton.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
@@ -1125,6 +1165,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.view.userInteractionEnabled = true
         }
+        let midButtonX:CGFloat = (miniButtonX + maxButtonX)/2.0
+        UIView.animateWithDuration(0.3, delay: 0, options: [.CurveEaseInOut , .AllowUserInteraction], animations: {
+            self.completeStringView.contentOffset.x = midButtonX - self.trueWidth/2>1 ? midButtonX - self.trueWidth/2 : 0
+            }, completion: nil)
     }
     
     // change the finger point status from gray button to black X
@@ -1502,14 +1546,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     func backToMainView() {
         self.view.userInteractionEnabled = false
-        
+        self.collectionView.contentOffset = self.completeStringView.contentOffset
         UIView.animateWithDuration(0.3, animations: {
             self.specificTabsScrollView.alpha = 0
             self.tabNameTextField.alpha = 0
             self.musicControlView.alpha = 1
             self.progressBlock.alpha = 1
             self.completeStringView.alpha = 0
-            self.collectionView.contentOffset = self.completeStringView.contentOffset
             self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
             self.collectionView.alpha = 1
             }, completion:  {
@@ -1565,7 +1608,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.collectionView.reloadData()
         } else {
             self.removeAvaliable = false
-//            self.statusLabel.text = "Tabs Editor"
             for item in self.specificTabsScrollView.subviews {
                 if item.isMemberOfClass(UIButton) {
                     let tempItem: UIButton = item as! UIButton
@@ -1815,8 +1857,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.userInteractionEnabled = true
     }
 
-    
+    var pressDoneButton:Bool = false
     func pressDoneButton(sender: UIButton) {
+        pressDoneButton = false
         if self.removeAvaliable == true {
             self.changeRemoveButtonStatus(self.removeButton)
         }
@@ -1827,16 +1870,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 if self.tabFingerPointChanged == true {
                     print("\(self.currentNoteButton.titleLabel?.text)")
                     let index = self.currentBaseButton.tag
-                    let name: String = self.tabNameTextField.text!
+                    let name: String = self.tabNameTextField.text!.replace(" ", replacement: "")
+                    self.tabNameTextField.text! = name
                     var content: String = String()
+                    let nameString = NSString(string: name)
+                    var finallength = NSString(string: self.currentBaseButton.titleLabel!.text!).length
+                    var tempCompareName:String = ""
+                    if(nameString.length>=finallength){
+                        tempCompareName = nameString.substringToIndex(finallength)
+                    }else{
+                        tempCompareName = name
+                    }
                     
-                    if name == "" || name.containsString(" ") {
+                    if name == "" || name.containsString(" ") || tempCompareName != self.currentBaseButton.titleLabel!.text! {
                         if self.specificTabsScrollView.subviews.count == 0 || (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel)) {
                             self.removeObjectsOnSpecificTabsScrollView()
                             let addBaseNoteLabel: UILabel = UILabel()
                             addBaseNoteLabel.frame = CGRectMake(0, 0, self.specificTabsScrollView.frame.size.width, self.specificTabsScrollView.frame.size.height)
-                            addBaseNoteLabel.text = "Please input a valid tab name (without space)"
-                            addBaseNoteLabel.font = UIFont.systemFontOfSize(15)
+                            addBaseNoteLabel.text = "Please input a valid chord name"
+                            addBaseNoteLabel.font = UIFont.systemFontOfSize(17)
                             addBaseNoteLabel.backgroundColor = UIColor(white: 0.7, alpha: 0.3)
                             addBaseNoteLabel.textAlignment = .Center
                             addBaseNoteLabel.textColor = UIColor.whiteColor()
@@ -1844,18 +1896,26 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             self.shakeAnimationScrollView()
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             self.tabNameTextField.becomeFirstResponder()
-                            self.statusLabel.text = "Input Chord Name"
+                            if(tempCompareName != self.currentBaseButton.titleLabel!.text! && !name.isEmpty){
+                                self.AnimationStatusLabel("Not Contain BaseNote Name")
+                            }else{
+                                self.AnimationStatusLabel("Input Chord Name")
+                            }
+                            
+                        }else if(tempCompareName != self.currentBaseButton.titleLabel!.text! && !name.isEmpty){
+                            self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
+                            shakeAnimationStatusLabel()
+                            self.AnimationStatusLabel("Not Contain BaseNote Name")
+                            self.tabNameTextField.becomeFirstResponder()
                         }else{
-                            let alertController = UIAlertController(title: "Warning", message: "Please choose or input a valid tab name (without space)", preferredStyle: UIAlertControllerStyle.Alert)
-                            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
-                                Success in
-                                //self.tabNameTextField.becomeFirstResponder()
-                            }))
-                            self.presentViewController(alertController, animated: true, completion: nil)
+                            self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
+                            shakeAnimationStatusLabel()
                             self.shakeAnimationScrollView()
-                            self.shakeAnimationTextField()
-                            self.statusLabel.text = "Press Red Button"
+                            self.AnimationStatusLabel("Choose Or Input Chord Name")
+                            self.tabNameTextField.becomeFirstResponder()
+                            pressDoneButton = true
                         }
+                        
                         
                         addSuccessed = false
                     } else {
@@ -1906,7 +1966,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         }
                     }
                     
-                    if addNew == true {
+                    if addNew == true{
                         addTabsToMainViewDataArray(self.currentSelectedSpecificTab)
                         reorganizeMainViewDataArray()
                         collectionView.reloadData()
@@ -1927,7 +1987,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 addBaseNoteLabel.textColor = UIColor.whiteColor()
                 self.specificTabsScrollView.addSubview(addBaseNoteLabel)
                 self.shakeAnimationScrollView()
-                self.statusLabel.text = "Choose Base Note"
+                self.AnimationStatusLabel("Choose Base Note")
             }
         } else {
             if isDemoSong {
@@ -2325,7 +2385,7 @@ extension TabsEditorViewController {
 //                }
 //            }
             self.currentBaseButton.center = CGPointMake(originalCenter!.x + transfer.x, originalCenter!.y + transfer.y)
-        } else if sender.state == .Ended {
+        } else if sender.state == .Ended || sender.state == .Cancelled {
             self.currentBaseButton.alpha = 0.8
             var indexFret: Int = Int()
             var indexString: Int = Int()
@@ -2390,7 +2450,7 @@ extension TabsEditorViewController {
             //            }
             
             self.currentBaseButton.center = CGPointMake(transfer.x - longPressX, transfer.y - longPressY)
-        } else if sender.state == .Ended {
+        } else if sender.state == .Ended || sender.state == .Cancelled {
             self.currentBaseButton.alpha = 0.8
             var indexFret: Int = Int()
             var indexString: Int = Int()
@@ -2508,7 +2568,7 @@ extension TabsEditorViewController {
         //remind and shake
         let animation = CABasicAnimation(keyPath: "position")
         animation.duration = 0.05
-        animation.repeatCount = 3
+        animation.repeatCount = 2
         animation.autoreverses = true
         animation.fromValue = NSValue(CGPoint: CGPointMake(self.tabNameTextField.center.x - 10, self.tabNameTextField.center.y))
         animation.toValue = NSValue(CGPoint: CGPointMake(self.tabNameTextField.center.x + 10, self.tabNameTextField.center.y))
@@ -2520,12 +2580,36 @@ extension TabsEditorViewController {
         //remind and shake
         let animation = CABasicAnimation(keyPath: "position")
         animation.duration = 0.05
-        animation.repeatCount = 3
+        animation.repeatCount = 2
         animation.autoreverses = true
         animation.fromValue = NSValue(CGPoint: CGPointMake(self.specificTabsScrollView.center.x - 10, self.specificTabsScrollView.center.y))
         animation.toValue = NSValue(CGPoint: CGPointMake(self.specificTabsScrollView.center.x + 10, self.specificTabsScrollView.center.y))
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
         self.specificTabsScrollView.layer.addAnimation(animation, forKey: "position")
+    }
+    
+    func shakeAnimationStatusLabel(){
+        //remind and shake
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.duration = 0.05
+        animation.repeatCount = 4
+        animation.autoreverses = true
+        animation.fromValue = NSValue(CGPoint: CGPointMake(self.statusLabel.center.x - 10, self.statusLabel.center.y))
+        animation.toValue = NSValue(CGPoint: CGPointMake(self.statusLabel.center.x + 10, self.statusLabel.center.y))
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+        self.statusLabel.layer.addAnimation(animation, forKey: "position")
+    }
+    
+    func AnimationStatusLabel(text:String){
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.statusLabel.alpha = 0
+            }, completion: {
+                completed in
+                self.statusLabel.text = text
+                UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
+                    self.statusLabel.alpha = 1
+                    }, completion: nil)
+        })
     }
     
 //    func autoScrollingOnEdgeToRight(sender: NSTimer) {
