@@ -2135,10 +2135,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.currentTabViewIndex = self.currentTabViewIndex--
             findCurrentTabView()
             if isDemoSong {
-                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                  self.currentTime = self.avPlayer.currentTime
             } else {
-                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.musicPlayer.currentPlaybackTime
             }
            
@@ -2514,6 +2514,7 @@ extension TabsEditorViewController {
     
     func startRightEdgeTimer(){
         if rightEdgeTimer == nil {
+            self.stopEdgeStartTime = -1
             rightEdgeTimer = NSTimer()
             rightEdgeTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("autoScrollingOnEdgeToRight"), userInfo: nil, repeats: true)
         }
@@ -2523,11 +2524,13 @@ extension TabsEditorViewController {
         if(rightEdgeTimer != nil){
             rightEdgeTimer!.invalidate()
             rightEdgeTimer = nil
+            self.stopEdgeStartTime = -1
         }
     }
     
     func startLeftEdgeTimer(){
         if leftEdgeTimer == nil {
+            self.stopEdgeStartTime = -1
             leftEdgeTimer = NSTimer()
             leftEdgeTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("autoScrollingOnEdgeToLeft"), userInfo: nil, repeats: true)
         }
@@ -2537,6 +2540,7 @@ extension TabsEditorViewController {
         if(leftEdgeTimer != nil){
             leftEdgeTimer!.invalidate()
             leftEdgeTimer = nil
+            self.stopEdgeStartTime = -1
         }
     }
 
