@@ -1933,10 +1933,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                                 }
                             }
                         }
-                        let tempTabs: Tabs = self.tabsDataManager.addNewTabs(index, name: name, content: content)
+                        if let compareExistTabs = self.tabsDataManager.getUniqueTab(index, name: name, content: content){
+                            self.currentSelectedSpecificTab.tabs = compareExistTabs.tabs
+                        } else {
+                            let tempTabs: Tabs = self.tabsDataManager.addNewTabs(index, name: name, content: content)
+                            self.currentSelectedSpecificTab.tabs = tempTabs
+                        }
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
                         self.currentSelectedSpecificTab = NormalTabs()
-                        self.currentSelectedSpecificTab.tabs = tempTabs
+                        
                         self.currentSelectedSpecificTab.index = index
                         self.currentSelectedSpecificTab.name = name
                         self.currentSelectedSpecificTab.content = content
@@ -2236,7 +2241,7 @@ extension TabsEditorViewController {
         let name = sender.tab.name
         let content = sender.tab.content
         let tempNormalTabs = tabsDataManager.getUniqueTab(index, name: name, content: content)
-        return tempNormalTabs
+        return tempNormalTabs!
     }
     
     func addTabsFromCoreDataToMainViewDataArray(sender: [Chord]) {
@@ -2553,14 +2558,20 @@ extension TabsEditorViewController {
         if indexString > oldTag / 100 {
             self.moveFingerPoint(newTag%100, indexString: indexString-1)
             self.fingerPoint[6 - indexString].hidden = true
+            self.fingerPoint[6 - indexString].accessibilityIdentifier = "grayButton"
+            self.fingerPoint[6 - indexString].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
             if(!self.fingerPoint[3].hidden){
                 if(self.fingerPoint[2].hidden){
                     self.moveFingerPoint(oldTagString4, indexString: 3)
                 }
                 self.fingerPoint[2].hidden = false
+                self.fingerPoint[2].accessibilityIdentifier = "grayButton"
+                self.fingerPoint[2].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
                 if indexString == 6 {
                     self.fingerPoint[1].hidden = false
                     self.moveFingerPoint(oldTagString5, indexString: 4)
+                    self.fingerPoint[1].accessibilityIdentifier = "grayButton"
+                    self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
                 }
             }
         } else {
@@ -2580,9 +2591,11 @@ extension TabsEditorViewController {
                 self.fingerPoint[0].hidden = true
                 self.fingerPoint[1].hidden = true
                 self.fingerPoint[2].hidden = true
-                self.fingerPoint[1].accessibilityIdentifier = "grayButton"
+                self.fingerPoint[0].accessibilityIdentifier = "blackX"
+                self.fingerPoint[1].accessibilityIdentifier = "blackX"
                 self.fingerPoint[2].accessibilityIdentifier = "grayButton"
-                self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
+                self.fingerPoint[0].setImage(UIImage(named: "blackX"), forState: UIControlState.Normal)
+                self.fingerPoint[1].setImage(UIImage(named: "blackX"), forState: UIControlState.Normal)
                 self.fingerPoint[2].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
             }else if (indexString == 5){
                 if(oldTag/100 != newTag/100){
@@ -2593,7 +2606,9 @@ extension TabsEditorViewController {
                 self.moveFingerPoint(0, indexString: 5)
                 self.fingerPoint[0].hidden = true
                 self.fingerPoint[1].hidden = true
+                self.fingerPoint[0].accessibilityIdentifier = "blackX"
                 self.fingerPoint[1].accessibilityIdentifier = "grayButton"
+                self.fingerPoint[0].setImage(UIImage(named: "blackX"), forState: UIControlState.Normal)
                 self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
             }else if(indexString == 6){
                 if(oldTag/100 != newTag/100){
@@ -2601,10 +2616,14 @@ extension TabsEditorViewController {
                 }
                 self.moveFingerPoint(newTag%100, indexString: indexString-1)
                 self.fingerPoint[0].hidden = true
+                self.fingerPoint[0].accessibilityIdentifier = "grayButton"
+                self.fingerPoint[0].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
+                
             }
         }
         for item in self.fingerPoint {
             print(item.tag)
+            print(item.accessibilityIdentifier)
         }
     }
     

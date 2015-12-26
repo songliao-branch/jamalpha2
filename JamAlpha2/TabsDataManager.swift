@@ -91,7 +91,7 @@ class TabsDataManager: NSObject {
                         } else if j == 8 {
                             commonChords["\(600 + j)00"] = "0\(j)\(j + 2)\(j + 2)0\(j + 1)0\(j)0\(j)"
                         } else if j == 9 {
-                            commonChords["\(600 + j)00"] = "x\(j)\(j + 2)\(j + 2)\(j + 1)0\(j)0\(j)"
+                            commonChords["\(600 + j)00"] = "0\(j)\(j + 2)\(j + 2)\(j + 1)0\(j)0\(j)"
                         }else {
                             commonChords["\(600 + j)00"] = "\(j)\(j + 2)\(j + 2)\(j + 1)\(j)\(j)"
                         }
@@ -188,7 +188,7 @@ class TabsDataManager: NSObject {
     }
     
     // get tabs by index, name and content
-    func getUniqueTab(index: NSNumber, name: String, content: String) -> NormalTabs {
+    func getUniqueTab(index: NSNumber, name: String, content: String) -> NormalTabs? {
         var tempNormalTabs: NormalTabs = NormalTabs()
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "index == '\(index)' AND name == '\(name)' AND content == '\(content)'")
