@@ -22,16 +22,13 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func loadData() {
-        //TODO: fix this, it should come from core data
-        APIManager.getFavorites({
-            favorites in
-            
-            for fav in favorites {
-                fav.findMediaItem()
-            }
-            self.songs = favorites
-            self.tableView.reloadData()
-        })
+        
+        songs =  CoreDataManager.getFavorites()
+        for song in songs {
+            song.findMediaItem()
+        }
+        self.tableView.reloadData()
+
     }
     
     func setUpNavigationBar() {

@@ -668,26 +668,17 @@ class CoreDataManager: NSObject {
             return matchedSong.isFavorited
         }
         return false
-    
     }
     
-//    
-//    class func saveSongId(findable: Findable, id: Int) {
-//        if let matchedSong = findSong(findable) {
-//            matchedSong.id = id
-//            SwiftCoreDataHelper.saveManagedObjectContext(moc)
-//        }
-//    }
-//
-//    
-//    class func getSongId(findable: Findable) -> Int {
-//        if let matchedSong = findSong(findable) {
-//            return  Int(matchedSong.id!)
-//        }
-//        return 0 //should not reach here
-//    }
-//    
-
+    class func getFavorites() -> [LocalSong] {
+        let favorites = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: NSPredicate(format: " isFavorited == true"), managedObjectContext: moc) as! [Song]
+        var localSongs = [LocalSong]()
+        for fav in favorites {
+            let song = LocalSong(title: fav.title, artist: fav.artist, duration: Float(fav.playbackDuration))
+            localSongs.append(song)
+        }
+        return localSongs
+    }
 }
 
 

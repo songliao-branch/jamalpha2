@@ -456,6 +456,7 @@ class MeLoginOrSignupViewController: UIViewController{
                             APIManager.getFavorites({
                                 songs in
                                 for song in songs {
+                                    CoreDataManager.initializeSongToDatabase(song)
                                     CoreDataManager.favoriteTheSong(song, shouldFavorite: true)
                                 }
                             })
