@@ -65,6 +65,7 @@ class MeLoginOrSignupViewController: UIViewController{
         //TODO: check if user is signed in already.
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
+        self.createAWSS3FilePath()
         setUpTopView()
         setUpViews()
     }
@@ -87,6 +88,20 @@ class MeLoginOrSignupViewController: UIViewController{
     override func viewWillDisappear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBarHidden = false
+    }
+    
+    func createAWSS3FilePath(){
+        // create temp file path to store upload image
+        let error = NSErrorPointer()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'upload' directory failed. Error: \(error)")
+        }
     }
     
     func setUpTopView() {
