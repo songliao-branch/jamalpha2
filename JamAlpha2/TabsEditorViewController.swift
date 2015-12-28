@@ -10,14 +10,17 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
+let kmovingMainNoteSliderHeight:CGFloat = 26
+
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate {
     
-    var doubleArrow: UIImageView = UIImageView(image: UIImage(named: "doubleArrow"))
+    var doubleArrowView: CustomizedView!
     
     // delete jiggling gesture 
     let deleteChordTap: UITapGestureRecognizer = UITapGestureRecognizer()
     let longPressSpecificTabButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     let longPressMainViewNoteButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
+    let prepareMoveLongPressGesture: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     
     // define jiggling gesture recognizer for base note button
     var isJiggling: Bool = false
@@ -458,7 +461,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     
-    let prepareMoveLongPressGesture: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     // MARK: collection view functions, include required functions and move cell functions
     func initCollectionView() {
         for var i = 0; i < 25; i++ {
@@ -495,22 +497,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             for var index = 0; index < self.string3FretPosition.count; index++ {
                 if location.x < self.string3FretPosition[self.string3FretPosition.count - 2] {
                     if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
-                        positionX = self.string3FretPosition[index]
+                        positionX = self.string3FretPosition[index] - self.collectionView.contentOffset.x
                         break
                     }
                 }
             }
             
+           
             let imageWidth: CGFloat = self.trueWidth / 5 - 10
-            let imageHeight: CGFloat = 44
-            self.doubleArrow.frame = CGRectMake(positionX + 5, collectionView.frame.origin.y - 44, imageWidth, imageHeight)
-            self.doubleArrow.backgroundColor = UIColor(white: 0.8, alpha: 0.8)
-            self.view.addSubview(self.doubleArrow)
+            let imageHeight: CGFloat = kmovingMainNoteSliderHeight
+            self.doubleArrowView = CustomizedView(frame: CGRectMake(positionX + 5, collectionView.frame.origin.y - kmovingMainNoteSliderHeight, imageWidth, imageHeight))
+            self.view.addSubview(self.doubleArrowView)
             let gesture = UIPanGestureRecognizer(target: self,
                 action: "handleGesture:")
             gesture.delegate = self
-            self.doubleArrow.addGestureRecognizer(gesture)
-            self.doubleArrow.userInteractionEnabled = true
+            self.doubleArrowView.addGestureRecognizer(gesture)
+            self.doubleArrowView.userInteractionEnabled = true
             prepareMoveLongPressGesture.enabled = false
         }
     }
@@ -627,7 +629,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if let ca = self.view {
             if let cv = self.collectionView {
                 let tempX = gestureRecognizer.locationInView(ca).x
-                let tempY = gestureRecognizer.locationInView(ca).y + 44
+                let tempY = gestureRecognizer.locationInView(ca).y + kmovingMainNoteSliderHeight
                 let pointPressedInCanvas = CGPointMake(tempX, tempY)
                 //let pointPressedInCanvas = gestureRecognizer.locationInView(ca)
                 for cell in cv.visibleCells() {
@@ -712,11 +714,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 var imageViewFrame = bundle.representationImageView.frame
                 var point = CGPointZero
                 point.x = dragPointOnCanvas.x - bundle.offset.x
-                point.y = dragPointOnCanvas.y - bundle.offset.y + 44
+                point.y = dragPointOnCanvas.y - bundle.offset.y + kmovingMainNoteSliderHeight
                 imageViewFrame.origin = point
                 bundle.representationImageView.frame = imageViewFrame
                 let tempX = gesture.locationInView(self.collectionView).x
-                let tempY = gesture.locationInView(self.collectionView).y + 44 + self.collectionView.frame.size.height / 2
+                let tempY = gesture.locationInView(self.collectionView).y + kmovingMainNoteSliderHeight + self.collectionView.frame.size.height / 2
                 let dragPointOnCollectionView = CGPointMake(tempX, tempY)//gesture.locationInView(self.collectionView)
                 if let toIndexPath : NSIndexPath = self.collectionView?.indexPathForItemAtPoint(dragPointOnCollectionView) {
                     self.checkForDraggingAtTheEdgeAndAnimatePaging(gesture)
@@ -727,7 +729,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 }
                 
-                self.doubleArrow.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - 22)
+                self.doubleArrowView.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - kmovingMainNoteSliderHeight/2)
             }
             if gesture.state == UIGestureRecognizerState.Ended {
                 bundle.sourceCell.hidden = false
@@ -735,7 +737,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 collectionView!.reloadData()
                 self.bundle = nil
                 prepareMoveLongPressGesture.enabled = true
-                doubleArrow.removeFromSuperview()
+                doubleArrowView.removeGestureRecognizer(gesture)
+                doubleArrowView.removeFromSuperview()
             }
         }
     }
@@ -1097,12 +1100,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         specificButton.transform = CGAffineTransformMakeScale(0.6,0.6)
                         if self.specificTabSets[i].isOriginal == true {
                             specificButton.accessibilityIdentifier = "isOriginal"
+                            specificButton.layer.shadowOpacity = 1
+                            specificButton.layer.shadowRadius = 4
+                            specificButton.layer.shadowOffset = CGSize(width: 0, height: 0)
+                            specificButton.layer.shadowColor = UIColor(red: 94/255, green: 38/255, blue: 18/255, alpha: 1).CGColor
+                            specificButton.layer.shadowPath = UIBezierPath(rect: specificButton.layer.bounds).CGPath
                         } else {
                             specificButton.accessibilityIdentifier = "isNotOriginal"
                             self.longPressSpecificTabButton.addTarget(self, action: "startNormalJinggling:")
                             self.longPressSpecificTabButton.minimumPressDuration = 0.5
                             specificButton.addGestureRecognizer(self.longPressSpecificTabButton)
-                            specificButton.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.8)
+                            specificButton.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)
+                            specificButton.layer.shadowOpacity = 1
+                            specificButton.layer.shadowRadius = 4
+                            specificButton.layer.shadowOffset = CGSize(width: 0, height: 0)
+                            specificButton.layer.shadowColor = UIColor.blackColor().CGColor
+                            specificButton.layer.shadowPath = UIBezierPath(rect: specificButton.layer.bounds).CGPath
                         }
                         self.specificTabsScrollView.addSubview(specificButton)
                         self.buttonOnSpecificScrollView.append(specificButton)
