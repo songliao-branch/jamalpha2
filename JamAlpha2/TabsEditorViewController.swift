@@ -822,9 +822,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func handleGesture(gesture: UIPanGestureRecognizer) -> Void {
         if let bundle = self.bundle {
+            print(gesture.translationInView(self.view))
             let dragPointOnCanvas = gesture.locationInView(self.view)
             //var originalIndexPath: NSIndexPath = self.collectionView.indexPathForItemAtPoint(dragPointOnCanvas)!
             if gesture.state == UIGestureRecognizerState.Began {
+                self.collectionView.scrollEnabled = false
                 self.tapGesture.enabled = false
                 self.stopScrollTimer()
                 self.startScrolling = false
@@ -835,7 +837,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 UIView.animateWithDuration(0.3, animations: { () -> Void in
                     bundle.representationImageView.alpha = 0.8
                 })
-                self.view.userInteractionEnabled = true
+                self.view.userInteractionEnabled = false
             }
             if gesture.state == UIGestureRecognizerState.Changed {
                 // Update the representation image
@@ -871,6 +873,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.tapGesture.enabled = true
                 self.view.userInteractionEnabled = true
                 self.isPanning = false
+                self.collectionView.scrollEnabled = true
             }
         }
     }
