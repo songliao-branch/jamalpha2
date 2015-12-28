@@ -15,7 +15,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var doubleArrow: UIImageView = UIImageView(image: UIImage(named: "doubleArrow"))
     
     // delete jiggling gesture 
-    let deleteChordTap: UITapGestureRecognizer = UITapGestureRecognizer()
+    let deleteChordOnMainView: UITapGestureRecognizer = UITapGestureRecognizer()
+    let deleteChordOnSpecificTabView: UITapGestureRecognizer = UITapGestureRecognizer()
     let longPressSpecificTabButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     let longPressMainViewNoteButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     
@@ -458,7 +459,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     
-    let prepareMoveLongPressGesture: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
+    let prepareMoveLongPressGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
     // MARK: collection view functions, include required functions and move cell functions
     func initCollectionView() {
         for var i = 0; i < 25; i++ {
@@ -479,7 +480,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         calculateBorders()
 
         prepareMoveLongPressGesture.addTarget(self, action: "prepareMoveLongPressGesture:")
-        prepareMoveLongPressGesture.minimumPressDuration = 0.2
+        prepareMoveLongPressGesture.direction = .Up
         prepareMoveLongPressGesture.delegate = self
         collectionView.addGestureRecognizer(prepareMoveLongPressGesture)
 
@@ -488,56 +489,76 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     }
     
-    func prepareMoveLongPressGesture(sender: UILongPressGestureRecognizer) {
-        if sender.state == .Began {
+    func prepareMoveLongPressGesture(sender: UISwipeGestureRecognizer) {
+//        if sender.state == .Began {
             let location = sender.locationInView(collectionView)
             var positionX: CGFloat = 0
+            var stringIndex: Int = 0
             for var index = 0; index < self.string3FretPosition.count; index++ {
                 if location.x < self.string3FretPosition[self.string3FretPosition.count - 2] {
                     if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
+                        stringIndex = index
                         positionX = self.string3FretPosition[index]
                         break
                     }
                 }
             }
             
-            let imageWidth: CGFloat = self.trueWidth / 5 - 10
-            let imageHeight: CGFloat = 44
-            self.doubleArrow.frame = CGRectMake(positionX + 5, collectionView.frame.origin.y - 44, imageWidth, imageHeight)
-            self.doubleArrow.backgroundColor = UIColor(white: 0.8, alpha: 0.8)
-            self.view.addSubview(self.doubleArrow)
-            let gesture = UIPanGestureRecognizer(target: self,
-                action: "handleGesture:")
-            gesture.delegate = self
-            self.doubleArrow.addGestureRecognizer(gesture)
-            self.doubleArrow.userInteractionEnabled = true
-            prepareMoveLongPressGesture.enabled = false
-        }
+//            var isLongPressButton: Bool = false
+//            for item in self.noteButtonWithTabArray {
+//                let tempLocation: CGPoint = CGPointMake(location.x - CGFloat(stringIndex) * self.trueWidth / 5, location.y)
+//                if CGRectContainsPoint(item.noteButton.frame, tempLocation) {
+//                    isLongPressButton = true
+//                    break
+//                }
+//            }
+            //if isLongPressButton == false {
+                
+                
+                let imageWidth: CGFloat = self.trueWidth / 5 - 10
+                let imageHeight: CGFloat = 44
+                self.doubleArrow.frame = CGRectMake(positionX + 5, collectionView.frame.origin.y - 44, imageWidth, imageHeight)
+                self.doubleArrow.backgroundColor = UIColor(white: 0.8, alpha: 0.8)
+                self.view.addSubview(self.doubleArrow)
+                let gesture = UIPanGestureRecognizer(target: self,
+                    action: "handleGesture:")
+                gesture.delegate = self
+                self.doubleArrow.addGestureRecognizer(gesture)
+                self.doubleArrow.userInteractionEnabled = true
+                
+                prepareMoveLongPressGesture.enabled = false
+                musicControlView.userInteractionEnabled = false
+           // }
+       // }
     }
     
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
-        var indexFret: Int = Int()
-        var indexString: Int = Int()
-        let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
-        var original:CGFloat = 0
-        let location = sender.locationInView(self.collectionView)
-        // get the tap position for fret number and string number
-        for var index = 0; index < self.string3FretPosition.count; index++ {
-            if location.x < self.string3FretPosition[self.string3FretPosition.count - 2] {
-                if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
-                    indexFret = index
-                    break
+        if isJiggling == false {
+            var indexFret: Int = Int()
+            var indexString: Int = Int()
+            let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
+            var original:CGFloat = 0
+            let location = sender.locationInView(self.collectionView)
+            // get the tap position for fret number and string number
+            for var index = 0; index < self.string3FretPosition.count; index++ {
+                if location.x < self.string3FretPosition[self.string3FretPosition.count - 2] {
+                    if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
+                        indexFret = index
+                        break
+                    }
                 }
             }
-        }
-        for var index = 0; index < self.string3Position.count; index++ {
-            if location.y >= self.string3Position[index] - string3Height && location.y <= self.string3Position[index] + string3Height {
-                indexString = index + 3
-                original = string3Height  - self.string3Position[index]
+            for var index = 0; index < self.string3Position.count; index++ {
+                if location.y >= self.string3Position[index] - string3Height && location.y <= self.string3Position[index] + string3Height {
+                    indexString = index + 3
+                    original = string3Height  - self.string3Position[index]
+                }
             }
+            // open the editor view and add note button
+            self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
+        } else {
+            self.stopNormalJinggling(longPressMainViewNoteButton)
         }
-        // open the editor view and add note button
-        self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
     }
     
     
@@ -644,6 +665,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
         }
         return (self.bundle != nil)
+    }
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
     func checkForDraggingAtTheEdgeAndAnimatePaging(gestureRecognizer: UIGestureRecognizer) {
@@ -1144,23 +1169,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         self.fingerPoint.removeAll(keepCapacity: false)
         self.createFingerPoint(index)
-//
-//            if self.currentSelectedSpecificTab.isOriginal == true {
-//                let alertController = UIAlertController(title: "Warning", message: "Cannot delete build in tabs", preferredStyle: UIAlertControllerStyle.Alert)
-//            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
-//                self.presentViewController(alertController, animated: true, completion: nil)
-//                self.changeRemoveButtonStatus(self.removeButton)
-//            } else {
-//
-//                //sender.removeFromSuperview()
-//                //self.removeObjectsOnCompleteStringView()
-//                self.removeObjectsOnSpecificTabsScrollView()
-//                tabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
-//                self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
-//                self.changeRemoveButtonStatus(self.removeButton)
-//                self.addSpecificTabButton(self.currentNoteButton.tag)
-//            }
-        
     }
     
     // create finger point for specific tabs
@@ -2739,8 +2747,12 @@ extension TabsEditorViewController {
                 tempView.center = center!
                 originalX = tempView.center.x
                 tempView.center.x = originalX - 1
+                self.deleteChordOnMainView.addTarget(self, action: "deleteChordOnMainView:")
+                tempView.addGestureRecognizer(self.deleteChordOnMainView)
             } else {
                 delta = -(buttonHeight / 3 / 2 - buttonHeight / 15)
+                self.deleteChordOnSpecificTabView.addTarget(self, action: "deleteChordOnSpecificTabView:")
+                tempView.addGestureRecognizer(deleteChordOnSpecificTabView)
             }
             
             let randomInt: UInt32  = arc4random_uniform(500)
@@ -2769,10 +2781,8 @@ extension TabsEditorViewController {
                 }, completion: nil
             )
             
-            self.deleteChordTap.addTarget(self, action: "deleteChord:")
-            tempView.addGestureRecognizer(deleteChordTap)
+
             self.longPressSpecificTabButton.enabled = false
-            
             self.completeStringView.userInteractionEnabled = false
         }
     }
@@ -2782,11 +2792,11 @@ extension TabsEditorViewController {
             self.completeStringView.userInteractionEnabled = true
             self.longPressSpecificTabButton.enabled = true
             let tempView = sender.view!
-            tempView.removeGestureRecognizer(deleteChordTap)
+            tempView.removeGestureRecognizer(deleteChordOnSpecificTabView)
             deleteView.removeFromSuperview()
             tempView.layer.removeAllAnimations()
             tempView.transform = CGAffineTransformIdentity
-            let buttonWidth = tempView.frame.size.width
+            let buttonWidth = tempView.frame.size.width * 5 / 6
             let buttonHeight = tempView.frame.size.height
             let oldCornerRadius = tempView.layer.cornerRadius
             let center = sender.view?.center
@@ -2801,7 +2811,7 @@ extension TabsEditorViewController {
         }
     }
     
-    func deleteChord(sender: UITapGestureRecognizer) {
+    func deleteChordOnSpecificTabView(sender: UITapGestureRecognizer) {
         let alertController = UIAlertController(title: "Notice", message: "This operation will delete this chord you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
             action in
@@ -2817,6 +2827,22 @@ extension TabsEditorViewController {
             self.addSpecificTabButton(self.currentBaseButton.tag)
         }))
         self.presentViewController(alertController, animated: true, completion: nil)
+    }
+    
+    func deleteChordOnMainView(sender: UITapGestureRecognizer) {
+        let index: Int = (sender.view?.tag)!
+        let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
+        for var i = 0; i < self.mainViewDataArray.count; i++ {
+            if self.mainViewDataArray[i].fretNumber == fretNumber {
+                for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
+                    if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[index].tab) {
+                        self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
+                        self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
+                    }
+                }
+            }
+        }
+        self.noteButtonWithTabArray.removeAtIndex(index)
     }
     
     // need to check whether the main view contain the delete tab
