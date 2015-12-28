@@ -2796,16 +2796,18 @@ extension TabsEditorViewController {
             deleteView.removeFromSuperview()
             tempView.layer.removeAllAnimations()
             tempView.transform = CGAffineTransformIdentity
-            let buttonWidth = tempView.frame.size.width * 5 / 6
+            var buttonWidth = tempView.frame.size.width
             let buttonHeight = tempView.frame.size.height
             let oldCornerRadius = tempView.layer.cornerRadius
             let center = sender.view?.center
    
             // circle
             if oldCornerRadius == 0.5 * buttonWidth {
+                buttonWidth = buttonWidth / 1.2
                 tempView.center = CGPoint(x: center!.x - 1, y: center!.y)
                 tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, buttonWidth, buttonWidth)
-                tempView.layer.cornerRadius = 0.5 * buttonWidth
+                tempView.center = center!
+                tempView.layer.cornerRadius = 0.5 * tempButtonWidth
             }
             self.isJiggling = false
         }
@@ -2830,6 +2832,7 @@ extension TabsEditorViewController {
     }
     
     func deleteChordOnMainView(sender: UITapGestureRecognizer) {
+        self.stopNormalJinggling(longPressMainViewNoteButton)
         let index: Int = (sender.view?.tag)!
         let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
         for var i = 0; i < self.mainViewDataArray.count; i++ {
@@ -2843,6 +2846,7 @@ extension TabsEditorViewController {
             }
         }
         self.noteButtonWithTabArray.removeAtIndex(index)
+        
     }
     
     // need to check whether the main view contain the delete tab
