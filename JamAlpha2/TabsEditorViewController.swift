@@ -10,15 +10,23 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
-class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate {
+let kmovingMainNoteSliderHeight:CGFloat = 26
+
+class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate,UIScrollViewDelegate {
     
-    var doubleArrow: UIImageView = UIImageView(image: UIImage(named: "doubleArrow"))
+    var playButtonImageView: UIImageView!
     
-    // delete jiggling gesture 
+    var doubleArrowView: CustomizedView!
+    var scrollTimer:NSTimer?
+    
+    // Gesture Recognizer on screen
     let deleteChordOnMainView: UITapGestureRecognizer = UITapGestureRecognizer()
     let deleteChordOnSpecificTabView: UITapGestureRecognizer = UITapGestureRecognizer()
     let longPressSpecificTabButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     let longPressMainViewNoteButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
+    let prepareMoveSwipeUpGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
+    let prepareMoveSwipeDownGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
+    let checkPanGesture:UIPanGestureRecognizer = UIPanGestureRecognizer()
     
     // define jiggling gesture recognizer for base note button
     var isJiggling: Bool = false
@@ -97,7 +105,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var tabsDataManager: TabsDataManager = TabsDataManager()
     
     // objects on view which need to be changed in different places
-    var removeButton: UIButton = UIButton()
     var statusLabel: UILabel = UILabel()
     var completeImageView: UIImageView = UIImageView()
     var noteButtonOnCompeteScrollView: UIButton = UIButton()
@@ -111,7 +118,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentTabViewIndex: Int = Int()
     var currentBaseButton: UIButton = UIButton()
     
-    // timer
+    // music timer
     var timer = NSTimer()
     
     var tuningMenu: UIView!
@@ -238,7 +245,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.createStringAndFretPosition()
         self.addObjectsOnEditView()
         self.addMusicControlView()
-        self.setUpTimeLabels()
+        
         self.setUpCountdownView()
 
         // initial collection view
@@ -458,9 +465,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    
-    let prepareMoveLongPressGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
     // MARK: collection view functions, include required functions and move cell functions
+    var tapGesture:UITapGestureRecognizer!
     func initCollectionView() {
         for var i = 0; i < 25; i++ {
             fretsNumber.append(i)
@@ -476,60 +482,86 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         collectionView.bounces = true
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.bounces = false
+        collectionView.delegate = self
         self.view.addSubview(collectionView)
         calculateBorders()
 
-        prepareMoveLongPressGesture.addTarget(self, action: "prepareMoveLongPressGesture:")
-        prepareMoveLongPressGesture.direction = .Up
-        prepareMoveLongPressGesture.delegate = self
-        collectionView.addGestureRecognizer(prepareMoveLongPressGesture)
+        prepareMoveSwipeUpGesture.addTarget(self, action: "prepareMoveSwipeGesture:")
+        prepareMoveSwipeUpGesture.direction = .Up
+        prepareMoveSwipeUpGesture.delegate = self
+        prepareMoveSwipeUpGesture.requireGestureRecognizerToFail(self.collectionView.panGestureRecognizer)
+        collectionView.addGestureRecognizer(prepareMoveSwipeUpGesture)
+        
+        
+        prepareMoveSwipeDownGesture.addTarget(self, action: "prepareMoveSwipeGesture:")
+        prepareMoveSwipeDownGesture.direction = .Down
+        prepareMoveSwipeDownGesture.delegate = self
+        prepareMoveSwipeDownGesture.requireGestureRecognizerToFail(self.collectionView.panGestureRecognizer)
+        collectionView.addGestureRecognizer(prepareMoveSwipeDownGesture)
+        
+        checkPanGesture.addTarget(self, action: "checkScrollview:")
+        checkPanGesture.delegate = self
+        collectionView.addGestureRecognizer(checkPanGesture)
 
-        let tapGesture = UITapGestureRecognizer(target: self, action: "singleTapOnCollectionView:")
+
+        tapGesture = UITapGestureRecognizer(target: self, action: "singleTapOnCollectionView:")
         collectionView.addGestureRecognizer(tapGesture)
 
     }
     
-    func prepareMoveLongPressGesture(sender: UISwipeGestureRecognizer) {
-//        if sender.state == .Began {
+
+    func checkScrollview(sender:UIPanGestureRecognizer){
+        let transfer = sender.translationInView(self.collectionView)
+        if(abs(transfer.x) >= abs(transfer.y)){
+            self.collectionView.scrollEnabled = true
+        }else{
+            self.collectionView.scrollEnabled = false
+        }
+        if(sender.state == .Ended){
+            self.collectionView.scrollEnabled = true
+        }
+    }
+    
+    func prepareMoveSwipeGesture(sender: UISwipeGestureRecognizer) {
+        print(sender.direction)
+        if sender.direction == .Up {
+            self.stopScrollTimer()
+            self.startScrolling = false
             let location = sender.locationInView(collectionView)
             var positionX: CGFloat = 0
-            var stringIndex: Int = 0
             for var index = 0; index < self.string3FretPosition.count; index++ {
                 if location.x < self.string3FretPosition[self.string3FretPosition.count - 2] {
                     if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
-                        stringIndex = index
-                        positionX = self.string3FretPosition[index]
+                        positionX = self.string3FretPosition[index] - self.collectionView.contentOffset.x
+                        self.doubleViewPositionX = self.string3FretPosition[index] + (self.trueWidth / 5 - 10)/2 + 5
                         break
                     }
                 }
             }
-            
-//            var isLongPressButton: Bool = false
-//            for item in self.noteButtonWithTabArray {
-//                let tempLocation: CGPoint = CGPointMake(location.x - CGFloat(stringIndex) * self.trueWidth / 5, location.y)
-//                if CGRectContainsPoint(item.noteButton.frame, tempLocation) {
-//                    isLongPressButton = true
-//                    break
-//                }
-//            }
-            //if isLongPressButton == false {
-                
-                
-                let imageWidth: CGFloat = self.trueWidth / 5 - 10
-                let imageHeight: CGFloat = 44
-                self.doubleArrow.frame = CGRectMake(positionX + 5, collectionView.frame.origin.y - 44, imageWidth, imageHeight)
-                self.doubleArrow.backgroundColor = UIColor(white: 0.8, alpha: 0.8)
-                self.view.addSubview(self.doubleArrow)
-                let gesture = UIPanGestureRecognizer(target: self,
-                    action: "handleGesture:")
-                gesture.delegate = self
-                self.doubleArrow.addGestureRecognizer(gesture)
-                self.doubleArrow.userInteractionEnabled = true
-                
-                prepareMoveLongPressGesture.enabled = false
-                musicControlView.userInteractionEnabled = false
-           // }
-       // }
+            let imageWidth: CGFloat = self.trueWidth / 5 - 10
+            let imageHeight: CGFloat = kmovingMainNoteSliderHeight
+            self.doubleArrowView = CustomizedView(frame: CGRectMake(positionX + 5, collectionView.frame.origin.y, imageWidth, imageHeight))
+            self.view.insertSubview(self.doubleArrowView, belowSubview: self.collectionView)
+            UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseIn,.AllowUserInteraction], animations: {
+                self.doubleArrowView.center.y = self.doubleArrowView.center.y - kmovingMainNoteSliderHeight
+                }, completion: {
+                    completed in
+                    let gesture = UIPanGestureRecognizer(target: self,
+                        action: "handleGesture:")
+                    
+                    gesture.delegate = self
+                    self.doubleArrowView.addGestureRecognizer(gesture)
+                    self.doubleArrowView.userInteractionEnabled = true
+            })
+            self.prepareMoveSwipeUpGesture.enabled = false
+            self.prepareMoveSwipeDownGesture.enabled = true
+        
+         
+        } else if sender.direction == .Down {
+            self.removeDoubleArrowView()
+            self.prepareMoveSwipeUpGesture.enabled = true
+            self.prepareMoveSwipeDownGesture.enabled = false
+        }
     }
     
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
@@ -563,6 +595,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     
     func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int, original:CGFloat?=nil) {
+        self.removeDoubleArrowView()
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
         if isDemoSong {
@@ -628,6 +661,62 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         return 25
     }
     
+    //scrollview delegate
+    var doubleViewPositionX:CGFloat = 0.0
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if(isPanning || self.animating){
+            stopScrollTimer()
+            startScrolling = false
+            return
+        }
+        if(self.doubleArrowView != nil && !startScrolling){
+            startScrolling = true
+             startScrollTimer()
+        }
+    }
+    
+//    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+//        if(self.doubleArrowView != nil){
+//          self.doubleViewPositionX = self.doubleArrowView.center.x + self.collectionView.contentOffset.x
+//        }
+//    }
+    
+    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate{
+            self.stopScrollTimer()
+            self.startScrolling = false
+        }
+    }
+    
+
+    
+    func startScrollTimer(){
+        if scrollingTimer == nil {
+            scrollingTimer = NSTimer()
+            scrollingTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("changDoubleArrowPosition"), userInfo: nil, repeats: true)
+            NSRunLoop.mainRunLoop().addTimer(scrollingTimer, forMode: NSRunLoopCommonModes)
+        }
+    }
+    
+    func stopScrollTimer(){
+        if(scrollingTimer != nil){
+            scrollingTimer!.invalidate()
+            scrollingTimer = nil
+        }
+    }
+
+    func changDoubleArrowPosition(){
+        if(self.doubleArrowView == nil){
+            return
+        }else{
+           // if (self.collectionView.contentOffset.x>0 && self.collectionView.contentOffset.x < 5*self.trueWidth){
+                self.doubleArrowView.center.x = doubleViewPositionX - self.collectionView.contentOffset.x
+            //}
+            
+        }
+    }
+    
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
         cell.imageView.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
@@ -648,7 +737,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if let ca = self.view {
             if let cv = self.collectionView {
                 let tempX = gestureRecognizer.locationInView(ca).x
-                let tempY = gestureRecognizer.locationInView(ca).y + 44
+                let tempY = gestureRecognizer.locationInView(ca).y + kmovingMainNoteSliderHeight
                 let pointPressedInCanvas = CGPointMake(tempX, tempY)
                 //let pointPressedInCanvas = gestureRecognizer.locationInView(ca)
                 for cell in cv.visibleCells() {
@@ -721,27 +810,33 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func handleGesture(gesture: UIPanGestureRecognizer) -> Void {
         if let bundle = self.bundle {
+            print(gesture.translationInView(self.view))
             let dragPointOnCanvas = gesture.locationInView(self.view)
             //var originalIndexPath: NSIndexPath = self.collectionView.indexPathForItemAtPoint(dragPointOnCanvas)!
             if gesture.state == UIGestureRecognizerState.Began {
+                self.collectionView.scrollEnabled = false
+                self.tapGesture.enabled = false
+                self.stopScrollTimer()
+                self.startScrolling = false
+                self.isPanning = true
                 bundle.sourceCell.hidden = true
                 self.view?.addSubview(bundle.representationImageView)
                 self.view.userInteractionEnabled = false
                 UIView.animateWithDuration(0.3, animations: { () -> Void in
                     bundle.representationImageView.alpha = 0.8
                 })
-                self.view.userInteractionEnabled = true
+                self.view.userInteractionEnabled = false
             }
             if gesture.state == UIGestureRecognizerState.Changed {
                 // Update the representation image
                 var imageViewFrame = bundle.representationImageView.frame
                 var point = CGPointZero
                 point.x = dragPointOnCanvas.x - bundle.offset.x
-                point.y = dragPointOnCanvas.y - bundle.offset.y + 44
+                point.y = dragPointOnCanvas.y - bundle.offset.y + kmovingMainNoteSliderHeight
                 imageViewFrame.origin = point
                 bundle.representationImageView.frame = imageViewFrame
                 let tempX = gesture.locationInView(self.collectionView).x
-                let tempY = gesture.locationInView(self.collectionView).y + 44 + self.collectionView.frame.size.height / 2
+                let tempY = gesture.locationInView(self.collectionView).y + kmovingMainNoteSliderHeight + self.collectionView.frame.size.height / 2
                 let dragPointOnCollectionView = CGPointMake(tempX, tempY)//gesture.locationInView(self.collectionView)
                 if let toIndexPath : NSIndexPath = self.collectionView?.indexPathForItemAtPoint(dragPointOnCollectionView) {
                     self.checkForDraggingAtTheEdgeAndAnimatePaging(gesture)
@@ -752,18 +847,40 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 }
                 
-                self.doubleArrow.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - 22)
+                self.doubleArrowView.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - kmovingMainNoteSliderHeight/2)
             }
             if gesture.state == UIGestureRecognizerState.Ended {
+                self.doubleArrowView.center.x = bundle.sourceCell.center.x - self.collectionView.contentOffset.x
+                self.doubleArrowView.frame.origin.y = self.collectionView.frame.origin.y - kmovingMainNoteSliderHeight
                 bundle.sourceCell.hidden = false
                 bundle.representationImageView.removeFromSuperview()
                 collectionView!.reloadData()
                 self.bundle = nil
-                prepareMoveLongPressGesture.enabled = true
-                musicControlView.userInteractionEnabled = true
-                doubleArrow.removeFromSuperview()
+
+                self.doubleArrowView.removeGestureRecognizer(gesture)
+                self.removeDoubleArrowView()
+                self.tapGesture.enabled = true
+                self.view.userInteractionEnabled = true
+                self.isPanning = false
+                self.collectionView.scrollEnabled = true
             }
         }
+    }
+    
+    func removeDoubleArrowView(){
+        self.stopScrollTimer()
+        self.startScrolling = false
+        if(self.doubleArrowView != nil){
+            UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseOut,.AllowUserInteraction], animations: {
+                self.doubleArrowView.center.y = self.doubleArrowView.center.y + kmovingMainNoteSliderHeight
+                }, completion: {
+                    completed in
+                    self.doubleArrowView.removeFromSuperview()
+                    self.doubleArrowView = nil
+                    self.prepareMoveSwipeUpGesture.enabled = true
+            })
+        }
+        
     }
 
     func addObjectsOnMainView() {
@@ -807,22 +924,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         statusLabel.textAlignment = NSTextAlignment.Center
         menuView.addSubview(statusLabel)
         
-        tuningButton.frame = CGRectMake(16.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        tuningButton.frame = CGRectMake(19.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
         tuningButton.setImage(UIImage(named: "icon-tuning"), forState: UIControlState.Normal)
         menuView.addSubview(tuningButton)
         
-        resetButton.frame = CGRectMake(19.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        resetButton.frame = CGRectMake(22.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
         resetButton.setImage(UIImage(named: "icon-reset"), forState: UIControlState.Normal)
         menuView.addSubview(resetButton)
-        
-        removeButton.frame = CGRectMake(22.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
-        removeButton.addTarget(self, action: "pressRemoveButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        removeButton.setImage(UIImage(named: "icon-remove"), forState: UIControlState.Normal)
-        removeButton.accessibilityIdentifier = "notRemove"
-        removeButton.hidden = true
-        menuView.addSubview(removeButton)
         
         addButton.frame = CGRectMake(25.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         addButton.addTarget(self, action: "pressAddButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -1123,12 +1233,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         specificButton.transform = CGAffineTransformMakeScale(0.6,0.6)
                         if self.specificTabSets[i].isOriginal == true {
                             specificButton.accessibilityIdentifier = "isOriginal"
+                            specificButton.layer.shadowOpacity = 1
+                            specificButton.layer.shadowRadius = 4
+                            specificButton.layer.shadowOffset = CGSize(width: 0, height: 0)
+                            specificButton.layer.shadowColor = UIColor(red: 94/255, green: 38/255, blue: 18/255, alpha: 1).CGColor
+                            specificButton.layer.shadowPath = UIBezierPath(rect: specificButton.layer.bounds).CGPath
                         } else {
                             specificButton.accessibilityIdentifier = "isNotOriginal"
                             self.longPressSpecificTabButton.addTarget(self, action: "startNormalJinggling:")
                             self.longPressSpecificTabButton.minimumPressDuration = 0.5
                             specificButton.addGestureRecognizer(self.longPressSpecificTabButton)
-                            specificButton.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.8)
+                            specificButton.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)
+                            specificButton.layer.shadowOpacity = 1
+                            specificButton.layer.shadowRadius = 4
+                            specificButton.layer.shadowOffset = CGSize(width: 0, height: 0)
+                            specificButton.layer.shadowColor = UIColor.blackColor().CGColor
+                            specificButton.layer.shadowPath = UIBezierPath(rect: specificButton.layer.bounds).CGPath
                         }
                         self.specificTabsScrollView.addSubview(specificButton)
                         self.buttonOnSpecificScrollView.append(specificButton)
@@ -1291,20 +1411,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // music control view, include progressblock, timelabel, previous button, pan gesture, update, count down
     func addMusicControlView() {
-        let previousButton: UIButton = UIButton()
-        previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 3 / 20 * self.trueHeight, 2.5 / 31 * self.trueWidth, 2.5 / 31 * trueWidth)
-        previousButton.addTarget(self, action: "pressPreviousButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        previousButton.setImage(UIImage(named: "icon-previous"), forState: UIControlState.Normal)
-        self.musicControlView.addSubview(previousButton)
-        
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
         
+        let previousButton: UIButton = UIButton()
+        previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 3 / 20 * self.trueHeight - 1.5 / 31 * self.trueWidth, 3 / 31 * self.trueWidth, 3 / 31 * trueWidth)
+        previousButton.addTarget(self, action: "pressPreviousButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        previousButton.setImage(UIImage(named: "icon-previous"), forState: UIControlState.Normal)
+        previousButton.backgroundColor = UIColor.blackColor()
+        self.musicControlView.addSubview(previousButton)
+
         musicSingleTapRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
         self.musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
         
         let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
+        self.setUpTimeLabels()
+        self.playButtonImageView = UIImageView(frame: CGRectMake((1 - 3 / 31) / 2 * self.trueWidth, 3 / 20 * self.trueHeight - 1.5 / 31 * trueWidth, 3 / 31 * trueWidth, 3 / 31 * trueWidth))
+        self.playButtonImageView.image = UIImage(named: "playbutton")
+        self.musicControlView.addSubview(self.playButtonImageView)
     }
     
     func setUpTimeLabels() {
@@ -1358,6 +1483,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // pan on music control view to change music time and progressblock time
     func panOnMusicControlView(sender: UIPanGestureRecognizer) {
         if sender.state == .Began {
+            self.removeDoubleArrowView()
             self.isPanning = true
             self.timer.invalidate()
             self.timer = NSTimer()
@@ -1408,6 +1534,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                 self.musicPlayer.currentPlaybackRate = speed
             }
+            self.removeDoubleArrowView()
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
         }
     }
@@ -1452,6 +1579,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 musicPlayer.pause()
             }
             timer.invalidate()
+            self.playButtonImageView.hidden = false
             self.view.userInteractionEnabled = true
         } else {
             self.isPlaying = true
@@ -1460,7 +1588,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.alpha = 1.0
             }, completion: nil)
-            
+            self.playButtonImageView.hidden = true
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
             musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
@@ -1645,7 +1773,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // correctly put the tabs on music line
     func setMainViewTabPositionInRange(tab: NormalTabs, endIndex: Int, allTabsOnMusicLine: [tabOnMusicLine]) -> CGRect {
         let labelHeight = self.progressBlock.frame.height / 2 / 4
-        let width = self.trueWidth / 20
+        let width = self.trueWidth / 16
         var frame: CGRect = CGRect()
         for var i = 0; i < endIndex; i++ {
             if self.compareTabs(allTabsOnMusicLine[i].tab, tab2: tab) {
@@ -1697,24 +1825,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.allTabsOnMusicLine.append(returnValue.1)
         }
         self.progressBlock.addSubview(returnValue.0)
-//         else {
-//            let fretNumber = Int(noteButtonWithTabArray[sender.tag].tab.index) - Int(noteButtonWithTabArray[sender.tag].tab.index) / 100 * 100
-//            for var i = 0; i < self.mainViewDataArray.count; i++ {
-//                if self.mainViewDataArray[i].fretNumber == fretNumber {
-//                    for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
-//                        if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[sender.tag].tab)  {
-//                            self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
-//                            self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
-//                        }
-//                    }
-//                }
-//            }
-//            self.noteButtonWithTabArray.removeAtIndex(sender.tag)
-//            for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
-//                self.noteButtonWithTabArray[i].noteButton.tag = i
-//            }
-//            self.changeRemoveButtonStatus(self.removeButton)
-//        }
     }
     
     func addTabViewOnMusicControlView(sender: Int) -> (UIView, tabOnMusicLine) {
@@ -2732,7 +2842,7 @@ extension TabsEditorViewController {
         if sender.state == .Began {
             self.isJiggling = true
             let tempView = sender.view!
-            self.currentSelectedSpecificTab = self.specificTabSets[tempView.tag]
+            //self.currentSelectedSpecificTab = self.specificTabSets[tempView.tag]
             var buttonWidth = tempView.frame.size.width
             let buttonHeight = tempView.frame.size.height
             let oldCornerRadius = tempView.layer.cornerRadius
@@ -2772,6 +2882,10 @@ extension TabsEditorViewController {
             deleteView.image = image
             
             tempView.addSubview(deleteView)
+            
+            if oldCornerRadius == 0.5 * buttonWidth {
+                tempView.center.x = originalX - 1
+            }
             
             UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
                 UIView.setAnimationRepeatCount(Float(NSNotFound))
@@ -2919,12 +3033,10 @@ extension TabsEditorViewController {
         for var j = 0; j < self.allTabsOnMusicLine.count; j++ {
             self.currentTime = self.allTabsOnMusicLine[j].time
             self.allTabsOnMusicLine[j].tabView.frame = self.setMainViewTabPositionInRange(self.allTabsOnMusicLine[j].tab, endIndex: tempAllTabsOnMusicLine.count, allTabsOnMusicLine: tempAllTabsOnMusicLine)
-
+            tempAllTabsOnMusicLine.append(allTabsOnMusicLine[j])
         }
         tempAllTabsOnMusicLine.removeAll()
     }
-    
-
 }
 
 
