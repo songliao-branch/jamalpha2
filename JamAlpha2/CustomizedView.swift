@@ -81,7 +81,7 @@ class CustomizedView: UIView {
         path.addCurveToPoint(CGPoint(x: initialPoint+cornerRadius, y: 0), controlPoint1: CGPoint(x: initialPoint+cornerRadius-(cornerRadius+tempXposition)/2, y: radiusTop - sqrt(pow(radiusTop,2) - pow((cornerRadius+tempXposition)/2 ,2 ))), controlPoint2: CGPoint(x:  initialPoint + cornerRadius - sqrt(pow(radiusTop,2) - pow(radiusTop-tempYposition/2 ,2 )), y: tempYposition/2))
         UIColor.grayColor().colorWithAlphaComponent(0.5).setFill()
         path.fill()
-
+        
     }
     
     
