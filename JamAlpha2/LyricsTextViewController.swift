@@ -19,7 +19,7 @@ class LyricsTextViewController: UIViewController {
     var viewHeight: CGFloat = CGFloat()
     
     var theSong: Findable!
-    
+    var titleView = UIView()
     var lyricsTextView: UITextView = UITextView()
     
     var textViewBottomLayoutGuideConstraint: NSLayoutConstraint!
@@ -48,8 +48,9 @@ class LyricsTextViewController: UIViewController {
             self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
         }
         
-        addObjectsOnMainView()
-        
+        addBackground()
+        addTitleView()
+        addLyricsTextView()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -87,7 +88,7 @@ class LyricsTextViewController: UIViewController {
         } else {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
         }
-        self.lyricsTextView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, self.lyricsTextView.frame.height + originDelta)
+        self.lyricsTextView.frame = CGRectMake(0, 20 + 44, self.viewWidth, self.lyricsTextView.frame.height + originDelta)
         self.lyricsTextView.layer.opacity = 0.1
         UIView.animateWithDuration(1.4, animations: {
             self.lyricsTextView.layer.opacity = 1
@@ -95,10 +96,10 @@ class LyricsTextViewController: UIViewController {
         })
     }
     
-    func addObjectsOnMainView() {
-        let backgroundImageWidth: CGFloat = self.viewHeight - 3.5 / 31 * self.viewHeight
+    func addBackground() {
+        let backgroundImageWidth: CGFloat = self.viewHeight - 44 - 20
         let backgroundImage: UIImageView = UIImageView()
-        backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
+        backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 44 + 20, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
         var image:UIImage!
         if let artwork = theSong!.getArtWork() {
@@ -111,45 +112,46 @@ class LyricsTextViewController: UIViewController {
         let blurredImage: UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
-        self.addTitleView()
-        self.addLyricsTextView()
     }
     
     func addTitleView() {
-        let titleView: UIView = UIView()
-        titleView.frame = CGRectMake(0, 0, self.viewWidth, 3.5 / 31 * self.viewHeight)
-        titleView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+        titleView.frame = CGRectMake(0, 0, self.viewWidth, 20 + 44)//status bar height and navigation bar height
+        titleView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(titleView)
         
         let buttonWidth: CGFloat = 2.0 / 20 * self.viewWidth
         let backButton: UIButton = UIButton()
-        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 0, buttonWidth, buttonWidth)
         backButton.setTitle("B", forState: UIControlState.Normal)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        backButton.center.y = 20 + 44/2
         titleView.addSubview(backButton)
         
         let doneButton: UIButton = UIButton()
-        doneButton.frame = CGRectMake(17.5 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        doneButton.frame = CGRectMake(17.5 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         doneButton.setTitle("D", forState: UIControlState.Normal)
         doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(doneButton)
         
-        let titleLabel: UIImageView = UIImageView()
-        titleLabel.frame = CGRectMake(6.5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, 7 / 20 * self.viewWidth, 2 / 31 * self.viewHeight)
-        titleLabel.image = UIImage(named: "lyrics-editor")
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
+        titleLabel.textColor = UIColor.whiteColor()
+        titleLabel.font = UIFont.systemFontOfSize(20)
+        titleLabel.text = "Add lyrics"
+        titleLabel.sizeToFit()
+        titleLabel.center = CGPoint(x: titleView.center.x, y: 44/2 + 20)
         titleView.addSubview(titleLabel)
         
         let deleteAllButton: UIButton = UIButton()
-        deleteAllButton.frame = CGRectMake(3 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        deleteAllButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         deleteAllButton.setTitle("D", forState: UIControlState.Normal)
         deleteAllButton.setImage(UIImage(named: "lyrics_delete_circle"), forState: UIControlState.Normal)
         deleteAllButton.addTarget(self, action: "pressDeleteAllButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(deleteAllButton)
         
         let reorganizeButton: UIButton = UIButton()
-        reorganizeButton.frame = CGRectMake(15 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        reorganizeButton.frame = CGRectMake(15 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         reorganizeButton.setTitle("R", forState: UIControlState.Normal)
         reorganizeButton.setImage(UIImage(named: "lyrics_reorganize_circle"), forState: UIControlState.Normal)
         reorganizeButton.addTarget(self, action: "pressReorganizeButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -165,7 +167,7 @@ class LyricsTextViewController: UIViewController {
     }
     
     func addLyricsTextView() {
-        self.lyricsTextView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, 27.5 / 31 * self.viewHeight)
+        self.lyricsTextView.frame = CGRect(x: 0, y: CGRectGetMaxY(titleView.frame), width: self.viewWidth, height: self.viewHeight - (20 + 44))
         self.lyricsTextView.backgroundColor = UIColor.clearColor()
         self.lyricsTextView.textAlignment = .Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
@@ -207,7 +209,11 @@ class LyricsTextViewController: UIViewController {
     }
     
     func pressDoneButton(sender: UIButton) {
-        print("done button")
+        if self.lyricsTextView.text.characters.count < 2 {
+            self.showMessage("Please add some lyrics before syncing", message: "", actionTitle: "OK", completion: nil)
+            return
+        }
+        
         self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         
@@ -283,9 +289,8 @@ class LyricsTextViewController: UIViewController {
         }))
         alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
-        
     }
-    
+
     func array2String(sender: [String]) -> String {
         var tempString: String = String()
         for var index = 0; index < self.lyricsReorganizedArray.count; index++ {
