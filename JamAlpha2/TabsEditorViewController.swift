@@ -502,11 +502,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         checkPanGesture.delegate = self
         collectionView.addGestureRecognizer(checkPanGesture)
 
+
         tapGesture = UITapGestureRecognizer(target: self, action: "singleTapOnCollectionView:")
         collectionView.addGestureRecognizer(tapGesture)
 
     }
     
+
     func checkScrollview(sender:UIPanGestureRecognizer){
         let transfer = sender.translationInView(self.collectionView)
         if(abs(transfer.x) >= abs(transfer.y)){
@@ -537,7 +539,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 }
             }
-            
 
 //            var isLongPressButton: Bool = false
 //            for item in self.noteButtonWithTabArray {
@@ -1779,18 +1780,18 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     // correctly put the tabs on music line
-    func setMainViewTabPositionInRange(tab: NormalTabs, endIndex: Int) -> CGRect {
+    func setMainViewTabPositionInRange(tab: NormalTabs, endIndex: Int, allTabsOnMusicLine: [tabOnMusicLine]) -> CGRect {
         let labelHeight = self.progressBlock.frame.height / 2 / 4
         let width = self.trueWidth / 20
         var frame: CGRect = CGRect()
         for var i = 0; i < endIndex; i++ {
-            if self.compareTabs(self.allTabsOnMusicLine[i].tab, tab2: tab) {
-                let tempFrame = CGRectMake(0 + CGFloat(self.currentTime / self.duration) * (self.progressBlock.frame.width), self.allTabsOnMusicLine[i].tabView.frame.origin.y, self.allTabsOnMusicLine[i].tabView.frame.width, self.allTabsOnMusicLine[i].tabView.frame.height)
+            if self.compareTabs(allTabsOnMusicLine[i].tab, tab2: tab) {
+                let tempFrame = CGRectMake(0 + CGFloat(self.currentTime / self.duration) * (self.progressBlock.frame.width), allTabsOnMusicLine[i].tabView.frame.origin.y, allTabsOnMusicLine[i].tabView.frame.width, allTabsOnMusicLine[i].tabView.frame.height)
                 return tempFrame
             }
         }
         
-        let numberOfUnrepeatedTab: Int = numberOfUnrepeatedTabOnMainView(endIndex)
+        let numberOfUnrepeatedTab: Int = numberOfUnrepeatedTabOnMainView(endIndex, allTabsOnMusicLine: allTabsOnMusicLine)
         let tempSender = CGFloat(numberOfUnrepeatedTab % 4)
         
         let dynamicHeight = 0.5 * self.progressBlock.frame.height + labelHeight * tempSender
@@ -1799,14 +1800,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
 
     // caluclate the tab on music line without repeat
-    func numberOfUnrepeatedTabOnMainView(endIndex: Int) -> Int{
+    func numberOfUnrepeatedTabOnMainView(endIndex: Int, allTabsOnMusicLine: [tabOnMusicLine]) -> Int{
         var set = [String: Int]()
         for var i = 0; i < endIndex; i++ {
-            if let val = set["\(self.allTabsOnMusicLine[i].tab.index) \(self.allTabsOnMusicLine[i].tab.name)"] {
-                set["\(self.allTabsOnMusicLine[i].tab.index) \(self.allTabsOnMusicLine[i].tab.name)"] = val + 1
+            if let val = set["\(allTabsOnMusicLine[i].tab.index) \(allTabsOnMusicLine[i].tab.name)"] {
+                set["\(allTabsOnMusicLine[i].tab.index) \(allTabsOnMusicLine[i].tab.name)"] = val + 1
             }
             else{
-                set["\(self.allTabsOnMusicLine[i].tab.index) \(self.allTabsOnMusicLine[i].tab.name)"] = 1
+                set["\(allTabsOnMusicLine[i].tab.index) \(allTabsOnMusicLine[i].tab.name)"] = 1
             }
         }
         return set.count
@@ -1859,7 +1860,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tempView.layer.cornerRadius = 2
         var tempStruct: tabOnMusicLine = tabOnMusicLine()
         let name = self.noteButtonWithTabArray[sender].tab.name
-        tempView.frame = setMainViewTabPositionInRange(self.noteButtonWithTabArray[sender].tab, endIndex: self.allTabsOnMusicLine.count)
+        tempView.frame = setMainViewTabPositionInRange(self.noteButtonWithTabArray[sender].tab, endIndex: self.allTabsOnMusicLine.count, allTabsOnMusicLine: self.allTabsOnMusicLine)
         let tempLabelView: UILabel = UILabel()
         
         tempLabelView.frame = CGRectMake(0, 0, tempView.frame.width, tempView.frame.height)
@@ -3054,17 +3055,14 @@ extension TabsEditorViewController {
         reorganizeAllTabsOnMusicLine()
     }
     
-    // need to fix the reorganize function
     func reorganizeAllTabsOnMusicLine() {
+        var tempAllTabsOnMusicLine: [tabOnMusicLine] = [tabOnMusicLine]()
         for var j = 0; j < self.allTabsOnMusicLine.count; j++ {
-            for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
-                if self.noteButtonWithTabArray[i].tab.index == self.allTabsOnMusicLine[j].tab.index && self.noteButtonWithTabArray[i].tab.name == self.allTabsOnMusicLine[j].tab.name && self.noteButtonWithTabArray[i].tab.content == self.allTabsOnMusicLine[j].tab.content {
-                    self.currentTime = self.allTabsOnMusicLine[j].time
-                    self.allTabsOnMusicLine[j].tabView.frame = self.setMainViewTabPositionInRange(self.noteButtonWithTabArray[i].tab, endIndex: j + 1)
-                }
-                
-            }
+            self.currentTime = self.allTabsOnMusicLine[j].time
+            self.allTabsOnMusicLine[j].tabView.frame = self.setMainViewTabPositionInRange(self.allTabsOnMusicLine[j].tab, endIndex: tempAllTabsOnMusicLine.count, allTabsOnMusicLine: tempAllTabsOnMusicLine)
+
         }
+        tempAllTabsOnMusicLine.removeAll()
     }
     
 
