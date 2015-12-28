@@ -82,7 +82,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 
                 let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
                 //TODO: better way to differentitate this?cell
-                let t = DownloadedTabsSet(id: -1, songId: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                let t = DownloadedTabsSet(id: -1, songId: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
 
                 allTabsSets[0]?.append(t)
             }
@@ -104,7 +104,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 let currentUser = CoreDataManager.getCurrentUser()!
                 
                 let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
-                let l = DownloadedLyricsSet(id: -1, songId: -1, lyricsPreview: preview, numberOfLines: lyric.lyric.count, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                let l = DownloadedLyricsSet(id: -1, songId: -1, lyricsPreview: preview, numberOfLines: lyric.lyric.count, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
                 allLyricsSets[0]?.append(l)
             }
         }
@@ -317,7 +317,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-            cell.dateLabel.text = tabsSet.updatedAt
+            cell.dateLabel.text = tabsSet.lastEdited
             
             //user section
             cell.profileName.text = tabsSet.editor.nickname
@@ -362,7 +362,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.subtitleLabel.text = "\(lyricsSet.numberOfLines) lines"
             
             cell.profileName.text = lyricsSet.editor.nickname
-            cell.dateLabel.text = lyricsSet.updatedAt
+            cell.dateLabel.text = lyricsSet.lastEdited
             
         
             cell.profileImage.image = nil
