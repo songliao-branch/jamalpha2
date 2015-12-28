@@ -39,8 +39,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     @IBOutlet weak var playPauseButton: UIButton!
     
+    //MARK: tutorial-related
     var tutorialScrollView: UIScrollView!
-
+    var numberOfTutorialPages = 5
+    var tutorialIndicators = [UIView]()
+    var indicatorOriginXPositions = [CGFloat]()
+    
     var backgroundImageView: UIImageView!
     var backgroundScaleFactor: CGFloat = 0.4
     var backgroundImage: UIImage?
@@ -339,6 +343,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         isViewDidAppear = true
     }
     
+
     func showTutorial() {
         if isDemoSong {
             avPlayer.pause()
@@ -352,9 +357,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
         tutorialScrollView.bounces = false
         tutorialScrollView.pagingEnabled = true
-        
-        for i in 0...4 {
-            
+        tutorialScrollView.delegate = self
+        for i in 0..<numberOfTutorialPages{
             let tutorialImage = UIImageView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: view.frame.height))
             tutorialImage.image = UIImage(named: "tutorial_\(i+1)_iPhone6")
             
@@ -369,7 +373,52 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         tutorialScrollView.contentSize = CGSize(width: 5 * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
+        
+        var originX = 0
+        if numberOfTutorialPages % 2 == 0 {//even
+            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5
+        } else {
+            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5 + 5
+        }
+        
+        for i in 0..<numberOfTutorialPages {
+            let circle = UIView(frame: CGRect(x: self.view.center.x - CGFloat(originX) + CGFloat(i * 15), y: self.view.frame.height - 20, width: 10, height: 10))
+            circle.backgroundColor = UIColor.whiteColor()
+            
+            if i == 0 {
+                circle.backgroundColor = UIColor.mainPinkColor()
+            }
+            circle.layer.cornerRadius = 5
+            tutorialScrollView.addSubview(circle)
+            tutorialIndicators.append(circle)
+            indicatorOriginXPositions.append(circle.frame.origin.x)
+        }
     }
+
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if  tutorialScrollView.hidden {
+            return
+        }
+        
+        for i in 0..<numberOfTutorialPages {
+            tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
+        }
+    }
+    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        if  tutorialScrollView.hidden {
+            return
+        }
+        
+        let currentPage = scrollView.contentOffset.x / self.view.frame.width
+        for i in 0..<numberOfTutorialPages {
+            if i == Int(currentPage) {
+                tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
+            } else {
+                tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
+            }
+        }
+    }
+
     
     func hideTutorial() {
         tutorialScrollView.hidden = true

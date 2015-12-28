@@ -227,7 +227,7 @@ class APIManager: NSObject {
                     print(json)
                     if let _ = json["error"].string {
                         print("no most liked tabs yet")
-                        completion(found: false, downloadWithContent:  DownloadedTabsSet(id: 0, songId: 0, tuning: "", capo: 0, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: ""))
+                        completion(found: false, downloadWithContent:  DownloadedTabsSet(id: 0, songId: 0, tuning: "", capo: 0, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: ""))
                         return
                     }
                     
@@ -336,7 +336,7 @@ class APIManager: NSObject {
                     print(json)
                     if let _ = json["error"].string {
                         print("no most liked lyrics yet")
-                        completion(found: false, downloadWithContent: DownloadedLyricsSet(id: 0, songId: 0, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: ""))
+                        completion(found: false, downloadWithContent: DownloadedLyricsSet(id: 0, songId: 0, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: ""))
                         return
                     }
                     let set = json["lyrics_set_content"]
