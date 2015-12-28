@@ -2814,21 +2814,44 @@ extension TabsEditorViewController {
     }
     
     func deleteChordOnSpecificTabView(sender: UITapGestureRecognizer) {
-        let alertController = UIAlertController(title: "Notice", message: "This operation will delete this chord you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
-        alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
-            action in
-            self.stopNormalJinggling(self.longPressSpecificTabButton)
-        }))
-        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
-            action in
-            self.deleteChordOnMainViewWhenDeleteOnEditView(Int(self.currentSelectedSpecificTab.index), name: self.currentSelectedSpecificTab.name, content: self.currentSelectedSpecificTab.content)
-            self.removeObjectsOnSpecificTabsScrollView()
-            self.tabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
-            self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
-            self.stopNormalJinggling(self.longPressSpecificTabButton)
-            self.addSpecificTabButton(self.currentBaseButton.tag)
-        }))
-        self.presentViewController(alertController, animated: true, completion: nil)
+        var needAlert: Bool = false
+        for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
+            if self.noteButtonWithTabArray[i].tab.index == Int(self.currentSelectedSpecificTab.index) && self.noteButtonWithTabArray[i].tab.name == self.currentSelectedSpecificTab.name && self.noteButtonWithTabArray[i].tab.content == self.currentSelectedSpecificTab.content {
+                needAlert = true
+                break
+            }
+        }
+        if needAlert == false {
+            for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+                if self.allTabsOnMusicLine[i].tab.index == Int(self.currentSelectedSpecificTab.index) && self.allTabsOnMusicLine[i].tab.name == self.currentSelectedSpecificTab.name && self.allTabsOnMusicLine[i].tab.content == self.currentSelectedSpecificTab.content {
+                    needAlert = true
+                    break
+                }
+            }
+        }
+        if needAlert {
+            let alertController = UIAlertController(title: "Notice", message: "This operation will delete this chord you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
+                action in
+                self.stopNormalJinggling(self.longPressSpecificTabButton)
+            }))
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
+                action in
+                self.deleteActionOnSpecificTabView()
+            }))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        } else {
+            self.deleteActionOnSpecificTabView()
+        }
+    }
+    
+    func deleteActionOnSpecificTabView() {
+        self.deleteChordOnMainViewWhenDeleteOnEditView(Int(self.currentSelectedSpecificTab.index), name: self.currentSelectedSpecificTab.name, content: self.currentSelectedSpecificTab.content)
+        self.removeObjectsOnSpecificTabsScrollView()
+        self.tabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
+        self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
+        self.stopNormalJinggling(self.longPressSpecificTabButton)
+        self.addSpecificTabButton(self.currentBaseButton.tag)
     }
     
     func deleteChordOnMainView(sender: UITapGestureRecognizer) {
