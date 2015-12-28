@@ -1045,6 +1045,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
                         specificButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
                         specificButton.layer.cornerRadius = 4
+                        
+                        specificButton.layer.shadowOpacity = 1
+                        specificButton.layer.shadowRadius = 4
+                        specificButton.layer.shadowOffset = CGSize(width: 0, height: 0)
+                        specificButton.layer.shadowColor = UIColor(red: 94/255, green: 38/255, blue: 18/255, alpha: 1).CGColor
+                        specificButton.layer.shadowPath = UIBezierPath(rect: specificButton.layer.bounds).CGPath
+                        
                         specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
                         specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
                         specificButton.tag = i
