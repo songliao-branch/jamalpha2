@@ -760,6 +760,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 collectionView!.reloadData()
                 self.bundle = nil
                 prepareMoveLongPressGesture.enabled = true
+                musicControlView.userInteractionEnabled = true
                 doubleArrow.removeFromSuperview()
             }
         }
