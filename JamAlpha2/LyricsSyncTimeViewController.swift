@@ -412,7 +412,7 @@ class LyricsSyncViewController: UIViewController  {
             sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
             sender.setTranslation(CGPointZero, inView: self.view)
             if self.currentTime >= 0 && self.currentTime <= self.duration {
-                let timeChange = NSTimeInterval(-translation.x / 10)
+                let timeChange = NSTimeInterval(-translation.x / 2 )
                 self.toTime = self.currentTime + timeChange
                 if self.toTime < 0 {
                     self.toTime = 0

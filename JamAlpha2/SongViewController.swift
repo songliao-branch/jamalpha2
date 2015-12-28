@@ -1359,21 +1359,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         case UIGestureRecognizerState.Ended:
             //child.frame.origin.x = newPosition
             //when finger is lifted
-                progressChangedOrigin = newPosition
-                isPanning = false
-                if(!isSongNeedPurchase){
-                    if isDemoSong {
-                        avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
-                        if avPlayer.rate > 0 {
-                            startTimer()
-                        }
-                    } else {
-                        player.currentPlaybackTime = NSTimeInterval(toTime)
-                        if player.playbackState == .Playing {
-                            startTimer()
-                        }
+            progressChangedOrigin = newPosition
+            isPanning = false
+            if(!isSongNeedPurchase){
+                if isDemoSong {
+                    avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
+                    if avPlayer.rate > 0 {
+                        startTimer()
+                    }
+                } else {
+                    player.currentPlaybackTime = NSTimeInterval(toTime)
+                    if player.playbackState == .Playing {
+                        startTimer()
                     }
                 }
+            }
             break
         default:
             break
