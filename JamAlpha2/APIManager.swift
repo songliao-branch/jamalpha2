@@ -197,11 +197,11 @@ class APIManager: NSObject {
                         
                         let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
                         
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
                         
                         t.title = set["song"]["title"].string!
                         t.artist = set["song"]["artist"].string!
-                        
+
                         allDownloads.append(t)
                     }
                    //after completed, pass everything to the callback
@@ -269,7 +269,8 @@ class APIManager: NSObject {
                     }
                     
                     let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
-                    let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                    let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+
                     
                     t.times = theTimes
                     t.chords  = set["chords"].arrayObject as! [String]
@@ -306,12 +307,13 @@ class APIManager: NSObject {
 
                     for set in json["lyrics_sets"].array! {
                         
-                         let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
+                        let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
                         
-                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
+                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
                         
                         l.title = set["song"]["title"].string!
                         l.artist = set["song"]["artist"].string!
+                        
                         allDownloads.append(l)
                     }
                     //after completed, pass everything to the callback
@@ -377,11 +379,10 @@ class APIManager: NSObject {
                     }
                     
                     let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
-                    let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                    let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
                     
                     l.lyrics = set["lyrics"].arrayObject as! [String]
-                    l.times = theTimes
-                    //after completed, pass everything to the callback
+                    l.times = theTimes                    //after completed, pass everything to the callback
                     completion(downloadWithContent: l)
                 }
             case .Failure(let error):
@@ -421,60 +422,6 @@ class APIManager: NSObject {
             }
         }
     }
-    
-    // get userInfo API
-    
-//    class func getUserLyricsInfo(userId: Int, completion: ((downloadWithContent: [DownloadedLyricsSet]) -> Void)) {
-//        
-//        Alamofire.request(.GET, jamBaseURL + "/users/\(userId)").responseJSON { response in
-//            var myLyricsSet: [DownloadedLyricsSet] = [DownloadedLyricsSet]()
-//            switch response.result {
-//            case .Success:
-//                if let data = response.result.value {
-//                    let json = JSON(data)
-//                    let set = json["user"]["lyrics_sets"]
-//                    for lyrics in set {
-//                        let mylyrics: DownloadedLyricsSet = DownloadedLyricsSet()
-//                        mylyrics.initialLyricsSet(lyrics.1["id"].int!, cached_votes_score: lyrics.1["cached_votes_score"].int!, number_of_lines: lyrics.1["number_of_lines"].int!, lyrics_preview: lyrics.1["lyrics_preview"].string!, vote_status: lyrics.1["vote_status"].string!, updated_at: lyrics.1["updated_at"].string!, song_id: lyrics.1["song"]["id"].int!, title: lyrics.1["song"]["title"].string!, artist: lyrics.1["song"]["artist"].string!, duration: lyrics.1["song"]["duration"].float!)
-//                        myLyricsSet.append(mylyrics)
-//                    } 
-//                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
-//                                        //after completed, pass everything to the callback
-//                    completion(downloadWithContent: myLyricsSet)
-//                }
-//            case .Failure(let error):
-//                print(error)
-//            }
-//        }
-//
-//    }
-//    
-
-//    class func getUserTabsInfo(userId: Int, completion: ((downloadWithContent: [DownloadedTabsSet]) -> Void)) {
-//        
-//        Alamofire.request(.GET, jamBaseURL + "/users/\(userId)").responseJSON { response in
-//            var myTabsSet: [DownloadedTabsSet] = [DownloadedTabsSet]()
-//            switch response.result {
-//            case .Success:
-//                if let data = response.result.value {
-//                    let json = JSON(data)
-//                    let set = json["user"]["tabs_sets"]
-//                    
-//                    for tabs in set {
-//                        let mytab: DownloadedTabsSet = DownloadedTabsSet()
-//                        mytab.initialTabSet(tabs.1["id"].int!, tuning: tabs.1["tuning"].string!, capo: tabs.1["capo"].int!, cached_votes_score: tabs.1["cached_votes_score"].int!, chords_preview: tabs.1["chords_preview"].string!, vote_status: tabs.1["vote_status"].string!, updated_at: tabs.1["updated_at"].string!, song_id: tabs.1["song"]["id"].int!, title: tabs.1["song"]["title"].string!, artist: tabs.1["song"]["artist"].string!, duration: tabs.1["song"]["duration"].float!)
-//                        myTabsSet.append(mytab)
-//                    }
-//                    
-//                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
-//                    //after completed, pass everything to the callback
-//                    completion(downloadWithContent: myTabsSet)
-//                }
-//            case .Failure(let error):
-//                print(error)
-//            }
-//        }
-//    }
     
     //MARK: update user API
     class func updateUserNickname(nickname: String, completion: ((completed: Bool) -> Void)) {
@@ -529,7 +476,7 @@ class APIManager: NSObject {
                     let editor = Editor(userId: json["user"]["id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
                     
                     for set in tabsSets.array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
                         t.chords = set["chords"].arrayObject as! [String]
                         t.tabs = set["tabs"].arrayObject as! [String]
                         
@@ -548,7 +495,7 @@ class APIManager: NSObject {
                     }
                     
                     for set in lyricsSets.array! {
-                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
                         l.lyrics = set["lyrics"].arrayObject as! [String]
                         
                         var tTimes = [Float]()
@@ -616,31 +563,7 @@ class APIManager: NSObject {
             }
         }
     }
-    
-//    class func getSongId(findable: Findable) {
-//        //if we already have song id
-//        if CoreDataManager.getSongId(findable) > 0 {
-//            return
-//        } //otherwise request it
-//        
-//        //given a song's title, artist, and duration, we can find all its corresponding tabs
-//        var parameters = [String: AnyObject]()
-//        
-//        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
-//        
-//        Alamofire.request(.GET, jamBaseURL + "/get_song_id", parameters: parameters).responseJSON { response in
-//            switch response.result {
-//            case .Success:
-//                if let data = response.result.value {
-//                    let json = JSON(data)
-//                    
-//                    CoreDataManager.saveSongId(findable, id: json["song_id"].int!)
-//                }
-//            case .Failure(let error):
-//                print("get song id request error: \(error)")
-//            }
-//        }
-//    }
+
 }
 
 

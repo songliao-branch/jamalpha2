@@ -496,7 +496,7 @@ class CoreDataManager: NSObject {
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc)
         for result in results {
             let temp = result as! TabsSet
-            let t = DownloadedTabsSet(id: Int(temp.id), tuning: temp.tuning, capo: Int(temp.capo), chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+            let t = DownloadedTabsSet(id: Int(temp.id), tuning: temp.tuning, capo: Int(temp.capo), chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: "")
             
             let chords = NSKeyedUnarchiver.unarchiveObjectWithData(temp.chords as! NSData) as! [String]
             let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(temp.tabs as! NSData) as! [String]
@@ -529,7 +529,7 @@ class CoreDataManager: NSObject {
         for result in results {
             let temp = result as! LyricsSet
             
-            let l = DownloadedLyricsSet(id: Int(temp.id), lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+            let l = DownloadedLyricsSet(id: Int(temp.id), lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(),lastEdited: "")
             
             let lyrics = NSKeyedUnarchiver.unarchiveObjectWithData(temp.lyrics as! NSData) as! [String]
             let times = NSKeyedUnarchiver.unarchiveObjectWithData(temp.times as! NSData) as! [Float]

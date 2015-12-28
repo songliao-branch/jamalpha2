@@ -26,7 +26,7 @@ class DownloadedTabsSet: NSObject {
     var voteStatus = ""//return "up", "down" ,"yet" vote status for current user, if not logged in show 
     //"no user applicable"
     var editor: Editor!//owner of this tabs
-    var updatedAt = "" //TODO: change to a string
+    var lastEdited = "" //TODO: change to a string
     
  
     //these variables are downloaded again when a single tabsSet is selected
@@ -40,8 +40,8 @@ class DownloadedTabsSet: NSObject {
     var title = ""
     var artist = ""
     var duration: Float = 0
-    
-    init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, updatedAt: String) {
+
+    init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, lastEdited: String) {
         self.id = id
         self.tuning = tuning
         self.capo = capo
@@ -49,41 +49,9 @@ class DownloadedTabsSet: NSObject {
         self.votesScore = votesScore
         self.voteStatus = voteStatus
         self.editor = editor
-        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updatedAt)
+        self.lastEdited = NSDate.convertFromIsoToHumanizedFormat(lastEdited)
     }
-    
-    func findSongInCoreData(findable: Findable) -> Bool {
-        if self.title == findable.getTitle() && artist == findable.getArtist() && abs(self.duration-findable.getDuration()) < 1 {
-            return true
-        }
-        return false
-    }
-    
-//    func initialTabSet(id: Int, tuning: String, capo: Int, cached_votes_score: Int, chords_preview: String, vote_status: String, updated_at: String, song_id: Int, title: String, artist: String, duration: Float) {
-//        self.id = id
-//        self.tuning = tuning
-//        self.capo = capo
-//        self.votesScore = cached_votes_score
-//        self.chordsPreview = chords_preview
-//        self.voteStatus = vote_status
-//        self.updatedAt = NSDate.convertFromIsoToHumanizedFormat(updated_at)
-//        self.song_id = song_id
-//        self.title = title
-//        self.artist = artist
-//        self.duration = duration
-//    }
 
 }
-//
-//class LocalTabSet {
-//    var id = -1
-//    var localSong: Song!
-//    
-//    init(id: Int, song: Song) {
-//        self.id = id
-//        self.localSong = song
-//    }
-//}
-
 
 
