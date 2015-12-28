@@ -2807,7 +2807,7 @@ extension TabsEditorViewController {
                 tempView.center = CGPoint(x: center!.x - 1, y: center!.y)
                 tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, buttonWidth, buttonWidth)
                 tempView.center = center!
-                tempView.layer.cornerRadius = 0.5 * tempButtonWidth
+                tempView.layer.cornerRadius = 0.5 * buttonWidth
             }
             self.isJiggling = false
         }
