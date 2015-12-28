@@ -168,7 +168,7 @@ class APIManager: NSObject {
                     for set in json["tabs_sets"].array! {
                         
                         let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
-                        let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
+                        let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
                         
                         allDownloads.append(t)
                     }
@@ -240,7 +240,7 @@ class APIManager: NSObject {
                         theTimes.append(Float(time)!)
                     }
                     
-                    let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: "")
                     
                     t.times = theTimes
                     t.chords  = set["chords"].arrayObject as! [String]
@@ -279,7 +279,7 @@ class APIManager: NSObject {
                         
                          let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
                         
-                        let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
+                        let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
                         
                         allDownloads.append(l)
                     }
@@ -348,7 +348,7 @@ class APIManager: NSObject {
                         theTimes.append(Float(time)!)
                     }
                     
-                    let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: "")
                     
                     l.lyrics = set["lyrics"].arrayObject as! [String]
                     l.times = theTimes
