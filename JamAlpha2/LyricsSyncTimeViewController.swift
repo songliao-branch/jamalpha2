@@ -177,41 +177,44 @@ class LyricsSyncViewController: UIViewController  {
     
     func setUpHeaderView() {
         let titleView: UIView = UIView()
-        titleView.frame = CGRectMake(0, 0, self.viewWidth, 3.5 / 31 * self.viewHeight)
-        titleView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+        titleView.frame = CGRectMake(0, 0, self.viewWidth, 20 + 44)
+        titleView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(titleView)
         
         let buttonWidth: CGFloat = 2.0 / 20 * self.viewWidth
         let backButton: UIButton = UIButton()
-        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 0, buttonWidth, buttonWidth)
         backButton.setTitle("B", forState: UIControlState.Normal)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        backButton.center.y = 20 + 44/2
         titleView.addSubview(backButton)
         
         let doneButton: UIButton = UIButton()
         doneButton.frame = CGRectMake(17.5
-            / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+            / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         doneButton.setTitle("D", forState: UIControlState.Normal)
         doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(doneButton)
         
-        let titleLabel: UIImageView = UIImageView()
-        titleLabel.frame = CGRectMake(6.5 / 20 * self.viewWidth, 1 / 31 * self.viewHeight, 7 / 20 * self.viewWidth, 2 / 31 * self.viewHeight)
-        titleLabel.image = UIImage(named: "sync-lyrics")
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
+        titleLabel.textColor = UIColor.whiteColor()
+        titleLabel.font = UIFont.systemFontOfSize(20)
+        titleLabel.text = "Sync lyrics"
+        titleLabel.sizeToFit()
+        titleLabel.center = CGPoint(x: titleView.center.x, y: 44/2 + 20)
         titleView.addSubview(titleLabel)
         
         let speedUpButton: UIButton = UIButton()
-        speedUpButton.frame = CGRectMake(15 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        speedUpButton.frame = CGRectMake(15 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedUpButton.setTitle("+", forState: UIControlState.Normal)
-        //speedUpButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         speedUpButton.addTarget(self, action: "pressSpeedUpButton:", forControlEvents: UIControlEvents.TouchUpInside)
         
         titleView.addSubview(speedUpButton)
         
         let speedDownButton: UIButton = UIButton()
-        speedDownButton.frame = CGRectMake(3 / 20 * self.viewWidth, 1.25 / 31 * self.viewHeight, buttonWidth, buttonWidth)
+        speedDownButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedDownButton.setTitle("-", forState: UIControlState.Normal)
         //speedDownButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         speedDownButton.addTarget(self, action: "pressSpeedDownButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -219,9 +222,9 @@ class LyricsSyncViewController: UIViewController  {
     }
     
     func setUpLyricsTableView() {
-        let backgroundImageWidth: CGFloat = self.viewHeight - 3.5 / 31 * self.viewHeight
+        let backgroundImageWidth: CGFloat = self.viewHeight - 64
         let backgroundImage: UIImageView = UIImageView()
-        backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
+        backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 64, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
         var image:UIImage!
         if let artwork = theSong.getArtWork() {
@@ -231,23 +234,20 @@ class LyricsSyncViewController: UIViewController  {
             image = UIImage(named: "liwengbg")
         }
         backgroundImage.image = image
-        //backgroundImage.image = theSong.artwork!.imageWithSize(size)
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
         
-        self.lyricsTableView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, 24 / 31 * self.viewHeight)
+        self.lyricsTableView.frame = CGRectMake(0, 64, self.viewWidth, 24 / 31 * self.viewHeight)
         self.lyricsTableView.delegate = self
         self.lyricsTableView.dataSource = self
         self.lyricsTableView.registerClass(LyricsSyncTimeTableViewCell.self, forCellReuseIdentifier: "lyricsSyncCell")
         self.lyricsTableView.backgroundColor = UIColor.clearColor()
-        
         self.view.addSubview(self.lyricsTableView)
     }
 
     func setUpProgressBlock() {
         progressChangedOrigin = self.view.center.x
-        
         progressBlockContainer = UIView(frame: CGRect(x: 0, y: viewHeight-progressContainerHeight, width: self.view.frame.width, height: progressContainerHeight))
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
@@ -412,7 +412,7 @@ class LyricsSyncViewController: UIViewController  {
             sender.view!.center = CGPointMake(sender.view!.center.x, sender.view!.center.y)
             sender.setTranslation(CGPointZero, inView: self.view)
             if self.currentTime >= 0 && self.currentTime <= self.duration {
-                let timeChange = NSTimeInterval(-translation.x / 10)
+                let timeChange = NSTimeInterval(-translation.x / 2 )
                 self.toTime = self.currentTime + timeChange
                 if self.toTime < 0 {
                     self.toTime = 0
@@ -645,8 +645,6 @@ extension LyricsSyncViewController {
             lyricsTimesTuple.append((self.addedLyricsWithTime.lyrics[i], self.addedLyricsWithTime.time[i]))
         }
         
-        
-
         var times = [Float]()
         for t in addedLyricsWithTime.time {
             times.append(Float(t))
@@ -660,6 +658,7 @@ extension LyricsSyncViewController {
             
             if let songVC = self.lyricsTextViewController.songViewController {
                 songVC.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
+                
                 if songVC.isDemoSong {
                     songVC.avPlayer.play()
                 } else {

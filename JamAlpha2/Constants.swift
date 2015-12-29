@@ -29,7 +29,7 @@ let facebookLoginSalt = "tJwIa021#1sm" //DO NOT MODIFITY THIS SALT, otherwise fa
 var kShouldReloadMusicTable = false
 
 let kShowDemoSong  = "showDemoSong"
-
+let kShowTutorial = "showTutorial"
 let kSongNames = ["Go"]
 
 //used in core data to refer to a locally created tabsSet/lyricsSet

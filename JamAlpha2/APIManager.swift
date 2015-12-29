@@ -243,7 +243,7 @@ class APIManager: NSObject {
         }
     }
     
-    class func downloadMostLikedTabs(findable: Findable, completion: (( downloadWithContent: DownloadedTabsSet) -> Void)) {
+    class func downloadMostLikedTabs(findable: Findable, completion: ((found: Bool, downloadWithContent: DownloadedTabsSet) -> Void)) {
         
         var parameters = [String: AnyObject]()
         
@@ -257,9 +257,12 @@ class APIManager: NSObject {
                     
                     if let _ = json["error"].string {
                         print("no most liked tabs yet")
+                        completion(found: false, downloadWithContent:  DownloadedTabsSet(id: 0,  tuning: "", capo: 0, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: ""))
                         return
                     }
+                    
                     let set = json["tabs_set_content"]
+
 
                     var theTimes = [Float]()
                     
@@ -277,7 +280,7 @@ class APIManager: NSObject {
                     t.tabs  = set["tabs"].arrayObject as! [String]
                     
                     //after completed, pass everything to the callback
-                    completion(downloadWithContent: t)
+                    completion(found: true, downloadWithContent: t)
                 }
             case .Failure(let error):
                 print(error)
@@ -353,7 +356,7 @@ class APIManager: NSObject {
         }
     }
     
-    class func downloadMostLikedLyrics(findable: Findable, completion: (( downloadWithContent: DownloadedLyricsSet) -> Void)) {
+    class func downloadMostLikedLyrics(findable: Findable, completion: (( found: Bool, downloadWithContent: DownloadedLyricsSet) -> Void)) {
         
         var parameters = [String: AnyObject]()
         
@@ -366,6 +369,7 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     if let _ = json["error"].string {
                         print("no most liked lyrics yet")
+                        completion(found: false, downloadWithContent: DownloadedLyricsSet(id: 0,lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: ""))
                         return
                     }
                     let set = json["lyrics_set_content"]
@@ -382,8 +386,10 @@ class APIManager: NSObject {
                     let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
                     
                     l.lyrics = set["lyrics"].arrayObject as! [String]
-                    l.times = theTimes                    //after completed, pass everything to the callback
-                    completion(downloadWithContent: l)
+                    l.times = theTimes
+                    //after completed, pass everything to the callback
+                    completion(found: true, downloadWithContent: l)
+
                 }
             case .Failure(let error):
                 print(error)

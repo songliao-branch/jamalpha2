@@ -39,6 +39,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     @IBOutlet weak var playPauseButton: UIButton!
     
+    //MARK: tutorial-related
+    var tutorialScrollView: UIScrollView!
+    var numberOfTutorialPages = 5
+    var tutorialIndicators = [UIView]()
+    var indicatorOriginXPositions = [CGFloat]()
+    
     var backgroundImageView: UIImageView!
     var backgroundScaleFactor: CGFloat = 0.4
     var backgroundImage: UIImage?
@@ -46,9 +52,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var buttonDimension: CGFloat = 50
     var pulldownButton:UIButton!
-    var tuningButton:UIButton!
     var tuningLabels = [UILabel]() //6 labels for each string
     var capoButton: UIButton!
+    var capoLabel: UILabel!
     
     var songNameLabel: MarqueeLabel!
     var artistNameLabel: UILabel!
@@ -63,10 +69,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var basesHeight: CGFloat!
     let marginBetweenBases: CGFloat = 15
     
+    //buttons in center of chordbase/lyricsBase to prompt users to add tabs/lyrics
+    var addTabsPrompt: UIButton!
+    var addLyricsPrompt: UIButton!
+    
     var chordBaseTapGesture: UITapGestureRecognizer!
     //MARK: progress Container
-    //var progressBlock: SoundWaveView!
-    
     var progressBlockViewWidth:CGFloat?
     var progressBlockContainer:UIView!
     var progressChangedOrigin:CGFloat!
@@ -273,6 +281,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpActionViews()
         setUpCountdownView()
         setUpStatusView()
+        
         if(!isSongNeedPurchase){
             updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
             updateFavoriteStatus(isDemoSong ? demoItem : nowPlayingMediaItem)
@@ -311,8 +320,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // is ONLY called when the view is fully dragged down or disappeared
         if viewDidFullyDisappear {
             viewDidFullyDisappear = false
-            if(!isSongNeedPurchase){
-                     resumeSong()
+            if !isSongNeedPurchase {
+                resumeSong()
             }
             if(isDemoSong){
                 self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
@@ -333,6 +342,94 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
         }
         isViewDidAppear = true
+    }
+    
+
+    func showTutorial() {
+        if isDemoSong {
+            avPlayer.pause()
+        } else {
+            player.pause()
+        }
+        
+        tutorialScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        tutorialScrollView.backgroundColor = UIColor.clearColor()
+        self.view.addSubview(tutorialScrollView)
+
+        tutorialScrollView.bounces = false
+        tutorialScrollView.pagingEnabled = true
+        tutorialScrollView.delegate = self
+        for i in 0..<numberOfTutorialPages{
+            let tutorialImage = UIImageView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: view.frame.height))
+            tutorialImage.image = UIImage(named: "tutorial_\(i+1)_iPhone6")
+            
+            tutorialScrollView.addSubview(tutorialImage)
+            
+            if i == 4 {
+                let startButton = UIButton(frame: CGRect(x: 0, y: 0, width: 101, height: 43))
+                startButton.center = CGPoint(x: 4.5 * self.view.frame.width, y: self.view.center.y-100)
+                startButton.setImage(UIImage(named: "start_button"), forState: .Normal)
+                startButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
+                tutorialScrollView.addSubview(startButton)
+            }
+        }
+        tutorialScrollView.contentSize = CGSize(width: 5 * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
+        
+        var originX = 0
+        if numberOfTutorialPages % 2 == 0 {//even
+            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5
+        } else {
+            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5 + 5
+        }
+        
+        for i in 0..<numberOfTutorialPages {
+            let circle = UIView(frame: CGRect(x: self.view.center.x - CGFloat(originX) + CGFloat(i * 15), y: self.view.frame.height - 20, width: 10, height: 10))
+            circle.backgroundColor = UIColor.whiteColor()
+            
+            if i == 0 {
+                circle.backgroundColor = UIColor.mainPinkColor()
+            }
+            circle.layer.cornerRadius = 5
+            tutorialScrollView.addSubview(circle)
+            tutorialIndicators.append(circle)
+            indicatorOriginXPositions.append(circle.frame.origin.x)
+        }
+    }
+
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if  tutorialScrollView.hidden {
+            return
+        }
+        
+        for i in 0..<numberOfTutorialPages {
+            tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
+        }
+    }
+    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        if  tutorialScrollView.hidden {
+            return
+        }
+        
+        let currentPage = scrollView.contentOffset.x / self.view.frame.width
+        for i in 0..<numberOfTutorialPages {
+            if i == Int(currentPage) {
+                tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
+            } else {
+                tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
+            }
+        }
+    }
+
+    
+    func hideTutorial() {
+        tutorialScrollView.hidden = true
+        if isDemoSong {
+            avPlayer.play()
+        } else {
+            player.play()
+        }
+        
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTutorial)
     }
     
     func setUpBackgroundImage(){
@@ -376,24 +473,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
         topView.addSubview(pulldownButton)
         
-        tuningButton = UIButton(frame: CGRect(x: 0 , y: 0, width: buttonDimension, height: buttonDimension))
-        tuningButton.setImage(UIImage(named: "tuning"), forState: UIControlState.Normal)
-        tuningButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
-        tuningButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
-        topView.addSubview(tuningButton)
-        
-        let capoCircleDimension: CGFloat = 16
-        capoButton = UIButton(frame: CGRect(x: 0, y: 0, width: capoCircleDimension, height: capoCircleDimension))
-        capoButton.backgroundColor = UIColor.whiteColor()
-        capoButton.layer.cornerRadius = capoButton.frame.height/2
-        capoButton.center = CGPoint(x: tuningButton.center.x+capoCircleDimension/2, y: tuningButton.center.y+capoCircleDimension/2)
-        capoButton.hidden = true
-        //its touch event is same as tuningButton because this view blocks part of tuning button,
-        //so I set the same touch event
+        capoButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
+        capoButton.setImage(UIImage(named: "blankCircle"), forState: .Normal)
         capoButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
-        capoButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        capoButton.titleLabel?.font = UIFont.systemFontOfSize(12)
-        self.view.addSubview(capoButton)
+        capoButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
+        topView.addSubview(capoButton)
+        
+        capoLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
+        capoLabel.textColor = UIColor.whiteColor()
+        capoLabel.font = UIFont.systemFontOfSize(16)
+        capoLabel.center = capoButton.center
+        capoLabel.userInteractionEnabled = false
+        capoLabel.textAlignment = .Center
+        capoLabel.text = "0"
+        topView.addSubview(capoLabel)
         
         let topViewSeparator = UIView(frame: CGRect(x: 11, y: CGRectGetMaxY(topView.frame), width: self.view.frame.width-11*2, height: 0.5 ))
         topViewSeparator.backgroundColor = UIColor.baseColor()
@@ -412,15 +505,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     private func updateCapo(capo: Int) {
-        if capo < 1 {
-            capoButton.hidden = true
-            return
-        }
-        capoButton.hidden = false
-        capoButton.setTitle(String(capo), forState: .Normal)
-        capoButton.titleLabel?.sizeToFit()
+        capoLabel.text = "\(capo)"
     }
-
     
     func setUpTuningLabels() {
         for i in 1..<topPoints.count{
@@ -429,7 +515,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             tuningLabel.font = UIFont.systemFontOfSize(minfont-5)
             tuningLabel.textAlignment = .Center
             tuningLabel.center = CGPoint(x: topPoints[i]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
-            tuningLabel.hidden = true
             self.view.addSubview(tuningLabel)
             tuningLabels.append(tuningLabel)
         }
@@ -441,7 +526,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 label.hidden = false
             }
         } else {
-            
             for label in tuningLabels {
                 label.hidden = true
             }
@@ -517,7 +601,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             previousButton.hidden = true
             nextButton.hidden = true
         }
-
     }
     
     var isNext = true
@@ -589,6 +672,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.chords = chords
             updateTuning(tuning)
             updateCapo(capo)
+            self.addTabsPrompt.hidden = true
             return true
         }
         return false
@@ -604,18 +688,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if lyric.lyric.count > 1 {
             self.lyric = lyric
-            
+            self.addLyricsPrompt.hidden = true
             return true
         }
         return false
     }
     
     func updateMusicData(song: Findable) {
-     
         //if nothing in core data, we look up the cloud
         if !canFindTabsFromCoreData(song) {
             APIManager.downloadMostLikedTabs(song, completion: {
-                download in
+                found, download in
+                
+                 //if still not found, we show a prompt
+                if !found {
+                    self.addTabsPrompt.hidden = false
+                    return
+                }
+                self.addTabsPrompt.hidden = true
                 
                 var times = [NSTimeInterval]()
                 for t in download.times {
@@ -642,7 +732,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if !canFindLyricsFromCoreData(song) {
             APIManager.downloadMostLikedLyrics(song, completion: {
-                download in
+                found, download in
+                //if still not found, we show a prompt
+                if !found {
+                    self.addLyricsPrompt.hidden = false
+                    return
+                }
+                self.addLyricsPrompt.hidden = true
                 
                 var times = [Float]()
                 for t in download.times {
@@ -687,6 +783,40 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
+    func setUpChordBase(){
+        let marginToTopView: CGFloat = 20
+        let marginToProgressContainer: CGFloat = 10
+        
+        basesHeight = self.view.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
+        
+        chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
+        chordBase.center.x = self.view.center.x
+        chordBase.backgroundColor = UIColor.clearColor()
+        
+        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
+        panRecognizer.delaysTouchesEnded = true
+        
+        panRecognizer.delegate = self
+        chordBase.addGestureRecognizer(panRecognizer)
+        
+        self.view.addSubview(chordBase)
+        
+        //add tap gesture to chordbase too
+        chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        chordBase.addGestureRecognizer(chordBaseTapGesture)
+        
+        addTabsPrompt = UIButton(frame: CGRect(x: 0, y: chordBase.frame.height-30, width: 200, height: 25))
+        addTabsPrompt.setTitle("Add tabs here", forState: .Normal)
+        addTabsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
+        addTabsPrompt.center.x = chordBase.frame.width/2
+        addTabsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
+        addTabsPrompt.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
+        addTabsPrompt.hidden = true
+        chordBase.addSubview(addTabsPrompt)
+        
+        calculateXPoints()
+    }
+    
     func setUpLyricsBase(){
         //Lyric labels
         currentLyricsIndex = -1
@@ -718,33 +848,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         bottomLyricLabel.lineBreakMode = .ByWordWrapping
         bottomLyricLabel.textColor = UIColor.silverGray()
         lyricbase.addSubview(bottomLyricLabel)
+        
+        addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
+        addLyricsPrompt.setTitle("Add lyrics here", forState: .Normal)
+        addLyricsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
+        addLyricsPrompt.center = CGPoint(x: lyricbase.frame.width/2, y: lyricbase.frame.height/2)
+        addLyricsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
+        addLyricsPrompt.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
+        addLyricsPrompt.hidden = true
+        lyricbase.addSubview(addLyricsPrompt)
     }
-    
 
-    func setUpChordBase(){
-        let marginToTopView: CGFloat = 20
-        let marginToProgressContainer: CGFloat = 10
-        
-        basesHeight = self.view.frame.height - topViewHeight - marginToTopView - bottomViewHeight - progressContainerHeight - marginBetweenBases - marginToProgressContainer
-        
-        chordBase = ChordBase(frame: CGRect(x: 0, y: CGRectGetMaxY(topView.frame) + marginToTopView, width: self.view.frame.width * 0.62, height: basesHeight * 0.55))
-        chordBase.center.x = self.view.center.x
-        chordBase.backgroundColor = UIColor.clearColor()
-        
-        panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleChordBasePan:"))
-        panRecognizer.delaysTouchesEnded = true
-        
-        panRecognizer.delegate = self
-        chordBase.addGestureRecognizer(panRecognizer)
-        
-        self.view.addSubview(chordBase)
-        
-        //add tap gesture to chordbase too
-        chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
-        chordBase.addGestureRecognizer(chordBaseTapGesture)
-        
-        calculateXPoints()
-    }
     
     func loadDisplayMode() {
         // zero means never been set before, 1 means true, 2 means false
@@ -1042,12 +1156,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     func resumeSong() {
         if selectedFromTable {
-            if isDemoSong {
-                avPlayer.play()
-            }else{
-                player.play()
+            if isDemoSong && NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial) {
+                showTutorial()
+            } else {
+                if isDemoSong {
+                    avPlayer.play()
+                }else{
+                    player.play()
+                }
+                startTimer()
             }
-            startTimer()
         } else { // selected from now view button
             if isDemoSong {
                 if avPlayer.rate > 0 {
@@ -1236,21 +1354,21 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         case UIGestureRecognizerState.Ended:
             //child.frame.origin.x = newPosition
             //when finger is lifted
-                progressChangedOrigin = newPosition
-                isPanning = false
-                if(!isSongNeedPurchase){
-                    if isDemoSong {
-                        avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
-                        if avPlayer.rate > 0 {
-                            startTimer()
-                        }
-                    } else {
-                        player.currentPlaybackTime = NSTimeInterval(toTime)
-                        if player.playbackState == .Playing {
-                            startTimer()
-                        }
+            progressChangedOrigin = newPosition
+            isPanning = false
+            if(!isSongNeedPurchase){
+                if isDemoSong {
+                    avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(toTime), 1))
+                    if avPlayer.rate > 0 {
+                        startTimer()
+                    }
+                } else {
+                    player.currentPlaybackTime = NSTimeInterval(toTime)
+                    if player.playbackState == .Playing {
+                        startTimer()
                     }
                 }
+            }
             break
         default:
             break
