@@ -270,8 +270,13 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             MusicManager.sharedInstance.avPlayer.pause()
             MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             MusicManager.sharedInstance.avPlayer.removeAllItems()
-        } else {
-            //TODO: search the song first..
+        } else if song.artist == "Alex Lisell" {
+            
+            MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
+            songVC.selectedRow = 0
+            MusicManager.sharedInstance.player.pause()
+            MusicManager.sharedInstance.player.currentPlaybackTime = 0
+            songVC.isDemoSong = true
             
         }// TODO: if demo song
         songVC.transitioningDelegate = self.animator
