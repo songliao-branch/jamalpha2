@@ -11,6 +11,9 @@ import MediaPlayer
 import AVFoundation
 
 class LyricsTextViewController: UIViewController {
+    
+    var hiddenKeyboardView: UIView = UIView()
+    
     var isDemoSong: Bool!
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
@@ -53,16 +56,16 @@ class LyricsTextViewController: UIViewController {
     }
     
     override func viewWillAppear(animated: Bool) {
-        let notificationCenter = NSNotificationCenter.defaultCenter()
-        notificationCenter.addObserver(self, selector: "handleKeyboardWillShowNotification:", name: UIKeyboardWillShowNotification, object: nil)
-        notificationCenter.addObserver(self, selector: "handleKeyboardWillHideNotification:", name: UIKeyboardWillHideNotification, object: nil)
+//        let notificationCenter = NSNotificationCenter.defaultCenter()
+//        notificationCenter.addObserver(self, selector: "handleKeyboardWillShowNotification:", name: UIKeyboardWillShowNotification, object: nil)
+//        notificationCenter.addObserver(self, selector: "handleKeyboardWillHideNotification:", name: UIKeyboardWillHideNotification, object: nil)
     }
     
     override func viewDidDisappear(animated: Bool) {
-        super.viewDidDisappear(animated)
-        let notificationCenter = NSNotificationCenter.defaultCenter()
-        notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
-        notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+//        super.viewDidDisappear(animated)
+//        let notificationCenter = NSNotificationCenter.defaultCenter()
+//        notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+//        notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
     }
     
     func handleKeyboardWillShowNotification(notification: NSNotification) {
@@ -83,6 +86,7 @@ class LyricsTextViewController: UIViewController {
         var originDelta: CGFloat = CGFloat()
         if showsKeyboard == true {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
+            self.hiddenKeyboardView.frame = CGRectMake(0, self.lyricsTextView.frame.height + originDelta, self.viewWidth, 10)
         } else {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
         }
@@ -94,7 +98,16 @@ class LyricsTextViewController: UIViewController {
         })
     }
     
+    func hiddenKeyboardPanGesture(sender: UIPanGestureRecognizer) {
+        let tranform = sender.locationInView(self.view)
+       
+    }
+    
     func addObjectsOnMainView() {
+        let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
+        hiddenKeyboardPanGesture.addTarget(self, action: "hiddenKeyboardPanGesture")
+        self.hiddenKeyboardView.addGestureRecognizer(hiddenKeyboardPanGesture)
+        
         let backgroundImageWidth: CGFloat = self.viewHeight - 3.5 / 31 * self.viewHeight
         let backgroundImage: UIImageView = UIImageView()
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 3.5 / 31 * self.viewHeight, backgroundImageWidth, backgroundImageWidth)
@@ -186,6 +199,17 @@ class LyricsTextViewController: UIViewController {
             self.lyricsTextView.text = "Put your lyrics here"
             self.lyricsTextView.textColor = UIColor.lightGrayColor()
         }
+        
+        self.lyricsTextView.addKeyboardPanningWithActionHandler({
+            (keyboardFrameInView, opening, closing) -> Void in
+            if opening {
+                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, keyboardFrameInView.size.height)
+                self.lyricsTextView.frame = tempFrame
+            } else if closing {
+                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, 27.5 / 31 * self.viewHeight)
+                self.lyricsTextView.frame = tempFrame
+            }
+        })
         
         
         self.view.addSubview(self.lyricsTextView)
