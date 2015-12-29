@@ -895,9 +895,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.doubleArrowView.center.y = self.doubleArrowView.center.y + kmovingMainNoteSliderHeight
                 }, completion: {
                     completed in
-                    self.doubleArrowView.removeFromSuperview()
-                    self.doubleArrowView = nil
-                    self.prepareMoveSwipeUpGesture.enabled = true
+                    if(self.doubleArrowView != nil){
+                        self.doubleArrowView.removeFromSuperview()
+                        self.doubleArrowView = nil
+                        self.prepareMoveSwipeUpGesture.enabled = true
+                    }
             })
         }
         
