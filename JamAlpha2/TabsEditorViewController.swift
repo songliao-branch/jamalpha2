@@ -20,7 +20,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // delete jiggling gesture 
     let deleteChordOnMainView: UITapGestureRecognizer = UITapGestureRecognizer()
     let deleteChordOnSpecificTabView: UITapGestureRecognizer = UITapGestureRecognizer()
-    let longPressSpecificTabButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
+    var longPressSpecificTabButton: [Int:UILongPressGestureRecognizer] = [Int:UILongPressGestureRecognizer]()
     let longPressMainViewNoteButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     let prepareMoveSwipeUpGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
     let prepareMoveSwipeDownGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
@@ -1014,7 +1014,19 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var isTextChanged = false
     func tapOnEditView(sender: UITapGestureRecognizer) {
         self.tabNameTextField.resignFirstResponder()
-        self.stopNormalJinggling(self.longPressSpecificTabButton)
+        stopSpecificJiggling()
+    }
+    
+    func stopSpecificJiggling(){
+        if(longPressSpecificTabButton.count == 0){
+            return
+        }
+        for button in buttonOnSpecificScrollView {
+            if(button.accessibilityIdentifier == "isNotOriginal"){
+                print(longPressSpecificTabButton.count)
+                self.stopNormalJinggling(self.longPressSpecificTabButton[button.tag]!)
+            }
+        }
     }
     
     //textfeild delege
@@ -1153,8 +1165,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
         } else {
             self.stopJiggling()
-            self.stopNormalJinggling(longPressSpecificTabButton)
-            
+            stopSpecificJiggling()
         }
         
         self.view.userInteractionEnabled = true
@@ -1227,8 +1238,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let buttonWidth: CGFloat = 4 / 20 * self.trueHeight
         // change specific tab button scrollview content frame
         let scrollviewWidth = (buttonWidth + 0.5 / 20 * self.trueWidth) * CGFloat(5) + 0.5 / 20 * self.trueWidth
-        
         self.specificTabsScrollView.contentSize = CGSizeMake(scrollviewWidth, 2.5 / 20 * self.trueHeight)
+        
+        if self.specificTabSets.count > 5 {
+            let tempScrollviewWidth = (buttonWidth + 0.6/20 * self.trueWidth) * CGFloat(self.specificTabSets.count)
+            self.specificTabsScrollView.contentSize = CGSizeMake(tempScrollviewWidth, 2.5 / 20 * self.trueHeight)
+        }
         
         self.specificTabsScrollView.contentOffset = CGPointZero
         UIView.animateWithDuration(0.1, animations: {
@@ -1237,14 +1252,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             }, completion:
             {   completed in
+                self.buttonOnSpecificScrollView.removeAll()
                 self.removeObjectsOnSpecificTabsScrollView()
+                self.longPressSpecificTabButton.removeAll()
                 for var i = 0; i < self.specificTabSets.count; i++ {
                     if self.specificTabSets[i].content != "" {
                         let specificButton: UIButton = UIButton()
                         specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
                         specificButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
                         specificButton.layer.cornerRadius = 4
-                        specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
+                        specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents:UIControlEvents.TouchUpInside)
                         specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
                         specificButton.tag = i
                         specificButton.alpha = 0
@@ -1258,9 +1275,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             specificButton.layer.shadowPath = UIBezierPath(rect: specificButton.layer.bounds).CGPath
                         } else {
                             specificButton.accessibilityIdentifier = "isNotOriginal"
-                            self.longPressSpecificTabButton.addTarget(self, action: "startNormalJinggling:")
-                            self.longPressSpecificTabButton.minimumPressDuration = 0.5
-                            specificButton.addGestureRecognizer(self.longPressSpecificTabButton)
+                            let longPress = UILongPressGestureRecognizer(target: self, action: "startNormalJinggling:")
+                            longPress.minimumPressDuration = 0.5
+                            specificButton.addGestureRecognizer(longPress)
+                            self.longPressSpecificTabButton[specificButton.tag] = longPress
+                           
                             specificButton.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)
                             specificButton.layer.shadowOpacity = 1
                             specificButton.layer.shadowRadius = 4
@@ -1293,6 +1312,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         self.view.userInteractionEnabled = true
     }
+    
     
     // choose specific tabs, and generate the finger point for this tab
     func pressSpecificTabButton(sender: UIButton) {
@@ -1765,6 +1785,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         self.oldTagString4 = 0
         self.oldTagString5 = 0
+        if(isJiggling == true){
+            stopSpecificJiggling()
+        }
         self.isJiggling = false
         self.addedNoteButtonOnCompleteView = false
         self.currentBaseButton.tag = 400
@@ -1969,6 +1992,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
 
     func pressAddButton(sender: UIButton) {
+        if(isJiggling){
+            stopSpecificJiggling()
+        }
+        self.removeDoubleArrowView()
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
         if isDemoSong {
@@ -2564,7 +2591,9 @@ extension TabsEditorViewController {
                 self.currentNoteButton = noteButton
                 self.currentBaseButton = noteButton
                 self.noteButtonOnCompeteScrollView = noteButton
-                self.addSpecificTabButton(noteButton.tag)
+                if(oldNoteButtonTag != currentNoteButton.tag){
+                    self.addSpecificTabButton(noteButton.tag)
+                }
                 self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
             } else {
                 self.currentBaseButton.center = self.originalCenter
@@ -2634,7 +2663,9 @@ extension TabsEditorViewController {
                 self.currentNoteButton = noteButton
                 self.currentBaseButton = noteButton
                 self.noteButtonOnCompeteScrollView = noteButton
-                self.addSpecificTabButton(noteButton.tag)
+                if(oldNoteButtonTag != currentNoteButton.tag){
+                    self.addSpecificTabButton(noteButton.tag)
+                }
                 self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
             } else {
                 self.currentBaseButton.center = self.originalCenter
@@ -2870,72 +2901,112 @@ extension TabsEditorViewController {
 extension TabsEditorViewController {
     func startNormalJinggling(sender: UILongPressGestureRecognizer) {
         if sender.state == .Began {
-            self.isJiggling = true
+            if isJiggling {
+                 stopJiggling()
+            }
+            self.removeDoubleArrowView()
             let tempView = sender.view!
-            self.currentSelectedSpecificTab = self.specificTabSets[tempView.tag]
-            var buttonWidth = tempView.frame.size.width
+            let buttonWidth = tempView.frame.size.width
             let buttonHeight = tempView.frame.size.height
             let oldCornerRadius = tempView.layer.cornerRadius
-            let center = sender.view?.center
+            let center:CGPoint = tempView.center
             var originalX: CGFloat = 0
             var delta: CGFloat = 0
             // circle
             if oldCornerRadius == 0.5 * buttonWidth {
-                buttonWidth = buttonWidth * 1.2
-                tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, buttonWidth, buttonWidth)
-                tempView.layer.cornerRadius = 0.5 * buttonWidth
-                delta = CGFloat((1 - sqrt(2.0))/2.0) * (tempView.frame.size.width/2.0) + (2/3)*(tempView.frame.size.width/4.0 - tempView.frame.size.width/6.0)
-                tempView.center = center!
-                originalX = tempView.center.x
-                tempView.center.x = originalX - 1
-                self.deleteChordOnMainView.addTarget(self, action: "deleteChordOnMainView:")
-                tempView.addGestureRecognizer(self.deleteChordOnMainView)
+                sender.enabled = false
+                self.isJiggling = true
+                UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseIn, .AllowUserInteraction], animations: {
+                    tempView.transform = CGAffineTransformMakeScale(1.3, 1.3)
+                    }, completion: {
+                        completed in
+                        tempView.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                        let tempbuttonWidth = buttonWidth * 1.2
+                        tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, tempbuttonWidth, tempbuttonWidth)
+                        tempView.layer.cornerRadius = 0.5 * tempbuttonWidth
+                        delta = CGFloat((1 - sqrt(2.0))/2.0) * (tempView.frame.size.width/2.0) + 1.2 * (tempView.frame.size.width/4.0 - tempView.frame.size.width/6.0)
+                        tempView.center = center
+                        originalX = center.x
+                        tempView.center.x = originalX - 2
+                        self.deleteChordOnMainView.addTarget(self, action: "deleteChordOnMainView:")
+                        tempView.addGestureRecognizer(self.deleteChordOnMainView)
+                        let randomInt: UInt32  = arc4random_uniform(500)
+                        let r:Double = (Double(randomInt) / 500.0) + 5
+                        
+                        let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(self.degreesToRadians( (self.kAnimationRotateDeg * -1.0) - r)))
+                        let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(self.degreesToRadians( self.kAnimationRotateDeg + r)))
+                        
+                        tempView.transform = leftWobble;  // starting point
+                        tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
+                        
+                        self.deleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
+                        
+                        
+                        let image =  UIImage(named: "deleteX")
+                        self.deleteView.image = image
+                        
+                        tempView.addSubview(self.deleteView)
+                        
+                        
+                        UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
+                            UIView.setAnimationRepeatCount(Float(NSNotFound))
+                            if oldCornerRadius == 0.5 * buttonWidth {
+                                tempView.center.x = originalX
+                            }
+                            tempView.transform = rightWobble
+                            }, completion: nil
+                        )
+                        
+                        self.completeStringView.userInteractionEnabled = false
+                })
             } else {
+                sender.enabled = false
+                self.stopSpecificJiggling()
+                sender.enabled = false
+                self.isJiggling = true
                 delta = -(buttonHeight / 3 / 2 - buttonHeight / 15)
                 self.deleteChordOnSpecificTabView.addTarget(self, action: "deleteChordOnSpecificTabView:")
                 tempView.addGestureRecognizer(deleteChordOnSpecificTabView)
+                let randomInt: UInt32  = arc4random_uniform(500)
+                let r:Double = (Double(randomInt) / 500.0) + 2
+                
+                let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
+                let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
+                
+                tempView.transform = leftWobble;  // starting point
+                tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
+                
+                deleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
+                
+                
+                let image =  UIImage(named: "deleteX")
+                deleteView.image = image
+                
+                tempView.addSubview(deleteView)
+                
+                
+                UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
+                    UIView.setAnimationRepeatCount(Float(NSNotFound))
+                    if oldCornerRadius == 0.5 * buttonWidth {
+                        tempView.center.x = originalX + 1
+                    }
+                    tempView.transform = rightWobble
+                    }, completion: nil
+                )
+                
+                
+                
+                self.completeStringView.userInteractionEnabled = false
             }
-            
-            let randomInt: UInt32  = arc4random_uniform(500)
-            let r:Double = (Double(randomInt) / 500.0) + 2
-            
-            let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
-            let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
-
-            tempView.transform = leftWobble;  // starting point
-            tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
-            
-            deleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
-            
-            
-            let image =  UIImage(named: "deleteX")
-            deleteView.image = image
-            
-            tempView.addSubview(deleteView)
-            
-            if oldCornerRadius == 0.5 * buttonWidth {
-                tempView.center.x = originalX - 1
-            }
-            
-            UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
-                UIView.setAnimationRepeatCount(Float(NSNotFound))
-                if oldCornerRadius == 0.5 * buttonWidth {
-                    tempView.center.x = originalX + 1
-                }
-                tempView.transform = rightWobble
-                }, completion: nil
-            )
-            
-
-            self.longPressSpecificTabButton.enabled = false
-            self.completeStringView.userInteractionEnabled = false
         }
     }
     
     func stopNormalJinggling(sender: UILongPressGestureRecognizer) {
-        if self.isJiggling {
+        if(sender.enabled){
+            return
+        }
             self.completeStringView.userInteractionEnabled = true
-            self.longPressSpecificTabButton.enabled = true
+            sender.enabled = true
             let tempView = sender.view!
             tempView.removeGestureRecognizer(deleteChordOnSpecificTabView)
             deleteView.removeFromSuperview()
@@ -2948,14 +3019,22 @@ extension TabsEditorViewController {
    
             // circle
             if oldCornerRadius == 0.5 * buttonWidth {
-                buttonWidth = buttonWidth / 1.2
-                tempView.center = CGPoint(x: center!.x - 1, y: center!.y)
-                tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, buttonWidth, buttonWidth)
-                tempView.center = center!
-                tempView.layer.cornerRadius = 0.5 * buttonWidth
+                UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseOut, animations: {
+                    tempView.transform = CGAffineTransformMakeScale(0.8, 0.8)
+                    (tempView as! UIButton).titleLabel?.transform = CGAffineTransformMakeScale(1.2, 1.2)
+                    }, completion: {
+                        completed in
+                        tempView.transform = CGAffineTransformMakeScale(1, 1)
+                        (tempView as! UIButton).titleLabel?.transform = CGAffineTransformMakeScale(1, 1)
+                        buttonWidth = buttonWidth / 1.2
+                        tempView.center = CGPoint(x: center!.x - 2, y: center!.y)
+                        tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, buttonWidth, buttonWidth)
+                        tempView.center = center!
+                        tempView.layer.cornerRadius = 0.5 * buttonWidth
+                        tempView.removeGestureRecognizer(self.deleteChordOnMainView)
+                })
             }
             self.isJiggling = false
-        }
     }
     
     func deleteChordOnSpecificTabView(sender: UITapGestureRecognizer) {
@@ -2978,7 +3057,7 @@ extension TabsEditorViewController {
             let alertController = UIAlertController(title: "Notice", message: "This operation will delete this chord you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
                 action in
-                self.stopNormalJinggling(self.longPressSpecificTabButton)
+                self.stopSpecificJiggling()
             }))
             alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
                 action in
@@ -2995,7 +3074,7 @@ extension TabsEditorViewController {
         self.removeObjectsOnSpecificTabsScrollView()
         self.tabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
         self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
-        self.stopNormalJinggling(self.longPressSpecificTabButton)
+        stopSpecificJiggling()
         self.addSpecificTabButton(self.currentBaseButton.tag)
     }
     
@@ -3063,7 +3142,7 @@ extension TabsEditorViewController {
         for var j = 0; j < self.allTabsOnMusicLine.count; j++ {
             self.currentTime = self.allTabsOnMusicLine[j].time
             self.allTabsOnMusicLine[j].tabView.frame = self.setMainViewTabPositionInRange(self.allTabsOnMusicLine[j].tab, endIndex: tempAllTabsOnMusicLine.count, allTabsOnMusicLine: tempAllTabsOnMusicLine)
-
+            tempAllTabsOnMusicLine.append(self.allTabsOnMusicLine[j])
         }
         tempAllTabsOnMusicLine.removeAll()
     }
