@@ -583,9 +583,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
         if isJiggling == false {
             var indexFret: Int = Int()
-            var indexString: Int = Int()
+            var indexString: Int = 5
             let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
-            var original:CGFloat = 0
+            var original:CGFloat = string3Height  - self.string3Position[2]
             let location = sender.locationInView(self.collectionView)
             // get the tap position for fret number and string number
             for var index = 0; index < self.string3FretPosition.count; index++ {
@@ -611,6 +611,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     
     func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int, original:CGFloat?=nil) {
+        if(self.doubleArrowView != nil){
+            self.doubleArrowView.alpha = 0
+        }
         self.removeDoubleArrowView()
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
@@ -1110,7 +1113,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         if(originalPosition != nil){
             let duration:NSTimeInterval = NSTimeInterval(sqrt(2.0*(buttonString-original)/9.8)/3)
-            UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: CGFloat(0.6/duration), initialSpringVelocity:CGFloat(0.6/duration), options: .CurveEaseInOut, animations: {
+            UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: CGFloat(0.6/duration), initialSpringVelocity:CGFloat(0.6/duration), options: [.CurveEaseInOut,.AllowUserInteraction], animations: {
                     noteButton.alpha = 1
                     noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
                 }, completion: nil)
@@ -1606,7 +1609,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
-        
+        self.removeDoubleArrowView()
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
             self.isPlaying = false
             //animate down progress block
@@ -2008,6 +2011,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if(isJiggling){
             self.stopMainViewJiggling()
         }
+        if(self.doubleArrowView != nil){
+            self.doubleArrowView.alpha = 0
+        }
         self.removeDoubleArrowView()
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
@@ -2054,16 +2060,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     let name: String = self.tabNameTextField.text!.replace(" ", replacement: "")
                     self.tabNameTextField.text! = name
                     var content: String = String()
-                    let nameString = NSString(string: name)
-                    let finallength = NSString(string: self.currentBaseButton.titleLabel!.text!).length
-                    var tempCompareName:String = ""
-                    if(nameString.length>=finallength){
-                        tempCompareName = nameString.substringToIndex(finallength)
-                    }else{
-                        tempCompareName = name
-                    }
                     
-                    if name == "" || name.containsString(" ") || tempCompareName != self.currentBaseButton.titleLabel!.text! {
+                    if name == "" || name.containsString(" ") || !(name.lowercaseString).containsString(self.currentBaseButton.titleLabel!.text!.lowercaseString) {
                         if self.specificTabsScrollView.subviews.count == 0 || (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel)) {
                             self.removeObjectsOnSpecificTabsScrollView()
                             let addBaseNoteLabel: UILabel = UILabel()
@@ -2077,15 +2075,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             self.shakeAnimationScrollView()
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             self.tabNameTextField.becomeFirstResponder()
-                            if(tempCompareName != self.currentBaseButton.titleLabel!.text! && !name.isEmpty){
+                            if(!(name.lowercaseString).containsString(self.currentBaseButton.titleLabel!.text!.lowercaseString) && !name.isEmpty){
                                 self.AnimationStatusLabel("Not Contain BaseNote Name")
                             }else{
                                 self.AnimationStatusLabel("Input Chord Name")
                             }
                             
-                        }else if(tempCompareName != self.currentBaseButton.titleLabel!.text! && !name.isEmpty){
-                            self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
+                        }else if(!(name.lowercaseString).containsString(self.currentBaseButton.titleLabel!.text!.lowercaseString) && !name.isEmpty){
                             shakeAnimationStatusLabel()
+                            shakeAnimationTextField()
                             self.AnimationStatusLabel("Not Contain BaseNote Name")
                             self.tabNameTextField.becomeFirstResponder()
                         }else{
@@ -2315,6 +2313,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressPreviousButton(sender: UIButton) {
+        self.removeDoubleArrowView()
         if self.allTabsOnMusicLine.count > 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
