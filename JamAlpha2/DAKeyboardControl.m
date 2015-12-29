@@ -464,7 +464,8 @@ static char UIViewKeyboardOpened;
             // Bound the keyboard to the bottom of the screen
             newKeyboardViewFrame.origin.y = MIN(newKeyboardViewFrame.origin.y, keyboardWindowHeight);
             newKeyboardViewFrame.origin.y = MAX(newKeyboardViewFrame.origin.y, keyboardWindowHeight - keyboardViewHeight);
-            
+            CGFloat newTextViewFrameHeight = newKeyboardViewFrame.origin.y;
+            CGRect newTextViewFrame = CGRectMake(self.keyboardActiveView.superview.frame.origin.x, self.keyboardActiveView.superview.frame.origin.x, self.keyboardActiveView.superview.frame.size.width, newTextViewFrameHeight);
             // Only update if the frame has actually changed
             if (newKeyboardViewFrame.origin.y != self.keyboardActiveView.frame.origin.y)
             {
@@ -473,6 +474,7 @@ static char UIViewKeyboardOpened;
                                     options:UIViewAnimationOptionTransitionNone | UIViewAnimationOptionBeginFromCurrentState
                                  animations:^{
                                      [self.keyboardActiveView setFrame:newKeyboardViewFrame];
+                                     [self.keyboardActiveView.superview setFrame:newTextViewFrame];
                                      /* Unnecessary now, due to KVO on self.keyboardActiveView
                                       CGRect newKeyboardViewFrameInView = [self convertRect:newKeyboardViewFrame
                                       fromView:self.keyboardActiveView.window];

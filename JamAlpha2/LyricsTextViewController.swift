@@ -62,6 +62,7 @@ class LyricsTextViewController: UIViewController {
     }
     
     override func viewDidDisappear(animated: Bool) {
+        self.lyricsTextView.removeKeyboardControl()
 //        super.viewDidDisappear(animated)
 //        let notificationCenter = NSNotificationCenter.defaultCenter()
 //        notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
@@ -184,7 +185,7 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.textColor = UIColor.whiteColor()
         self.lyricsTextView.tintColor = UIColor.mainPinkColor()
         self.lyricsTextView.delegate = self
-
+        //self.lyricsTextView.keyboardTriggerOffset = self.lyricsTextView.frame.size.height
         var lyric = Lyric()
         (lyric, _) =  CoreDataManager.getLyrics(theSong, fetchingLocalOnly: true)
         

@@ -967,6 +967,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.tabNameTextField.delegate = self
         self.tabNameTextField.attributedPlaceholder = NSAttributedString(string:"Input Name",
             attributes:[NSForegroundColorAttributeName: UIColor(white: 0.8, alpha: 1), NSFontAttributeName: UIFont.boldSystemFontOfSize(17)])
+        self.tabNameTextField.returnKeyType = .Done
         self.tabNameTextField.textAlignment = .Center
         self.editView.addSubview(tabNameTextField)
         self.tabNameTextField.addTarget(self, action: "textFieldTextChanged:", forControlEvents: UIControlEvents.EditingChanged)
@@ -990,6 +991,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.addString6View()
         self.specificTabsScrollView.alpha = 0
         self.tabNameTextField.alpha = 0
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        pressDoneButton()
+        return true
     }
     
     // hide the keyboard
@@ -1969,9 +1975,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.createEditFingerPoint(400)
         self.view.userInteractionEnabled = true
     }
-
+    
     var pressDoneButton:Bool = false
-    func pressDoneButton(sender: UIButton) {
+    func pressDoneButton(sender: UIButton?=nil) {
         pressDoneButton = false
 
         if self.intoEditView == true {
@@ -2080,7 +2086,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         }
                     }
                     
-                    if addNew == true{
+                    if addNew == true {
                         self.addTabsToMainViewDataArray(self.currentSelectedSpecificTab)
                         self.reorganizeMainViewDataArray()
                         self.collectionView.reloadData()
