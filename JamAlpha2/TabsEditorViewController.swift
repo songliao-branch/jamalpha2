@@ -17,7 +17,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     var speed: Float = 1
     
-    var songViewController: SongViewController!
+    var songViewController: SongViewController?
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -43,6 +43,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var progressBlock: SoundWaveView!
     var theSong: Findable!
     var currentTime: NSTimeInterval = NSTimeInterval()
+    
+    // sample song using avplayer
     var avPlayer: AVAudioPlayer!
     var musicPlayer: MPMusicPlayerController!
     var isDemoSong = false
@@ -266,8 +268,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             musicPlayer.currentPlaybackRate = self.speed
         }
     }
-    
-    
+
     // MARK: check theSong can convert to MPMediaItem
     func checkConverToMPMediaItem() {
         if !self.isDemoSong {
@@ -452,9 +453,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         calculateBorders()
         let gesture = UILongPressGestureRecognizer(target: self,
             action: "handleGesture:")
+        let tapGesture = UITapGestureRecognizer(target: self, action: "singleTapOnCollectionView:")
+        collectionView.addGestureRecognizer(tapGesture)
         gesture.minimumPressDuration = 0.2
         gesture.delegate = self
         collectionView.addGestureRecognizer(gesture)
+    }
+    
+    func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
+        
     }
 
     func calculateBorders() {
@@ -689,12 +696,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func addObjectsOnEditView() {
         self.specificTabsScrollView.frame = CGRectMake(0.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 20 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
         self.specificTabsScrollView.contentSize = CGSizeMake(self.trueWidth / 2, 2.5 / 20 * self.trueHeight)
-        self.specificTabsScrollView.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+        self.specificTabsScrollView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
         self.specificTabsScrollView.layer.cornerRadius = 3
         self.editView.addSubview(specificTabsScrollView)
         
         self.tabNameTextField.frame = CGRectMake(23.5 / 31 * self.trueWidth, 0.25 / 20 * self.trueHeight, 7 / 31 * self.trueWidth, 2.5 / 20 * self.trueHeight)
-        self.tabNameTextField.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(1)
+        self.tabNameTextField.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(1)
         self.tabNameTextField.layer.cornerRadius = 3
         self.tabNameTextField.autocorrectionType = UITextAutocorrectionType.No
         self.editView.addSubview(tabNameTextField)
@@ -1530,11 +1537,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
                 }
             })
         }
@@ -1744,10 +1754,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             
-            CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value))
+            CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId)
             
-            self.songViewController.updateMusicData(theSong)
-            
+            if let songVC = self.songViewController {
+               songVC.updateMusicData(theSong)
+            }
+
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
             removeNotification()
@@ -1759,11 +1772,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
+                    
                 }
             })
         }
@@ -1861,10 +1878,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.currentTabViewIndex = self.currentTabViewIndex--
             findCurrentTabView()
             if isDemoSong {
-                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                  self.currentTime = self.avPlayer.currentTime
             } else {
-                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.musicPlayer.currentPlaybackTime
             }
            
@@ -2012,7 +2029,7 @@ extension TabsEditorViewController {
     
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: Findable) {
-        let tabs = CoreDataManager.getTabs(sender, fetchingLocalOnly: true)
+        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capo: Int = tabs.2

@@ -500,8 +500,6 @@ extension MusicViewController {
     
     func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
         
-        CoreDataManager.initializeSongToDatabase(nowPlayingItem)
-        
         if let _ = CoreDataManager.getSongWaveFormImage(nowPlayingItem) {
             // songCount can be only incremented in one queue no matter how many threads
             self.incrementSongCountInThread()

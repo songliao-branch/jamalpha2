@@ -14,9 +14,9 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBOutlet weak var tableView: UITableView!
     
-    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo Mode"]
+    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo", "Tutorial"]
     
-    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode"]
+    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode", "Tutorial"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,6 +79,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         if indexPath.section == 0 {
             
             let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 3 : 4
+            let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
             if indexPath.item == 0 {
                 let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
                 self.navigationController?.pushViewController(aboutVC, animated: true)
@@ -88,6 +89,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
                 self.contactUs()
             } else if indexPath.item == indexofDemoMode {
                 let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                self.navigationController?.pushViewController(demoVC, animated: true)
+            } else if indexPath.item == indexOfTutorialMode {
+                let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                demoVC.isDemo = false
                 self.navigationController?.pushViewController(demoVC, animated: true)
             }
         } else {
@@ -140,8 +145,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
     }
-    
-    
+
     func rateTwistjam() {
 //        let url = "itms-apps://itunes.apple.com/app/id\(APP_STORE_ID)"
 //        UIApplication.sharedApplication().openURL(NSURL(string: url)!)

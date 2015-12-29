@@ -21,6 +21,9 @@ extension UIColor {
         return UIColor(red: 100 / 255, green: 100 / 255, blue: 100 / 255, alpha: 1)
     }
     
+    class func tutorialBackgroundGray() -> UIColor {
+        return UIColor(red: 76 / 255, green: 75 / 255, blue: 75 / 255, alpha: 0.4)
+    }
     // for use in search table view section header
     class func backgroundGray()-> UIColor {
         return UIColor(red: 246/255, green: 246/255, blue: 246/255, alpha: 1)
