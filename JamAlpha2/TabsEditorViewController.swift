@@ -1460,8 +1460,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let previousButton: UIButton = UIButton()
         previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 3 / 20 * self.trueHeight - 1.5 / 31 * self.trueWidth, 3 / 31 * self.trueWidth, 3 / 31 * trueWidth)
         previousButton.addTarget(self, action: "pressPreviousButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        previousButton.setImage(UIImage(named: "icon-previous"), forState: UIControlState.Normal)
-        previousButton.backgroundColor = UIColor.blackColor()
+        previousButton.setImage(UIImage(named: "backspace"), forState: UIControlState.Normal)
+        previousButton.backgroundColor = UIColor.clearColor()
         self.musicControlView.addSubview(previousButton)
 
         musicSingleTapRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
@@ -2450,6 +2450,26 @@ extension TabsEditorViewController {
         }
     }
     
+    func checkChordsWithCoredata(sender: Findable) {
+        var  needAddNewChords: Bool = false
+        if needAddNewChords {
+            var needAddNewChordsArray: [Chord] = [Chord]()
+            var nameString: String = ""
+            for item in needAddNewChordsArray {
+                nameString = nameString + item.tab.name + ", "
+            }
+            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
+                action in
+                
+            }))
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
+                action in
+                
+            }))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        }
+    }
 
 }
 
@@ -3049,7 +3069,7 @@ extension TabsEditorViewController {
             }
         }
         if needAlert {
-            let alertController = UIAlertController(title: "Notice", message: "This operation will delete this chord you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
+            let alertController = UIAlertController(title: "Notice", message: "This operation will delete all '\(self.currentSelectedSpecificTab.name)' you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
                 action in
                 self.stopSpecificJiggling()
