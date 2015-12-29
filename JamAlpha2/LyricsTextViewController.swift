@@ -14,6 +14,8 @@ class LyricsTextViewController: UIViewController {
     
     var hiddenKeyboardView: UIView = UIView()
     
+    var keyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
+    
     var isDemoSong: Bool!
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
@@ -56,17 +58,17 @@ class LyricsTextViewController: UIViewController {
     }
     
     override func viewWillAppear(animated: Bool) {
-//        let notificationCenter = NSNotificationCenter.defaultCenter()
-//        notificationCenter.addObserver(self, selector: "handleKeyboardWillShowNotification:", name: UIKeyboardWillShowNotification, object: nil)
-//        notificationCenter.addObserver(self, selector: "handleKeyboardWillHideNotification:", name: UIKeyboardWillHideNotification, object: nil)
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.addObserver(self, selector: "handleKeyboardWillShowNotification:", name: UIKeyboardWillShowNotification, object: nil)
+        notificationCenter.addObserver(self, selector: "handleKeyboardWillHideNotification:", name: UIKeyboardWillHideNotification, object: nil)
     }
     
     override func viewDidDisappear(animated: Bool) {
         self.lyricsTextView.removeKeyboardControl()
-//        super.viewDidDisappear(animated)
-//        let notificationCenter = NSNotificationCenter.defaultCenter()
-//        notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
-//        notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+        super.viewDidDisappear(animated)
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+        notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
     }
     
     func handleKeyboardWillShowNotification(notification: NSNotification) {
@@ -88,6 +90,8 @@ class LyricsTextViewController: UIViewController {
         if showsKeyboard == true {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
             self.hiddenKeyboardView.frame = CGRectMake(0, self.lyricsTextView.frame.height + originDelta, self.viewWidth, 10)
+            self.view.addGestureRecognizer(keyboardPanGesture)
+            self.keyboardPanGesture.addTarget(self, action: "keyboradPan:")
         } else {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
         }
@@ -99,9 +103,9 @@ class LyricsTextViewController: UIViewController {
         })
     }
     
-    func hiddenKeyboardPanGesture(sender: UIPanGestureRecognizer) {
-        let tranform = sender.locationInView(self.view)
-       
+    func keyboardPan(sender: UIPanGestureRecognizer) {
+        let location = sender.locationInView(self.view)
+        
     }
     
     func addObjectsOnMainView() {
@@ -179,13 +183,14 @@ class LyricsTextViewController: UIViewController {
     
     func addLyricsTextView() {
         self.lyricsTextView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, 27.5 / 31 * self.viewHeight)
+        self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
         self.lyricsTextView.backgroundColor = UIColor.clearColor()
         self.lyricsTextView.textAlignment = .Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
         self.lyricsTextView.tintColor = UIColor.mainPinkColor()
         self.lyricsTextView.delegate = self
-        //self.lyricsTextView.keyboardTriggerOffset = self.lyricsTextView.frame.size.height
+
         var lyric = Lyric()
         (lyric, _) =  CoreDataManager.getLyrics(theSong, fetchingLocalOnly: true)
         
@@ -201,16 +206,18 @@ class LyricsTextViewController: UIViewController {
             self.lyricsTextView.textColor = UIColor.lightGrayColor()
         }
         
-        self.lyricsTextView.addKeyboardPanningWithActionHandler({
-            (keyboardFrameInView, opening, closing) -> Void in
-            if opening {
-                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, keyboardFrameInView.size.height)
-                self.lyricsTextView.frame = tempFrame
-            } else if closing {
-                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, 27.5 / 31 * self.viewHeight)
-                self.lyricsTextView.frame = tempFrame
-            }
-        })
+//        self.lyricsTextView.addKeyboardPanningWithActionHandler({
+//            (keyboardFrameInView, opening, closing) -> Void in
+//            if opening {
+//                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, keyboardFrameInView.size.height)
+//                self.lyricsTextView.frame = tempFrame
+//                self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
+//            } else if closing {
+//                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, 27.5 / 31 * self.viewHeight)
+//                self.lyricsTextView.frame = tempFrame
+//                self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
+//            }
+//        })
         
         
         self.view.addSubview(self.lyricsTextView)
@@ -328,5 +335,10 @@ extension LyricsTextViewController: UITextViewDelegate {
             textView.textColor = UIColor.whiteColor()
         }
     }
+    
+    func textViewDidEndEditing(textView: UITextView) {
+        self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
+    }
+  
 }
 
