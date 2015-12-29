@@ -2063,7 +2063,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     self.tabNameTextField.text! = name
                     var content: String = String()
                     
-                    if name == "" || name.containsString(" ") || !(name.lowercaseString).containsString(self.currentBaseButton.titleLabel!.text!.lowercaseString) {
+                    if name == "" || name.containsString(" ") {
                         if self.specificTabsScrollView.subviews.count == 0 || (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel)) {
                             self.removeObjectsOnSpecificTabsScrollView()
                             let addBaseNoteLabel: UILabel = UILabel()
@@ -2077,17 +2077,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             self.shakeAnimationScrollView()
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             self.tabNameTextField.becomeFirstResponder()
-                            if(!(name.lowercaseString).containsString(self.currentBaseButton.titleLabel!.text!.lowercaseString) && !name.isEmpty){
-                                self.AnimationStatusLabel("Not Contain BaseNote Name")
-                            }else{
-                                self.AnimationStatusLabel("Input Chord Name")
-                            }
+                            self.AnimationStatusLabel("Input Chord Name")
                             
-                        }else if(!(name.lowercaseString).containsString(self.currentBaseButton.titleLabel!.text!.lowercaseString) && !name.isEmpty){
-                            shakeAnimationStatusLabel()
-                            shakeAnimationTextField()
-                            self.AnimationStatusLabel("Not Contain BaseNote Name")
-                            self.tabNameTextField.becomeFirstResponder()
                         }else{
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             shakeAnimationStatusLabel()
@@ -2917,8 +2908,8 @@ extension TabsEditorViewController {
 
 
 extension TabsEditorViewController {
-    func startMainViewJiggling(sender:UILongPressGestureRecognizer){
-        if(sender.state == .Began){
+    func startMainViewJiggling(sender:UILongPressGestureRecognizer?=nil){
+        if(sender == nil || sender!.state == .Began){
             for buttonWithTab in self.noteButtonWithTabArray {
                 let button = buttonWithTab.noteButton
                 let gesture = self.longPressMainViewNoteButton[button]
@@ -3135,7 +3126,9 @@ extension TabsEditorViewController {
             self.musicControlView.userInteractionEnabled = true
             self.isJiggling = false
         }
-        
+        stopMainViewJiggling()
+         reorganizeMainViewDataArray()
+        startMainViewJiggling()
     }
     
     // need to check whether the main view contain the delete tab
@@ -3146,7 +3139,6 @@ extension TabsEditorViewController {
             }
         }
         self.deleteChordOnMusicLine(index, name: name, content: content)
-        
     }
     
     func deleteChordOnString3View(sender: Int) {
