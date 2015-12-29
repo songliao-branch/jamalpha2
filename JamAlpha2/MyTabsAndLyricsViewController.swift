@@ -262,9 +262,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         songVC.selectedFromTable = true
         //TODO: fix this crash bug
-        // songVC.transitioningDelegate = self.animator
-        // self.animator!.attachToViewController(songVC)
-        
+
         if let item = song.mediaItem {
             print("item found title:\(item.title!)")
             MusicManager.sharedInstance.setPlayerQueue([item])
@@ -276,6 +274,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             //TODO: search the song first..
             
         }// TODO: if demo song
+        songVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(songVC)
         
         self.presentViewController(songVC, animated: true, completion: {
             completed in
