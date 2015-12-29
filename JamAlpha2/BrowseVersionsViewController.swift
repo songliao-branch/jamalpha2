@@ -300,10 +300,21 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             let tabsSet: DownloadedTabsSet = tabsInOneSection![indexPath.row]
             
             var tuning = ""
+            
             if tabsSet.tuning == "E-B-G-D-A-E-" {
                 tuning = "standard"
             } else {
                 tuning = tabsSet.tuning
+            }
+            
+            if tabsSet.id < 0 {//my tabs
+                cell.upVoteButton.hidden = true
+                cell.downVoteButton.hidden = true
+                cell.votesLabel.hidden = true
+            } else {
+                cell.upVoteButton.hidden = false
+                cell.downVoteButton.hidden = false
+                cell.votesLabel.hidden = false
             }
             
             if tabsSet.voteStatus == "up" {
@@ -348,6 +359,15 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             let lyricsInOneSection = allLyricsSets[indexPath.section]
             let lyricsSet: DownloadedLyricsSet = lyricsInOneSection![indexPath.row]
 
+            if lyricsSet.id < 0 {//my tabs
+                cell.upVoteButton.hidden = true
+                cell.downVoteButton.hidden = true
+                cell.votesLabel.hidden = true
+            } else {
+                cell.upVoteButton.hidden = false
+                cell.downVoteButton.hidden = false
+                cell.votesLabel.hidden = false
+            }
             
             if lyricsSet.voteStatus == "up" {
                 cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)

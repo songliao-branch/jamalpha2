@@ -624,7 +624,7 @@ class CoreDataManager: NSObject {
         }
     }
     
-    //a local tabs that has never been uploaded will have an id -1, once it's uploaded, the retrieved cloud id will overwrite -1
+    //a local tabs that has never been uploaded will have an id -1, once it's uploaded, the retrieved cloud id will 
     class func saveCloudIdToTabs(findable: Findable, cloudId: Int) {
         if let matchedSong = findSong(findable) {
             let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
