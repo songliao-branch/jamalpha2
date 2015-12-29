@@ -79,6 +79,9 @@ class LyricsTextViewController: UIViewController {
         keyboardWillChangeFrameWithNotification(notification, showsKeyboard: false)
     }
     
+    var keyboardScreenBeginFrame: CGRect!
+    var keyboardScreenEndFrame: CGRect!
+    
     func keyboardWillChangeFrameWithNotification(notification: NSNotification, showsKeyboard: Bool) {
         let userInfo = notification.userInfo!
         // Convert the keyboard frame from screen to view coordinates.
@@ -105,6 +108,9 @@ class LyricsTextViewController: UIViewController {
     
     func keyboardPan(sender: UIPanGestureRecognizer) {
         let location = sender.locationInView(self.view)
+        if location.y > keyboardScreenEndFrame.size.height {
+            
+        }
         
     }
     

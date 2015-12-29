@@ -19,14 +19,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var doubleArrowView: CustomizedView!
     var scrollTimer:NSTimer?
     
+
     // Gesture Recognizer on screen
-    let deleteChordOnMainView: UITapGestureRecognizer = UITapGestureRecognizer()
+    // delete jiggling gesture 
+    var deleteChordOnMainView: [UIButton:UITapGestureRecognizer] = [UIButton:UITapGestureRecognizer]()
     let deleteChordOnSpecificTabView: UITapGestureRecognizer = UITapGestureRecognizer()
-    let longPressSpecificTabButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
-    let longPressMainViewNoteButton: UILongPressGestureRecognizer = UILongPressGestureRecognizer()
+    var longPressSpecificTabButton: [Int:UILongPressGestureRecognizer] = [Int:UILongPressGestureRecognizer]()
+    var longPressMainViewNoteButton: [UIButton:UILongPressGestureRecognizer] = [UIButton:UILongPressGestureRecognizer]()
     let prepareMoveSwipeUpGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
     let prepareMoveSwipeDownGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer()
     let checkPanGesture:UIPanGestureRecognizer = UIPanGestureRecognizer()
+    let temptapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
     
     // define jiggling gesture recognizer for base note button
     var isJiggling: Bool = false
@@ -39,6 +42,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     let jigglingLongPressGesture : UILongPressGestureRecognizer = UILongPressGestureRecognizer()
     var originalCenter: CGPoint!
     var deleteView:UIImageView = UIImageView()
+    var deleteViewArray:[UIButton:UIImageView] = [UIButton:UIImageView]()
     var scrollingTimer: NSTimer!
     var startScrolling: Bool = false
     var stopEdgeStartTime:Double = -1
@@ -546,6 +550,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.doubleArrowView.center.y = self.doubleArrowView.center.y - kmovingMainNoteSliderHeight
                 }, completion: {
                     completed in
+                    self.doubleArrowView.removeFromSuperview()
+                    self.view.insertSubview(self.doubleArrowView, aboveSubview: self.collectionView)
                     let gesture = UIPanGestureRecognizer(target: self,
                         action: "handleGesture:")
                     
@@ -567,9 +573,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
         if isJiggling == false {
             var indexFret: Int = Int()
-            var indexString: Int = Int()
+            var indexString: Int = 5
             let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
-            var original:CGFloat = 0
+            var original:CGFloat = string3Height  - self.string3Position[2]
             let location = sender.locationInView(self.collectionView)
             // get the tap position for fret number and string number
             for var index = 0; index < self.string3FretPosition.count; index++ {
@@ -589,12 +595,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             // open the editor view and add note button
             self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
         } else {
-            self.stopNormalJinggling(longPressMainViewNoteButton)
+            self.stopMainViewJiggling()
         }
     }
     
     
     func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int, original:CGFloat?=nil) {
+        if(self.doubleArrowView != nil){
+            self.doubleArrowView.alpha = 0
+        }
         self.removeDoubleArrowView()
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
@@ -871,13 +880,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.stopScrollTimer()
         self.startScrolling = false
         if(self.doubleArrowView != nil){
+            self.doubleArrowView.removeFromSuperview()
+            self.view.insertSubview(self.doubleArrowView, belowSubview: self.collectionView)
             UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseOut,.AllowUserInteraction], animations: {
                 self.doubleArrowView.center.y = self.doubleArrowView.center.y + kmovingMainNoteSliderHeight
                 }, completion: {
                     completed in
-                    self.doubleArrowView.removeFromSuperview()
-                    self.doubleArrowView = nil
-                    self.prepareMoveSwipeUpGesture.enabled = true
+                    if(self.doubleArrowView != nil){
+                        self.doubleArrowView.removeFromSuperview()
+                        self.doubleArrowView = nil
+                        self.prepareMoveSwipeUpGesture.enabled = true
+                    }
             })
         }
         
@@ -1002,20 +1015,36 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var isTextChanged = false
     func tapOnEditView(sender: UITapGestureRecognizer) {
         self.tabNameTextField.resignFirstResponder()
-        self.stopNormalJinggling(self.longPressSpecificTabButton)
+        stopJiggling()
+        stopSpecificJiggling()
+        stopMainViewJiggling()
+    }
+    
+    func stopSpecificJiggling(){
+        if(longPressSpecificTabButton.count == 0){
+            return
+        }
+        for button in buttonOnSpecificScrollView {
+            if(button.accessibilityIdentifier == "isNotOriginal"){
+                print(longPressSpecificTabButton.count)
+                self.stopNormalJinggling(self.longPressSpecificTabButton[button.tag]!)
+            }
+        }
     }
     
     //textfeild delege
-    let tempTapView:UIView = UIView()
+    var tempTapView:UIView?
     func textFieldDidBeginEditing(textField: UITextField) {
         self.tabFingerPointChanged = true
-        tempTapView.frame = self.completeStringView.frame
-        tempTapView.backgroundColor = UIColor.clearColor()
-        self.editView.addSubview(self.tempTapView)
+        tempTapView = UIView()
+        tempTapView!.frame = self.completeStringView.frame
+        tempTapView!.backgroundColor = UIColor.clearColor()
+        self.editView.addSubview(self.tempTapView!)
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
-        tempTapView.removeFromSuperview()
+        tempTapView!.removeFromSuperview()
+        tempTapView = nil
         if (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel) && !isTextChanged){
             self.removeObjectsOnSpecificTabsScrollView()
             self.tabNameTextField.text = ""
@@ -1076,7 +1105,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         if(originalPosition != nil){
             let duration:NSTimeInterval = NSTimeInterval(sqrt(2.0*(buttonString-original)/9.8)/3)
-            UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: CGFloat(0.6/duration), initialSpringVelocity:CGFloat(0.6/duration), options: .CurveEaseInOut, animations: {
+            UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: CGFloat(0.6/duration), initialSpringVelocity:CGFloat(0.6/duration), options: [.CurveEaseInOut,.AllowUserInteraction], animations: {
                     noteButton.alpha = 1
                     noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
                 }, completion: nil)
@@ -1141,8 +1170,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
         } else {
             self.stopJiggling()
-            self.stopNormalJinggling(longPressSpecificTabButton)
-            
+            stopSpecificJiggling()
         }
         
         self.view.userInteractionEnabled = true
@@ -1215,8 +1243,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let buttonWidth: CGFloat = 4 / 20 * self.trueHeight
         // change specific tab button scrollview content frame
         let scrollviewWidth = (buttonWidth + 0.5 / 20 * self.trueWidth) * CGFloat(5) + 0.5 / 20 * self.trueWidth
-        
         self.specificTabsScrollView.contentSize = CGSizeMake(scrollviewWidth, 2.5 / 20 * self.trueHeight)
+        
+        if self.specificTabSets.count > 5 {
+            let tempScrollviewWidth = (buttonWidth + 0.6/20 * self.trueWidth) * CGFloat(self.specificTabSets.count)
+            self.specificTabsScrollView.contentSize = CGSizeMake(tempScrollviewWidth, 2.5 / 20 * self.trueHeight)
+        }
         
         self.specificTabsScrollView.contentOffset = CGPointZero
         UIView.animateWithDuration(0.1, animations: {
@@ -1225,14 +1257,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             }, completion:
             {   completed in
+                self.buttonOnSpecificScrollView.removeAll()
                 self.removeObjectsOnSpecificTabsScrollView()
+                self.longPressSpecificTabButton.removeAll()
                 for var i = 0; i < self.specificTabSets.count; i++ {
                     if self.specificTabSets[i].content != "" {
                         let specificButton: UIButton = UIButton()
                         specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
                         specificButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
                         specificButton.layer.cornerRadius = 4
-                        specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents: UIControlEvents.TouchUpInside)
+                        specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents:UIControlEvents.TouchUpInside)
                         specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
                         specificButton.tag = i
                         specificButton.alpha = 0
@@ -1246,9 +1280,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             specificButton.layer.shadowPath = UIBezierPath(rect: specificButton.layer.bounds).CGPath
                         } else {
                             specificButton.accessibilityIdentifier = "isNotOriginal"
-                            self.longPressSpecificTabButton.addTarget(self, action: "startNormalJinggling:")
-                            self.longPressSpecificTabButton.minimumPressDuration = 0.5
-                            specificButton.addGestureRecognizer(self.longPressSpecificTabButton)
+                            let longPress = UILongPressGestureRecognizer(target: self, action: "startNormalJinggling:")
+                            longPress.minimumPressDuration = 0.5
+                            specificButton.addGestureRecognizer(longPress)
+                            self.longPressSpecificTabButton[specificButton.tag] = longPress
+                           
                             specificButton.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)
                             specificButton.layer.shadowOpacity = 1
                             specificButton.layer.shadowRadius = 4
@@ -1281,6 +1317,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         self.view.userInteractionEnabled = true
     }
+    
     
     // choose specific tabs, and generate the finger point for this tab
     func pressSpecificTabButton(sender: UIButton) {
@@ -1569,7 +1606,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
-        
+        self.removeDoubleArrowView()
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
             self.isPlaying = false
             //animate down progress block
@@ -1759,6 +1796,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         self.oldTagString4 = 0
         self.oldTagString5 = 0
+        if(isJiggling == true){
+            stopSpecificJiggling()
+        }
         self.isJiggling = false
         self.addedNoteButtonOnCompleteView = false
         self.currentBaseButton.tag = 400
@@ -1812,25 +1852,27 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // press the note button to add the tab in music line
     func pressMainViewNoteButton(sender: UIButton) {
-        var inserted: Bool = false
-        let index = sender.tag
-        let returnValue = addTabViewOnMusicControlView(index)
-        for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
-            if self.currentTime <= self.allTabsOnMusicLine[0].time {
-                print("insert")
-                self.allTabsOnMusicLine.insert(returnValue.1, atIndex: 0)
-                inserted = true
-                break
-            } else if self.currentTime > self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i + 1].time {
-                self.allTabsOnMusicLine.insert(returnValue.1, atIndex: i + 1)
-                inserted = true
-                break
+        if !isJiggling{
+            var inserted: Bool = false
+            let index = sender.tag
+            let returnValue = addTabViewOnMusicControlView(index)
+            for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
+                if self.currentTime <= self.allTabsOnMusicLine[0].time {
+                    print("insert")
+                    self.allTabsOnMusicLine.insert(returnValue.1, atIndex: 0)
+                    inserted = true
+                    break
+                } else if self.currentTime > self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i + 1].time {
+                    self.allTabsOnMusicLine.insert(returnValue.1, atIndex: i + 1)
+                    inserted = true
+                    break
+                }
             }
+            if !inserted {
+                self.allTabsOnMusicLine.append(returnValue.1)
+            }
+            self.progressBlock.addSubview(returnValue.0)
         }
-        if !inserted {
-            self.allTabsOnMusicLine.append(returnValue.1)
-        }
-        self.progressBlock.addSubview(returnValue.0)
     }
     
     func addTabViewOnMusicControlView(sender: Int) -> (UIView, tabOnMusicLine) {
@@ -1945,6 +1987,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
 
     func pressAddButton(sender: UIButton) {
+        if(isJiggling){
+            self.stopMainViewJiggling()
+        }
+        if(self.doubleArrowView != nil){
+            self.doubleArrowView.alpha = 0
+        }
+        self.removeDoubleArrowView()
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
         if isDemoSong {
@@ -1990,16 +2039,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     let name: String = self.tabNameTextField.text!.replace(" ", replacement: "")
                     self.tabNameTextField.text! = name
                     var content: String = String()
-                    let nameString = NSString(string: name)
-                    let finallength = NSString(string: self.currentBaseButton.titleLabel!.text!).length
-                    var tempCompareName:String = ""
-                    if(nameString.length>=finallength){
-                        tempCompareName = nameString.substringToIndex(finallength)
-                    }else{
-                        tempCompareName = name
-                    }
                     
-                    if name == "" || name.containsString(" ") || tempCompareName != self.currentBaseButton.titleLabel!.text! {
+                    if name == "" || name.containsString(" ") {
                         if self.specificTabsScrollView.subviews.count == 0 || (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel)) {
                             self.removeObjectsOnSpecificTabsScrollView()
                             let addBaseNoteLabel: UILabel = UILabel()
@@ -2013,17 +2054,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             self.shakeAnimationScrollView()
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             self.tabNameTextField.becomeFirstResponder()
-                            if(tempCompareName != self.currentBaseButton.titleLabel!.text! && !name.isEmpty){
-                                self.AnimationStatusLabel("Not Contain BaseNote Name")
-                            }else{
-                                self.AnimationStatusLabel("Input Chord Name")
-                            }
+                            self.AnimationStatusLabel("Input Chord Name")
                             
-                        }else if(tempCompareName != self.currentBaseButton.titleLabel!.text! && !name.isEmpty){
-                            self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
-                            shakeAnimationStatusLabel()
-                            self.AnimationStatusLabel("Not Contain BaseNote Name")
-                            self.tabNameTextField.becomeFirstResponder()
                         }else{
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             shakeAnimationStatusLabel()
@@ -2174,8 +2206,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tempButton.addTarget(self, action: "pressMainViewNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
         tempButton.layer.cornerRadius = 0.5 * buttonWidth
         tempButton.frame = CGRectMake(fretPosition, stringPosition, buttonWidth, buttonWidth)
-        tempButton.addGestureRecognizer(self.longPressMainViewNoteButton)
-        self.longPressMainViewNoteButton.addTarget(self, action: "startNormalJinggling:")
+        
+        let longPress = UILongPressGestureRecognizer(target: self, action: "startMainViewJiggling:")
+        self.longPressMainViewNoteButton[tempButton] = longPress
+        tempButton.addGestureRecognizer(longPress)
+        
+        
         let tempTab: NormalTabs = NormalTabs()
         tempTab.index = sender.index
         tempTab.name = sender.name
@@ -2247,6 +2283,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressPreviousButton(sender: UIButton) {
+        self.removeDoubleArrowView()
         if self.allTabsOnMusicLine.count > 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
@@ -2540,7 +2577,9 @@ extension TabsEditorViewController {
                 self.currentNoteButton = noteButton
                 self.currentBaseButton = noteButton
                 self.noteButtonOnCompeteScrollView = noteButton
-                self.addSpecificTabButton(noteButton.tag)
+                if(oldNoteButtonTag != currentNoteButton.tag){
+                    self.addSpecificTabButton(noteButton.tag)
+                }
                 self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
             } else {
                 self.currentBaseButton.center = self.originalCenter
@@ -2610,7 +2649,9 @@ extension TabsEditorViewController {
                 self.currentNoteButton = noteButton
                 self.currentBaseButton = noteButton
                 self.noteButtonOnCompeteScrollView = noteButton
-                self.addSpecificTabButton(noteButton.tag)
+                if(oldNoteButtonTag != currentNoteButton.tag){
+                    self.addSpecificTabButton(noteButton.tag)
+                }
                 self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
             } else {
                 self.currentBaseButton.center = self.originalCenter
@@ -2844,94 +2885,151 @@ extension TabsEditorViewController {
 
 
 extension TabsEditorViewController {
-    func startNormalJinggling(sender: UILongPressGestureRecognizer) {
-        if sender.state == .Began {
-            self.isJiggling = true
-            let tempView = sender.view!
-            //self.currentSelectedSpecificTab = self.specificTabSets[tempView.tag]
-            var buttonWidth = tempView.frame.size.width
-            let buttonHeight = tempView.frame.size.height
-            let oldCornerRadius = tempView.layer.cornerRadius
-            let center = sender.view?.center
-            var originalX: CGFloat = 0
-            var delta: CGFloat = 0
-            // circle
-            if oldCornerRadius == 0.5 * buttonWidth {
-                buttonWidth = buttonWidth * 1.2
-                tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, buttonWidth, buttonWidth)
-                tempView.layer.cornerRadius = 0.5 * buttonWidth
-                delta = CGFloat((1 - sqrt(2.0))/2.0) * (tempView.frame.size.width/2.0) + (2/3)*(tempView.frame.size.width/4.0 - tempView.frame.size.width/6.0)
-                tempView.center = center!
-                originalX = tempView.center.x
-                tempView.center.x = originalX - 1
-                self.deleteChordOnMainView.addTarget(self, action: "deleteChordOnMainView:")
-                tempView.addGestureRecognizer(self.deleteChordOnMainView)
-            } else {
-                delta = -(buttonHeight / 3 / 2 - buttonHeight / 15)
-                self.deleteChordOnSpecificTabView.addTarget(self, action: "deleteChordOnSpecificTabView:")
-                tempView.addGestureRecognizer(deleteChordOnSpecificTabView)
+    func startMainViewJiggling(sender:UILongPressGestureRecognizer?=nil){
+        if(sender == nil || sender!.state == .Began){
+            for buttonWithTab in self.noteButtonWithTabArray {
+                let button = buttonWithTab.noteButton
+                let gesture = self.longPressMainViewNoteButton[button]
+                startNormalJinggling(gesture!)
             }
-            
-            let randomInt: UInt32  = arc4random_uniform(500)
-            let r:Double = (Double(randomInt) / 500.0) + 2
-            
-            let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
-            let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
-
-            tempView.transform = leftWobble;  // starting point
-            tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
-            
-            deleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
-            
-            
-            let image =  UIImage(named: "deleteX")
-            deleteView.image = image
-            
-            tempView.addSubview(deleteView)
-            
-            if oldCornerRadius == 0.5 * buttonWidth {
-                tempView.center.x = originalX - 1
-            }
-            
-            UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
-                UIView.setAnimationRepeatCount(Float(NSNotFound))
-                if oldCornerRadius == 0.5 * buttonWidth {
-                    tempView.center.x = originalX + 1
-                }
-                tempView.transform = rightWobble
-                }, completion: nil
-            )
-            
-
-            self.longPressSpecificTabButton.enabled = false
-            self.completeStringView.userInteractionEnabled = false
+            self.tempTapView = UIView(frame: CGRectMake(musicControlView.frame.origin.x, musicControlView.frame.origin.y, musicControlView.frame.size.width, musicControlView.frame.size.height))
+            temptapOnEditView.addTarget(self, action: "tapOnEditView:")
+            self.tempTapView!.addGestureRecognizer(temptapOnEditView)
+            self.view.addSubview(self.tempTapView!)
         }
     }
     
-    func stopNormalJinggling(sender: UILongPressGestureRecognizer) {
-        if self.isJiggling {
-            self.completeStringView.userInteractionEnabled = true
-            self.longPressSpecificTabButton.enabled = true
+    func stopMainViewJiggling(){
+        for buttonWithTab in self.noteButtonWithTabArray {
+            let button = buttonWithTab.noteButton
+            let gesture = self.longPressMainViewNoteButton[button]
+            stopNormalJinggling(gesture!, button: button)
+        }
+        self.completeStringView.userInteractionEnabled = true
+        self.musicControlView.userInteractionEnabled = true
+        if(tempTapView != nil){
+            tempTapView?.removeGestureRecognizer(temptapOnEditView)
+            tempTapView!.removeFromSuperview()
+            tempTapView = nil
+        }
+        self.isJiggling = false
+    }
+    
+    func startNormalJinggling(sender: UILongPressGestureRecognizer) {
+            if isJiggling {
+                 stopJiggling()
+            }
+            if(!intoEditView){
+                self.musicControlView.userInteractionEnabled = false
+            }
+            self.removeDoubleArrowView()
+            let tempView = sender.view!
+
+            let buttonWidth = tempView.frame.size.width
+
+            let buttonHeight = tempView.frame.size.height
+            let oldCornerRadius = tempView.layer.cornerRadius
+            var delta: CGFloat = 0
+            let originalX = tempView.center.x
+            // circle
+        if oldCornerRadius >= 0.5 * buttonWidth - 0.1 && oldCornerRadius <= 0.5 * buttonWidth + 0.1 {
+                sender.enabled = false
+                self.isJiggling = true
+                delta = CGFloat((1 - sqrt(2.0))/2.0) * (tempView.frame.size.width/2.0) + (tempView.frame.size.width/4.0 - tempView.frame.size.width/6.0)
+                tempView.center.x = originalX - 1
+                
+                let tempDeleteChordOnMainView = UITapGestureRecognizer(target: self, action: "deleteChordOnMainView:")
+                self.deleteChordOnMainView[tempView as! UIButton] = tempDeleteChordOnMainView
+                tempView.addGestureRecognizer(tempDeleteChordOnMainView)
+                let randomInt: UInt32  = arc4random_uniform(500)
+                let r:Double = (Double(randomInt) / 500.0) + 5
+                
+                let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(self.degreesToRadians( (self.kAnimationRotateDeg * -1.0) - r)))
+                let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(self.degreesToRadians( self.kAnimationRotateDeg + r)))
+                
+                tempView.transform = leftWobble;  // starting point
+                tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
+                
+                let tempDeleteView = UIImageView(image: UIImage(named: "deleteX"))
+                
+                tempDeleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
+                
+                self.deleteViewArray[tempView as! UIButton] = tempDeleteView
+                
+                tempView.addSubview(tempDeleteView)
+                
+                
+                UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
+                    UIView.setAnimationRepeatCount(Float(NSNotFound))
+                    if oldCornerRadius == 0.5 * buttonWidth {
+                        tempView.center.x = originalX + 1
+                    }
+                    tempView.transform = rightWobble
+                    }, completion: nil
+                )
+                
+                self.completeStringView.userInteractionEnabled = false
+               
+            } else if sender.state == .Began {
+                sender.enabled = false
+                self.stopSpecificJiggling()
+                sender.enabled = false
+                self.isJiggling = true
+                delta = -(buttonHeight / 3 / 2 - buttonHeight / 15)
+                self.deleteChordOnSpecificTabView.addTarget(self, action: "deleteChordOnSpecificTabView:")
+                tempView.addGestureRecognizer(deleteChordOnSpecificTabView)
+                let randomInt: UInt32  = arc4random_uniform(500)
+                let r:Double = (Double(randomInt) / 500.0) + 2
+                
+                let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
+                let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
+                
+                tempView.transform = leftWobble;  // starting point
+                tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
+                
+                deleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
+                
+                
+                let image =  UIImage(named: "deleteX")
+                deleteView.image = image
+                
+                tempView.addSubview(deleteView)
+                
+                
+                UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
+                    UIView.setAnimationRepeatCount(Float(NSNotFound))
+                    tempView.transform = rightWobble
+                    }, completion: nil
+                )
+                self.completeStringView.userInteractionEnabled = false
+            }
+    }
+    
+    func stopNormalJinggling(sender: UILongPressGestureRecognizer, button:UIButton?=nil) {
+        if(sender.enabled){
+            return
+        }
+            if(button == nil){
+               self.completeStringView.userInteractionEnabled = true
+                self.isJiggling = false
+            }
+            sender.enabled = true
             let tempView = sender.view!
             tempView.removeGestureRecognizer(deleteChordOnSpecificTabView)
             deleteView.removeFromSuperview()
             tempView.layer.removeAllAnimations()
             tempView.transform = CGAffineTransformIdentity
-            var buttonWidth = tempView.frame.size.width
-            let buttonHeight = tempView.frame.size.height
+            let buttonWidth = tempView.frame.size.width
             let oldCornerRadius = tempView.layer.cornerRadius
             let center = sender.view?.center
-   
             // circle
-            if oldCornerRadius == 0.5 * buttonWidth {
-                buttonWidth = buttonWidth / 1.2
+            if oldCornerRadius >= 0.5 * buttonWidth - 0.1 && oldCornerRadius <= 0.5 * buttonWidth + 0.1 {
+                deleteViewArray[button!]!.removeFromSuperview()
+                deleteViewArray.removeValueForKey(button!)
                 tempView.center = CGPoint(x: center!.x - 1, y: center!.y)
-                tempView.frame = CGRectMake(tempView.frame.origin.x, tempView.frame.origin.y, buttonWidth, buttonWidth)
-                tempView.center = center!
-                tempView.layer.cornerRadius = 0.5 * buttonWidth
+                tempView.removeGestureRecognizer(deleteChordOnMainView[button!]!)
+                deleteChordOnMainView.removeValueForKey(button!)
             }
-            self.isJiggling = false
-        }
     }
     
     func deleteChordOnSpecificTabView(sender: UITapGestureRecognizer) {
@@ -2954,7 +3052,7 @@ extension TabsEditorViewController {
             let alertController = UIAlertController(title: "Notice", message: "This operation will delete this chord you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
                 action in
-                self.stopNormalJinggling(self.longPressSpecificTabButton)
+                self.stopSpecificJiggling()
             }))
             alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
                 action in
@@ -2971,13 +3069,13 @@ extension TabsEditorViewController {
         self.removeObjectsOnSpecificTabsScrollView()
         self.tabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
         self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
-        self.stopNormalJinggling(self.longPressSpecificTabButton)
+        stopSpecificJiggling()
         self.addSpecificTabButton(self.currentBaseButton.tag)
     }
     
     func deleteChordOnMainView(sender: UITapGestureRecognizer) {
-        self.stopNormalJinggling(longPressMainViewNoteButton)
         let index: Int = (sender.view?.tag)!
+        self.stopNormalJinggling(longPressMainViewNoteButton[self.noteButtonWithTabArray[index].noteButton]!, button: self.noteButtonWithTabArray[index].noteButton)
         let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
         for var i = 0; i < self.mainViewDataArray.count; i++ {
             if self.mainViewDataArray[i].fretNumber == fretNumber {
@@ -2990,7 +3088,22 @@ extension TabsEditorViewController {
             }
         }
         self.noteButtonWithTabArray.removeAtIndex(index)
-        
+        for var i = 0; i < noteButtonWithTabArray.count; i++ {
+            noteButtonWithTabArray[i].noteButton.tag = i
+        }
+        if(self.noteButtonWithTabArray.count == 0){
+            self.completeStringView.userInteractionEnabled = true
+            if(tempTapView != nil){
+                tempTapView?.removeGestureRecognizer(temptapOnEditView)
+                tempTapView!.removeFromSuperview()
+                tempTapView = nil
+            }
+            self.musicControlView.userInteractionEnabled = true
+            self.isJiggling = false
+        }
+        stopMainViewJiggling()
+         reorganizeMainViewDataArray()
+        startMainViewJiggling()
     }
     
     // need to check whether the main view contain the delete tab
@@ -3001,7 +3114,6 @@ extension TabsEditorViewController {
             }
         }
         self.deleteChordOnMusicLine(index, name: name, content: content)
-        
     }
     
     func deleteChordOnString3View(sender: Int) {
@@ -3039,7 +3151,9 @@ extension TabsEditorViewController {
         for var j = 0; j < self.allTabsOnMusicLine.count; j++ {
             self.currentTime = self.allTabsOnMusicLine[j].time
             self.allTabsOnMusicLine[j].tabView.frame = self.setMainViewTabPositionInRange(self.allTabsOnMusicLine[j].tab, endIndex: tempAllTabsOnMusicLine.count, allTabsOnMusicLine: tempAllTabsOnMusicLine)
-            tempAllTabsOnMusicLine.append(allTabsOnMusicLine[j])
+
+            tempAllTabsOnMusicLine.append(self.allTabsOnMusicLine[j])
+
         }
         tempAllTabsOnMusicLine.removeAll()
     }
