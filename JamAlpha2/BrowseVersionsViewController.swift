@@ -435,12 +435,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 APIManager.downloadTabsSetContent(tabsSet, completion: {
                     download in
                     
-                    var times = [NSTimeInterval]()
-                    for t in download.times {
-                        times.append(NSTimeInterval(t))
-                    }
-                    
-                    CoreDataManager.saveTabs(self.findable, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
+                    CoreDataManager.saveTabs(self.findable, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
                     
                     self.songViewController.updateMusicData(self.findable)
                     

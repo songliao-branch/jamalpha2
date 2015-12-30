@@ -1739,12 +1739,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.currentTime = 0
             var allChords = [String]()
             var allTabs = [String]()
-            var allTimes = [NSTimeInterval]()
+            var allTimes = [Float]()
 
             for oneline in allTabsOnMusicLine {
                 allChords.append(oneline.tab.name)
                 allTabs.append(oneline.tab.content)
-                allTimes.append(oneline.time)
+                allTimes.append(Float(oneline.time))
                 
                 print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
             }

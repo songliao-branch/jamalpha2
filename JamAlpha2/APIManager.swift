@@ -225,7 +225,6 @@ class APIManager: NSObject {
                     
                     var theTimes = [Float]()
                     
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                     for time in set["times"].arrayObject as! [String] {
                         theTimes.append(Float(time)!)
                     }
@@ -262,18 +261,15 @@ class APIManager: NSObject {
                     }
                     
                     let set = json["tabs_set_content"]
-
-
-                    var theTimes = [Float]()
-                    
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
-                    for time in set["times"].arrayObject as! [String] {
-                        theTimes.append(Float(time)!)
-                    }
                     
                     let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
                     let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
-
+                    
+                    var theTimes = [Float]()
+                    
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
                     
                     t.times = theTimes
                     t.chords  = set["chords"].arrayObject as! [String]
@@ -339,7 +335,6 @@ class APIManager: NSObject {
                     
                     var theTimes = [Float]()
                     
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                     for time in set["times"].arrayObject as! [String] {
                         theTimes.append(Float(time)!)
                     }
@@ -376,8 +371,6 @@ class APIManager: NSObject {
                     
                     
                     var theTimes = [Float]()
-                    
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                     for time in set["times"].arrayObject as! [String] {
                         theTimes.append(Float(time)!)
                     }
@@ -486,17 +479,17 @@ class APIManager: NSObject {
                         t.chords = set["chords"].arrayObject as! [String]
                         t.tabs = set["tabs"].arrayObject as! [String]
                         
-                        var tTimes = [Float]()
+                        var theTimes = [Float]()
                         t.title = set["song"]["title"].string!
                         t.artist = set["song"]["artist"].string!
                         t.duration = set["song"]["duration"].float!
                         
                         //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                         for time in set["times"].arrayObject as! [String] {
-                            tTimes.append(Float(time)!)
+                            theTimes.append(Float(time)!)
                         }
                         
-                        t.times = tTimes
+                        t.times = theTimes
                         myTabsSets.append(t)
                     }
                     
@@ -504,14 +497,14 @@ class APIManager: NSObject {
                         let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
                         l.lyrics = set["lyrics"].arrayObject as! [String]
                         
-                        var tTimes = [Float]()
+                        var theTimes = [Float]()
                         
                         //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                         for time in set["times"].arrayObject as! [String] {
-                            tTimes.append(Float(time)!)
+                            theTimes.append(Float(time)!)
                         }
                         
-                        l.times = tTimes
+                        l.times = theTimes
                         l.title = set["song"]["title"].string!
                         l.artist = set["song"]["artist"].string!
                         l.duration = set["song"]["duration"].float!

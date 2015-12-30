@@ -444,7 +444,7 @@ class CoreDataManager: NSObject {
     }
 
     //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
-    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[NSTimeInterval], tuning:String, capo: Int, userId: Int, tabsSetId: Int) {
+    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[Float], tuning:String, capo: Int, userId: Int, tabsSetId: Int) {
         
         if let matchedSong = findSong(item) {
             
@@ -500,7 +500,7 @@ class CoreDataManager: NSObject {
             
             let chords = NSKeyedUnarchiver.unarchiveObjectWithData(temp.chords as! NSData) as! [String]
             let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(temp.tabs as! NSData) as! [String]
-            let times = NSKeyedUnarchiver.unarchiveObjectWithData(temp.times as! NSData) as! [NSTimeInterval]
+            let times = NSKeyedUnarchiver.unarchiveObjectWithData(temp.times as! NSData) as! [Float]
             
             t.chords = chords 
             t.tabs = tabs
@@ -579,13 +579,13 @@ class CoreDataManager: NSObject {
             
             let chords = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.chords as! NSData) as! [String]
             let tabs = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.tabs as! NSData) as! [String]
-            let times = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.times as! NSData) as! [NSTimeInterval]
+            let times = NSKeyedUnarchiver.unarchiveObjectWithData(foundTabsSet.times as! NSData) as! [Float]
             
             var chordsToBeUsed = [Chord]()
             
             for i in 0..<chords.count {
                 let singleChord = Tab(name: chords[i], content: tabs[i])
-                let timedChord = Chord(tab: singleChord, time: TimeNumber(time: Float(times[i])))
+                let timedChord = Chord(tab: singleChord, time: TimeNumber(time: times[i]))
                 chordsToBeUsed.append(timedChord)
             }
             return (chordsToBeUsed, foundTabsSet.tuning, Int(foundTabsSet.capo), Int(foundTabsSet.id))
