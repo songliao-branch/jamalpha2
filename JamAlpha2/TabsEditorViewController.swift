@@ -17,10 +17,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var playButtonImageView: UIImageView!
     
     var doubleArrowView: CustomizedView!
-    var scrollTimer:NSTimer?
-    
+    var scrollTimer: NSTimer?
 
-    // Gesture Recognizer on screen
     // delete jiggling gesture 
     var deleteChordOnMainView: [UIButton:UITapGestureRecognizer] = [UIButton:UITapGestureRecognizer]()
     let deleteChordOnSpecificTabView: UITapGestureRecognizer = UITapGestureRecognizer()
@@ -533,7 +531,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func prepareMoveSwipeGesture(sender: UISwipeGestureRecognizer) {
-        print(sender.direction)
         if sender.direction == .Up {
             self.stopScrollTimer()
             self.startScrolling = false
@@ -709,7 +706,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func startScrollTimer(){
         if scrollingTimer == nil {
             scrollingTimer = NSTimer()
-            scrollingTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("changDoubleArrowPosition"), userInfo: nil, repeats: true)
+            scrollingTimer = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("changDoubleArrowPosition"), userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(scrollingTimer, forMode: NSRunLoopCommonModes)
         }
     }
@@ -725,10 +722,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if(self.doubleArrowView == nil){
             return
         }else{
-           // if (self.collectionView.contentOffset.x>0 && self.collectionView.contentOffset.x < 5*self.trueWidth){
-                self.doubleArrowView.center.x = doubleViewPositionX - self.collectionView.contentOffset.x
-            //}
-            
+            self.doubleArrowView.center.x = doubleViewPositionX - self.collectionView.contentOffset.x
         }
     }
     
@@ -830,9 +824,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func handleGesture(gesture: UIPanGestureRecognizer) -> Void {
         if let bundle = self.bundle {
-            print(gesture.translationInView(self.view))
             let dragPointOnCanvas = gesture.locationInView(self.view)
-            //var originalIndexPath: NSIndexPath = self.collectionView.indexPathForItemAtPoint(dragPointOnCanvas)!
             if gesture.state == UIGestureRecognizerState.Began {
                 self.collectionView.scrollEnabled = false
                 self.tapGesture.enabled = false
@@ -1037,7 +1029,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         for button in buttonOnSpecificScrollView {
             if(button.accessibilityIdentifier == "isNotOriginal"){
-                print(longPressSpecificTabButton.count)
                 self.stopNormalJinggling(self.longPressSpecificTabButton[button.tag]!)
             }
         }
@@ -1191,8 +1182,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func moveFingerPoint(indexFret: Int, indexString: Int) {
         print("move finger point")
         self.view.userInteractionEnabled = false
-        //let noteString = self.currentBaseButton.tag / 100 - 1
-       // if indexString != noteString {
             let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
             let buttonX = (string6FretPosition[indexFret] + string6FretPosition[indexFret + 1]) / 2 - buttonWidth / 2
             let buttonY = string6Position[indexString] - buttonWidth / 2
@@ -1205,7 +1194,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             })
             self.view.userInteractionEnabled = true
             self.tabFingerPointChanged = true
-        //}
     }
     
     var addedNoteButtonOnCompleteView: Bool = false
@@ -1869,7 +1857,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let returnValue = addTabViewOnMusicControlView(index)
             for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
                 if self.currentTime <= self.allTabsOnMusicLine[0].time {
-                    print("insert")
                     self.allTabsOnMusicLine.insert(returnValue.1, atIndex: 0)
                     inserted = true
                     break
@@ -2046,7 +2033,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if self.addNewTab == true {
                 var addSuccessed: Bool = true
                 if self.tabFingerPointChanged == true {
-                    print("\(self.currentNoteButton.titleLabel?.text)")
                     let index = self.currentBaseButton.tag
                     let name: String = self.tabNameTextField.text!.replace(" ", replacement: "")
                     self.tabNameTextField.text! = name
@@ -2170,7 +2156,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 allChords.append(oneline.tab.name)
                 allTabs.append(oneline.tab.content)
                 allTimes.append(oneline.time)
-                
                 print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
             }
             
@@ -2270,21 +2255,18 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 }
                 if tempButtonArray.count == 1 {
-                    print(tempButtonArray[0].noteButton.titleLabel!.text)
                     tempButtonArray[0].noteButton.frame = CGRectMake(self.trueWidth / 5 / 2 - buttonWidth / 2, self.string3Position[Int(tempButtonArray[0].tab.index) / 100 - 4] - buttonWidth / 2, buttonWidth, buttonWidth)
                     tempButtonArray[0].noteButton.layer.cornerRadius = 0.5 * buttonWidth
                     tempButtonArray[0].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
                 }
                 if tempButtonArray.count == 2 {
                     for var j = 0; j < tempButtonArray.count; j++ {
-                        print(tempButtonArray[j].noteButton.titleLabel!.text)
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX2[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth2 / 2, buttonWidth2, buttonWidth2)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth2
                         tempButtonArray[j].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
                     }
                 } else if tempButtonArray.count == 3 {
                     for var j = 0; j < tempButtonArray.count; j++ {
-                        print(tempButtonArray[j].noteButton.titleLabel!.text)
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX3[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth3 / 2, buttonWidth3, buttonWidth3)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth3
                         tempButtonArray[j].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
@@ -2416,17 +2398,10 @@ extension TabsEditorViewController {
     
     func addTabsFromCoreDataToMusicControlView(sender: [Chord]) {
         for item in sender {
-            print("\(item.time.toDecimalNumer())")
-        }
-        for item in sender {
             for var i = 0; i < noteButtonWithTabArray.count; i++ {
                 let normalTab = getNormalTabFromChord(item)
                 if normalTab.name == noteButtonWithTabArray[i].tab.name && normalTab.index == noteButtonWithTabArray[i].tab.index && normalTab.content == noteButtonWithTabArray[i].tab.content {
-                    
                     self.currentTime = Double(item.time.toDecimalNumer())
-                    print("\(currentTime)")
-                    print("\(normalTab.name)")
-                    //refresh progress block
                     let presentPosition = CGFloat(self.currentTime / self.duration)
                     self.progressBlock.setProgress(presentPosition)
                     self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
@@ -2759,15 +2734,12 @@ extension TabsEditorViewController {
                 }
             }
         } else {
-            
             if(indexString == 4){
                 if(oldTag/100 != newTag/100){
                     self.oldTagString4 = fingerPoint[2].tag
                     if(!fingerPoint[1].hidden){
                         self.oldTagString5 = fingerPoint[1].tag
                     }
-                    print(oldTagString4)
-                    print(oldTagString5)
                 }
                 self.moveFingerPoint(newTag%100, indexString: indexString-1)
                 self.moveFingerPoint(0, indexString: 4)
@@ -2804,10 +2776,6 @@ extension TabsEditorViewController {
                 self.fingerPoint[0].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
                 
             }
-        }
-        for item in self.fingerPoint {
-            print(item.tag)
-            print(item.accessibilityIdentifier)
         }
     }
     

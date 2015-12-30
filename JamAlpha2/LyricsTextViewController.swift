@@ -12,6 +12,9 @@ import AVFoundation
 
 class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     
+    
+    var formattedLyrics: Bool = false
+    
     var hiddenKeyboardView: UIView = UIView()
     let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
 
@@ -63,7 +66,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     override func viewDidDisappear(animated: Bool) {
-        self.lyricsTextView.removeKeyboardControl()
         super.viewDidDisappear(animated)
         let notificationCenter = NSNotificationCenter.defaultCenter()
         notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
@@ -236,14 +238,14 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func pressDoneButton(sender: UIButton) {
-        print("done button")
         self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         
         lyricsSyncViewController.lyricsTextViewController = self
         if lyricsTextView.text == "" {
             lyricsSyncViewController.lyricsFromTextView = "You don't have any lyrics"
-        }else {
+            lyricsSyncViewController.lyricsOrganizedArray = ["You don't have any lyrics"]
+        } else {
             lyricsSyncViewController.lyricsFromTextView = lyricsTextView.text
             lyricsSyncViewController.lyricsOrganizedArray = self.lyricsReorganizedArray
         }
@@ -263,7 +265,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
             if str.count == 0{
                 continue
             }
-            print(str)
             if(str.count <= maxCharPerLine)
             {
                 result.append("\(str)")
@@ -289,7 +290,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func pressDeleteAllButton(sender: UIButton) {
-        print("delete all")
         let alert = UIAlertController(title: "Warning", message: "Are you sure you want to delete all lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
             self.lyricsTextView.text = "Put lyrics here..."
@@ -300,7 +300,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func pressReorganizeButton(sender: UIButton) {
-        print("reorganize")
         let alert = UIAlertController(title: "Reorganize Lyrics", message: "Are you sure you want to automatically organize the lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
             self.lyricsReorganizedArray = self.formatLyrics(self.lyricsTextView.text)
@@ -309,6 +308,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
             UIView.animateWithDuration(0.5, animations: {
                 self.lyricsTextView.alpha = 1
             })
+            self.formattedLyrics = true
         }))
         alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)

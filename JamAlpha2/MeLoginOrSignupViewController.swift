@@ -398,15 +398,10 @@ class MeLoginOrSignupViewController: UIViewController{
                 self.submitButton.enabled = true
                 switch response.result {
                 case .Success:
-                    print(response)
-                    
                     if let data = response.result.value {
                         let json = JSON(data)
-                        
                         let user = json["user_initialization"]
-                        
                         if user != nil {
-
                             afterRetrievingUser(id: user["id"].int!, email: user["email"].string!, authToken: user["auth_token"].string!, nickname: user["nickname"].string!, avatarUrlMedium: user["avatar_url_medium"].string!, avatarUrlThumbnail: user["avatar_url_thumbnail"].string!)
                             
                             //go back to user profile view
@@ -495,8 +490,7 @@ class MeLoginOrSignupViewController: UIViewController{
                     
                     let userId = result.valueForKey("id") as! String
                     let facebookAvatarUrl = "https://graph.facebook.com/\(userId)/picture?height=320&width=320"
-                    
-                    
+                  
                     let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!)!
                     let thumbnailImage = originImage.resize(35)
                     // add request to upload array

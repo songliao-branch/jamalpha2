@@ -138,9 +138,11 @@ class LyricsSyncViewController: UIViewController  {
                 startUpdateTimer()
                 isPlaying = true
             }
+            playButtonImageView.hidden = true
             self.progressBlock.alpha = 1
         } else if musicPlayer.playbackState == .Paused {
             isPlaying = false
+            playButtonImageView.hidden = false
             updateTimer.invalidate()
             updateTimer = NSTimer()
             self.progressBlock.alpha = 0.5
@@ -245,12 +247,18 @@ class LyricsSyncViewController: UIViewController  {
         self.view.addSubview(self.lyricsTableView)
     }
 
+    
+    var playButtonImageView: UIImageView = UIImageView()
     func setUpProgressBlock() {
         progressChangedOrigin = self.view.center.x
         
         progressBlockContainer = UIView(frame: CGRect(x: 0, y: viewHeight-progressContainerHeight, width: self.view.frame.width, height: progressContainerHeight))
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
+        
+        playButtonImageView.frame = CGRectMake((viewWidth - progressContainerHeight / 1.5) / 2, progressContainerHeight / 3, progressContainerHeight / 1.5, progressContainerHeight / 1.5)
+        playButtonImageView.image = UIImage(named: "playbutton")
+        self.progressBlockContainer.addSubview(playButtonImageView)
 
         self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.getDuration()) * 2, soundwaveHeight))
         
@@ -325,8 +333,9 @@ class LyricsSyncViewController: UIViewController  {
             countdownView.setNumber(countDownStartSecond)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
-
+            playButtonImageView.hidden = true
         } else {
+            playButtonImageView.hidden = false
             self.isPlaying = false
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
