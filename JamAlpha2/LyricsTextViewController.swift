@@ -10,12 +10,11 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
-class LyricsTextViewController: UIViewController {
+class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var hiddenKeyboardView: UIView = UIView()
-    
-    var keyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
-    
+    let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
+
     var isDemoSong: Bool!
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
@@ -78,9 +77,7 @@ class LyricsTextViewController: UIViewController {
     func handleKeyboardWillHideNotification(notification: NSNotification) {
         keyboardWillChangeFrameWithNotification(notification, showsKeyboard: false)
     }
-    
-    var keyboardScreenBeginFrame: CGRect!
-    var keyboardScreenEndFrame: CGRect!
+
     
     func keyboardWillChangeFrameWithNotification(notification: NSNotification, showsKeyboard: Bool) {
         let userInfo = notification.userInfo!
@@ -92,12 +89,16 @@ class LyricsTextViewController: UIViewController {
         var originDelta: CGFloat = CGFloat()
         if showsKeyboard == true {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
-            self.hiddenKeyboardView.frame = CGRectMake(0, keyboardViewEndFrame.origin.y, self.viewWidth, 20)
+            self.hiddenKeyboardView.addGestureRecognizer(hiddenKeyboardPanGesture)
+            self.lyricsTextView.addGestureRecognizer(hiddenKeyboardPanGesture)
+            self.hiddenKeyboardView.frame = CGRectMake(0, keyboardViewEndFrame.origin.y - 5, self.viewWidth, 5)
             self.view.addSubview(self.hiddenKeyboardView)
             self.hiddenKeyboardView.hidden = false
         } else {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
             self.hiddenKeyboardView.hidden = true
+            self.hiddenKeyboardView.removeGestureRecognizer(hiddenKeyboardPanGesture)
+            self.lyricsTextView.removeGestureRecognizer(hiddenKeyboardPanGesture)
         }
         
         self.lyricsTextView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, self.lyricsTextView.frame.height + originDelta)
@@ -108,27 +109,21 @@ class LyricsTextViewController: UIViewController {
  
     }
     
-    func keyboardPan(sender: UIPanGestureRecognizer) {
-        let location = sender.locationInView(self.view)
-        print(location.x)
-        print(keyboardScreenEndFrame.size.height)
-        if location.y > keyboardScreenEndFrame.size.height {
-            self.lyricsTextView.resignFirstResponder()
-        }
-        
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
     func hiddenKeyboardPanGesture(sender: UIPanGestureRecognizer) {
-        let transform = sender.translationInView(self.hiddenKeyboardView)
-        if transform.y > 5 {
+        let location = sender.locationInView(self.hiddenKeyboardView)
+        if location.y > 0 {
             self.lyricsTextView.resignFirstResponder()
         }
+
     }
     
     func addObjectsOnMainView() {
-        let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
-        hiddenKeyboardPanGesture.addTarget(self, action: "hiddenKeyboardPanGesture")
-        self.hiddenKeyboardView.addGestureRecognizer(hiddenKeyboardPanGesture)
+        hiddenKeyboardPanGesture.addTarget(self, action: "hiddenKeyboardPanGesture:")
+        hiddenKeyboardPanGesture.delegate = self
         
         let backgroundImageWidth: CGFloat = self.viewHeight - 3.5 / 31 * self.viewHeight
         let backgroundImage: UIImageView = UIImageView()
@@ -222,20 +217,6 @@ class LyricsTextViewController: UIViewController {
             self.lyricsTextView.text = "Put your lyrics here"
             self.lyricsTextView.textColor = UIColor.lightGrayColor()
         }
-        
-//        self.lyricsTextView.addKeyboardPanningWithActionHandler({
-//            (keyboardFrameInView, opening, closing) -> Void in
-//            if opening {
-//                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, keyboardFrameInView.size.height)
-//                self.lyricsTextView.frame = tempFrame
-//                self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
-//            } else if closing {
-//                let tempFrame = CGRectMake(self.lyricsTextView.frame.origin.x, self.lyricsTextView.frame.origin.y, self.lyricsTextView.frame.size.width, 27.5 / 31 * self.viewHeight)
-//                self.lyricsTextView.frame = tempFrame
-//                self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
-//            }
-//        })
-        
         
         self.view.addSubview(self.lyricsTextView)
     }
