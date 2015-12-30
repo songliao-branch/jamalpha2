@@ -70,7 +70,7 @@ class LyricsTextViewController: UIViewController {
         notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
     }
-    
+
     func handleKeyboardWillShowNotification(notification: NSNotification) {
         keyboardWillChangeFrameWithNotification(notification, showsKeyboard: true)
     }
@@ -92,26 +92,37 @@ class LyricsTextViewController: UIViewController {
         var originDelta: CGFloat = CGFloat()
         if showsKeyboard == true {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
-            self.hiddenKeyboardView.frame = CGRectMake(0, self.lyricsTextView.frame.height + originDelta, self.viewWidth, 10)
-            self.view.addGestureRecognizer(keyboardPanGesture)
-            self.keyboardPanGesture.addTarget(self, action: "keyboradPan:")
+            self.hiddenKeyboardView.frame = CGRectMake(0, keyboardViewEndFrame.origin.y, self.viewWidth, 20)
+            self.view.addSubview(self.hiddenKeyboardView)
+            self.hiddenKeyboardView.hidden = false
         } else {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
+            self.hiddenKeyboardView.hidden = true
         }
+        
         self.lyricsTextView.frame = CGRectMake(0, 3.5 / 31 * self.viewHeight, self.viewWidth, self.lyricsTextView.frame.height + originDelta)
         self.lyricsTextView.layer.opacity = 0.1
         UIView.animateWithDuration(1.4, animations: {
             self.lyricsTextView.layer.opacity = 1
-            
-        })
+            })
+ 
     }
     
     func keyboardPan(sender: UIPanGestureRecognizer) {
         let location = sender.locationInView(self.view)
+        print(location.x)
+        print(keyboardScreenEndFrame.size.height)
         if location.y > keyboardScreenEndFrame.size.height {
-            
+            self.lyricsTextView.resignFirstResponder()
         }
         
+    }
+    
+    func hiddenKeyboardPanGesture(sender: UIPanGestureRecognizer) {
+        let transform = sender.translationInView(self.hiddenKeyboardView)
+        if transform.y > 5 {
+            self.lyricsTextView.resignFirstResponder()
+        }
     }
     
     func addObjectsOnMainView() {

@@ -738,6 +738,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for item in self.mainViewDataArray[indexPath.item].noteButtonsWithTab {
             cell.contentView.addSubview(item.noteButton)
         }
+        if isJiggling {
+            stopMainViewJiggling()
+            startMainViewJiggling()
+        }
         cell.backgroundColor = UIColor.clearColor()
         return cell
     }
