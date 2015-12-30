@@ -2109,6 +2109,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
        self.showTabsEditor()
     }
     
+    func checkChordsWithCoredata(sender: Findable) {
+        var  needAddNewChords: Bool = false
+        if needAddNewChords {
+            var needAddNewChordsArray: [Chord] = [Chord]()
+            var nameString: String = ""
+            for item in needAddNewChordsArray {
+                nameString = nameString + item.tab.name + ", "
+            }
+            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
+                action in
+                
+            }))
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
+                action in
+                
+            }))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        }
+    }
+    
     func showTabsEditor(){
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false

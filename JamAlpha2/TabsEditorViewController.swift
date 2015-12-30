@@ -12,12 +12,16 @@ import AVFoundation
 
 let kmovingMainNoteSliderHeight:CGFloat = 26
 
-class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate,UIScrollViewDelegate {
+class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate {
     
     var playButtonImageView: UIImageView!
     
     var doubleArrowView: CustomizedView!
     var scrollTimer: NSTimer?
+    
+    //for doublearror adjust position
+    var doubleViewPositionX:CGFloat = 0.0
+    
 
     // delete jiggling gesture 
     var deleteChordOnMainView: [UIButton:UITapGestureRecognizer] = [UIButton:UITapGestureRecognizer]()
@@ -519,8 +523,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
 
     func checkScrollview(sender:UIPanGestureRecognizer){
-        let transfer = sender.translationInView(self.collectionView)
-        if(abs(transfer.x) >= abs(transfer.y)){
+        let transfer = sender.velocityInView(self.collectionView)
+        if(abs(transfer.x) > abs(transfer.y)){
             self.collectionView.scrollEnabled = true
         }else{
             self.collectionView.scrollEnabled = false
@@ -532,12 +536,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func prepareMoveSwipeGesture(sender: UISwipeGestureRecognizer) {
         if sender.direction == .Up {
-            self.stopScrollTimer()
             self.startScrolling = false
             let location = sender.locationInView(collectionView)
             var positionX: CGFloat = 0
             for var index = 0; index < self.string3FretPosition.count; index++ {
-                if location.x < self.string3FretPosition[self.string3FretPosition.count - 2] {
+                if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
                     if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
                         positionX = self.string3FretPosition[index] - self.collectionView.contentOffset.x
                         self.doubleViewPositionX = self.string3FretPosition[index] + (self.trueWidth / 5 - 10)/2 + 5
@@ -561,6 +564,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     gesture.delegate = self
                     self.doubleArrowView.addGestureRecognizer(gesture)
                     self.doubleArrowView.userInteractionEnabled = true
+                    self.startScrollTimer()
             })
             self.prepareMoveSwipeUpGesture.enabled = false
             self.prepareMoveSwipeDownGesture.enabled = true
@@ -673,35 +677,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         return 25
     }
     
-    //scrollview delegate
-    var doubleViewPositionX:CGFloat = 0.0
-    
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        if(isPanning || self.animating){
-            stopScrollTimer()
-            startScrolling = false
-            return
-        }
-        if(self.doubleArrowView != nil && !startScrolling){
-            startScrolling = true
-             startScrollTimer()
-        }
-    }
-    
-//    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-//        if(self.doubleArrowView != nil){
-//          self.doubleViewPositionX = self.doubleArrowView.center.x + self.collectionView.contentOffset.x
-//        }
-//    }
-    
-    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate{
-            self.stopScrollTimer()
-            self.startScrolling = false
-        }
-    }
-    
-
     
     func startScrollTimer(){
         if scrollingTimer == nil {
@@ -880,7 +855,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func removeDoubleArrowView(){
-        self.stopScrollTimer()
         self.startScrolling = false
         if(self.doubleArrowView != nil){
             self.doubleArrowView.removeFromSuperview()
@@ -893,6 +867,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.doubleArrowView.removeFromSuperview()
                         self.doubleArrowView = nil
                         self.prepareMoveSwipeUpGesture.enabled = true
+                        self.stopScrollTimer()
                     }
             })
         }
@@ -1010,7 +985,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
-        pressDoneButton()
+        textField.resignFirstResponder()
         return true
     }
     
@@ -2435,27 +2410,6 @@ extension TabsEditorViewController {
         if chord.count > 0 {
             addTabsFromCoreDataToMainViewDataArray(chord)
             addTabsFromCoreDataToMusicControlView(chord)
-        }
-    }
-    
-    func checkChordsWithCoredata(sender: Findable) {
-        var  needAddNewChords: Bool = false
-        if needAddNewChords {
-            var needAddNewChordsArray: [Chord] = [Chord]()
-            var nameString: String = ""
-            for item in needAddNewChordsArray {
-                nameString = nameString + item.tab.name + ", "
-            }
-            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
-            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
-                action in
-                
-            }))
-            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
-                action in
-                
-            }))
-            self.presentViewController(alertController, animated: true, completion: nil)
         }
     }
 
