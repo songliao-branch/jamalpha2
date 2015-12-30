@@ -289,12 +289,18 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.startTimer()
                 isPlaying = true
             }
-            self.progressBlock.alpha = 1
+            self.playButtonImageView.hidden = true
+            if !self.intoEditView{
+                self.progressBlock.alpha = 1
+            }
         } else if musicPlayer.playbackState == .Paused {
+            self.playButtonImageView.hidden = false
             isPlaying = false
             timer.invalidate()
             timer = NSTimer()
-            self.progressBlock.alpha = 0.5
+            if !self.intoEditView{
+                self.progressBlock.alpha = 0.5
+            }
         }
     }
     
@@ -738,6 +744,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for item in self.mainViewDataArray[indexPath.item].noteButtonsWithTab {
             cell.contentView.addSubview(item.noteButton)
         }
+
         if isJiggling {
             stopMainViewJiggling()
             startMainViewJiggling()
@@ -1583,6 +1590,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.removeDoubleArrowView()
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+             NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
         }
     }
 
@@ -1611,6 +1619,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
         self.removeDoubleArrowView()
+        self.playButtonImageView.hidden = true
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
             self.isPlaying = false
             //animate down progress block
@@ -1626,7 +1635,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 musicPlayer.pause()
             }
             timer.invalidate()
-            self.playButtonImageView.hidden = false
             self.view.userInteractionEnabled = true
         } else {
             self.isPlaying = true
@@ -1635,7 +1643,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 self.progressBlock!.alpha = 1.0
             }, completion: nil)
-            self.playButtonImageView.hidden = true
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
             musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
@@ -1785,7 +1792,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.specificTabsScrollView.alpha = 0
             self.tabNameTextField.alpha = 0
             self.musicControlView.alpha = 1
-            self.progressBlock.alpha = 1
+            self.progressBlock.alpha = 0.5
             self.completeStringView.alpha = 0
             self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
             self.collectionView.alpha = 1
@@ -2011,6 +2018,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         self.addSpecificFingerPoint = false
         self.musicControlView.alpha = 0
+        self.progressBlock.alpha = 0
         self.progressBlock.alpha = 0
         self.collectionView.alpha = 0
         self.statusLabel.text = "Add New Chords"
