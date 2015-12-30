@@ -50,13 +50,13 @@ class APIManager: NSObject {
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
     //upload tabs
-    class func uploadTabs(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
+    class func uploadTabs(song: Findable, completion: ((cloudId: Int) -> Void)) {
         
         var chords = [Chord]() //([Chord], String, Int)
         var tuning = ""
         var capo = 0
         
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalOnly: true)
+        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: true)
         
         if chords.count < 2 {
             print("uploading tabs error: tabs count is less than 2")
@@ -91,21 +91,25 @@ class APIManager: NSObject {
                 response in
                 switch response.result {
                 case .Success:
-                    completion(isSuccess: true)
-                    print("Tabs uploaded succesfully")
+                    if let data = response.result.value {
+                        let json = JSON(data)
+                        //we get an ID, successfully created or updated
+                        completion(cloudId: json["tabs_set"]["id"].int!)
+                        print("Tabs uploaded succesfully")
+                    }
                 case .Failure(let error):
-                    completion(isSuccess: false)
+                    print("upload tabs failed")
                     print(error)
                 }
         }
     }
     
     //upload lyrics
-    class func uploadLyrics(song: Findable, completion: ((isSuccess: Bool) -> Void)) {
+    class func uploadLyrics(song: Findable, completion: ((cloudId: Int) -> Void)) {
 
         var lyric = Lyric()
         
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: true)
         
         if lyric.lyric.count < 2 {
             print("uploading lyrics error: lyrics count is less than 2")
@@ -136,14 +140,38 @@ class APIManager: NSObject {
                 response in
                 switch response.result {
                 case .Success:
-                    print("Lyrics uploaded succesfully")
-                    completion(isSuccess: true)
+                    if let data = response.result.value {
+                        let json = JSON(data)
+                        //we get an ID, successfully created or updated
+                        completion(cloudId: json["lyrics_set"]["id"].int!)
+                        print("Lyrics uploaded succesfully")
+                    }
                 case .Failure(_):
-                    completion(isSuccess: false)
+                    print("Lyrics upload failed")
                 }
         }
     }
     
+    class func deleteSet(isTabs isTabs: Bool, id: Int) {
+        let url = isTabs ? tabsSetURL : lyricsSetURL
+        Alamofire.request(.DELETE, url + "/\(id)").responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    if json["result"].string! == "successfully destroyed"{
+                        print("successfully destroyed")
+                    } else {
+                        print("delete request sent, but cannot delete")
+                    }
+                }
+            case .Failure(let error):
+                print("Cannot delete network error")
+                print(error)
+            }
+        }
+    }
+
     //download all tabs sets for one song, the callback return the result
     class func downloadTabs(findable: Findable, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
         
@@ -164,12 +192,16 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
+
                     for set in json["tabs_sets"].array! {
                         
                         let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
-                        let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
                         
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
+                        
+                        t.title = set["song"]["title"].string!
+                        t.artist = set["song"]["artist"].string!
+
                         allDownloads.append(t)
                     }
                    //after completed, pass everything to the callback
@@ -191,7 +223,6 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     let set = json["tabs_set_content"]
                     
-                    print(json)
                     var theTimes = [Float]()
                     
                     //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
@@ -212,7 +243,7 @@ class APIManager: NSObject {
         }
     }
     
-    class func downloadMostLikedTabs(findable: Findable, completion: (( downloadWithContent: DownloadedTabsSet) -> Void)) {
+    class func downloadMostLikedTabs(findable: Findable, completion: ((found: Bool, downloadWithContent: DownloadedTabsSet) -> Void)) {
         
         var parameters = [String: AnyObject]()
         
@@ -224,15 +255,15 @@ class APIManager: NSObject {
                 if let data = response.result.value {
                     let json = JSON(data)
                     
-                    print(json)
                     if let _ = json["error"].string {
                         print("no most liked tabs yet")
+                        completion(found: false, downloadWithContent:  DownloadedTabsSet(id: 0,  tuning: "", capo: 0, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: ""))
                         return
                     }
+                    
                     let set = json["tabs_set_content"]
-                    
-           
-                    
+
+
                     var theTimes = [Float]()
                     
                     //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
@@ -240,14 +271,16 @@ class APIManager: NSObject {
                         theTimes.append(Float(time)!)
                     }
                     
-                    let t = DownloadedTabsSet(id: set["id"].int!, songId: set["song_id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
+                    let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+
                     
                     t.times = theTimes
                     t.chords  = set["chords"].arrayObject as! [String]
                     t.tabs  = set["tabs"].arrayObject as! [String]
                     
                     //after completed, pass everything to the callback
-                    completion(downloadWithContent: t)
+                    completion(found: true, downloadWithContent: t)
                 }
             case .Failure(let error):
                 print(error)
@@ -274,12 +307,15 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
+
                     for set in json["lyrics_sets"].array! {
                         
-                         let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
+                        let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
                         
-                        let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, updatedAt: set["updated_at"].string!)
+                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
+                        
+                        l.title = set["song"]["title"].string!
+                        l.artist = set["song"]["artist"].string!
                         
                         allDownloads.append(l)
                     }
@@ -301,7 +337,6 @@ class APIManager: NSObject {
                     let json = JSON(data)
                     let set = json["lyrics_set_content"]
                     
-                    print(json)
                     var theTimes = [Float]()
                     
                     //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
@@ -321,7 +356,7 @@ class APIManager: NSObject {
         }
     }
     
-    class func downloadMostLikedLyrics(findable: Findable, completion: (( downloadWithContent: DownloadedLyricsSet) -> Void)) {
+    class func downloadMostLikedLyrics(findable: Findable, completion: (( found: Bool, downloadWithContent: DownloadedLyricsSet) -> Void)) {
         
         var parameters = [String: AnyObject]()
         
@@ -332,10 +367,9 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    
-                    print(json)
                     if let _ = json["error"].string {
                         print("no most liked lyrics yet")
+                        completion(found: false, downloadWithContent: DownloadedLyricsSet(id: 0,lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: ""))
                         return
                     }
                     let set = json["lyrics_set_content"]
@@ -348,12 +382,14 @@ class APIManager: NSObject {
                         theTimes.append(Float(time)!)
                     }
                     
-                    let l = DownloadedLyricsSet(id: set["id"].int!, songId: set["song_id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(), updatedAt: "")
+                    let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
+                    let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
                     
                     l.lyrics = set["lyrics"].arrayObject as! [String]
                     l.times = theTimes
                     //after completed, pass everything to the callback
-                    completion(downloadWithContent: l)
+                    completion(found: true, downloadWithContent: l)
+
                 }
             case .Failure(let error):
                 print(error)
@@ -393,7 +429,6 @@ class APIManager: NSObject {
         }
     }
     
-    
     //MARK: update user API
     class func updateUserNickname(nickname: String, completion: ((completed: Bool) -> Void)) {
         
@@ -428,6 +463,68 @@ class APIManager: NSObject {
         }
     }
     
+    class func downloadCurrentUserTabsAndLyrics(completion: ((downloadedTabsSets: [DownloadedTabsSet], downloadedLyricsSets: [DownloadedLyricsSet]) -> Void)) {
+      
+        Alamofire.request(.GET, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)").responseJSON { response in
+            
+            var myTabsSets = [DownloadedTabsSet]()
+            var myLyricsSets = [DownloadedLyricsSet]()
+            
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    let tabsSets = json["user"]["tabs_sets"]
+                    let lyricsSets = json["user"]["lyrics_sets"]
+                    
+                    //must have an user_id
+                    let editor = Editor(userId: json["user"]["id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
+                    
+                    for set in tabsSets.array! {
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+                        t.chords = set["chords"].arrayObject as! [String]
+                        t.tabs = set["tabs"].arrayObject as! [String]
+                        
+                        var tTimes = [Float]()
+                        t.title = set["song"]["title"].string!
+                        t.artist = set["song"]["artist"].string!
+                        t.duration = set["song"]["duration"].float!
+                        
+                        //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                        for time in set["times"].arrayObject as! [String] {
+                            tTimes.append(Float(time)!)
+                        }
+                        
+                        t.times = tTimes
+                        myTabsSets.append(t)
+                    }
+                    
+                    for set in lyricsSets.array! {
+                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+                        l.lyrics = set["lyrics"].arrayObject as! [String]
+                        
+                        var tTimes = [Float]()
+                        
+                        //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
+                        for time in set["times"].arrayObject as! [String] {
+                            tTimes.append(Float(time)!)
+                        }
+                        
+                        l.times = tTimes
+                        l.title = set["song"]["title"].string!
+                        l.artist = set["song"]["artist"].string!
+                        l.duration = set["song"]["duration"].float!
+                        myLyricsSets.append(l)
+                    }
+                   completion(downloadedTabsSets: myTabsSets, downloadedLyricsSets: myLyricsSets)
+                }
+            case .Failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     //favorite a song
     class func favoriteTheSong(findable: Findable, completion: ((completed: String) -> Void)) {
         //given a song's title, artist, and duration, we can find all its corresponding tabs
@@ -452,7 +549,7 @@ class APIManager: NSObject {
         }
     }
     
-    class func getFavorites() {
+    class func getFavorites(completion: (( songs: [LocalSong]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_songs").responseJSON { response in
             print(response)
             switch response.result {
@@ -460,12 +557,19 @@ class APIManager: NSObject {
                 if let data = response.result.value {
                     let json = JSON(data)
                     print(json)
+                    var songs = [LocalSong]()
+                    for song in json["users"].array! {
+                        let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
+                        songs.append(s)
+                    }
+                    completion(songs: songs)
                 }
             case .Failure(let error):
                 print("favorite song error: \(error)")
             }
         }
     }
+
 }
 
 

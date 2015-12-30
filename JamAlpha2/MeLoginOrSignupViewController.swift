@@ -391,7 +391,7 @@ class MeLoginOrSignupViewController: UIViewController{
     }
     //used for facebook button too
     private func signUpLoginRequest(parameters: [String: String],  afterRetrievingUser: (( id: Int, email: String, authToken: String, nickname: String, avatarUrlMedium: String, avatarUrlThumbnail: String) -> Void)) {
-
+        
         Alamofire.request(.POST, jamBaseURL + "/users", parameters: parameters, encoding: .JSON).responseJSON
             {
                 response in
@@ -431,7 +431,45 @@ class MeLoginOrSignupViewController: UIViewController{
                                 userProfileVC.refreshUserImage()
                             }
 
+                            
                             print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
+
+                            //TODO: maybe put this in a background thread?
+                            APIManager.downloadCurrentUserTabsAndLyrics({
+                                tabsSets, lyricsSets in
+                                
+                                for set in tabsSets {
+
+                                    let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
+                                    //initialize the song just in case we don't find it in existing core data
+                                    CoreDataManager.initializeSongToDatabase(localSong)
+                                    
+                                    var times = [NSTimeInterval]()
+                                    for t in set.times {
+                                        times.append(NSTimeInterval(t))
+                                    }
+                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id)
+                                }
+                                
+                                for set in lyricsSets {
+                                    let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
+                                    //initialize the song just in case we don't find it in
+                                    CoreDataManager.initializeSongToDatabase(localSong)
+
+                                    CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id)
+                                }
+                                
+                                print("user has \(tabsSets.count) tabs and \(lyricsSets.count) lyrics")
+                            })
+                            
+                            //mark all the user's favorite songs in the core data
+                            APIManager.getFavorites({
+                                songs in
+                                for song in songs {
+                                    CoreDataManager.initializeSongToDatabase(song)
+                                    CoreDataManager.favoriteTheSong(song, shouldFavorite: true)
+                                }
+                            })
                             
                         } else { //we have an error
                             var errorMessage = ""

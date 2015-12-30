@@ -211,12 +211,21 @@ class MusicManager: NSObject {
             song in
             song.playbackDuration > 30
         }
+        
+        //initialize everything in core data, the song needs to be in the coredata so that when we fetched all cloud tabs for the user it can find the right match immediately
+        for song in uniqueSongs {
+            CoreDataManager.initializeSongToDatabase(song)
+        }
     }
     
     func loadDemoSongs() {
         //we have one demo song so far
         demoSongs = kSongNames.map {
             AVPlayerItem(URL: NSBundle.mainBundle().URLForResource($0, withExtension: "mp3")!)
+        }
+        
+        for song in demoSongs {
+            CoreDataManager.initializeSongToDatabase(song)
         }
     }
     

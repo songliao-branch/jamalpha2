@@ -46,9 +46,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         allLyricsSets[1] = []
         
         if isPullingTabs {
-            ( _, _, _, lastSelectedSetId) = CoreDataManager.getTabs(findable, fetchingLocalOnly: false)
+            ( _, _, _, lastSelectedSetId) = CoreDataManager.getTabs(findable, fetchingLocalUserOnly: false)
         } else {
-            (_, lastSelectedSetId) = CoreDataManager.getLyrics(findable, fetchingLocalOnly: false)
+            (_, lastSelectedSetId) = CoreDataManager.getLyrics(findable, fetchingLocalUserOnly: false)
         }
 
         loadLocalData()
@@ -65,7 +65,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             var tuning = ""
             var capo = -1
             
-            (chords, tuning, capo, _) = CoreDataManager.getTabs(findable, fetchingLocalOnly: true)
+            (chords, tuning, capo, _) = CoreDataManager.getTabs(findable, fetchingLocalUserOnly: true)
      
             var preview = ""
             
@@ -82,7 +82,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 
                 let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
                 //TODO: better way to differentitate this?cell
-                let t = DownloadedTabsSet(id: -1, songId: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+                let t = DownloadedTabsSet(id: -1, tuning: tuning, capo: capo, chordsPreview: preview, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+
 
                 allTabsSets[0]?.append(t)
             }
@@ -90,7 +91,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             
             var lyric = Lyric()
             
-            (lyric, _) = CoreDataManager.getLyrics(findable, fetchingLocalOnly: true)
+            (lyric, _) = CoreDataManager.getLyrics(findable, fetchingLocalUserOnly: true)
             
             var preview = ""
             for i in 0..<lyric.lyric.count {
@@ -104,7 +105,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 let currentUser = CoreDataManager.getCurrentUser()!
                 
                 let editor = Editor(userId: Int(currentUser.id), nickname: currentUser.nickname!, avatarUrlMedium: "", avatarUrlThumbnail: "")
-                let l = DownloadedLyricsSet(id: -1, songId: -1, lyricsPreview: preview, numberOfLines: lyric.lyric.count, votesScore: 0, voteStatus: "", editor: editor, updatedAt: "")
+
+                let l = DownloadedLyricsSet(id: -1, lyricsPreview: preview, numberOfLines: lyric.lyric.count, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+                
                 allLyricsSets[0]?.append(l)
             }
         }
@@ -297,10 +300,21 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             let tabsSet: DownloadedTabsSet = tabsInOneSection![indexPath.row]
             
             var tuning = ""
+            
             if tabsSet.tuning == "E-B-G-D-A-E-" {
                 tuning = "standard"
             } else {
                 tuning = tabsSet.tuning
+            }
+            
+            if tabsSet.id < 0 {//my tabs
+                cell.upVoteButton.hidden = true
+                cell.downVoteButton.hidden = true
+                cell.votesLabel.hidden = true
+            } else {
+                cell.upVoteButton.hidden = false
+                cell.downVoteButton.hidden = false
+                cell.votesLabel.hidden = false
             }
             
             if tabsSet.voteStatus == "up" {
@@ -317,7 +331,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-            cell.dateLabel.text = tabsSet.updatedAt
+            cell.dateLabel.text = tabsSet.lastEdited
             
             //user section
             cell.profileName.text = tabsSet.editor.nickname
@@ -345,6 +359,15 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             let lyricsInOneSection = allLyricsSets[indexPath.section]
             let lyricsSet: DownloadedLyricsSet = lyricsInOneSection![indexPath.row]
 
+            if lyricsSet.id < 0 {//my tabs
+                cell.upVoteButton.hidden = true
+                cell.downVoteButton.hidden = true
+                cell.votesLabel.hidden = true
+            } else {
+                cell.upVoteButton.hidden = false
+                cell.downVoteButton.hidden = false
+                cell.votesLabel.hidden = false
+            }
             
             if lyricsSet.voteStatus == "up" {
                 cell.upVoteButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
@@ -362,7 +385,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.subtitleLabel.text = "\(lyricsSet.numberOfLines) lines"
             
             cell.profileName.text = lyricsSet.editor.nickname
-            cell.dateLabel.text = lyricsSet.updatedAt
+            cell.dateLabel.text = lyricsSet.lastEdited
             
         
             cell.profileImage.image = nil
@@ -417,7 +440,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                         times.append(NSTimeInterval(t))
                     }
                     
-                    CoreDataManager.saveTabs(self.findable, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, tabsSetId: download.id)
+                    CoreDataManager.saveTabs(self.findable, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
                     
                     self.songViewController.updateMusicData(self.findable)
                     
@@ -440,9 +463,9 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 APIManager.downloadLyricsSetContent(lyricsSet, completion: {
                     download in
                     
-                    CoreDataManager.saveLyrics(self.findable, lyrics: download.lyrics, times: download.times, lyricsSetId: download.id)
+                    CoreDataManager.saveLyrics(self.findable, lyrics: download.lyrics, times: download.times, userId: download.editor.userId, lyricsSetId: download.id)
                     
-                    (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.findable, fetchingLocalOnly: false)
+                    (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.findable, fetchingLocalUserOnly: false)
                     self.dismissViewControllerAnimated(true, completion: nil)
                 })
             }
