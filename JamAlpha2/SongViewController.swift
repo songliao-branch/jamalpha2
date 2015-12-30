@@ -238,14 +238,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 avPlayer = MusicManager.sharedInstance.avPlayer
                 self.demoItem = avPlayer.currentItem
                 self.demoItemDuration = self.demoItem.getDuration()
-//                APIManager.getSongId(demoItem)
                 removeAllObserver()
             } else {
                 player = MusicManager.sharedInstance.player
                 print("VIEWDIDLOAD: \(player.nowPlayingItem!.title!)")
                 self.nowPlayingMediaItem = player.nowPlayingItem
                 self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
-//                APIManager.getSongId(nowPlayingMediaItem)
                 removeAllObserver()
             }
             
@@ -1739,8 +1737,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
             return
         }
-        
-        let findable: Findable = isSongNeedPurchase ? songNeedPurchase : player.nowPlayingItem!
+     
+        let song: Findable = isDemoSong ? demoItem : player.nowPlayingItem!
+
+        let findable: Findable = isSongNeedPurchase ? songNeedPurchase : song
         
         APIManager.favoriteTheSong(findable, completion: {
             result in
