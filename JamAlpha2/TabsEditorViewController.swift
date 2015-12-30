@@ -1754,8 +1754,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             
+            //TODO: add a button to toggle visibility
+            let visible: Bool = allChords.count % 2 == 0 ? true : false //even visible
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
-                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId)
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId, visible: visible)
             
             if let songVC = self.songViewController {
                songVC.updateMusicData(theSong)

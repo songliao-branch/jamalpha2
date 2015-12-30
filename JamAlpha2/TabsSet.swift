@@ -20,4 +20,5 @@ class TabsSet: NSManagedObject {
     @NSManaged var tuning: String
     @NSManaged var lastSelectedDate: NSDate//everytime when this is saved
     @NSManaged var userId: NSNumber
+    @NSManaged var visible: Bool
 }

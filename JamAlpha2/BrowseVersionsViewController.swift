@@ -46,7 +46,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         allLyricsSets[1] = []
         
         if isPullingTabs {
-            ( _, _, _, lastSelectedSetId) = CoreDataManager.getTabs(findable, fetchingLocalUserOnly: false)
+            ( _, _, _, lastSelectedSetId, _) = CoreDataManager.getTabs(findable, fetchingLocalUserOnly: false)
         } else {
             (_, lastSelectedSetId) = CoreDataManager.getLyrics(findable, fetchingLocalUserOnly: false)
         }
@@ -65,7 +65,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             var tuning = ""
             var capo = -1
             
-            (chords, tuning, capo, _) = CoreDataManager.getTabs(findable, fetchingLocalUserOnly: true)
+            (chords, tuning, capo, _, _) = CoreDataManager.getTabs(findable, fetchingLocalUserOnly: true)
      
             var preview = ""
             
@@ -435,7 +435,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 APIManager.downloadTabsSetContent(tabsSet, completion: {
                     download in
                     
-                    CoreDataManager.saveTabs(self.findable, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
+                    CoreDataManager.saveTabs(self.findable, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id, visible: true)
                     
                     self.songViewController.updateMusicData(self.findable)
                     

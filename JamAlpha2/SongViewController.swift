@@ -667,7 +667,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var chords = [Chord]()
         var tuning = ""
         var capo = 0
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: false)
+        (chords, tuning, capo, _, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: false)
         if chords.count > 2 {
             self.chords = chords
             updateTuning(tuning)
@@ -707,7 +707,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
                 self.addTabsPrompt.hidden = true
                 
-                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
+                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id, visible: true)
                 
                 if self.canFindTabsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
@@ -2077,7 +2077,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         var chords = [Chord]()
-        (chords, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
+
+        (chords, _, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
         
         if chords.count < 2 {
             self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
