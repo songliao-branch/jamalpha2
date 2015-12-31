@@ -562,7 +562,12 @@ class CoreDataManager: NSObject {
             
             var foundTabsSet: TabsSet!
             
+            for set in sets {
+                print("set id: \(set.id) || capo is:\(set.capo)")
+            }
+            
             if fetchingLocalUserOnly {
+                
                 foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
             } else {
                 //find the most recently selected tabsSet

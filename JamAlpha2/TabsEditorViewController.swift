@@ -2146,8 +2146,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             
-            //TODO: add a button to toggle visibility
-            let visible: Bool = allChords.count % 2 == 0 ? true : false //even visible
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
                 Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId, visible: isPublic)
             
@@ -2161,6 +2159,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             } else {
                 self.musicPlayer.pause()
             }
+            
+            let demoItem: Findable = MusicManager.sharedInstance.demoSongs[0]
+            //automatically upload tabs
+            APIManager.uploadTabs(isDemoSong ? demoItem : theSong , completion: {
+                cloudId in
+                
+                CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? demoItem : self.theSong, cloudId: cloudId)
+            })
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in

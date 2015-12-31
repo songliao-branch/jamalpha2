@@ -159,10 +159,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var navigationOutActionView: UIView!
     var browseTabsButton: UIButton!
     var addTabsButton: UIButton!
-    var uploadTabsButton: UIButton!
     var browseLyricsButton: UIButton!
     var addLyricsButton: UIButton!
-    var uploadLyricsButton: UIButton!
     var goToArtistButton: UIButton!
     var goToAlbumButton: UIButton!
     
@@ -447,6 +445,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func loadBackgroundImageFromMediaItem(item: Findable) {
         if let artwork = item.getArtWork() {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            if currentImage == nil {
+             currentImage = UIImage(named: "liwengbg")
+            }
         } else {
             //TODO: add a placeholder album cover
             currentImage = UIImage(named: "liwengbg")
@@ -454,6 +455,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.backgroundImage = currentImage
         self.blurredImage = currentImage!.applyLightEffect()!
     }
+    
     func setUpTopButtons() {
 
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
@@ -1662,22 +1664,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         addTabsButton.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addTabsButton)
         
-        uploadTabsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: 0, width: buttonDimension, height: buttonDimension))
-        uploadTabsButton.setImage(UIImage(named: "upload"), forState: .Normal)
-        uploadTabsButton.addTarget(self, action: "uploadTabs:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(uploadTabsButton)
-        
         //position 2
         addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
         addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
         addLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         addLyricsButton.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addLyricsButton)
-        
-        uploadLyricsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: rowHeight, width: buttonDimension, height: buttonDimension))
-        uploadLyricsButton.setImage(UIImage(named: "upload"), forState: .Normal)
-        uploadLyricsButton.addTarget(self, action: "uploadLyrics:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(uploadLyricsButton)
         
         //position 3
         goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
@@ -2066,30 +2058,30 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     
-    func uploadTabs(button: UIButton) {
-        self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
-        if shouldShowSignUpPage("") {
-            return
-        }
-        
-        var chords = [Chord]()
-
-        (chords, _, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
-        
-        if chords.count < 2 {
-            self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
-            return
-        }
-        
-        APIManager.uploadTabs(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-            cloudId in
-            
-            CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
-            self.showStatusView(true)
-            self.startHideStatusViewTimer()
-        })
-    }
+//    func uploadTabs(button: UIButton) {
+//        self.isRemoveProgressBlock = false
+//        self.selectedFromTable = false
+//        if shouldShowSignUpPage("") {
+//            return
+//        }
+//        
+//        var chords = [Chord]()
+//
+//        (chords, _, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
+//        
+//        if chords.count < 2 {
+//            self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
+//            return
+//        }
+//        
+//        APIManager.uploadTabs(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
+//            cloudId in
+//            
+//            CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
+//            self.showStatusView(true)
+//            self.startHideStatusViewTimer()
+//        })
+//    }
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
