@@ -108,7 +108,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var string3FretPosition: [CGFloat] = [CGFloat]()
     
     // core data functions
-    var tabsDataManager: TabsDataManager = TabsDataManager()
     
     // objects on view which need to be changed in different places
     var statusLabel: UILabel = UILabel()
@@ -241,7 +240,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentBaseButton.tag = 400
         
         // add the default tab data into coredata if it doesn't exist
-        self.tabsDataManager.addDefaultData()
+        TabsDataManager.addDefaultData()
         
         // initial the edit view
         self.editView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 18 / 20 * self.trueHeight)
@@ -1063,7 +1062,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         noteButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
         noteButton.tag = (indexString + 1) * 100 + indexFret
         noteButton.addTarget(self, action: "pressNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
+        let tabName = TabsDataManager.fretsBoard[indexString][indexFret]
         noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
         self.currentNoteButton = noteButton
         self.currentBaseButton = noteButton
@@ -1212,7 +1211,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.userInteractionEnabled = false
         let index: NSNumber = NSNumber(integer: sender)
         self.specificTabSets.removeAll()
-        self.specificTabSets = self.tabsDataManager.getTabsSets(index)
+        self.specificTabSets = TabsDataManager.getTabsSets(index)
         let buttonHeight: CGFloat = 2 / 20 * self.trueHeight
         let buttonWidth: CGFloat = 4 / 20 * self.trueHeight
         // change specific tab button scrollview content frame
@@ -2052,10 +2051,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         }
                         print("This is the new tab's content: \(content)")
                         self.currentSelectedSpecificTab = NormalTabs()
-                        if let compareExistTabs = self.tabsDataManager.getUniqueTab(index, name: name, content: content)?.tabs {
+                        if let compareExistTabs = TabsDataManager.getUniqueTab(index, name: name, content: content)?.tabs {
                             self.currentSelectedSpecificTab.tabs = compareExistTabs
                         } else {
-                            let tempTabs: Tabs = self.tabsDataManager.addNewTabs(index, name: name, content: content)
+                            let tempTabs: Tabs = TabsDataManager.addNewTabs(index, name: name, content: content)
                             self.currentSelectedSpecificTab.tabs = tempTabs
                         }
                         self.currentNoteButton.setTitle(name, forState: UIControlState.Normal)
@@ -2358,7 +2357,7 @@ extension TabsEditorViewController {
         let index = getBasicNoteIndex(sender.tab.contentArray)
         let name = sender.tab.name
         let content = sender.tab.content
-        let tempNormalTabs = tabsDataManager.getUniqueTab(index, name: name, content: content)
+        let tempNormalTabs = TabsDataManager.getUniqueTab(index, name: name, content: content)
         return tempNormalTabs!
     }
     
@@ -2532,7 +2531,7 @@ extension TabsEditorViewController {
                 let noteButton = sender.view as! UIButton
                 let oldNoteButtonTag = noteButton.tag
                 noteButton.tag = (indexString + 1) * 100 + indexFret
-                let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
+                let tabName = TabsDataManager.fretsBoard[indexString][indexFret]
                 noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
                 self.tabNameTextField.text = ""
                 self.fingerPoint[6 - (indexString + 1)].hidden = true
@@ -2603,7 +2602,7 @@ extension TabsEditorViewController {
                 let noteButton = self.currentBaseButton
                 oldNoteButtonTag = noteButton.tag
                 noteButton.tag = (indexString + 1) * 100 + indexFret
-                let tabName = self.tabsDataManager.fretsBoard[indexString][indexFret]
+                let tabName = TabsDataManager.fretsBoard[indexString][indexFret]
                 noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
                 self.tabNameTextField.text = ""
                 self.fingerPoint[6 - (indexString + 1)].hidden = true
@@ -3022,7 +3021,7 @@ extension TabsEditorViewController {
     func deleteActionOnSpecificTabView() {
         self.deleteChordOnMainViewWhenDeleteOnEditView(Int(self.currentSelectedSpecificTab.index), name: self.currentSelectedSpecificTab.name, content: self.currentSelectedSpecificTab.content)
         self.removeObjectsOnSpecificTabsScrollView()
-        self.tabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
+        TabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
         self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
         stopSpecificJiggling()
         self.addSpecificTabButton(self.currentBaseButton.tag)
