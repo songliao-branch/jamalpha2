@@ -14,13 +14,21 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     @IBOutlet weak var tableView: UITableView!
     
     var songs = [LocalSong]()
+    var animator: CustomTransitionAnimation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        createTransitionAnimation()
         loadData()
         setUpNavigationBar()
     }
     
+    func createTransitionAnimation(){
+        if(animator == nil){
+            self.animator = CustomTransitionAnimation()
+        }
+    }
+
     func loadData() {
         
         songs =  CoreDataManager.getFavorites()
@@ -69,9 +77,18 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             MusicManager.sharedInstance.avPlayer.pause()
             MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             MusicManager.sharedInstance.avPlayer.removeAllItems()
-        } else {
-            //TODO: search the song first..
-        }// TODO: if demo song
+        } else if song.artist == "Alex Lisell" {
+            
+            MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
+            songVC.selectedRow = 0
+            MusicManager.sharedInstance.player.pause()
+            MusicManager.sharedInstance.player.currentPlaybackTime = 0
+            songVC.isDemoSong = true
+            
+        }
+        
+        songVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(songVC)
         
         self.presentViewController(songVC, animated: true, completion: nil)
         self.tableView.deselectRowAtIndexPath(indexPath, animated: true)

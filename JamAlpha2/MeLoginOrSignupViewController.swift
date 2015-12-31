@@ -65,6 +65,7 @@ class MeLoginOrSignupViewController: UIViewController{
         //TODO: check if user is signed in already.
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
+        self.createAWSS3FilePath()
         setUpTopView()
         setUpViews()
     }
@@ -87,6 +88,20 @@ class MeLoginOrSignupViewController: UIViewController{
     override func viewWillDisappear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBarHidden = false
+    }
+    
+    func createAWSS3FilePath(){
+        // create temp file path to store upload image
+        let error = NSErrorPointer()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'upload' directory failed. Error: \(error)")
+        }
     }
     
     func setUpTopView() {
@@ -232,8 +247,8 @@ class MeLoginOrSignupViewController: UIViewController{
         scrollView.addSubview(facebookButton)
         
         //TODO: hide facebook in beta mode
-        facebookButton.hidden = true
-        orLabel.hidden = true
+        facebookButton.hidden = false
+        orLabel.hidden = false
         
         //log in screen
         let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
@@ -383,15 +398,10 @@ class MeLoginOrSignupViewController: UIViewController{
                 self.submitButton.enabled = true
                 switch response.result {
                 case .Success:
-                    print(response)
-                    
                     if let data = response.result.value {
                         let json = JSON(data)
-                        
                         let user = json["user_initialization"]
-                        
                         if user != nil {
-
                             afterRetrievingUser(id: user["id"].int!, email: user["email"].string!, authToken: user["auth_token"].string!, nickname: user["nickname"].string!, avatarUrlMedium: user["avatar_url_medium"].string!, avatarUrlThumbnail: user["avatar_url_thumbnail"].string!)
                             
                             //go back to user profile view
@@ -514,8 +524,7 @@ class MeLoginOrSignupViewController: UIViewController{
                     
                     let userId = result.valueForKey("id") as! String
                     let facebookAvatarUrl = "https://graph.facebook.com/\(userId)/picture?height=320&width=320"
-                    
-                    
+                  
                     let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!)!
                     let thumbnailImage = originImage.resize(35)
                     // add request to upload array

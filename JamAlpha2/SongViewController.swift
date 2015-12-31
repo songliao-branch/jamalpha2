@@ -15,6 +15,7 @@ let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange, used in 
 let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
+
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate, SKStoreProductViewControllerDelegate {
     
     var musicViewController: MusicViewController!
@@ -92,11 +93,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var startdisappearing: Int = 0
     var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
-    
-    //tuning of capo 
-    var tuningOfTheTabsSet = "E-B-G-D-A-E"//standard tuning, from high E to low E
-    // we reverse the order when present above the chordBase
-    var capoOfTheTabsSet = 0
+
     
     //time
     //var timer: NSTimer?
@@ -238,14 +235,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 avPlayer = MusicManager.sharedInstance.avPlayer
                 self.demoItem = avPlayer.currentItem
                 self.demoItemDuration = self.demoItem.getDuration()
-//                APIManager.getSongId(demoItem)
                 removeAllObserver()
             } else {
                 player = MusicManager.sharedInstance.player
                 print("VIEWDIDLOAD: \(player.nowPlayingItem!.title!)")
                 self.nowPlayingMediaItem = player.nowPlayingItem
                 self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
-//                APIManager.getSongId(nowPlayingMediaItem)
                 removeAllObserver()
             }
             
@@ -495,7 +490,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     private func updateTuning(tuning: String) {
         print("current tuning is \(tuning)")
-        let tuningArray = tuning.characters.split{$0 == "-"}.map(String.init)
+        let tuningArray = Tuning.toArray(tuning)
         let tuningToShow = Array(tuningArray.reverse())
         for i in 0..<tuningLabels.count {
             tuningLabels[i].text = tuningToShow[i]
@@ -1734,8 +1729,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
             return
         }
-        
-        let findable: Findable = isSongNeedPurchase ? songNeedPurchase : player.nowPlayingItem!
+     
+        let song: Findable = isDemoSong ? demoItem : player.nowPlayingItem!
+
+        let findable: Findable = isSongNeedPurchase ? songNeedPurchase : song
         
         APIManager.favoriteTheSong(findable, completion: {
             result in
@@ -2101,8 +2098,58 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("goToTabsEditor") {
             return
         }
-        
-       self.showTabsEditor()
+        self.showTabsEditor()
+//        let theSong: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
+//        self.checkChordsWithCoredata(theSong)
+    }
+//////////////////
+//    func checkChordsWithCoredata(sender: Findable) {
+//        var  needAddNewChords: Bool = false
+//        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
+//        var needAddNewChordsArray: [Tab] = [Tab]()
+//        for item in tabs.0 {
+//            print(item.tab.name)
+//            print(item.tab.content)
+//            let index = self.getBasicNoteIndex(item.tab.contentArray)
+//            print(index)
+//            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
+//                continue
+//            } else {
+//                needAddNewChords = true
+//                needAddNewChordsArray.append(item.tab)
+//            }
+//        }
+//        
+//        if needAddNewChords {
+//            var nameString: String = ""
+//            for item in needAddNewChordsArray {
+//                nameString = nameString + item.name + ", "
+//            }
+//            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+//            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
+//            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
+//                action in
+//                for item in needAddNewChordsArray {
+//                    let index = self.getBasicNoteIndex(item.contentArray)
+//                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+//                }
+//                self.showTabsEditor()
+//            }))
+//            self.presentViewController(alertController, animated: true, completion: nil)
+//        } else {
+//            self.showTabsEditor()
+//        }
+//    }
+    
+    func getBasicNoteIndex(sender: [String]) -> Int {
+        for var i = 0; i < 6; i++ {
+            if sender[i] != "x" {
+                let stringIndex = 6 - i
+                let fretIndex = Int(sender[i])
+                return stringIndex * 100 + fretIndex!
+            }
+        }
+        return 0
     }
     
     func showTabsEditor(){
@@ -2125,6 +2172,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tabsEditorVC.songViewController = self
         tabsEditorVC.isDemoSong = self.isDemoSong
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
+        
     }
     
     func uploadLyrics(button: UIButton) {

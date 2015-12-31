@@ -14,6 +14,4 @@ class NormalTabs: NSObject {
     var content: String = String()
     var isOriginal: Bool = Bool()
     var tabs: Tabs!
-    
-
 }
