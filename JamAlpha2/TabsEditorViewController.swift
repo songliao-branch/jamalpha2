@@ -143,7 +143,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     //an attribtue corresponding to the visible attribute of tabsSet
     var isPublic = true
-    
+    var privacyButton = UIButton()
     var isPlaying:Bool = false
     
     // count down section
@@ -937,7 +937,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         menuView.addSubview(doneButton)
         
         //TODO: set button from the visible attribute itself
-        let privacyButton = UIButton(frame: CGRect(x: 100, y: 0, width: 200, height: 30))
+        privacyButton = UIButton(frame: CGRect(x: 200, y: 0, width: 200, height: 30))
         privacyButton.setTitle("Public", forState: .Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
         menuView.addSubview(privacyButton)
@@ -2149,7 +2149,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             //TODO: add a button to toggle visibility
             let visible: Bool = allChords.count % 2 == 0 ? true : false //even visible
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
-                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId, visible: visible)
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId, visible: isPublic)
             
             self.songViewController.updateMusicData(theSong)
             
@@ -2299,9 +2299,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func privacyButtonPressed(button: UIButton) {
-    
+        if isPublic {
+            isPublic = false
+            privacyButton.setTitle("Private", forState: .Normal)
+        } else {
+            isPublic = true
+            privacyButton.setTitle("Public", forState: .Normal)
+        }
     }
-    
     
     // find the current tab according to the current music time
     func findCurrentTabView() {
@@ -2419,10 +2424,9 @@ extension TabsEditorViewController {
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
-        
+        let visible: Bool = tabs.4
         
         //let visible
-        
         if chord.count > 0 {
             addTabsFromCoreDataToMainViewDataArray(chord)
             addTabsFromCoreDataToMusicControlView(chord)
@@ -2430,10 +2434,15 @@ extension TabsEditorViewController {
             let tuningValues = Tuning.toArray(tuning)
             for i in 0..<tuningValueLabels.count {
                 tuningValueLabels[i].text = tuningValues[i]
-                
             }
             capoStepper.value = Double(capoValue)
             capoLabel.text = "Capo: \(capoValue)"
+            isPublic = visible
+            if isPublic {
+                privacyButton.setTitle("Public", forState: .Normal)
+            } else {
+                privacyButton.setTitle("Private", forState: .Normal)
+            }
         }
     }
 }
