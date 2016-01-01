@@ -214,7 +214,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var isSongNeedPurchase = false
     var songNeedPurchase: SearchResult!
-    var AVplayer: AVPlayer!
     var playPreveiwButton:UIButton!
     var previewActionViewHeight: CGFloat = 54 * 4 + 3
     var previewView:UIView!
@@ -2851,7 +2850,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(playPreveiwButton)
         let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
         let playerItem = AVPlayerItem( URL:url)
-        AVplayer = AVPlayer(playerItem:playerItem)
+        KAVplayer = AVPlayer(playerItem:playerItem)
         displayLink = CADisplayLink(target: self, selector: ("updateSliderProgress"))
         displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
         displayLink.paused = true
@@ -2945,9 +2944,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func previewPlay(){
-        if(self.AVplayer.rate == 0.0){
+        if(KAVplayer.rate == 0.0){
             previewProgress.setColors(UIColor.mainPinkColor())
-            AVplayer.rate = 1.0;
+            KAVplayer.rate = 1.0;
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
@@ -2955,7 +2954,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: {
                     finished in
                     self.displayLink.paused = false
-                    self.AVplayer.play()
+                    KAVplayer.play()
             })
         }else{
             UIView.animateWithDuration(0.2, delay: 0.0,
@@ -2965,7 +2964,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: {
                     finished in
                     self.displayLink.paused = true
-                    self.AVplayer.pause()
+                    KAVplayer.pause()
             })
         }
     }
@@ -2996,15 +2995,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func updateSliderProgress(){
-        let angle = self.AVplayer.currentTime().seconds * 360/self.AVplayer.currentItem!.duration.seconds
+        let angle = KAVplayer.currentTime().seconds * 360/KAVplayer.currentItem!.duration.seconds
         if(angle.isFinite && !angle.isNaN){
             previewProgress.angle = Int(angle)
         }else{
             previewProgress.angle = 0
         }
         
-        if(AVplayer.currentTime() == AVplayer.currentItem!.duration){
-            AVplayer.seekToTime(kCMTimeZero)
+        if(KAVplayer.currentTime() == KAVplayer.currentItem!.duration){
+            KAVplayer.seekToTime(kCMTimeZero)
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
@@ -3042,7 +3041,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.previewView = nil
         self.playPreveiwButton.removeFromSuperview()
         self.playPreveiwButton = nil
-        self.AVplayer = nil
+        KAVplayer = nil
         //recover
         player = MusicManager.sharedInstance.player
         self.nowPlayingMediaItem = player.nowPlayingItem

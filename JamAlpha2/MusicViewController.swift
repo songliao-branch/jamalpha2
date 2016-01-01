@@ -123,6 +123,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
       
         songVC.selectedFromTable = false
         songVC.musicViewController = self
+        songVC.nowView = self.nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
@@ -347,6 +348,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     MusicManager.sharedInstance.player.pause()
                     MusicManager.sharedInstance.player.currentPlaybackTime = 0
                     songVC.isDemoSong = true
+                    if (KAVplayer != nil && KAVplayer.rate > 0){
+                        KAVplayer.rate = 0
+                        KAVplayer = nil
+                    }
                     
                 } else {
                     MusicManager.sharedInstance.setPlayerQueue(songsSorted)

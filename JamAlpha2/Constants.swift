@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import MediaPlayer
+import AVFoundation
 
 let KGLOBAL_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_operationCache = [NSURL:NSBlockOperation]()
@@ -34,3 +36,5 @@ let kSongNames = ["Go"]
 
 //used in core data to refer to a locally created tabsSet/lyricsSet
 let kLocalSetId = -1
+
+var KAVplayer: AVPlayer!
