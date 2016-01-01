@@ -355,7 +355,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 searchResponse.collectionName = collectionName
             }
             if let artwork = item["artworkUrl100"].string {
-                searchResponse.artworkUrl100 = artwork
+                let newString = artwork.replace("100x100", replacement: "300x300")
+                searchResponse.artworkUrl100 = newString
             }
             if let preview = item["previewUrl"].string {
                 searchResponse.previewUrl = preview
