@@ -1804,13 +1804,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("") {
             self.isRemoveProgressBlock = false
             self.selectedFromTable = false
-            
-            if isDemoSong {
-                self.avPlayer.pause()
-            } else {
-                self.player.pause()
-            }
-
             return
         }
      
@@ -2051,7 +2044,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
-            player.play()
+            if isDemoSong {
+                avPlayer.play()
+            }else{
+                player.play()
+            }
         }
     }
     
