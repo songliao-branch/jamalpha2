@@ -2832,7 +2832,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.isSongNeedPurchase = false
         self.selectedFromTable = true
         self.removeAllObserver()
-        loadBackgroundImageFromMediaItem(nowPlayingMediaItem)
+        CoreDataManager.initializeSongToDatabase(PlayingItem)
         self.registerMediaPlayerNotification()
         self.resumeSong()
         if(!isGenerated){

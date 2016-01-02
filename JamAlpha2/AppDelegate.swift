@@ -108,16 +108,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 
-        MusicManager.sharedInstance.reloadCollections()
-        
+         var isKeepGoingOn:Bool = true
         let currentVC = topViewController(rootViewController())
-        
+        MusicManager.sharedInstance.reloadCollections()
         // if the collection is different i.e. new songs are added/old songs are removed
         // we manually reload MusicViewController table
-        if kShouldReloadMusicTable {
             if rootViewController().isKindOfClass(TabBarController) {
                 let tabBarController = rootViewController() as! TabBarController
-                
                 for tabItemController in (tabBarController.viewControllers)! {
                     if tabItemController.isKindOfClass(UINavigationController){
                         for childVC in tabItemController.childViewControllers {
@@ -127,7 +124,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                                     musicVC.reloadDataAndTable()
                                     
-                                    if(!musicVC.uniqueSongs.isEmpty){
+                                    if(!musicVC.uniqueSongs.isEmpty && kShouldReloadMusicTable){
                                         musicVC.songCount = 0
                                         musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
                                     }
@@ -139,7 +136,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                             MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
                                             MusicManager.sharedInstance.setIndexInTheQueue(0)
                                             self.suspended = true
+                                            ////////////////////////////////////
                                             currentSongVC.recoverToNormalSongVC(purchasedItem)
+                                        }
+                                    }else{
+                                        if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && !currentSongVC.isDemoSong){
+                                            if !MusicManager.sharedInstance.uniqueSongs.contains(MusicManager.sharedInstance.player.nowPlayingItem!){
+                                                currentSongVC.dismissViewControllerAnimated(true, completion: {
+                                                    completed in
+                                                    KGLOBAL_queue.suspended = false
+                                                    KGLOBAL_init_queue.suspended = self.suspended
+                                                    isKeepGoingOn = false
+                                                })
+                                            }
                                         }
                                     }
                                 }
@@ -148,73 +157,75 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }
             }
-        }
-
-        if currentVC.isKindOfClass(SongViewController) {
-            let currentSongVC = currentVC as! SongViewController
-            currentSongVC.removeAllObserver()
-            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
-                
-                // if go outside Twistjam and close Music App, nowPlayingItem is set to nil
-                // we force to dismiss SongViewController and re-initialize player
-                if (!currentSongVC.isSongNeedPurchase) {
-                    currentSongVC.viewDidDisappear(false)
-                    currentSongVC.dismissViewControllerAnimated(true, completion: {
-                        completed in
+    
+        if isKeepGoingOn {
+            if currentVC.isKindOfClass(SongViewController) {
+                let currentSongVC = currentVC as! SongViewController
+                currentSongVC.removeAllObserver()
+                if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
+                    
+                    // if go outside Twistjam and close Music App, nowPlayingItem is set to nil
+                    // we force to dismiss SongViewController and re-initialize player
+                    if (!currentSongVC.isSongNeedPurchase) {
+                        currentSongVC.viewDidDisappear(false)
+                        currentSongVC.dismissViewControllerAnimated(true, completion: {
+                            completed in
+                            KGLOBAL_queue.suspended = false
+                            KGLOBAL_init_queue.suspended = self.suspended
+                            MusicManager.sharedInstance.initializePlayer()
+                        })
+                    }else{
                         KGLOBAL_queue.suspended = false
                         KGLOBAL_init_queue.suspended = self.suspended
-                        MusicManager.sharedInstance.initializePlayer()
-                    })
+                        
+                    }
                 }else{
+                    currentSongVC.registerMediaPlayerNotification()
+                    currentSongVC.selectedFromTable = false
+                    if(!currentSongVC.isSongNeedPurchase){
+                        currentSongVC.resumeSong()
+                    }
+                    print("Song VC entering forground")
                     KGLOBAL_queue.suspended = false
                     KGLOBAL_init_queue.suspended = self.suspended
-                    
                 }
-            }else{
-                currentSongVC.registerMediaPlayerNotification()
-                currentSongVC.selectedFromTable = false
-                if(!currentSongVC.isSongNeedPurchase){
-                    currentSongVC.resumeSong()
-                }
-                print("Song VC entering forground")
-                KGLOBAL_queue.suspended = false
-                KGLOBAL_init_queue.suspended = self.suspended
-            }
-            
-            //check if the viewController is Tabs Editor or lyrics SyncEditor
-            //in case mediaItem was changed outside the app, if changed, we used 
-            //the last playing item and time
-            if(currentVC.presentedViewController != nil){
-                let presentVC = currentVC.presentedViewController!
-                if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
-                    var isDemoSong:Bool = false
-                    if presentVC.isKindOfClass(TabsEditorViewController) {
-                        isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
-                    }else if presentVC.isKindOfClass(LyricsTextViewController){
-                        isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
-                    }
-                    
-                    let lastPlayingItem = MusicManager.sharedInstance.lastPlayingItem
-                    
-                    if(!isDemoSong){
+                
+                //check if the viewController is Tabs Editor or lyrics SyncEditor
+                //in case mediaItem was changed outside the app, if changed, we used
+                //the last playing item and time
+                if(currentVC.presentedViewController != nil){
+                    let presentVC = currentVC.presentedViewController!
+                    if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
+                        var isDemoSong:Bool = false
+                        if presentVC.isKindOfClass(TabsEditorViewController) {
+                            isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
+                        }else if presentVC.isKindOfClass(LyricsTextViewController){
+                            isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
+                        }
                         
-                        if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != lastPlayingItem){
-                            MusicManager.sharedInstance.player.stop()
-                            MusicManager.sharedInstance.player.repeatMode = .All
-                            MusicManager.sharedInstance.player.shuffleMode = .Off
-                            MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
-                            MusicManager.sharedInstance.player.nowPlayingItem = lastPlayingItem
+                        let lastPlayingItem = MusicManager.sharedInstance.lastPlayingItem
+                        
+                        if(!isDemoSong){
+                            
+                            if MusicManager.sharedInstance.player != nil && (MusicManager.sharedInstance.player.nowPlayingItem == nil || MusicManager.sharedInstance.player.nowPlayingItem != lastPlayingItem){
+                                MusicManager.sharedInstance.player.stop()
+                                MusicManager.sharedInstance.player.repeatMode = .All
+                                MusicManager.sharedInstance.player.shuffleMode = .Off
+                                MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                                MusicManager.sharedInstance.player.nowPlayingItem = lastPlayingItem
+                                MusicManager.sharedInstance.player.repeatMode = .One
+                                MusicManager.sharedInstance.player.shuffleMode = .Off
+                                MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime                     }
+                        } else if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.player.nowPlayingItem == lastPlayingItem {
                             MusicManager.sharedInstance.player.repeatMode = .One
                             MusicManager.sharedInstance.player.shuffleMode = .Off
-                            MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime                     }
-                    } else if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.player.nowPlayingItem == lastPlayingItem {
-                        MusicManager.sharedInstance.player.repeatMode = .One
-                        MusicManager.sharedInstance.player.shuffleMode = .Off
-                        MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
+                            MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
+                        }
                     }
                 }
             }
         }
+
         KGLOBAL_isNeedToCheckIndex = true
         print("Go into forground")
     }

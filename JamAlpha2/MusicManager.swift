@@ -58,7 +58,6 @@ class MusicManager: NSObject {
     
     //check when search a cloud item, if it matches, we use the song we already have
     func isNeedReloadCollections(title:String, artist:String, duration:Float) -> MPMediaItem? {
-        self.reloadCollections()
         let result = uniqueSongs.filter{
             (song: MPMediaItem) -> Bool in
             if let tempTitle = song.title, tempArtist = song.artist {
@@ -68,18 +67,18 @@ class MusicManager: NSObject {
         }.first
         if(result != nil){
             return result!
+        }else{
+            self.reloadCollections()
         }
         return nil
     }
 
     func reloadCollections(){
-        let tempCount = uniqueSongs.count
         loadLocalSongs()
-        if tempCount != uniqueSongs.count {
-            kShouldReloadMusicTable = true
-            loadLocalAlbums()
-            loadLocalArtist()
-        }
+        loadLocalAlbums()
+        loadLocalArtist()
+        kShouldReloadMusicTable = true
+        queueChanged = true
     }
     
     func initializePlayer(){
