@@ -417,7 +417,7 @@ class CoreDataManager: NSObject {
         return (Lyric(), 0)
     }
     
-    class func setLocalLyricsMostRecent(item: Findable) {
+    class func setUserLyricsMostRecent(item: Findable) {
         if let matchedSong = findSong(item) {
             let savedSets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
             let foundLocalSet = savedSets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
@@ -430,7 +430,7 @@ class CoreDataManager: NSObject {
         }
     }
     
-    class func setLocalTabsMostRecent (item: Findable) {
+    class func setUserTabsMostRecent (item: Findable) {
         if let matchedSong = findSong(item) {
             let savedSets = matchedSong.tabsSets.allObjects as! [TabsSet]
             
@@ -600,37 +600,23 @@ class CoreDataManager: NSObject {
     }
     
     
-    class func deleteLocalTab(findable: Findable) {
-        if let matchedSong = findSong(findable) {
-            let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
-            
-            var foundTabsSet: TabsSet!
-            
-            foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
-            
-            if foundTabsSet != nil {
-                moc.deleteObject(foundTabsSet)
-                SwiftCoreDataHelper.saveManagedObjectContext(moc)
-            }
+    class func deleteUserTabs(setId: Int) {
+        let sets = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: NSPredicate(format: "id == \(setId)"), managedObjectContext: moc) as! [TabsSet]
+        
+        if sets.count == 1 {
+            moc.deleteObject(sets[0])
         }
     }
     
-    class func deleteLocalLyrics(findable: Findable) {
-        if let matchedSong = findSong(findable) {
-            let sets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
-            
-            var foundLyricsSet: LyricsSet!
-            
-            foundLyricsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
-            
-            if foundLyricsSet != nil {
-                moc.deleteObject(foundLyricsSet)
-                SwiftCoreDataHelper.saveManagedObjectContext(moc)
-            }
+    class func deleteUserlyrics(setId: Int) {
+        let sets = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: NSPredicate(format: "id == \(setId)"), managedObjectContext: moc) as! [LyricsSet]
+        
+        if sets.count == 1 {
+            moc.deleteObject(sets[0])
         }
     }
     
-    //a local tabs that has never been uploaded will have an id -1, once it's uploaded, the retrieved cloud id will 
+    //a local tabs that has never been uploaded will have an id -1, once it's uploaded, the retrieved cloud id will
     class func saveCloudIdToTabs(findable: Findable, cloudId: Int) {
         if let matchedSong = findSong(findable) {
             let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
