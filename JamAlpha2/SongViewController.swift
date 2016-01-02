@@ -2106,7 +2106,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("goToTabsEditor") {
             return
         }
-        self.showTabsEditor()
+        //self.showTabsEditor()
         let theSong: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
         self.checkChordsWithCoredata(theSong)
     }
