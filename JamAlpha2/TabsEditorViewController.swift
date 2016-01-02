@@ -2146,9 +2146,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             
-            CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
-                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId, visible: isPublic)
+            //check if tabsSet id is bigger than 0, if so, means this tabs has been saved to the cloud, then we use same tabsSetid, otherwise if less than one, it means it's new
+            let savedTabsSetId = CoreDataManager.getTabs(theSong, fetchingUsers: true).3
             
+            CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic)
+
             self.songViewController.updateMusicData(theSong)
             
             tuningMenu.hidden = true
@@ -2426,7 +2429,7 @@ extension TabsEditorViewController {
     
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: Findable) {
-        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
+        let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2

@@ -552,7 +552,7 @@ class CoreDataManager: NSObject {
     //if fetchingLocalUserOnly true, will get the currently locally saved tabs,
     //otherwise we will retrieve all tabsSets(both local user's and downloaded) and select the most
     //recently selected one
-    class func getTabs(item: Findable, fetchingLocalUserOnly: Bool) -> ([Chord], String, Int, Int, Bool) { //return chords, tuning and capo, song_id, visible
+    class func getTabs(item: Findable, fetchingUsers: Bool) -> ([Chord], String, Int, Int, Bool) { //return chords, tuning and capo, tabsSet id, visible
         
         //song id is used to determine which tabs
         if let matchedSong = findSong(item) {
@@ -566,8 +566,7 @@ class CoreDataManager: NSObject {
                 print("set id: \(set.id) || capo is:\(set.capo)")
             }
             
-            if fetchingLocalUserOnly {
-                
+            if fetchingUsers {
                 foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
             } else {
                 //find the most recently selected tabsSet

@@ -39,7 +39,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         resultsTableView.backgroundView = layer
         
         if isPullingTabs {
-            ( _, _, _, lastSelectedSetId, _) = CoreDataManager.getTabs(findable, fetchingLocalUserOnly: false)
+            ( _, _, _, lastSelectedSetId, _) = CoreDataManager.getTabs(findable, fetchingUsers: false)
         } else {
             (_, lastSelectedSetId) = CoreDataManager.getLyrics(findable, fetchingLocalUserOnly: false)
         }

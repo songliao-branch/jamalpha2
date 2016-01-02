@@ -56,7 +56,7 @@ class APIManager: NSObject {
         var tuning = ""
         var capo = 0
         var visible = true
-        (chords, tuning, capo, _, visible) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: true)
+        (chords, tuning, capo, _, visible) = CoreDataManager.getTabs(song, fetchingUsers: true)
         
         if chords.count < 2 {
             print("uploading tabs error: tabs count is less than 2")
