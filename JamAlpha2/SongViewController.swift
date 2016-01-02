@@ -2107,47 +2107,47 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         self.showTabsEditor()
-//        let theSong: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
-//        self.checkChordsWithCoredata(theSong)
+        let theSong: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
+        self.checkChordsWithCoredata(theSong)
     }
-//////////////////
-//    func checkChordsWithCoredata(sender: Findable) {
-//        var  needAddNewChords: Bool = false
-//        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
-//        var needAddNewChordsArray: [Tab] = [Tab]()
-//        for item in tabs.0 {
-//            print(item.tab.name)
-//            print(item.tab.content)
-//            let index = self.getBasicNoteIndex(item.tab.contentArray)
-//            print(index)
-//            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
-//                continue
-//            } else {
-//                needAddNewChords = true
-//                needAddNewChordsArray.append(item.tab)
-//            }
-//        }
-//        
-//        if needAddNewChords {
-//            var nameString: String = ""
-//            for item in needAddNewChordsArray {
-//                nameString = nameString + item.name + ", "
-//            }
-//            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
-//            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
-//            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
-//                action in
-//                for item in needAddNewChordsArray {
-//                    let index = self.getBasicNoteIndex(item.contentArray)
-//                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
-//                }
-//                self.showTabsEditor()
-//            }))
-//            self.presentViewController(alertController, animated: true, completion: nil)
-//        } else {
-//            self.showTabsEditor()
-//        }
-//    }
+
+    func checkChordsWithCoredata(sender: Findable) {
+        var  needAddNewChords: Bool = false
+        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
+        var needAddNewChordsArray: [Tab] = [Tab]()
+        for item in tabs.0 {
+            print(item.tab.name)
+            print(item.tab.content)
+            let index = self.getBasicNoteIndex(item.tab.contentArray)
+            print(index)
+            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
+                continue
+            } else {
+                needAddNewChords = true
+                needAddNewChordsArray.append(item.tab)
+            }
+        }
+        
+        if needAddNewChords {
+            var nameString: String = ""
+            for item in needAddNewChordsArray {
+                nameString = nameString + item.name + ", "
+            }
+            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
+                action in
+                for item in needAddNewChordsArray {
+                    let index = self.getBasicNoteIndex(item.contentArray)
+                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+                }
+                self.showTabsEditor()
+            }))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        } else {
+            self.showTabsEditor()
+        }
+    }
     
     func getBasicNoteIndex(sender: [String]) -> Int {
         for var i = 0; i < 6; i++ {
