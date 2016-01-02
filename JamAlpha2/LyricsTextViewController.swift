@@ -216,7 +216,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         self.lyricsTextView.delegate = self
 
         var lyrics: Lyric = Lyric()
-        (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingLocalUserOnly: true)
+        (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingUsers: true)
 
         if lyrics.lyric.count > 0 {
             var lyricsToDisplay = ""
@@ -359,8 +359,4 @@ extension LyricsTextViewController: UITextViewDelegate {
   
 }
 
-// download exist lyrcis from database if the user uploaded it
-extension LyricsTextViewController {
-
-}
 

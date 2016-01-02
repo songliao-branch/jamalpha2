@@ -661,7 +661,17 @@ extension LyricsSyncViewController {
             times.append(Float(t))
         }
         
-        CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times, userId: Int(CoreDataManager.getCurrentUser()!.id), lyricsSetId: kLocalSetId )
+        //check if lyricsSet id is bigger than 0, if so, means this lyrics has been saved to the cloud, then we use same lyricsSetId, otherwise if less than one, it means it's new
+        let savedLyricsSetId = CoreDataManager.getLyrics(theSong, fetchingUsers: true).1
+        
+        CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times, userId: Int(CoreDataManager.getCurrentUser()!.id), lyricsSetId: savedLyricsSetId > 0 ? savedLyricsSetId: kLocalSetId )
+        
+        //TODO: add placeholder lyrics if lyrics.count is 2 or less
+        APIManager.uploadLyrics(isDemoSong ? MusicManager.sharedInstance.demoSongs[0]: theSong , completion: {
+            cloudId in
+            
+            CoreDataManager.saveCloudIdToLyrics(self.isDemoSong ? MusicManager.sharedInstance.demoSongs[0]: self.theSong, cloudId: cloudId)
+        })
         
         self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: {
             
@@ -714,7 +724,7 @@ extension LyricsSyncViewController {
     func addLyricsToEditorView(sender: Findable) {
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(sender, fetchingLocalUserOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(sender, fetchingUsers: true)
      
         let count = lyric.lyric.count
         var i = 0

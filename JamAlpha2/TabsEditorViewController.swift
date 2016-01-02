@@ -141,6 +141,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var tuningValueLabels = [UILabel]()
     var tunings = [Tuning]()
     
+    //an attribtue corresponding to the visible attribute of tabsSet
+    var isPublic = true
+    var privacyButton = UIButton()
     var isPlaying:Bool = false
     
     // count down section
@@ -413,7 +416,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             stepUpButton.center = CGPoint(x: tuningValueLabel.center.x + buttonDimension + 10, y: tuningValueLabel.center.y)
             tuningMenu.addSubview(stepUpButton)
             stepUpButtons.append(stepUpButton)
-
+            
             let stepDownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 20))
             
             stepDownButton.tag = i
@@ -886,8 +889,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         let addButton: UIButton = UIButton()
         let doneButton: UIButton = UIButton()
-
-        
+       
         menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
         menuView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
         menuView.backgroundColor = UIColor.clearColor()
@@ -933,6 +935,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         doneButton.setImage(UIImage(named: "icon-done"), forState: UIControlState.Normal)
         menuView.addSubview(doneButton)
+        
+        //TODO: set button from the visible attribute itself
+        privacyButton = UIButton(frame: CGRect(x: 200, y: 0, width: 200, height: 30))
+        privacyButton.setTitle("Public", forState: .Normal)
+        privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
+        menuView.addSubview(privacyButton)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
@@ -2124,12 +2132,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.currentTime = 0
             var allChords = [String]()
             var allTabs = [String]()
-            var allTimes = [NSTimeInterval]()
+            var allTimes = [Float]()
 
             for oneline in allTabsOnMusicLine {
                 allChords.append(oneline.tab.name)
                 allTabs.append(oneline.tab.content)
-                allTimes.append(oneline.time)
+                allTimes.append(Float(oneline.time))
                 print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
             }
             
@@ -2138,9 +2146,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 tuningOfTheSong += "\(label.text!)-"
             }
             
-            CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
-                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId: kLocalSetId)
+            //check if tabsSet id is bigger than 0, if so, means this tabs has been saved to the cloud, then we use same tabsSetid, otherwise if less than one, it means it's new
+            let savedTabsSetId = CoreDataManager.getTabs(theSong, fetchingUsers: true).3
             
+            CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic)
+
             self.songViewController.updateMusicData(theSong)
             
             tuningMenu.hidden = true
@@ -2151,6 +2162,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             } else {
                 self.musicPlayer.pause()
             }
+            
+            let demoItem: Findable = MusicManager.sharedInstance.demoSongs[0]
+            //automatically upload tabs
+            APIManager.uploadTabs(isDemoSong ? demoItem : theSong , completion: {
+                cloudId in
+                
+                CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? demoItem : self.theSong, cloudId: cloudId)
+            })
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
@@ -2288,6 +2307,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     }
     
+    func privacyButtonPressed(button: UIButton) {
+        if isPublic {
+            isPublic = false
+            privacyButton.setTitle("Private", forState: .Normal)
+        } else {
+            isPublic = true
+            privacyButton.setTitle("Public", forState: .Normal)
+        }
+    }
     
     // find the current tab according to the current music time
     func findCurrentTabView() {
@@ -2401,17 +2429,31 @@ extension TabsEditorViewController {
     
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: Findable) {
-        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
+        let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
-        let capo: Int = tabs.2
+        let capoValue: Int = tabs.2
+        let visible: Bool = tabs.4
         
+        //let visible
         if chord.count > 0 {
             addTabsFromCoreDataToMainViewDataArray(chord)
             addTabsFromCoreDataToMusicControlView(chord)
+            
+            let tuningValues = Tuning.toArray(tuning)
+            for i in 0..<tuningValueLabels.count {
+                tuningValueLabels[i].text = tuningValues[i]
+            }
+            capoStepper.value = Double(capoValue)
+            capoLabel.text = "Capo: \(capoValue)"
+            isPublic = visible
+            if isPublic {
+                privacyButton.setTitle("Public", forState: .Normal)
+            } else {
+                privacyButton.setTitle("Private", forState: .Normal)
+            }
         }
     }
-
 }
 
 //MARK: Jiggling button
@@ -2911,8 +2953,7 @@ extension TabsEditorViewController {
                 self.deleteViewArray[tempView as! UIButton] = tempDeleteView
                 
                 tempView.addSubview(tempDeleteView)
-                
-                
+            
                 UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
                     UIView.setAnimationRepeatCount(Float(NSNotFound))
                     if oldCornerRadius == 0.5 * buttonWidth {

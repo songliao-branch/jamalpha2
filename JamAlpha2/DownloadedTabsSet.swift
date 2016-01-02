@@ -41,6 +41,9 @@ class DownloadedTabsSet: NSObject {
     var artist = ""
     var duration: Float = 0
 
+    //this is only used for current user's tabs
+    var visible = true
+    
     init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, lastEdited: String) {
         self.id = id
         self.tuning = tuning

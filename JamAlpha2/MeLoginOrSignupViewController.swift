@@ -414,7 +414,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     }
                                     
                                     if self.isGoToTabEditor {
-                                        self.songViewController!.showTabsEditor()
+                                        self.songViewController!.checkChordsWithCoredata()
                                         self.songViewController!.resumeNormalSpeed()
                                     } else if(self.isGoToLyricEditor){
 
@@ -444,11 +444,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     //initialize the song just in case we don't find it in existing core data
                                     CoreDataManager.initializeSongToDatabase(localSong)
                                     
-                                    var times = [NSTimeInterval]()
-                                    for t in set.times {
-                                        times.append(NSTimeInterval(t))
-                                    }
-                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id)
+                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible)
                                 }
                                 
                                 for set in lyricsSets {

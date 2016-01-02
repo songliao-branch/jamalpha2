@@ -93,11 +93,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var startdisappearing: Int = 0
     var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
-    
-    //tuning of capo 
-    var tuningOfTheTabsSet = "E-B-G-D-A-E"//standard tuning, from high E to low E
-    // we reverse the order when present above the chordBase
-    var capoOfTheTabsSet = 0
+
     
     //time
     //var timer: NSTimer?
@@ -141,13 +137,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var countDownStartSecond = 3 //count from 3 to 1
     var countdownView: CountdownView!
     
-    //status view pop up
-    var statusView: UIView!
-    var successImage: UIImageView!
-    var failureImage: UIImageView!
-    var statusLabel: UILabel!
-    var hideStatusViewTimer = NSTimer()
-    
     // Guitar actions views
     var guitarActionView: UIView!
     var volumeView: MPVolumeView!
@@ -163,10 +152,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var navigationOutActionView: UIView!
     var browseTabsButton: UIButton!
     var addTabsButton: UIButton!
-    var uploadTabsButton: UIButton!
     var browseLyricsButton: UIButton!
     var addLyricsButton: UIButton!
-    var uploadLyricsButton: UIButton!
     var goToArtistButton: UIButton!
     var goToAlbumButton: UIButton!
     
@@ -279,7 +266,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         setUpActionViews()
         setUpCountdownView()
-        setUpStatusView()
         
         if(!isSongNeedPurchase){
             updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
@@ -451,6 +437,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func loadBackgroundImageFromMediaItem(item: Findable) {
         if let artwork = item.getArtWork() {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            if currentImage == nil {
+             currentImage = UIImage(named: "liwengbg")
+            }
         } else {
             //TODO: add a placeholder album cover
             currentImage = UIImage(named: "liwengbg")
@@ -458,6 +447,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.backgroundImage = currentImage
         self.blurredImage = currentImage!.applyLightEffect()!
     }
+    
     func setUpTopButtons() {
 
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
@@ -494,7 +484,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     private func updateTuning(tuning: String) {
         print("current tuning is \(tuning)")
-        let tuningArray = tuning.characters.split{$0 == "-"}.map(String.init)
+        let tuningArray = Tuning.toArray(tuning)
         let tuningToShow = Array(tuningArray.reverse())
         for i in 0..<tuningLabels.count {
             tuningLabels[i].text = tuningToShow[i]
@@ -666,7 +656,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var chords = [Chord]()
         var tuning = ""
         var capo = 0
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: false)
+        (chords, tuning, capo, _, _) = CoreDataManager.getTabs(song, fetchingUsers: false)
         if chords.count > 2 {
             self.chords = chords
             updateTuning(tuning)
@@ -683,7 +673,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.bottomLyricLabel.text = ""
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: false)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: false)
         
         if lyric.lyric.count > 1 {
             self.lyric = lyric
@@ -706,12 +696,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
                 self.addTabsPrompt.hidden = true
                 
-                var times = [NSTimeInterval]()
-                for t in download.times {
-                    times.append(NSTimeInterval(t))
-                }
-                
-                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
+                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id, visible: true)
                 
                 if self.canFindTabsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
@@ -1671,22 +1656,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         addTabsButton.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addTabsButton)
         
-        uploadTabsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: 0, width: buttonDimension, height: buttonDimension))
-        uploadTabsButton.setImage(UIImage(named: "upload"), forState: .Normal)
-        uploadTabsButton.addTarget(self, action: "uploadTabs:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(uploadTabsButton)
-        
         //position 2
         addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
         addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
         addLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         addLyricsButton.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addLyricsButton)
-        
-        uploadLyricsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: rowHeight, width: buttonDimension, height: buttonDimension))
-        uploadLyricsButton.setImage(UIImage(named: "upload"), forState: .Normal)
-        uploadLyricsButton.addTarget(self, action: "uploadLyrics:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(uploadLyricsButton)
         
         //position 3
         goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
@@ -1976,58 +1951,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             player.play()
         }
     }
-    
-    func setUpStatusView() {
-        statusView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-        statusView.backgroundColor = UIColor(red: 114/255, green: 114/255, blue: 114/255, alpha: 0.80)
-        statusView.hidden = true
-        statusView.center = self.view.center
-        statusView.layer.cornerRadius = 20
-        self.view.addSubview(statusView)
-        
-        successImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 40, height: 30))
-        successImage.image = UIImage(named: "check")
-        successImage.center.x = statusView.frame.width/2
-        successImage.hidden = true
-        statusView.addSubview(successImage)
-        
-        failureImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 35, height: 35))
-        failureImage.image = UIImage(named: "closebutton")
-        failureImage.center.x = statusView.frame.width/2
-        failureImage.hidden = true
-        statusView.addSubview(failureImage)
-        
-        statusLabel = UILabel(frame: CGRect(x: 0, y: 55, width: 100, height: 35))
-        statusLabel.textColor = UIColor.whiteColor()
-        statusLabel.textAlignment = .Center
-        statusLabel.font = UIFont.systemFontOfSize(16)
-        statusLabel.center.x = statusView.frame.width/2
-        statusView.addSubview(statusLabel)
-    }
-    
-    func showStatusView(isSucess: Bool) {
-        if isSucess {
-            statusView.hidden = false
-            successImage.hidden = false
-            failureImage.hidden = true
-            statusLabel.text = "Uploaded"
-        } else {
-            statusView.hidden = false
-            successImage.hidden = true
-            failureImage.hidden = false
-            statusLabel.text = "Upload failed"
-        }
-    }
-    
-    func startHideStatusViewTimer() {
-        hideStatusViewTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: Selector("hideStatusView"), userInfo: nil, repeats: false)
-        self.dismissAction()
-    }
-    
-    func hideStatusView() {
-        statusView.hidden = true
-    }
-    
+
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
         stopTimer()
@@ -2073,31 +1997,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.clearActions()
         })
     }
-
-    
-    func uploadTabs(button: UIButton) {
-        self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
-        if shouldShowSignUpPage("") {
-            return
-        }
-        
-        var chords = [Chord]()
-        (chords, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
-        
-        if chords.count < 2 {
-            self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
-            return
-        }
-        
-        APIManager.uploadTabs(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-            cloudId in
-            
-            CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
-            self.showStatusView(true)
-            self.startHideStatusViewTimer()
-        })
-    }
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
@@ -2106,14 +2005,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("goToTabsEditor") {
             return
         }
+
         //self.showTabsEditor()
-        let theSong: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
-        self.checkChordsWithCoredata(theSong)
+
+        self.checkChordsWithCoredata()
     }
 
-    func checkChordsWithCoredata(sender: Findable) {
+    func checkChordsWithCoredata() {
+        let sender: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
         var  needAddNewChords: Bool = false
-        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
+        let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
         var needAddNewChordsArray: [Tab] = [Tab]()
         for item in tabs.0 {
             print(item.tab.name)
@@ -2159,7 +2060,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         return 0
     }
-    
+
     func showTabsEditor(){
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
@@ -2181,31 +2082,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tabsEditorVC.isDemoSong = self.isDemoSong
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
         
-    }
-    
-    func uploadLyrics(button: UIButton) {
-        self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
-        
-        if shouldShowSignUpPage("") {
-            return
-        }
-        
-        var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
-        
-        if lyric.lyric.count < 2 {
-             self.showMessage("Your lyrics looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
-            return
-        }
- 
-        APIManager.uploadLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-            cloudId in
-            
-            CoreDataManager.saveCloudIdToLyrics(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
-            self.showStatusView(true)
-            self.startHideStatusViewTimer()
-        })
     }
     
     func browseLyrics(button: UIButton) {

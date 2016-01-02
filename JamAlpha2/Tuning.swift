@@ -70,5 +70,10 @@ class Tuning: NSObject {
             return downArrow
         }
     }
+    
+    //convert from format of 'E-A-B-D-A-E' to ['E', 'A', 'B', 'D', 'A', 'E']
+    class func toArray(value: String) -> [String] {
+        return value.characters.split{$0 == "-"}.map(String.init)
+    }
 }
  
