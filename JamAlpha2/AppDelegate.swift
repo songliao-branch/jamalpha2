@@ -107,6 +107,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+
         MusicManager.sharedInstance.reloadCollections()
         
         let currentVC = topViewController(rootViewController())
@@ -129,6 +130,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     if(!musicVC.uniqueSongs.isEmpty){
                                         musicVC.songCount = 0
                                         musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+                                    }
+                                }
+                                if(currentVC.isKindOfClass(SongViewController)){
+                                    let currentSongVC = currentVC as! SongViewController
+                                    if(currentSongVC.isSongNeedPurchase){
+                                        if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(currentSongVC.songNeedPurchase.trackName!, artist: currentSongVC.songNeedPurchase.artistName!, duration: currentSongVC.songNeedPurchase.trackTimeMillis!)){
+                                            MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
+                                            MusicManager.sharedInstance.setIndexInTheQueue(0)
+                                            self.suspended = true
+                                            currentSongVC.recoverToNormalSongVC(purchasedItem)
+                                        }
                                     }
                                 }
                             }

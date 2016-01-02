@@ -526,12 +526,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     func checkScrollview(sender:UIPanGestureRecognizer){
         let transfer = sender.velocityInView(self.collectionView)
-        if(abs(transfer.x) > abs(transfer.y)){
-            self.collectionView.scrollEnabled = true
-        }else{
-            self.collectionView.scrollEnabled = false
+        if(sender.state == .Began){
+            if(abs(transfer.x) >= abs(transfer.y)){
+                self.collectionView.scrollEnabled = true
+            }else{
+                self.collectionView.scrollEnabled = false
+            }
         }
-        if(sender.state == .Ended){
+        
+        if(sender.state == .Ended || sender.state == .Cancelled){
             self.collectionView.scrollEnabled = true
         }
     }

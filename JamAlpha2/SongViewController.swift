@@ -1246,12 +1246,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
             guard let assetURL = nowPlayingItem.getURL() else {
                 print("sound url not available")
+                KGLOBAL_init_queue.suspended = false
                 return
             }
             
             var op:NSBlockOperation?
             op = KGLOBAL_operationCache[assetURL as! NSURL]
             if(op == nil){
+                KGLOBAL_init_queue.suspended = true
                 // have to use the temp value to do the nsoperation, cannot use (self.) do that.
                 let tempNowPlayingItem = nowPlayingItem
                 let tempProgressBlock = KGLOBAL_progressBlock
@@ -2804,7 +2806,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
                 MusicManager.sharedInstance.setIndexInTheQueue(0)
 
-            self.recoverToNormalSongVC()
+            self.recoverToNormalSongVC(purchasedItem)
             
         }else{
               print("didn't purchase the song")
@@ -2814,7 +2816,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     
-    func recoverToNormalSongVC(){
+    func recoverToNormalSongVC(PlayingItem:MPMediaItem){
         //delete
         self.displayLink.paused = true
         self.displayLink.invalidate()
@@ -2825,9 +2827,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.AVplayer = nil
         //recover
         player = MusicManager.sharedInstance.player
-        self.nowPlayingMediaItem = player.nowPlayingItem
+        self.nowPlayingMediaItem = PlayingItem
         self.nowPlayingItemDuration = nowPlayingMediaItem.playbackDuration
         self.isSongNeedPurchase = false
+        self.selectedFromTable = true
         self.removeAllObserver()
         loadBackgroundImageFromMediaItem(nowPlayingMediaItem)
         self.registerMediaPlayerNotification()
