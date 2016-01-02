@@ -111,22 +111,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let currentVC = topViewController(rootViewController())
         
-         let baseVC:BaseViewController = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
-        
         // if the collection is different i.e. new songs are added/old songs are removed
         // we manually reload MusicViewController table
         if kShouldReloadMusicTable {
-            for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                musicVC.reloadDataAndTable()
+            if rootViewController().isKindOfClass(TabBarController) {
+                let tabBarController = rootViewController() as! TabBarController
                 
-                if(!musicVC.uniqueSongs.isEmpty){
-                    musicVC.songCount = 0
-                    musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+                for tabItemController in (tabBarController.viewControllers)! {
+                    if tabItemController.isKindOfClass(UINavigationController){
+                        for childVC in tabItemController.childViewControllers {
+                            if childVC.isKindOfClass(BaseViewController) {
+                                let baseVC = childVC as! BaseViewController
+
+                                for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                                    musicVC.reloadDataAndTable()
+                                    
+                                    if(!musicVC.uniqueSongs.isEmpty){
+                                        musicVC.songCount = 0
+                                        musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
         
         if(!currentVC.isKindOfClass(SongViewController)){
+            let baseVC:BaseViewController = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
             if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
                 if(MusicManager.sharedInstance.player.playbackState == .Playing){
                     baseVC.nowView.start()

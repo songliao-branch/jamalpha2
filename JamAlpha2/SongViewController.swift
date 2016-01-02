@@ -455,6 +455,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if let artwork = item.getArtWork() {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
             if currentImage == nil {
+                CoreDataManager.initializeSongToDatabase(item)
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
                     self.webSearchSong(item.getArtist() + " " + item.getAlbum())
                 }
