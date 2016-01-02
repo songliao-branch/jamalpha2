@@ -681,7 +681,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.bottomLyricLabel.text = ""
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: false)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: false)
         
         if lyric.lyric.count > 1 {
             self.lyric = lyric
@@ -2056,32 +2056,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.clearActions()
         })
     }
-
-    
-//    func uploadTabs(button: UIButton) {
-//        self.isRemoveProgressBlock = false
-//        self.selectedFromTable = false
-//        if shouldShowSignUpPage("") {
-//            return
-//        }
-//        
-//        var chords = [Chord]()
-//
-//        (chords, _, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
-//        
-//        if chords.count < 2 {
-//            self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
-//            return
-//        }
-//        
-//        APIManager.uploadTabs(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-//            cloudId in
-//            
-//            CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
-//            self.showStatusView(true)
-//            self.startHideStatusViewTimer()
-//        })
-//    }
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
@@ -2091,59 +2065,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
         self.showTabsEditor()
-//        let theSong: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
-//        self.checkChordsWithCoredata(theSong)
+
     }
-//////////////////
-//    func checkChordsWithCoredata(sender: Findable) {
-//        var  needAddNewChords: Bool = false
-//        let tabs = CoreDataManager.getTabs(sender, fetchingLocalUserOnly: true)
-//        var needAddNewChordsArray: [Tab] = [Tab]()
-//        for item in tabs.0 {
-//            print(item.tab.name)
-//            print(item.tab.content)
-//            let index = self.getBasicNoteIndex(item.tab.contentArray)
-//            print(index)
-//            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
-//                continue
-//            } else {
-//                needAddNewChords = true
-//                needAddNewChordsArray.append(item.tab)
-//            }
-//        }
-//        
-//        if needAddNewChords {
-//            var nameString: String = ""
-//            for item in needAddNewChordsArray {
-//                nameString = nameString + item.name + ", "
-//            }
-//            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
-//            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
-//            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
-//                action in
-//                for item in needAddNewChordsArray {
-//                    let index = self.getBasicNoteIndex(item.contentArray)
-//                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
-//                }
-//                self.showTabsEditor()
-//            }))
-//            self.presentViewController(alertController, animated: true, completion: nil)
-//        } else {
-//            self.showTabsEditor()
-//        }
-//    }
-    
-    func getBasicNoteIndex(sender: [String]) -> Int {
-        for var i = 0; i < 6; i++ {
-            if sender[i] != "x" {
-                let stringIndex = 6 - i
-                let fretIndex = Int(sender[i])
-                return stringIndex * 100 + fretIndex!
-            }
-        }
-        return 0
-    }
-    
+
     func showTabsEditor(){
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
@@ -2176,7 +2100,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingUsers: true)
         
         if lyric.lyric.count < 2 {
              self.showMessage("Your lyrics looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)

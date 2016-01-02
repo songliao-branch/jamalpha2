@@ -374,10 +374,10 @@ class CoreDataManager: NSObject {
         }
     }
     
-    //if fetchingLocalUserOnly true, will get the currently locally saved lyrics,
-    //otherwise we will retrieve all lyricsSet(both local user's and downloaded) and select the most 
+    //if fetchingLocalUserOnly true, will get user's lyrics,
+    //otherwise we will retrieve all lyricsSet and select the most
     //recently selected one
-    class func getLyrics(item: Findable, fetchingLocalUserOnly: Bool) -> (Lyric, Int) {
+    class func getLyrics(item: Findable, fetchingUsers: Bool) -> (Lyric, Int) { //return lyrics count and lyrics set id
         
         if let matchedSong = findSong(item) {
             print("has \(matchedSong.lyricsSets.count) set of lyrics")
@@ -386,7 +386,7 @@ class CoreDataManager: NSObject {
             
             var foundLyricsSet: LyricsSet!
             
-            if fetchingLocalUserOnly {
+            if fetchingUsers {
                 let localUserId = CoreDataManager.getCurrentUser()!.id
                 foundLyricsSet = sets.filter({ $0.userId == localUserId }).first
             } else {

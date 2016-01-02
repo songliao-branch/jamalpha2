@@ -110,7 +110,7 @@ class APIManager: NSObject {
 
         var lyric = Lyric()
         
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: true)
         
         if lyric.lyric.count < 2 {
             print("uploading lyrics error: lyrics count is less than 2")
@@ -133,7 +133,8 @@ class APIManager: NSObject {
             
             "times": times,
             "lyrics": lyrics,
-            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id),
+            "visible": true //lyrics are all public..I assume no-one cares
         ]
     
         Alamofire.request(.POST, lyricsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON

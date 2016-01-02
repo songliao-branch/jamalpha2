@@ -41,7 +41,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         if isPullingTabs {
             ( _, _, _, lastSelectedSetId, _) = CoreDataManager.getTabs(findable, fetchingUsers: false)
         } else {
-            (_, lastSelectedSetId) = CoreDataManager.getLyrics(findable, fetchingLocalUserOnly: false)
+            (_, lastSelectedSetId) = CoreDataManager.getLyrics(findable, fetchingUsers: false)
         }
 
         fetchData()
@@ -344,7 +344,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 
                 CoreDataManager.saveLyrics(self.findable, lyrics: download.lyrics, times: download.times, userId: download.editor.userId, lyricsSetId: download.id)
                 
-                (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.findable, fetchingLocalUserOnly: false)
+                (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.findable, fetchingUsers: false)
                 self.dismissViewControllerAnimated(true, completion: nil)
             })
         }
