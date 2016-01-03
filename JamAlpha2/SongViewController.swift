@@ -97,7 +97,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var startdisappearing: Int = 0
     var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
-
+    var volume:Float = 0
     
     //time
     //var timer: NSTimer?
@@ -240,11 +240,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         } else {
             MusicManager.sharedInstance.player.stop()
-            if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
-                MusicManager.sharedInstance.avPlayer.pause()
-                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
-                MusicManager.sharedInstance.avPlayer.removeAllItems()
+            
+            MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
+            self.volume = MusicManager.sharedInstance.avPlayer.volume
+            MusicManager.sharedInstance.avPlayer.volume = 0
+            if(MusicManager.sharedInstance.avPlayer.rate == 0){
+              MusicManager.sharedInstance.avPlayer.play()
             }
+            self.avPlayer = MusicManager.sharedInstance.avPlayer
+            
            let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 self.musicViewController = musicVC
@@ -311,7 +315,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if !isSongNeedPurchase {
                 resumeSong()
             }
-            if(isDemoSong){
+            if(isDemoSong || isSongNeedPurchase){
                 self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
             }
         }
@@ -2213,6 +2217,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         print("view will disappear")
+        if isSongNeedPurchase{
+            if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+                MusicManager.sharedInstance.avPlayer.volume = self.volume
+                MusicManager.sharedInstance.avPlayer.pause()
+                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                MusicManager.sharedInstance.avPlayer.removeAllItems()
+                avPlayer.removeObserver(self, forKeyPath: "rate")
+            }
+        }
         stopTimer()
         viewDidFullyDisappear = true
         
@@ -2230,6 +2243,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if isSongNeedPurchase{
+            if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+                MusicManager.sharedInstance.avPlayer.volume = self.volume
+                MusicManager.sharedInstance.avPlayer.pause()
+                MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                MusicManager.sharedInstance.avPlayer.removeAllItems()
+                avPlayer.removeObserver(self, forKeyPath: "rate")
+            }
             return
         }
         if isDemoSong {
@@ -2908,6 +2928,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func recoverToNormalSongVC(PlayingItem:MPMediaItem){
         //delete
+        if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+            MusicManager.sharedInstance.avPlayer.volume = self.volume
+            MusicManager.sharedInstance.avPlayer.pause()
+            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+            MusicManager.sharedInstance.avPlayer.removeAllItems()
+            avPlayer.removeObserver(self, forKeyPath: "rate")
+        }
         self.displayLink.paused = true
         self.displayLink.invalidate()
         self.displayLink = nil

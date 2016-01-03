@@ -20,6 +20,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var suspended:Bool = false
+    
+    var shuffleMode:MPMusicShuffleMode!
+    var repeatMode:MPMusicRepeatMode!
+
       
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
@@ -102,15 +106,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.suspended = KGLOBAL_init_queue.suspended
         KGLOBAL_queue.suspended = true
         KGLOBAL_init_queue.suspended = true
+        shuffleMode = MusicManager.sharedInstance.player.shuffleMode
+        repeatMode = MusicManager.sharedInstance.player.repeatMode
+        
         print("Go into Background suspend nsoperationqueue:\(self.suspended)")
     }
     
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-
+        
          var isKeepGoingOn:Bool = true
         let currentVC = topViewController(rootViewController())
+        if(MusicManager.sharedInstance.player != nil) {
+            MusicManager.sharedInstance.player.repeatMode = .All
+            MusicManager.sharedInstance.player.shuffleMode = .Off
+        }
         MusicManager.sharedInstance.reloadCollections()
+        
+        if(MusicManager.sharedInstance.player != nil) {
+            MusicManager.sharedInstance.player.repeatMode = self.repeatMode
+            MusicManager.sharedInstance.player.shuffleMode = self.shuffleMode
+        }
+        
+        
         // if the collection is different i.e. new songs are added/old songs are removed
         // we manually reload MusicViewController table
             if rootViewController().isKindOfClass(TabBarController) {
@@ -141,12 +159,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     }else{
                                         if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && !currentSongVC.isDemoSong){
                                             if !MusicManager.sharedInstance.uniqueSongs.contains(MusicManager.sharedInstance.player.nowPlayingItem!){
-                                                currentSongVC.dismissViewControllerAnimated(true, completion: {
-                                                    completed in
-                                                    KGLOBAL_queue.suspended = false
-                                                    KGLOBAL_init_queue.suspended = self.suspended
-                                                    isKeepGoingOn = false
-                                                })
+                                                if (MusicManager.sharedInstance.player.currentPlaybackRate == 0){
+                                                    currentSongVC.dismissViewControllerAnimated(true, completion: {
+                                                        completed in
+                                                        KGLOBAL_queue.suspended = false
+                                                        KGLOBAL_init_queue.suspended = self.suspended
+                                                        isKeepGoingOn = false
+                                                    })
+                                                }
                                             }
                                         }
                                     }
@@ -165,7 +185,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if(MusicManager.sharedInstance.player.playbackState == .Playing){
                     baseVC.nowView.start()
                 }
-                if (MusicManager.sharedInstance.avPlayer.rate == 0){
+                if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
                     MusicManager.sharedInstance.avPlayer.removeAllItems()
                 }
             }

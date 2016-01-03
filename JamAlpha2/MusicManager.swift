@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AVFoundation
 import MediaPlayer
 
 class MusicManager: NSObject {
@@ -79,7 +80,6 @@ class MusicManager: NSObject {
         loadLocalArtist()
         kShouldReloadMusicTable = true
         queueChanged = true
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~\(uniqueSongs.count)")
     }
     
     func initializePlayer(){
@@ -92,6 +92,7 @@ class MusicManager: NSObject {
             player.repeatMode = .All
             player.shuffleMode = .Off
             self.setPlayerQueue(uniqueSongs)
+            player.prepareToPlay()
         
         //initialize AVQueuePlayer
             self.avPlayer = AVQueuePlayer()
