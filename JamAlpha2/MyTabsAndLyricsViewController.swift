@@ -83,18 +83,18 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         // 2
         let editAction = UIAlertAction(title: "Edit", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
-            self.goToEditor(sender.tag-1)
+            self.goToEditor(sender.tag)
         })
         
         let privacyAction = UIAlertAction(title: "Mark as public", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
 
-            print(self.allTabsSets[sender.tag-1].visible)
+            print(self.allTabsSets[sender.tag].visible)
         })
 
         let deleteAction = UIAlertAction(title: "Delete", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
-            self.deleteSet(sender.tag-1)
+            self.deleteSet(sender.tag)
         })
         
         
