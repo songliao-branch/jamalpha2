@@ -4,6 +4,7 @@ import AVFoundation
 import Alamofire
 import Haneke
 import StoreKit
+import SwiftyJSON
 
 let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
@@ -19,6 +20,9 @@ let soundwaveHeight: CGFloat = 161
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate, SKStoreProductViewControllerDelegate {
     
     var musicViewController: MusicViewController!
+    
+    var searchResults: SearchResult!
+    var musicRequest: Request?
     
     private var rwLock = pthread_rwlock_t()
     
@@ -198,7 +202,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var isSongNeedPurchase = false
     var songNeedPurchase: SearchResult!
-    var AVplayer: AVPlayer!
     var playPreveiwButton:UIButton!
     var previewActionViewHeight: CGFloat = 54 * 4 + 3
     var previewView:UIView!
@@ -428,6 +431,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else if self.backgroundImage  == nil { //make sure album cover downloaded from iTunes is not blank
             currentImage = UIImage(named: "liwengbg")
             blurredImage = currentImage?.applyLightEffect()!
+            currentImage = nil
         }
         
         backgroundImageView.center.x = self.view.center.x
@@ -438,15 +442,75 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if let artwork = item.getArtWork() {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
             if currentImage == nil {
-             currentImage = UIImage(named: "liwengbg")
+                CoreDataManager.initializeSongToDatabase(item)
+                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+                    self.webSearchSong(item.getArtist() + " " + item.getAlbum())
+                }
+            }else{
+                self.backgroundImage = currentImage
+                self.blurredImage = currentImage!.applyLightEffect()!
             }
         } else {
             //TODO: add a placeholder album cover
             currentImage = UIImage(named: "liwengbg")
+            self.backgroundImage = currentImage
+            self.blurredImage = currentImage!.applyLightEffect()!
+            currentImage = nil
         }
-        self.backgroundImage = currentImage
-        self.blurredImage = currentImage!.applyLightEffect()!
+       
     }
+
+    func webSearchSong(searchText: String) {
+        if searchText.characters.count < 1 {
+            return
+        }
+        musicRequest?.cancel()
+        searchResults = nil
+        
+        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
+            if let data = response.result.value {
+                self.addDataToResults(JSON(data))
+                if let imageURL = self.searchResults.artworkUrl100 {
+                    let url = NSURL(string: imageURL)!
+                    let fetcher = NetworkFetcher<UIImage>(URL: url)
+                    
+                    let cache = Shared.imageCache
+                    cache.fetch(fetcher: fetcher).onSuccess { image in
+                        self.currentImage = image
+                        self.backgroundImage = image
+                        self.blurredImage = image.applyLightEffect()!
+                        self.isBlurred = !self.isBlurred
+                        if (self.isChordShown || self.isTabsShown || self.isLyricsShown) && !self.isBlurred {
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.backgroundImageView.image = self.blurredImage
+                            }
+                            self.isBlurred = true
+                        } else if (!self.isChordShown && !self.isTabsShown && !self.isLyricsShown && self.isBlurred) { //
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.backgroundImageView.image = self.backgroundImage
+                            }
+                            self.isBlurred = false
+                        }
+                    }
+                }
+                
+            } else {
+                print("something went wrong with search \(response.result.error)")
+            }
+        }
+    }
+    
+    func addDataToResults(data: SwiftyJSON.JSON){
+            let item = data["results"].array![0]
+            let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
+            
+            if let artwork = item["artworkUrl100"].string {
+                let newString = artwork.replace("100x100", replacement: "300x300")
+                searchResponse.artworkUrl100 = newString
+            }
+            searchResults = searchResponse
+    }
+
     
     func setUpTopButtons() {
 
@@ -950,7 +1014,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
-                self.progressBlockViewWidth = nil
+                self.progressBlockViewWidth = 0
         
                 //////////////////////////////
                 //remove from superView
@@ -962,7 +1026,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // get a new progressBlock
                 var progressBarWidth:CGFloat!
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
-                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
+                if (progressBarWidth <= 0.1){
+                    nowPlayingItemDuration = 1000
+                }
+                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
+        
                 KGLOBAL_progressBlock.center.y = progressContainerHeight
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
@@ -1042,7 +1110,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // get a new progressBlock
         var progressBarWidth:CGFloat!
         progressBarWidth = CGFloat(demoItemDuration) * progressWidthMultiplier
-        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
+        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
@@ -1202,8 +1270,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     KGLOBAL_progressBlock.removeFromSuperview()
                     KGLOBAL_progressBlock = nil
         }
-        
-        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
+        if (progressBarWidth <= 0.1){
+            nowPlayingItemDuration = 1000
+        }
+        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
@@ -1706,13 +1776,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("") {
             self.isRemoveProgressBlock = false
             self.selectedFromTable = false
-            
-            if isDemoSong {
-                self.avPlayer.pause()
-            } else {
-                self.player.pause()
-            }
-
             return
         }
      
@@ -1881,7 +1944,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //we blur the image if one of the chord, tabs or lyrics is shown
         if (isChordShown || isTabsShown || isLyricsShown) && !isBlurred {
         
-            self.backgroundImageView.image = blurredImage
+            dispatch_async(dispatch_get_main_queue()) {
+                self.backgroundImageView.image = self.blurredImage
+            }
             self.isBlurred = true
             
             // we dont' need animation when changing song
@@ -1897,8 +1962,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 })
             }
         } else if (!isChordShown && !isTabsShown && !isLyricsShown && isBlurred) { // center the image
-            
-            self.backgroundImageView.image = backgroundImage
+            dispatch_async(dispatch_get_main_queue()) {
+                self.backgroundImageView.image = self.backgroundImage
+            }
            
             self.isBlurred = false
             
@@ -1950,7 +2016,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
-            player.play()
+            if isDemoSong {
+                avPlayer.play()
+            }else{
+                player.play()
+            }
         }
     }
 
@@ -2542,12 +2612,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if !isViewDidAppear || startTime.toDecimalNumer() < 3 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 3 || startTime.toDecimalNumer() - toTime < (1 * speed) {
+            if !isViewDidAppear || startTime.toDecimalNumer() < 2 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 2 || startTime.toDecimalNumer() - toTime < (1 * speed) {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
                 let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
+                    if(!isDemoSong && nowPlayingItemDuration == 1000){
+                        if(player.nowPlayingItem!.playbackDuration > 1){
+                            if(KGLOBAL_progressBlock.frame.size.width > CGFloat(400)){
+                                nowPlayingMediaItem = player.nowPlayingItem
+                                nowPlayingItemDuration = nowPlayingMediaItem.playbackDuration
+                                let progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
+                                KGLOBAL_progressBlock.frame = CGRect(x: KGLOBAL_progressBlock.frame.origin.x, y: KGLOBAL_progressBlock.frame.origin.y, width: progressBarWidth, height: soundwaveHeight)
+                                if self.player.repeatMode != .One {
+                                    self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingMediaItem!.title!)
+                                    self.songNameLabel.textAlignment = NSTextAlignment.Center
+                                    self.artistNameLabel.text = nowPlayingMediaItem!.artist
+                                    if(currentImage == nil){
+                                        isBlurred = !isBlurred
+                                        applyEffectsToBackgroundImage(changeSong: true)
+                                    }
+                                    self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
+                                }
+                            }
+                        }
+                    }
                 } else {
                     startTime.addTime(Int(100 / stepPerSecond))
                 }
@@ -2633,7 +2723,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(playPreveiwButton)
         let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
         let playerItem = AVPlayerItem( URL:url)
-        AVplayer = AVPlayer(playerItem:playerItem)
+        KAVplayer = AVPlayer(playerItem:playerItem)
         displayLink = CADisplayLink(target: self, selector: ("updateSliderProgress"))
         displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
         displayLink.paused = true
@@ -2727,9 +2817,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func previewPlay(){
-        if(self.AVplayer.rate == 0.0){
+        if(KAVplayer.rate == 0.0){
             previewProgress.setColors(UIColor.mainPinkColor())
-            AVplayer.rate = 1.0;
+            KAVplayer.rate = 1.0;
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
@@ -2737,7 +2827,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: {
                     finished in
                     self.displayLink.paused = false
-                    self.AVplayer.play()
+                    KAVplayer.play()
             })
         }else{
             UIView.animateWithDuration(0.2, delay: 0.0,
@@ -2747,7 +2837,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: {
                     finished in
                     self.displayLink.paused = true
-                    self.AVplayer.pause()
+                    KAVplayer.pause()
             })
         }
     }
@@ -2778,15 +2868,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func updateSliderProgress(){
-        let angle = self.AVplayer.currentTime().seconds * 360/self.AVplayer.currentItem!.duration.seconds
+        let angle = KAVplayer.currentTime().seconds * 360/KAVplayer.currentItem!.duration.seconds
         if(angle.isFinite && !angle.isNaN){
             previewProgress.angle = Int(angle)
         }else{
             previewProgress.angle = 0
         }
         
-        if(AVplayer.currentTime() == AVplayer.currentItem!.duration){
-            AVplayer.seekToTime(kCMTimeZero)
+        if(KAVplayer.currentTime() == KAVplayer.currentItem!.duration){
+            KAVplayer.seekToTime(kCMTimeZero)
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
@@ -2824,7 +2914,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.previewView = nil
         self.playPreveiwButton.removeFromSuperview()
         self.playPreveiwButton = nil
-        self.AVplayer = nil
+        KAVplayer = nil
         //recover
         player = MusicManager.sharedInstance.player
         self.nowPlayingMediaItem = PlayingItem

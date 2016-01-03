@@ -79,6 +79,7 @@ class MusicManager: NSObject {
         loadLocalArtist()
         kShouldReloadMusicTable = true
         queueChanged = true
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~\(uniqueSongs.count)")
     }
     
     func initializePlayer(){

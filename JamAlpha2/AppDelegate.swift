@@ -136,7 +136,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                             MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
                                             MusicManager.sharedInstance.setIndexInTheQueue(0)
                                             self.suspended = true
-                                            ////////////////////////////////////
                                             currentSongVC.recoverToNormalSongVC(purchasedItem)
                                         }
                                     }else{
@@ -157,7 +156,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }
             }
+
     
+        
+        if(!currentVC.isKindOfClass(SongViewController)){
+            let baseVC:BaseViewController = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
+            if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                if(MusicManager.sharedInstance.player.playbackState == .Playing){
+                    baseVC.nowView.start()
+                }
+                if (MusicManager.sharedInstance.avPlayer.rate == 0){
+                    MusicManager.sharedInstance.avPlayer.removeAllItems()
+                }
+            }
+        }
+        
         if isKeepGoingOn {
             if currentVC.isKindOfClass(SongViewController) {
                 let currentSongVC = currentVC as! SongViewController

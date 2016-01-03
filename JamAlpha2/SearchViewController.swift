@@ -355,7 +355,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 searchResponse.collectionName = collectionName
             }
             if let artwork = item["artworkUrl100"].string {
-                searchResponse.artworkUrl100 = artwork
+                let newString = artwork.replace("100x100", replacement: "300x300")
+                searchResponse.artworkUrl100 = newString
             }
             if let preview = item["previewUrl"].string {
                 searchResponse.previewUrl = preview
@@ -391,23 +392,23 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(needStart:Bool){
-        for tabItemController in (self.tabBarController?.viewControllers)! {
-            if tabItemController.isKindOfClass(UINavigationController){
-                for childVC in tabItemController.childViewControllers {
-                    if childVC.isKindOfClass(BaseViewController) {
-                        let baseVC = childVC as! BaseViewController
-                        if(needStart){
-                            baseVC.nowView.start()
-                        }else{
-                            baseVC.nowView.stop()
-                        }
-                        
-                        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                            musicVC.musicTable.reloadData()
-                        }
-                    }
-                }
-            }
+        let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+        if(needStart){
+            baseVC.nowView.start()
+        }else{
+            baseVC.nowView.stop()
+        }
+    
+        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+            musicVC.musicTable.reloadData()
+        }
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if( KAVplayer != nil && KAVplayer.rate != 0){
+            let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+            baseVC.nowView.start()
         }
     }
 

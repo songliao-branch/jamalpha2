@@ -234,7 +234,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             //TODO: add a placeholder album cover
             image = UIImage(named: "liwengbg")
         }
-        backgroundImage.image = image
+        backgroundImage.image = image != nil ? image : songViewController?.backgroundImage
         
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
