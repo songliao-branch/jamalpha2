@@ -605,6 +605,7 @@ class CoreDataManager: NSObject {
         
         if sets.count == 1 {
             moc.deleteObject(sets[0])
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     
@@ -613,6 +614,7 @@ class CoreDataManager: NSObject {
         
         if sets.count == 1 {
             moc.deleteObject(sets[0])
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     

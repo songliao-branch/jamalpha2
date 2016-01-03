@@ -60,6 +60,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             for t in self.allTabsSets {
                 let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
                 song.findMediaItem()
+                print("visible: \(t.visible)")
                 songs.append(song)
             }
         } else {
@@ -78,17 +79,18 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         //TODO: UI bug: open last row's option, then this row
         
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+       
         
-        optionMenu.view.tintColor = UIColor.mainPinkColor()
         // 2
         let editAction = UIAlertAction(title: "Edit", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.goToEditor(sender.tag)
         })
         
+        
         let privacyAction = UIAlertAction(title: "Mark as public", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
-
+            
             print(self.allTabsSets[sender.tag].visible)
         })
 
@@ -99,9 +101,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         
         //
-        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: {
-            (alert: UIAlertAction!) -> Void in
-        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
         
         
         // 4
@@ -112,6 +112,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         // 5
         self.presentViewController(optionMenu, animated: true, completion: nil)
+        
+        optionMenu.view.tintColor = UIColor.mainPinkColor()
     }
     
     func goToEditor(index: Int) {
