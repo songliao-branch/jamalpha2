@@ -2951,6 +2951,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.removeAllObserver()
         CoreDataManager.initializeSongToDatabase(PlayingItem)
         self.registerMediaPlayerNotification()
+        startTime.setTime(3)
         self.resumeSong()
         if(!isGenerated){
             generateSoundWave(nowPlayingMediaItem)
