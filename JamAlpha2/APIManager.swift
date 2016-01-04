@@ -39,13 +39,6 @@ let jamBaseURL = "https://jamapi.herokuapp.com"
 
 class APIManager: NSObject {
     
-    //MARK: iTunes search
-    static let searchBaseURL = "https://itunes.apple.com/search"
-    
-    class func searchParameters(searchTerm: String) -> [String: String] {
-        return ["term":"\(searchTerm)", "limit":"20", "media":"music"]
-    }
-    
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     

@@ -11,86 +11,101 @@ import Alamofire
 import Haneke
 import SwiftyJSON
 
-
 class SearchAPI: NSObject {
-    var searchResults: [SearchResult]!
-    var musicRequest: Request?
+
+    enum ImageSize: String {
+        case Thumbnail = "100x100", Large = "300x300"
+    }
     
-    func webSearchSong(searchText: String, searchResultTableView:UITableView?=nil, completion: ((data: SwiftyJSON.JSON) -> Void)?) {
+    static var musicRequest: Request?
+    //MARK: iTunes search
+    static let searchBaseURL = "https://itunes.apple.com/search"
+    
+    class func searchSong(searchText: String, completion: ((results: [SearchResult]) -> Void)) {
         if searchText.characters.count < 1 {
             return
         }
         musicRequest?.cancel()
-        searchResults = [SearchResult]()
-        if(searchResultTableView != nil){
-            searchResultTableView!.reloadData()
-        }
+        var searchResults = [SearchResult]()
         
-        
-        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
+        let parameters = ["term":"\(searchText)", "limit":"30", "media":"music"]
+        musicRequest = Alamofire.request(.GET, searchBaseURL, parameters: parameters).responseJSON { response in
             if let data = response.result.value {
-                if(searchResultTableView != nil){
-                    self.addDataToResults(JSON(data),searchResultTableView:searchResultTableView!)
-                }else{
-                    self.addDataToResults(JSON(data))
+                
+                let json = JSON(data)
+                
+                for item in json["results"].array! {
+                    let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
+                    
+                    if let trackId = item["trackId"].number {
+                        searchResponse.trackId = Int(trackId)
+                    }
+                    if let trackName = item["trackName"].string {
+                        searchResponse.trackName = trackName
+                    }
+                    if let artistName = item["artistName"].string {
+                        searchResponse.artistName = artistName
+                    }
+                    if let collectionName = item["collectionName"].string {
+                        searchResponse.collectionName = collectionName
+                    }
+                    if let artwork = item["artworkUrl100"].string {
+                        let newString = artwork.replace("100x100", replacement: "300x300")
+                        searchResponse.artworkUrl100 = newString
+                    }
+                    if let preview = item["previewUrl"].string {
+                        searchResponse.previewUrl = preview
+                    }
+                    if let trackViewUrl = item["trackViewUrl"].string {
+                        searchResponse.trackViewUrl = trackViewUrl
+                    }
+                    
+                    if let trackTimeMillis = item["trackTimeMillis"].number {
+                        searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
+                    }
+                    
+                    searchResults.append(searchResponse)
                 }
-                completion?(data: JSON(data))
-            } else {
-                print("something went wrong with search \(response.result.error)")
-                completion?(data: nil)
+                
+                completion(results: searchResults)
             }
         }
     }
     
-    
-    func addDataToResults(data: SwiftyJSON.JSON, searchResultTableView:UITableView?=nil){
-        if(searchResultTableView != nil){
-            for item in data["results"].array! {
-                let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
-                
-                if let trackId = item["trackId"].number {
-                    searchResponse.trackId = Int(trackId)
-                }
-                if let trackName = item["trackName"].string {
-                    searchResponse.trackName = trackName
-                }
-                if let artistName = item["artistName"].string {
-                    searchResponse.artistName = artistName
-                }
-                if let collectionName = item["collectionName"].string {
-                    searchResponse.collectionName = collectionName
-                }
-                if let artwork = item["artworkUrl100"].string {
-                    let newString = artwork.replace("100x100", replacement: "300x300")
-                    searchResponse.artworkUrl100 = newString
-                }
-                if let preview = item["previewUrl"].string {
-                    searchResponse.previewUrl = preview
-                }
-                if let trackViewUrl = item["trackViewUrl"].string {
-                    searchResponse.trackViewUrl = trackViewUrl
-                }
-                
-                if let trackTimeMillis = item["trackTimeMillis"].number {
-                    searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
-                }
-                
-                searchResults.append(searchResponse)
-            }
-            
-            dispatch_async(dispatch_get_main_queue()) {
-                searchResultTableView!.reloadData()
-            }
-        }else {
-            let item = data["results"].array![0]
-            let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
-            
-            if let artwork = item["artworkUrl100"].string {
-                let newString = artwork.replace("100x100", replacement: "300x300")
-                searchResponse.artworkUrl100 = newString
-            }
-            searchResults.append(searchResponse)
+
+    class func getBackgroundImageForSong(searchText: String, imageSize: ImageSize, completion: ((image: UIImage) -> Void)) {
+        if searchText.characters.count < 1 {
+            return
         }
- 
+        musicRequest?.cancel()
+        
+        let parameters = ["term":"\(searchText)", "limit":"1", "media":"music"]
+        
+        musicRequest = Alamofire.request(.GET, searchBaseURL, parameters: parameters).responseJSON { response in
+            if let data = response.result.value {
+                
+                let json = JSON(data)
+                
+                if json["resultCount"] > 0 {
+                    let firstValue = json["results"].array![0]
+                    let searchResponse = SearchResult(wrapperType: firstValue["wrapperType"].string!, kind: firstValue["kind"].string!)
+                    
+                    if let artwork = firstValue["artworkUrl100"].string {
+                        let newString = artwork.replace("100x100", replacement: imageSize.rawValue)
+                        searchResponse.artworkUrl100 = newString
+                        
+                        let url = NSURL(string: newString)!
+                        let fetcher = NetworkFetcher<UIImage>(URL: url)
+                        let cache = Shared.imageCache
+                        cache.fetch(fetcher: fetcher).onSuccess { image in
+                            completion(image: image)
+                        }
+                    }
+                } else {
+                    completion(image: UIImage(named: "liwengbg")!)
+                }
+            }
+        }
     }
+
 }

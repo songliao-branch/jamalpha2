@@ -448,19 +448,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func loadBackgroundImageFromMediaItem(item: Findable) {
+        
         if let artwork = item.getArtWork() {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
             if currentImage == nil {
+                self.currentImage = nil
                 CoreDataManager.initializeSongToDatabase(item)
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-                    self.searchAPI.webSearchSong(item.getArtist() + " " + item.getAlbum(), completion: {
-                        data in
-                        if(data != nil){
-                            if (data["resultCount"] > 0){
-                                self.reloadBackgroundImageAfterSearch()
-                            }
-                        }
-                    })
+                   self.reloadBackgroundImageAfterSearch(item)
                 }
             }else{
                 self.backgroundImage = currentImage
@@ -468,71 +463,39 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         } else {
             //TODO: add a placeholder album cover
+            self.currentImage = UIImage(named: "liwengbg")
+            self.backgroundImage = currentImage
+            self.blurredImage = currentImage!.applyLightEffect()!
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-                self.searchAPI.webSearchSong(item.getArtist() + " " + item.getAlbum(), completion: {
-                    data in
-                    if(data != nil){
-                        if (data["resultCount"] > 0){
-                            self.reloadBackgroundImageAfterSearch()
-                        }else{
-                            self.currentImage = UIImage(named: "liwengbg")
-                            self.backgroundImage = self.currentImage
-                            self.blurredImage = self.currentImage!.applyLightEffect()!
-                            self.currentImage = nil
-                        }
-                    }else{
-                        self.currentImage = UIImage(named: "liwengbg")
-                        self.backgroundImage = self.currentImage
-                        self.blurredImage = self.currentImage!.applyLightEffect()!
-                        self.currentImage = nil
-                    }
-                })
+               self.reloadBackgroundImageAfterSearch(item)
             }
         }
        
     }
 
-//    func webSearchSong(searchText: String) {
-//        if searchText.characters.count < 1 {
-//            return
-//        }
-//        musicRequest?.cancel()
-//        searchResults = nil
-//        
-//        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
-//            if let data = response.result.value {
-//                self.addDataToResults(JSON(data))
-//                
-//            } else {
-//                print("something went wrong with search \(response.result.error)")
-//            }
-//        }
-//    }
     
-    func reloadBackgroundImageAfterSearch(){
-        if let imageURL = self.searchAPI.searchResults[0].artworkUrl100 {
-            let url = NSURL(string: imageURL)!
-            let fetcher = NetworkFetcher<UIImage>(URL: url)
-            
-            let cache = Shared.imageCache
-            cache.fetch(fetcher: fetcher).onSuccess { image in
-                self.currentImage = image
-                self.backgroundImage = image
-                self.blurredImage = image.applyLightEffect()!
-                self.isBlurred = !self.isBlurred
-                if (self.isChordShown || self.isTabsShown || self.isLyricsShown) && !self.isBlurred {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        self.backgroundImageView.image = self.blurredImage
-                    }
-                    self.isBlurred = true
-                } else if (!self.isChordShown && !self.isTabsShown && !self.isLyricsShown && self.isBlurred) { //
+    func reloadBackgroundImageAfterSearch(item:Findable){
+        let searchText = item.getArtist() + " " + item.getTitle()
+        
+        SearchAPI.getBackgroundImageForSong(searchText, imageSize: SearchAPI.ImageSize.Large, completion: {
+            image in
+            self.currentImage = image
+            self.backgroundImage = image
+            self.blurredImage = image.applyLightEffect()!
+            self.isBlurred = !self.isBlurred
+            if (self.isChordShown || self.isTabsShown || self.isLyricsShown) && !self.isBlurred {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.backgroundImageView.image = self.blurredImage
+                }
+                self.isBlurred = true
+            } else if (!self.isChordShown && !self.isTabsShown && !self.isLyricsShown && self.isBlurred) { //
                     dispatch_async(dispatch_get_main_queue()) {
                         self.backgroundImageView.image = self.backgroundImage
                     }
                     self.isBlurred = false
                 }
             }
-        }
+        )
     }
     
     
@@ -1050,7 +1013,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // get a new progressBlock
                 var progressBarWidth:CGFloat!
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
-                if (progressBarWidth <= 0.1){
+        
+                //如果是在线从来没有听过的queue切歌的很快的时候duration是读不出来的
+                if progressBarWidth <= 0.1 {
                     nowPlayingItemDuration = 1000
                 }
                 KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
@@ -2704,7 +2669,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if !isViewDidAppear || startTime.toDecimalNumer() < 2 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 2 || startTime.toDecimalNumer() - toTime < (1 * speed) {
+            if !self.selectedFromSearchTab && (!isViewDidAppear || startTime.toDecimalNumer() < 2 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 2 || startTime.toDecimalNumer() - toTime < (1 * speed)) {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
                 let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime

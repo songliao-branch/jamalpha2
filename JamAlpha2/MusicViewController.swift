@@ -256,36 +256,16 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             // some song does not have an album cover
             if let cover = song.getArtWork() {
                 let image = cover.imageWithSize(CGSize(width: 54, height: 54))
-                if image == nil{
-                    dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-                        self.searchAPI.webSearchSong(song.getArtist() + " " + song.getAlbum(), completion: {
-                            data in
-                            if(data != nil){
-                                if (data["resultCount"] > 0){
-                                   self.reloadCellImageAfterSearch(cell)
-                                }
-                            }
-                        })
-                    }
-                }else{
-                    cell.coverImage.image = image
+                if let img = image {
+                    cell.coverImage.image = img
+                } else { //this happens somewhow when songs load too fast
+                    //TODO: load something else
+                    cell.coverImage.image = UIImage(named: "liweng")
+                    loadAPISearchImageToCell(cell, song: song)
                 }
             } else {
-                //TODO: add a placeholder cover
-                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-                    self.searchAPI.webSearchSong(song.getArtist() + " " + song.getAlbum(), completion: {
-                        data in
-                        if(data != nil){
-                            if (data["resultCount"] > 0){
-                                self.reloadCellImageAfterSearch(cell)
-                            }else{
-                                cell.coverImage.image = UIImage(named: "liweng")
-                            }
-                        }else{
-                            cell.coverImage.image = UIImage(named: "liweng")
-                        }
-                    })
-                }
+                cell.coverImage.image = UIImage(named: "liweng")
+                loadAPISearchImageToCell(cell, song: song)
             }
             
             cell.mainTitle.text = song.getTitle()
@@ -527,22 +507,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         return itemsInPreviousSections + currentRow
     }
     
-    func reloadCellImageAfterSearch(cell:MusicCell){
-        if let imageURL = self.searchAPI.searchResults[0].artworkUrl100 {
-            let tempImageURL = imageURL.replace("300X300", replacement: "60X60")
-            let url = NSURL(string: tempImageURL)!
-            let fetcher = NetworkFetcher<UIImage>(URL: url)
-            
-            let cache = Shared.imageCache
-            cache.fetch(fetcher: fetcher).onSuccess { image in
+    
+    func loadAPISearchImageToCell(cell: MusicCell, song: Findable) {
+        dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+            SearchAPI.getBackgroundImageForSong(song.getArtist() + " " + song.getTitle(), imageSize: SearchAPI.ImageSize.Thumbnail, completion: {
+                image in
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.coverImage.image = image
                 }
-            }
+            })
         }
     }
-
-    
 }
 
 extension MusicViewController {

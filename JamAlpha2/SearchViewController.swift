@@ -13,6 +13,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var uniqueSongs: [MPMediaItem] = [MPMediaItem]()
     var filteredSongs: [MPMediaItem] = [MPMediaItem]()
     
+    var searchResults = [SearchResult]()
+    
     var searchAPI:SearchAPI = SearchAPI()
     var animator: CustomTransitionAnimation?
     
@@ -29,7 +31,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
-        searchAPI.searchResults = [SearchResult]()
         setUpSearchBar()
         setUpSearchPromptBackground()
     }
@@ -101,7 +102,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             return 30
         } else if section == 1 {
-            if searchAPI.searchResults.count == 0 || !resultSearchController.active {
+            if searchResults.count == 0 || !resultSearchController.active {
                 return 0
             }
             return 30
@@ -135,7 +136,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return view
             
         } else if section == 1 {
-            if searchAPI.searchResults.count == 0 {
+            if searchResults.count == 0 {
                 return nil
             }
             let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
@@ -160,7 +161,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 return filteredSongs.count
             } else if section == 1 {
                 tableView.hidden = false
-              return searchAPI.searchResults.count
+              return searchResults.count
             }
         } else if !resultSearchController.active && section == 0 && searchHistoryManager.getAllHistory().count > 0 {
             searchBackgroundLabel.hidden = true
@@ -196,14 +197,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     cell.albumCover.image = UIImage(named: "liweng")
                 }
             } else { //web search in section 1
-                if let track = searchAPI.searchResults[indexPath.row].trackName {
+                if let track = searchResults[indexPath.row].trackName {
                     cell.titleLabel.text = track
                 }
-                if let artist = searchAPI.searchResults[indexPath.row].artistName {
+                if let artist = searchResults[indexPath.row].artistName {
                     cell.subtitleLabel.text = artist
                 }
                 
-                if let imageURL = searchAPI.searchResults[indexPath.row].artworkUrl100 {
+                if let imageURL = searchResults[indexPath.row].artworkUrl100 {
                     cell.albumCover.image = nil
                     let url = NSURL(string: imageURL)!
                     let fetcher = NetworkFetcher<UIImage>(URL: url)
@@ -211,9 +212,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image
-                        if(indexPath.row < (self.searchAPI.searchResults.count)){
-                            self.searchAPI.searchResults[indexPath.row].image = nil
-                            self.searchAPI.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                        
+                        if(indexPath.row < (self.searchResults.count)){
+                            self.searchResults[indexPath.row].image = nil
+                            self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
                         }
                     }
                 }
@@ -233,12 +235,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             } else {
                 cell.searchHistoryLabel.text = "Clear recent searches"
             }
-            
-        
         }
         return cell
     }
-    
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if resultSearchController.active {
@@ -263,7 +262,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
                 songVC.selectedFromTable = true
-                let searchSong = self.searchAPI.searchResults[indexPath.row]
+                let searchSong = searchResults[indexPath.row]
                 var isReload = true
                 
                 if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
@@ -271,8 +270,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                 }else{
                     songVC.isSongNeedPurchase = true
-                    songVC.songNeedPurchase = self.searchAPI.searchResults[indexPath.row]
-                    if let img = self.searchAPI.searchResults[indexPath.row].image {
+                    songVC.songNeedPurchase = searchResults[indexPath.row]
+                    if let img = searchResults[indexPath.row].image {
                         songVC.backgroundImage = img
                         songVC.blurredImage = img.applyLightEffect()
                     }
@@ -314,7 +313,16 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         filterLocalSongs(searchController.searchBar.text!)
-        searchAPI.webSearchSong(searchController.searchBar.text!, searchResultTableView: self.searchResultTableView,completion: nil)
+        self.searchResultTableView.reloadData()
+        SearchAPI.searchSong(searchController.searchBar.text!, completion: {
+            results in
+            
+            self.searchResults = results
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                self.searchResultTableView.reloadData()
+            }
+        })
     }
     
     
