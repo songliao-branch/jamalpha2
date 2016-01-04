@@ -55,7 +55,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     var speed: Float = 1
     
-    var songViewController: SongViewController!
+    var songViewController: SongViewController?
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -1903,11 +1903,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
                 }
             })
         }
@@ -2155,9 +2157,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let savedTabsSetId = CoreDataManager.getTabs(theSong, fetchingUsers: true).3
             
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
-                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic)
-
-            self.songViewController.updateMusicData(theSong)
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic, lastEditedDate: NSDate())
+            
+            if let songVC = songViewController {
+                songVC.updateMusicData(theSong)
+            }
             
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
@@ -2178,11 +2182,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
                 }
             })
         }

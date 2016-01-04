@@ -18,4 +18,5 @@ class LyricsSet: NSManagedObject {
     @NSManaged var id: NSNumber
     @NSManaged var lastSelectedDate: NSDate
     @NSManaged var userId: NSNumber
+    @NSManaged var lastEditedDate: NSDate
 }

@@ -234,7 +234,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.votesLabel.text = String(tabsSet.votesScore)
             cell.titleLabel.text = tabsSet.chordsPreview + "..."
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
-            cell.dateLabel.text = tabsSet.lastEdited
+            cell.dateLabel.text = NSDate.timeAgoSinceDate(tabsSet.lastEdited!, numericDates: true)
             
             //user section
             cell.profileName.text = tabsSet.editor.nickname
@@ -287,7 +287,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.subtitleLabel.text = "\(lyricsSet.numberOfLines) lines"
             
             cell.profileName.text = lyricsSet.editor.nickname
-            cell.dateLabel.text = lyricsSet.lastEdited
+            cell.dateLabel.text = NSDate.timeAgoSinceDate(lyricsSet.lastEdited!, numericDates: true)
             
         
             cell.profileImage.image = nil

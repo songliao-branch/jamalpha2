@@ -333,7 +333,7 @@ class CoreDataManager: NSObject {
     }
     
     // MARK: save, retrieve lyrics, userId can be either localuserId or downloaded lyricsSet's user id
-    class func saveLyrics(item: Findable, lyrics: [String], times: [Float], userId: Int, lyricsSetId: Int) {
+    class func saveLyrics(item: Findable, lyrics: [String], times: [Float], userId: Int, lyricsSetId: Int, lastEditedDate: NSDate?=nil) {
 
         if let matchedSong = findSong(item) {
           
@@ -354,6 +354,10 @@ class CoreDataManager: NSObject {
                     
                     foundDownloadedLyricsSet.times = timesData
                     foundDownloadedLyricsSet.lastSelectedDate = NSDate()
+                    
+                    if let lastEdited = lastEditedDate {
+                        foundDownloadedLyricsSet.lastEditedDate = lastEdited
+                    }
                     break
                 }
             }
@@ -369,6 +373,10 @@ class CoreDataManager: NSObject {
                 lyricsSet.lastSelectedDate = NSDate()
                 lyricsSet.id = lyricsSetId
                 lyricsSet.userId = userId
+                
+                if let lastEdited = lastEditedDate {
+                    lyricsSet.lastEditedDate = lastEdited
+                }
             }
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
@@ -417,7 +425,7 @@ class CoreDataManager: NSObject {
         return (Lyric(), 0)
     }
     
-    class func setLocalLyricsMostRecent(item: Findable) {
+    class func setUserLyricsMostRecent(item: Findable) {
         if let matchedSong = findSong(item) {
             let savedSets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
             let foundLocalSet = savedSets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
@@ -430,7 +438,7 @@ class CoreDataManager: NSObject {
         }
     }
     
-    class func setLocalTabsMostRecent (item: Findable) {
+    class func setUserTabsMostRecent (item: Findable) {
         if let matchedSong = findSong(item) {
             let savedSets = matchedSong.tabsSets.allObjects as! [TabsSet]
             
@@ -444,7 +452,7 @@ class CoreDataManager: NSObject {
     }
 
     //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
-    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[Float], tuning:String, capo: Int, userId: Int, tabsSetId: Int, visible: Bool) {
+    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[Float], tuning:String, capo: Int, userId: Int, tabsSetId: Int, visible: Bool, lastEditedDate: NSDate?=nil) {//last parameter is only required for user tabs
         
         if let matchedSong = findSong(item) {
             
@@ -467,6 +475,11 @@ class CoreDataManager: NSObject {
                     foundTabsSet.capo = capo
                     foundTabsSet.lastSelectedDate = NSDate()
                     foundTabsSet.visible = visible
+                    
+                    //save last edited date of only user tabs, this is used to sorted descending in my tabs
+                    if let lastEdited = lastEditedDate {
+                        foundTabsSet.lastEditedDate = lastEdited
+                    }
                     break
                 }
             }
@@ -485,7 +498,12 @@ class CoreDataManager: NSObject {
                 tabsSet.id = tabsSetId
                 tabsSet.userId = userId
                 tabsSet.visible = visible
+                
+                if let lastEdited = lastEditedDate {
+                    tabsSet.lastEditedDate = lastEdited
+                }
             }
+            
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
@@ -495,9 +513,16 @@ class CoreDataManager: NSObject {
         var sets = [DownloadedTabsSet]()
         let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
         
-        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc)
+        var results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc) as! [TabsSet]
+        
+        results.sortInPlace({
+            setA, setB in
+            return setA.lastEditedDate.compare(setB.lastEditedDate) == NSComparisonResult.OrderedDescending
+        })
+        
         for result in results {
-            let temp = result as! TabsSet
+            let temp = result
+            
             let t = DownloadedTabsSet(id: Int(temp.id), tuning: temp.tuning, capo: Int(temp.capo), chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: "")
             
             let chords = NSKeyedUnarchiver.unarchiveObjectWithData(temp.chords as! NSData) as! [String]
@@ -517,6 +542,7 @@ class CoreDataManager: NSObject {
             t.title = temp.song.title
             t.artist = temp.song.artist
             t.duration = Float(temp.song.playbackDuration)
+            
             sets.append(t)
         }
         return sets
@@ -527,9 +553,15 @@ class CoreDataManager: NSObject {
         var sets = [DownloadedLyricsSet]()
         let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
         
-        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: predicate, managedObjectContext: moc)
+        var results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: predicate, managedObjectContext: moc) as! [LyricsSet]
+        
+        results.sortInPlace({
+            setA, setB in
+            return setA.lastEditedDate.compare(setB.lastEditedDate) == NSComparisonResult.OrderedDescending
+        })
+        
         for result in results {
-            let temp = result as! LyricsSet
+            let temp = result
             
             let l = DownloadedLyricsSet(id: Int(temp.id), lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(),lastEdited: "")
             
@@ -600,37 +632,25 @@ class CoreDataManager: NSObject {
     }
     
     
-    class func deleteLocalTab(findable: Findable) {
-        if let matchedSong = findSong(findable) {
-            let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
-            
-            var foundTabsSet: TabsSet!
-            
-            foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
-            
-            if foundTabsSet != nil {
-                moc.deleteObject(foundTabsSet)
-                SwiftCoreDataHelper.saveManagedObjectContext(moc)
-            }
+    class func deleteUserTabs(setId: Int) {
+        let sets = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: NSPredicate(format: "id == \(setId)"), managedObjectContext: moc) as! [TabsSet]
+        
+        if sets.count == 1 {
+            moc.deleteObject(sets[0])
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     
-    class func deleteLocalLyrics(findable: Findable) {
-        if let matchedSong = findSong(findable) {
-            let sets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
-            
-            var foundLyricsSet: LyricsSet!
-            
-            foundLyricsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first
-            
-            if foundLyricsSet != nil {
-                moc.deleteObject(foundLyricsSet)
-                SwiftCoreDataHelper.saveManagedObjectContext(moc)
-            }
+    class func deleteUserlyrics(setId: Int) {
+        let sets = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: NSPredicate(format: "id == \(setId)"), managedObjectContext: moc) as! [LyricsSet]
+        
+        if sets.count == 1 {
+            moc.deleteObject(sets[0])
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
     
-    //a local tabs that has never been uploaded will have an id -1, once it's uploaded, the retrieved cloud id will 
+    //a local tabs that has never been uploaded will have an id -1, once it's uploaded, the retrieved cloud id will
     class func saveCloudIdToTabs(findable: Findable, cloudId: Int) {
         if let matchedSong = findSong(findable) {
             let sets = matchedSong.tabsSets.allObjects as! [TabsSet]

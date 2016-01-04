@@ -19,7 +19,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     var hiddenKeyboardView: UIView = UIView()
     let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
 
-    var isDemoSong: Bool!
+    var isDemoSong = false
 
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     

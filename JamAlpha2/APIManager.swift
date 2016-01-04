@@ -496,15 +496,16 @@ class APIManager: NSObject {
                     let editor = Editor(userId: json["user"]["id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
                     
                     for set in tabsSets.array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: set["last_edited"].string!)
+                        
                         t.chords = set["chords"].arrayObject as! [String]
                         t.tabs = set["tabs"].arrayObject as! [String]
-                        t.visible = set["visible"].bool! //TODO: waiting for API changes
+                        t.visible = set["visible"].bool!
+                        
                         var theTimes = [Float]()
                         t.title = set["song"]["title"].string!
                         t.artist = set["song"]["artist"].string!
                         t.duration = set["song"]["duration"].float!
-
                         for time in set["times"].arrayObject as! [String] {
                             theTimes.append(Float(time)!)
                         }
@@ -514,7 +515,7 @@ class APIManager: NSObject {
                     }
                     
                     for set in lyricsSets.array! {
-                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: set["last_edited"].string!)
                         l.lyrics = set["lyrics"].arrayObject as! [String]
                         
                         var theTimes = [Float]()

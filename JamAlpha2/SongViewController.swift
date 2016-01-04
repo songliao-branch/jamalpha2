@@ -2101,8 +2101,60 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("goToTabsEditor") {
             return
         }
-        self.showTabsEditor()
 
+        //self.showTabsEditor()
+
+        self.checkChordsWithCoredata()
+    }
+
+    func checkChordsWithCoredata() {
+        let sender: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
+        var  needAddNewChords: Bool = false
+        let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
+        var needAddNewChordsArray: [Tab] = [Tab]()
+        for item in tabs.0 {
+            print(item.tab.name)
+            print(item.tab.content)
+            let index = self.getBasicNoteIndex(item.tab.contentArray)
+            print(index)
+            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
+                continue
+            } else {
+                needAddNewChords = true
+                needAddNewChordsArray.append(item.tab)
+            }
+        }
+        
+        if needAddNewChords {
+            var nameString: String = ""
+            for item in needAddNewChordsArray {
+                nameString = nameString + item.name + ", "
+            }
+            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
+                action in
+                for item in needAddNewChordsArray {
+                    let index = self.getBasicNoteIndex(item.contentArray)
+                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+                }
+                self.showTabsEditor()
+            }))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        } else {
+            self.showTabsEditor()
+        }
+    }
+    
+    func getBasicNoteIndex(sender: [String]) -> Int {
+        for var i = 0; i < 6; i++ {
+            if sender[i] != "x" {
+                let stringIndex = 6 - i
+                let fretIndex = Int(sender[i])
+                return stringIndex * 100 + fretIndex!
+            }
+        }
+        return 0
     }
 
     func showTabsEditor(){
