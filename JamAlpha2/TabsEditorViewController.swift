@@ -292,8 +292,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if(!isPlaying){
                 self.startTimer()
                 isPlaying = true
+                self.playButtonImageView.hidden = true
             }
-            self.playButtonImageView.hidden = true
             if !self.intoEditView{
                 self.progressBlock.alpha = 1
             }
@@ -309,8 +309,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func currentSongChanged(sender: NSNotification){
-        if musicPlayer.playbackState == .Playing {
-            musicPlayer.currentPlaybackRate = self.speed
+        if musicPlayer.playbackState == .Playing && isPlaying{
+            musicPlayer.pause()
+            self.playButtonImageView.hidden = false
         }
     }
     
@@ -943,7 +944,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         privacyButton = UIButton(frame: CGRect(x: 200, y: 0, width: 200, height: 30))
         privacyButton.setTitle("Public", forState: .Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
-        menuView.addSubview(privacyButton)
+       // menuView.addSubview(privacyButton)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
@@ -1704,6 +1705,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
+                self.musicPlayer.skipToNextItem()
             }
             timer.invalidate()
             timer = NSTimer()

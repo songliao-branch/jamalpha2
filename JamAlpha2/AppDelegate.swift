@@ -89,11 +89,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     var isDemoSong:Bool = false
                     if presentVC.isKindOfClass(TabsEditorViewController) {
                         isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
+                        if(!isDemoSong){
+                            (presentVC as! TabsEditorViewController).removeNotification()
+                            (presentVC as! TabsEditorViewController).isPlaying = false
+                            (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
+                        }
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
                         isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
                     
                     if(!isDemoSong){
+                        
                         MusicManager.sharedInstance.player.pause()
                         
                         MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
@@ -254,11 +260,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 MusicManager.sharedInstance.player.nowPlayingItem = lastPlayingItem
                                 MusicManager.sharedInstance.player.repeatMode = .One
                                 MusicManager.sharedInstance.player.shuffleMode = .Off
-                                MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime                     }
+                                MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
+                                MusicManager.sharedInstance.player.pause()
+                                if presentVC.isKindOfClass(TabsEditorViewController) {
+                                    (presentVC as! TabsEditorViewController).registerNotification()
+                                }
+                            }
                         } else if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.player.nowPlayingItem == lastPlayingItem {
                             MusicManager.sharedInstance.player.repeatMode = .One
                             MusicManager.sharedInstance.player.shuffleMode = .Off
                             MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
+                             MusicManager.sharedInstance.player.pause()
                         }
                     }
                 }
