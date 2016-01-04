@@ -2152,7 +2152,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let savedTabsSetId = CoreDataManager.getTabs(theSong, fetchingUsers: true).3
             
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
-                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic)
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic, lastEditedDate: NSDate())
             
             if let songVC = songViewController {
                 songVC.updateMusicData(theSong)

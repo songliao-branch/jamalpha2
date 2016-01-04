@@ -60,7 +60,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             for t in self.allTabsSets {
                 let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
                 song.findMediaItem()
-                print("visible: \(t.visible)")
+                print("t is:\(song.title)")
                 songs.append(song)
             }
         } else {
@@ -76,17 +76,11 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     }
 
     func optionsButtonPressed(sender: UIButton) {
-        //TODO: UI bug: open last row's option, then this row
-        
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
-       
-        
-        // 2
         let editAction = UIAlertAction(title: "Edit", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.goToEditor(sender.tag)
         })
-        
         
         let privacyAction = UIAlertAction(title: "Mark as public", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
@@ -99,12 +93,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             self.deleteSet(sender.tag)
         })
         
-        
-        //
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
         
         
-        // 4
         optionMenu.addAction(editAction)
         optionMenu.addAction(privacyAction)
         optionMenu.addAction(deleteAction)

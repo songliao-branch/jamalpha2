@@ -444,7 +444,7 @@ class CoreDataManager: NSObject {
     }
 
     //We save both user edited tabs and downloaded tabs, the last parameter is for the downloaded tabs, if they match what we have in the database we don't store them
-    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[Float], tuning:String, capo: Int, userId: Int, tabsSetId: Int, visible: Bool) {
+    class func saveTabs(item: Findable, chords: [String], tabs: [String], times:[Float], tuning:String, capo: Int, userId: Int, tabsSetId: Int, visible: Bool, lastEditedDate: NSDate?=nil) {//last parameter is only required for user tabs
         
         if let matchedSong = findSong(item) {
             
@@ -467,6 +467,11 @@ class CoreDataManager: NSObject {
                     foundTabsSet.capo = capo
                     foundTabsSet.lastSelectedDate = NSDate()
                     foundTabsSet.visible = visible
+                    
+                    //save last edited date of only user tabs, this is used to sorted descending in my tabs
+                    if let lastEdited = lastEditedDate {
+                        foundTabsSet.lastEditedDate = lastEdited
+                    }
                     break
                 }
             }
@@ -485,7 +490,12 @@ class CoreDataManager: NSObject {
                 tabsSet.id = tabsSetId
                 tabsSet.userId = userId
                 tabsSet.visible = visible
+                
+                if let lastEdited = lastEditedDate {
+                    tabsSet.lastEditedDate = lastEdited
+                }
             }
+            
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
@@ -495,9 +505,16 @@ class CoreDataManager: NSObject {
         var sets = [DownloadedTabsSet]()
         let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
         
-        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc)
+        var results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: predicate, managedObjectContext: moc) as! [TabsSet]
+        
+        results.sortInPlace({
+            setA, setB in
+            return setA.lastEditedDate.compare(setB.lastEditedDate) == NSComparisonResult.OrderedDescending
+        })
+        
         for result in results {
-            let temp = result as! TabsSet
+            let temp = result
+            
             let t = DownloadedTabsSet(id: Int(temp.id), tuning: temp.tuning, capo: Int(temp.capo), chordsPreview: "", votesScore: 0, voteStatus: "", editor: Editor(), lastEdited: "")
             
             let chords = NSKeyedUnarchiver.unarchiveObjectWithData(temp.chords as! NSData) as! [String]
@@ -517,6 +534,7 @@ class CoreDataManager: NSObject {
             t.title = temp.song.title
             t.artist = temp.song.artist
             t.duration = Float(temp.song.playbackDuration)
+            
             sets.append(t)
         }
         return sets

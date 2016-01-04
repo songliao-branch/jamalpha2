@@ -500,11 +500,12 @@ class APIManager: NSObject {
                         t.chords = set["chords"].arrayObject as! [String]
                         t.tabs = set["tabs"].arrayObject as! [String]
                         t.visible = set["visible"].bool! //TODO: waiting for API changes
+                        t.lastEdited = set["last_edited"].string!
+                        
                         var theTimes = [Float]()
                         t.title = set["song"]["title"].string!
                         t.artist = set["song"]["artist"].string!
                         t.duration = set["song"]["duration"].float!
-
                         for time in set["times"].arrayObject as! [String] {
                             theTimes.append(Float(time)!)
                         }

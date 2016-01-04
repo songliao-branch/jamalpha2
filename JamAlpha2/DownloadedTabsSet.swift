@@ -28,7 +28,6 @@ class DownloadedTabsSet: NSObject {
     var editor: Editor!//owner of this tabs
     var lastEdited = "" //TODO: change to a string
     
- 
     //these variables are downloaded again when a single tabsSet is selected
     var chords = [String]()
     var tabs = [String]()
