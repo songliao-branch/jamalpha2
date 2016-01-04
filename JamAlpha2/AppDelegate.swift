@@ -159,7 +159,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     }else{
                                         if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && !currentSongVC.isDemoSong){
                                             if !MusicManager.sharedInstance.uniqueSongs.contains(MusicManager.sharedInstance.player.nowPlayingItem!){
-                                                if (MusicManager.sharedInstance.player.currentPlaybackRate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime == 0 && currentVC.presentedViewController == nil){
+                                                if (currentSongVC.selectedFromSearchTab && currentSongVC.presentedViewController == nil){
+                                                    MusicManager.sharedInstance.player.pause()
                                                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                                                         completed in
                                                         KGLOBAL_queue.suspended = false

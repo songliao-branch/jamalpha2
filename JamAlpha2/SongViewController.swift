@@ -220,6 +220,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var selectedRow:Int!
 
     var isChangedSpeed:Bool = true
+    var selectedFromSearchTab = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -241,7 +242,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         } else {
             MusicManager.sharedInstance.player.stop()
-            
+            selectedFromSearchTab = true
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             self.volume = MusicManager.sharedInstance.avPlayer.volume
             MusicManager.sharedInstance.avPlayer.volume = 0
@@ -316,7 +317,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if !isSongNeedPurchase {
                 resumeSong()
             }
-            if(isDemoSong || isSongNeedPurchase){
+            if(isDemoSong){
                 self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
             }
         }
@@ -329,6 +330,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }else{
             if(!isSongNeedPurchase){
               self.registerMediaPlayerNotification()
+            }else{
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeDemoSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
             }
         }
         if(!isGenerated && !isSongNeedPurchase){
@@ -702,9 +706,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func changeDemoSong(){
         avPlayer.seekToTime(kCMTimeZero)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
-        if(!viewDidFullyDisappear){
-            avPlayer.removeObserver(self, forKeyPath: "rate")
-        }
+//        if(!viewDidFullyDisappear){
+//            avPlayer.removeObserver(self, forKeyPath: "rate")
+//        }
         let rate = avPlayer.rate
         if(isNext){
             self.selectedRow = self.selectedRow + 1
@@ -722,7 +726,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         avPlayer.seekToTime(kCMTimeZero)
         if(!viewDidFullyDisappear){
             self.currentLocalSongChanged(rate)
-            self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
+            //self.avPlayer.addObserver(self, forKeyPath: "rate", options: [.New, .Initial], context: nil)
         }
         if(isDemoSong){
             NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changeDemoSong"), name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
@@ -2239,7 +2243,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 MusicManager.sharedInstance.avPlayer.pause()
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 MusicManager.sharedInstance.avPlayer.removeAllItems()
-                avPlayer.removeObserver(self, forKeyPath: "rate")
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
             }
         }
         stopTimer()
@@ -2264,7 +2268,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 MusicManager.sharedInstance.avPlayer.pause()
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 MusicManager.sharedInstance.avPlayer.removeAllItems()
-                avPlayer.removeObserver(self, forKeyPath: "rate")
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
             }
             return
         }
@@ -2949,7 +2953,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             MusicManager.sharedInstance.avPlayer.pause()
             MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             MusicManager.sharedInstance.avPlayer.removeAllItems()
-            avPlayer.removeObserver(self, forKeyPath: "rate")
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: self.avPlayer.currentItem)
         }
         self.displayLink.paused = true
         self.displayLink.invalidate()
