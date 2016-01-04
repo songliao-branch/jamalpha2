@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import Haneke
 
 
 class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
@@ -24,6 +25,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var rwLock = pthread_rwlock_t()
     
     var pageIndex = 0
+    var searchAPI:SearchAPI! = SearchAPI()
     
     @IBOutlet weak var musicTable: UITableView!
     
@@ -254,10 +256,36 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             // some song does not have an album cover
             if let cover = song.getArtWork() {
                 let image = cover.imageWithSize(CGSize(width: 54, height: 54))
-                cell.coverImage.image = image
+                if image == nil{
+                    dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+                        self.searchAPI.webSearchSong(song.getArtist() + " " + song.getAlbum(), completion: {
+                            data in
+                            if(data != nil){
+                                if (data["resultCount"] > 0){
+                                   self.reloadCellImageAfterSearch(cell)
+                                }
+                            }
+                        })
+                    }
+                }else{
+                    cell.coverImage.image = image
+                }
             } else {
                 //TODO: add a placeholder cover
-                cell.coverImage.image = UIImage(named: "liweng")
+                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+                    self.searchAPI.webSearchSong(song.getArtist() + " " + song.getAlbum(), completion: {
+                        data in
+                        if(data != nil){
+                            if (data["resultCount"] > 0){
+                                self.reloadCellImageAfterSearch(cell)
+                            }else{
+                                cell.coverImage.image = UIImage(named: "liweng")
+                            }
+                        }else{
+                            cell.coverImage.image = UIImage(named: "liweng")
+                        }
+                    })
+                }
             }
             
             cell.mainTitle.text = song.getTitle()
@@ -498,6 +526,22 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
         return itemsInPreviousSections + currentRow
     }
+    
+    func reloadCellImageAfterSearch(cell:MusicCell){
+        if let imageURL = self.searchAPI.searchResults[0].artworkUrl100 {
+            let tempImageURL = imageURL.replace("300X300", replacement: "60X60")
+            let url = NSURL(string: tempImageURL)!
+            let fetcher = NetworkFetcher<UIImage>(URL: url)
+            
+            let cache = Shared.imageCache
+            cache.fetch(fetcher: fetcher).onSuccess { image in
+                dispatch_async(dispatch_get_main_queue()) {
+                    cell.coverImage.image = image
+                }
+            }
+        }
+    }
+
     
 }
 

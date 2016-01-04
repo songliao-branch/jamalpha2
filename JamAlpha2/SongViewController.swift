@@ -21,10 +21,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var musicViewController: MusicViewController!
     
-    var searchResults: SearchResult!
-    var musicRequest: Request?
+
     
     private var rwLock = pthread_rwlock_t()
+    
+    var searchAPI:SearchAPI! = SearchAPI()
     
     //for nsoperation
     var isGenerated:Bool = true
@@ -448,7 +449,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if currentImage == nil {
                 CoreDataManager.initializeSongToDatabase(item)
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-                    self.webSearchSong(item.getArtist() + " " + item.getAlbum())
+                    self.searchAPI.webSearchSong(item.getArtist() + " " + item.getAlbum(), completion: {
+                        data in
+                        if(data != nil){
+                            if (data["resultCount"] > 0){
+                                self.reloadBackgroundImageAfterSearch()
+                            }
+                        }
+                    })
                 }
             }else{
                 self.backgroundImage = currentImage
@@ -456,65 +464,73 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         } else {
             //TODO: add a placeholder album cover
-            currentImage = UIImage(named: "liwengbg")
-            self.backgroundImage = currentImage
-            self.blurredImage = currentImage!.applyLightEffect()!
-            currentImage = nil
+            dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+                self.searchAPI.webSearchSong(item.getArtist() + " " + item.getAlbum(), completion: {
+                    data in
+                    if(data != nil){
+                        if (data["resultCount"] > 0){
+                            self.reloadBackgroundImageAfterSearch()
+                        }else{
+                            self.currentImage = UIImage(named: "liwengbg")
+                            self.backgroundImage = self.currentImage
+                            self.blurredImage = self.currentImage!.applyLightEffect()!
+                            self.currentImage = nil
+                        }
+                    }else{
+                        self.currentImage = UIImage(named: "liwengbg")
+                        self.backgroundImage = self.currentImage
+                        self.blurredImage = self.currentImage!.applyLightEffect()!
+                        self.currentImage = nil
+                    }
+                })
+            }
         }
        
     }
 
-    func webSearchSong(searchText: String) {
-        if searchText.characters.count < 1 {
-            return
-        }
-        musicRequest?.cancel()
-        searchResults = nil
-        
-        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
-            if let data = response.result.value {
-                self.addDataToResults(JSON(data))
-                if let imageURL = self.searchResults.artworkUrl100 {
-                    let url = NSURL(string: imageURL)!
-                    let fetcher = NetworkFetcher<UIImage>(URL: url)
-                    
-                    let cache = Shared.imageCache
-                    cache.fetch(fetcher: fetcher).onSuccess { image in
-                        self.currentImage = image
-                        self.backgroundImage = image
-                        self.blurredImage = image.applyLightEffect()!
-                        self.isBlurred = !self.isBlurred
-                        if (self.isChordShown || self.isTabsShown || self.isLyricsShown) && !self.isBlurred {
-                            dispatch_async(dispatch_get_main_queue()) {
-                                self.backgroundImageView.image = self.blurredImage
-                            }
-                            self.isBlurred = true
-                        } else if (!self.isChordShown && !self.isTabsShown && !self.isLyricsShown && self.isBlurred) { //
-                            dispatch_async(dispatch_get_main_queue()) {
-                                self.backgroundImageView.image = self.backgroundImage
-                            }
-                            self.isBlurred = false
-                        }
+//    func webSearchSong(searchText: String) {
+//        if searchText.characters.count < 1 {
+//            return
+//        }
+//        musicRequest?.cancel()
+//        searchResults = nil
+//        
+//        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
+//            if let data = response.result.value {
+//                self.addDataToResults(JSON(data))
+//                
+//            } else {
+//                print("something went wrong with search \(response.result.error)")
+//            }
+//        }
+//    }
+    
+    func reloadBackgroundImageAfterSearch(){
+        if let imageURL = self.searchAPI.searchResults[0].artworkUrl100 {
+            let url = NSURL(string: imageURL)!
+            let fetcher = NetworkFetcher<UIImage>(URL: url)
+            
+            let cache = Shared.imageCache
+            cache.fetch(fetcher: fetcher).onSuccess { image in
+                self.currentImage = image
+                self.backgroundImage = image
+                self.blurredImage = image.applyLightEffect()!
+                self.isBlurred = !self.isBlurred
+                if (self.isChordShown || self.isTabsShown || self.isLyricsShown) && !self.isBlurred {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.backgroundImageView.image = self.blurredImage
                     }
+                    self.isBlurred = true
+                } else if (!self.isChordShown && !self.isTabsShown && !self.isLyricsShown && self.isBlurred) { //
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.backgroundImageView.image = self.backgroundImage
+                    }
+                    self.isBlurred = false
                 }
-                
-            } else {
-                print("something went wrong with search \(response.result.error)")
             }
         }
     }
     
-    func addDataToResults(data: SwiftyJSON.JSON){
-            let item = data["results"].array![0]
-            let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
-            
-            if let artwork = item["artworkUrl100"].string {
-                let newString = artwork.replace("100x100", replacement: "300x300")
-                searchResponse.artworkUrl100 = newString
-            }
-            searchResults = searchResponse
-    }
-
     
     func setUpTopButtons() {
 

@@ -159,7 +159,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     }else{
                                         if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && !currentSongVC.isDemoSong){
                                             if !MusicManager.sharedInstance.uniqueSongs.contains(MusicManager.sharedInstance.player.nowPlayingItem!){
-                                                if (MusicManager.sharedInstance.player.currentPlaybackRate == 0){
+                                                if (MusicManager.sharedInstance.player.currentPlaybackRate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime == 0 && currentVC.presentedViewController == nil){
                                                     currentSongVC.dismissViewControllerAnimated(true, completion: {
                                                         completed in
                                                         KGLOBAL_queue.suspended = false
@@ -244,7 +244,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 MusicManager.sharedInstance.player.stop()
                                 MusicManager.sharedInstance.player.repeatMode = .All
                                 MusicManager.sharedInstance.player.shuffleMode = .Off
-                                MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                                if(MusicManager.sharedInstance.lastPlayerQueue.contains(lastPlayingItem)){
+                                    MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                                }else{
+                                    MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: [lastPlayingItem]))
+                                    MusicManager.sharedInstance.lastPlayerQueue = [lastPlayingItem]
+                                }
                                 MusicManager.sharedInstance.player.nowPlayingItem = lastPlayingItem
                                 MusicManager.sharedInstance.player.repeatMode = .One
                                 MusicManager.sharedInstance.player.shuffleMode = .Off

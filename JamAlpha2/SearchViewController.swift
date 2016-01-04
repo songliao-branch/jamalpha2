@@ -13,8 +13,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var uniqueSongs: [MPMediaItem] = [MPMediaItem]()
     var filteredSongs: [MPMediaItem] = [MPMediaItem]()
     
-    var searchResults: [SearchResult]!
-    var musicRequest: Request?
+    var searchAPI:SearchAPI = SearchAPI()
     var animator: CustomTransitionAnimation?
     
     
@@ -30,7 +29,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
-        searchResults = [SearchResult]()
+        searchAPI.searchResults = [SearchResult]()
         setUpSearchBar()
         setUpSearchPromptBackground()
     }
@@ -102,7 +101,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             return 30
         } else if section == 1 {
-            if searchResults.count == 0 || !resultSearchController.active {
+            if searchAPI.searchResults.count == 0 || !resultSearchController.active {
                 return 0
             }
             return 30
@@ -136,7 +135,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             return view
             
         } else if section == 1 {
-            if searchResults.count == 0 {
+            if searchAPI.searchResults.count == 0 {
                 return nil
             }
             let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
@@ -161,7 +160,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 return filteredSongs.count
             } else if section == 1 {
                 tableView.hidden = false
-              return searchResults.count
+              return searchAPI.searchResults.count
             }
         } else if !resultSearchController.active && section == 0 && searchHistoryManager.getAllHistory().count > 0 {
             searchBackgroundLabel.hidden = true
@@ -197,14 +196,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     cell.albumCover.image = UIImage(named: "liweng")
                 }
             } else { //web search in section 1
-                if let track = searchResults[indexPath.row].trackName {
+                if let track = searchAPI.searchResults[indexPath.row].trackName {
                     cell.titleLabel.text = track
                 }
-                if let artist = searchResults[indexPath.row].artistName {
+                if let artist = searchAPI.searchResults[indexPath.row].artistName {
                     cell.subtitleLabel.text = artist
                 }
                 
-                if let imageURL = searchResults[indexPath.row].artworkUrl100 {
+                if let imageURL = searchAPI.searchResults[indexPath.row].artworkUrl100 {
                     cell.albumCover.image = nil
                     let url = NSURL(string: imageURL)!
                     let fetcher = NetworkFetcher<UIImage>(URL: url)
@@ -212,9 +211,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image
-                        if(indexPath.row < (self.searchResults.count)){
-                            self.searchResults[indexPath.row].image = nil
-                            self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
+                        if(indexPath.row < (self.searchAPI.searchResults.count)){
+                            self.searchAPI.searchResults[indexPath.row].image = nil
+                            self.searchAPI.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
                         }
                     }
                 }
@@ -264,7 +263,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
                 songVC.selectedFromTable = true
-                let searchSong = self.searchResults[indexPath.row]
+                let searchSong = self.searchAPI.searchResults[indexPath.row]
                 var isReload = true
                 
                 if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
@@ -272,8 +271,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                 }else{
                     songVC.isSongNeedPurchase = true
-                    songVC.songNeedPurchase = self.searchResults[indexPath.row]
-                    if let img = self.searchResults[indexPath.row].image {
+                    songVC.songNeedPurchase = self.searchAPI.searchResults[indexPath.row]
+                    if let img = self.searchAPI.searchResults[indexPath.row].image {
                         songVC.backgroundImage = img
                         songVC.blurredImage = img.applyLightEffect()
                     }
@@ -290,7 +289,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
             
-            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)//////////改这句话
+            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)
             
         } else if !resultSearchController.active { //&& indexPath.section == 0 {
             
@@ -315,67 +314,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         filterLocalSongs(searchController.searchBar.text!)
-        webSearchSong(searchController.searchBar.text!)
+        searchAPI.webSearchSong(searchController.searchBar.text!, searchResultTableView: self.searchResultTableView,completion: nil)
     }
     
-
-    func webSearchSong(searchText: String) {
-        if searchText.characters.count < 1 {
-            return
-        }
-        musicRequest?.cancel()
-        searchResults = [SearchResult]()
-        self.searchResultTableView.reloadData()
-        
-        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
-            if let data = response.result.value {
-                print("JSON: \(data)")
-                self.addDataToResults(JSON(data))
-            } else {
-                print("something went wrong with search \(response.result.error)")
-            }
-        }
-    }
-    
-    
-    func addDataToResults(data: SwiftyJSON.JSON){
-        for item in data["results"].array! {
-            let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
-            
-            if let trackId = item["trackId"].number {
-                searchResponse.trackId = Int(trackId)
-            }
-            if let trackName = item["trackName"].string {
-                searchResponse.trackName = trackName
-            }
-            if let artistName = item["artistName"].string {
-                searchResponse.artistName = artistName
-            }
-            if let collectionName = item["collectionName"].string {
-                searchResponse.collectionName = collectionName
-            }
-            if let artwork = item["artworkUrl100"].string {
-                let newString = artwork.replace("100x100", replacement: "300x300")
-                searchResponse.artworkUrl100 = newString
-            }
-            if let preview = item["previewUrl"].string {
-                searchResponse.previewUrl = preview
-            }
-            if let trackViewUrl = item["trackViewUrl"].string {
-                searchResponse.trackViewUrl = trackViewUrl
-            }
-            
-            if let trackTimeMillis = item["trackTimeMillis"].number {
-                searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
-            }
-            
-            searchResults.append(searchResponse)
-        }
-
-        dispatch_async(dispatch_get_main_queue()) {
-            self.searchResultTableView.reloadData()
-        }
-    }
     
     func filterLocalSongs(searchText: String) {
         self.filteredSongs = uniqueSongs.filter({
