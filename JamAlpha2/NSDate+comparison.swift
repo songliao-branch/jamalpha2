@@ -19,17 +19,11 @@ extension NSDate {
         dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
         dateFormatter.timeZone = NSTimeZone.localTimeZone()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        
         return dateFormatter.dateFromString(isoString)!
     }
     
-    class func convertFromIsoToHumanizedFormat(isoString: String) -> String {
-        if let date = convertFromIsoToNSDate(isoString) {
-            return timeAgoSinceDate(date, numericDates: true)
-        }
-        return ""
-    }
-    
-    private class func timeAgoSinceDate(date: NSDate, numericDates:Bool) -> String {
+    class func timeAgoSinceDate(date: NSDate, numericDates:Bool) -> String {
         let calendar = NSCalendar.currentCalendar()
         let now = NSDate()
         let earliest = now.earlierDate(date)

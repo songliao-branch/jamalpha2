@@ -333,7 +333,7 @@ class CoreDataManager: NSObject {
     }
     
     // MARK: save, retrieve lyrics, userId can be either localuserId or downloaded lyricsSet's user id
-    class func saveLyrics(item: Findable, lyrics: [String], times: [Float], userId: Int, lyricsSetId: Int) {
+    class func saveLyrics(item: Findable, lyrics: [String], times: [Float], userId: Int, lyricsSetId: Int, lastEditedDate: NSDate?=nil) {
 
         if let matchedSong = findSong(item) {
           
@@ -354,6 +354,10 @@ class CoreDataManager: NSObject {
                     
                     foundDownloadedLyricsSet.times = timesData
                     foundDownloadedLyricsSet.lastSelectedDate = NSDate()
+                    
+                    if let lastEdited = lastEditedDate {
+                        foundDownloadedLyricsSet.lastEditedDate = lastEdited
+                    }
                     break
                 }
             }
@@ -369,6 +373,10 @@ class CoreDataManager: NSObject {
                 lyricsSet.lastSelectedDate = NSDate()
                 lyricsSet.id = lyricsSetId
                 lyricsSet.userId = userId
+                
+                if let lastEdited = lastEditedDate {
+                    lyricsSet.lastEditedDate = lastEdited
+                }
             }
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
@@ -545,9 +553,15 @@ class CoreDataManager: NSObject {
         var sets = [DownloadedLyricsSet]()
         let predicate: NSPredicate = NSPredicate(format: "(userId == \(CoreDataManager.getCurrentUser()!.id))")
         
-        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: predicate, managedObjectContext: moc)
+        var results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: predicate, managedObjectContext: moc) as! [LyricsSet]
+        
+        results.sortInPlace({
+            setA, setB in
+            return setA.lastEditedDate.compare(setB.lastEditedDate) == NSComparisonResult.OrderedDescending
+        })
+        
         for result in results {
-            let temp = result as! LyricsSet
+            let temp = result
             
             let l = DownloadedLyricsSet(id: Int(temp.id), lyricsPreview: "", numberOfLines: 0, votesScore: 0, voteStatus: "", editor: Editor(),lastEdited: "")
             

@@ -60,7 +60,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             for t in self.allTabsSets {
                 let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
                 song.findMediaItem()
-                print("t is:\(song.title)")
                 songs.append(song)
             }
         } else {

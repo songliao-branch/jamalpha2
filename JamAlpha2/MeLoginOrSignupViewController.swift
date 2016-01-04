@@ -444,7 +444,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     //initialize the song just in case we don't find it in existing core data
                                     CoreDataManager.initializeSongToDatabase(localSong)
                                     
-                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible, lastEditedDate: NSDate.convertFromIsoToNSDate(set.lastEdited))
+                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible, lastEditedDate: set.lastEdited)
                                 }
                                 
                                 for set in lyricsSets {
@@ -452,7 +452,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     //initialize the song just in case we don't find it in
                                     CoreDataManager.initializeSongToDatabase(localSong)
 
-                                    CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id)
+                                    CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id, lastEditedDate: set.lastEdited)
                                 }
                                 
                                 print("user has \(tabsSets.count) tabs and \(lyricsSets.count) lyrics")

@@ -19,7 +19,7 @@ class DownloadedLyricsSet: NSObject {
     var voteStatus = "" //up, down, yet, not applicable
     
     var editor: Editor!//owner of this tabs
-    var lastEdited = "" //TODO: change to a string
+    var lastEdited: NSDate?
     
     //retrieved later when user clicks one of the lyricsSet in the list
     var lyrics = [String]()
@@ -38,6 +38,9 @@ class DownloadedLyricsSet: NSObject {
         self.votesScore = votesScore
         self.voteStatus = voteStatus
         self.editor = editor
-        self.lastEdited =  NSDate.convertFromIsoToHumanizedFormat(lastEdited)
+        
+        if let date = NSDate.convertFromIsoToNSDate(lastEdited) {
+            self.lastEdited = date
+        }
     }
 }
