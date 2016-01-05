@@ -2472,7 +2472,7 @@ extension TabsEditorViewController {
                         continue
                     } else {
                         TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
-                    } 
+                    }
                 }
                 completion(complete: newChords)
             }))
