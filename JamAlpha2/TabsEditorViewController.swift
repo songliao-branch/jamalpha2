@@ -1660,11 +1660,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var i = 0; i < 6; i++ {
             let tempStringView: UIView = UIView()
             tempStringView.frame = CGRectMake(0, CGFloat(i) * string6Height, self.trueWidth * 5, string6Height)
-            if i % 2 == 0 {
-                tempStringView.backgroundColor = UIColor.clearColor()
-            } else {
-                tempStringView.backgroundColor = UIColor.clearColor()
+            if i == 5 {
+                tempStringView.frame = CGRectMake(0, CGFloat(i) * string6Height, self.trueWidth * 5, string6Height + 1 / 20 * self.trueHeight)
             }
+            tempStringView.backgroundColor = UIColor.clearColor()
             self.completeStringView.addSubview(tempStringView)
             self.string6View.append(tempStringView)
         }
