@@ -121,72 +121,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         
-        var isSongVCdismissed = false
         let currentVC = topViewController(rootViewController())
-        if(MusicManager.sharedInstance.player != nil) {
-            MusicManager.sharedInstance.player.repeatMode = .All
-            MusicManager.sharedInstance.player.shuffleMode = .Off
-        }
-        
-        MusicManager.sharedInstance.reloadCollections()
-        
-        if(MusicManager.sharedInstance.player != nil) {
-            MusicManager.sharedInstance.player.repeatMode = self.repeatMode
-            MusicManager.sharedInstance.player.shuffleMode = self.shuffleMode
-        }
         
         let baseVC = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
         
-        // if the collection is different i.e. new songs are added/old songs are removed
-        // we manually reload MusicViewController table
-        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-            musicVC.reloadDataAndTable()
-            if(!musicVC.uniqueSongs.isEmpty && kShouldReloadMusicTable){
-                musicVC.songCount = 0
-                musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
-            }
-        }
-        
-        if(currentVC.isKindOfClass(SongViewController)){
-            let currentSongVC = currentVC as! SongViewController
-            if (currentSongVC.isSongNeedPurchase) {
-                if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(currentSongVC.songNeedPurchase.trackName!, artist: currentSongVC.songNeedPurchase.artistName!, duration: currentSongVC.songNeedPurchase.trackTimeMillis!)){
-                    MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
-                    MusicManager.sharedInstance.setIndexInTheQueue(0)
-                    self.suspended = true
-                    currentSongVC.recoverToNormalSongVC(purchasedItem)
-                }
-            }else{
-                //If add a song with apple music, go to Twistjam and play it, then pause it, delete it from my music, and come back to Twistjam, the songVc will dismiss itself
-                if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && !currentSongVC.isDemoSong){
-                    if !MusicManager.sharedInstance.uniqueSongs.contains(MusicManager.sharedInstance.player.nowPlayingItem!){
-                        if (currentSongVC.selectedFromSearchTab && currentSongVC.presentedViewController == nil){
-                            MusicManager.sharedInstance.player.pause()
-                            currentSongVC.dismissViewControllerAnimated(true, completion: {
-                                completed in
-                                KGLOBAL_queue.suspended = false
-                                KGLOBAL_init_queue.suspended = self.suspended
-                                isSongVCdismissed = true
-                            })
-                        }
-                    }
-                }
-            }
-        } else {
-            if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
-                if(MusicManager.sharedInstance.player.playbackState == .Playing){
-                    baseVC.nowView.start()
-                }
-                if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
-                    MusicManager.sharedInstance.avPlayer.removeAllItems()
-                }
-            }
-        }
-        
-        if isSongVCdismissed {
-            KGLOBAL_isNeedToCheckIndex = true
-            return
-        }
     
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
@@ -260,6 +198,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
                          MusicManager.sharedInstance.player.pause()
                     }
+                }
+            }
+        } else {
+            if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                if(MusicManager.sharedInstance.player.playbackState == .Playing){
+                    baseVC.nowView.start()
+                }
+                if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
+                    MusicManager.sharedInstance.avPlayer.removeAllItems()
                 }
             }
         }

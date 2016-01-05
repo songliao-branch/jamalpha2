@@ -84,17 +84,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         objc_sync_exit(lock)
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        if kShouldReloadMusicTable { //this is only called after new song is added
-           reloadDataAndTable()
-        }
-    }
     
     func reloadDataAndTable() {
         loadAndSortMusic()
         musicTable.reloadData()
-        kShouldReloadMusicTable = false
     }
     
     func currentSongChanged(notification: NSNotification){
