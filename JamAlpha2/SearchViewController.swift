@@ -248,6 +248,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
                 songVC.selectedFromTable = true
+                songVC.selectedFromSearchTab = true
                 
                 MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
                 MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
@@ -278,7 +279,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     }
                     isReload = false
                 }
-                
+                songVC.selectedFromSearchTab = true
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {

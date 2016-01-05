@@ -98,8 +98,8 @@ class MusicManager: NSObject {
         }
         
         searchVC.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
-        if searchVC.searchResultTableView != nil {
-            
+        if searchVC.searchResultTableView != nil && searchVC.resultSearchController.active {
+            searchVC.filterLocalSongs(searchVC.resultSearchController.searchBar.text!)
             searchVC.searchResultTableView.reloadData() 
         }
        
