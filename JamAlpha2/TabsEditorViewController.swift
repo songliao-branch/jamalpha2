@@ -292,8 +292,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if(!isPlaying){
                 self.startTimer()
                 isPlaying = true
-                self.playButtonImageView.hidden = true
             }
+            self.playButtonImageView.hidden = true
             if !self.intoEditView{
                 self.progressBlock.alpha = 1
             }
