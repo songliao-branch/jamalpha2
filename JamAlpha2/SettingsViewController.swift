@@ -14,18 +14,51 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBOutlet weak var tableView: UITableView!
     
-    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo", "Tutorial"]
+    var isFromUnLoginVC: Bool = false
+    
+    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo Mode", "Tutorial"]
     
     let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode", "Tutorial"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if isFromUnLoginVC {
+            presentViewAnimation()
+        }
         setUpNavigationBar()
     }
     
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Landscape
+    }
+    
+    func presentViewAnimation() {
+        let animationView: UIView = UIView(frame: CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height))
+        self.view.addSubview(animationView)
+        animationView.backgroundColor = UIColor.whiteColor()
+        self.view.userInteractionEnabled = false
+        UIView.animateWithDuration(0.3, animations: {
+            animated in
+            animationView.backgroundColor = UIColor.clearColor()
+            }, completion: {
+                completed in
+                animationView.removeFromSuperview()
+                self.view.userInteractionEnabled = true
+        })
+    }
+    
     func setUpNavigationBar() {
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
         self.navigationItem.title = "Setting"
         tableView.registerClass(SettingFBCell.self, forCellReuseIdentifier: "fbcell")
+        let leftButton: UIBarButtonItem = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain, target: self, action: "pressLeftButton:")
+        self.navigationItem.setLeftBarButtonItem(leftButton, animated: false)
+    }
+    
+    func pressLeftButton(sender: UIBarButtonItem) {
+        self.dismissViewControllerAnimated(false, completion: nil)
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -89,9 +122,11 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
                 self.contactUs()
             } else if indexPath.item == indexofDemoMode {
                 let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                demoVC.isFromUnLoginVC = self.isFromUnLoginVC
                 self.navigationController?.pushViewController(demoVC, animated: true)
             } else if indexPath.item == indexOfTutorialMode {
                 let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                demoVC.isFromUnLoginVC = self.isFromUnLoginVC
                 demoVC.isDemo = false
                 self.navigationController?.pushViewController(demoVC, animated: true)
             }
