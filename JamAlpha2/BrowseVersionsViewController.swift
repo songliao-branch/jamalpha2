@@ -249,7 +249,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                     }
                 }
             )
-            
+          
             if tabsSet.id == lastSelectedSetId {
                 cell.checkmark.hidden = false
                 cell.previewRightConstraint.constant = 45

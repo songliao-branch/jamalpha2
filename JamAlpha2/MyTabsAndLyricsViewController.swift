@@ -81,12 +81,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             self.goToEditor(sender.tag)
         })
         
-        let privacyAction = UIAlertAction(title: "Mark as public", style: .Default, handler: {
-            (alert: UIAlertAction!) -> Void in
-            
-            print(self.allTabsSets[sender.tag].visible)
-        })
-
         let deleteAction = UIAlertAction(title: "Delete", style: .Default, handler: {
             (alert: UIAlertAction!) -> Void in
             self.deleteSet(sender.tag)
@@ -96,7 +90,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         
         optionMenu.addAction(editAction)
-        optionMenu.addAction(privacyAction)
         optionMenu.addAction(deleteAction)
         optionMenu.addAction(cancelAction)
         
@@ -164,21 +157,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         cell.optionsButton.tag = indexPath.row
         cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
-        
-//        if isViewingTabs {
-//            if allTabsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
-//                cell.uploadedImage.hidden = true
-//            } else {
-//                cell.uploadedImage.hidden = false
-//            }
-//        } else {
-//            if allLyricsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
-//                cell.uploadedImage.hidden = true
-//            } else {
-//                cell.uploadedImage.hidden = false
-//            }
-//        }
-
         
         return cell
     }
