@@ -96,7 +96,10 @@ class MusicManager: NSObject {
                 musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
             }
         }
-        searchVC.searchResultTableView.reloadData()
+        if searchVC.searchResultTableView != nil {
+            searchVC.searchResultTableView.reloadData() 
+        }
+       
         
         if(currentVC.isKindOfClass(SongViewController)){
             let currentSongVC = currentVC as! SongViewController
