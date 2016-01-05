@@ -13,8 +13,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var uniqueSongs: [MPMediaItem] = [MPMediaItem]()
     var filteredSongs: [MPMediaItem] = [MPMediaItem]()
     
-    var searchResults: [SearchResult]!
-    var musicRequest: Request?
+    var searchResults = [SearchResult]()
+    
+    var searchAPI:SearchAPI = SearchAPI()
     var animator: CustomTransitionAnimation?
     
     
@@ -27,10 +28,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         createTransitionAnimation()
+        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         self.automaticallyAdjustsScrollViewInsets = false
-        searchResults = [SearchResult]()
         setUpSearchBar()
         setUpSearchPromptBackground()
     }
@@ -40,7 +40,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             self.animator = CustomTransitionAnimation()
         }
     }
-
+    
+    
     func setUpSearchPromptBackground() {
         searchBackgroundIcon = UIImageView(frame: CGRect(x: 0, y: 0, width: 222, height: 244))
         searchBackgroundIcon.image = UIImage(named: "big_search")
@@ -212,6 +213,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     let cache = Shared.imageCache
                     cache.fetch(fetcher: fetcher).onSuccess { image in
                         cell.albumCover.image = image
+                        
                         if(indexPath.row < (self.searchResults.count)){
                             self.searchResults[indexPath.row].image = nil
                             self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
@@ -234,12 +236,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             } else {
                 cell.searchHistoryLabel.text = "Clear recent searches"
             }
-            
-        
         }
         return cell
     }
-    
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if resultSearchController.active {
@@ -249,6 +248,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
                 songVC.selectedFromTable = true
+                songVC.selectedFromSearchTab = true
                 
                 MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
                 MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
@@ -264,7 +264,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
                 
                 songVC.selectedFromTable = true
-                let searchSong = self.searchResults[indexPath.row]
+                let searchSong = searchResults[indexPath.row]
                 var isReload = true
                 
                 if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
@@ -272,14 +272,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                 }else{
                     songVC.isSongNeedPurchase = true
-                    songVC.songNeedPurchase = self.searchResults[indexPath.row]
-                    if let img = self.searchResults[indexPath.row].image {
+                    songVC.songNeedPurchase = searchResults[indexPath.row]
+                    if let img = searchResults[indexPath.row].image {
                         songVC.backgroundImage = img
                         songVC.blurredImage = img.applyLightEffect()
                     }
                     isReload = false
                 }
-                
+                songVC.selectedFromSearchTab = true
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
@@ -290,7 +290,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
             
-            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)//////////改这句话
+            searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)
             
         } else if !resultSearchController.active { //&& indexPath.section == 0 {
             
@@ -315,66 +315,18 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         filterLocalSongs(searchController.searchBar.text!)
-        webSearchSong(searchController.searchBar.text!)
-    }
-    
-
-    func webSearchSong(searchText: String) {
-        if searchText.characters.count < 1 {
-            return
-        }
-        musicRequest?.cancel()
-        searchResults = [SearchResult]()
         self.searchResultTableView.reloadData()
-        
-        musicRequest = Alamofire.request(.GET, APIManager.searchBaseURL, parameters: APIManager.searchParameters(searchText)).responseJSON { response in
-            if let data = response.result.value {
-                print("JSON: \(data)")
-                self.addDataToResults(JSON(data))
-            } else {
-                print("something went wrong with search \(response.result.error)")
+        SearchAPI.searchSong(searchController.searchBar.text!, completion: {
+            results in
+            
+            self.searchResults = results
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                self.searchResultTableView.reloadData()
             }
-        }
+        })
     }
     
-    
-    func addDataToResults(data: SwiftyJSON.JSON){
-        for item in data["results"].array! {
-            let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
-            
-            if let trackId = item["trackId"].number {
-                searchResponse.trackId = Int(trackId)
-            }
-            if let trackName = item["trackName"].string {
-                searchResponse.trackName = trackName
-            }
-            if let artistName = item["artistName"].string {
-                searchResponse.artistName = artistName
-            }
-            if let collectionName = item["collectionName"].string {
-                searchResponse.collectionName = collectionName
-            }
-            if let artwork = item["artworkUrl100"].string {
-                searchResponse.artworkUrl100 = artwork
-            }
-            if let preview = item["previewUrl"].string {
-                searchResponse.previewUrl = preview
-            }
-            if let trackViewUrl = item["trackViewUrl"].string {
-                searchResponse.trackViewUrl = trackViewUrl
-            }
-            
-            if let trackTimeMillis = item["trackTimeMillis"].number {
-                searchResponse.trackTimeMillis = Float(trackTimeMillis)/1000
-            }
-            
-            searchResults.append(searchResponse)
-        }
-
-        dispatch_async(dispatch_get_main_queue()) {
-            self.searchResultTableView.reloadData()
-        }
-    }
     
     func filterLocalSongs(searchText: String) {
         self.filteredSongs = uniqueSongs.filter({
@@ -391,23 +343,23 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(needStart:Bool){
-        for tabItemController in (self.tabBarController?.viewControllers)! {
-            if tabItemController.isKindOfClass(UINavigationController){
-                for childVC in tabItemController.childViewControllers {
-                    if childVC.isKindOfClass(BaseViewController) {
-                        let baseVC = childVC as! BaseViewController
-                        if(needStart){
-                            baseVC.nowView.start()
-                        }else{
-                            baseVC.nowView.stop()
-                        }
-                        
-                        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                            musicVC.musicTable.reloadData()
-                        }
-                    }
-                }
-            }
+        let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+        if(needStart){
+            baseVC.nowView.start()
+        }else{
+            baseVC.nowView.stop()
+        }
+    
+        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+            musicVC.musicTable.reloadData()
+        }
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if( KAVplayer != nil && KAVplayer.rate != 0){
+            let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+            baseVC.nowView.start()
         }
     }
 

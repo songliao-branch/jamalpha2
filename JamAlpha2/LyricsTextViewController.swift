@@ -10,8 +10,17 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
-class LyricsTextViewController: UIViewController {
+
+class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
+    
+    
+    var formattedLyrics: Bool = false
+    
+    var hiddenKeyboardView: UIView = UIView()
+    let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
+
     var isDemoSong = false
+
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
     var songViewController: SongViewController? //used to parse synced lyrics from LyricsSyncViewController
@@ -66,8 +75,9 @@ class LyricsTextViewController: UIViewController {
         let notificationCenter = NSNotificationCenter.defaultCenter()
         notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+        self.lyricsTextView.resignFirstResponder()
     }
-    
+
     func handleKeyboardWillShowNotification(notification: NSNotification) {
         keyboardWillChangeFrameWithNotification(notification, showsKeyboard: true)
     }
@@ -75,10 +85,10 @@ class LyricsTextViewController: UIViewController {
     func handleKeyboardWillHideNotification(notification: NSNotification) {
         keyboardWillChangeFrameWithNotification(notification, showsKeyboard: false)
     }
+
     
     func keyboardWillChangeFrameWithNotification(notification: NSNotification, showsKeyboard: Bool) {
         let userInfo = notification.userInfo!
-        //let animationDuration: NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
         // Convert the keyboard frame from screen to view coordinates.
         let keyboardScreenBeginFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as! NSValue).CGRectValue()
         let keyboardScreenEndFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
@@ -87,19 +97,46 @@ class LyricsTextViewController: UIViewController {
         var originDelta: CGFloat = CGFloat()
         if showsKeyboard == true {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
+            self.hiddenKeyboardView.addGestureRecognizer(hiddenKeyboardPanGesture)
+            self.lyricsTextView.addGestureRecognizer(hiddenKeyboardPanGesture)
+            self.hiddenKeyboardView.frame = CGRectMake(0, keyboardViewEndFrame.origin.y - 5, self.viewWidth, 5)
+            self.view.addSubview(self.hiddenKeyboardView)
+            self.hiddenKeyboardView.hidden = false
         } else {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
+            self.hiddenKeyboardView.hidden = true
+            self.hiddenKeyboardView.removeGestureRecognizer(hiddenKeyboardPanGesture)
+            self.lyricsTextView.removeGestureRecognizer(hiddenKeyboardPanGesture)
         }
+
         self.lyricsTextView.frame = CGRectMake(0, 20 + 44, self.viewWidth, self.lyricsTextView.frame.height + originDelta)
+
         self.lyricsTextView.layer.opacity = 0.1
         UIView.animateWithDuration(1.4, animations: {
             self.lyricsTextView.layer.opacity = 1
-            
-        })
+            })
+ 
     }
     
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    func hiddenKeyboardPanGesture(sender: UIPanGestureRecognizer) {
+        let location = sender.locationInView(self.hiddenKeyboardView)
+        if location.y > 0 {
+            self.lyricsTextView.resignFirstResponder()
+        }
+
+    }
+    
+
     func addBackground() {
+        hiddenKeyboardPanGesture.addTarget(self, action: "hiddenKeyboardPanGesture:")
+        hiddenKeyboardPanGesture.delegate = self
+        
         let backgroundImageWidth: CGFloat = self.viewHeight - 44 - 20
+
         let backgroundImage: UIImageView = UIImageView()
         backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 44 + 20, backgroundImageWidth, backgroundImageWidth)
         let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
@@ -110,7 +147,7 @@ class LyricsTextViewController: UIViewController {
             //TODO: add a placeholder album cover
             image = UIImage(named: "liwengbg")
         }
-        backgroundImage.image = image
+        backgroundImage.image = image != nil ? image : songViewController!.backgroundImage
         let blurredImage: UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
@@ -169,7 +206,9 @@ class LyricsTextViewController: UIViewController {
     }
     
     func addLyricsTextView() {
+
         self.lyricsTextView.frame = CGRect(x: 0, y: CGRectGetMaxY(titleView.frame), width: self.viewWidth, height: self.viewHeight - (20 + 44))
+        self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
         self.lyricsTextView.backgroundColor = UIColor.clearColor()
         self.lyricsTextView.textAlignment = .Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
@@ -178,7 +217,7 @@ class LyricsTextViewController: UIViewController {
         self.lyricsTextView.delegate = self
 
         var lyrics: Lyric = Lyric()
-        (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingLocalUserOnly: true)
+        (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingUsers: true)
 
         if lyrics.lyric.count > 0 {
             var lyricsToDisplay = ""
@@ -192,7 +231,6 @@ class LyricsTextViewController: UIViewController {
             self.lyricsTextView.text = "Put your lyrics here"
             self.lyricsTextView.textColor = UIColor.lightGrayColor()
         }
-
         self.view.addSubview(self.lyricsTextView)
     }
     
@@ -213,18 +251,21 @@ class LyricsTextViewController: UIViewController {
     }
     
     func pressDoneButton(sender: UIButton) {
+
         if self.lyricsTextView.text.characters.count < 2 {
             self.showMessage("Please add some lyrics before syncing", message: "", actionTitle: "OK", completion: nil)
             return
         }
         
+
         self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
         
         lyricsSyncViewController.lyricsTextViewController = self
         if lyricsTextView.text == "" {
             lyricsSyncViewController.lyricsFromTextView = "You don't have any lyrics"
-        }else {
+            lyricsSyncViewController.lyricsOrganizedArray = ["You don't have any lyrics"]
+        } else {
             lyricsSyncViewController.lyricsFromTextView = lyricsTextView.text
             lyricsSyncViewController.lyricsOrganizedArray = self.lyricsReorganizedArray
         }
@@ -244,7 +285,6 @@ class LyricsTextViewController: UIViewController {
             if str.count == 0{
                 continue
             }
-            print(str)
             if(str.count <= maxCharPerLine)
             {
                 result.append("\(str)")
@@ -270,7 +310,6 @@ class LyricsTextViewController: UIViewController {
     }
     
     func pressDeleteAllButton(sender: UIButton) {
-        print("delete all")
         let alert = UIAlertController(title: "Warning", message: "Are you sure you want to delete all lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
             self.lyricsTextView.text = "Put lyrics here..."
@@ -281,7 +320,6 @@ class LyricsTextViewController: UIViewController {
     }
     
     func pressReorganizeButton(sender: UIButton) {
-        print("reorganize")
         let alert = UIAlertController(title: "Reorganize Lyrics", message: "Are you sure you want to automatically organize the lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
             self.lyricsReorganizedArray = self.formatLyrics(self.lyricsTextView.text)
@@ -290,6 +328,7 @@ class LyricsTextViewController: UIViewController {
             UIView.animateWithDuration(0.5, animations: {
                 self.lyricsTextView.alpha = 1
             })
+            self.formattedLyrics = true
         }))
         alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
@@ -314,10 +353,11 @@ extension LyricsTextViewController: UITextViewDelegate {
             textView.textColor = UIColor.whiteColor()
         }
     }
+    
+    func textViewDidEndEditing(textView: UITextView) {
+        self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
+    }
+  
 }
 
-// download exist lyrcis from database if the user uploaded it
-extension LyricsTextViewController {
-
-}
 

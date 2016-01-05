@@ -4,6 +4,7 @@ import AVFoundation
 import Alamofire
 import Haneke
 import StoreKit
+import SwiftyJSON
 
 let stepPerSecond: Float = 100   //steps of chord move persecond
 //Parameters to simulate the disappearing
@@ -15,11 +16,16 @@ let progressContainerHeight:CGFloat = 80 //TODO: Change to percentange, used in 
 let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
+
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate, SKStoreProductViewControllerDelegate {
     
     var musicViewController: MusicViewController!
     
+
+    
     private var rwLock = pthread_rwlock_t()
+    
+    var searchAPI:SearchAPI! = SearchAPI()
     
     //for nsoperation
     var isGenerated:Bool = true
@@ -92,11 +98,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var startdisappearing: Int = 0
     var activelabels:[(labels: [UIView], ylocation: CGFloat, alpha: Int)] = []
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
-    
-    //tuning of capo 
-    var tuningOfTheTabsSet = "E-B-G-D-A-E"//standard tuning, from high E to low E
-    // we reverse the order when present above the chordBase
-    var capoOfTheTabsSet = 0
+    var volume:Float = 0
     
     //time
     //var timer: NSTimer?
@@ -140,13 +142,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var countDownStartSecond = 3 //count from 3 to 1
     var countdownView: CountdownView!
     
-    //status view pop up
-    var statusView: UIView!
-    var successImage: UIImageView!
-    var failureImage: UIImageView!
-    var statusLabel: UILabel!
-    var hideStatusViewTimer = NSTimer()
-    
     // Guitar actions views
     var guitarActionView: UIView!
     var volumeView: MPVolumeView!
@@ -162,10 +157,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var navigationOutActionView: UIView!
     var browseTabsButton: UIButton!
     var addTabsButton: UIButton!
-    var uploadTabsButton: UIButton!
     var browseLyricsButton: UIButton!
     var addLyricsButton: UIButton!
-    var uploadLyricsButton: UIButton!
     var goToArtistButton: UIButton!
     var goToAlbumButton: UIButton!
     
@@ -210,7 +203,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var isSongNeedPurchase = false
     var songNeedPurchase: SearchResult!
-    var AVplayer: AVPlayer!
     var playPreveiwButton:UIButton!
     var previewActionViewHeight: CGFloat = 54 * 4 + 3
     var previewView:UIView!
@@ -228,6 +220,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var selectedRow:Int!
 
     var isChangedSpeed:Bool = true
+    var selectedFromSearchTab = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -254,6 +247,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 MusicManager.sharedInstance.avPlayer.removeAllItems()
             }
+            self.selectedFromSearchTab = true
            let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 self.musicViewController = musicVC
@@ -278,7 +272,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         setUpActionViews()
         setUpCountdownView()
-        setUpStatusView()
         
         if(!isSongNeedPurchase){
             updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
@@ -333,7 +326,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             isRemoveProgressBlock = true
         }else{
             if(!isSongNeedPurchase){
-              self.registerMediaPlayerNotification()
+                self.registerMediaPlayerNotification()
             }
         }
         if(!isGenerated && !isSongNeedPurchase){
@@ -441,6 +434,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else if self.backgroundImage  == nil { //make sure album cover downloaded from iTunes is not blank
             currentImage = UIImage(named: "liwengbg")
             blurredImage = currentImage?.applyLightEffect()!
+            currentImage = nil
         }
         
         backgroundImageView.center.x = self.view.center.x
@@ -448,15 +442,57 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func loadBackgroundImageFromMediaItem(item: Findable) {
+        
         if let artwork = item.getArtWork() {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
+            if currentImage == nil {
+                self.currentImage = nil
+                CoreDataManager.initializeSongToDatabase(item)
+                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+                   self.reloadBackgroundImageAfterSearch(item)
+                }
+            }else{
+                self.backgroundImage = currentImage
+                self.blurredImage = currentImage!.applyLightEffect()!
+            }
         } else {
             //TODO: add a placeholder album cover
-            currentImage = UIImage(named: "liwengbg")
+            self.currentImage = UIImage(named: "liwengbg")
+            self.backgroundImage = currentImage
+            self.blurredImage = currentImage!.applyLightEffect()!
+            dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+               self.reloadBackgroundImageAfterSearch(item)
+            }
         }
-        self.backgroundImage = currentImage
-        self.blurredImage = currentImage!.applyLightEffect()!
+       
     }
+
+    
+    func reloadBackgroundImageAfterSearch(item:Findable){
+        let searchText = item.getArtist() + " " + item.getTitle()
+        
+        SearchAPI.getBackgroundImageForSong(searchText, imageSize: SearchAPI.ImageSize.Large, completion: {
+            image in
+            self.currentImage = image
+            self.backgroundImage = image
+            self.blurredImage = image.applyLightEffect()!
+            self.isBlurred = !self.isBlurred
+            if (self.isChordShown || self.isTabsShown || self.isLyricsShown) && !self.isBlurred {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.backgroundImageView.image = self.blurredImage
+                }
+                self.isBlurred = true
+            } else if (!self.isChordShown && !self.isTabsShown && !self.isLyricsShown && self.isBlurred) { //
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.backgroundImageView.image = self.backgroundImage
+                    }
+                    self.isBlurred = false
+                }
+            }
+        )
+    }
+    
+    
     func setUpTopButtons() {
 
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
@@ -493,7 +529,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     private func updateTuning(tuning: String) {
         print("current tuning is \(tuning)")
-        let tuningArray = tuning.characters.split{$0 == "-"}.map(String.init)
+        let tuningArray = Tuning.toArray(tuning)
         let tuningToShow = Array(tuningArray.reverse())
         for i in 0..<tuningLabels.count {
             tuningLabels[i].text = tuningToShow[i]
@@ -665,7 +701,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var chords = [Chord]()
         var tuning = ""
         var capo = 0
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: false)
+        (chords, tuning, capo, _, _) = CoreDataManager.getTabs(song, fetchingUsers: false)
         if chords.count > 2 {
             self.chords = chords
             updateTuning(tuning)
@@ -682,7 +718,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.bottomLyricLabel.text = ""
         
         var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: false)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: false)
         
         if lyric.lyric.count > 1 {
             self.lyric = lyric
@@ -700,17 +736,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                  //if still not found, we show a prompt
                 if !found {
-                    self.addTabsPrompt.hidden = false
+                    if !self.isSongNeedPurchase {
+                        self.addTabsPrompt.hidden = false
+                    }
                     return
                 }
                 self.addTabsPrompt.hidden = true
                 
-                var times = [NSTimeInterval]()
-                for t in download.times {
-                    times.append(NSTimeInterval(t))
-                }
-                
-                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id)
+                CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id, visible: true)
                 
                 if self.canFindTabsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
@@ -733,7 +766,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 found, download in
                 //if still not found, we show a prompt
                 if !found {
-                    self.addLyricsPrompt.hidden = false
+                    if !self.isSongNeedPurchase{
+                        self.addLyricsPrompt.hidden = false
+                    }
                     return
                 }
                 self.addLyricsPrompt.hidden = true
@@ -964,7 +999,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
-                self.progressBlockViewWidth = nil
+                self.progressBlockViewWidth = 0
         
                 //////////////////////////////
                 //remove from superView
@@ -976,7 +1011,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 // get a new progressBlock
                 var progressBarWidth:CGFloat!
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
-                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
+        
+                //如果是在线从来没有听过的queue切歌的很快的时候duration是读不出来的
+                if progressBarWidth <= 0.1 {
+                    nowPlayingItemDuration = 1000
+                }
+                KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
+        
                 KGLOBAL_progressBlock.center.y = progressContainerHeight
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
@@ -1056,7 +1097,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // get a new progressBlock
         var progressBarWidth:CGFloat!
         progressBarWidth = CGFloat(demoItemDuration) * progressWidthMultiplier
-        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
+        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
@@ -1216,8 +1257,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     KGLOBAL_progressBlock.removeFromSuperview()
                     KGLOBAL_progressBlock = nil
         }
-        
-        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth, height: soundwaveHeight))
+        if (progressBarWidth <= 0.1){
+            nowPlayingItemDuration = 1000
+        }
+        KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
@@ -1260,12 +1303,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
             guard let assetURL = nowPlayingItem.getURL() else {
                 print("sound url not available")
+                KGLOBAL_init_queue.suspended = false
                 return
             }
             
             var op:NSBlockOperation?
             op = KGLOBAL_operationCache[assetURL as! NSURL]
             if(op == nil){
+                KGLOBAL_init_queue.suspended = true
                 // have to use the temp value to do the nsoperation, cannot use (self.) do that.
                 let tempNowPlayingItem = nowPlayingItem
                 let tempProgressBlock = KGLOBAL_progressBlock
@@ -1670,22 +1715,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         addTabsButton.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addTabsButton)
         
-        uploadTabsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: 0, width: buttonDimension, height: buttonDimension))
-        uploadTabsButton.setImage(UIImage(named: "upload"), forState: .Normal)
-        uploadTabsButton.addTarget(self, action: "uploadTabs:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(uploadTabsButton)
-        
         //position 2
         addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
         addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
         addLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         addLyricsButton.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addLyricsButton)
-        
-        uploadLyricsButton = UIButton(frame: CGRect(x: width-buttonDimension-sideMargin, y: rowHeight, width: buttonDimension, height: buttonDimension))
-        uploadLyricsButton.setImage(UIImage(named: "upload"), forState: .Normal)
-        uploadLyricsButton.addTarget(self, action: "uploadLyrics:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(uploadLyricsButton)
         
         //position 3
         goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
@@ -1728,13 +1763,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("") {
             self.isRemoveProgressBlock = false
             self.selectedFromTable = false
-            
-            if isDemoSong {
-                self.avPlayer.pause()
-            } else {
-                self.player.pause()
-            }
-
             return
         }
      
@@ -1910,7 +1938,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         //we blur the image if one of the chord, tabs or lyrics is shown
         if (isChordShown || isTabsShown || isLyricsShown) && !isBlurred {
         
-            self.backgroundImageView.image = blurredImage
+            dispatch_async(dispatch_get_main_queue()) {
+                self.backgroundImageView.image = self.blurredImage
+            }
             self.isBlurred = true
             
             // we dont' need animation when changing song
@@ -1926,8 +1956,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 })
             }
         } else if (!isChordShown && !isTabsShown && !isLyricsShown && isBlurred) { // center the image
-            
-            self.backgroundImageView.image = backgroundImage
+            dispatch_async(dispatch_get_main_queue()) {
+                self.backgroundImageView.image = self.backgroundImage
+            }
            
             self.isBlurred = false
             
@@ -1979,61 +2010,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
-            player.play()
+            if isDemoSong {
+                avPlayer.play()
+            }else{
+                player.play()
+            }
         }
     }
-    
-    func setUpStatusView() {
-        statusView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-        statusView.backgroundColor = UIColor(red: 114/255, green: 114/255, blue: 114/255, alpha: 0.80)
-        statusView.hidden = true
-        statusView.center = self.view.center
-        statusView.layer.cornerRadius = 20
-        self.view.addSubview(statusView)
-        
-        successImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 40, height: 30))
-        successImage.image = UIImage(named: "check")
-        successImage.center.x = statusView.frame.width/2
-        successImage.hidden = true
-        statusView.addSubview(successImage)
-        
-        failureImage = UIImageView(frame: CGRect(x: 0, y: 15, width: 35, height: 35))
-        failureImage.image = UIImage(named: "closebutton")
-        failureImage.center.x = statusView.frame.width/2
-        failureImage.hidden = true
-        statusView.addSubview(failureImage)
-        
-        statusLabel = UILabel(frame: CGRect(x: 0, y: 55, width: 100, height: 35))
-        statusLabel.textColor = UIColor.whiteColor()
-        statusLabel.textAlignment = .Center
-        statusLabel.font = UIFont.systemFontOfSize(16)
-        statusLabel.center.x = statusView.frame.width/2
-        statusView.addSubview(statusLabel)
-    }
-    
-    func showStatusView(isSucess: Bool) {
-        if isSucess {
-            statusView.hidden = false
-            successImage.hidden = false
-            failureImage.hidden = true
-            statusLabel.text = "Uploaded"
-        } else {
-            statusView.hidden = false
-            successImage.hidden = true
-            failureImage.hidden = false
-            statusLabel.text = "Upload failed"
-        }
-    }
-    
-    func startHideStatusViewTimer() {
-        hideStatusViewTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: Selector("hideStatusView"), userInfo: nil, repeats: false)
-        self.dismissAction()
-    }
-    
-    func hideStatusView() {
-        statusView.hidden = true
-    }
-    
+
     // MARK: functions in guitarActionView
     func speedStepperValueChanged(stepper: UIStepper) {
         stopTimer()
@@ -2079,31 +2063,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.clearActions()
         })
     }
-
-    
-    func uploadTabs(button: UIButton) {
-        self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
-        if shouldShowSignUpPage("") {
-            return
-        }
-        
-        var chords = [Chord]()
-        (chords, _, _, _) = CoreDataManager.getTabs(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
-        
-        if chords.count < 2 {
-            self.showMessage("Your tabs looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
-            return
-        }
-        
-        APIManager.uploadTabs(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-            cloudId in
-            
-            CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
-            self.showStatusView(true)
-            self.startHideStatusViewTimer()
-        })
-    }
     
     func goToTabsEditor() {
         self.isRemoveProgressBlock = false
@@ -2112,10 +2071,62 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if shouldShowSignUpPage("goToTabsEditor") {
             return
         }
+
+        //self.showTabsEditor()
+
+        self.checkChordsWithCoredata()
+    }
+
+    func checkChordsWithCoredata() {
+        let sender: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
+        var  needAddNewChords: Bool = false
+        let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
+        var needAddNewChordsArray: [Tab] = [Tab]()
+        for item in tabs.0 {
+            print(item.tab.name)
+            print(item.tab.content)
+            let index = self.getBasicNoteIndex(item.tab.contentArray)
+            print(index)
+            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
+                continue
+            } else {
+                needAddNewChords = true
+                needAddNewChordsArray.append(item.tab)
+            }
+        }
         
-       self.showTabsEditor()
+        if needAddNewChords {
+            var nameString: String = ""
+            for item in needAddNewChordsArray {
+                nameString = nameString + item.name + ", "
+            }
+            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
+                action in
+                for item in needAddNewChordsArray {
+                    let index = self.getBasicNoteIndex(item.contentArray)
+                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+                }
+                self.showTabsEditor()
+            }))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        } else {
+            self.showTabsEditor()
+        }
     }
     
+    func getBasicNoteIndex(sender: [String]) -> Int {
+        for var i = 0; i < 6; i++ {
+            if sender[i] != "x" {
+                let stringIndex = 6 - i
+                let fretIndex = Int(sender[i])
+                return stringIndex * 100 + fretIndex!
+            }
+        }
+        return 0
+    }
+
     func showTabsEditor(){
         self.isRemoveProgressBlock = false
         self.selectedFromTable = false
@@ -2136,31 +2147,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tabsEditorVC.songViewController = self
         tabsEditorVC.isDemoSong = self.isDemoSong
         self.presentViewController(tabsEditorVC, animated: true, completion: nil)
-    }
-    
-    func uploadLyrics(button: UIButton) {
-        self.isRemoveProgressBlock = false
-        self.selectedFromTable = false
         
-        if shouldShowSignUpPage("") {
-            return
-        }
-        
-        var lyric = Lyric()
-        (lyric, _) = CoreDataManager.getLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , fetchingLocalUserOnly: true)
-        
-        if lyric.lyric.count < 2 {
-             self.showMessage("Your lyrics looks empty, please add more before uploading.", message: "", actionTitle: "OK", completion: nil)
-            return
-        }
- 
-        APIManager.uploadLyrics(isDemoSong ? demoItem : nowPlayingMediaItem , completion: {
-            cloudId in
-            
-            CoreDataManager.saveCloudIdToLyrics(self.isDemoSong ? self.demoItem : self.nowPlayingMediaItem, cloudId: cloudId)
-            self.showStatusView(true)
-            self.startHideStatusViewTimer()
-        })
     }
     
     func browseLyrics(button: UIButton) {
@@ -2671,12 +2658,32 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if !isPanning && !isSongNeedPurchase {
-            if !isViewDidAppear || startTime.toDecimalNumer() < 3 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 3 || startTime.toDecimalNumer() - toTime < (1 * speed) {
+            if !self.selectedFromSearchTab && (!isViewDidAppear || startTime.toDecimalNumer() < 2 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 2 || startTime.toDecimalNumer() - toTime < (1 * speed)) {
                 startTime.addTime(Int(100 / stepPerSecond))
             } else {
                 let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
+                    if(!isDemoSong && nowPlayingItemDuration == 1000){
+                        if(player.nowPlayingItem!.playbackDuration > 1){
+                            if(KGLOBAL_progressBlock.frame.size.width > CGFloat(400)){
+                                nowPlayingMediaItem = player.nowPlayingItem
+                                nowPlayingItemDuration = nowPlayingMediaItem.playbackDuration
+                                let progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
+                                KGLOBAL_progressBlock.frame = CGRect(x: KGLOBAL_progressBlock.frame.origin.x, y: KGLOBAL_progressBlock.frame.origin.y, width: progressBarWidth, height: soundwaveHeight)
+                                if self.player.repeatMode != .One {
+                                    self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingMediaItem!.title!)
+                                    self.songNameLabel.textAlignment = NSTextAlignment.Center
+                                    self.artistNameLabel.text = nowPlayingMediaItem!.artist
+                                    if(currentImage == nil){
+                                        isBlurred = !isBlurred
+                                        applyEffectsToBackgroundImage(changeSong: true)
+                                    }
+                                    self.totalTimeLabel.text = TimeNumber(time: Float(nowPlayingItemDuration)).toDisplayString()
+                                }
+                            }
+                        }
+                    }
                 } else {
                     startTime.addTime(Int(100 / stepPerSecond))
                 }
@@ -2762,7 +2769,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(playPreveiwButton)
         let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
         let playerItem = AVPlayerItem( URL:url)
-        AVplayer = AVPlayer(playerItem:playerItem)
+        KAVplayer = AVPlayer(playerItem:playerItem)
         displayLink = CADisplayLink(target: self, selector: ("updateSliderProgress"))
         displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
         displayLink.paused = true
@@ -2856,9 +2863,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func previewPlay(){
-        if(self.AVplayer.rate == 0.0){
+        if(KAVplayer.rate == 0.0){
             previewProgress.setColors(UIColor.mainPinkColor())
-            AVplayer.rate = 1.0;
+            KAVplayer.rate = 1.0;
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
@@ -2866,7 +2873,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: {
                     finished in
                     self.displayLink.paused = false
-                    self.AVplayer.play()
+                    KAVplayer.play()
             })
         }else{
             UIView.animateWithDuration(0.2, delay: 0.0,
@@ -2876,7 +2883,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }, completion: {
                     finished in
                     self.displayLink.paused = true
-                    self.AVplayer.pause()
+                    KAVplayer.pause()
             })
         }
     }
@@ -2907,15 +2914,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func updateSliderProgress(){
-        let angle = self.AVplayer.currentTime().seconds * 360/self.AVplayer.currentItem!.duration.seconds
+        let angle = KAVplayer.currentTime().seconds * 360/KAVplayer.currentItem!.duration.seconds
         if(angle.isFinite && !angle.isNaN){
             previewProgress.angle = Int(angle)
         }else{
             previewProgress.angle = 0
         }
         
-        if(AVplayer.currentTime() == AVplayer.currentItem!.duration){
-            AVplayer.seekToTime(kCMTimeZero)
+        if(KAVplayer.currentTime() == KAVplayer.currentItem!.duration){
+            KAVplayer.seekToTime(kCMTimeZero)
             UIView.animateWithDuration(0.2, delay: 0.0,
                 options: .CurveEaseOut,
                 animations: {
@@ -2935,7 +2942,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
                 MusicManager.sharedInstance.setIndexInTheQueue(0)
 
-            self.recoverToNormalSongVC()
+            self.recoverToNormalSongVC(purchasedItem)
             
         }else{
               print("didn't purchase the song")
@@ -2945,7 +2952,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
     }
     
-    func recoverToNormalSongVC(){
+    func recoverToNormalSongVC(PlayingItem:MPMediaItem){
         //delete
         self.displayLink.paused = true
         self.displayLink.invalidate()
@@ -2953,19 +2960,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.previewView = nil
         self.playPreveiwButton.removeFromSuperview()
         self.playPreveiwButton = nil
-        self.AVplayer = nil
+        KAVplayer = nil
         //recover
         player = MusicManager.sharedInstance.player
-        self.nowPlayingMediaItem = player.nowPlayingItem
+        self.nowPlayingMediaItem = PlayingItem
         self.nowPlayingItemDuration = nowPlayingMediaItem.playbackDuration
         self.isSongNeedPurchase = false
+        self.selectedFromTable = true
         self.removeAllObserver()
-        loadBackgroundImageFromMediaItem(nowPlayingMediaItem)
+        CoreDataManager.initializeSongToDatabase(PlayingItem)
         self.registerMediaPlayerNotification()
+        startTime.setTime(3)
         self.resumeSong()
         if(!isGenerated){
             generateSoundWave(nowPlayingMediaItem)
         }
+        self.updateMusicData(nowPlayingMediaItem)
         shuffleButton.enabled = true
         othersButton.enabled = true
         speedStepper.enabled = true

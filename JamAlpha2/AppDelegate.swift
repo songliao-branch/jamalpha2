@@ -20,6 +20,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var suspended:Bool = false
+    
+    var shuffleMode:MPMusicShuffleMode!
+    var repeatMode:MPMusicRepeatMode!
+
       
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
@@ -85,11 +89,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     var isDemoSong:Bool = false
                     if presentVC.isKindOfClass(TabsEditorViewController) {
                         isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
+                        if(!isDemoSong){
+                            (presentVC as! TabsEditorViewController).removeNotification()
+                            (presentVC as! TabsEditorViewController).isPlaying = false
+                            (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
+                        }
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
                         isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
                     
                     if(!isDemoSong){
+                        
                         MusicManager.sharedInstance.player.pause()
                         
                         MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
@@ -102,42 +112,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.suspended = KGLOBAL_init_queue.suspended
         KGLOBAL_queue.suspended = true
         KGLOBAL_init_queue.suspended = true
+        shuffleMode = MusicManager.sharedInstance.player.shuffleMode
+        repeatMode = MusicManager.sharedInstance.player.repeatMode
+        
         print("Go into Background suspend nsoperationqueue:\(self.suspended)")
     }
     
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-        MusicManager.sharedInstance.reloadCollections()
         
         let currentVC = topViewController(rootViewController())
         
-        // if the collection is different i.e. new songs are added/old songs are removed
-        // we manually reload MusicViewController table
-        if kShouldReloadMusicTable {
-            if rootViewController().isKindOfClass(TabBarController) {
-                let tabBarController = rootViewController() as! TabBarController
-                
-                for tabItemController in (tabBarController.viewControllers)! {
-                    if tabItemController.isKindOfClass(UINavigationController){
-                        for childVC in tabItemController.childViewControllers {
-                            if childVC.isKindOfClass(BaseViewController) {
-                                let baseVC = childVC as! BaseViewController
-
-                                for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                                    musicVC.reloadDataAndTable()
-                                    
-                                    if(!musicVC.uniqueSongs.isEmpty){
-                                        musicVC.songCount = 0
-                                        musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+        let baseVC = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
+        
+    
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
@@ -153,12 +141,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         KGLOBAL_init_queue.suspended = self.suspended
                         MusicManager.sharedInstance.initializePlayer()
                     })
-                }else{
+                } else {
                     KGLOBAL_queue.suspended = false
                     KGLOBAL_init_queue.suspended = self.suspended
-                    
                 }
-            }else{
+            } else {
                 currentSongVC.registerMediaPlayerNotification()
                 currentSongVC.selectedFromTable = false
                 if(!currentSongVC.isSongNeedPurchase){
@@ -170,7 +157,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             
             //check if the viewController is Tabs Editor or lyrics SyncEditor
-            //in case mediaItem was changed outside the app, if changed, we used 
+            //in case mediaItem was changed outside the app, if changed, we used
             //the last playing item and time
             if(currentVC.presentedViewController != nil){
                 let presentVC = currentVC.presentedViewController!
@@ -190,23 +177,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             MusicManager.sharedInstance.player.stop()
                             MusicManager.sharedInstance.player.repeatMode = .All
                             MusicManager.sharedInstance.player.shuffleMode = .Off
-                            MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                            if(MusicManager.sharedInstance.lastPlayerQueue.contains(lastPlayingItem)){
+                                MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: MusicManager.sharedInstance.lastPlayerQueue))
+                            }else{
+                                MusicManager.sharedInstance.player.setQueueWithItemCollection(MPMediaItemCollection(items: [lastPlayingItem]))
+                                MusicManager.sharedInstance.lastPlayerQueue = [lastPlayingItem]
+                            }
                             MusicManager.sharedInstance.player.nowPlayingItem = lastPlayingItem
                             MusicManager.sharedInstance.player.repeatMode = .One
                             MusicManager.sharedInstance.player.shuffleMode = .Off
-                            MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime                     }
+                            MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
+                            MusicManager.sharedInstance.player.pause()
+                            if presentVC.isKindOfClass(TabsEditorViewController) {
+                                (presentVC as! TabsEditorViewController).registerNotification()
+                            }
+                        }
                     } else if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.player.nowPlayingItem == lastPlayingItem {
                         MusicManager.sharedInstance.player.repeatMode = .One
                         MusicManager.sharedInstance.player.shuffleMode = .Off
                         MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
+                         MusicManager.sharedInstance.player.pause()
                     }
                 }
             }
+        } else {
+            if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                if(MusicManager.sharedInstance.player.playbackState == .Playing){
+                    baseVC.nowView.start()
+                }
+                if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
+                    MusicManager.sharedInstance.avPlayer.removeAllItems()
+                }
+            }
         }
+        
         KGLOBAL_isNeedToCheckIndex = true
-        print("Go into forground")
     }
-   
+
+
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         

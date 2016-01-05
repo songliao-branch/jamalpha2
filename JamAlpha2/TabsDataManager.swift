@@ -11,9 +11,9 @@ import CoreData
 
 class TabsDataManager: NSObject {
     
-    let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
+    static let moc: NSManagedObjectContext = SwiftCoreDataHelper.managedObjectContext()
     
-    let fretsBoard: [[String]] = [
+    static let fretsBoard: [[String]] = [
         //Fret board note, from high E string to low E string
         ["E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E"],
         ["B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
@@ -23,7 +23,7 @@ class TabsDataManager: NSObject {
         ["E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E"]
     ]
 
-    func commonChords() -> [String: String] {
+    class func commonChords() -> [String: String] {
         var commonChords: [String: String] = [String: String]()
         //4th string
         commonChords["40000"] = "xxxx00020302"//D
@@ -91,7 +91,7 @@ class TabsDataManager: NSObject {
                         } else if j == 8 {
                             commonChords["\(600 + j)00"] = "0\(j)\(j + 2)\(j + 2)0\(j + 1)0\(j)0\(j)"
                         } else if j == 9 {
-                            commonChords["\(600 + j)00"] = "x\(j)\(j + 2)\(j + 2)\(j + 1)0\(j)0\(j)"
+                            commonChords["\(600 + j)00"] = "0\(j)\(j + 2)\(j + 2)\(j + 1)0\(j)0\(j)"
                         }else {
                             commonChords["\(600 + j)00"] = "\(j)\(j + 2)\(j + 2)\(j + 1)\(j)\(j)"
                         }
@@ -124,7 +124,7 @@ class TabsDataManager: NSObject {
         return commonChords
     }
     
-    func addDefaultData() {
+    class func addDefaultData() {
         let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Tabs), withPredicate: nil, managedObjectContext: moc)
         if results.count < 1 { // if results are empty, we initiate original tabs
             let dict = commonChords()
@@ -142,7 +142,7 @@ class TabsDataManager: NSObject {
     }
     
     
-    func insertInitialTabs(index: NSNumber, name: String, dict: Dictionary<String, String>) {
+    class func insertInitialTabs(index: NSNumber, name: String, dict: Dictionary<String, String>) {
     var tabSuffix: [String] = ["", "m", "7", "m7"]
 
     for var i = 0; i < 4; i++ {
@@ -161,7 +161,7 @@ class TabsDataManager: NSObject {
     }
     
     // get all tabs give a fret positino
-    func getTabsSets(index: NSNumber) -> [NormalTabs] {
+    class func getTabsSets(index: NSNumber) -> [NormalTabs] {
         var tempTabSet: [NormalTabs] = [NormalTabs]()
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "index == '\(index)'")
@@ -188,8 +188,8 @@ class TabsDataManager: NSObject {
     }
     
     // get tabs by index, name and content
-    func getUniqueTab(index: NSNumber, name: String, content: String) -> NormalTabs {
-        var tempNormalTabs: NormalTabs = NormalTabs()
+    class func getUniqueTab(index: NSNumber, name: String, content: String) -> NormalTabs? {
+        var tempNormalTabs: NormalTabs!
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "index == '\(index)' AND name == '\(name)' AND content == '\(content)'")
         do {
@@ -198,7 +198,9 @@ class TabsDataManager: NSObject {
                     let tempItem: Tabs = item as Tabs
                     let tempTab: NormalTabs = NormalTabs()
                     tempTab.name = tempItem.name
-                    print("\(tempItem.index)")
+                    print("...\(tempItem.index)")
+                    print("...\(tempItem.name)")
+                    print("...\(tempItem.content)")
                     tempTab.index = tempItem.index
                     tempTab.content = tempItem.content
                     tempTab.isOriginal = tempItem.isOriginal
@@ -210,10 +212,10 @@ class TabsDataManager: NSObject {
         } catch {
             fatalError("There was an error fetching tabs on the index \(index)")
         }
-        return tempNormalTabs
+        return nil
     }
     
-    func addNewTabs(index: NSNumber, name: String, content: String) -> Tabs {
+    class func addNewTabs(index: NSNumber, name: String, content: String) -> Tabs {
         let tabs: Tabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Tabs), managedObjectConect: moc) as! Tabs
         tabs.index = index
         tabs.name = name
@@ -224,7 +226,7 @@ class TabsDataManager: NSObject {
     }
     
 
-    func removeTabs(tabs: Tabs) {
+    class func removeTabs(tabs: Tabs) {
         if tabs.isOriginal {
             print("cannot remove original tabs")
             return
@@ -233,7 +235,7 @@ class TabsDataManager: NSObject {
         SwiftCoreDataHelper.saveManagedObjectContext(moc)
     }
 
-    func printAllNewTabs() {
+    class func printAllNewTabs() {
         let fetchRequest = NSFetchRequest(entityName: "Tabs")
         fetchRequest.predicate = NSPredicate(format: "isOriginal == false")//needs to verify this works
         do {
@@ -248,7 +250,7 @@ class TabsDataManager: NSObject {
     }
     
     //Sort tab sets given on a index to the order of major, minor, m7, 7, and user added ones
-    func sortTabsSets(tabsSets: [NormalTabs]) -> [NormalTabs] {
+    class func sortTabsSets(tabsSets: [NormalTabs]) -> [NormalTabs] {
         return tabsSets.sort{
             (left, right) in
             if !left.isOriginal { // put all non-original last unsorted, maybe later by uses frequency

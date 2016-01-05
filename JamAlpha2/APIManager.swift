@@ -39,13 +39,6 @@ let jamBaseURL = "https://jamapi.herokuapp.com"
 
 class APIManager: NSObject {
     
-    //MARK: iTunes search
-    static let searchBaseURL = "https://itunes.apple.com/search"
-    
-    class func searchParameters(searchTerm: String) -> [String: String] {
-        return ["term":"\(searchTerm)", "limit":"20", "media":"music"]
-    }
-    
     static let tabsSetURL = jamBaseURL + "/tabs_sets"
     static let lyricsSetURL = jamBaseURL + "/lyrics_sets"
     
@@ -55,8 +48,8 @@ class APIManager: NSObject {
         var chords = [Chord]() //([Chord], String, Int)
         var tuning = ""
         var capo = 0
-        
-        (chords, tuning, capo, _) = CoreDataManager.getTabs(song, fetchingLocalUserOnly: true)
+        var visible = true
+        (chords, tuning, capo, _, visible) = CoreDataManager.getTabs(song, fetchingUsers: true)
         
         if chords.count < 2 {
             print("uploading tabs error: tabs count is less than 2")
@@ -83,7 +76,8 @@ class APIManager: NSObject {
             "times": timesData,
             "chords": chordsData,
             "tabs": tabsData,
-            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id),
+            "visible": visible
         ]
         
         Alamofire.request(.POST, tabsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -109,7 +103,7 @@ class APIManager: NSObject {
 
         var lyric = Lyric()
         
-        (lyric, _) = CoreDataManager.getLyrics(song, fetchingLocalUserOnly: true)
+        (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: true)
         
         if lyric.lyric.count < 2 {
             print("uploading lyrics error: lyrics count is less than 2")
@@ -132,7 +126,8 @@ class APIManager: NSObject {
             
             "times": times,
             "lyrics": lyrics,
-            "user_id": Int(CoreDataManager.getCurrentUser()!.id)
+            "user_id": Int(CoreDataManager.getCurrentUser()!.id),
+            "visible": true //lyrics are all public..I assume no-one cares
         ]
     
         Alamofire.request(.POST, lyricsSetURL, parameters: parameters as? [String : AnyObject], encoding: .JSON).responseJSON
@@ -149,6 +144,25 @@ class APIManager: NSObject {
                 case .Failure(_):
                     print("Lyrics upload failed")
                 }
+        }
+    }
+    
+    class func toggleSetVisibility(setId setId: Int, isTabs: Bool, completion: ((visible: Bool) -> Void)) {
+        let url = isTabs ? tabsSetURL : lyricsSetURL
+        // PUT /tabs_sets/:id/change_visibility
+        Alamofire.request(.PUT, url + "/\(setId)/change_visibility").responseJSON { response in
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+ 
+                    let visible = isTabs ? json["tabs_set"]["visible"].bool! : json["lyrics_set"]["visible"].bool!
+                    completion(visible: visible)
+                }
+            case .Failure(let error):
+                print("Cannot delete network error")
+                print(error)
+            }
         }
     }
     
@@ -225,7 +239,6 @@ class APIManager: NSObject {
                     
                     var theTimes = [Float]()
                     
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                     for time in set["times"].arrayObject as! [String] {
                         theTimes.append(Float(time)!)
                     }
@@ -262,18 +275,15 @@ class APIManager: NSObject {
                     }
                     
                     let set = json["tabs_set_content"]
-
-
-                    var theTimes = [Float]()
-                    
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
-                    for time in set["times"].arrayObject as! [String] {
-                        theTimes.append(Float(time)!)
-                    }
                     
                     let editor = Editor(userId: set["user_id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
                     let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: "", votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
-
+                    
+                    var theTimes = [Float]()
+                    
+                    for time in set["times"].arrayObject as! [String] {
+                        theTimes.append(Float(time)!)
+                    }
                     
                     t.times = theTimes
                     t.chords  = set["chords"].arrayObject as! [String]
@@ -339,7 +349,6 @@ class APIManager: NSObject {
                     
                     var theTimes = [Float]()
                     
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                     for time in set["times"].arrayObject as! [String] {
                         theTimes.append(Float(time)!)
                     }
@@ -376,8 +385,6 @@ class APIManager: NSObject {
                     
                     
                     var theTimes = [Float]()
-                    
-                    //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                     for time in set["times"].arrayObject as! [String] {
                         theTimes.append(Float(time)!)
                     }
@@ -482,36 +489,36 @@ class APIManager: NSObject {
                     let editor = Editor(userId: json["user"]["id"].int!, nickname: "", avatarUrlMedium: "", avatarUrlThumbnail: "")
                     
                     for set in tabsSets.array! {
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: set["last_edited"].string!)
+                        
                         t.chords = set["chords"].arrayObject as! [String]
                         t.tabs = set["tabs"].arrayObject as! [String]
+                        t.visible = set["visible"].bool!
                         
-                        var tTimes = [Float]()
+                        var theTimes = [Float]()
                         t.title = set["song"]["title"].string!
                         t.artist = set["song"]["artist"].string!
                         t.duration = set["song"]["duration"].float!
-                        
-                        //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                         for time in set["times"].arrayObject as! [String] {
-                            tTimes.append(Float(time)!)
+                            theTimes.append(Float(time)!)
                         }
                         
-                        t.times = tTimes
+                        t.times = theTimes
                         myTabsSets.append(t)
                     }
                     
                     for set in lyricsSets.array! {
-                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: "")
+                        let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: 0, voteStatus: "", editor: editor, lastEdited: set["last_edited"].string!)
                         l.lyrics = set["lyrics"].arrayObject as! [String]
                         
-                        var tTimes = [Float]()
+                        var theTimes = [Float]()
                         
                         //TODO: array for times come in as string array, need to change backend, and this might too much for everything at once, needs pagination soon
                         for time in set["times"].arrayObject as! [String] {
-                            tTimes.append(Float(time)!)
+                            theTimes.append(Float(time)!)
                         }
                         
-                        l.times = tTimes
+                        l.times = theTimes
                         l.title = set["song"]["title"].string!
                         l.artist = set["song"]["artist"].string!
                         l.duration = set["song"]["duration"].float!

@@ -26,9 +26,8 @@ class DownloadedTabsSet: NSObject {
     var voteStatus = ""//return "up", "down" ,"yet" vote status for current user, if not logged in show 
     //"no user applicable"
     var editor: Editor!//owner of this tabs
-    var lastEdited = "" //TODO: change to a string
+    var lastEdited: NSDate?
     
- 
     //these variables are downloaded again when a single tabsSet is selected
     var chords = [String]()
     var tabs = [String]()
@@ -41,6 +40,9 @@ class DownloadedTabsSet: NSObject {
     var artist = ""
     var duration: Float = 0
 
+    //this is only used for current user's tabs
+    var visible = true
+    
     init(id: Int, tuning: String, capo: Int, chordsPreview: String, votesScore: Int, voteStatus: String, editor: Editor, lastEdited: String) {
         self.id = id
         self.tuning = tuning
@@ -49,7 +51,10 @@ class DownloadedTabsSet: NSObject {
         self.votesScore = votesScore
         self.voteStatus = voteStatus
         self.editor = editor
-        self.lastEdited = NSDate.convertFromIsoToHumanizedFormat(lastEdited)
+        
+        if let date = NSDate.convertFromIsoToNSDate(lastEdited) {
+             self.lastEdited = date
+        }
     }
 
 }

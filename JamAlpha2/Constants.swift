@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import MediaPlayer
+import AVFoundation
 
 let KGLOBAL_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_operationCache = [NSURL:NSBlockOperation]()
@@ -25,8 +27,6 @@ var KEY_isSoundWaveformGeneratingInBackground:Bool = false
 
 let facebookLoginSalt = "tJwIa021#1sm" //DO NOT MODIFITY THIS SALT, otherwise facebook user can get back their account created with facebook
 
-//reload music table after detecting new songs are added
-var kShouldReloadMusicTable = false
 
 let kShowDemoSong  = "showDemoSong"
 let kShowTutorial = "showTutorial"
@@ -34,3 +34,5 @@ let kSongNames = ["Go"]
 
 //used in core data to refer to a locally created tabsSet/lyricsSet
 let kLocalSetId = -1
+
+var KAVplayer: AVPlayer!

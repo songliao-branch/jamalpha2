@@ -1,5 +1,6 @@
 import UIKit
 import MediaPlayer
+import Haneke
 
 
 class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
@@ -24,6 +25,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     private var rwLock = pthread_rwlock_t()
     
     var pageIndex = 0
+    var searchAPI:SearchAPI! = SearchAPI()
     
     @IBOutlet weak var musicTable: UITableView!
     
@@ -82,17 +84,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         objc_sync_exit(lock)
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        if kShouldReloadMusicTable { //this is only called after new song is added
-           reloadDataAndTable()
-        }
-    }
     
     func reloadDataAndTable() {
         loadAndSortMusic()
         musicTable.reloadData()
-        kShouldReloadMusicTable = false
     }
     
     func currentSongChanged(notification: NSNotification){
@@ -123,6 +118,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
       
         songVC.selectedFromTable = false
         songVC.musicViewController = self
+        songVC.nowView = self.nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
@@ -253,10 +249,16 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             // some song does not have an album cover
             if let cover = song.getArtWork() {
                 let image = cover.imageWithSize(CGSize(width: 54, height: 54))
-                cell.coverImage.image = image
+                if let img = image {
+                    cell.coverImage.image = img
+                } else { //this happens somewhow when songs load too fast
+                    //TODO: load something else
+                    cell.coverImage.image = UIImage(named: "liweng")
+                    loadAPISearchImageToCell(cell, song: song)
+                }
             } else {
-                //TODO: add a placeholder cover
                 cell.coverImage.image = UIImage(named: "liweng")
+                loadAPISearchImageToCell(cell, song: song)
             }
             
             cell.mainTitle.text = song.getTitle()
@@ -347,6 +349,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     MusicManager.sharedInstance.player.pause()
                     MusicManager.sharedInstance.player.currentPlaybackTime = 0
                     songVC.isDemoSong = true
+                    if (KAVplayer != nil && KAVplayer.rate > 0){
+                        KAVplayer.rate = 0
+                        KAVplayer = nil
+                    }
                     
                 } else {
                     MusicManager.sharedInstance.setPlayerQueue(songsSorted)
@@ -494,6 +500,17 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         return itemsInPreviousSections + currentRow
     }
     
+    
+    func loadAPISearchImageToCell(cell: MusicCell, song: Findable) {
+        dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+            SearchAPI.getBackgroundImageForSong(song.getArtist() + " " + song.getTitle(), imageSize: SearchAPI.ImageSize.Thumbnail, completion: {
+                image in
+                dispatch_async(dispatch_get_main_queue()) {
+                    cell.coverImage.image = image
+                }
+            })
+        }
+    }
 }
 
 extension MusicViewController {

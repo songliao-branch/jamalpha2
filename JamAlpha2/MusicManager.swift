@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AVFoundation
 import MediaPlayer
 
 class MusicManager: NSObject {
@@ -54,11 +55,11 @@ class MusicManager: NSObject {
         loadLocalAlbums()
         loadLocalArtist()
         initializePlayer()
+        addNotification()
     }
     
     //check when search a cloud item, if it matches, we use the song we already have
     func isNeedReloadCollections(title:String, artist:String, duration:Float) -> MPMediaItem? {
-        self.reloadCollections()
         let result = uniqueSongs.filter{
             (song: MPMediaItem) -> Bool in
             if let tempTitle = song.title, tempArtist = song.artist {
@@ -71,15 +72,65 @@ class MusicManager: NSObject {
         }
         return nil
     }
-
-    func reloadCollections(){
-        let tempCount = uniqueSongs.count
-        loadLocalSongs()
-        if tempCount != uniqueSongs.count {
-            kShouldReloadMusicTable = true
-            loadLocalAlbums()
-            loadLocalArtist()
+    
+    func addNotification(){
+        MPMediaLibrary.defaultMediaLibrary().beginGeneratingLibraryChangeNotifications()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "musicLibraryDidChange", name: MPMediaLibraryDidChangeNotification, object: nil)
+    }
+    
+    func musicLibraryDidChange(){
+        
+        reloadCollections()
+        
+        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController()
+        let currentVC = (UIApplication.sharedApplication().delegate as! AppDelegate).topViewController(rootViewController)
+        let baseVC = ((rootViewController as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
+        let searchVC = ((rootViewController as! TabBarController).childViewControllers[1].childViewControllers[0]) as! SearchViewController
+        
+        // if the collection is different i.e. new songs are added/old songs are removed
+        // we manually reload MusicViewController table
+        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+            musicVC.reloadDataAndTable()
+            if(!musicVC.uniqueSongs.isEmpty){
+                musicVC.songCount = 0
+                musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+            }
         }
+        
+        searchVC.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+        if searchVC.searchResultTableView != nil && searchVC.resultSearchController.active {
+            searchVC.filterLocalSongs(searchVC.resultSearchController.searchBar.text!)
+            searchVC.searchResultTableView.reloadData() 
+        }
+       
+        
+        if(currentVC.isKindOfClass(SongViewController)){
+            let currentSongVC = currentVC as! SongViewController
+            if (currentSongVC.isSongNeedPurchase) {
+                if let purchasedItem = (isNeedReloadCollections(currentSongVC.songNeedPurchase.trackName!, artist: currentSongVC.songNeedPurchase.artistName!, duration: currentSongVC.songNeedPurchase.trackTimeMillis!)){
+                    setPlayerQueue([purchasedItem])
+                    setIndexInTheQueue(0)
+                    currentSongVC.recoverToNormalSongVC(purchasedItem)
+                }
+            }else{
+                //If add a song with apple music, go to Twistjam and play it, then pause it, delete it from my music, and come back to Twistjam, the songVc will dismiss itself
+                if (player != nil && player.nowPlayingItem != nil && !currentSongVC.isDemoSong){
+                    if !uniqueSongs.contains(player.nowPlayingItem!){
+                        if (currentSongVC.selectedFromSearchTab && currentSongVC.presentedViewController == nil){
+                            player.pause()
+                            currentSongVC.dismissViewControllerAnimated(true, completion: nil)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func reloadCollections() {
+        loadLocalSongs()
+        loadLocalAlbums()
+        loadLocalArtist()
+        queueChanged = true
     }
     
     func initializePlayer(){
@@ -92,6 +143,7 @@ class MusicManager: NSObject {
             player.repeatMode = .All
             player.shuffleMode = .Off
             self.setPlayerQueue(uniqueSongs)
+            player.prepareToPlay()
         
         //initialize AVQueuePlayer
             self.avPlayer = AVQueuePlayer()

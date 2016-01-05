@@ -17,13 +17,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     @IBOutlet weak var tableView: UITableView!
     
     let cellHeight: CGFloat = 60
-    //title, artist, "1"(uploaded), "unpressed", songId, set id
-    //var myDataArray: [(String, String, String, String, Int, Int)] = [(String, String, String, String, Int, Int)]()
   
     var songs = [LocalSong]()//for showing title and artist for the tableview
     
-    var lastInsertedRow = -1
-    let optionPlaceHolderTitle = "optionPlaceHolderTitle"//used to identify a placeholder inserted to songs to instantiate an options cell
     var allTabsSets = [DownloadedTabsSet]()
     var allLyricsSets = [DownloadedLyricsSet]()
     
@@ -75,54 +71,36 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             }
         }
         
-        lastInsertedRow = -1 //reset the insertedRow because all cells have been reset
         self.tableView.reloadData()
     }
 
     func optionsButtonPressed(sender: UIButton) {
-        //TODO: UI bug: open last row's option, then this row
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+        let editAction = UIAlertAction(title: "Edit", style: .Default, handler: {
+            (alert: UIAlertAction!) -> Void in
+            self.goToEditor(sender.tag)
+        })
         
-        //if an options cell is open
-        if lastInsertedRow > 0 {
-            //close it
-            songs.removeAtIndex(lastInsertedRow)
-            self.tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: lastInsertedRow, inSection: 0)], withRowAnimation: .Automatic)
-            
-            //if selecting the same cell opened the options cell, the above close just fine
-            if lastInsertedRow - 1 == sender.tag {
-                lastInsertedRow = -1
-            } else { //if select a different cell while the cell is open
-                let index = NSIndexPath(forRow: sender.tag, inSection: 0)
-                insertOptionsRow(index)
-            }
-
-        } else { //if no cells is open
-            let index = NSIndexPath(forRow: sender.tag, inSection: 0)
-            insertOptionsRow(index)
-        }
+        let deleteAction = UIAlertAction(title: "Delete", style: .Default, handler: {
+            (alert: UIAlertAction!) -> Void in
+            self.deleteSet(sender.tag)
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        
+        
+        optionMenu.addAction(editAction)
+        optionMenu.addAction(deleteAction)
+        optionMenu.addAction(cancelAction)
+        
+        // 5
+        self.presentViewController(optionMenu, animated: true, completion: nil)
+        
+        optionMenu.view.tintColor = UIColor.mainPinkColor()
     }
     
-    func removeInsertedRow() {
-        if lastInsertedRow > 0 {
-            songs.removeAtIndex(lastInsertedRow)
-            self.tableView.reloadData()
-            lastInsertedRow = -1
-        }
-    }
-
-    func insertOptionsRow(indexPath: NSIndexPath) {
-        //remove last options row
-        
-        let placeHolder = LocalSong(title: optionPlaceHolderTitle, artist: "", duration: 0.0)
-        songs.insert(placeHolder, atIndex: indexPath.row + 1)
-        let pathToBeInserted = NSIndexPath(forRow: indexPath.row + 1, inSection: 0)
-        self.tableView.insertRowsAtIndexPaths([pathToBeInserted], withRowAnimation: .Automatic)
-        lastInsertedRow = indexPath.row + 1
-    }
-    
-    func pressEditButton(sender: UIButton) {
-        // go to edit tab vc,
-        let song = songs[sender.tag-1]
+    func goToEditor(index: Int) {
+        let song = songs[index]
         guard let item = song.mediaItem else {
             print("no media item found for \(song.title)")
             return
@@ -131,74 +109,33 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         if let _ = MusicManager.sharedInstance.player.nowPlayingItem {
             MusicManager.sharedInstance.player.pause()
         }
-        
         if isViewingTabs {
             let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
             
+            CoreDataManager.setUserTabsMostRecent(item)
             tabsEditorVC.theSong = item
             
             //  tabsEditorVC.isDemoSong = false
-            self.presentViewController(tabsEditorVC, animated: true, completion: {
-                completed in
-                self.removeInsertedRow()
-            })
+            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
             
             
         } else {
             let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
                 as! LyricsTextViewController
+            CoreDataManager.setUserLyricsMostRecent(item)
             lyricsEditor.theSong = item
-            self.presentViewController(lyricsEditor, animated: true, completion: {
-                completed in
-                self.removeInsertedRow()
-            })
+            self.presentViewController(lyricsEditor, animated: true, completion: nil)
         }
     }
-    
-    func pressUploadButton(sender: UIButton) {
-        
-        let song = songs[sender.tag-1]
-        guard let item = song.mediaItem else {
-            print("no media item found for \(song.title)")
-            return
-        }
-        
-        if isViewingTabs {
-            APIManager.uploadTabs(item, completion: {
-                cloudId in
-                
-                CoreDataManager.saveCloudIdToTabs(item, cloudId: cloudId)
-                self.showStatusView(true)
-                self.startHideStatusViewTimer()
-                self.loadData()
-            })
-        } else {
-            APIManager.uploadLyrics(item, completion: {
-                cloudId in
-                
-                CoreDataManager.saveCloudIdToLyrics(item, cloudId: cloudId)
-                self.showStatusView(true)
-                self.startHideStatusViewTimer()
-                self.loadData()
-            })
-        }
-    }
-    
-    func pressDeleteButton(sender: UIButton) {
-        
-        let song = songs[sender.tag-1]
-        guard let item = song.mediaItem else {
-            print("no media item found for \(song.title)")
-            return
-        }
-        
-        let id = isViewingTabs ? allTabsSets[sender.tag-1].id : allLyricsSets[sender.tag-1].id
+
+    func deleteSet(index: Int) {
+        let id = isViewingTabs ? allTabsSets[index].id : allLyricsSets[index].id
         
         //delete local core data first
         if isViewingTabs {
-            CoreDataManager.deleteLocalTab(item)
+            CoreDataManager.deleteUserTabs(id)
         } else {
-            CoreDataManager.deleteLocalLyrics(item)
+            CoreDataManager.deleteUserlyrics(id)
         }
         
         self.loadData()
@@ -212,45 +149,16 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let song = songs[indexPath.row] //TODO: Filter by edit date
-        
-        if song.title == optionPlaceHolderTitle {
-            let cell = tableView.dequeueReusableCellWithIdentifier("OptionsCell", forIndexPath: indexPath) as! OptionsCell
-            cell.editButton.tag = indexPath.row
-            cell.editButton.addTarget(self, action: "pressEditButton:", forControlEvents: .TouchUpInside)
-            cell.uploadButton.tag = indexPath.row
-            cell.uploadButton.addTarget(self, action: "pressUploadButton:", forControlEvents: .TouchUpInside)
-            
-            cell.deleteButton.tag = indexPath.row
-            cell.deleteButton.addTarget(self, action: "pressDeleteButton:", forControlEvents: .TouchUpInside)
-            
-            return cell
-        } else {
-            let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
-            cell.numberLabel.text = "\(indexPath.row + 1)."
+        let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
+        cell.numberLabel.text = "\(indexPath.row + 1)."
 
-            cell.titleLabel.text = song.title
-            cell.artistLabel.text = song.artist
-            
-            cell.optionsButton.tag = indexPath.row
-            
-            if isViewingTabs {
-                if allTabsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
-                    cell.uploadedImage.hidden = true
-                } else {
-                    cell.uploadedImage.hidden = false
-                }
-            } else {
-                if allLyricsSets[indexPath.row].id < 0 { //if tabsSet id less than 1, means not uploaded
-                    cell.uploadedImage.hidden = true
-                } else {
-                    cell.uploadedImage.hidden = false
-                }
-            }
-            
-            cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
-            
-            return cell
-        }
+        cell.titleLabel.text = song.title
+        cell.artistLabel.text = song.artist
+        
+        cell.optionsButton.tag = indexPath.row
+        cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
+        
+        return cell
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -261,8 +169,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
-        //TODO: fix this crash bug
-
         if let item = song.mediaItem {
             print("item found title:\(item.title!)")
             MusicManager.sharedInstance.setPlayerQueue([item])
@@ -282,10 +188,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         
-        self.presentViewController(songVC, animated: true, completion: {
-            completed in
-            self.removeInsertedRow()
-        })
+        self.presentViewController(songVC, animated: true, completion: nil)
         
         self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
