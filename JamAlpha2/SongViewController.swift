@@ -1738,9 +1738,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
      
-        let song: Findable = isDemoSong ? demoItem : player.nowPlayingItem!
-
-        let findable: Findable = isSongNeedPurchase ? songNeedPurchase : song
+        var findable: Findable!
+        
+        if isDemoSong {
+            findable = demoItem
+        } else if isSongNeedPurchase {
+            findable = songNeedPurchase
+        } else {
+            findable = player.nowPlayingItem
+        }
+        
         
         APIManager.favoriteTheSong(findable, completion: {
             result in
