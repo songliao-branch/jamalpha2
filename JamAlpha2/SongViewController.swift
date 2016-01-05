@@ -736,7 +736,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                  //if still not found, we show a prompt
                 if !found {
-                    self.addTabsPrompt.hidden = false
+                    if !self.isSongNeedPurchase {
+                        self.addTabsPrompt.hidden = false
+                    }
                     return
                 }
                 self.addTabsPrompt.hidden = true
@@ -764,7 +766,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 found, download in
                 //if still not found, we show a prompt
                 if !found {
-                    self.addLyricsPrompt.hidden = false
+                    if !self.isSongNeedPurchase{
+                        self.addLyricsPrompt.hidden = false
+                    }
                     return
                 }
                 self.addLyricsPrompt.hidden = true
@@ -2964,6 +2968,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!isGenerated){
             generateSoundWave(nowPlayingMediaItem)
         }
+        self.updateMusicData(nowPlayingMediaItem)
         shuffleButton.enabled = true
         othersButton.enabled = true
         speedStepper.enabled = true
