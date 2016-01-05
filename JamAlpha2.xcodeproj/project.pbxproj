@@ -17,7 +17,6 @@
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
-		BF3029AA1C3B370B000E029F /* UnLoginSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF3029A91C3B370B000E029F /* UnLoginSettingViewController.swift */; };
 		BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */; };
 		BF4B83E51BFA776200AF8A2A /* MeUserProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */; };
 		BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */; };
@@ -135,7 +134,6 @@
 		5491F35DF2FB90338EBDC0CC /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		842DB0241B55EA8B00B4E165 /* TimeNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeNumber.swift; sourceTree = "<group>"; };
 		84DA61A31B4E211100979A42 /* Lyric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lyric.swift; sourceTree = "<group>"; };
-		BF3029A91C3B370B000E029F /* UnLoginSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnLoginSettingViewController.swift; sourceTree = "<group>"; };
 		BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeContentProfileTableViewCell.swift; sourceTree = "<group>"; };
 		BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeUserProfileTableViewCell.swift; sourceTree = "<group>"; };
 		BF4B84361C09938900AF8A2A /* JamAlpha2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JamAlpha2-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -301,7 +299,6 @@
 			isa = PBXGroup;
 			children = (
 				BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */,
-				BF3029A91C3B370B000E029F /* UnLoginSettingViewController.swift */,
 				E4D5EEE81C10DAC0000FA35E /* Helper */,
 				BFE49ECF1C1220C200F26877 /* SettingViewController */,
 				E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */,
@@ -809,7 +806,6 @@
 				E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */,
 				E43DA1291B9FDCE1003180FB /* SearchHistory.swift in Sources */,
 				E43713EF1C34850200517D03 /* LocalSong.swift in Sources */,
-				BF3029AA1C3B370B000E029F /* UnLoginSettingViewController.swift in Sources */,
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
 				E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
