@@ -174,8 +174,10 @@ class MeLoginOrSignupViewController: UIViewController{
     }
     
     func settingsButtonPressed() {
-        let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
-        self.showViewController(settingsVC, sender: nil)
+        let unloginsettingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("unloginsettingsVC") as! UnLoginSettingsViewController
+        let navigationController = UINavigationController(rootViewController: unloginsettingsVC)
+        
+        self.presentViewController(navigationController, animated: false, completion: nil)
     }
     
     func setUpViews() {

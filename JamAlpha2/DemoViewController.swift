@@ -18,6 +18,8 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
     var cell:DemoCell!
     var baseVC:BaseViewController!
     
+    var isFromUnLoginVC: Bool = false
+    
     var showTutorial = false
     
     override func viewDidLoad() {
@@ -27,7 +29,11 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
     }
     
     func findMusicVC(){
-        baseVC = self.parentViewController!.parentViewController?.childViewControllers[0].childViewControllers[0] as! BaseViewController
+        if isFromUnLoginVC {
+            baseVC = (UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController
+        } else {
+            baseVC = self.parentViewController!.parentViewController?.childViewControllers[0].childViewControllers[0] as! BaseViewController
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
