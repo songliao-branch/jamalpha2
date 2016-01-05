@@ -2442,14 +2442,18 @@ extension TabsEditorViewController {
         
         if needAddNewChords {
             var nameString: String = ""
+            var set:[String: Int] = [String: Int]()
             for item in needAddNewChordsArray {
-                nameString = nameString + item.name + ", "
+                set[item.name] = 0
+            }
+            for item in set {
+                nameString = nameString + item.0 + ", "
             }
             let alertController = UIAlertController(title: nil, message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
             
             alertController.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default,handler: {
                 action in
-                for var i = 0; i < chords.count; i++ {
+                for var i = chords.count - 1; i >= 0; i-- {
                     let index = self.getBasicNoteIndex(chords[i].tab.contentArray)
                     if let _ = TabsDataManager.getUniqueTab(index, name: chords[i].tab.name, content: chords[i].tab.content) {
                         continue
@@ -2464,7 +2468,11 @@ extension TabsEditorViewController {
                 action in
                 for item in needAddNewChordsArray {
                     let index = self.getBasicNoteIndex(item.contentArray)
-                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+                    if let _ = TabsDataManager.getUniqueTab(index, name: item.name, content: item.content) {
+                        continue
+                    } else {
+                        TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+                    } 
                 }
                 completion(complete: newChords)
             }))
