@@ -74,12 +74,18 @@ class MusicManager: NSObject {
         return nil
     }
 
-    func reloadCollections(){
+    func reloadCollections() {
+        let oldQueue = uniqueSongs
         loadLocalSongs()
-        loadLocalAlbums()
-        loadLocalArtist()
-        kShouldReloadMusicTable = true
-        queueChanged = true
+        for song in oldQueue {//compare two queues
+            if !uniqueSongs.contains(song) {//if a queue is different
+                loadLocalAlbums()
+                loadLocalArtist()
+                kShouldReloadMusicTable = true
+                queueChanged = true
+                break
+            }
+        }
     }
     
     func initializePlayer(){
@@ -207,6 +213,7 @@ class MusicManager: NSObject {
     // MARK: get all MPMediaItems
     func loadLocalSongs(){
         uniqueSongs = [MPMediaItem]()
+        
         let songCollection = MPMediaQuery.songsQuery()
         uniqueSongs = songCollection.items!.filter {
             song in
