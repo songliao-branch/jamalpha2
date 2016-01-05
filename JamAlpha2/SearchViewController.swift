@@ -28,8 +28,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         createTransitionAnimation()
+        uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         self.automaticallyAdjustsScrollViewInsets = false
         setUpSearchBar()
         setUpSearchPromptBackground()
@@ -40,7 +40,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             self.animator = CustomTransitionAnimation()
         }
     }
-
+    
+    
     func setUpSearchPromptBackground() {
         searchBackgroundIcon = UIImageView(frame: CGRect(x: 0, y: 0, width: 222, height: 244))
         searchBackgroundIcon.image = UIImage(named: "big_search")
