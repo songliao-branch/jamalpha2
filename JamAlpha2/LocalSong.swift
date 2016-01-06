@@ -17,6 +17,8 @@ class LocalSong: NSObject {
     
     var mediaItem: MPMediaItem? //it might or might not have a corresponding mediaItem found
     
+    var searchResult: SearchResult? //if mediaItem is not found, we find a corresponding API object
+    
     init(title: String, artist: String, duration: Float) {
         self.title = title
         self.artist = artist
@@ -27,9 +29,23 @@ class LocalSong: NSObject {
         self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
             item in
             if let itemTitle = item.title, itemArtist = item.artist {
-                return itemTitle == title && itemArtist == artist && abs((Float(item.playbackDuration) - duration)) < 1
+                return itemTitle == title && itemArtist == artist && abs((Float(item.playbackDuration) - duration)) < 1.5
             }
             return false
         }.first
+    }
+    
+    func findSearchResult(completion: ((searchResult: SearchResult) -> Void)) {
+        if mediaItem == nil {
+            SearchAPI.searchSong(title + " " + artist, completion: {
+                results in
+                for result in results {
+                    if result.getTitle() == self.title && result.getArtist() == self.artist && abs(result.getDuration() - self.duration) < 1.5 {
+                        completion(searchResult: result)
+                        break
+                    }
+                }
+            })
+        }
     }
 }
