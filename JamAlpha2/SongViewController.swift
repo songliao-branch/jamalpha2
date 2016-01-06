@@ -931,7 +931,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func registerMediaPlayerNotification(){
         if(!isSongNeedPurchase){
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
             
             NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
             if(player != nil){
@@ -944,7 +944,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
 
-    func currentSongChanged(notification: NSNotification){
+    func currentSongChanged(){
         if(viewDidFullyDisappear){
             return
         }
@@ -1040,7 +1040,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
         
             resumeNormalSpeed()
-            self.updateAll(0)
+        let currentTime = player.currentPlaybackTime
+        self.updateAll(Float(currentTime.isNaN ? 0 : currentTime))
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.startTimer()
             }

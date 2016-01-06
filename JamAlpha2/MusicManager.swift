@@ -112,16 +112,6 @@ class MusicManager: NSObject {
                     setIndexInTheQueue(0)
                     currentSongVC.recoverToNormalSongVC(purchasedItem)
                 }
-            }else{
-                //If add a song with apple music, go to Twistjam and play it, then pause it, delete it from my music, and come back to Twistjam, the songVc will dismiss itself
-                if (player != nil && player.nowPlayingItem != nil && !currentSongVC.isDemoSong){
-                    if !uniqueSongs.contains(player.nowPlayingItem!){
-                        if (currentSongVC.selectedFromSearchTab && currentSongVC.presentedViewController == nil){
-                            player.pause()
-                            currentSongVC.dismissViewControllerAnimated(true, completion: nil)
-                        }
-                    }
-                }
             }
         }
     }
@@ -143,7 +133,6 @@ class MusicManager: NSObject {
             player.repeatMode = .All
             player.shuffleMode = .Off
             self.setPlayerQueue(uniqueSongs)
-            player.prepareToPlay()
         
         //initialize AVQueuePlayer
             self.avPlayer = AVQueuePlayer()
