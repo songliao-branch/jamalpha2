@@ -11,6 +11,32 @@ import Alamofire
 import Haneke
 import SwiftyJSON
 
+
+class SearchResult {
+    
+    var wrapperType: String!
+    var kind: String!
+    
+    var trackId:Int?
+    var trackName: String?
+    var artistName: String?
+    var collectionName: String?
+    var trackTimeMillis: Float?
+    
+    
+    var artworkUrl100: String?//large 100
+    var previewUrl: String?
+    var trackViewUrl: String? // link to apple music or iTunes
+    
+    init(wrapperType: String, kind: String){
+        self.wrapperType = wrapperType
+        self.kind = kind
+    }
+    
+    var image: UIImage?
+}
+
+
 class SearchAPI: NSObject {
 
     enum ImageSize: String {

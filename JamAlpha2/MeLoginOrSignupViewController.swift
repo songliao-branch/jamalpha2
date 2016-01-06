@@ -249,8 +249,8 @@ class MeLoginOrSignupViewController: UIViewController{
         scrollView.addSubview(facebookButton)
         
         //TODO: hide facebook in beta mode
-        facebookButton.hidden = false
-        orLabel.hidden = false
+        facebookButton.hidden = true
+        orLabel.hidden = true
         
         //log in screen
         let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
