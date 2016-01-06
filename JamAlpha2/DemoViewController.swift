@@ -13,14 +13,12 @@ import MediaPlayer
 class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
     
     var isDemo = true //false means we are showing tutorial
-    
+    var tutorialTexts = ["Show music player tutorial", "Show tabs editor tutorial"]
     @IBOutlet weak var demoTable: UITableView!
     var cell:DemoCell!
     var baseVC:BaseViewController!
     
     var isFromUnLoginVC: Bool = false
-    
-    var showTutorial = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +38,6 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
         super.viewWillAppear(animated)
         //come back from MusicViewController to DemoViewController should refresh this variable
         if !isDemo {
-            showTutorial = NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial)
             demoTable.reloadData()
         }
     }
@@ -58,7 +55,10 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        if isDemo {
+            return 1
+        }
+        return 2
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -66,14 +66,20 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
             cell.demoSwith.tintColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
             cell.demoSwith.onTintColor = UIColor.mainPinkColor()
             cell.demoSwith.addTarget(self, action: "switchChanged:", forControlEvents: .ValueChanged)
-        
+            cell.demoSwith.tag = indexPath.row
         
         if isDemo {
             cell.imfoLabel.text = "Show Demo"
             cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong)
         } else {
-            cell.imfoLabel.text = "Show Tutorial"
-            cell.demoSwith.on = showTutorial
+            cell.imfoLabel.text = tutorialTexts[indexPath.row]
+            
+            if indexPath.row == 0 {
+                cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial)
+                
+            } else {
+                cell.demoSwith.on =  NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorial)
+            }
         }
 
         cell.selectionStyle = UITableViewCellSelectionStyle.None
@@ -99,8 +105,12 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
                 self.baseVC.nowView.stop()
             }
         } else {
-            NSUserDefaults.standardUserDefaults().setBool(true, forKey: kShowTutorial)
+            if uiswitch.tag == 0 {
+                NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowTutorial)
+            } else {
+                NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowTabsEditorTutorial)
+            }
         }
-
+        demoTable.reloadData()
     }
 }

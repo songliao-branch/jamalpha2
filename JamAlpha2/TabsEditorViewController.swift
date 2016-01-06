@@ -9,10 +9,11 @@
 import UIKit
 import MediaPlayer
 import AVFoundation
+import YouTubePlayer
 
 let kmovingMainNoteSliderHeight:CGFloat = 26
 
-class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate {
+class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
     var playButtonImageView: UIImageView!
     
@@ -163,6 +164,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentSelectedSpecificTab: NormalTabs!
     var countDownNumber: Float = 3
     
+    //MARK: tutorials
+    var tutorialOverlay: UIView!
+    var videoPlayerView: YouTubePlayerView!
+    
+    
     // Mark: Main view data array structure
     class mainViewData {
         var fretNumber: Int = Int()
@@ -268,6 +274,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         // MARK: add exist chord to tab editor view
         self.addChordToEditorView(theSong)
+        
+        if NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorial) {
+            setUpTutorial()
+        }
     }
     
     // MARK: Notification
@@ -480,8 +490,57 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    func setUpTutorial() {
+        tutorialOverlay = UIView(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
+        tutorialOverlay.backgroundColor = UIColor.tutorialBackgroundGray()
+        self.view.addSubview(tutorialOverlay)
+        
+        let playTutorialButton = UIButton(frame: CGRect(x: 0, y: 0, width: 223, height: 86))
+        playTutorialButton.setImage(UIImage(named: "play_tutorial"), forState: .Normal)
+        playTutorialButton.addTarget(self, action: "playTutorial", forControlEvents: .TouchUpInside)
+        playTutorialButton.center = CGPoint(x: trueWidth/2, y: trueHeight/2 )
+        tutorialOverlay.addSubview(playTutorialButton)
+        
+        let skipTutorialButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(playTutorialButton.frame), width: 70, height: 38))
+        skipTutorialButton.setImage(UIImage(named: "skip"), forState: .Normal)
+        skipTutorialButton.addTarget(self, action: "skipTutorial", forControlEvents: .TouchUpInside)
+        skipTutorialButton.center.x = trueWidth/2
+        tutorialOverlay.addSubview(skipTutorialButton)
+    }
+    
+    func playTutorial() {
+        videoPlayerView = YouTubePlayerView(frame: self.view.frame)
+        videoPlayerView.delegate = self
+        let url = NSURL(string: "https://www.youtube.com/watch?v=5ZDLU4ruk-M")!
+        videoPlayerView.loadVideoURL(url)
+        self.view.addSubview(videoPlayerView)
+    }
+    
+    func skipTutorial() {
+        tutorialOverlay.hidden = true
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
+    }
+    
+    //MARK: YouTubePlayerView delegate methods
+    func playerReady(videoPlayer: YouTubePlayerView) {
+        
+    }
+
+    func playerStateChanged(videoPlayer: YouTubePlayerView, playerState: YouTubePlayerState) {
+        if playerState == .Ended || playerState == .Paused {
+            tutorialOverlay.hidden = true
+            videoPlayerView.hidden = true
+            NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
+        }
+    }
+    
+    func playerQualityChanged(videoPlayer: YouTubePlayerView, playbackQuality: YouTubePlaybackQuality) {
+        
+    }
+    
     // MARK: collection view functions, include required functions and move cell functions
     var tapGesture:UITapGestureRecognizer!
+    
     func initCollectionView() {
         for var i = 0; i < 25; i++ {
             fretsNumber.append(i)
