@@ -709,6 +709,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.addTabsPrompt.hidden = true
             return true
         }
+        updateCapo(capo)
         return false
     }
     
