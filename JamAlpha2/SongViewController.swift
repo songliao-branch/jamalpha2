@@ -1038,8 +1038,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     print("changeScale")
                     //self.progressBlock!.alpha = 0.5
                 }
-        
+        if(player.currentPlaybackRate == 1){
             resumeNormalSpeed()
+        }
         let currentTime = player.currentPlaybackTime
         self.updateAll(Float(currentTime.isNaN ? 0 : currentTime))
             if self.player.playbackState == MPMusicPlaybackState.Playing{

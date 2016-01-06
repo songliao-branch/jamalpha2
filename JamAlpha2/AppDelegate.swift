@@ -207,9 +207,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     currentSongVC.registerMediaPlayerNotification()
                     currentSongVC.selectedFromTable = false
                     if(!currentSongVC.isSongNeedPurchase){
-                        if(MusicManager.sharedInstance.player.nowPlayingItem != MusicManager.sharedInstance.lastPlayingItem){
-                           currentSongVC.currentSongChanged() 
-                        }
+                        currentSongVC.currentSongChanged()
                         currentSongVC.resumeSong()
                     }
                     print("Song VC entering forground")
