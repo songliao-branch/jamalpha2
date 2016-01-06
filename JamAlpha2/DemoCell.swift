@@ -11,6 +11,6 @@ import UIKit
 class DemoCell: UITableViewCell {
     
     @IBOutlet weak var imfoLabel: UILabel!
-    
     @IBOutlet weak var demoSwith: UISwitch!
+    
 }
