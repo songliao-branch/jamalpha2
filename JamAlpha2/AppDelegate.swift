@@ -101,12 +101,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     if(!isDemoSong){
                         
                         MusicManager.sharedInstance.player.pause()
-                        
-                        MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
-                        MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
                     }
                 }
             }
+        }
+        if(MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
+            MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
+            MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
         }
         
         self.suspended = KGLOBAL_init_queue.suspended
@@ -206,7 +207,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     currentSongVC.registerMediaPlayerNotification()
                     currentSongVC.selectedFromTable = false
                     if(!currentSongVC.isSongNeedPurchase){
-                        currentSongVC.currentSongChanged()
+                        if(MusicManager.sharedInstance.player.nowPlayingItem != MusicManager.sharedInstance.lastPlayingItem){
+                           currentSongVC.currentSongChanged() 
+                        }
                         currentSongVC.resumeSong()
                     }
                     print("Song VC entering forground")

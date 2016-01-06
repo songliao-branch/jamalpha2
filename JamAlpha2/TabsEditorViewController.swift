@@ -1562,6 +1562,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                 self.musicPlayer.currentPlaybackRate = speed
             }
+            self.playButtonImageView.hidden = true
             self.removeDoubleArrowView()
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
              NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
@@ -1593,8 +1594,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
         self.removeDoubleArrowView()
-        self.playButtonImageView.hidden = true
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
+            self.playButtonImageView.hidden = false
             self.isPlaying = false
             //animate down progress block
             self.view.userInteractionEnabled = false
@@ -1611,6 +1612,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer.invalidate()
             self.view.userInteractionEnabled = true
         } else {
+            self.playButtonImageView.hidden = true
             self.isPlaying = true
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
             self.view.userInteractionEnabled = false
@@ -1716,6 +1718,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                  musicPlayer.currentPlaybackTime = currentTime
             }
+            self.playButtonImageView.hidden = false
         }
 
         if !isPanning {
