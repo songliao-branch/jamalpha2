@@ -91,9 +91,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
                         if(!isDemoSong){
                             (presentVC as! TabsEditorViewController).removeNotification()
-                            (presentVC as! TabsEditorViewController).isPlaying = false
-                            (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
                         }
+                        (presentVC as! TabsEditorViewController).isPlaying = false
+                        (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
                         isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
