@@ -270,8 +270,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
-        
-        
+    }
+    
+    override func viewDidAppear(animated: Bool) {
         // MARK: add exist chord to tab editor view
         self.addChordToEditorView(theSong)
         
@@ -1621,6 +1622,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                 self.musicPlayer.currentPlaybackRate = speed
             }
+            self.playButtonImageView.hidden = true
             self.removeDoubleArrowView()
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
              NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
@@ -1652,8 +1654,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
         self.removeDoubleArrowView()
-        self.playButtonImageView.hidden = true
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
+            self.playButtonImageView.hidden = false
             self.isPlaying = false
             //animate down progress block
             self.view.userInteractionEnabled = false
@@ -1670,6 +1672,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer.invalidate()
             self.view.userInteractionEnabled = true
         } else {
+            self.playButtonImageView.hidden = true
             self.isPlaying = true
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
             self.view.userInteractionEnabled = false
@@ -1775,6 +1778,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                  musicPlayer.currentPlaybackTime = currentTime
             }
+            self.playButtonImageView.hidden = false
         }
 
         if !isPanning {
@@ -2496,32 +2500,93 @@ extension TabsEditorViewController {
         update()
     }
 
-    
+    func checkChordsWithCoredata(chords: [Chord], completion: ((complete: [Chord]) -> Void)) {
+        var needAddNewChords: Bool = false
+        var newChords: [Chord] = chords
+        var needAddNewChordsArray: [Tab] = [Tab]()
+        for item in chords {
+            let index = self.getBasicNoteIndex(item.tab.contentArray)
+            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
+                continue
+            } else {
+                needAddNewChords = true
+                needAddNewChordsArray.append(item.tab)
+            }
+        }
+        
+        if needAddNewChords {
+            var nameString: String = ""
+            var set:[String: Int] = [String: Int]()
+            for item in needAddNewChordsArray {
+                set[item.name] = 0
+            }
+            for item in set {
+                nameString = nameString + item.0 + ", "
+            }
+            let alertController = UIAlertController(title: nil, message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+            
+            alertController.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default,handler: {
+                action in
+                for var i = chords.count - 1; i >= 0; i-- {
+                    let index = self.getBasicNoteIndex(chords[i].tab.contentArray)
+                    if let _ = TabsDataManager.getUniqueTab(index, name: chords[i].tab.name, content: chords[i].tab.content) {
+                        continue
+                    } else {
+                        newChords.removeAtIndex(i)
+                    }
+                }
+                completion(complete: newChords)
+            }))
+            
+            alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler: {
+                action in
+                for item in needAddNewChordsArray {
+                    let index = self.getBasicNoteIndex(item.contentArray)
+                    if let _ = TabsDataManager.getUniqueTab(index, name: item.name, content: item.content) {
+                        continue
+                    } else {
+                        TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+                    } 
+                }
+                completion(complete: newChords)
+            }))
+            
+            self.presentViewController(alertController, animated: true, completion: nil)
+        } else {
+            completion(complete: newChords)
+        }
+    }
+
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: Findable) {
         let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
-        let chord: [Chord] = tabs.0
+        var chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
         let visible: Bool = tabs.4
         
         //let visible
         if chord.count > 0 {
-            addTabsFromCoreDataToMainViewDataArray(chord)
-            addTabsFromCoreDataToMusicControlView(chord)
+            self.checkChordsWithCoredata(chord, completion: {
+                complete in
+                self.addTabsFromCoreDataToMainViewDataArray(complete)
+                self.addTabsFromCoreDataToMusicControlView(complete)
+                let tuningValues = Tuning.toArray(tuning)
+                for i in 0..<self.tuningValueLabels.count {
+                    self.tuningValueLabels[i].text = tuningValues[i]
+                }
+                self.capoStepper.value = Double(capoValue)
+                self.capoLabel.text = "Capo: \(capoValue)"
+                self.isPublic = visible
+                if self.isPublic {
+                    self.privacyButton.setTitle("Public", forState: .Normal)
+                } else {
+                    self.privacyButton.setTitle("Private", forState: .Normal)
+                }
+            })
             
-            let tuningValues = Tuning.toArray(tuning)
-            for i in 0..<tuningValueLabels.count {
-                tuningValueLabels[i].text = tuningValues[i]
-            }
-            capoStepper.value = Double(capoValue)
-            capoLabel.text = "Capo: \(capoValue)"
-            isPublic = visible
-            if isPublic {
-                privacyButton.setTitle("Public", forState: .Normal)
-            } else {
-                privacyButton.setTitle("Private", forState: .Normal)
-            }
+            
+
         }
     }
 }
@@ -3114,7 +3179,7 @@ extension TabsEditorViewController {
             }
         }
         if needAlert {
-            let alertController = UIAlertController(title: "Notice", message: "This operation will delete all '\(self.currentSelectedSpecificTab.name)' you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
+            let alertController = UIAlertController(title: nil, message: "This operation will delete all '\(self.currentSelectedSpecificTab.name)' you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
                 action in
                 self.stopSpecificJiggling()
@@ -3221,6 +3286,30 @@ extension TabsEditorViewController {
 
         }
         tempAllTabsOnMusicLine.removeAll()
+    }
+}
+
+extension TabsEditorViewController {
+    
+    func setupAudioPlayerWithFile(file: NSString, type: NSString) -> AVAudioPlayer? {
+        let path = NSBundle.mainBundle().pathForResource(file as String, ofType: type as String)
+        let url = NSURL.fileURLWithPath(path!)
+        var audioPlayer: AVAudioPlayer?
+        do {
+            try audioPlayer = AVAudioPlayer(contentsOfURL: url)
+        } catch {
+            print("Player not available")
+        }
+        return audioPlayer
+    }
+    
+    func playTheSound(urls: [NSString]) {
+        var tempSoundArray: [AVAudioPlayer] = [AVAudioPlayer]()
+        for item in urls {
+            let tempSound = setupAudioPlayerWithFile(item, type: ".wav")
+            tempSoundArray.append(tempSound!)
+        }
+        
     }
 }
 

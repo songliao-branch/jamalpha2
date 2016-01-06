@@ -92,9 +92,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         isDemoSong = (presentVC as! TabsEditorViewController).isDemoSong
                         if(!isDemoSong){
                             (presentVC as! TabsEditorViewController).removeNotification()
-                            (presentVC as! TabsEditorViewController).isPlaying = false
-                            (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
                         }
+                        (presentVC as! TabsEditorViewController).isPlaying = false
+                        (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
                         isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
@@ -102,12 +102,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     if(!isDemoSong){
                         
                         MusicManager.sharedInstance.player.pause()
-                        
-                        MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
-                        MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
                     }
                 }
             }
+        }
+        if(MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
+            MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
+            MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
         }
         
         self.suspended = KGLOBAL_init_queue.suspended
@@ -125,42 +126,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentVC = topViewController(rootViewController())
         
         let baseVC = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
-        
+        if(MusicManager.sharedInstance.player != nil){
+            MusicManager.sharedInstance.player.shuffleMode = self.shuffleMode
+            MusicManager.sharedInstance.player.repeatMode = repeatMode
+        }
     
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             currentSongVC.removeAllObserver()
-            if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
-                
-                // if go outside Twistjam and close Music App, nowPlayingItem is set to nil
-                // we force to dismiss SongViewController and re-initialize player
-                if (!currentSongVC.isSongNeedPurchase) {
-                    currentSongVC.viewDidDisappear(false)
-                    currentSongVC.dismissViewControllerAnimated(true, completion: {
-                        completed in
-                        KGLOBAL_queue.suspended = false
-                        KGLOBAL_init_queue.suspended = self.suspended
-                        MusicManager.sharedInstance.initializePlayer()
-                    })
-                } else {
-                    KGLOBAL_queue.suspended = false
-                    KGLOBAL_init_queue.suspended = self.suspended
-                }
-            } else {
-                currentSongVC.registerMediaPlayerNotification()
-                currentSongVC.selectedFromTable = false
-                if(!currentSongVC.isSongNeedPurchase){
-                    currentSongVC.resumeSong()
-                }
-                print("Song VC entering forground")
-                KGLOBAL_queue.suspended = false
-                KGLOBAL_init_queue.suspended = self.suspended
-            }
             
             //check if the viewController is Tabs Editor or lyrics SyncEditor
             //in case mediaItem was changed outside the app, if changed, we used
             //the last playing item and time
             if(currentVC.presentedViewController != nil){
+                currentSongVC.registerMediaPlayerNotification()
                 let presentVC = currentVC.presentedViewController!
                 if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
                     var isDemoSong:Bool = false
@@ -192,13 +171,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             if presentVC.isKindOfClass(TabsEditorViewController) {
                                 (presentVC as! TabsEditorViewController).registerNotification()
                             }
+                        }else if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.player.nowPlayingItem == lastPlayingItem {
+                            MusicManager.sharedInstance.player.repeatMode = .One
+                            MusicManager.sharedInstance.player.shuffleMode = .Off
+                            MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
+                            MusicManager.sharedInstance.player.pause()
+                            if presentVC.isKindOfClass(TabsEditorViewController) {
+                                (presentVC as! TabsEditorViewController).registerNotification()
+                            }
                         }
-                    } else if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.player.nowPlayingItem == lastPlayingItem {
-                        MusicManager.sharedInstance.player.repeatMode = .One
-                        MusicManager.sharedInstance.player.shuffleMode = .Off
-                        MusicManager.sharedInstance.player.currentPlaybackTime = MusicManager.sharedInstance.lastPlayingTime
-                         MusicManager.sharedInstance.player.pause()
+                    }else{
+                        if  MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil {
+                            MusicManager.sharedInstance.player.pause()
+                        }
                     }
+                }
+            }else {
+                if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
+                    // if go outside Twistjam and close Music App, nowPlayingItem is set to nil
+                    // we force to dismiss SongViewController and re-initialize player
+                    if (!currentSongVC.isSongNeedPurchase) {
+                        
+                        currentSongVC.viewDidDisappear(false)
+                        currentSongVC.dismissViewControllerAnimated(true, completion: {
+                            completed in
+                            KGLOBAL_queue.suspended = false
+                            KGLOBAL_init_queue.suspended = self.suspended
+                            MusicManager.sharedInstance.initializePlayer()
+                        })
+                    } else {
+                        currentSongVC.registerMediaPlayerNotification()
+                        KGLOBAL_queue.suspended = false
+                        KGLOBAL_init_queue.suspended = self.suspended
+                    }
+                } else {
+                    currentSongVC.registerMediaPlayerNotification()
+                    currentSongVC.selectedFromTable = false
+                    if(!currentSongVC.isSongNeedPurchase){
+                        currentSongVC.currentSongChanged()
+                        currentSongVC.resumeSong()
+                    }
+                    print("Song VC entering forground")
+                    KGLOBAL_queue.suspended = false
+                    KGLOBAL_init_queue.suspended = self.suspended
                 }
             }
         } else {
@@ -209,6 +224,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
                     MusicManager.sharedInstance.avPlayer.removeAllItems()
                 }
+            }else{
+                baseVC.nowView.stop()
             }
         }
         

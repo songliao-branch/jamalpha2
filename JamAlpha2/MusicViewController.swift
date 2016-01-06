@@ -523,7 +523,7 @@ extension MusicViewController {
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                 guard let assetURL = nowPlayingItem.valueForProperty(MPMediaItemPropertyAssetURL) else {
-                    print("\(nowPlayingItem.title!) does not have a sound url")
+//                    print("\(nowPlayingItem.title!) does not have a sound url")
                     
                     self.incrementSongCountInThread()
                     return
@@ -551,7 +551,7 @@ extension MusicViewController {
                                 tempProgressBlock.generateWaveforms()
                                 let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                                 CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveData: tempProgressBlock.averageSampleBuffer!, soundwaveImage: data!)
-                                print("Soundwave generated for \(nowPlayingItem.title!) in background")
+//                                print("Soundwave generated for \(nowPlayingItem.title!) in background")
                                 self.incrementSongCountInThread()
                             })
                         }

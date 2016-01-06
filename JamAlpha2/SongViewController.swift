@@ -709,6 +709,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.addTabsPrompt.hidden = true
             return true
         }
+        updateCapo(capo)
         return false
     }
     
@@ -931,7 +932,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func registerMediaPlayerNotification(){
         if(!isSongNeedPurchase){
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
             
             NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: player)
             if(player != nil){
@@ -944,7 +945,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
 
-    func currentSongChanged(notification: NSNotification){
+    func currentSongChanged(){
         if(viewDidFullyDisappear){
             return
         }
@@ -1012,7 +1013,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 var progressBarWidth:CGFloat!
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
         
-                //如果是在线从来没有听过的queue切歌的很快的时候duration是读不出来的
+                //如果是在线从来没有听过的queue切歌很快的时候duration是读不出来的
                 if progressBarWidth <= 0.1 {
                     nowPlayingItemDuration = 1000
                 }
@@ -1038,9 +1039,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     print("changeScale")
                     //self.progressBlock!.alpha = 0.5
                 }
-        
+        if(player.currentPlaybackRate == 1){
             resumeNormalSpeed()
-            self.updateAll(0)
+        }
+        let currentTime = player.currentPlaybackTime
+        self.updateAll(Float(currentTime.isNaN ? 0 : currentTime))
             if self.player.playbackState == MPMusicPlaybackState.Playing{
                 self.startTimer()
             }
@@ -2072,59 +2075,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             return
         }
 
-        //self.showTabsEditor()
-
-        self.checkChordsWithCoredata()
-    }
-
-    func checkChordsWithCoredata() {
-        let sender: Findable = isDemoSong ? self.demoItem : self.nowPlayingMediaItem
-        var  needAddNewChords: Bool = false
-        let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
-        var needAddNewChordsArray: [Tab] = [Tab]()
-        for item in tabs.0 {
-            print(item.tab.name)
-            print(item.tab.content)
-            let index = self.getBasicNoteIndex(item.tab.contentArray)
-            print(index)
-            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
-                continue
-            } else {
-                needAddNewChords = true
-                needAddNewChordsArray.append(item.tab)
-            }
-        }
-        
-        if needAddNewChords {
-            var nameString: String = ""
-            for item in needAddNewChordsArray {
-                nameString = nameString + item.name + ", "
-            }
-            let alertController = UIAlertController(title: "Notice", message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
-            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
-            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
-                action in
-                for item in needAddNewChordsArray {
-                    let index = self.getBasicNoteIndex(item.contentArray)
-                    TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
-                }
-                self.showTabsEditor()
-            }))
-            self.presentViewController(alertController, animated: true, completion: nil)
-        } else {
-            self.showTabsEditor()
-        }
-    }
-    
-    func getBasicNoteIndex(sender: [String]) -> Int {
-        for var i = 0; i < 6; i++ {
-            if sender[i] != "x" {
-                let stringIndex = 6 - i
-                let fretIndex = Int(sender[i])
-                return stringIndex * 100 + fretIndex!
-            }
-        }
-        return 0
+        self.showTabsEditor()
     }
 
     func showTabsEditor(){
@@ -2671,6 +2622,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 nowPlayingItemDuration = nowPlayingMediaItem.playbackDuration
                                 let progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
                                 KGLOBAL_progressBlock.frame = CGRect(x: KGLOBAL_progressBlock.frame.origin.x, y: KGLOBAL_progressBlock.frame.origin.y, width: progressBarWidth, height: soundwaveHeight)
+                                if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem) {
+                                    KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+                                    KGLOBAL_init_queue.suspended = false
+                                    isGenerated = true
+                                }
                                 if self.player.repeatMode != .One {
                                     self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingMediaItem!.title!)
                                     self.songNameLabel.textAlignment = NSTextAlignment.Center

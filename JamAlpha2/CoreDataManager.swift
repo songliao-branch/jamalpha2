@@ -277,7 +277,7 @@ class CoreDataManager: NSObject {
     
     //song-related
     private class func findSong(item: Findable) -> Song? {
-        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (playbackDuration <= '\(item.getDuration() + 1)') AND (playbackDuration >= '\(item.getDuration() - 1)')")
+        let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (playbackDuration <= '\(item.getDuration() + 1.5)') AND (playbackDuration >= '\(item.getDuration() - 1.5)')")
 
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
         
@@ -313,8 +313,11 @@ class CoreDataManager: NSObject {
     
 
     class func getSongWaveFormData(item: Findable) -> NSMutableArray? {
-        
-        if let matchedSong = findSong(item) {
+        var findItme:Findable? = MusicManager.sharedInstance.isNeedReloadCollections(item.getTitle(), artist: item.getArtist(), duration: item.getDuration())
+        if findItme == nil {
+            findItme = item
+        }
+        if let matchedSong = findSong(findItme!) {
          //   print("sound wave data found for song")
             return NSKeyedUnarchiver.unarchiveObjectWithData(matchedSong.soundwaveData as! NSData) as? NSMutableArray
         }
@@ -322,8 +325,11 @@ class CoreDataManager: NSObject {
     }
     
     class func getSongWaveFormImage(item: Findable) -> NSData? {
-        
-        if let matchedSong = findSong(item) {
+        var findItme:Findable? = MusicManager.sharedInstance.isNeedReloadCollections(item.getTitle(), artist: item.getArtist(), duration: item.getDuration())
+        if findItme == nil {
+            findItme = item
+        }
+        if let matchedSong = findSong(findItme!) {
            // print("sound wave image found for song")
             return matchedSong.soundwaveImage
         }

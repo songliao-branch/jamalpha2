@@ -53,8 +53,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         self.navigationController?.navigationBar.translucent = false
         self.navigationItem.title = "Setting"
         tableView.registerClass(SettingFBCell.self, forCellReuseIdentifier: "fbcell")
-        let leftButton: UIBarButtonItem = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain, target: self, action: "pressLeftButton:")
-        self.navigationItem.setLeftBarButtonItem(leftButton, animated: false)
+        if isFromUnLoginVC {
+            let leftButton: UIBarButtonItem = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.Plain, target: self, action: "pressLeftButton:")
+            self.navigationItem.setLeftBarButtonItem(leftButton, animated: false)
+        }
     }
     
     func pressLeftButton(sender: UIBarButtonItem) {
