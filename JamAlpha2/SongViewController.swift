@@ -2671,6 +2671,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 nowPlayingItemDuration = nowPlayingMediaItem.playbackDuration
                                 let progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
                                 KGLOBAL_progressBlock.frame = CGRect(x: KGLOBAL_progressBlock.frame.origin.x, y: KGLOBAL_progressBlock.frame.origin.y, width: progressBarWidth, height: soundwaveHeight)
+                                if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem) {
+                                    KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
+                                    KGLOBAL_init_queue.suspended = false
+                                    isGenerated = true
+                                }
                                 if self.player.repeatMode != .One {
                                     self.songNameLabel.attributedText = NSMutableAttributedString(string: nowPlayingMediaItem!.title!)
                                     self.songNameLabel.textAlignment = NSTextAlignment.Center

@@ -63,7 +63,7 @@ class MusicManager: NSObject {
         let result = uniqueSongs.filter{
             (song: MPMediaItem) -> Bool in
             if let tempTitle = song.title, tempArtist = song.artist {
-                return tempTitle == title && tempArtist == artist && abs((Float(song.playbackDuration) - duration))<1.5
+                return tempTitle.lowercaseString == title.lowercaseString && tempArtist.lowercaseString == artist.lowercaseString && abs((Float(song.playbackDuration) - duration))<1.5
             }
             return false
         }.first
