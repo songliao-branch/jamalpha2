@@ -223,6 +223,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
                     MusicManager.sharedInstance.avPlayer.removeAllItems()
                 }
+            }else{
+                baseVC.nowView.stop()
             }
         }
         

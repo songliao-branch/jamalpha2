@@ -1013,7 +1013,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 var progressBarWidth:CGFloat!
                 progressBarWidth = CGFloat(nowPlayingItemDuration) * progressWidthMultiplier
         
-                //如果是在线从来没有听过的queue切歌的很快的时候duration是读不出来的
+                //如果是在线从来没有听过的queue切歌很快的时候duration是读不出来的
                 if progressBarWidth <= 0.1 {
                     nowPlayingItemDuration = 1000
                 }
