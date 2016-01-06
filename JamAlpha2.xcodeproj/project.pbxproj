@@ -28,6 +28,9 @@
 		BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED01C1220E700F26877 /* AboutViewController.swift */; };
 		BFE49ED61C12471200F26877 /* AppConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED51C12471200F26877 /* AppConstant.swift */; };
 		BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */; };
+		BFFAA5131C3CE0D400DC3253 /* PlayChordsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */; };
+		BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */; };
+		BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -146,6 +149,11 @@
 		BFE49ED01C1220E700F26877 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		BFE49ED51C12471200F26877 /* AppConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConstant.swift; sourceTree = "<group>"; };
 		BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingFBLikeCell.swift; sourceTree = "<group>"; };
+		BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayChordsManager.swift; sourceTree = "<group>"; };
+		BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OpenALSupport.c; sourceTree = "<group>"; };
+		BFFAA5161C3CE12400DC3253 /* OpenALSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenALSupport.h; sourceTree = "<group>"; };
+		BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundBankPlayer.h; sourceTree = "<group>"; };
+		BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundBankPlayer.m; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -269,6 +277,7 @@
 		BF0B3AF51C33C99D003F0541 /* TabsEdtiorViewController */ = {
 			isa = PBXGroup;
 			children = (
+				BFFAA5141C3CE0DD00DC3253 /* PlayChordsManager */,
 				105B2EC61C316E20002BC17A /* CustomizedView.swift */,
 				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
 			);
@@ -304,6 +313,18 @@
 				E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */,
 			);
 			name = MeViewController;
+			sourceTree = "<group>";
+		};
+		BFFAA5141C3CE0DD00DC3253 /* PlayChordsManager */ = {
+			isa = PBXGroup;
+			children = (
+				BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */,
+				BFFAA5161C3CE12400DC3253 /* OpenALSupport.h */,
+				BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */,
+				BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */,
+				BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */,
+			);
+			name = PlayChordsManager;
 			sourceTree = "<group>";
 		};
 		E41D6CFC1BA149BF006A9993 /* Helper */ = {
@@ -819,6 +840,7 @@
 				BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */,
 				10AC35A41C21509D00749744 /* DemoViewController.swift in Sources */,
 				E43713F51C34853600517D03 /* UserTabsLyricsCell.swift in Sources */,
+				BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
@@ -834,11 +856,13 @@
 				E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */,
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
+				BFFAA5131C3CE0D400DC3253 /* PlayChordsManager.swift in Sources */,
 				E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */,
 				E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */,
 				E44359021B1947660091E926 /* Album.swift in Sources */,
+				BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */,
 				BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */,
 				BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
