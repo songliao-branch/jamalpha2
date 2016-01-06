@@ -16,7 +16,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var isFromUnLoginVC: Bool = false
     
-    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo Mode", "Tutorial"]
+    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo", "Tutorial"]
     
     let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode", "Tutorial"]
     
