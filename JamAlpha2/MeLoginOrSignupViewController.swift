@@ -416,7 +416,6 @@ class MeLoginOrSignupViewController: UIViewController{
                                     }
                                     
                                     if self.isGoToTabEditor {
-                                        self.songViewController!.checkChordsWithCoredata()
                                         self.songViewController!.resumeNormalSpeed()
                                     } else if(self.isGoToLyricEditor){
 
