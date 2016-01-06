@@ -57,7 +57,7 @@ class PlayChordsManager: NSObject {
                 midiArray.append(convertIndexToMidi(index))
             }
         }
-        return midiArray
+        return midiArray.reverse()
     }
     
     func initialSoundBank() {

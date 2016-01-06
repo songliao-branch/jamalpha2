@@ -156,6 +156,12 @@
 		BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundBankPlayer.h; sourceTree = "<group>"; };
 		BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundBankPlayer.m; sourceTree = "<group>"; };
 		BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GuitarSoundFont.plist; sourceTree = "<group>"; };
+		BFFAA51E1C3DB7D700DC3253 /* E3.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = E3.caf; path = ../../../E3.caf; sourceTree = "<group>"; };
+		BFFAA51F1C3DB7D700DC3253 /* E5.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = E5.caf; path = ../../../E5.caf; sourceTree = "<group>"; };
+		BFFAA5201C3DB7D700DC3253 /* G4.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = G4.caf; path = ../../../G4.caf; sourceTree = "<group>"; };
+		BFFAA5211C3DB7D700DC3253 /* D4.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = D4.caf; path = ../../../D4.caf; sourceTree = "<group>"; };
+		BFFAA5221C3DB7D700DC3253 /* B4.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = B4.caf; path = ../../../B4.caf; sourceTree = "<group>"; };
+		BFFAA5231C3DB7D700DC3253 /* A3.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = A3.caf; path = ../../../A3.caf; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -320,6 +326,7 @@
 		BFFAA5141C3CE0DD00DC3253 /* PlayChordsManager */ = {
 			isa = PBXGroup;
 			children = (
+				BFFAA51D1C3DB7C200DC3253 /* SourceFiles */,
 				BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */,
 				BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */,
 				BFFAA5161C3CE12400DC3253 /* OpenALSupport.h */,
@@ -328,6 +335,19 @@
 				BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */,
 			);
 			name = PlayChordsManager;
+			sourceTree = "<group>";
+		};
+		BFFAA51D1C3DB7C200DC3253 /* SourceFiles */ = {
+			isa = PBXGroup;
+			children = (
+				BFFAA51E1C3DB7D700DC3253 /* E3.caf */,
+				BFFAA51F1C3DB7D700DC3253 /* E5.caf */,
+				BFFAA5201C3DB7D700DC3253 /* G4.caf */,
+				BFFAA5211C3DB7D700DC3253 /* D4.caf */,
+				BFFAA5221C3DB7D700DC3253 /* B4.caf */,
+				BFFAA5231C3DB7D700DC3253 /* A3.caf */,
+			);
+			name = SourceFiles;
 			sourceTree = "<group>";
 		};
 		E41D6CFC1BA149BF006A9993 /* Helper */ = {
