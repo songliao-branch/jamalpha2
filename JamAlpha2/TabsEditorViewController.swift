@@ -2486,7 +2486,7 @@ extension TabsEditorViewController {
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: Findable) {
         let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
-        var chord: [Chord] = tabs.0
+        let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
         let visible: Bool = tabs.4

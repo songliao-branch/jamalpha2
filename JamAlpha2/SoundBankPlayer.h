@@ -7,6 +7,7 @@
 #import <Foundation/Foundation.h>
 #import <OpenAL/al.h>
 #import <OpenAL/alc.h>
+#import <AVFoundation/AVFoundation.h>
 
 /*
  * How many OpenAL sources we will use. Each source plays a single buffer, so
