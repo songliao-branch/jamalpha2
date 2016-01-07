@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AVFoundation
 import MediaPlayer
 
 class MusicManager: NSObject {
@@ -54,15 +55,15 @@ class MusicManager: NSObject {
         loadLocalAlbums()
         loadLocalArtist()
         initializePlayer()
+        addNotification()
     }
     
     //check when search a cloud item, if it matches, we use the song we already have
     func isNeedReloadCollections(title:String, artist:String, duration:Float) -> MPMediaItem? {
-        self.reloadCollections()
         let result = uniqueSongs.filter{
             (song: MPMediaItem) -> Bool in
             if let tempTitle = song.title, tempArtist = song.artist {
-                return tempTitle == title && tempArtist == artist && abs((Float(song.playbackDuration) - duration))<1.5
+                return tempTitle.lowercaseString == title.lowercaseString && tempArtist.lowercaseString == artist.lowercaseString && abs((Float(song.playbackDuration) - duration))<1.5
             }
             return false
         }.first
@@ -71,15 +72,67 @@ class MusicManager: NSObject {
         }
         return nil
     }
-
-    func reloadCollections(){
-        let tempCount = uniqueSongs.count
-        loadLocalSongs()
-        if tempCount != uniqueSongs.count {
-            kShouldReloadMusicTable = true
-            loadLocalAlbums()
-            loadLocalArtist()
+    
+    func addNotification(){
+        MPMediaLibrary.defaultMediaLibrary().beginGeneratingLibraryChangeNotifications()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "musicLibraryDidChange", name: MPMediaLibraryDidChangeNotification, object: nil)
+    }
+    
+    func musicLibraryDidChange(){
+        
+        reloadCollections()
+        
+        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController()
+        let currentVC = (UIApplication.sharedApplication().delegate as! AppDelegate).topViewController(rootViewController)
+        let baseVC = ((rootViewController as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
+        let searchVC = ((rootViewController as! TabBarController).childViewControllers[1].childViewControllers[0]) as! SearchViewController
+        
+        // if the collection is different i.e. new songs are added/old songs are removed
+        // we manually reload MusicViewController table
+        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+            musicVC.reloadDataAndTable()
+            if(!musicVC.uniqueSongs.isEmpty){
+                musicVC.songCount = 0
+                musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
+            }
         }
+        
+        searchVC.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+        if searchVC.searchResultTableView != nil && searchVC.resultSearchController.active {
+            searchVC.filterLocalSongs(searchVC.resultSearchController.searchBar.text!)
+            searchVC.searchResultTableView.reloadData() 
+        }
+       
+        if(currentVC.isKindOfClass(SongViewController)){
+            let currentSongVC = currentVC as! SongViewController
+            if (currentSongVC.isSongNeedPurchase) {
+                if let purchasedItem = (isNeedReloadCollections(currentSongVC.songNeedPurchase.trackName!, artist: currentSongVC.songNeedPurchase.artistName!, duration: currentSongVC.songNeedPurchase.trackTimeMillis!)){
+                    setPlayerQueue([purchasedItem])
+                    setIndexInTheQueue(0)
+                    currentSongVC.recoverToNormalSongVC(purchasedItem)
+                }
+            }
+        }
+        
+        let thirdBarItemVC = (rootViewController as! TabBarController).childViewControllers[2]
+        
+        if thirdBarItemVC.childViewControllers.count > 1 { //means navigation controller has at least pushed one view controller (the root navigation controller is UserProfileViewController)
+            let firstPushedVC = thirdBarItemVC.childViewControllers[1]
+            if firstPushedVC.isKindOfClass(MyTabsAndLyricsViewController) {
+                let myTabsLyricsVC = firstPushedVC as! MyTabsAndLyricsViewController
+                myTabsLyricsVC.loadData()
+            } else if firstPushedVC.isKindOfClass(MyFavoritesViewController) {
+                let myFavoritesVC = firstPushedVC as! MyFavoritesViewController
+                myFavoritesVC.loadData()
+            }
+        }
+    }
+    
+    func reloadCollections() {
+        loadLocalSongs()
+        loadLocalAlbums()
+        loadLocalArtist()
+        queueChanged = true
     }
     
     func initializePlayer(){
@@ -135,10 +188,6 @@ class MusicManager: NSObject {
             print(MPMediaItemPropertyReleaseDate)
             
             queueChanged = true
-            //testing
-            for song in collection {
-                print("\(_TAG) setting up queue of song: \(song.title!)")
-            }
             return
         }
         

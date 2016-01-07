@@ -11,20 +11,19 @@ import Foundation
 
 extension NSDate {
     
-    class func convertFromIsoToHumanizedFormat(isoString: String) -> String {
-        //TODO: add an attribute for local tabsSet updatedAt?
+    class func convertFromIsoToNSDate(isoString: String) -> NSDate? {
         if isoString == "" {
-            return ""
+            return nil
         }
         let dateFormatter = NSDateFormatter()
         dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
         dateFormatter.timeZone = NSTimeZone.localTimeZone()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        let date = dateFormatter.dateFromString(isoString)!
-        return timeAgoSinceDate(date, numericDates: true)
+        
+        return dateFormatter.dateFromString(isoString)!
     }
     
-    private class func timeAgoSinceDate(date: NSDate, numericDates:Bool) -> String {
+    class func timeAgoSinceDate(date: NSDate, numericDates:Bool) -> String {
         let calendar = NSCalendar.currentCalendar()
         let now = NSDate()
         let earliest = now.earlierDate(date)

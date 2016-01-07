@@ -249,8 +249,8 @@ class MeLoginOrSignupViewController: UIViewController{
         scrollView.addSubview(facebookButton)
         
         //TODO: hide facebook in beta mode
-        facebookButton.hidden = false
-        orLabel.hidden = false
+        facebookButton.hidden = true
+        orLabel.hidden = true
         
         //log in screen
         let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
@@ -417,10 +417,10 @@ class MeLoginOrSignupViewController: UIViewController{
                                     
                                     if self.isGoToTabEditor {
                                         self.songViewController!.resumeNormalSpeed()
+                                        self.songViewController!.showTabsEditor()
                                     } else if(self.isGoToLyricEditor){
-
-                                        self.songViewController!.showLyricsEditor()
                                         self.songViewController!.resumeNormalSpeed()
+                                        self.songViewController!.showLyricsEditor()
                                     }
                                     
                                 })
@@ -445,7 +445,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     //initialize the song just in case we don't find it in existing core data
                                     CoreDataManager.initializeSongToDatabase(localSong)
                                     
-                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible)
+                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible, lastEditedDate: set.lastEdited)
                                 }
                                 
                                 for set in lyricsSets {
@@ -453,7 +453,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     //initialize the song just in case we don't find it in
                                     CoreDataManager.initializeSongToDatabase(localSong)
 
-                                    CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id)
+                                    CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id, lastEditedDate: set.lastEdited)
                                 }
                                 
                                 print("user has \(tabsSets.count) tabs and \(lyricsSets.count) lyrics")

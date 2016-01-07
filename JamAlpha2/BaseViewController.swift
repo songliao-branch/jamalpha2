@@ -110,7 +110,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func goToNowPlaying() { //tell me when it kicks in
         for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
-            if player.nowPlayingItem != nil {
+            if player.nowPlayingItem != nil || MusicManager.sharedInstance.avPlayer.currentItem != nil {
                 musicViewController.popToCurrentSong()
             }
         }

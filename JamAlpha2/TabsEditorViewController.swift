@@ -9,10 +9,11 @@
 import UIKit
 import MediaPlayer
 import AVFoundation
+import YouTubePlayer
 
 let kmovingMainNoteSliderHeight:CGFloat = 26
 
-class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate {
+class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
     var string3BackgroundImage: [String] = ["fret0", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string"]
     
@@ -57,7 +58,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var startTime: TimeNumber = TimeNumber(second: 0, decimal: 0)
     var speed: Float = 1
     
-    var songViewController: SongViewController!
+    var songViewController: SongViewController?
     // collection view
     var collectionView: UICollectionView!
     let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -165,6 +166,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentSelectedSpecificTab: NormalTabs!
     var countDownNumber: Float = 3
     
+    //MARK: tutorials
+    var tutorialOverlay: UIView!
+    var videoPlayerView: YouTubePlayerView!
+    
+    
     // Mark: Main view data array structure
     class mainViewData {
         var fretNumber: Int = Int()
@@ -236,7 +242,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             //TODO: add a placeholder album cover
             image = UIImage(named: "liwengbg")
         }
-        backgroundImage.image = image
+        backgroundImage.image = image != nil ? image : songViewController?.backgroundImage
         
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
@@ -271,6 +277,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     override func viewDidAppear(animated: Bool) {
         // MARK: add exist chord to tab editor view
         self.addChordToEditorView(theSong)
+        
+        if NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorial) {
+            setUpTutorial()
+        }
     }
     
     // MARK: Notification
@@ -312,8 +322,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func currentSongChanged(sender: NSNotification){
-        if musicPlayer.playbackState == .Playing {
-            musicPlayer.currentPlaybackRate = self.speed
+        if musicPlayer.playbackState == .Playing && isPlaying{
+            musicPlayer.pause()
+            self.playButtonImageView.hidden = false
         }
     }
     
@@ -482,8 +493,57 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    func setUpTutorial() {
+        tutorialOverlay = UIView(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
+        tutorialOverlay.backgroundColor = UIColor.tutorialBackgroundGray()
+        self.view.addSubview(tutorialOverlay)
+        
+        let playTutorialButton = UIButton(frame: CGRect(x: 0, y: 0, width: 223, height: 86))
+        playTutorialButton.setImage(UIImage(named: "play_tutorial"), forState: .Normal)
+        playTutorialButton.addTarget(self, action: "playTutorial", forControlEvents: .TouchUpInside)
+        playTutorialButton.center = CGPoint(x: trueWidth/2, y: trueHeight/2 )
+        tutorialOverlay.addSubview(playTutorialButton)
+        
+        let skipTutorialButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(playTutorialButton.frame), width: 70, height: 38))
+        skipTutorialButton.setImage(UIImage(named: "skip"), forState: .Normal)
+        skipTutorialButton.addTarget(self, action: "skipTutorial", forControlEvents: .TouchUpInside)
+        skipTutorialButton.center.x = trueWidth/2
+        tutorialOverlay.addSubview(skipTutorialButton)
+    }
+    
+    func playTutorial() {
+        videoPlayerView = YouTubePlayerView(frame: self.view.frame)
+        videoPlayerView.delegate = self
+        let url = NSURL(string: "https://www.youtube.com/watch?v=5ZDLU4ruk-M")!
+        videoPlayerView.loadVideoURL(url)
+        self.view.addSubview(videoPlayerView)
+    }
+    
+    func skipTutorial() {
+        tutorialOverlay.hidden = true
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
+    }
+    
+    //MARK: YouTubePlayerView delegate methods
+    func playerReady(videoPlayer: YouTubePlayerView) {
+        
+    }
+
+    func playerStateChanged(videoPlayer: YouTubePlayerView, playerState: YouTubePlayerState) {
+        if playerState == .Ended || playerState == .Paused {
+            tutorialOverlay.hidden = true
+            videoPlayerView.hidden = true
+            NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
+        }
+    }
+    
+    func playerQualityChanged(videoPlayer: YouTubePlayerView, playbackQuality: YouTubePlaybackQuality) {
+        
+    }
+    
     // MARK: collection view functions, include required functions and move cell functions
     var tapGesture:UITapGestureRecognizer!
+    
     func initCollectionView() {
         for var i = 0; i < 25; i++ {
             fretsNumber.append(i)
@@ -529,12 +589,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     func checkScrollview(sender:UIPanGestureRecognizer){
         let transfer = sender.velocityInView(self.collectionView)
-        if(abs(transfer.x) > abs(transfer.y)){
-            self.collectionView.scrollEnabled = true
-        }else{
-            self.collectionView.scrollEnabled = false
+        if(sender.state == .Began){
+            if(abs(transfer.x) >= abs(transfer.y)){
+                self.collectionView.scrollEnabled = true
+            }else{
+                self.collectionView.scrollEnabled = false
+            }
         }
-        if(sender.state == .Ended){
+        
+        if(sender.state == .Ended || sender.state == .Cancelled){
             self.collectionView.scrollEnabled = true
         }
     }
@@ -944,7 +1007,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         privacyButton = UIButton(frame: CGRect(x: 200, y: 0, width: 200, height: 30))
         privacyButton.setTitle("Public", forState: .Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
-        menuView.addSubview(privacyButton)
+       // menuView.addSubview(privacyButton)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
@@ -1562,6 +1625,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                 self.musicPlayer.currentPlaybackRate = speed
             }
+            self.playButtonImageView.hidden = true
             self.removeDoubleArrowView()
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
              NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
@@ -1593,8 +1657,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // pause the music or restart it, and count down
     func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
         self.removeDoubleArrowView()
-        self.playButtonImageView.hidden = true
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
+            self.playButtonImageView.hidden = false
             self.isPlaying = false
             //animate down progress block
             self.view.userInteractionEnabled = false
@@ -1611,6 +1675,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer.invalidate()
             self.view.userInteractionEnabled = true
         } else {
+            self.playButtonImageView.hidden = true
             self.isPlaying = true
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
             self.view.userInteractionEnabled = false
@@ -1704,6 +1769,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.avPlayer.pause()
             } else {
                 self.musicPlayer.pause()
+                self.musicPlayer.skipToNextItem()
             }
             timer.invalidate()
             timer = NSTimer()
@@ -1715,6 +1781,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                  musicPlayer.currentPlaybackTime = currentTime
             }
+            self.playButtonImageView.hidden = false
         }
 
         if !isPanning {
@@ -1904,11 +1971,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
                 }
             })
         }
@@ -2156,9 +2225,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let savedTabsSetId = CoreDataManager.getTabs(theSong, fetchingUsers: true).3
             
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
-                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic)
-
-            self.songViewController.updateMusicData(theSong)
+                Int(CoreDataManager.getCurrentUser()!.id), tabsSetId:  savedTabsSetId > 0 ?savedTabsSetId : kLocalSetId, visible: isPublic, lastEditedDate: NSDate())
+            
+            if let songVC = songViewController {
+                songVC.updateMusicData(theSong)
+            }
             
             tuningMenu.hidden = true
             self.progressBlock.hidden = true
@@ -2179,11 +2250,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
-                if self.isDemoSong {
-                    self.songViewController.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    self.songViewController.player.play()
+                
+                if let songVC = self.songViewController {
+                    if self.isDemoSong {
+                        songVC.avPlayer.play()
+                    } else {
+                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                        songVC.player.play()
+                    }
                 }
             })
         }

@@ -19,7 +19,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     var hiddenKeyboardView: UIView = UIView()
     let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
 
-    var isDemoSong: Bool!
+    var isDemoSong = false
 
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
@@ -147,7 +147,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
             //TODO: add a placeholder album cover
             image = UIImage(named: "liwengbg")
         }
-        backgroundImage.image = image
+        backgroundImage.image = image != nil ? image : songViewController!.backgroundImage
         let blurredImage: UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)

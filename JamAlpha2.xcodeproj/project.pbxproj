@@ -14,6 +14,7 @@
 		10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */; };
 		10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */; };
 		10E930A01C15753400C1D0C9 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */; };
+		10FFBAA91C3A41EB003DF489 /* SearchAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FFBAA81C3A41EB003DF489 /* SearchAPI.swift */; };
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; };
 		842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842DB0241B55EA8B00B4E165 /* TimeNumber.swift */; };
 		84DA61A41B4E211100979A42 /* Lyric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DA61A31B4E211100979A42 /* Lyric.swift */; };
@@ -51,7 +52,6 @@
 		E43713EF1C34850200517D03 /* LocalSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713EE1C34850200517D03 /* LocalSong.swift */; };
 		E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713F01C34851200517D03 /* MyFavoritesCell.swift */; };
 		E43713F51C34853600517D03 /* UserTabsLyricsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713F41C34853600517D03 /* UserTabsLyricsCell.swift */; };
-		E43713F91C34868C00517D03 /* OptionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713F81C34868C00517D03 /* OptionsCell.swift */; };
 		E43713FB1C3486BE00517D03 /* MyFavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713FA1C3486BD00517D03 /* MyFavoritesViewController.swift */; };
 		E43713FD1C34871300517D03 /* MyTabsAndLyricsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713FC1C34871300517D03 /* MyTabsAndLyricsViewController.swift */; };
 		E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4399C341B90041900906DBD /* SoundWaveView.swift */; };
@@ -133,6 +133,7 @@
 		10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageZoomAnimation.swift; sourceTree = "<group>"; };
 		10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewerViewController.swift; sourceTree = "<group>"; };
 		10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
+		10FFBAA81C3A41EB003DF489 /* SearchAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchAPI.swift; sourceTree = "<group>"; };
 		1E225B71031C3EA2120F8192 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A63591A1C3B0728C38D7319 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		5491F35DF2FB90338EBDC0CC /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -181,7 +182,6 @@
 		E43713EE1C34850200517D03 /* LocalSong.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalSong.swift; sourceTree = "<group>"; };
 		E43713F01C34851200517D03 /* MyFavoritesCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFavoritesCell.swift; sourceTree = "<group>"; };
 		E43713F41C34853600517D03 /* UserTabsLyricsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserTabsLyricsCell.swift; sourceTree = "<group>"; };
-		E43713F81C34868C00517D03 /* OptionsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionsCell.swift; sourceTree = "<group>"; };
 		E43713FA1C3486BD00517D03 /* MyFavoritesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFavoritesViewController.swift; sourceTree = "<group>"; };
 		E43713FC1C34871300517D03 /* MyTabsAndLyricsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyTabsAndLyricsViewController.swift; sourceTree = "<group>"; };
 		E4399C341B90041900906DBD /* SoundWaveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundWaveView.swift; sourceTree = "<group>"; };
@@ -462,7 +462,6 @@
 				10AC35A51C215BE300749744 /* DemoCell.swift */,
 				BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */,
 				E43713F41C34853600517D03 /* UserTabsLyricsCell.swift */,
-				E43713F81C34868C00517D03 /* OptionsCell.swift */,
 				E43713F01C34851200517D03 /* MyFavoritesCell.swift */,
 			);
 			name = TableCells;
@@ -564,6 +563,7 @@
 			children = (
 				E48F22651BF5920300F24962 /* Models */,
 				E48AE2D11B955BB40044CFDB /* APIManager.swift */,
+				10FFBAA81C3A41EB003DF489 /* SearchAPI.swift */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -691,7 +691,7 @@
 				TargetAttributes = {
 					E488773C1B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 978SMNLLT3;
+						DevelopmentTeam = 3ME9DMV2GU;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -891,9 +891,9 @@
 				BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
 				10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */,
+				10FFBAA91C3A41EB003DF489 /* SearchAPI.swift in Sources */,
 				E41D6D011BA149EB006A9993 /* SearchHistoryManager.swift in Sources */,
 				E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */,
-				E43713F91C34868C00517D03 /* OptionsCell.swift in Sources */,
 				E4B6362E1B854A5900F331A7 /* Colors+.swift in Sources */,
 				10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */,
 				E48AE2D21B955BB40044CFDB /* APIManager.swift in Sources */,
