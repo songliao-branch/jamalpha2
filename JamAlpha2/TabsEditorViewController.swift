@@ -1042,7 +1042,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.completeStringView.backgroundColor = UIColor.clearColor()
         
         self.completeImageView.frame = CGRectMake(0, 0, 5 * self.trueWidth, 15 / 20 * self.trueHeight)
-        self.completeImageView.image = UIImage(named: "6-strings-new-with-numbers")
+        self.completeImageView.image = UIImage(named: "6stringFretboard")
         self.completeStringView.addSubview(completeImageView)
         self.editView.addSubview(completeStringView)
         
