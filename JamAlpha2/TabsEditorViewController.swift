@@ -14,6 +14,8 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate {
     
+    var string3BackgroundImage: [String] = ["fret0", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string"]
+    
     var playButtonImageView: UIImageView!
     
     var doubleArrowView: CustomizedView!
@@ -707,6 +709,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
         cell.imageView.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
+        cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
         for subview in cell.contentView.subviews {
             if subview.isKindOfClass(UIButton){
@@ -1752,6 +1755,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let temp = self.mainViewDataArray[fromIndexPath.item]
         self.mainViewDataArray.removeAtIndex(fromIndexPath.item)
         self.mainViewDataArray.insert(temp, atIndex: toIndexPath.item)
+        let tempImage = self.string3BackgroundImage[fromIndexPath.item]
+        self.string3BackgroundImage.removeAtIndex(fromIndexPath.item)
+        self.string3BackgroundImage.insert(tempImage, atIndex: toIndexPath.item)
     }
     
 
