@@ -33,6 +33,8 @@
 		BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */; };
 		BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */; };
 		BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */; };
+		BFFD859C1C407B5C004E7803 /* FFTHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD859B1C407B5C004E7803 /* FFTHelper.mm */; };
+		BFFD859E1C407B80004E7803 /* TunerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD859D1C407B80004E7803 /* TunerManager.swift */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -157,6 +159,9 @@
 		BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundBankPlayer.h; sourceTree = "<group>"; };
 		BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundBankPlayer.m; sourceTree = "<group>"; };
 		BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GuitarSoundFont.plist; sourceTree = "<group>"; };
+		BFFD859A1C407B5C004E7803 /* FFTHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FFTHelper.h; path = "../../../../Downloads/DetectingAudioFrequency-master/DetectingSoundFrequency/FFTHelper.h"; sourceTree = "<group>"; };
+		BFFD859B1C407B5C004E7803 /* FFTHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FFTHelper.mm; path = "../../../../Downloads/DetectingAudioFrequency-master/DetectingSoundFrequency/FFTHelper.mm"; sourceTree = "<group>"; };
+		BFFD859D1C407B80004E7803 /* TunerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerManager.swift; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -298,6 +303,7 @@
 		BFE49ECF1C1220C200F26877 /* SettingViewController */ = {
 			isa = PBXGroup;
 			children = (
+				BFFD85981C407B1E004E7803 /* Tuner */,
 				BFE49ED51C12471200F26877 /* AppConstant.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
@@ -342,6 +348,24 @@
 				BFFAA5161C3CE12400DC3253 /* OpenALSupport.h */,
 				BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */,
 				BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */,
+			);
+			name = Helper;
+			sourceTree = "<group>";
+		};
+		BFFD85981C407B1E004E7803 /* Tuner */ = {
+			isa = PBXGroup;
+			children = (
+				BFFD85991C407B26004E7803 /* Helper */,
+				BFFD859D1C407B80004E7803 /* TunerManager.swift */,
+			);
+			name = Tuner;
+			sourceTree = "<group>";
+		};
+		BFFD85991C407B26004E7803 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				BFFD859A1C407B5C004E7803 /* FFTHelper.h */,
+				BFFD859B1C407B5C004E7803 /* FFTHelper.mm */,
 			);
 			name = Helper;
 			sourceTree = "<group>";
@@ -835,6 +859,7 @@
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
 				E4473CA31BF909E20061D4C9 /* BorderedCellView.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
+				BFFD859E1C407B80004E7803 /* TunerManager.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
 				BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */,
 				BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */,
@@ -884,6 +909,7 @@
 				E44359021B1947660091E926 /* Album.swift in Sources */,
 				BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */,
 				BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */,
+				BFFD859C1C407B5C004E7803 /* FFTHelper.mm in Sources */,
 				BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
 				10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */,
