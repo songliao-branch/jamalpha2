@@ -400,6 +400,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 MusicManager.sharedInstance.avPlayer.removeAllItems()
             }
+            
+            ///////////////////////////////////////////
             if((songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.isReachableViaWWAN && !isDemoSong){
                 var counter = 0
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
@@ -475,6 +477,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     self.musicTable.reloadData()
                 })
             }
+            //////////////////////////////////////////////////////////
         }
         else if pageIndex == 1 {
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)

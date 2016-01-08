@@ -55,8 +55,16 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                 return
             }
             
-            if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                self.artistTable.reloadData()
+            if player.nowPlayingItem != nil {
+                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
+                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.artistTable.reloadData()
+                    }
+                }else{
+                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.artistTable.reloadData()
+                    }
+                }
             }
         }
     }
@@ -131,6 +139,20 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         // assign empty string if no track number
         cell.trackNumberLabel.text = song.albumTrackNumber > 0 ? String(song.albumTrackNumber) : ""
+        
+        if(NetworkManager.sharedInstance.isReachableViaWWAN || !NetworkManager.sharedInstance.isReachable){
+                if (song ).cloudItem{
+                    cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(0.5)
+                    cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(0.5)
+                }else{
+                    cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
+                    cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
+                }
+        }else{
+                cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
+                cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
+        }
+        
         return cell
     }
     
@@ -159,18 +181,81 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
         MusicManager.sharedInstance.avPlayer.removeAllItems()
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.selectedFromTable = true
-        songVC.musicViewController = self.musicViewController
-        songVC.nowView = self.nowView
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
-        
-        self.presentViewController(songVC, animated: true, completion: {
-                completed in
-                tableView.reloadData()
+        ///////////////////////////////////////////
+        if((artistAllSongs[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.isReachableViaWWAN){
+            var counter = 0
+            dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
+                while (true){
+                    
+                    if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                        MusicManager.sharedInstance.player.stop()
+                        self.nowView.stop()
+                        dispatch_async(dispatch_get_main_queue()) {
+                            let alert = UIAlertController(title: "Connect to Wi-Fi to Play Music", message: "To play songs when you aren't connnected to Wi-Fi, turn on cellular playback in Music in the Settings app", preferredStyle: UIAlertControllerStyle.Alert)
+                            let url:NSURL! = NSURL(string : "prefs:root=MUSIC")
+                            let goToMusicSetting = UIAlertAction(title: "Settings", style: UIAlertActionStyle.Default, handler: {
+                                finished in
+                                UIApplication.sharedApplication().openURL(url)
+                            })
+                            let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: nil)
+                            alert.addAction(goToMusicSetting)
+                            alert.addAction(cancel)
+                            self.presentViewController(alert, animated: true, completion: {
+                                completed in
+                                self.artistTable.reloadData()
+                            })
+                        }
+                        break
+                    }
+                    print(counter)
+                    if(counter++ == 20){
+                        if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                            dispatch_async(dispatch_get_main_queue()) {
+                                songVC.selectedFromTable = true
+                                songVC.transitioningDelegate = self.animator
+                                self.animator!.attachToViewController(songVC)
+                                songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
+                                songVC.nowView = self.nowView
+                                self.presentViewController(songVC, animated: true, completion: {
+                                    completed in
+                                    //reload table to show loudspeaker icon on current selected row
+                                    tableView.reloadData()
+                                })
+                            }
+                            break
+                        }
+                    }
+                }
             }
-        )
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        }else if (NetworkManager.sharedInstance.isReachableViaWiFi || !artistAllSongs[indexToBePlayed].cloudItem){
+            MusicManager.sharedInstance.player.play()
+            songVC.selectedFromTable = true
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
+            songVC.nowView = self.nowView
+            self.presentViewController(songVC, animated: true, completion: {
+                completed in
+                //reload table to show loudspeaker icon on current selected row
+                tableView.reloadData()
+            })
+        } else if ( !NetworkManager.sharedInstance.isReachable && artistAllSongs[indexToBePlayed].cloudItem) {
+            MusicManager.sharedInstance.player.stop()
+            let alert = UIAlertController(title: "Connect to Wi-Fi or Cellular to Play Music", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
+            let url:NSURL! = NSURL(string : "prefs:root=Cellular")
+            let goToMusicSetting = UIAlertAction(title: "Settings", style: UIAlertActionStyle.Default, handler: {
+                finished in
+                UIApplication.sharedApplication().openURL(url)
+            })
+            let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: nil)
+            alert.addAction(goToMusicSetting)
+            alert.addAction(cancel)
+            self.presentViewController(alert, animated: true, completion: {
+                completed in
+                self.artistTable.reloadData()
+            })
+        }
+        //////////////////////////////////////////////////////////
     }
     
  }
