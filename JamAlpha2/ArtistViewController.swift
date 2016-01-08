@@ -10,9 +10,6 @@ import MediaPlayer
 class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate{
     
     var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
-
-    var nowView: VisualizerView!
-    
     var theArtist:Artist!
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
@@ -189,7 +186,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                     
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
-                        self.nowView.stop()
+                        KGLOBAL_nowView.stop()
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)                        }
                         isSeekingPlayerState = false
@@ -202,7 +199,6 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                                 songVC.transitioningDelegate = self.animator
                                 self.animator!.attachToViewController(songVC)
                                 songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
-                                songVC.nowView = self.nowView
                                 self.presentViewController(songVC, animated: true, completion: {
                                     completed in
                                     //reload table to show loudspeaker icon on current selected row
@@ -224,7 +220,6 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
-            songVC.nowView = self.nowView
             self.presentViewController(songVC, animated: true, completion: {
                 completed in
                 //reload table to show loudspeaker icon on current selected row

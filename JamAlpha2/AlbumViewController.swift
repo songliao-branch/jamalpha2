@@ -6,7 +6,6 @@ import MediaPlayer
 class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UITableViewDataSource{
 
     var musicViewController: MusicViewController! // for songviewcontroller to go to artist or album from musicviewcontroller
-    var nowView: VisualizerView!
     
     var theAlbum:Album!
     var animator: CustomTransitionAnimation?
@@ -137,7 +136,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                     
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
-                        self.nowView.stop()
+                        KGLOBAL_nowView.stop()
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)
                         }
@@ -151,7 +150,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                                 songVC.transitioningDelegate = self.animator
                                 self.animator!.attachToViewController(songVC)
                                 songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
-                                songVC.nowView = self.nowView
                                 self.presentViewController(songVC, animated: true, completion: {
                                     completed in
                                     //reload table to show loudspeaker icon on current selected row
@@ -173,7 +171,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
-            songVC.nowView = self.nowView
             self.presentViewController(songVC, animated: true, completion: {
                 completed in
                 //reload table to show loudspeaker icon on current selected row

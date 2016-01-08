@@ -258,6 +258,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                         while (isSeekingPlayerState) {
                             if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                 MusicManager.sharedInstance.player.stop()
+                                KGLOBAL_nowView.stop()
                                 dispatch_async(dispatch_get_main_queue()) {
                                     self.showCellularEnablesStreaming(tableView)
                                 }
@@ -302,6 +303,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && filteredSongs[indexPath.row].cloudItem) {
                     isSeekingPlayerState = false
                     MusicManager.sharedInstance.player.stop()
+                    KGLOBAL_nowView.stop()
                     self.showConnectInternet(tableView)
                 }
                 
@@ -321,6 +323,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                             while (isSeekingPlayerState) {
                                 if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                     MusicManager.sharedInstance.player.stop()
+                                    KGLOBAL_nowView.stop()
                                     dispatch_async(dispatch_get_main_queue()) {
                                         self.showCellularEnablesStreaming(tableView)
                                     }
@@ -365,6 +368,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && foundItem.cloudItem) {
                         isSeekingPlayerState = false
                         MusicManager.sharedInstance.player.stop()
+                        KGLOBAL_nowView.stop()
                         self.showConnectInternet(tableView)
                     }
                 }else{
@@ -442,25 +446,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(needStart:Bool){
         let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
-        if(needStart){
-            baseVC.nowView.start()
-        }else{
-            baseVC.nowView.stop()
-        }
-    
         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
             musicVC.musicTable.reloadData()
         }
     }
     
-    override func viewDidDisappear(animated: Bool) {
-        super.viewDidDisappear(animated)
-        if( KAVplayer != nil && KAVplayer.rate != 0){
-            let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
-            baseVC.nowView.start()
-        }
-    }
-
 }
 
 

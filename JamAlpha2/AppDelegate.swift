@@ -125,7 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let currentVC = topViewController(rootViewController())
         
-        let baseVC = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
+       
         if(MusicManager.sharedInstance.player != nil){
             MusicManager.sharedInstance.player.shuffleMode = self.shuffleMode
             MusicManager.sharedInstance.player.repeatMode = repeatMode
@@ -219,13 +219,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
                 if(MusicManager.sharedInstance.player.playbackState == .Playing){
-                    baseVC.nowView.start()
+                    KGLOBAL_nowView.start()
                 }
                 if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
                     MusicManager.sharedInstance.avPlayer.removeAllItems()
                 }
             }else{
-                baseVC.nowView.stop()
+                KGLOBAL_nowView.stop()
             }
         }
         

@@ -189,6 +189,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                         
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
+                            KGLOBAL_nowView.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
@@ -229,6 +230,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && item.cloudItem) {
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
+                KGLOBAL_nowView.stop()
                 self.showConnectInternet(tableView)
             }
             

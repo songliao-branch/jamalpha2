@@ -31,7 +31,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     //for transition view animator
     var animator: CustomTransitionAnimation?
-    var nowView: VisualizerView!
     
     var songCount: Int64 = 0
     
@@ -130,7 +129,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
       
         songVC.selectedFromTable = false
         songVC.musicViewController = self
-        songVC.nowView = self.nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
@@ -414,7 +412,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     while (isSeekingPlayerState) {
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
-                            self.nowView.stop()
+                            KGLOBAL_nowView.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                               self.showCellularEnablesStreaming(tableView)
                             }
@@ -430,7 +428,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                                     songVC.transitioningDelegate = self.animator
                                     self.animator!.attachToViewController(songVC)
                                     songVC.musicViewController = self //for goToArtist and goToAlbum from here
-                                    songVC.nowView = self.nowView
+                                    
                                     self.presentViewController(songVC, animated: true, completion: {
                                         completed in
                                         //reload table to show loudspeaker icon on current selected row
@@ -455,7 +453,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     songVC.transitioningDelegate = self.animator
                     self.animator!.attachToViewController(songVC)
                     songVC.musicViewController = self //for goToArtist and goToAlbum from here
-                    songVC.nowView = self.nowView
+          
                     self.presentViewController(songVC, animated: true, completion: {
                         completed in
                         //reload table to show loudspeaker icon on current selected row
@@ -473,7 +471,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
-            artistVC.nowView = self.nowView
             artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
@@ -485,7 +482,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.musicViewController = self
-            albumVC.nowView = self.nowView
             albumVC.theAlbum = albumsSorted[indexToBePlayed]
             
             self.showViewController(albumVC, sender: self)
@@ -500,7 +496,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             if theArtist == artist.artistName {
                 let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
                 artistVC.musicViewController = self
-                artistVC.nowView = self.nowView
                 artistVC.theArtist = artist
                 self.showViewController(artistVC, sender: self)
                 print("jumping to artist \(theArtist)")
@@ -514,7 +509,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             if theAlbum == album.albumTitle {
                 let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
                 albumVC.musicViewController = self
-                albumVC.nowView = self.nowView
                 albumVC.theAlbum = album
                 self.showViewController(albumVC, sender: self)
                 print("jumping to album \(theAlbum)")

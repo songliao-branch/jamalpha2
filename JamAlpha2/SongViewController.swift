@@ -34,8 +34,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var freefallTime:Float = 3.0
     var minfont: CGFloat = 15
     
-    var nowView: VisualizerView!
-
     var selectedFromTable = true
     
     var viewDidFullyDisappear = true
@@ -252,8 +250,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 self.musicViewController = musicVC
             }
-            self.nowView = baseVC.nowView
-            self.nowView.stop()
+            KGLOBAL_nowView.stop()
             CoreDataManager.initializeSongToDatabase(songNeedPurchase)
         }
         
@@ -2231,13 +2228,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         if isDemoSong {
             if avPlayer.rate > 0 {
-                if nowView != nil {
-                    self.nowView.start()
-                }
+                KGLOBAL_nowView.start()
+
             } else {
-                if nowView != nil {
-                    self.nowView.stop()
-                }
+                KGLOBAL_nowView.stop()
             }
             
             if avPlayer.rate > 0 {
@@ -2248,13 +2242,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         }else{
             if player.playbackState == .Playing {
-                if nowView != nil {
-                    self.nowView.start()
-                }
+               KGLOBAL_nowView.start()
             } else {
-                if nowView != nil {
-                    self.nowView.stop()
-                }
+               KGLOBAL_nowView.stop()
             }
             
             if player.playbackState == MPMusicPlaybackState.Playing {
