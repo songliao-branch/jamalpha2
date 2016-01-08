@@ -231,6 +231,7 @@ class MusicManager: NSObject {
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
                 player.prepareToPlay()
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
+                
             } else {
                 if queueChanged { // if we selected the same song from a different queue this time
                     let lastPlaybackTime = player.currentPlaybackTime

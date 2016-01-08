@@ -10,7 +10,7 @@ import Alamofire
 import SwiftyJSON
 import MediaPlayer
 
-class SearchResult {
+class SearchResult:NSObject {
     
     var wrapperType: String!
     var kind: String!
