@@ -97,8 +97,14 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 return
             }
             if player.nowPlayingItem != nil {
-                if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                    self.musicTable.reloadData()
+                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
+                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.musicTable.reloadData()
+                    }
+                }else{
+                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.musicTable.reloadData()
+                    }
                 }
             }
         }
@@ -265,8 +271,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 if(song.isKindOfClass(MPMediaItem)){
                     if (song as! MPMediaItem).cloudItem{
                         cell.coverImage.alpha = 0.8
-                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(0.4)
-                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(0.4)
+                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(0.5)
+                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(0.5)
                     }else{
                         cell.coverImage.alpha = 1
                         cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
@@ -279,11 +285,9 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 }
             }else{
                 if(song.isKindOfClass(MPMediaItem)){
-                    if (song as! MPMediaItem).cloudItem{
                         cell.coverImage.alpha = 1
                         cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
                         cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
-                    }
                 }
             }
             

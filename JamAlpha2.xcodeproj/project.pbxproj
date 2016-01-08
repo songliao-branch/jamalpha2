@@ -377,7 +377,6 @@
 		E44358FC1B1947120091E926 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				10FFBAAE1C3F9973003DF489 /* NetworkManager */,
 				E431BA991B913A0900E32A0B /* MusicManager */,
 				842DB0241B55EA8B00B4E165 /* TimeNumber.swift */,
 				84DA61A31B4E211100979A42 /* Lyric.swift */,
@@ -538,6 +537,7 @@
 		E48F22651BF5920300F24962 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				10FFBAAE1C3F9973003DF489 /* NetworkManager */,
 				E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */,
 				E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */,
 			);
