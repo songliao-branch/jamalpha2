@@ -15,7 +15,7 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
-    var string3BackgroundImage: [String] = ["fret0", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string", "3-string"]
+    var string3BackgroundImage: [String] = ["iPhone5_fret0", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret"]
     
     var playButtonImageView: UIImageView!
     
@@ -272,6 +272,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
+        PlayChordsManager.sharedInstance.initialSoundBank()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -465,21 +466,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func stepUpPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
-        currentNote.stepUp()
-        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
-        let center = tuningValueLabels[button.tag].center
-        tuningValueLabels[button.tag].sizeToFit()
-        tuningValueLabels[button.tag].center = center
+        if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: true) {
+            currentNote.stepUp()
+            tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+            let center = tuningValueLabels[button.tag].center
+            tuningValueLabels[button.tag].sizeToFit()
+            tuningValueLabels[button.tag].center = center
+        }
     }
     
     func stepDownPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
-        currentNote.stepDown()
-        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
-        let center = tuningValueLabels[button.tag].center
-
-        tuningValueLabels[button.tag].sizeToFit()
-         tuningValueLabels[button.tag].center = center
+        if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: false) {
+            currentNote.stepDown()
+            tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+            let center = tuningValueLabels[button.tag].center
+            tuningValueLabels[button.tag].sizeToFit()
+             tuningValueLabels[button.tag].center = center
+        }
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
@@ -771,7 +775,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
-        cell.imageView.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
+        cell.imageView.backgroundColor = UIColor.clearColor()
         cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
         

@@ -1,6 +1,5 @@
 //
 //  PlaySoundManager.swift
-//  aaa
 //
 //  Created by Jun Zhou on 1/5/16.
 //  Copyright © 2016 myStride. All rights reserved.
@@ -17,6 +16,9 @@ class PlayChordsManager: NSObject {
     var arpeggioDelay: CFTimeInterval = 0
     var arpeggioNotes: NSArray = NSArray()
     var arpeggioIndex: Int = 0
+    let standardFret0Midi = [76, 71, 67, 62, 57, 52]
+    var fret0Midi = [76, 71, 67, 62, 57, 52]
+    
     
     class var sharedInstance: PlayChordsManager {
         struct Static {
@@ -35,10 +37,27 @@ class PlayChordsManager: NSObject {
     }
     
     func convertIndexToMidi(index: Int) -> Int32 {
-        let fret0Midi = [52, 57, 62, 67, 71, 76]
+        
         let stringIndex = index / 100
         let fretIndex = index - stringIndex * 100
-        return Int32(fret0Midi[stringIndex] + fretIndex)
+        return Int32(fret0Midi[stringIndex - 1] + fretIndex)
+    }
+    
+    func tuningString(stringIndex: Int, up: Bool) -> Bool {
+        if up {
+            let temp = fret0Midi[stringIndex - 1] + 1
+            if temp <= standardFret0Midi[stringIndex - 1] + 5 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
+                fret0Midi[stringIndex - 1]++
+                return true
+            }
+        } else {
+            let temp = fret0Midi[stringIndex - 1] - 1
+            if  temp <= standardFret0Midi[stringIndex - 1] + 5 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
+                fret0Midi[stringIndex - 1]--
+                return true
+            }
+        }
+        return false
     }
     
     func convertContentToIndexArray(content: String) -> [Int32] {
@@ -62,7 +81,7 @@ class PlayChordsManager: NSObject {
     
     func initialSoundBank() {
         self.soundBank = SoundBankPlayer()
-        self.soundBank.setSoundBank("GuitarSoundFont")
+        self.soundBank.setSoundBank("test")
         self.playingArpeggio = false
     }
     

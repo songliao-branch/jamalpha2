@@ -23,7 +23,7 @@ class FretCell: UICollectionViewCell {
 
         imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height * 11 / 12))
         //imageView.image = UIImage(named: "3-string")
-        imageView.contentMode = UIViewContentMode.ScaleAspectFit
+        imageView.contentMode = UIViewContentMode.ScaleAspectFill
         contentView.addSubview(imageView)
         
         fretNumberLabel = UILabel(frame: CGRect(x: 0, y: imageView.frame.size.height, width: frame.size.width, height: frame.size.height * 1 / 12))
