@@ -54,6 +54,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        NetworkManager.sharedInstance.tableView = self.musicTable
+    }
+    
     func loadAndSortMusic() {
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
@@ -267,7 +272,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
             cell.mainTitle.text = song.getTitle()
             cell.subtitle.text = song.getArtist()
-            if(NetworkManager.sharedInstance.isReachableViaWWAN || !NetworkManager.sharedInstance.isReachable){
+            
+            if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable()){
                 if(song.isKindOfClass(MPMediaItem)){
                     if (song as! MPMediaItem).cloudItem{
                         cell.coverImage.alpha = 0.8
@@ -402,31 +408,21 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 MusicManager.sharedInstance.avPlayer.removeAllItems()
             }
             
-            ///////////////////////////////////////////
-            if((songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.isReachableViaWWAN && !isDemoSong){
+            //We use a background thread to constantly check player's current playing item, and we only pop up
+            if((songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() && !isDemoSong) {
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    while (key){
+                    while (key) {
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             self.nowView.stop()
                             dispatch_async(dispatch_get_main_queue()) {
-                                let alert = UIAlertController(title: "Connect to Wi-Fi to Play Music", message: "To play songs when you aren't connnected to Wi-Fi, turn on cellular playback in Music in the Settings app", preferredStyle: UIAlertControllerStyle.Alert)
-                                let url:NSURL! = NSURL(string : "prefs:root=MUSIC")
-                                let goToMusicSetting = UIAlertAction(title: "Settings", style: UIAlertActionStyle.Default, handler: {
-                                    finished in
-                                    UIApplication.sharedApplication().openURL(url)
-                                })
-                                let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: nil)
-                                alert.addAction(goToMusicSetting)
-                                alert.addAction(cancel)
-                                self.presentViewController(alert, animated: true, completion: {
-                                    completed in
-                                    self.musicTable.reloadData()
-                                })
+                              self.showCellularEnablesStreaming(tableView)
                             }
                             key = false
+                        
                             break
                         }
+                     
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
                             if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                 dispatch_async(dispatch_get_main_queue()) {
@@ -447,7 +443,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                         }
                     }
                 }
-            }else if (NetworkManager.sharedInstance.isReachableViaWiFi || !songsSorted[indexToBePlayed].cloudItem || isDemoSong ){
+            }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem || isDemoSong ){
                     key = false
                     if(!isDemoSong){
                         if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
@@ -465,22 +461,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                         //reload table to show loudspeaker icon on current selected row
                         tableView.reloadData()
                     })
-            } else if ( !NetworkManager.sharedInstance.isReachable && songsSorted[indexToBePlayed].cloudItem) {
+            } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && songsSorted[indexToBePlayed].cloudItem) {
                 key = false
                 MusicManager.sharedInstance.player.stop()
-                let alert = UIAlertController(title: "Connect to Wi-Fi or Cellular to Play Music", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-                let url:NSURL! = NSURL(string : "prefs:root=Cellular")
-                let goToMusicSetting = UIAlertAction(title: "Settings", style: UIAlertActionStyle.Default, handler: {
-                    finished in
-                    UIApplication.sharedApplication().openURL(url)
-                })
-                let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: nil)
-                alert.addAction(goToMusicSetting)
-                alert.addAction(cancel)
-                self.presentViewController(alert, animated: true, completion: {
-                    completed in
-                    self.musicTable.reloadData()
-                })
+                self.showConnectInternet(tableView)
             }
             //////////////////////////////////////////////////////////
         }

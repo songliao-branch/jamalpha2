@@ -27,13 +27,14 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
     }
-
+    
     
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        NetworkManager.sharedInstance.tableView = artistTable
     }
     
     func registerMusicPlayerNotificationForSongChanged(){
@@ -140,7 +141,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         // assign empty string if no track number
         cell.trackNumberLabel.text = song.albumTrackNumber > 0 ? String(song.albumTrackNumber) : ""
         
-        if(NetworkManager.sharedInstance.isReachableViaWWAN || !NetworkManager.sharedInstance.isReachable){
+        if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable() ){
                 if (song ).cloudItem{
                     cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(0.5)
                     cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(0.5)
@@ -182,7 +183,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         MusicManager.sharedInstance.avPlayer.removeAllItems()
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         ///////////////////////////////////////////
-        if((artistAllSongs[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.isReachableViaWWAN){
+        if((artistAllSongs[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                 while (key){
                     
@@ -190,20 +191,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                         MusicManager.sharedInstance.player.stop()
                         self.nowView.stop()
                         dispatch_async(dispatch_get_main_queue()) {
-                            let alert = UIAlertController(title: "Connect to Wi-Fi to Play Music", message: "To play songs when you aren't connnected to Wi-Fi, turn on cellular playback in Music in the Settings app", preferredStyle: UIAlertControllerStyle.Alert)
-                            let url:NSURL! = NSURL(string : "prefs:root=MUSIC")
-                            let goToMusicSetting = UIAlertAction(title: "Settings", style: UIAlertActionStyle.Default, handler: {
-                                finished in
-                                UIApplication.sharedApplication().openURL(url)
-                            })
-                            let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: nil)
-                            alert.addAction(goToMusicSetting)
-                            alert.addAction(cancel)
-                            self.presentViewController(alert, animated: true, completion: {
-                                completed in
-                                self.artistTable.reloadData()
-                            })
-                        }
+                            self.showCellularEnablesStreaming(tableView)                        }
                         key = false
                         break
                     }
@@ -227,7 +215,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                     }
                 }
             }
-        }else if (NetworkManager.sharedInstance.isReachableViaWiFi || !artistAllSongs[indexToBePlayed].cloudItem){
+        }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !artistAllSongs[indexToBePlayed].cloudItem){
             key = false
             if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
                 MusicManager.sharedInstance.player.play()
@@ -242,22 +230,10 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                 //reload table to show loudspeaker icon on current selected row
                 tableView.reloadData()
             })
-        } else if ( !NetworkManager.sharedInstance.isReachable && artistAllSongs[indexToBePlayed].cloudItem) {
+        } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && artistAllSongs[indexToBePlayed].cloudItem) {
             key = false
             MusicManager.sharedInstance.player.stop()
-            let alert = UIAlertController(title: "Connect to Wi-Fi or Cellular to Play Music", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-            let url:NSURL! = NSURL(string : "prefs:root=Cellular")
-            let goToMusicSetting = UIAlertAction(title: "Settings", style: UIAlertActionStyle.Default, handler: {
-                finished in
-                UIApplication.sharedApplication().openURL(url)
-            })
-            let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: nil)
-            alert.addAction(goToMusicSetting)
-            alert.addAction(cancel)
-            self.presentViewController(alert, animated: true, completion: {
-                completed in
-                self.artistTable.reloadData()
-            })
+            self.showConnectInternet(tableView)
         }
         //////////////////////////////////////////////////////////
     }

@@ -55,8 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let credentialsProvider = AWSCognitoCredentialsProvider(regionType: CognitoRegionType, identityPoolId: CognitoIdentityPoolId)
         let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
         AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
-        let temp = NetworkManager.sharedInstance.isReachable
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~\(temp)")
+        NetworkManager.sharedInstance.reachability.isReachable()
         return true
     }
     

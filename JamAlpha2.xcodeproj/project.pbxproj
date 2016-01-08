@@ -527,6 +527,7 @@
 		E48AE2D01B955BA30044CFDB /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				10FFBAAE1C3F9973003DF489 /* NetworkManager */,
 				E48F22651BF5920300F24962 /* Models */,
 				E48AE2D11B955BB40044CFDB /* APIManager.swift */,
 				10FFBAA81C3A41EB003DF489 /* SearchAPI.swift */,
@@ -537,7 +538,6 @@
 		E48F22651BF5920300F24962 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				10FFBAAE1C3F9973003DF489 /* NetworkManager */,
 				E48F22661BF5923F00F24962 /* DownloadedTabsSet.swift */,
 				E42032BF1BFA977600A5D36D /* DownloadedLyricsSet.swift */,
 			);
@@ -658,7 +658,7 @@
 				TargetAttributes = {
 					E488773C1B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 978SMNLLT3;
+						DevelopmentTeam = 3ME9DMV2GU;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
