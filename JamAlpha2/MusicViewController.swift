@@ -364,6 +364,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var isDemoSong = false
+        var key = true
         if pageIndex == 0 {
             KGLOBAL_init_queue.suspended = true
             
@@ -403,10 +404,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             
             ///////////////////////////////////////////
             if((songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.isReachableViaWWAN && !isDemoSong){
-                var counter = 0
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    while (true){
-                        
+                    while (key){
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             self.nowView.stop()
@@ -425,9 +424,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                                     self.musicTable.reloadData()
                                 })
                             }
+                            key = false
                             break
                         }
-                        if(counter++ == 4){
+                        if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
                             if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                 dispatch_async(dispatch_get_main_queue()) {
                                     songVC.selectedFromTable = true
@@ -441,15 +441,19 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                                         tableView.reloadData()
                                     })
                                 }
+                                key = false
                                 break
                             }
                         }
                     }
                 }
             }else if (NetworkManager.sharedInstance.isReachableViaWiFi || !songsSorted[indexToBePlayed].cloudItem || isDemoSong ){
-                if(!isDemoSong){
-                   MusicManager.sharedInstance.player.play()
-                }
+                    key = false
+                    if(!isDemoSong){
+                        if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
+                            MusicManager.sharedInstance.player.play()
+                        }
+                    }
                 
                     songVC.selectedFromTable = true
                     songVC.transitioningDelegate = self.animator
@@ -462,6 +466,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                         tableView.reloadData()
                     })
             } else if ( !NetworkManager.sharedInstance.isReachable && songsSorted[indexToBePlayed].cloudItem) {
+                key = false
                 MusicManager.sharedInstance.player.stop()
                 let alert = UIAlertController(title: "Connect to Wi-Fi or Cellular to Play Music", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
                 let url:NSURL! = NSURL(string : "prefs:root=Cellular")
@@ -480,6 +485,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             //////////////////////////////////////////////////////////
         }
         else if pageIndex == 1 {
+            key = false
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
@@ -490,7 +496,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             
         }
         else if pageIndex == 2 {
-            
+            key = false
             let indexToBePlayed = findIndexToBePlayed(albumsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
