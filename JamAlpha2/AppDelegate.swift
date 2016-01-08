@@ -1,5 +1,4 @@
-//
-//  AppDelegate.swift
+
 //  JamAlpha2
 //
 //  Created by Song Liao on 5/26/15.
