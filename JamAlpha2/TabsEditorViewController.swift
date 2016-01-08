@@ -774,6 +774,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         cell.imageView.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
         cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
+        
+        
         for subview in cell.contentView.subviews {
             if subview.isKindOfClass(UIButton){
                 subview.removeFromSuperview()
@@ -1042,7 +1044,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.completeStringView.backgroundColor = UIColor.clearColor()
         
         self.completeImageView.frame = CGRectMake(0, 0, 5 * self.trueWidth, 15 / 20 * self.trueHeight)
-        self.completeImageView.image = UIImage(named: "6stringFretboard")
+        self.completeImageView.image = UIImage(named: "iPhone5_fullFretboard")
         self.completeStringView.addSubview(completeImageView)
         self.editView.addSubview(completeStringView)
         
