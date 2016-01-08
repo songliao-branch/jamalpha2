@@ -103,7 +103,6 @@ class MusicManager: NSObject {
             searchVC.searchResultTableView.reloadData() 
         }
        
-        
         if(currentVC.isKindOfClass(SongViewController)){
             let currentSongVC = currentVC as! SongViewController
             if (currentSongVC.isSongNeedPurchase) {
@@ -112,6 +111,19 @@ class MusicManager: NSObject {
                     setIndexInTheQueue(0)
                     currentSongVC.recoverToNormalSongVC(purchasedItem)
                 }
+            }
+        }
+        
+        let thirdBarItemVC = (rootViewController as! TabBarController).childViewControllers[2]
+        
+        if thirdBarItemVC.childViewControllers.count > 1 { //means navigation controller has at least pushed one view controller (the root navigation controller is UserProfileViewController)
+            let firstPushedVC = thirdBarItemVC.childViewControllers[1]
+            if firstPushedVC.isKindOfClass(MyTabsAndLyricsViewController) {
+                let myTabsLyricsVC = firstPushedVC as! MyTabsAndLyricsViewController
+                myTabsLyricsVC.loadData()
+            } else if firstPushedVC.isKindOfClass(MyFavoritesViewController) {
+                let myFavoritesVC = firstPushedVC as! MyFavoritesViewController
+                myFavoritesVC.loadData()
             }
         }
     }
@@ -176,10 +188,6 @@ class MusicManager: NSObject {
             print(MPMediaItemPropertyReleaseDate)
             
             queueChanged = true
-            //testing
-            for song in collection {
-                print("\(_TAG) setting up queue of song: \(song.title!)")
-            }
             return
         }
         

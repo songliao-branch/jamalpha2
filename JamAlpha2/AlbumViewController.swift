@@ -119,7 +119,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var key = true
+        var isSeekingPlayerState = true
         KGLOBAL_init_queue.suspended = true
        
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
@@ -133,7 +133,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         ///////////////////////////////////////////
         if((songsInTheAlbum[indexPath.row]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                while (key){
+                while (isSeekingPlayerState){
                     
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
@@ -141,7 +141,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)
                         }
-                        key = false
+                        isSeekingPlayerState = false
                         break
                     }
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -158,14 +158,14 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                                     tableView.reloadData()
                                 })
                             }
-                            key = false
+                            isSeekingPlayerState = false
                             break
                         }
                     }
                 }
             }
         }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !(songsInTheAlbum[indexPath.row]).cloudItem){
-            key = false
+            isSeekingPlayerState = false
             if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
                 MusicManager.sharedInstance.player.play()
             }
@@ -180,7 +180,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                 tableView.reloadData()
             })
         } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && (songsInTheAlbum[indexPath.row]).cloudItem) {
-            key = false
+            isSeekingPlayerState = false
             MusicManager.sharedInstance.player.stop()
             self.showConnectInternet(tableView)
         }

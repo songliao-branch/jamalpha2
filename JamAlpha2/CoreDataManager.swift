@@ -65,7 +65,6 @@ extension MPMediaItem: Findable {
         }
         return nil
     }
-
 }
 
 extension SearchResult: Findable {
@@ -103,11 +102,6 @@ extension SearchResult: Findable {
     func getArtWork() -> MPMediaItemArtwork? {
         return nil
     }
-    
-    func cloudItem() -> Bool {
-        return true
-    }
-    
 }
 
 extension AVPlayerItem: Findable {

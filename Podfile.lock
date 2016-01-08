@@ -30,6 +30,7 @@ PODS:
   - Reachability (3.2)
   - RSKImageCropper (1.4.1)
   - SwiftyJSON (2.3.2)
+  - YouTubePlayer (0.3.0)
 
 DEPENDENCIES:
   - Alamofire (~> 3.0)
@@ -44,6 +45,7 @@ DEPENDENCIES:
   - Reachability
   - RSKImageCropper
   - SwiftyJSON (from `https://github.com/SwiftyJSON/SwiftyJSON.git`)
+  - YouTubePlayer
 
 EXTERNAL SOURCES:
   SwiftyJSON:
@@ -69,5 +71,6 @@ SPEC CHECKSUMS:
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   RSKImageCropper: 98ae426eb4eb11b733ff87f8e2542a480f4fa8e6
   SwiftyJSON: 04ccea08915aa0109039157c7974cf0298da292a
+  YouTubePlayer: 88713a96c356f2c88da8925eb61438eda88bcd57
 
 COCOAPODS: 0.39.0

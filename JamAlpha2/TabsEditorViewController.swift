@@ -9,10 +9,11 @@
 import UIKit
 import MediaPlayer
 import AVFoundation
+import YouTubePlayer
 
 let kmovingMainNoteSliderHeight:CGFloat = 26
 
-class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate {
+class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
     var playButtonImageView: UIImageView!
     
@@ -163,6 +164,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var currentSelectedSpecificTab: NormalTabs!
     var countDownNumber: Float = 3
     
+    //MARK: tutorials
+    var tutorialOverlay: UIView!
+    var videoPlayerView: YouTubePlayerView!
+    
+    
     // Mark: Main view data array structure
     class mainViewData {
         var fretNumber: Int = Int()
@@ -264,10 +270,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
-        
-        
+    }
+    
+    override func viewDidAppear(animated: Bool) {
         // MARK: add exist chord to tab editor view
         self.addChordToEditorView(theSong)
+        
+        if NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorial) {
+            setUpTutorial()
+        }
     }
     
     // MARK: Notification
@@ -480,8 +491,57 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    func setUpTutorial() {
+        tutorialOverlay = UIView(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
+        tutorialOverlay.backgroundColor = UIColor.tutorialBackgroundGray()
+        self.view.addSubview(tutorialOverlay)
+        
+        let playTutorialButton = UIButton(frame: CGRect(x: 0, y: 0, width: 223, height: 86))
+        playTutorialButton.setImage(UIImage(named: "play_tutorial"), forState: .Normal)
+        playTutorialButton.addTarget(self, action: "playTutorial", forControlEvents: .TouchUpInside)
+        playTutorialButton.center = CGPoint(x: trueWidth/2, y: trueHeight/2 )
+        tutorialOverlay.addSubview(playTutorialButton)
+        
+        let skipTutorialButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(playTutorialButton.frame), width: 70, height: 38))
+        skipTutorialButton.setImage(UIImage(named: "skip"), forState: .Normal)
+        skipTutorialButton.addTarget(self, action: "skipTutorial", forControlEvents: .TouchUpInside)
+        skipTutorialButton.center.x = trueWidth/2
+        tutorialOverlay.addSubview(skipTutorialButton)
+    }
+    
+    func playTutorial() {
+        videoPlayerView = YouTubePlayerView(frame: self.view.frame)
+        videoPlayerView.delegate = self
+        let url = NSURL(string: "https://www.youtube.com/watch?v=5ZDLU4ruk-M")!
+        videoPlayerView.loadVideoURL(url)
+        self.view.addSubview(videoPlayerView)
+    }
+    
+    func skipTutorial() {
+        tutorialOverlay.hidden = true
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
+    }
+    
+    //MARK: YouTubePlayerView delegate methods
+    func playerReady(videoPlayer: YouTubePlayerView) {
+        
+    }
+
+    func playerStateChanged(videoPlayer: YouTubePlayerView, playerState: YouTubePlayerState) {
+        if playerState == .Ended || playerState == .Paused {
+            tutorialOverlay.hidden = true
+            videoPlayerView.hidden = true
+            NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
+        }
+    }
+    
+    func playerQualityChanged(videoPlayer: YouTubePlayerView, playbackQuality: YouTubePlaybackQuality) {
+        
+    }
+    
     // MARK: collection view functions, include required functions and move cell functions
     var tapGesture:UITapGestureRecognizer!
+    
     func initCollectionView() {
         for var i = 0; i < 25; i++ {
             fretsNumber.append(i)
@@ -2440,32 +2500,93 @@ extension TabsEditorViewController {
         update()
     }
 
-    
+    func checkChordsWithCoredata(chords: [Chord], completion: ((complete: [Chord]) -> Void)) {
+        var needAddNewChords: Bool = false
+        var newChords: [Chord] = chords
+        var needAddNewChordsArray: [Tab] = [Tab]()
+        for item in chords {
+            let index = self.getBasicNoteIndex(item.tab.contentArray)
+            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
+                continue
+            } else {
+                needAddNewChords = true
+                needAddNewChordsArray.append(item.tab)
+            }
+        }
+        
+        if needAddNewChords {
+            var nameString: String = ""
+            var set:[String: Int] = [String: Int]()
+            for item in needAddNewChordsArray {
+                set[item.name] = 0
+            }
+            for item in set {
+                nameString = nameString + item.0 + ", "
+            }
+            let alertController = UIAlertController(title: nil, message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
+            
+            alertController.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default,handler: {
+                action in
+                for var i = chords.count - 1; i >= 0; i-- {
+                    let index = self.getBasicNoteIndex(chords[i].tab.contentArray)
+                    if let _ = TabsDataManager.getUniqueTab(index, name: chords[i].tab.name, content: chords[i].tab.content) {
+                        continue
+                    } else {
+                        newChords.removeAtIndex(i)
+                    }
+                }
+                completion(complete: newChords)
+            }))
+            
+            alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler: {
+                action in
+                for item in needAddNewChordsArray {
+                    let index = self.getBasicNoteIndex(item.contentArray)
+                    if let _ = TabsDataManager.getUniqueTab(index, name: item.name, content: item.content) {
+                        continue
+                    } else {
+                        TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
+                    } 
+                }
+                completion(complete: newChords)
+            }))
+            
+            self.presentViewController(alertController, animated: true, completion: nil)
+        } else {
+            completion(complete: newChords)
+        }
+    }
+
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: Findable) {
         let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
-        let chord: [Chord] = tabs.0
+        var chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
         let visible: Bool = tabs.4
         
         //let visible
         if chord.count > 0 {
-            addTabsFromCoreDataToMainViewDataArray(chord)
-            addTabsFromCoreDataToMusicControlView(chord)
+            self.checkChordsWithCoredata(chord, completion: {
+                complete in
+                self.addTabsFromCoreDataToMainViewDataArray(complete)
+                self.addTabsFromCoreDataToMusicControlView(complete)
+                let tuningValues = Tuning.toArray(tuning)
+                for i in 0..<self.tuningValueLabels.count {
+                    self.tuningValueLabels[i].text = tuningValues[i]
+                }
+                self.capoStepper.value = Double(capoValue)
+                self.capoLabel.text = "Capo: \(capoValue)"
+                self.isPublic = visible
+                if self.isPublic {
+                    self.privacyButton.setTitle("Public", forState: .Normal)
+                } else {
+                    self.privacyButton.setTitle("Private", forState: .Normal)
+                }
+            })
             
-            let tuningValues = Tuning.toArray(tuning)
-            for i in 0..<tuningValueLabels.count {
-                tuningValueLabels[i].text = tuningValues[i]
-            }
-            capoStepper.value = Double(capoValue)
-            capoLabel.text = "Capo: \(capoValue)"
-            isPublic = visible
-            if isPublic {
-                privacyButton.setTitle("Public", forState: .Normal)
-            } else {
-                privacyButton.setTitle("Private", forState: .Normal)
-            }
+            
+
         }
     }
 }
@@ -3058,7 +3179,7 @@ extension TabsEditorViewController {
             }
         }
         if needAlert {
-            let alertController = UIAlertController(title: "Notice", message: "This operation will delete all '\(self.currentSelectedSpecificTab.name)' you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
+            let alertController = UIAlertController(title: nil, message: "This operation will delete all '\(self.currentSelectedSpecificTab.name)' you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
                 action in
                 self.stopSpecificJiggling()
@@ -3165,6 +3286,30 @@ extension TabsEditorViewController {
 
         }
         tempAllTabsOnMusicLine.removeAll()
+    }
+}
+
+extension TabsEditorViewController {
+    
+    func setupAudioPlayerWithFile(file: NSString, type: NSString) -> AVAudioPlayer? {
+        let path = NSBundle.mainBundle().pathForResource(file as String, ofType: type as String)
+        let url = NSURL.fileURLWithPath(path!)
+        var audioPlayer: AVAudioPlayer?
+        do {
+            try audioPlayer = AVAudioPlayer(contentsOfURL: url)
+        } catch {
+            print("Player not available")
+        }
+        return audioPlayer
+    }
+    
+    func playTheSound(urls: [NSString]) {
+        var tempSoundArray: [AVAudioPlayer] = [AVAudioPlayer]()
+        for item in urls {
+            let tempSound = setupAudioPlayerWithFile(item, type: ".wav")
+            tempSoundArray.append(tempSound!)
+        }
+        
     }
 }
 

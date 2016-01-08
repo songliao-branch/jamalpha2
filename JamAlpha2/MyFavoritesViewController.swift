@@ -19,8 +19,12 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     override func viewDidLoad() {
         super.viewDidLoad()
         createTransitionAnimation()
-        loadData()
         setUpNavigationBar()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        loadData()
     }
     
     func createTransitionAnimation(){
@@ -31,7 +35,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
 
     func loadData() {
         
-        songs =  CoreDataManager.getFavorites()
+        songs = CoreDataManager.getFavorites()
         for song in songs {
             song.findMediaItem()
         }
@@ -63,21 +67,30 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
+        
         let song = songs[indexPath.row]
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
-        // TODO: fix this crash bug
-        // songVC.transitioningDelegate = self.animator
-        // self.animator!.attachToViewController(songVC)
+        
         if let item = song.mediaItem {
-            MusicManager.sharedInstance.setPlayerQueue([item])  //TODO: for a selection?
+            print("item found title:\(item.title!)")
+            MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
             MusicManager.sharedInstance.avPlayer.pause()
             MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             MusicManager.sharedInstance.avPlayer.removeAllItems()
-        } else if song.artist == "Alex Lisell" {
+            
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            
+            self.presentViewController(songVC, animated: true, completion: nil)
+            
+            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            
+            
+        }  else if song.artist == "Alex Lisell" { //if demo song
             
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
@@ -85,12 +98,28 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             MusicManager.sharedInstance.player.currentPlaybackTime = 0
             songVC.isDemoSong = true
             
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            
+            self.presentViewController(songVC, animated: true, completion: nil)
+            
+            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            
+            
+        } else { //if the mediaItem is not found, and an searchResult is found
+            song.findSearchResult( {
+                result in
+                
+                songVC.isSongNeedPurchase = true
+                songVC.songNeedPurchase = result
+                songVC.reloadBackgroundImageAfterSearch(result)
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: nil)
+                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                
+            })
         }
-        
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
-        
-        self.presentViewController(songVC, animated: true, completion: nil)
-        self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+
     }
 }

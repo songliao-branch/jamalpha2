@@ -35,8 +35,12 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         super.viewDidLoad()
         self.setUpNavigationBar()
         createTransitionAnimation()
-        loadData()
         setUpStatusView()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        loadData()
     }
     
     func createTransitionAnimation(){
@@ -169,14 +173,23 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
+
         if let item = song.mediaItem {
-            print("item found title:\(item.title!)")
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
             MusicManager.sharedInstance.avPlayer.pause()
             MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             MusicManager.sharedInstance.avPlayer.removeAllItems()
-        } else if song.artist == "Alex Lisell" {
+            
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            
+            self.presentViewController(songVC, animated: true, completion: nil)
+            
+            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+
+            
+        }  else if song.artist == "Alex Lisell" { //if demo song
             
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
@@ -184,15 +197,30 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             MusicManager.sharedInstance.player.currentPlaybackTime = 0
             songVC.isDemoSong = true
             
-        }// TODO: if demo song
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
-        
-        self.presentViewController(songVC, animated: true, completion: nil)
-        
-        self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            
+            self.presentViewController(songVC, animated: true, completion: nil)
+            
+            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+
+            
+        } else { //if the mediaItem is not found, and an searchResult is found
+            song.findSearchResult( {
+                result in
+                
+                songVC.isSongNeedPurchase = true
+                songVC.songNeedPurchase = result
+                songVC.reloadBackgroundImageAfterSearch(result)
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: nil)
+                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                
+            })
+        }
     }
-    
+
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.songs.count
     }
