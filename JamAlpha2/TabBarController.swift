@@ -12,6 +12,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate {
     
     override func viewDidLoad() {
         self.delegate = self
+         (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC = self
     }
     override func shouldAutorotate() -> Bool {
         return false

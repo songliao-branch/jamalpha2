@@ -82,8 +82,9 @@ class MusicManager: NSObject {
         
         reloadCollections()
         
-        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController()
+        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC
         let currentVC = (UIApplication.sharedApplication().delegate as! AppDelegate).topViewController(rootViewController)
+        
         let baseVC = ((rootViewController as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
         let searchVC = ((rootViewController as! TabBarController).childViewControllers[1].childViewControllers[0]) as! SearchViewController
         

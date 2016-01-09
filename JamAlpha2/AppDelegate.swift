@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var shuffleMode:MPMusicShuffleMode!
     var repeatMode:MPMusicRepeatMode!
-
+    var rootVC: UIViewController!
       
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
@@ -56,6 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
         AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
         NetworkManager.sharedInstance.reachability.isReachable()
+
         return true
     }
     
