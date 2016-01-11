@@ -34,7 +34,59 @@
 		BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */; };
 		BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */; };
 		BFFD859C1C407B5C004E7803 /* FFTHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD859B1C407B5C004E7803 /* FFTHelper.mm */; };
-		BFFD859E1C407B80004E7803 /* TunerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD859D1C407B80004E7803 /* TunerManager.swift */; };
+		BFFD859E1C407B80004E7803 /* TunerConstent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD859D1C407B80004E7803 /* TunerConstent.swift */; };
+		BFFD85A21C407BEF004E7803 /* TunerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD85A11C407BEF004E7803 /* TunerViewController.swift */; };
+		BFFD85E81C42F51D004E7803 /* A3.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85B81C42F48E004E7803 /* A3.aif */; };
+		BFFD85E91C42F51D004E7803 /* A3#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85B91C42F48E004E7803 /* A3#.aif */; };
+		BFFD85EA1C42F51D004E7803 /* A4.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85BA1C42F48E004E7803 /* A4.aif */; };
+		BFFD85EB1C42F51D004E7803 /* A4#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85BB1C42F48E004E7803 /* A4#.aif */; };
+		BFFD85EC1C42F51D004E7803 /* A5.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85BC1C42F48E004E7803 /* A5.aif */; };
+		BFFD85ED1C42F51D004E7803 /* A5#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85BD1C42F48E004E7803 /* A5#.aif */; };
+		BFFD85EE1C42F51D004E7803 /* A7.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85BE1C42F48E004E7803 /* A7.aif */; };
+		BFFD85EF1C42F51D004E7803 /* E3.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D51C42F4B8004E7803 /* E3.aif */; };
+		BFFD85F01C42F51D004E7803 /* E4.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D61C42F4B8004E7803 /* E4.aif */; };
+		BFFD85F11C42F51D004E7803 /* G3.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E11C42F4C1004E7803 /* G3.aif */; };
+		BFFD85F21C42F51D004E7803 /* G4.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E21C42F4C1004E7803 /* G4.aif */; };
+		BFFD85F31C42F51D004E7803 /* G4#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E31C42F4C2004E7803 /* G4#.aif */; };
+		BFFD85F41C42F51D004E7803 /* G5.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E41C42F4C2004E7803 /* G5.aif */; };
+		BFFD85F51C42F51D004E7803 /* G5#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E51C42F4C2004E7803 /* G5#.aif */; };
+		BFFD85F61C42F51D004E7803 /* G6.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E61C42F4C2004E7803 /* G6.aif */; };
+		BFFD85F71C42F51D004E7803 /* G6#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E71C42F4C2004E7803 /* G6#.aif */; };
+		BFFD85F81C42F51D004E7803 /* E5.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D71C42F4B8004E7803 /* E5.aif */; };
+		BFFD85F91C42F51D004E7803 /* E6.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D81C42F4B8004E7803 /* E6.aif */; };
+		BFFD85FA1C42F51D004E7803 /* F3.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D91C42F4B8004E7803 /* F3.aif */; };
+		BFFD85FB1C42F51D004E7803 /* F3#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85DA1C42F4B8004E7803 /* F3#.aif */; };
+		BFFD85FC1C42F51D004E7803 /* F4.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85DB1C42F4B8004E7803 /* F4.aif */; };
+		BFFD85FD1C42F51D004E7803 /* F4#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85DC1C42F4B8004E7803 /* F4#.aif */; };
+		BFFD85FE1C42F51D004E7803 /* F5.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85DD1C42F4B8004E7803 /* F5.aif */; };
+		BFFD85FF1C42F51D004E7803 /* F5#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85DE1C42F4B8004E7803 /* F5#.aif */; };
+		BFFD86001C42F51D004E7803 /* F6.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85DF1C42F4B8004E7803 /* F6.aif */; };
+		BFFD86011C42F51D004E7803 /* F6#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85E01C42F4B8004E7803 /* F6#.aif */; };
+		BFFD86021C42F51D004E7803 /* A7#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85BF1C42F48E004E7803 /* A7#.aif */; };
+		BFFD86031C42F51D004E7803 /* B2.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C01C42F499004E7803 /* B2.aif */; };
+		BFFD86041C42F51D004E7803 /* B3.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C11C42F499004E7803 /* B3.aif */; };
+		BFFD86051C42F51D004E7803 /* B4.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C21C42F499004E7803 /* B4.aif */; };
+		BFFD86061C42F51D004E7803 /* B5.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C31C42F499004E7803 /* B5.aif */; };
+		BFFD86071C42F51D004E7803 /* B7.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C41C42F499004E7803 /* B7.aif */; };
+		BFFD86081C42F51D004E7803 /* C3.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C51C42F4A5004E7803 /* C3.aif */; };
+		BFFD86091C42F51D004E7803 /* C3#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C61C42F4A5004E7803 /* C3#.aif */; };
+		BFFD860A1C42F51D004E7803 /* D3.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85CE1C42F4AE004E7803 /* D3.aif */; };
+		BFFD860B1C42F51D004E7803 /* D3#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85CF1C42F4AE004E7803 /* D3#.aif */; };
+		BFFD860C1C42F51D004E7803 /* D4.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D01C42F4AE004E7803 /* D4.aif */; };
+		BFFD860D1C42F51D004E7803 /* D4#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D11C42F4AE004E7803 /* D4#.aif */; };
+		BFFD860E1C42F51D004E7803 /* D5.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D21C42F4AE004E7803 /* D5.aif */; };
+		BFFD860F1C42F51D004E7803 /* D6.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D31C42F4AE004E7803 /* D6.aif */; };
+		BFFD86101C42F51D004E7803 /* D6#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85D41C42F4AE004E7803 /* D6#.aif */; };
+		BFFD86111C42F51D004E7803 /* C4.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C71C42F4A5004E7803 /* C4.aif */; };
+		BFFD86121C42F51D004E7803 /* C4#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C81C42F4A5004E7803 /* C4#.aif */; };
+		BFFD86131C42F51D004E7803 /* C5.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85C91C42F4A5004E7803 /* C5.aif */; };
+		BFFD86141C42F51D004E7803 /* C5#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85CA1C42F4A5004E7803 /* C5#.aif */; };
+		BFFD86151C42F51D004E7803 /* C6.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85CB1C42F4A5004E7803 /* C6.aif */; };
+		BFFD86161C42F51D004E7803 /* C6#.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85CC1C42F4A5004E7803 /* C6#.aif */; };
+		BFFD86171C42F51D004E7803 /* C7.aif in Resources */ = {isa = PBXBuildFile; fileRef = BFFD85CD1C42F4A5004E7803 /* C7.aif */; };
+		BFFD86201C4385C9004E7803 /* mo_audio.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD861C1C4385C9004E7803 /* mo_audio.mm */; };
+		BFFD86211C4385C9004E7803 /* mo_gfx.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD861F1C4385C9004E7803 /* mo_gfx.mm */; };
+		BFFD86241C438605004E7803 /* TunerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86231C438605004E7803 /* TunerManager.mm */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -161,7 +213,63 @@
 		BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GuitarSoundFont.plist; sourceTree = "<group>"; };
 		BFFD859A1C407B5C004E7803 /* FFTHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FFTHelper.h; path = "../../../../Downloads/DetectingAudioFrequency-master/DetectingSoundFrequency/FFTHelper.h"; sourceTree = "<group>"; };
 		BFFD859B1C407B5C004E7803 /* FFTHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FFTHelper.mm; path = "../../../../Downloads/DetectingAudioFrequency-master/DetectingSoundFrequency/FFTHelper.mm"; sourceTree = "<group>"; };
-		BFFD859D1C407B80004E7803 /* TunerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerManager.swift; sourceTree = "<group>"; };
+		BFFD859D1C407B80004E7803 /* TunerConstent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerConstent.swift; sourceTree = "<group>"; };
+		BFFD85A11C407BEF004E7803 /* TunerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerViewController.swift; sourceTree = "<group>"; };
+		BFFD85B81C42F48E004E7803 /* A3.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = A3.aif; sourceTree = "<group>"; };
+		BFFD85B91C42F48E004E7803 /* A3#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A3#.aif"; sourceTree = "<group>"; };
+		BFFD85BA1C42F48E004E7803 /* A4.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = A4.aif; sourceTree = "<group>"; };
+		BFFD85BB1C42F48E004E7803 /* A4#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A4#.aif"; sourceTree = "<group>"; };
+		BFFD85BC1C42F48E004E7803 /* A5.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = A5.aif; sourceTree = "<group>"; };
+		BFFD85BD1C42F48E004E7803 /* A5#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A5#.aif"; sourceTree = "<group>"; };
+		BFFD85BE1C42F48E004E7803 /* A7.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = A7.aif; sourceTree = "<group>"; };
+		BFFD85BF1C42F48E004E7803 /* A7#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A7#.aif"; sourceTree = "<group>"; };
+		BFFD85C01C42F499004E7803 /* B2.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = B2.aif; sourceTree = "<group>"; };
+		BFFD85C11C42F499004E7803 /* B3.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = B3.aif; sourceTree = "<group>"; };
+		BFFD85C21C42F499004E7803 /* B4.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = B4.aif; sourceTree = "<group>"; };
+		BFFD85C31C42F499004E7803 /* B5.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = B5.aif; sourceTree = "<group>"; };
+		BFFD85C41C42F499004E7803 /* B7.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = B7.aif; sourceTree = "<group>"; };
+		BFFD85C51C42F4A5004E7803 /* C3.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = C3.aif; sourceTree = "<group>"; };
+		BFFD85C61C42F4A5004E7803 /* C3#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C3#.aif"; sourceTree = "<group>"; };
+		BFFD85C71C42F4A5004E7803 /* C4.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = C4.aif; sourceTree = "<group>"; };
+		BFFD85C81C42F4A5004E7803 /* C4#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C4#.aif"; sourceTree = "<group>"; };
+		BFFD85C91C42F4A5004E7803 /* C5.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = C5.aif; sourceTree = "<group>"; };
+		BFFD85CA1C42F4A5004E7803 /* C5#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C5#.aif"; sourceTree = "<group>"; };
+		BFFD85CB1C42F4A5004E7803 /* C6.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = C6.aif; sourceTree = "<group>"; };
+		BFFD85CC1C42F4A5004E7803 /* C6#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C6#.aif"; sourceTree = "<group>"; };
+		BFFD85CD1C42F4A5004E7803 /* C7.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = C7.aif; sourceTree = "<group>"; };
+		BFFD85CE1C42F4AE004E7803 /* D3.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = D3.aif; sourceTree = "<group>"; };
+		BFFD85CF1C42F4AE004E7803 /* D3#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D3#.aif"; sourceTree = "<group>"; };
+		BFFD85D01C42F4AE004E7803 /* D4.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = D4.aif; sourceTree = "<group>"; };
+		BFFD85D11C42F4AE004E7803 /* D4#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D4#.aif"; sourceTree = "<group>"; };
+		BFFD85D21C42F4AE004E7803 /* D5.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = D5.aif; sourceTree = "<group>"; };
+		BFFD85D31C42F4AE004E7803 /* D6.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = D6.aif; sourceTree = "<group>"; };
+		BFFD85D41C42F4AE004E7803 /* D6#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D6#.aif"; sourceTree = "<group>"; };
+		BFFD85D51C42F4B8004E7803 /* E3.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = E3.aif; sourceTree = "<group>"; };
+		BFFD85D61C42F4B8004E7803 /* E4.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = E4.aif; sourceTree = "<group>"; };
+		BFFD85D71C42F4B8004E7803 /* E5.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = E5.aif; sourceTree = "<group>"; };
+		BFFD85D81C42F4B8004E7803 /* E6.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = E6.aif; sourceTree = "<group>"; };
+		BFFD85D91C42F4B8004E7803 /* F3.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = F3.aif; sourceTree = "<group>"; };
+		BFFD85DA1C42F4B8004E7803 /* F3#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F3#.aif"; sourceTree = "<group>"; };
+		BFFD85DB1C42F4B8004E7803 /* F4.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = F4.aif; sourceTree = "<group>"; };
+		BFFD85DC1C42F4B8004E7803 /* F4#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F4#.aif"; sourceTree = "<group>"; };
+		BFFD85DD1C42F4B8004E7803 /* F5.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = F5.aif; sourceTree = "<group>"; };
+		BFFD85DE1C42F4B8004E7803 /* F5#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F5#.aif"; sourceTree = "<group>"; };
+		BFFD85DF1C42F4B8004E7803 /* F6.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = F6.aif; sourceTree = "<group>"; };
+		BFFD85E01C42F4B8004E7803 /* F6#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F6#.aif"; sourceTree = "<group>"; };
+		BFFD85E11C42F4C1004E7803 /* G3.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = G3.aif; sourceTree = "<group>"; };
+		BFFD85E21C42F4C1004E7803 /* G4.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = G4.aif; sourceTree = "<group>"; };
+		BFFD85E31C42F4C2004E7803 /* G4#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G4#.aif"; sourceTree = "<group>"; };
+		BFFD85E41C42F4C2004E7803 /* G5.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = G5.aif; sourceTree = "<group>"; };
+		BFFD85E51C42F4C2004E7803 /* G5#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G5#.aif"; sourceTree = "<group>"; };
+		BFFD85E61C42F4C2004E7803 /* G6.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = G6.aif; sourceTree = "<group>"; };
+		BFFD85E71C42F4C2004E7803 /* G6#.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G6#.aif"; sourceTree = "<group>"; };
+		BFFD861B1C4385C9004E7803 /* mo_audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_audio.h; sourceTree = "<group>"; };
+		BFFD861C1C4385C9004E7803 /* mo_audio.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = mo_audio.mm; sourceTree = "<group>"; };
+		BFFD861D1C4385C9004E7803 /* mo_def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_def.h; sourceTree = "<group>"; };
+		BFFD861E1C4385C9004E7803 /* mo_gfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_gfx.h; sourceTree = "<group>"; };
+		BFFD861F1C4385C9004E7803 /* mo_gfx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = mo_gfx.mm; sourceTree = "<group>"; };
+		BFFD86221C438605004E7803 /* TunerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TunerManager.h; sourceTree = "<group>"; };
+		BFFD86231C438605004E7803 /* TunerManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TunerManager.mm; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -336,6 +444,54 @@
 		BFFAA51D1C3DB7C200DC3253 /* SourceFiles */ = {
 			isa = PBXGroup;
 			children = (
+				BFFD85B81C42F48E004E7803 /* A3.aif */,
+				BFFD85B91C42F48E004E7803 /* A3#.aif */,
+				BFFD85BA1C42F48E004E7803 /* A4.aif */,
+				BFFD85BB1C42F48E004E7803 /* A4#.aif */,
+				BFFD85BC1C42F48E004E7803 /* A5.aif */,
+				BFFD85BD1C42F48E004E7803 /* A5#.aif */,
+				BFFD85BE1C42F48E004E7803 /* A7.aif */,
+				BFFD85BF1C42F48E004E7803 /* A7#.aif */,
+				BFFD85C01C42F499004E7803 /* B2.aif */,
+				BFFD85C11C42F499004E7803 /* B3.aif */,
+				BFFD85C21C42F499004E7803 /* B4.aif */,
+				BFFD85C31C42F499004E7803 /* B5.aif */,
+				BFFD85C41C42F499004E7803 /* B7.aif */,
+				BFFD85C51C42F4A5004E7803 /* C3.aif */,
+				BFFD85C61C42F4A5004E7803 /* C3#.aif */,
+				BFFD85C71C42F4A5004E7803 /* C4.aif */,
+				BFFD85C81C42F4A5004E7803 /* C4#.aif */,
+				BFFD85C91C42F4A5004E7803 /* C5.aif */,
+				BFFD85CA1C42F4A5004E7803 /* C5#.aif */,
+				BFFD85CB1C42F4A5004E7803 /* C6.aif */,
+				BFFD85CC1C42F4A5004E7803 /* C6#.aif */,
+				BFFD85CD1C42F4A5004E7803 /* C7.aif */,
+				BFFD85CE1C42F4AE004E7803 /* D3.aif */,
+				BFFD85CF1C42F4AE004E7803 /* D3#.aif */,
+				BFFD85D01C42F4AE004E7803 /* D4.aif */,
+				BFFD85D11C42F4AE004E7803 /* D4#.aif */,
+				BFFD85D21C42F4AE004E7803 /* D5.aif */,
+				BFFD85D31C42F4AE004E7803 /* D6.aif */,
+				BFFD85D41C42F4AE004E7803 /* D6#.aif */,
+				BFFD85D51C42F4B8004E7803 /* E3.aif */,
+				BFFD85D61C42F4B8004E7803 /* E4.aif */,
+				BFFD85D71C42F4B8004E7803 /* E5.aif */,
+				BFFD85D81C42F4B8004E7803 /* E6.aif */,
+				BFFD85D91C42F4B8004E7803 /* F3.aif */,
+				BFFD85DA1C42F4B8004E7803 /* F3#.aif */,
+				BFFD85DB1C42F4B8004E7803 /* F4.aif */,
+				BFFD85DC1C42F4B8004E7803 /* F4#.aif */,
+				BFFD85DD1C42F4B8004E7803 /* F5.aif */,
+				BFFD85DE1C42F4B8004E7803 /* F5#.aif */,
+				BFFD85DF1C42F4B8004E7803 /* F6.aif */,
+				BFFD85E01C42F4B8004E7803 /* F6#.aif */,
+				BFFD85E11C42F4C1004E7803 /* G3.aif */,
+				BFFD85E21C42F4C1004E7803 /* G4.aif */,
+				BFFD85E31C42F4C2004E7803 /* G4#.aif */,
+				BFFD85E41C42F4C2004E7803 /* G5.aif */,
+				BFFD85E51C42F4C2004E7803 /* G5#.aif */,
+				BFFD85E61C42F4C2004E7803 /* G6.aif */,
+				BFFD85E71C42F4C2004E7803 /* G6#.aif */,
 				BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */,
 			);
 			name = SourceFiles;
@@ -355,8 +511,8 @@
 		BFFD85981C407B1E004E7803 /* Tuner */ = {
 			isa = PBXGroup;
 			children = (
+				BFFD85A11C407BEF004E7803 /* TunerViewController.swift */,
 				BFFD85991C407B26004E7803 /* Helper */,
-				BFFD859D1C407B80004E7803 /* TunerManager.swift */,
 			);
 			name = Tuner;
 			sourceTree = "<group>";
@@ -364,10 +520,34 @@
 		BFFD85991C407B26004E7803 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				BFFD859D1C407B80004E7803 /* TunerConstent.swift */,
+				BFFD86221C438605004E7803 /* TunerManager.h */,
+				BFFD86231C438605004E7803 /* TunerManager.mm */,
+				BFFD86251C43860B004E7803 /* FFTHelper */,
+				BFFD861A1C438585004E7803 /* MoMu */,
+			);
+			name = Helper;
+			sourceTree = "<group>";
+		};
+		BFFD861A1C438585004E7803 /* MoMu */ = {
+			isa = PBXGroup;
+			children = (
+				BFFD861B1C4385C9004E7803 /* mo_audio.h */,
+				BFFD861C1C4385C9004E7803 /* mo_audio.mm */,
+				BFFD861D1C4385C9004E7803 /* mo_def.h */,
+				BFFD861E1C4385C9004E7803 /* mo_gfx.h */,
+				BFFD861F1C4385C9004E7803 /* mo_gfx.mm */,
+			);
+			name = MoMu;
+			sourceTree = "<group>";
+		};
+		BFFD86251C43860B004E7803 /* FFTHelper */ = {
+			isa = PBXGroup;
+			children = (
 				BFFD859A1C407B5C004E7803 /* FFTHelper.h */,
 				BFFD859B1C407B5C004E7803 /* FFTHelper.mm */,
 			);
-			name = Helper;
+			name = FFTHelper;
 			sourceTree = "<group>";
 		};
 		E41D6CFC1BA149BF006A9993 /* Helper */ = {
@@ -749,6 +929,54 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFFD85E81C42F51D004E7803 /* A3.aif in Resources */,
+				BFFD85E91C42F51D004E7803 /* A3#.aif in Resources */,
+				BFFD85EA1C42F51D004E7803 /* A4.aif in Resources */,
+				BFFD85EB1C42F51D004E7803 /* A4#.aif in Resources */,
+				BFFD85EC1C42F51D004E7803 /* A5.aif in Resources */,
+				BFFD85ED1C42F51D004E7803 /* A5#.aif in Resources */,
+				BFFD85EE1C42F51D004E7803 /* A7.aif in Resources */,
+				BFFD85EF1C42F51D004E7803 /* E3.aif in Resources */,
+				BFFD85F01C42F51D004E7803 /* E4.aif in Resources */,
+				BFFD85F11C42F51D004E7803 /* G3.aif in Resources */,
+				BFFD85F21C42F51D004E7803 /* G4.aif in Resources */,
+				BFFD85F31C42F51D004E7803 /* G4#.aif in Resources */,
+				BFFD85F41C42F51D004E7803 /* G5.aif in Resources */,
+				BFFD85F51C42F51D004E7803 /* G5#.aif in Resources */,
+				BFFD85F61C42F51D004E7803 /* G6.aif in Resources */,
+				BFFD85F71C42F51D004E7803 /* G6#.aif in Resources */,
+				BFFD85F81C42F51D004E7803 /* E5.aif in Resources */,
+				BFFD85F91C42F51D004E7803 /* E6.aif in Resources */,
+				BFFD85FA1C42F51D004E7803 /* F3.aif in Resources */,
+				BFFD85FB1C42F51D004E7803 /* F3#.aif in Resources */,
+				BFFD85FC1C42F51D004E7803 /* F4.aif in Resources */,
+				BFFD85FD1C42F51D004E7803 /* F4#.aif in Resources */,
+				BFFD85FE1C42F51D004E7803 /* F5.aif in Resources */,
+				BFFD85FF1C42F51D004E7803 /* F5#.aif in Resources */,
+				BFFD86001C42F51D004E7803 /* F6.aif in Resources */,
+				BFFD86011C42F51D004E7803 /* F6#.aif in Resources */,
+				BFFD86021C42F51D004E7803 /* A7#.aif in Resources */,
+				BFFD86031C42F51D004E7803 /* B2.aif in Resources */,
+				BFFD86041C42F51D004E7803 /* B3.aif in Resources */,
+				BFFD86051C42F51D004E7803 /* B4.aif in Resources */,
+				BFFD86061C42F51D004E7803 /* B5.aif in Resources */,
+				BFFD86071C42F51D004E7803 /* B7.aif in Resources */,
+				BFFD86081C42F51D004E7803 /* C3.aif in Resources */,
+				BFFD86091C42F51D004E7803 /* C3#.aif in Resources */,
+				BFFD860A1C42F51D004E7803 /* D3.aif in Resources */,
+				BFFD860B1C42F51D004E7803 /* D3#.aif in Resources */,
+				BFFD860C1C42F51D004E7803 /* D4.aif in Resources */,
+				BFFD860D1C42F51D004E7803 /* D4#.aif in Resources */,
+				BFFD860E1C42F51D004E7803 /* D5.aif in Resources */,
+				BFFD860F1C42F51D004E7803 /* D6.aif in Resources */,
+				BFFD86101C42F51D004E7803 /* D6#.aif in Resources */,
+				BFFD86111C42F51D004E7803 /* C4.aif in Resources */,
+				BFFD86121C42F51D004E7803 /* C4#.aif in Resources */,
+				BFFD86131C42F51D004E7803 /* C5.aif in Resources */,
+				BFFD86141C42F51D004E7803 /* C5#.aif in Resources */,
+				BFFD86151C42F51D004E7803 /* C6.aif in Resources */,
+				BFFD86161C42F51D004E7803 /* C6#.aif in Resources */,
+				BFFD86171C42F51D004E7803 /* C7.aif in Resources */,
 				E475311B1C2228360072E791 /* Go.mp3 in Resources */,
 				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
 				BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */,
@@ -853,13 +1081,15 @@
 				E42032E61BFE90CB00A5D36D /* User.swift in Sources */,
 				E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */,
 				E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */,
+				BFFD86241C438605004E7803 /* TunerManager.mm in Sources */,
 				E46EA8061BD0CAE8006EAB31 /* Tuning.swift in Sources */,
 				BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */,
 				E42032E81BFED9E300A5D36D /* UserProfileViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
+				BFFD86201C4385C9004E7803 /* mo_audio.mm in Sources */,
 				E4473CA31BF909E20061D4C9 /* BorderedCellView.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
-				BFFD859E1C407B80004E7803 /* TunerManager.swift in Sources */,
+				BFFD859E1C407B80004E7803 /* TunerConstent.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
 				BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */,
 				BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */,
@@ -873,6 +1103,7 @@
 				E43DA1291B9FDCE1003180FB /* SearchHistory.swift in Sources */,
 				E43713EF1C34850200517D03 /* LocalSong.swift in Sources */,
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
+				BFFD85A21C407BEF004E7803 /* TunerViewController.swift in Sources */,
 				E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
@@ -895,6 +1126,7 @@
 				105B2EC71C316E20002BC17A /* CustomizedView.swift in Sources */,
 				84DA61A41B4E211100979A42 /* Lyric.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
+				BFFD86211C4385C9004E7803 /* mo_gfx.mm in Sources */,
 				E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */,
 				E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */,
 				BF4B83E51BFA776200AF8A2A /* MeUserProfileTableViewCell.swift in Sources */,

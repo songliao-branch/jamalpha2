@@ -14,7 +14,7 @@ class PlayChordsManager: NSObject {
     var playingArpeggio: Bool = false
     var arpeggioStartTime: CFTimeInterval = 0
     var arpeggioDelay: CFTimeInterval = 0
-    var arpeggioNotes: NSArray = NSArray()
+    var arpeggioNotes: NSMutableArray = NSMutableArray()
     var arpeggioIndex: Int = 0
     let standardFret0Midi = [76, 71, 67, 62, 57, 52]
     var fret0Midi = [76, 71, 67, 62, 57, 52]
@@ -81,7 +81,7 @@ class PlayChordsManager: NSObject {
     
     func initialSoundBank() {
         self.soundBank = SoundBankPlayer()
-        self.soundBank.setSoundBank("test")
+        self.soundBank.setSoundBank("GuitarSoundFont")
         self.playingArpeggio = false
     }
     
@@ -90,7 +90,9 @@ class PlayChordsManager: NSObject {
     }
     
     func playSingleNoteSound(index: Int) {
+        
         let midi = convertIndexToMidi(index)
+        print("midi: \(midi)")
         soundBank.queueNote(midi, gain: 0.4)
         soundBank.playQueuedNotes()
     }
@@ -108,7 +110,9 @@ class PlayChordsManager: NSObject {
         let midiArray: [Int32] = convertContentToIndexArray(content)
         if playingArpeggio == false {
             playingArpeggio = true
-            arpeggioNotes = [NSNumber(int:midiArray[0]), NSNumber(int:midiArray[1]), NSNumber(int:midiArray[2]), NSNumber(int:midiArray[3]), NSNumber(int:midiArray[4]), NSNumber(int:midiArray[5])]
+            for var i = 0; i < midiArray.count; i++ {
+                arpeggioNotes.addObject(NSNumber(int:midiArray[i]))
+            }
             arpeggioIndex = 0
             arpeggioDelay = delay
             arpeggioStartTime = CACurrentMediaTime()
@@ -133,7 +137,7 @@ class PlayChordsManager: NSObject {
                 arpeggioIndex = arpeggioIndex + 1
                 if arpeggioIndex == arpeggioNotes.count {
                     playingArpeggio = false
-                    arpeggioNotes = NSArray()
+                    arpeggioNotes.removeAllObjects()
                 } else {
                     arpeggioStartTime = now
                 }

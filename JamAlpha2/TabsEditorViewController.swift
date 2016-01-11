@@ -272,6 +272,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
+        
         PlayChordsManager.sharedInstance.initialSoundBank()
     }
     
@@ -1225,6 +1226,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if (indexString + 1) < self.currentBaseButton.tag / 100 {
                 moveFingerPoint(indexFret, indexString: indexString)
             }
+            print("index: \((indexString + 1) * 100 + indexFret))")
+            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
         } else {
             self.stopJiggling()
             stopSpecificJiggling()
@@ -1382,6 +1385,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.tabFingerPointChanged = false
         self.addSpecificFingerPoint = true
         self.currentNoteButton = sender
+        self.view.userInteractionEnabled = false
+        PlayChordsManager.sharedInstance.playChordArpeggio(self.currentSelectedSpecificTab.content, delay: 0.4, completion: {
+            complete in
+            self.view.userInteractionEnabled = true
+        })
         for item in self.fingerPoint {
             item.removeFromSuperview()
         }
