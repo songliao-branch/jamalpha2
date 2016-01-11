@@ -16,9 +16,9 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var isFromUnLoginVC: Bool = false
     
-    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo", "Tutorial"]
+    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo", "Tutorial", "Tuner"]
     
-    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode", "Tutorial"]
+    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode", "Tutorial", "Tuner"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -115,6 +115,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             
             let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 3 : 4
             let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
+            let indexOfTunerMode = CoreDataManager.getCurrentUser() == nil ? 5 : 6
             if indexPath.item == 0 {
                 let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
                 self.navigationController?.pushViewController(aboutVC, animated: true)
@@ -131,6 +132,9 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
                 demoVC.isFromUnLoginVC = self.isFromUnLoginVC
                 demoVC.isDemo = false
                 self.navigationController?.pushViewController(demoVC, animated: true)
+            } else if indexPath.item == indexOfTunerMode {
+                let tunerVC: TunerViewController = self.storyboard?.instantiateViewControllerWithIdentifier("tunerVC") as! TunerViewController
+                self.navigationController?.pushViewController(tunerVC, animated: true)
             }
         } else {
             

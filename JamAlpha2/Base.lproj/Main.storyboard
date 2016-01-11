@@ -1058,6 +1058,24 @@
             </objects>
             <point key="canvasLocation" x="-215" y="2248"/>
         </scene>
+        <!--Tuner View Controller-->
+        <scene sceneID="8Qh-44-5w0">
+            <objects>
+                <viewController storyboardIdentifier="tunerVC" id="jWK-Vy-y0l" customClass="TunerViewController" customModule="JamAlpha2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="CHn-YR-THL"/>
+                        <viewControllerLayoutGuide type="bottom" id="wGa-Ga-1XO"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="iaY-wg-fMk">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lBL-I0-39l" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="175" y="2248"/>
+        </scene>
         <!--User Profile Edit View Controller-->
         <scene sceneID="z4t-qA-bgp">
             <objects>

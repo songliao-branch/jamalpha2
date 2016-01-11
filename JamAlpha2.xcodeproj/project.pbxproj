@@ -39,6 +39,7 @@
 		BFFD86201C4385C9004E7803 /* mo_audio.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD861C1C4385C9004E7803 /* mo_audio.mm */; };
 		BFFD86211C4385C9004E7803 /* mo_gfx.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD861F1C4385C9004E7803 /* mo_gfx.mm */; };
 		BFFD86241C438605004E7803 /* TunerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86231C438605004E7803 /* TunerManager.mm */; };
+		BFFD86271C445C2E004E7803 /* TunerFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86261C445C2E004E7803 /* TunerFunction.swift */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -174,6 +175,7 @@
 		BFFD861F1C4385C9004E7803 /* mo_gfx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = mo_gfx.mm; sourceTree = "<group>"; };
 		BFFD86221C438605004E7803 /* TunerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TunerManager.h; sourceTree = "<group>"; };
 		BFFD86231C438605004E7803 /* TunerManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TunerManager.mm; sourceTree = "<group>"; };
+		BFFD86261C445C2E004E7803 /* TunerFunction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerFunction.swift; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -368,6 +370,8 @@
 			isa = PBXGroup;
 			children = (
 				BFFD85A11C407BEF004E7803 /* TunerViewController.swift */,
+				BFFD859D1C407B80004E7803 /* TunerConstent.swift */,
+				BFFD86261C445C2E004E7803 /* TunerFunction.swift */,
 				BFFD85991C407B26004E7803 /* Helper */,
 			);
 			name = Tuner;
@@ -376,7 +380,6 @@
 		BFFD85991C407B26004E7803 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
-				BFFD859D1C407B80004E7803 /* TunerConstent.swift */,
 				BFFD86221C438605004E7803 /* TunerManager.h */,
 				BFFD86231C438605004E7803 /* TunerManager.mm */,
 				BFFD86251C43860B004E7803 /* FFTHelper */,
@@ -886,6 +889,7 @@
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
+				BFFD86271C445C2E004E7803 /* TunerFunction.swift in Sources */,
 				E42032E61BFE90CB00A5D36D /* User.swift in Sources */,
 				E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */,
 				E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */,
