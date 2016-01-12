@@ -679,7 +679,7 @@ extension LyricsSyncViewController {
             
             if let songVC = self.lyricsTextViewController.songViewController {
                 songVC.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
-                
+                songVC.addLyricsPrompt.hidden = true
                 if songVC.isDemoSong {
                     songVC.avPlayer.play()
                 } else {
