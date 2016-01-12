@@ -27,9 +27,11 @@ class TunerViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    override func viewDidDisappear(animated: Bool) {
+    override func viewWillDisappear(animated: Bool) {
         stopTimer()
+        TunerManager.deinitMomuAudio()
+    }
+    override func viewDidDisappear(animated: Bool) {
         TunerManager.deinitialTuner() 
     }
     
@@ -48,10 +50,10 @@ class TunerViewController: UIViewController {
         print("\(result.0), \(result.1), \(result.2), \(result.3)")
         let letterWidth: CGFloat = self.view.frame.size.width / 6
         if result.0 == result.1 {
-            self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 1.5 * letterWidth, 0), animated: true)
+            self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth, 0), animated: true)
         } else {
             let position = TunerFunction.sharedInstance.calcPosition(result.0, range_max_HZ: result.1)
-            self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 1.5 * letterWidth + letterWidth * CGFloat(position), 0), animated: true)
+            self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth + 2 * letterWidth * CGFloat(position), 0), animated: true)
         }
     }
     

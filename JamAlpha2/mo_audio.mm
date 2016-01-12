@@ -749,6 +749,7 @@ bool MoAudio::start( MoCallback callback, void * bindle )
     if( !m_hasInit )
     {
         // TODO: error message
+        printf("m_hasInit");
         return false;
     }
     
@@ -756,6 +757,7 @@ bool MoAudio::start( MoCallback callback, void * bindle )
     if( m_isRunning )
     {
         // TODO: warning message
+        printf("m_isrunning");
         return false;
     }
     
@@ -772,6 +774,7 @@ bool MoAudio::start( MoCallback callback, void * bindle )
     if( err )
     {
         // TODO: "couldn't start audio unit...\n" );
+        printf("couldn't start audio unit...");
         return false;
     }
 

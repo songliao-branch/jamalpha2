@@ -155,9 +155,12 @@ void AudioCallback( Float32 * buffer, UInt32 frameSize, void * userData )
     if (!result) { NSLog(@" MoAudio start ERROR"); }
 }
 
-+ (void) deinitialTuner {
++ (void) deinitMomuAudio {
     MoAudio::stop();
     MoAudio::shutdown();
+}
+
++ (void) deinitialTuner {
     destroyAccumulator();
     FFTHelperRelease(fftConverter);
 }

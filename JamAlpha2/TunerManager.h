@@ -13,6 +13,7 @@
 + (void)initialTuner;
 + (void)initMomuAudio;
 + (void)deinitialTuner;
++ (void)deinitMomuAudio;
 + (Float32)getMaxHZ;
 @end
 #endif /* TunerManager_h */
