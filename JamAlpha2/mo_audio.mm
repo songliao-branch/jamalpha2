@@ -775,6 +775,7 @@ bool MoAudio::start( MoCallback callback, void * bindle )
     {
         // TODO: "couldn't start audio unit...\n" );
         printf("couldn't start audio unit...");
+        m_isRunning = true;
         return false;
     }
 
