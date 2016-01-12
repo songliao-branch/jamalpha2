@@ -38,11 +38,13 @@ class TunerFunction: NSObject {
         return Static.instance!
     }
     
-    func checkTheHZRange() -> (Float, Float, String, String) {
+    func checkTheHZRange() -> (Float, Float, String, String, Int, Int) {
         var range_min_HZ: Float = 0
         var range_max_HZ: Float = 0
         var range_min_Name: String = ""
         var range_max_Name: String = ""
+        var noteI: Int = 0
+        var noteN: Int = 0
         for var i = 0; i < noteIndex.count - 1; i++ {
             if max_HZ >= NOTE_HZ[i][0] && max_HZ < NOTE_HZ[i + 1][0] {
                 for var j = 0; j < noteName.count - 1; j++ {
@@ -50,16 +52,29 @@ class TunerFunction: NSObject {
                         range_min_HZ = NOTE_HZ[i][j]
                         range_max_HZ = NOTE_HZ[i][j + 1]
                         range_min_Name = noteName[j] + noteIndex[i]
-                        range_max_Name = noteName[j + 1] + noteIndex[i + 1]
+                        range_max_Name = noteName[j + 1] + noteIndex[i]
+                        noteI = i
+                        noteN = j
+                        if max_HZ >= NOTE_HZ[i][j] * 0.99 && max_HZ <= NOTE_HZ[i][j] * 1.01 {
+                            range_max_HZ = range_min_HZ
+                            range_max_Name = range_min_Name
+                        } else if max_HZ >= NOTE_HZ[i][j + 1] * 0.99 && max_HZ <= NOTE_HZ[i][j + 1] * 1.01 {
+                            range_max_HZ = range_min_HZ
+                            range_max_Name = range_min_Name
+                        }
                         break
                     }
                 }
             }
         }
-        return (range_min_HZ, range_max_HZ, range_min_Name, range_max_Name)
+        return (range_min_HZ, range_max_HZ, range_min_Name, range_max_Name, noteI, noteN)
     }
     
     func getMax_HZ(sender: Float) {
         max_HZ = sender
+    }
+    
+    func calcPosition(range_min_HZ: Float, range_max_HZ: Float) -> Float {
+        return (max_HZ - range_min_HZ) / (range_max_HZ - range_min_HZ)
     }
 }

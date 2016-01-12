@@ -406,6 +406,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't open the remote I/O unit"
+        printf("couldn't open the remote I/O unit");
         return false;
     }
     
@@ -416,6 +417,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't enable input on the remote I/O unit"
+        printf("couldn't enable input on the remote I/O unit");
         return false;
     }
     
@@ -425,6 +427,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't set remote i/o render callback"
+        printf("couldn't set remote i/o render callback");
         return false;
     }
     
@@ -435,6 +438,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't get the remote I/O unit's output client format"
+        printf("couldn't get the remote I/O unit's output client format");
         return false;
     }
     
@@ -459,6 +463,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't set the remote I/O unit's input client format"
+        printf("couldn't set the remote I/O unit's input client format");
         return false;
     }
     
@@ -469,6 +474,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't get the remote I/O unit's output client format"
+        printf("couldn't get the remote I/O unit's output client format");
         return false;
     }
     err = AudioUnitSetProperty( inRemoteIOUnit, kAudioUnitProperty_StreamFormat,
@@ -476,6 +482,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't set the remote I/O unit's input client format"
+        printf("couldn't set the remote I/O unit's input client format");
         return false;
     }
     
@@ -488,6 +495,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't initialize the remote I/O unit"
+        printf("couldn't initialize the remote I/O unit");
         return false;
     }
     
@@ -652,20 +660,6 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
         }        
     }
     
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
     // compute durations
     Float32 preferredBufferSize = (Float32)(frameSize / srate); // .020;
     // set I/O buffer duration
@@ -702,7 +696,7 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
     
     // set up remote I/O
     bool reslt;
-    if (enableBuiltInAEC==true) {
+    if ( enableBuiltInAEC == true) {
         reslt = setupRemoteIO(m_au, m_renderProc, m_info->m_dataFormat, kAudioUnitSubType_VoiceProcessingIO);
     } else {
         reslt = setupRemoteIO(m_au, m_renderProc, m_info->m_dataFormat, kAudioUnitSubType_RemoteIO);
