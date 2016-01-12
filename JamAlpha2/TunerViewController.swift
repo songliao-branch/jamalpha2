@@ -17,7 +17,7 @@ class TunerViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        TunerManager.initialTuner()
+        
         startTimer()
         setUpOnMainView()
         setUpIndicator()
@@ -27,6 +27,10 @@ class TunerViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    override func viewWillAppear(animated: Bool) {
+        TunerManager.initialTuner()
+    }
+    
     override func viewWillDisappear(animated: Bool) {
         stopTimer()
         TunerManager.deinitMomuAudio()
