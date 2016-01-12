@@ -67,7 +67,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        
+        var isSeekingPlayerState = true
         let song = songs[indexPath.row]
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
@@ -75,22 +75,64 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         songVC.selectedFromTable = true
         
         if let item = song.mediaItem {
-            print("item found title:\(item.title!)")
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
             MusicManager.sharedInstance.avPlayer.pause()
             MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
             MusicManager.sharedInstance.avPlayer.removeAllItems()
             
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
+            if(item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
+                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
+                    while (isSeekingPlayerState){
+                        
+                        if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                            MusicManager.sharedInstance.player.stop()
+                            KGLOBAL_nowView.stop()
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.showCellularEnablesStreaming(tableView)
+                            }
+                            isSeekingPlayerState = false
+                            break
+                        }
+                        if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
+                            if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    songVC.selectedFromTable = true
+                                    songVC.transitioningDelegate = self.animator
+                                    self.animator!.attachToViewController(songVC)
+                                    self.presentViewController(songVC, animated: true, completion: {
+                                        completed in
+                                        //reload table to show loudspeaker icon on current selected row
+                                        tableView.reloadData()
+                                    })
+                                }
+                                isSeekingPlayerState = false
+                                break
+                            }
+                        }
+                    }
+                }
+            }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !item.cloudItem){
+                isSeekingPlayerState = false
+                if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
+                    MusicManager.sharedInstance.player.play()
+                }
+                songVC.selectedFromTable = true
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: {
+                    completed in
+                    //reload table to show loudspeaker icon on current selected row
+                    tableView.reloadData()
+                })
+            } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && item.cloudItem) {
+                isSeekingPlayerState = false
+                MusicManager.sharedInstance.player.stop()
+                KGLOBAL_nowView.stop()
+                self.showConnectInternet(tableView)
+            }
             
-            self.presentViewController(songVC, animated: true, completion: nil)
-            
-            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
-            
-            
-        }  else if song.artist == "Alex Lisell" { //if demo song
+        }   else if song.artist == "Alex Lisell" { //if demo song
             
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0

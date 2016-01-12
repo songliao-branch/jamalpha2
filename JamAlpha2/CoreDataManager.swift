@@ -23,6 +23,7 @@ protocol Findable {
     func getDuration() -> Float
     func getURL() -> AnyObject?
     func getArtWork() -> MPMediaItemArtwork?
+    func isKindOfClass(aClass: AnyClass) -> Bool
 }
 
 extension MPMediaItem: Findable {
@@ -64,7 +65,6 @@ extension MPMediaItem: Findable {
         }
         return nil
     }
-
 }
 
 extension SearchResult: Findable {

@@ -82,8 +82,9 @@ class MusicManager: NSObject {
         
         reloadCollections()
         
-        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController()
+        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC
         let currentVC = (UIApplication.sharedApplication().delegate as! AppDelegate).topViewController(rootViewController)
+        
         let baseVC = ((rootViewController as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
         let searchVC = ((rootViewController as! TabBarController).childViewControllers[1].childViewControllers[0]) as! SearchViewController
         
@@ -239,6 +240,7 @@ class MusicManager: NSObject {
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
                 player.prepareToPlay()
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
+                
             } else {
                 if queueChanged { // if we selected the same song from a different queue this time
                     let lastPlaybackTime = player.currentPlaybackTime

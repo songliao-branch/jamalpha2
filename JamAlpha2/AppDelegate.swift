@@ -1,5 +1,4 @@
-//
-//  AppDelegate.swift
+
 //  JamAlpha2
 //
 //  Created by Song Liao on 5/26/15.
@@ -23,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var shuffleMode:MPMusicShuffleMode!
     var repeatMode:MPMusicRepeatMode!
-
+    var rootVC: UIViewController!
       
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
@@ -56,6 +55,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let credentialsProvider = AWSCognitoCredentialsProvider(regionType: CognitoRegionType, identityPoolId: CognitoIdentityPoolId)
         let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
         AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
+        NetworkManager.sharedInstance.reachability.isReachable()
+
         return true
     }
     
@@ -125,7 +126,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let currentVC = topViewController(rootViewController())
         
-        let baseVC = ((rootViewController() as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
+       
         if(MusicManager.sharedInstance.player != nil){
             MusicManager.sharedInstance.player.shuffleMode = self.shuffleMode
             MusicManager.sharedInstance.player.repeatMode = repeatMode
@@ -219,13 +220,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
                 if(MusicManager.sharedInstance.player.playbackState == .Playing){
-                    baseVC.nowView.start()
+                    KGLOBAL_nowView.start()
                 }
                 if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
                     MusicManager.sharedInstance.avPlayer.removeAllItems()
                 }
             }else{
-                baseVC.nowView.stop()
+                KGLOBAL_nowView.stop()
             }
         }
         

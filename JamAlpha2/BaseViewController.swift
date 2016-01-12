@@ -21,8 +21,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     var buttonText :[String] = []
     var currentPageIndex:Int!
     
-    var nowView:VisualizerView! = VisualizerView()
-    
     var isPageScrolling = false //prevent scrolling / button tap crash
     
     var statusAndNavigationBarHeight: CGFloat = 0
@@ -54,9 +52,9 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         print("playbackStateChanged \(player.playbackState.rawValue)")
         if playbackState == .Playing {
             print("now it starts again")
-            nowView.start()
+            KGLOBAL_nowView.start()
         } else  {
-            nowView.stop()
+            KGLOBAL_nowView.stop()
         }
     }
     
@@ -71,11 +69,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     
     func setUpNowView(){
-        nowView.initWithNumberOfBars(4)
-        nowView.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
+        KGLOBAL_nowView.initWithNumberOfBars(4)
+        KGLOBAL_nowView.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
-        nowView.addGestureRecognizer(tapRecognizer)
-        self.navigationController!.navigationBar.addSubview(nowView)
+        KGLOBAL_nowView.addGestureRecognizer(tapRecognizer)
+        self.navigationController!.navigationBar.addSubview(KGLOBAL_nowView)
     }
     
     func setUpPageViewController(){
@@ -107,7 +105,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         }
         self.currentPageIndex = 0
     }
-    
     func goToNowPlaying() { //tell me when it kicks in
         for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
             if player.nowPlayingItem != nil || MusicManager.sharedInstance.avPlayer.currentItem != nil {
@@ -225,8 +222,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         
         musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
         musicViewController.pageIndex = index
-
-        musicViewController.nowView = self.nowView!
         return musicViewController
     }
 

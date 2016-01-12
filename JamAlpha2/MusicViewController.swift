@@ -31,7 +31,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     //for transition view animator
     var animator: CustomTransitionAnimation?
-    var nowView: VisualizerView!
     
     var songCount: Int64 = 0
     
@@ -52,6 +51,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
             KEY_isSoundWaveformGeneratingInBackground = true
         }
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        NetworkManager.sharedInstance.tableView = self.musicTable
     }
     
     func loadAndSortMusic() {
@@ -96,9 +100,16 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             if player.repeatMode == .One {
                 return
             }
-            
-            if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                self.musicTable.reloadData()
+            if player.nowPlayingItem != nil {
+                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
+                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.musicTable.reloadData()
+                    }
+                }else{
+                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.musicTable.reloadData()
+                    }
+                }
             }
         }
     }
@@ -118,7 +129,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
       
         songVC.selectedFromTable = false
         songVC.musicViewController = self
-        songVC.nowView = self.nowView
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
@@ -205,9 +215,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
-        
         cell.demoImage.hidden = true
         
         if pageIndex == 0 {
@@ -260,9 +268,32 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 cell.coverImage.image = UIImage(named: "liweng")
                 loadAPISearchImageToCell(cell, song: song)
             }
-            
             cell.mainTitle.text = song.getTitle()
             cell.subtitle.text = song.getArtist()
+            
+            if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable()){
+                if(song.isKindOfClass(MPMediaItem)){
+                    if (song as! MPMediaItem).cloudItem{
+                        cell.coverImage.alpha = 0.8
+                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(0.5)
+                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(0.5)
+                    }else{
+                        cell.coverImage.alpha = 1
+                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
+                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
+                    }
+                }else{
+                    cell.coverImage.alpha = 1
+                    cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
+                    cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
+                }
+            }else{
+                if(song.isKindOfClass(MPMediaItem)){
+                        cell.coverImage.alpha = 1
+                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
+                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
+                }
+            }
             
         } else if pageIndex == 1  {
             
@@ -336,12 +367,13 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
+        var isDemoSong = false
+        var isSeekingPlayerState = true
         if pageIndex == 0 {
             KGLOBAL_init_queue.suspended = true
             
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
- 
+            var indexToBePlayed:Int = 0
             if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
                 if indexPath.section == 0 {
                     MusicManager.sharedInstance.setDemoSongQueue(demoSongs, selectedIndex: indexPath.row)
@@ -349,6 +381,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     MusicManager.sharedInstance.player.pause()
                     MusicManager.sharedInstance.player.currentPlaybackTime = 0
                     songVC.isDemoSong = true
+                    isDemoSong = true
                     if (KAVplayer != nil && KAVplayer.rate > 0){
                         KAVplayer.rate = 0
                         KAVplayer = nil
@@ -356,7 +389,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     
                 } else {
                     MusicManager.sharedInstance.setPlayerQueue(songsSorted)
-                    let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section-1, currentRow: indexPath.row)
+                    indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section-1, currentRow: indexPath.row)
                     MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
                     MusicManager.sharedInstance.avPlayer.pause()
                     MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
@@ -366,41 +399,89 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 
             } else {
                 MusicManager.sharedInstance.setPlayerQueue(songsSorted)
-                let indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
+                indexToBePlayed = findIndexToBePlayed(songsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
                 MusicManager.sharedInstance.setIndexInTheQueue(indexToBePlayed)
                 MusicManager.sharedInstance.avPlayer.pause()
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 MusicManager.sharedInstance.avPlayer.removeAllItems()
             }
             
-            songVC.selectedFromTable = true
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            songVC.musicViewController = self //for goToArtist and goToAlbum from here
-            songVC.nowView = self.nowView
-            self.presentViewController(songVC, animated: true, completion: {
-                completed in
-                //reload table to show loudspeaker icon on current selected row
-                tableView.reloadData()
-            })
+            //We use a background thread to constantly check player's current playing item, and we only pop up
+            if((songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() && !isDemoSong) {
+                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
+                    while (isSeekingPlayerState) {
+                        if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                            MusicManager.sharedInstance.player.stop()
+                            KGLOBAL_nowView.stop()
+                            dispatch_async(dispatch_get_main_queue()) {
+                              self.showCellularEnablesStreaming(tableView)
+                            }
+                            isSeekingPlayerState = false
+                        
+                            break
+                        }
+                     
+                        if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
+                            if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    songVC.selectedFromTable = true
+                                    songVC.transitioningDelegate = self.animator
+                                    self.animator!.attachToViewController(songVC)
+                                    songVC.musicViewController = self //for goToArtist and goToAlbum from here
+                                    
+                                    self.presentViewController(songVC, animated: true, completion: {
+                                        completed in
+                                        //reload table to show loudspeaker icon on current selected row
+                                        tableView.reloadData()
+                                    })
+                                }
+                                isSeekingPlayerState = false
+                                break
+                            }
+                        }
+                    }
+                }
+            }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem || isDemoSong ){
+                    isSeekingPlayerState = false
+                    if(!isDemoSong){
+                        if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
+                            MusicManager.sharedInstance.player.play()
+                        }
+                    }
+                
+                    songVC.selectedFromTable = true
+                    songVC.transitioningDelegate = self.animator
+                    self.animator!.attachToViewController(songVC)
+                    songVC.musicViewController = self //for goToArtist and goToAlbum from here
+          
+                    self.presentViewController(songVC, animated: true, completion: {
+                        completed in
+                        //reload table to show loudspeaker icon on current selected row
+                        tableView.reloadData()
+                    })
+            } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && songsSorted[indexToBePlayed].cloudItem) {
+                isSeekingPlayerState = false
+                MusicManager.sharedInstance.player.stop()
+                self.showConnectInternet(tableView)
+            }
+            //////////////////////////////////////////////////////////
         }
         else if pageIndex == 1 {
+            isSeekingPlayerState = false
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
-            artistVC.nowView = self.nowView
             artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
             
         }
         else if pageIndex == 2 {
-            
+            isSeekingPlayerState = false
             let indexToBePlayed = findIndexToBePlayed(albumsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.musicViewController = self
-            albumVC.nowView = self.nowView
             albumVC.theAlbum = albumsSorted[indexToBePlayed]
             
             self.showViewController(albumVC, sender: self)
@@ -415,7 +496,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             if theArtist == artist.artistName {
                 let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
                 artistVC.musicViewController = self
-                artistVC.nowView = self.nowView
                 artistVC.theArtist = artist
                 self.showViewController(artistVC, sender: self)
                 print("jumping to artist \(theArtist)")
@@ -429,7 +509,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             if theAlbum == album.albumTitle {
                 let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
                 albumVC.musicViewController = self
-                albumVC.nowView = self.nowView
                 albumVC.theAlbum = album
                 self.showViewController(albumVC, sender: self)
                 print("jumping to album \(theAlbum)")

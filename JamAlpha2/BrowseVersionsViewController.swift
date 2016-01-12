@@ -10,6 +10,7 @@ import Foundation
 import MediaPlayer
 import UIKit
 import Haneke
+
 class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var songViewController: SongViewController!
@@ -371,7 +372,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             dispatch_async(dispatch_get_main_queue()) {
-                let i = NSIndexPath(forRow: button.tag, inSection: 1)
+                let i = NSIndexPath(forRow: button.tag, inSection: 0)
                 self.resultsTableView.reloadRowsAtIndexPaths([i], withRowAnimation: UITableViewRowAnimation.None)
             }
             
@@ -399,7 +400,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             dispatch_async(dispatch_get_main_queue()) {
-                let i = NSIndexPath(forRow: button.tag, inSection: 1)
+                let i = NSIndexPath(forRow: button.tag, inSection: 0)
                 self.resultsTableView.reloadRowsAtIndexPaths([i], withRowAnimation: UITableViewRowAnimation.None)
             }
         })

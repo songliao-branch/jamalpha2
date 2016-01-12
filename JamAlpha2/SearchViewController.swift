@@ -246,23 +246,71 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if indexPath.section == 0 {
                 
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-                
+                var isSeekingPlayerState = true
                 songVC.selectedFromTable = true
                 songVC.selectedFromSearchTab = true
                 
                 MusicManager.sharedInstance.setPlayerQueue(filteredSongs)
                 MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)
                 
-                songVC.transitioningDelegate = self.animator
-                self.animator!.attachToViewController(songVC)
-                self.presentViewController(songVC, animated: true, completion: {
-                    completed in
-                    self.reloadMusicTable(true)
-                })
+                if((filteredSongs[indexPath.row]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {
+                    dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
+                        while (isSeekingPlayerState) {
+                            if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                                MusicManager.sharedInstance.player.stop()
+                                KGLOBAL_nowView.stop()
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    self.showCellularEnablesStreaming(tableView)
+                                }
+                                isSeekingPlayerState = false
+                                
+                                break
+                            }
+                            
+                            if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
+                                if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        songVC.selectedFromTable = true
+                                        songVC.transitioningDelegate = self.animator
+                                        self.animator!.attachToViewController(songVC)
+
+                                        self.presentViewController(songVC, animated: true, completion: {
+                                            completed in
+                                            //reload table to show loudspeaker icon on current selected row
+                                            self.reloadMusicTable(true)
+                                        })
+                                    }
+                                    isSeekingPlayerState = false
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !filteredSongs[indexPath.row].cloudItem){
+                    isSeekingPlayerState = false
+                    if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
+                        MusicManager.sharedInstance.player.play()
+                    }
+                    
+                    songVC.selectedFromTable = true
+                    songVC.transitioningDelegate = self.animator
+                    self.animator!.attachToViewController(songVC)
+                    self.presentViewController(songVC, animated: true, completion: {
+                        completed in
+                        //reload table to show loudspeaker icon on current selected row
+                        self.reloadMusicTable(true)
+                    })
+                } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && filteredSongs[indexPath.row].cloudItem) {
+                    isSeekingPlayerState = false
+                    MusicManager.sharedInstance.player.stop()
+                    KGLOBAL_nowView.stop()
+                    self.showConnectInternet(tableView)
+                }
+                
                 
             }else {
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-                
+                var isSeekingPlayerState = true
                 songVC.selectedFromTable = true
                 let searchSong = searchResults[indexPath.row]
                 var isReload = true
@@ -270,7 +318,61 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
                     MusicManager.sharedInstance.setPlayerQueue([foundItem])
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
+                    if(foundItem.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {
+                        dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
+                            while (isSeekingPlayerState) {
+                                if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                                    MusicManager.sharedInstance.player.stop()
+                                    KGLOBAL_nowView.stop()
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        self.showCellularEnablesStreaming(tableView)
+                                    }
+                                    isSeekingPlayerState = false
+                                    
+                                    break
+                                }
+                                
+                                if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
+                                    if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                                        dispatch_async(dispatch_get_main_queue()) {
+                                            songVC.selectedFromTable = true
+                                            songVC.transitioningDelegate = self.animator
+                                            self.animator!.attachToViewController(songVC)
+                                            
+                                            self.presentViewController(songVC, animated: true, completion: {
+                                                completed in
+                                                //reload table to show loudspeaker icon on current selected row
+                                                self.reloadMusicTable(true)
+                                            })
+                                        }
+                                        isSeekingPlayerState = false
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    } else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !foundItem.cloudItem){
+                        isSeekingPlayerState = false
+                        if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
+                            MusicManager.sharedInstance.player.play()
+                        }
+                        
+                        songVC.selectedFromTable = true
+                        songVC.transitioningDelegate = self.animator
+                        self.animator!.attachToViewController(songVC)
+                        self.presentViewController(songVC, animated: true, completion: {
+                            completed in
+                            //reload table to show loudspeaker icon on current selected row
+                            self.reloadMusicTable(true)
+                        })
+                    } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && foundItem.cloudItem) {
+                        isSeekingPlayerState = false
+                        MusicManager.sharedInstance.player.stop()
+                        KGLOBAL_nowView.stop()
+                        self.showConnectInternet(tableView)
+                    }
                 }else{
+                    isSeekingPlayerState = false
                     songVC.isSongNeedPurchase = true
                     songVC.songNeedPurchase = searchResults[indexPath.row]
                     if let img = searchResults[indexPath.row].image {
@@ -278,14 +380,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                         songVC.blurredImage = img.applyLightEffect()
                     }
                     isReload = false
+                    songVC.selectedFromSearchTab = true
+                    songVC.transitioningDelegate = self.animator
+                    self.animator!.attachToViewController(songVC)
+                    self.presentViewController(songVC, animated: true, completion: {
+                        completed in
+                        self.reloadMusicTable(isReload)
+                    })
                 }
-                songVC.selectedFromSearchTab = true
-                songVC.transitioningDelegate = self.animator
-                self.animator!.attachToViewController(songVC)
-                self.presentViewController(songVC, animated: true, completion: {
-                    completed in
-                    self.reloadMusicTable(isReload)
-                })
             }
             
             tableView.deselectRowAtIndexPath(indexPath, animated: false)
@@ -344,25 +446,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(needStart:Bool){
         let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
-        if(needStart){
-            baseVC.nowView.start()
-        }else{
-            baseVC.nowView.stop()
-        }
-    
         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
             musicVC.musicTable.reloadData()
         }
     }
     
-    override func viewDidDisappear(animated: Bool) {
-        super.viewDidDisappear(animated)
-        if( KAVplayer != nil && KAVplayer.rate != 0){
-            let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
-            baseVC.nowView.start()
-        }
-    }
-
 }
 
 

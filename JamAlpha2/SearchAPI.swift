@@ -12,7 +12,7 @@ import Haneke
 import SwiftyJSON
 
 
-class SearchResult {
+class SearchResult: NSObject {
     
     var wrapperType: String!
     var kind: String!

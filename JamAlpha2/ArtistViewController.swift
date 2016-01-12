@@ -10,9 +10,6 @@ import MediaPlayer
 class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate{
     
     var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
-
-    var nowView: VisualizerView!
-    
     var theArtist:Artist!
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
@@ -27,13 +24,14 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
     }
-
+    
     
     override func viewWillAppear(animated: Bool) {
         //change status bar text to light
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        NetworkManager.sharedInstance.tableView = artistTable
     }
     
     func registerMusicPlayerNotificationForSongChanged(){
@@ -55,8 +53,16 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                 return
             }
             
-            if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                self.artistTable.reloadData()
+            if player.nowPlayingItem != nil {
+                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
+                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.artistTable.reloadData()
+                    }
+                }else{
+                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                        self.artistTable.reloadData()
+                    }
+                }
             }
         }
     }
@@ -131,6 +137,20 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         // assign empty string if no track number
         cell.trackNumberLabel.text = song.albumTrackNumber > 0 ? String(song.albumTrackNumber) : ""
+        
+        if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable() ){
+                if (song ).cloudItem{
+                    cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(0.5)
+                    cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(0.5)
+                }else{
+                    cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
+                    cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
+                }
+        }else{
+                cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
+                cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
+        }
+        
         return cell
     }
     
@@ -141,7 +161,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     // when selecting section 2 2nd song, we iterate through all previous albums tracks
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-       
+        var isSeekingPlayerState = true
         KGLOBAL_init_queue.suspended = true
         
         let albumIndex = indexPath.section
@@ -159,18 +179,58 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
         MusicManager.sharedInstance.avPlayer.removeAllItems()
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        songVC.selectedFromTable = true
-        songVC.musicViewController = self.musicViewController
-        songVC.nowView = self.nowView
-        songVC.transitioningDelegate = self.animator
-        self.animator!.attachToViewController(songVC)
-        
-        self.presentViewController(songVC, animated: true, completion: {
-                completed in
-                tableView.reloadData()
+        ///////////////////////////////////////////
+        if((artistAllSongs[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
+            dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
+                while (isSeekingPlayerState){
+                    
+                    if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                        MusicManager.sharedInstance.player.stop()
+                        KGLOBAL_nowView.stop()
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.showCellularEnablesStreaming(tableView)                        }
+                        isSeekingPlayerState = false
+                        break
+                    }
+                    if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
+                        if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                            dispatch_async(dispatch_get_main_queue()) {
+                                songVC.selectedFromTable = true
+                                songVC.transitioningDelegate = self.animator
+                                self.animator!.attachToViewController(songVC)
+                                songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
+                                self.presentViewController(songVC, animated: true, completion: {
+                                    completed in
+                                    //reload table to show loudspeaker icon on current selected row
+                                    tableView.reloadData()
+                                })
+                            }
+                            isSeekingPlayerState = false
+                            break
+                        }
+                    }
+                }
             }
-        )
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !artistAllSongs[indexToBePlayed].cloudItem){
+            isSeekingPlayerState = false
+            if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
+                MusicManager.sharedInstance.player.play()
+            }
+            songVC.selectedFromTable = true
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
+            self.presentViewController(songVC, animated: true, completion: {
+                completed in
+                //reload table to show loudspeaker icon on current selected row
+                tableView.reloadData()
+            })
+        } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && artistAllSongs[indexToBePlayed].cloudItem) {
+            isSeekingPlayerState = false
+            MusicManager.sharedInstance.player.stop()
+            self.showConnectInternet(tableView)
+        }
+        //////////////////////////////////////////////////////////
     }
     
  }
