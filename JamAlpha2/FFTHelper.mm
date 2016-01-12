@@ -11,7 +11,7 @@ FFTHelperRef * FFTHelperCreate(long numberOfSamples) {
     FFTHelperRef *helperRef = (FFTHelperRef*) malloc(sizeof(FFTHelperRef));
     vDSP_Length log2n = log2f(numberOfSamples);    
     helperRef->fftSetup = vDSP_create_fftsetup(log2n, FFT_RADIX2);
-    int nOver2 = numberOfSamples / 2;
+    long nOver2 = numberOfSamples / 2;
     helperRef->complexA.realp = (Float32*) malloc(nOver2*sizeof(Float32) );
     helperRef->complexA.imagp = (Float32*) malloc(nOver2*sizeof(Float32) );
     

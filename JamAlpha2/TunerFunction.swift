@@ -25,7 +25,6 @@ class TunerFunction: NSObject {
     let noteIndex = ["1", "2", "3", "4", "5", "6", "7"]
     
     var max_HZ: Float = 0
-    var timer: NSTimer!
     
     class var sharedInstance: TunerFunction {
         struct Static {

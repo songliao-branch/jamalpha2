@@ -12,11 +12,11 @@
 
 
 /// Nyquist Maximum Frequency
-const Float32 NyquistMaxFreq = SAMPLE_RATE/2.0;
+const Float32 NyquistMaxFreq = SAMPLE_RATE / 2.0;
 
 /// caculates HZ value for specified index from a FFT bins vector
 Float32 frequencyHerzValue(long frequencyIndex, long fftVectorSize, Float32 nyquistFrequency ) {
-    return ((Float32)frequencyIndex/(Float32)fftVectorSize) * nyquistFrequency;
+    return ((Float32)frequencyIndex / (Float32)fftVectorSize) * nyquistFrequency;
 }
 
 
@@ -47,10 +47,14 @@ static BOOL accumulateFrames(Float32 *frames, UInt32 lenght) { //returned YES if
     //    float zero = 0.0;
     //    vDSP_vsmul(frames, 1, &zero, frames, 1, lenght);
     
-    if (accumulatorFillIndex>=accumulatorDataLenght) { return YES; } else {
+    if (accumulatorFillIndex >= accumulatorDataLenght) {
+        return YES;
+    } else {
         memmove(dataAccumulator+accumulatorFillIndex, frames, sizeof(Float32)*lenght);
         accumulatorFillIndex = accumulatorFillIndex+lenght;
-        if (accumulatorFillIndex>=accumulatorDataLenght) { return YES; }
+        if (accumulatorFillIndex >= accumulatorDataLenght) {
+            return YES;
+        }
     }
     return NO;
 }
@@ -94,7 +98,9 @@ static Float32 strongestFrequencyHZ(Float32 *buffer, FFTHelperRef *fftHelper, UI
     Float32 max = 0;
     unsigned long maxIndex = 0;
     max = vectorMaxValueACC32_index(fftData, length, 1, &maxIndex);
-    if (freqValue!=NULL) { *freqValue = max; }
+    if (freqValue != NULL) {
+        *freqValue = max;
+    }
     Float32 HZ = frequencyHerzValue(maxIndex, length, NyquistMaxFreq);
     return HZ;
 }
@@ -116,7 +122,9 @@ void AudioCallback( Float32 * buffer, UInt32 frameSize, void * userData )
     if (accumulateFrames(buffer, frameSize)==YES) { //if full
         
         //windowing the time domain data before FFT (using Blackman Window)
-        if (windowBuffer==NULL) { windowBuffer = (Float32*) malloc(sizeof(Float32)*windowLength); }
+        if (windowBuffer == NULL) {
+            windowBuffer = (Float32*) malloc(sizeof(Float32)*windowLength);
+        }
         vDSP_blkman_window(windowBuffer, windowLength, 0);
         vDSP_vmul(dataAccumulator, 1, windowBuffer, 1, dataAccumulator, 1, accumulatorDataLenght);
         //=========================================

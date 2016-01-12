@@ -12,12 +12,12 @@ class TunerViewController: UIViewController {
     
     var timer: NSTimer!
     var frequencyScrollView: UIScrollView!
-    
+    var audioRecognizer: ARAudioRecognizer!
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        
+        audioRecognizer = ARAudioRecognizer()
         startTimer()
         setUpOnMainView()
         setUpIndicator()
@@ -48,16 +48,20 @@ class TunerViewController: UIViewController {
     }
     
     func handleTimer(sender: NSTimer) {
-        let max_HZ: Float = TunerManager.getMaxHZ()
-        TunerFunction.sharedInstance.getMax_HZ(max_HZ)
-        let result = TunerFunction.sharedInstance.checkTheHZRange()
-        print("\(result.0), \(result.1), \(result.2), \(result.3)")
-        let letterWidth: CGFloat = self.view.frame.size.width / 6
-        if result.0 == result.1 {
-            self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth, 0), animated: true)
+        if audioRecognizer.getPower() > -35 {
+            let max_HZ: Float = TunerManager.getMaxHZ()
+            TunerFunction.sharedInstance.getMax_HZ(max_HZ)
+            let result = TunerFunction.sharedInstance.checkTheHZRange()
+            print("\(result.0), \(result.1), \(result.2), \(result.3)")
+            let letterWidth: CGFloat = self.view.frame.size.width / 6
+            if result.0 == result.1 {
+                self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth, 0), animated: true)
+            } else {
+                let position = TunerFunction.sharedInstance.calcPosition(result.0, range_max_HZ: result.1)
+                self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth + 2 * letterWidth * CGFloat(position), 0), animated: true)
+            }
         } else {
-            let position = TunerFunction.sharedInstance.calcPosition(result.0, range_max_HZ: result.1)
-            self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth + 2 * letterWidth * CGFloat(position), 0), animated: true)
+            self.frequencyScrollView.setContentOffset(CGPointMake(0, 0), animated: true)
         }
     }
     
@@ -69,7 +73,7 @@ class TunerViewController: UIViewController {
         timer.invalidate()
         timer = nil
     }
-    
+
 }
 
 extension TunerViewController {

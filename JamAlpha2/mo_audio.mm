@@ -59,6 +59,7 @@
 #include "mo_audio.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <Foundation/Foundation.h>
+#include <AVFoundation/AVFoundation.h>
 
 
 // static member initialization
@@ -288,7 +289,12 @@ static void rioInterruptionListener( void * inUserData, UInt32 inInterruption )
     if( inInterruption == kAudioSessionEndInterruption )
     {
         // make sure we are again the active session
-        AudioSessionSetActive( true );
+        NSError *deactivationError = nil;
+        BOOL success = [[AVAudioSession sharedInstance] setActive:YES error:&deactivationError];
+        if (!success) {
+            NSLog(@"%@", [deactivationError localizedDescription]);
+        }
+        //AudioSessionSetActive( true );
         AudioOutputUnitStart( *rio );
     }
     
@@ -330,11 +336,14 @@ static void propListener( void * inClientData, AudioSessionPropertyID inID,
         
         
             
-        UInt32 size = sizeof(MoAudio::m_hwSampleRate);
+        //UInt32 size = sizeof(MoAudio::m_hwSampleRate);
         // get sample rate
-        err = AudioSessionGetProperty( kAudioSessionProperty_CurrentHardwareSampleRate, 
-                                       &size, &MoAudio::m_hwSampleRate );
-        if( err )
+        NSError* error = nil;
+        BOOL success = [[AVAudioSession sharedInstance] setPreferredSampleRate:kAudioSessionProperty_CurrentHardwareSampleRate error:&error];
+        MoAudio::m_hwSampleRate = [AVAudioSession sharedInstance].sampleRate;
+        //err = AudioSessionGetProperty( kAudioSessionProperty_CurrentHardwareSampleRate,
+        //                               &size, &MoAudio::m_hwSampleRate );
+        if( !success )
         {
             // TODO: "couldn't get new sample rate"
             return;
@@ -352,26 +361,27 @@ static void propListener( void * inClientData, AudioSessionPropertyID inID,
         }
             
         // get route
-        CFStringRef newRoute;
-        size = sizeof(CFStringRef);
-        err = AudioSessionGetProperty( kAudioSessionProperty_AudioRoute, &size, &newRoute );
-        if( err )
-        {
-            // TODO: "couldn't get new audio route"
-            return;
-        }
-        
-        // check route
-        if( newRoute )
-        {
-            // CFShow( newRoute );
-            if( CFStringCompare( newRoute, CFSTR("Headset"), NULL ) == kCFCompareEqualTo )
-            { }
-            else if( CFStringCompare( newRoute, CFSTR("Receiver" ), NULL ) == kCFCompareEqualTo )
-            { }         
-            else // unknown
-            { }
-        }
+//        CFStringRef newRoute;
+//        size = sizeof(CFStringRef);
+//        AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
+//        //err = AudioSessionGetProperty( kAudioSessionProperty_AudioRoute, &size, &newRoute );
+//        if( err )
+//        {
+//            // TODO: "couldn't get new audio route"
+//            return;
+//        }
+//        
+//        // check route
+//        if( newRoute )
+//        {
+//            // CFShow( newRoute );
+//            if( CFStringCompare( newRoute, CFSTR("Headset"), NULL ) == kCFCompareEqualTo )
+//            { }
+//            else if( CFStringCompare( newRoute, CFSTR("Receiver" ), NULL ) == kCFCompareEqualTo )
+//            { }         
+//            else // unknown
+//            { }
+//        }
     }
 }
 
@@ -561,6 +571,8 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
     OSStatus err;
     
     // initialize and configure the audio session
+    //NSError* error;
+    //[[AVAudioSession sharedInstance] setActive:YES error:&error];
     err = AudioSessionInitialize( NULL, NULL, rioInterruptionListener, m_au );
     if( err )
     {
@@ -580,6 +592,8 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
 
     UInt32 category = kAudioSessionCategory_PlayAndRecord;
     // set audio category
+    //[[AVAudioSession sharedInstance] setCategory:kAudioSessionCategory_PlayAndRecord error:error];
+
     err = AudioSessionSetProperty( kAudioSessionProperty_AudioCategory, sizeof(category), &category );
     if( err )
     {
