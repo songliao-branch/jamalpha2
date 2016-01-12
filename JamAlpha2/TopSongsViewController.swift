@@ -1,17 +1,18 @@
 //
-//  MyFavoritesViewController.swift
+//  TopSongsViewController.swift
 //  JamAlpha2
 //
-//  Created by Jun Zhou on 12/11/15.
-//  Copyright © 2015 Song Liao. All rights reserved.
+//  Created by Song Liao on 1/12/16.
+//  Copyright © 2016 Song Liao. All rights reserved.
 //
 
 import UIKit
 import MediaPlayer
 
-class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    @IBOutlet weak var tableView: UITableView!
+//TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
+class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
+    @IBOutlet weak var topSongsTable: UITableView!
     
     var songs = [LocalSong]()
     var animator: CustomTransitionAnimation?
@@ -32,42 +33,43 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             self.animator = CustomTransitionAnimation()
         }
     }
-
+    
     func loadData() {
-        
-        songs = CoreDataManager.getFavorites()
-        for song in songs {
-            song.findMediaItem()
-        }
-        self.tableView.reloadData()
-
+        APIManager.getTopSongs({
+            songs in
+            self.songs = songs
+            for song in songs {
+                song.findMediaItem()
+            }
+            self.topSongsTable.reloadData()
+        })
     }
     
     func setUpNavigationBar() {
+        self.automaticallyAdjustsScrollViewInsets = false
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-        self.navigationItem.title = "My Favorites"
+        self.navigationItem.title = "Top Songs"
     }
-
+    
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return songs.count
+        return self.songs.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("MyFavoritesCell", forIndexPath: indexPath) as! MyFavoritesCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("TopSongsCell", forIndexPath: indexPath) as! TopSongsCell
         let song = songs[indexPath.row]
-        cell.numberLabel.text = "\(indexPath.row+1)"
+        cell.numberLabel.text = "\(indexPath.row + 1)"
         cell.titleLabel.text = song.title
-        cell.artistLabel.text = song.artist
-        
+        cell.subtitleLabel.text = song.artist
         return cell
     }
     
-
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
         var isSeekingPlayerState = true
+        
         let song = songs[indexPath.row]
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
@@ -145,7 +147,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             
             self.presentViewController(songVC, animated: true, completion: nil)
             
-            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            self.topSongsTable.deselectRowAtIndexPath(indexPath, animated: true)
             
             
         } else { //if the mediaItem is not found, and an searchResult is found
@@ -158,10 +160,9 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: nil)
-                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                self.topSongsTable.deselectRowAtIndexPath(indexPath, animated: true)
                 
             })
         }
-
     }
 }

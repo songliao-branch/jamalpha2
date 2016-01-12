@@ -85,8 +85,8 @@ class MusicManager: NSObject {
         let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC
         let currentVC = (UIApplication.sharedApplication().delegate as! AppDelegate).topViewController(rootViewController)
         
-        let baseVC = ((rootViewController as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
-        let searchVC = ((rootViewController as! TabBarController).childViewControllers[1].childViewControllers[0]) as! SearchViewController
+        let baseVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
+        let searchVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfSearchPage].childViewControllers[0]) as! SearchViewController
         
         // if the collection is different i.e. new songs are added/old songs are removed
         // we manually reload MusicViewController table
@@ -115,10 +115,10 @@ class MusicManager: NSObject {
             }
         }
         
-        let thirdBarItemVC = (rootViewController as! TabBarController).childViewControllers[2]
+        let userBarItemVC = (rootViewController as! TabBarController).childViewControllers[kIndexOfUserPage]
         
-        if thirdBarItemVC.childViewControllers.count > 1 { //means navigation controller has at least pushed one view controller (the root navigation controller is UserProfileViewController)
-            let firstPushedVC = thirdBarItemVC.childViewControllers[1]
+        if userBarItemVC.childViewControllers.count > 1 { //means navigation controller has at least pushed one view controller (the root navigation controller is UserProfileViewController)
+            let firstPushedVC = userBarItemVC.childViewControllers[1]
             if firstPushedVC.isKindOfClass(MyTabsAndLyricsViewController) {
                 let myTabsLyricsVC = firstPushedVC as! MyTabsAndLyricsViewController
                 myTabsLyricsVC.loadData()

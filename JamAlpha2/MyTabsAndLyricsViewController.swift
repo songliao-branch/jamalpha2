@@ -154,7 +154,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         let song = songs[indexPath.row] //TODO: Filter by edit date
         let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
-        cell.numberLabel.text = "\(indexPath.row + 1)."
+        cell.numberLabel.text = "\(indexPath.row + 1)"
 
         cell.titleLabel.text = song.title
         cell.artistLabel.text = song.artist

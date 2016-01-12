@@ -85,6 +85,8 @@
 		E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */; };
 		E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */; };
 		E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */; };
+		E4C2A4C11C45BD5700F92A1A /* TopSongsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C2A4C01C45BD5700F92A1A /* TopSongsViewController.swift */; };
+		E4C2A4C31C45BEFD00F92A1A /* TopSongsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C2A4C21C45BEFD00F92A1A /* TopSongsCell.swift */; };
 		E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */; };
 		E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF61B9E88A600473FC4 /* FretCell.swift */; };
 		E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */; };
@@ -208,6 +210,8 @@
 		E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumSectionCell.swift; sourceTree = "<group>"; };
 		E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumTrackCell.swift; sourceTree = "<group>"; };
 		E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+comparison.swift"; sourceTree = "<group>"; };
+		E4C2A4C01C45BD5700F92A1A /* TopSongsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSongsViewController.swift; sourceTree = "<group>"; };
+		E4C2A4C21C45BEFD00F92A1A /* TopSongsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSongsCell.swift; sourceTree = "<group>"; };
 		E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsDataManager.swift; sourceTree = "<group>"; };
 		E4CBBFF61B9E88A600473FC4 /* FretCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FretCell.swift; sourceTree = "<group>"; };
 		E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TabsEditorViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -429,6 +433,7 @@
 				BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */,
 				E43713F41C34853600517D03 /* UserTabsLyricsCell.swift */,
 				E43713F01C34851200517D03 /* MyFavoritesCell.swift */,
+				E4C2A4C21C45BEFD00F92A1A /* TopSongsCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -576,6 +581,7 @@
 				E49AF0961B2699C800DD3342 /* BaseViewController.swift */,
 				1045413E1BCAFBB300A4590B /* TabBarController.swift */,
 				E48877441B151628004785D3 /* SearchViewController.swift */,
+				E4C2A4C01C45BD5700F92A1A /* TopSongsViewController.swift */,
 			);
 			name = TabItemControllers;
 			sourceTree = "<group>";
@@ -817,6 +823,7 @@
 				E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */,
 				E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */,
 				E43DA1291B9FDCE1003180FB /* SearchHistory.swift in Sources */,
+				E4C2A4C31C45BEFD00F92A1A /* TopSongsCell.swift in Sources */,
 				E43713EF1C34850200517D03 /* LocalSong.swift in Sources */,
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
 				E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */,
@@ -825,6 +832,7 @@
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
 				E43713FD1C34871300517D03 /* MyTabsAndLyricsViewController.swift in Sources */,
 				E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */,
+				E4C2A4C11C45BD5700F92A1A /* TopSongsViewController.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* CoreDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				10AC35A61C215BE300749744 /* DemoCell.swift in Sources */,
