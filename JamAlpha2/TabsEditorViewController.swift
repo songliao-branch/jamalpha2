@@ -510,7 +510,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func playTutorial() {
-        videoPlayerView = YouTubePlayerView(frame: self.view.frame)
+        videoPlayerView = YouTubePlayerView(frame: CGRect(x: 20, y: 20, width: trueWidth-40, height: trueHeight-40))
         videoPlayerView.delegate = self
         let url = NSURL(string: "https://www.youtube.com/watch?v=5ZDLU4ruk-M")!
         videoPlayerView.loadVideoURL(url)
@@ -2489,8 +2489,8 @@ extension TabsEditorViewController {
                     self.progressBlock.addSubview(returnValue.0)
                 }
             }
-            
         }
+        
         let current = NSTimeInterval(sender[sender.count - 1].time.toDecimalNumer()) + 0.1
         if isDemoSong {
             self.avPlayer.currentTime = current
