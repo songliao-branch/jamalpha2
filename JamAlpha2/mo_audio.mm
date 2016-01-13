@@ -578,6 +578,7 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
         return false;
     }
     
+    
     UInt32 category = kAudioSessionCategory_PlayAndRecord;
     // set audio category
     err = AudioSessionSetProperty( kAudioSessionProperty_AudioCategory, sizeof(category), &category );
@@ -587,8 +588,6 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
         NSLog(@" error = couldn't set audio category ");
         return false;
     }
-    
-    
     
     //  MODES
     UInt32 sessionMode;
