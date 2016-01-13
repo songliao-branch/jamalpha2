@@ -1386,7 +1386,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.addSpecificFingerPoint = true
         self.currentNoteButton = sender
         self.view.userInteractionEnabled = false
-        PlayChordsManager.sharedInstance.playChordArpeggio(self.currentSelectedSpecificTab.content, delay: 0.4, completion: {
+        PlayChordsManager.sharedInstance.playChordArpeggio(self.currentSelectedSpecificTab.content, delay: 0.04, completion: {
             complete in
             self.view.userInteractionEnabled = true
         })

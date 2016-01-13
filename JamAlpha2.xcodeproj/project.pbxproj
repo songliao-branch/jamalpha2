@@ -39,6 +39,56 @@
 		BFFD86271C445C2E004E7803 /* TunerFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86261C445C2E004E7803 /* TunerFunction.swift */; };
 		BFFD862A1C455745004E7803 /* FFTHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86291C455745004E7803 /* FFTHelper.mm */; };
 		BFFD86351C45B870004E7803 /* ARAudioRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86341C45B870004E7803 /* ARAudioRecognizer.m */; };
+		BFFD86701C46D8C6004E7803 /* A3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD863E1C46D856004E7803 /* A3.aac */; };
+		BFFD86711C46D8C6004E7803 /* A3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD863F1C46D856004E7803 /* A3#.aac */; };
+		BFFD86721C46D8C6004E7803 /* A4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86401C46D856004E7803 /* A4.aac */; };
+		BFFD86731C46D8C6004E7803 /* A4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86411C46D856004E7803 /* A4#.aac */; };
+		BFFD86741C46D8C6004E7803 /* A5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86421C46D856004E7803 /* A5.aac */; };
+		BFFD86751C46D8C6004E7803 /* A5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86431C46D856004E7803 /* A5#.aac */; };
+		BFFD86761C46D8C6004E7803 /* A6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86441C46D856004E7803 /* A6.aac */; };
+		BFFD86771C46D8C6004E7803 /* A6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86451C46D856004E7803 /* A6#.aac */; };
+		BFFD86781C46D8C6004E7803 /* B2.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86461C46D85F004E7803 /* B2.aac */; };
+		BFFD86791C46D8C6004E7803 /* B3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86471C46D85F004E7803 /* B3.aac */; };
+		BFFD867A1C46D8C6004E7803 /* B4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86481C46D85F004E7803 /* B4.aac */; };
+		BFFD867B1C46D8C6004E7803 /* B5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86491C46D85F004E7803 /* B5.aac */; };
+		BFFD867C1C46D8C6004E7803 /* B6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864A1C46D85F004E7803 /* B6.aac */; };
+		BFFD867D1C46D8C6004E7803 /* C3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864B1C46D86B004E7803 /* C3.aac */; };
+		BFFD867E1C46D8C6004E7803 /* C3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864C1C46D86B004E7803 /* C3#.aac */; };
+		BFFD867F1C46D8C6004E7803 /* C4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864D1C46D86B004E7803 /* C4.aac */; };
+		BFFD86801C46D8C6004E7803 /* C4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864E1C46D86B004E7803 /* C4#.aac */; };
+		BFFD86811C46D8C6004E7803 /* C5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864F1C46D86B004E7803 /* C5.aac */; };
+		BFFD86821C46D8C6004E7803 /* C5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86501C46D86B004E7803 /* C5#.aac */; };
+		BFFD86831C46D8C6004E7803 /* C6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86511C46D86B004E7803 /* C6.aac */; };
+		BFFD86841C46D8C6004E7803 /* C6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86521C46D86B004E7803 /* C6#.aac */; };
+		BFFD86851C46D8C6004E7803 /* C7.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86531C46D86B004E7803 /* C7.aac */; };
+		BFFD86861C46D8C6004E7803 /* D3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86541C46D879004E7803 /* D3.aac */; };
+		BFFD86871C46D8C6004E7803 /* D3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86551C46D879004E7803 /* D3#.aac */; };
+		BFFD86881C46D8C6004E7803 /* D4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86561C46D879004E7803 /* D4.aac */; };
+		BFFD86891C46D8C6004E7803 /* D4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86571C46D879004E7803 /* D4#.aac */; };
+		BFFD868A1C46D8C6004E7803 /* D5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86581C46D879004E7803 /* D5.aac */; };
+		BFFD868B1C46D8C6004E7803 /* D5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86591C46D879004E7803 /* D5#.aac */; };
+		BFFD868C1C46D8C6004E7803 /* D6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865A1C46D879004E7803 /* D6.aac */; };
+		BFFD868D1C46D8C6004E7803 /* D6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865B1C46D879004E7803 /* D6#.aac */; };
+		BFFD868E1C46D8C6004E7803 /* E3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865C1C46D880004E7803 /* E3.aac */; };
+		BFFD868F1C46D8C6004E7803 /* E4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865D1C46D880004E7803 /* E4.aac */; };
+		BFFD86901C46D8C6004E7803 /* E5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865E1C46D880004E7803 /* E5.aac */; };
+		BFFD86911C46D8C6004E7803 /* E6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865F1C46D880004E7803 /* E6.aac */; };
+		BFFD86921C46D8C6004E7803 /* F3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86601C46D880004E7803 /* F3.aac */; };
+		BFFD86931C46D8C6004E7803 /* F3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86611C46D880004E7803 /* F3#.aac */; };
+		BFFD86941C46D8C6004E7803 /* F4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86621C46D880004E7803 /* F4.aac */; };
+		BFFD86951C46D8C6004E7803 /* F4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86631C46D880004E7803 /* F4#.aac */; };
+		BFFD86961C46D8C6004E7803 /* F5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86641C46D880004E7803 /* F5.aac */; };
+		BFFD86971C46D8C6004E7803 /* F5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86651C46D880004E7803 /* F5#.aac */; };
+		BFFD86981C46D8C6004E7803 /* F6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86661C46D880004E7803 /* F6.aac */; };
+		BFFD86991C46D8C6004E7803 /* F6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86671C46D880004E7803 /* F6#.aac */; };
+		BFFD869A1C46D8C6004E7803 /* G3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86681C46D889004E7803 /* G3.aac */; };
+		BFFD869B1C46D8C6004E7803 /* G3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86691C46D889004E7803 /* G3#.aac */; };
+		BFFD869C1C46D8C6004E7803 /* G4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866A1C46D889004E7803 /* G4.aac */; };
+		BFFD869D1C46D8C6004E7803 /* G4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866B1C46D889004E7803 /* G4#.aac */; };
+		BFFD869E1C46D8C6004E7803 /* G5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866C1C46D889004E7803 /* G5.aac */; };
+		BFFD869F1C46D8C6004E7803 /* G5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866D1C46D889004E7803 /* G5#.aac */; };
+		BFFD86A01C46D8C6004E7803 /* G6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866E1C46D889004E7803 /* G6.aac */; };
+		BFFD86A11C46D8C6004E7803 /* G6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866F1C46D889004E7803 /* G6#.aac */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -174,6 +224,56 @@
 		BFFD86291C455745004E7803 /* FFTHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFTHelper.mm; sourceTree = "<group>"; };
 		BFFD86331C45B870004E7803 /* ARAudioRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARAudioRecognizer.h; sourceTree = "<group>"; };
 		BFFD86341C45B870004E7803 /* ARAudioRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARAudioRecognizer.m; sourceTree = "<group>"; };
+		BFFD863E1C46D856004E7803 /* A3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A3.aac; sourceTree = "<group>"; };
+		BFFD863F1C46D856004E7803 /* A3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A3#.aac"; sourceTree = "<group>"; };
+		BFFD86401C46D856004E7803 /* A4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A4.aac; sourceTree = "<group>"; };
+		BFFD86411C46D856004E7803 /* A4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A4#.aac"; sourceTree = "<group>"; };
+		BFFD86421C46D856004E7803 /* A5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A5.aac; sourceTree = "<group>"; };
+		BFFD86431C46D856004E7803 /* A5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A5#.aac"; sourceTree = "<group>"; };
+		BFFD86441C46D856004E7803 /* A6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A6.aac; sourceTree = "<group>"; };
+		BFFD86451C46D856004E7803 /* A6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A6#.aac"; sourceTree = "<group>"; };
+		BFFD86461C46D85F004E7803 /* B2.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B2.aac; sourceTree = "<group>"; };
+		BFFD86471C46D85F004E7803 /* B3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B3.aac; sourceTree = "<group>"; };
+		BFFD86481C46D85F004E7803 /* B4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B4.aac; sourceTree = "<group>"; };
+		BFFD86491C46D85F004E7803 /* B5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B5.aac; sourceTree = "<group>"; };
+		BFFD864A1C46D85F004E7803 /* B6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B6.aac; sourceTree = "<group>"; };
+		BFFD864B1C46D86B004E7803 /* C3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C3.aac; sourceTree = "<group>"; };
+		BFFD864C1C46D86B004E7803 /* C3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C3#.aac"; sourceTree = "<group>"; };
+		BFFD864D1C46D86B004E7803 /* C4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C4.aac; sourceTree = "<group>"; };
+		BFFD864E1C46D86B004E7803 /* C4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C4#.aac"; sourceTree = "<group>"; };
+		BFFD864F1C46D86B004E7803 /* C5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C5.aac; sourceTree = "<group>"; };
+		BFFD86501C46D86B004E7803 /* C5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C5#.aac"; sourceTree = "<group>"; };
+		BFFD86511C46D86B004E7803 /* C6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C6.aac; sourceTree = "<group>"; };
+		BFFD86521C46D86B004E7803 /* C6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C6#.aac"; sourceTree = "<group>"; };
+		BFFD86531C46D86B004E7803 /* C7.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C7.aac; sourceTree = "<group>"; };
+		BFFD86541C46D879004E7803 /* D3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D3.aac; sourceTree = "<group>"; };
+		BFFD86551C46D879004E7803 /* D3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D3#.aac"; sourceTree = "<group>"; };
+		BFFD86561C46D879004E7803 /* D4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D4.aac; sourceTree = "<group>"; };
+		BFFD86571C46D879004E7803 /* D4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D4#.aac"; sourceTree = "<group>"; };
+		BFFD86581C46D879004E7803 /* D5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D5.aac; sourceTree = "<group>"; };
+		BFFD86591C46D879004E7803 /* D5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D5#.aac"; sourceTree = "<group>"; };
+		BFFD865A1C46D879004E7803 /* D6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D6.aac; sourceTree = "<group>"; };
+		BFFD865B1C46D879004E7803 /* D6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D6#.aac"; sourceTree = "<group>"; };
+		BFFD865C1C46D880004E7803 /* E3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E3.aac; sourceTree = "<group>"; };
+		BFFD865D1C46D880004E7803 /* E4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E4.aac; sourceTree = "<group>"; };
+		BFFD865E1C46D880004E7803 /* E5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E5.aac; sourceTree = "<group>"; };
+		BFFD865F1C46D880004E7803 /* E6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E6.aac; sourceTree = "<group>"; };
+		BFFD86601C46D880004E7803 /* F3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F3.aac; sourceTree = "<group>"; };
+		BFFD86611C46D880004E7803 /* F3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F3#.aac"; sourceTree = "<group>"; };
+		BFFD86621C46D880004E7803 /* F4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F4.aac; sourceTree = "<group>"; };
+		BFFD86631C46D880004E7803 /* F4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F4#.aac"; sourceTree = "<group>"; };
+		BFFD86641C46D880004E7803 /* F5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F5.aac; sourceTree = "<group>"; };
+		BFFD86651C46D880004E7803 /* F5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F5#.aac"; sourceTree = "<group>"; };
+		BFFD86661C46D880004E7803 /* F6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F6.aac; sourceTree = "<group>"; };
+		BFFD86671C46D880004E7803 /* F6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F6#.aac"; sourceTree = "<group>"; };
+		BFFD86681C46D889004E7803 /* G3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G3.aac; sourceTree = "<group>"; };
+		BFFD86691C46D889004E7803 /* G3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G3#.aac"; sourceTree = "<group>"; };
+		BFFD866A1C46D889004E7803 /* G4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G4.aac; sourceTree = "<group>"; };
+		BFFD866B1C46D889004E7803 /* G4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G4#.aac"; sourceTree = "<group>"; };
+		BFFD866C1C46D889004E7803 /* G5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G5.aac; sourceTree = "<group>"; };
+		BFFD866D1C46D889004E7803 /* G5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G5#.aac"; sourceTree = "<group>"; };
+		BFFD866E1C46D889004E7803 /* G6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G6.aac; sourceTree = "<group>"; };
+		BFFD866F1C46D889004E7803 /* G6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G6#.aac"; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -348,6 +448,56 @@
 		BFFAA51D1C3DB7C200DC3253 /* SourceFiles */ = {
 			isa = PBXGroup;
 			children = (
+				BFFD863E1C46D856004E7803 /* A3.aac */,
+				BFFD863F1C46D856004E7803 /* A3#.aac */,
+				BFFD86401C46D856004E7803 /* A4.aac */,
+				BFFD86411C46D856004E7803 /* A4#.aac */,
+				BFFD86421C46D856004E7803 /* A5.aac */,
+				BFFD86431C46D856004E7803 /* A5#.aac */,
+				BFFD86441C46D856004E7803 /* A6.aac */,
+				BFFD86451C46D856004E7803 /* A6#.aac */,
+				BFFD86461C46D85F004E7803 /* B2.aac */,
+				BFFD86471C46D85F004E7803 /* B3.aac */,
+				BFFD86481C46D85F004E7803 /* B4.aac */,
+				BFFD86491C46D85F004E7803 /* B5.aac */,
+				BFFD864A1C46D85F004E7803 /* B6.aac */,
+				BFFD864B1C46D86B004E7803 /* C3.aac */,
+				BFFD864C1C46D86B004E7803 /* C3#.aac */,
+				BFFD864D1C46D86B004E7803 /* C4.aac */,
+				BFFD864E1C46D86B004E7803 /* C4#.aac */,
+				BFFD864F1C46D86B004E7803 /* C5.aac */,
+				BFFD86501C46D86B004E7803 /* C5#.aac */,
+				BFFD86511C46D86B004E7803 /* C6.aac */,
+				BFFD86521C46D86B004E7803 /* C6#.aac */,
+				BFFD86531C46D86B004E7803 /* C7.aac */,
+				BFFD86541C46D879004E7803 /* D3.aac */,
+				BFFD86551C46D879004E7803 /* D3#.aac */,
+				BFFD86561C46D879004E7803 /* D4.aac */,
+				BFFD86571C46D879004E7803 /* D4#.aac */,
+				BFFD86581C46D879004E7803 /* D5.aac */,
+				BFFD86591C46D879004E7803 /* D5#.aac */,
+				BFFD865A1C46D879004E7803 /* D6.aac */,
+				BFFD865B1C46D879004E7803 /* D6#.aac */,
+				BFFD865C1C46D880004E7803 /* E3.aac */,
+				BFFD865D1C46D880004E7803 /* E4.aac */,
+				BFFD865E1C46D880004E7803 /* E5.aac */,
+				BFFD865F1C46D880004E7803 /* E6.aac */,
+				BFFD86601C46D880004E7803 /* F3.aac */,
+				BFFD86611C46D880004E7803 /* F3#.aac */,
+				BFFD86621C46D880004E7803 /* F4.aac */,
+				BFFD86631C46D880004E7803 /* F4#.aac */,
+				BFFD86641C46D880004E7803 /* F5.aac */,
+				BFFD86651C46D880004E7803 /* F5#.aac */,
+				BFFD86661C46D880004E7803 /* F6.aac */,
+				BFFD86671C46D880004E7803 /* F6#.aac */,
+				BFFD86681C46D889004E7803 /* G3.aac */,
+				BFFD86691C46D889004E7803 /* G3#.aac */,
+				BFFD866A1C46D889004E7803 /* G4.aac */,
+				BFFD866B1C46D889004E7803 /* G4#.aac */,
+				BFFD866C1C46D889004E7803 /* G5.aac */,
+				BFFD866D1C46D889004E7803 /* G5#.aac */,
+				BFFD866E1C46D889004E7803 /* G6.aac */,
+				BFFD866F1C46D889004E7803 /* G6#.aac */,
 				BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */,
 			);
 			name = SourceFiles;
@@ -793,6 +943,56 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFFD86701C46D8C6004E7803 /* A3.aac in Resources */,
+				BFFD86711C46D8C6004E7803 /* A3#.aac in Resources */,
+				BFFD86721C46D8C6004E7803 /* A4.aac in Resources */,
+				BFFD86731C46D8C6004E7803 /* A4#.aac in Resources */,
+				BFFD86741C46D8C6004E7803 /* A5.aac in Resources */,
+				BFFD86751C46D8C6004E7803 /* A5#.aac in Resources */,
+				BFFD86761C46D8C6004E7803 /* A6.aac in Resources */,
+				BFFD86771C46D8C6004E7803 /* A6#.aac in Resources */,
+				BFFD86781C46D8C6004E7803 /* B2.aac in Resources */,
+				BFFD86791C46D8C6004E7803 /* B3.aac in Resources */,
+				BFFD867A1C46D8C6004E7803 /* B4.aac in Resources */,
+				BFFD867B1C46D8C6004E7803 /* B5.aac in Resources */,
+				BFFD867C1C46D8C6004E7803 /* B6.aac in Resources */,
+				BFFD867D1C46D8C6004E7803 /* C3.aac in Resources */,
+				BFFD867E1C46D8C6004E7803 /* C3#.aac in Resources */,
+				BFFD867F1C46D8C6004E7803 /* C4.aac in Resources */,
+				BFFD86801C46D8C6004E7803 /* C4#.aac in Resources */,
+				BFFD86811C46D8C6004E7803 /* C5.aac in Resources */,
+				BFFD86821C46D8C6004E7803 /* C5#.aac in Resources */,
+				BFFD86831C46D8C6004E7803 /* C6.aac in Resources */,
+				BFFD86841C46D8C6004E7803 /* C6#.aac in Resources */,
+				BFFD86851C46D8C6004E7803 /* C7.aac in Resources */,
+				BFFD86861C46D8C6004E7803 /* D3.aac in Resources */,
+				BFFD86871C46D8C6004E7803 /* D3#.aac in Resources */,
+				BFFD86881C46D8C6004E7803 /* D4.aac in Resources */,
+				BFFD86891C46D8C6004E7803 /* D4#.aac in Resources */,
+				BFFD868A1C46D8C6004E7803 /* D5.aac in Resources */,
+				BFFD868B1C46D8C6004E7803 /* D5#.aac in Resources */,
+				BFFD868C1C46D8C6004E7803 /* D6.aac in Resources */,
+				BFFD868D1C46D8C6004E7803 /* D6#.aac in Resources */,
+				BFFD868E1C46D8C6004E7803 /* E3.aac in Resources */,
+				BFFD868F1C46D8C6004E7803 /* E4.aac in Resources */,
+				BFFD86901C46D8C6004E7803 /* E5.aac in Resources */,
+				BFFD86911C46D8C6004E7803 /* E6.aac in Resources */,
+				BFFD86921C46D8C6004E7803 /* F3.aac in Resources */,
+				BFFD86931C46D8C6004E7803 /* F3#.aac in Resources */,
+				BFFD86941C46D8C6004E7803 /* F4.aac in Resources */,
+				BFFD86951C46D8C6004E7803 /* F4#.aac in Resources */,
+				BFFD86961C46D8C6004E7803 /* F5.aac in Resources */,
+				BFFD86971C46D8C6004E7803 /* F5#.aac in Resources */,
+				BFFD86981C46D8C6004E7803 /* F6.aac in Resources */,
+				BFFD86991C46D8C6004E7803 /* F6#.aac in Resources */,
+				BFFD869A1C46D8C6004E7803 /* G3.aac in Resources */,
+				BFFD869B1C46D8C6004E7803 /* G3#.aac in Resources */,
+				BFFD869C1C46D8C6004E7803 /* G4.aac in Resources */,
+				BFFD869D1C46D8C6004E7803 /* G4#.aac in Resources */,
+				BFFD869E1C46D8C6004E7803 /* G5.aac in Resources */,
+				BFFD869F1C46D8C6004E7803 /* G5#.aac in Resources */,
+				BFFD86A01C46D8C6004E7803 /* G6.aac in Resources */,
+				BFFD86A11C46D8C6004E7803 /* G6#.aac in Resources */,
 				E475311B1C2228360072E791 /* Go.mp3 in Resources */,
 				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
 				BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */,

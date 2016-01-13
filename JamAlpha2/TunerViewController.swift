@@ -18,7 +18,7 @@ class TunerViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-
+        setUpNavigationBar()
         audioRecognizer = ARAudioRecognizer()
         startTimer()
         setUpOnMainView()
@@ -47,6 +47,13 @@ class TunerViewController: UIViewController {
     
     override func shouldAutorotate() -> Bool {
         return true
+    }
+    
+    func setUpNavigationBar() {
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
+        self.navigationItem.title = "Tuner"
     }
     
     func handleTimer(sender: NSTimer) {

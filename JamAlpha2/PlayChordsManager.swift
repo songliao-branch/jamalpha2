@@ -110,7 +110,7 @@ class PlayChordsManager: NSObject {
         let midiArray: [Int32] = convertContentToIndexArray(content)
         if playingArpeggio == false {
             playingArpeggio = true
-            for var i = 0; i < midiArray.count; i++ {
+            for var i = midiArray.count - 1; i >= 0 ; i-- {
                 arpeggioNotes.addObject(NSNumber(int:midiArray[i]))
             }
             arpeggioIndex = 0
