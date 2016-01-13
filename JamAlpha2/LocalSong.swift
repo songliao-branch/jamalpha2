@@ -29,7 +29,7 @@ class LocalSong: NSObject {
         self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
             item in
             if let itemTitle = item.title, itemArtist = item.artist {
-                return itemTitle == title && itemArtist == artist && abs((Float(item.playbackDuration) - duration)) < 1.5
+                return itemTitle.lowercaseString == title.lowercaseString && itemArtist.lowercaseString == artist.lowercaseString && abs((Float(item.playbackDuration) - duration)) < 1.5
             }
             return false
         }.first
@@ -40,7 +40,7 @@ class LocalSong: NSObject {
             SearchAPI.searchSong(title + " " + artist, completion: {
                 results in
                 for result in results {
-                    if result.getTitle() == self.title && result.getArtist() == self.artist && abs(result.getDuration() - self.duration) < 1.5 {
+                    if result.getTitle().lowercaseString == self.title.lowercaseString && result.getArtist().lowercaseString == self.artist.lowercaseString && abs(result.getDuration() - self.duration) < 1.5 {
                         completion(searchResult: result)
                         break
                     }

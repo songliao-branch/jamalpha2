@@ -134,7 +134,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 self.showConnectInternet(tableView)
             }
             
-        }   else if song.artist == "Alex Lisell" { //if demo song
+        } else if song.artist == "Alex Lisell" { //if demo song
             
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
@@ -146,7 +146,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             self.animator!.attachToViewController(songVC)
             
             self.presentViewController(songVC, animated: true, completion: nil)
-            
             self.topSongsTable.deselectRowAtIndexPath(indexPath, animated: true)
             
             
