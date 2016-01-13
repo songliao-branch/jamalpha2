@@ -1,18 +1,18 @@
 /*----------------------------------------------------------------------------
-  MoMu: A Mobile Music Toolkit
-  Copyright (c) 2010 Nicholas J. Bryan, Jorge Herrera, Jieun Oh, and Ge Wang
-  All rights reserved.
-    http://momu.stanford.edu/toolkit/
+ MoMu: A Mobile Music Toolkit
+ Copyright (c) 2010 Nicholas J. Bryan, Jorge Herrera, Jieun Oh, and Ge Wang
+ All rights reserved.
+ http://momu.stanford.edu/toolkit/
  
-  Mobile Music Research @ CCRMA
-  Music, Computing, Design Group
-  Stanford University
-    http://momu.stanford.edu/
-    http://ccrma.stanford.edu/groups/mcd/
+ Mobile Music Research @ CCRMA
+ Music, Computing, Design Group
+ Stanford University
+ http://momu.stanford.edu/
+ http://ccrma.stanford.edu/groups/mcd/
  
  MoMu is distributed under the following BSD style open source license:
  
- Permission is hereby granted, free of charge, to any person obtaining a 
+ Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the
  "Software"), to deal in the Software without restriction, including
  without limitation the rights to use, copy, modify, merge, publish,
@@ -21,9 +21,9 @@
  the following conditions:
  
  The authors encourage users of MoMu to include this copyright notice,
- and to let us know that you are using MoMu. Any person wishing to 
- distribute modifications to the Software is encouraged to send the 
- modifications to the original authors so that they can be incorporated 
+ and to let us know that you are using MoMu. Any person wishing to
+ distribute modifications to the Software is encouraged to send the
+ modifications to the original authors so that they can be incorporated
  into the canonical version.
  
  The Software is provided "as is", WITHOUT ANY WARRANTY, express or implied,
@@ -31,7 +31,7 @@
  FOR A PARTICULAR PURPOSE and NONINFRINGEMENT.  In no event shall the authors
  or copyright holders by liable for any claim, damages, or other liability,
  whether in an actino of a contract, tort or otherwise, arising from, out of
- or in connection with the Software or the use or other dealings in the 
+ or in connection with the Software or the use or other dealings in the
  software.
  -----------------------------------------------------------------------------*/
 //-----------------------------------------------------------------------------
@@ -58,8 +58,6 @@
 //-----------------------------------------------------------------------------
 #include "mo_audio.h"
 #include <AudioToolbox/AudioToolbox.h>
-#include <Foundation/Foundation.h>
-#include <AVFoundation/AVFoundation.h>
 
 
 // static member initialization
@@ -106,8 +104,8 @@ void silenceData( AudioBufferList * inData )
 // name: convertToUser()
 // desc: convert to user data (stereo)
 //-----------------------------------------------------------------------------
-void convertToUser( AudioBufferList * inData, Float32 * buffy, 
-                    UInt32 numFrames, UInt32 & actualFrames )
+void convertToUser( AudioBufferList * inData, Float32 * buffy,
+                   UInt32 numFrames, UInt32 & actualFrames )
 {
     // make sure there are exactly two channels
     assert( inData->mNumberBuffers == MoAudio::m_numChannels );
@@ -121,9 +119,9 @@ void convertToUser( AudioBufferList * inData, Float32 * buffy,
     // fixed to float scaling factor
     Float32 factor = (Float32)(1 << 24);
     
-//    NSLog(@" factor=%f ", factor);
-//    NSLog(@"  %f", MAXFLOAT);
-//    printf("\n factor = %f", factor);
+    //    NSLog(@" factor=%f ", factor);
+    //    NSLog(@"  %f", MAXFLOAT);
+    //    printf("\n factor = %f", factor);
     
     // interleave (AU is by default non interleaved)
     for( UInt32 i = 0; i < inFrames; i++ )
@@ -138,7 +136,7 @@ void convertToUser( AudioBufferList * inData, Float32 * buffy,
 
 
 void convertToUser2( AudioBufferList * inData, Float32 * buffy,
-                   UInt32 numFrames, UInt32 & actualFrames )
+                    UInt32 numFrames, UInt32 & actualFrames )
 {
     // make sure there are exactly two channels
     assert( inData->mNumberBuffers == MoAudio::m_numChannels );
@@ -148,7 +146,7 @@ void convertToUser2( AudioBufferList * inData, Float32 * buffy,
     assert( inFrames <= numFrames );
     // channels
     SInt32 * data = (SInt32 *)inData->mBuffers[0].mData;
-//    SInt32 * right = (SInt32 *)inData->mBuffers[1].mData;
+    //    SInt32 * right = (SInt32 *)inData->mBuffers[1].mData;
     // fixed to float scaling factor
     Float32 factor = (Float32)(1 << 24);
     
@@ -226,15 +224,15 @@ void convertFromUser2( AudioBufferList * inData, Float32 * buffy, UInt32 numFram
 // desc: callback procedure awaiting audio unit audio buffers
 //-----------------------------------------------------------------------------
 static OSStatus SMALLRenderProc(
-    void * inRefCon, 
-    AudioUnitRenderActionFlags * ioActionFlags, 
-    const AudioTimeStamp * inTimeStamp, 
-    UInt32 inBusNumber, 
-    UInt32 inNumberFrames, 
-    AudioBufferList * ioData ) 
+                                void * inRefCon,
+                                AudioUnitRenderActionFlags * ioActionFlags,
+                                const AudioTimeStamp * inTimeStamp,
+                                UInt32 inBusNumber,
+                                UInt32 inNumberFrames,
+                                AudioBufferList * ioData )
 {
     OSStatus err = noErr;
-
+    
     // render if full-duplex available and enabled
     if( MoAudio::m_handleInput )
     {
@@ -246,20 +244,20 @@ static OSStatus SMALLRenderProc(
             return err;
         }
     }
-
+    
     // actual frames
     UInt32 actualFrames = 0;
     
     // convert
     convertToUser( ioData, MoAudio::m_info->m_ioBuffer, MoAudio::m_info->m_bufferSize, actualFrames );
-//    convertToUser2( ioData, MoAudio::m_info->m_ioBuffer, MoAudio::m_info->m_bufferSize, actualFrames );
+    //    convertToUser2( ioData, MoAudio::m_info->m_ioBuffer, MoAudio::m_info->m_bufferSize, actualFrames );
     
     // callback
     MoAudio::m_callback( MoAudio::m_info->m_ioBuffer, actualFrames, MoAudio::m_bindle );
     
     // convert back
     convertFromUser( ioData, MoAudio::m_info->m_ioBuffer, MoAudio::m_info->m_bufferSize );
-//    convertFromUser2( ioData, MoAudio::m_info->m_ioBuffer, MoAudio::m_info->m_bufferSize );
+    //    convertFromUser2( ioData, MoAudio::m_info->m_ioBuffer, MoAudio::m_info->m_bufferSize );
     
     // mute?
     if( MoAudio::m_isMute )
@@ -277,8 +275,8 @@ static OSStatus SMALLRenderProc(
 //-----------------------------------------------------------------------------
 static void rioInterruptionListener( void * inUserData, UInt32 inInterruption )
 {
-    // printf( "Session interrupted! --- %s ---", 
-    //     inInterruption == kAudioSessionBeginInterruption 
+    // printf( "Session interrupted! --- %s ---",
+    //     inInterruption == kAudioSessionBeginInterruption
     //     ? "Begin Interruption" : "End Interruption" );
     
     if (inUserData==NULL) { printf(" NULL \n"); return; }
@@ -289,18 +287,13 @@ static void rioInterruptionListener( void * inUserData, UInt32 inInterruption )
     if( inInterruption == kAudioSessionEndInterruption )
     {
         // make sure we are again the active session
-        NSError *deactivationError = nil;
-        BOOL success = [[AVAudioSession sharedInstance] setActive:YES error:&deactivationError];
-        if (!success) {
-            NSLog(@"%@", [deactivationError localizedDescription]);
-        }
-        //AudioSessionSetActive( true );
+        AudioSessionSetActive( true );
         AudioOutputUnitStart( *rio );
     }
     
     // begin
     if( inInterruption == kAudioSessionBeginInterruption )
-        AudioOutputUnitStop( *rio );        
+        AudioOutputUnitStop( *rio );
 }
 
 
@@ -311,14 +304,14 @@ static void rioInterruptionListener( void * inUserData, UInt32 inInterruption )
 // desc: audio session property listener
 //-----------------------------------------------------------------------------
 static void propListener( void * inClientData, AudioSessionPropertyID inID,
-                          UInt32 inDataSize, const void * inData )
+                         UInt32 inDataSize, const void * inData )
 {
     // detect audio route change
     if( inID == kAudioSessionProperty_AudioRouteChange )
     {
         // status code
         OSStatus err;
-
+        
         // if there was a route change, we need to dispose the current rio unit and create a new one
         err = AudioComponentInstanceDispose( MoAudio::m_au );
         if( err )
@@ -335,15 +328,12 @@ static void propListener( void * inClientData, AudioSessionPropertyID inID,
         }
         
         
-            
-        //UInt32 size = sizeof(MoAudio::m_hwSampleRate);
+        
+        UInt32 size = sizeof(MoAudio::m_hwSampleRate);
         // get sample rate
-        NSError* error = nil;
-        BOOL success = [[AVAudioSession sharedInstance] setPreferredSampleRate:kAudioSessionProperty_CurrentHardwareSampleRate error:&error];
-        MoAudio::m_hwSampleRate = [AVAudioSession sharedInstance].sampleRate;
-        //err = AudioSessionGetProperty( kAudioSessionProperty_CurrentHardwareSampleRate,
-        //                               &size, &MoAudio::m_hwSampleRate );
-        if( !success )
+        err = AudioSessionGetProperty( kAudioSessionProperty_CurrentHardwareSampleRate,
+                                      &size, &MoAudio::m_hwSampleRate );
+        if( err )
         {
             // TODO: "couldn't get new sample rate"
             return;
@@ -359,29 +349,28 @@ static void propListener( void * inClientData, AudioSessionPropertyID inID,
             // TODO: "couldn't start unit"
             return;
         }
-            
+        
         // get route
-//        CFStringRef newRoute;
-//        size = sizeof(CFStringRef);
-//        AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
-//        //err = AudioSessionGetProperty( kAudioSessionProperty_AudioRoute, &size, &newRoute );
-//        if( err )
-//        {
-//            // TODO: "couldn't get new audio route"
-//            return;
-//        }
-//        
-//        // check route
-//        if( newRoute )
-//        {
-//            // CFShow( newRoute );
-//            if( CFStringCompare( newRoute, CFSTR("Headset"), NULL ) == kCFCompareEqualTo )
-//            { }
-//            else if( CFStringCompare( newRoute, CFSTR("Receiver" ), NULL ) == kCFCompareEqualTo )
-//            { }         
-//            else // unknown
-//            { }
-//        }
+        CFStringRef newRoute;
+        size = sizeof(CFStringRef);
+        err = AudioSessionGetProperty( kAudioSessionProperty_AudioRoute, &size, &newRoute );
+        if( err )
+        {
+            // TODO: "couldn't get new audio route"
+            return;
+        }
+        
+        // check route
+        if( newRoute )
+        {
+            // CFShow( newRoute );
+            if( CFStringCompare( newRoute, CFSTR("Headset"), NULL ) == kCFCompareEqualTo )
+            { }
+            else if( CFStringCompare( newRoute, CFSTR("Receiver" ), NULL ) == kCFCompareEqualTo )
+            { }
+            else // unknown
+            { }
+        }
     }
 }
 
@@ -437,7 +426,7 @@ bool setupRemoteIO( AudioUnit & inRemoteIOUnit, AURenderCallbackStruct inRenderP
     if( err )
     {
         // TODO: "couldn't set remote i/o render callback"
-        printf("couldn't set remote i/o render callback");
+        printf("");
         return false;
     }
     
@@ -533,16 +522,17 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
     }
     
     // TODO: fix this
-//    assert( numChannels == 2 );
+    //    assert( numChannels == 2 );
     
     // set audio unit callback
     m_renderProc.inputProc = SMALLRenderProc;
+    
     // uh, this probably shouldn't be NULL
     m_renderProc.inputProcRefCon = NULL;
     
     // allocate info
     m_info = new MoAudioUnitInfo();
-
+    
     // set the desired data format
     m_info->m_dataFormat.mSampleRate = srate;
     m_info->m_dataFormat.mFormatID = kAudioFormatLinearPCM;
@@ -554,31 +544,29 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
     m_info->m_dataFormat.mReserved = 0;
     m_info->m_dataFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger;
     m_info->m_done = 0;
-
+    
     // bound parameters
     if( frameSize > m_info->m_bufferSize )
         frameSize = m_info->m_bufferSize;
-
-//    if( numChannels != 2 )
-//        numChannels = 2;
+    
+    //    if( numChannels != 2 )
+    //        numChannels = 2;
     
     // copy parameters
     m_srate = srate;
     m_frameSize = frameSize;
     m_numChannels = numChannels;
-
+    
     // return status code
     OSStatus err;
     
     // initialize and configure the audio session
-    //NSError* error;
-    //[[AVAudioSession sharedInstance] setActive:YES error:&error];
     err = AudioSessionInitialize( NULL, NULL, rioInterruptionListener, m_au );
     if( err )
     {
         // TODO: "couldn't initialize audio session"
         NSLog(@" error = AudioSessionInitialize ");
-//        return false;
+        //        return false;
     }
     
     // set audio session active
@@ -589,11 +577,9 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
         NSLog(@" error = AudioSessionSetActive");
         return false;
     }
-
+    
     UInt32 category = kAudioSessionCategory_PlayAndRecord;
     // set audio category
-    //[[AVAudioSession sharedInstance] setCategory:kAudioSessionCategory_PlayAndRecord error:error];
-
     err = AudioSessionSetProperty( kAudioSessionProperty_AudioCategory, sizeof(category), &category );
     if( err )
     {
@@ -601,9 +587,9 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
         NSLog(@" error = couldn't set audio category ");
         return false;
     }
-
     
-
+    
+    
     //  MODES
     UInt32 sessionMode;
     
@@ -620,7 +606,7 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
     
     
     
-
+    
     // set property listener
     err = AudioSessionAddPropertyListener( kAudioSessionProperty_AudioRouteChange, propListener, NULL );
     if( err )
@@ -671,14 +657,14 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
             // TODO: "couldn't get new audio route\n"
             NSLog(@" error = couldn't set new audio route ");
             return false;
-        }        
+        }
     }
     
     // compute durations
     Float32 preferredBufferSize = (Float32)(frameSize / srate); // .020;
     // set I/O buffer duration
     AudioSessionSetProperty( kAudioSessionProperty_PreferredHardwareIOBufferDuration,
-                             sizeof(preferredBufferSize), &preferredBufferSize );
+                            sizeof(preferredBufferSize), &preferredBufferSize );
     if( err )
     {
         // TODO: "couldn't set i/o buffer duration"
@@ -686,11 +672,11 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
         
         return false;
     }
-
+    
     Float64 preferredSampleRate = srate;
     // set sample rate
     AudioSessionSetProperty( kAudioSessionProperty_PreferredHardwareSampleRate,
-                             sizeof(preferredSampleRate), &preferredSampleRate );
+                            sizeof(preferredSampleRate), &preferredSampleRate );
     if( err )
     {
         // TODO: "couldn't set preferred sample rate"
@@ -710,7 +696,7 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
     
     // set up remote I/O
     bool reslt;
-    if ( enableBuiltInAEC == true) {
+    if (enableBuiltInAEC==true) {
         reslt = setupRemoteIO(m_au, m_renderProc, m_info->m_dataFormat, kAudioUnitSubType_VoiceProcessingIO);
     } else {
         reslt = setupRemoteIO(m_au, m_renderProc, m_info->m_dataFormat, kAudioUnitSubType_RemoteIO);
@@ -735,10 +721,10 @@ bool MoAudio::init( Float64 srate, UInt32 frameSize, UInt32 numChannels, bool en
     
     // check audio input
     checkInput();
-
+    
     // done with initialization
     m_hasInit = true;
-
+    
     return true;
 }
 
@@ -758,7 +744,7 @@ bool MoAudio::start( MoCallback callback, void * bindle )
 {
     // assert
     assert( callback != NULL );
-
+    
     // sanity check
     if( !m_hasInit )
     {
@@ -771,7 +757,7 @@ bool MoAudio::start( MoCallback callback, void * bindle )
     if( m_isRunning )
     {
         // TODO: warning message
-        printf("m_isrunning");
+        printf("m_isRunning");
         return false;
     }
     
@@ -782,23 +768,21 @@ bool MoAudio::start( MoCallback callback, void * bindle )
     
     // status code
     OSStatus err;
-
+    
     // start audio unit
     err = AudioOutputUnitStart( m_au );
     if( err )
     {
         // TODO: "couldn't start audio unit...\n" );
         printf("couldn't start audio unit...");
-        m_isRunning = true;
-        return false;
+        //return false;
     }
-
+    
     // started
     m_isRunning = true;
-
+    
     return true;
 }
-
 
 
 
@@ -817,7 +801,10 @@ void MoAudio::stop()
     
     // stop audio unit
     err = AudioOutputUnitStop( m_au );
-
+    if(!err) {
+        printf("AudioOutputUnitStop");
+    }
+    
     // flag
     m_isRunning = false;
 }
@@ -835,9 +822,9 @@ void MoAudio::shutdown()
     AudioSessionRemovePropertyListenerWithUserData(kAudioSessionProperty_AudioRouteChange, propListener, NULL);
     
     // sanity check
-    if( !m_hasInit )
-        return;
-
+//    if( !m_hasInit )
+//        return;
+    
     // stop
     stop();
     
@@ -862,11 +849,11 @@ void MoAudio::checkInput()
 {
     // handle input in callback
     m_handleInput = true;
-
+    
     UInt32 has_input;
     UInt32 size = sizeof(has_input);
     // get property
-    OSStatus err = AudioSessionGetProperty( kAudioSessionProperty_AudioInputAvailable, &size, &has_input );        
+    OSStatus err = AudioSessionGetProperty( kAudioSessionProperty_AudioInputAvailable, &size, &has_input );
     if( err )
     {
         // TODO: "warning: unable to determine availability of audio input"

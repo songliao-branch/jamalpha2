@@ -144,6 +144,8 @@ public: // ge: making this public was a hack
     static UInt32 m_numChannels;
     static void * m_bindle;
     
+    static Float32 m_soundPower;
+    
     static bool builtIntAEC_Enabled;
     static bool isRunning();
     

@@ -35,7 +35,6 @@
 		BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */; };
 		BFFD85A21C407BEF004E7803 /* TunerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD85A11C407BEF004E7803 /* TunerViewController.swift */; };
 		BFFD86201C4385C9004E7803 /* mo_audio.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD861C1C4385C9004E7803 /* mo_audio.mm */; };
-		BFFD86211C4385C9004E7803 /* mo_gfx.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD861F1C4385C9004E7803 /* mo_gfx.mm */; };
 		BFFD86241C438605004E7803 /* TunerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86231C438605004E7803 /* TunerManager.mm */; };
 		BFFD86271C445C2E004E7803 /* TunerFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86261C445C2E004E7803 /* TunerFunction.swift */; };
 		BFFD862A1C455745004E7803 /* FFTHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86291C455745004E7803 /* FFTHelper.mm */; };
@@ -168,8 +167,6 @@
 		BFFD861B1C4385C9004E7803 /* mo_audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_audio.h; sourceTree = "<group>"; };
 		BFFD861C1C4385C9004E7803 /* mo_audio.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = mo_audio.mm; sourceTree = "<group>"; };
 		BFFD861D1C4385C9004E7803 /* mo_def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_def.h; sourceTree = "<group>"; };
-		BFFD861E1C4385C9004E7803 /* mo_gfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_gfx.h; sourceTree = "<group>"; };
-		BFFD861F1C4385C9004E7803 /* mo_gfx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = mo_gfx.mm; sourceTree = "<group>"; };
 		BFFD86221C438605004E7803 /* TunerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TunerManager.h; sourceTree = "<group>"; };
 		BFFD86231C438605004E7803 /* TunerManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TunerManager.mm; sourceTree = "<group>"; };
 		BFFD86261C445C2E004E7803 /* TunerFunction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerFunction.swift; sourceTree = "<group>"; };
@@ -395,8 +392,6 @@
 				BFFD861B1C4385C9004E7803 /* mo_audio.h */,
 				BFFD861C1C4385C9004E7803 /* mo_audio.mm */,
 				BFFD861D1C4385C9004E7803 /* mo_def.h */,
-				BFFD861E1C4385C9004E7803 /* mo_gfx.h */,
-				BFFD861F1C4385C9004E7803 /* mo_gfx.mm */,
 			);
 			name = MoMu;
 			sourceTree = "<group>";
@@ -949,7 +944,6 @@
 				105B2EC71C316E20002BC17A /* CustomizedView.swift in Sources */,
 				84DA61A41B4E211100979A42 /* Lyric.swift in Sources */,
 				E48877451B151628004785D3 /* SearchViewController.swift in Sources */,
-				BFFD86211C4385C9004E7803 /* mo_gfx.mm in Sources */,
 				E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */,
 				E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */,
 				BF4B83E51BFA776200AF8A2A /* MeUserProfileTableViewCell.swift in Sources */,

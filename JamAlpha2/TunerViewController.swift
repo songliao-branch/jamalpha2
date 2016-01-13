@@ -17,6 +17,7 @@ class TunerViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+
         audioRecognizer = ARAudioRecognizer()
         startTimer()
         setUpOnMainView()
@@ -48,6 +49,7 @@ class TunerViewController: UIViewController {
     }
     
     func handleTimer(sender: NSTimer) {
+        print(audioRecognizer.getPower() )
         if audioRecognizer.getPower() > -35 {
             let max_HZ: Float = TunerManager.getMaxHZ()
             TunerFunction.sharedInstance.getMax_HZ(max_HZ)

@@ -164,7 +164,6 @@ void AudioCallback( Float32 * buffer, UInt32 frameSize, void * userData )
 }
 
 + (void) deinitMomuAudio {
-    MoAudio::stop();
     MoAudio::shutdown();
 }
 

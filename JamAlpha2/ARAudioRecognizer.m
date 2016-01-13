@@ -27,7 +27,7 @@
 
 - (id)init
 {
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+    //[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
 
     return [self initWithSensitivity:AR_AUDIO_RECOGNIZER_SENSITIVITY_DEFAULT
                            frequency:AR_AUDIO_RECOGNIZER_FREQUENCY_DEFAULT];
@@ -72,14 +72,12 @@
 
 - (void)initializeLevelTimer
 {
-    self.levelTimer = [NSTimer scheduledTimerWithTimeInterval: 0.03 target: self selector: @selector(levelTimerCallback:) userInfo: nil repeats: YES];
+    self.levelTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5 target: self selector: @selector(levelTimerCallback:) userInfo: nil repeats: YES];
 }
 
 - (void)levelTimerCallback:(NSTimer *)timer
 {
 	[self.recorder updateMeters];
-    
-    //NSLog(@"%f",[self.recorder averagePowerForChannel:0]);
 }
 
 - (float)getPower {
