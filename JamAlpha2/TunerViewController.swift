@@ -12,6 +12,7 @@ class TunerViewController: UIViewController {
     
     var timer: NSTimer!
     var frequencyScrollView: UIScrollView!
+    var soundPowerLabel: UILabel!
     var audioRecognizer: ARAudioRecognizer!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,6 +52,10 @@ class TunerViewController: UIViewController {
     func handleTimer(sender: NSTimer) {
         print(audioRecognizer.getPower() )
         if audioRecognizer.getPower() > -35 {
+            
+            self.soundPowerLabel.text = "Detected the sound"
+            self.soundPowerLabel.textColor = UIColor.greenColor()
+            
             let max_HZ: Float = TunerManager.getMaxHZ()
             TunerFunction.sharedInstance.getMax_HZ(max_HZ)
             let result = TunerFunction.sharedInstance.checkTheHZRange()
@@ -63,6 +68,8 @@ class TunerViewController: UIViewController {
                 self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth + 2 * letterWidth * CGFloat(position), 0), animated: true)
             }
         } else {
+            self.soundPowerLabel.text = "Sound is too small to detect"
+            self.soundPowerLabel.textColor = UIColor.redColor()
             self.frequencyScrollView.setContentOffset(CGPointMake(0, 0), animated: true)
         }
     }
@@ -80,10 +87,18 @@ class TunerViewController: UIViewController {
 
 extension TunerViewController {
     func setUpOnMainView() {
+        let labelWidth: CGFloat = 0.9 * self.view.frame.size.width
+        self.soundPowerLabel = UILabel()
+        self.soundPowerLabel.frame = CGRectMake(self.view.centerX - labelWidth / 2, 44, labelWidth, 44)
+        self.soundPowerLabel.text = "Sound is too small to detect"
+        self.soundPowerLabel.textColor = UIColor.redColor()
+        self.view.addSubview(self.soundPowerLabel)
+        
         let letterWidth: CGFloat = self.view.frame.size.width / 6
         let frame = CGRectMake(0, self.view.center.y - letterWidth * 2, self.view.frame.size.width, letterWidth)
         self.frequencyScrollView = UIScrollView(frame: frame)
         self.frequencyScrollView.contentSize = CGSizeMake(self.view.frame.width * 28, letterWidth)
+        self.frequencyScrollView.showsHorizontalScrollIndicator = false
         
         for var i = 0; i < 7 * 12; i++ {
             let noteLabel: UILabel = UILabel()
