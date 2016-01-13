@@ -309,7 +309,6 @@
 			isa = PBXGroup;
 			children = (
 				BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */,
-				E4D5EEE81C10DAC0000FA35E /* Helper */,
 				BFE49ECF1C1220C200F26877 /* SettingViewController */,
 				E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */,
 			);
@@ -527,6 +526,7 @@
 		E48AE2D01B955BA30044CFDB /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				E4D5EEE81C10DAC0000FA35E /* S3 */,
 				10FFBAAE1C3F9973003DF489 /* NetworkManager */,
 				E48F22651BF5920300F24962 /* Models */,
 				E48AE2D11B955BB40044CFDB /* APIManager.swift */,
@@ -593,13 +593,13 @@
 			name = UserProfileViewController;
 			sourceTree = "<group>";
 		};
-		E4D5EEE81C10DAC0000FA35E /* Helper */ = {
+		E4D5EEE81C10DAC0000FA35E /* S3 */ = {
 			isa = PBXGroup;
 			children = (
 				BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */,
 				BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */,
 			);
-			name = Helper;
+			name = S3;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
