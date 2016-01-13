@@ -90,7 +90,7 @@ class PlayChordsManager: NSObject {
     }
     
     func playSingleNoteSound(index: Int) {
-        
+        soundBank.allNotesOff()
         let midi = convertIndexToMidi(index)
         print("midi: \(midi)")
         soundBank.queueNote(midi, gain: 0.4)
@@ -98,6 +98,7 @@ class PlayChordsManager: NSObject {
     }
     
     func playChordSimultenous(content: String) {
+        soundBank.allNotesOff()
         let midiArray: [Int32] = convertContentToIndexArray(content)
         for item in midiArray {
             soundBank.queueNote(item, gain: 0.4)
@@ -106,6 +107,7 @@ class PlayChordsManager: NSObject {
     }
     
     func playChordArpeggio(content: String, delay: CFTimeInterval, completion: ((complete: Bool) -> Void)) {
+        soundBank.allNotesOff()
         self.startTimer()
         let midiArray: [Int32] = convertContentToIndexArray(content)
         if playingArpeggio == false {
