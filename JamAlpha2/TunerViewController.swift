@@ -58,7 +58,7 @@ class TunerViewController: UIViewController {
     
     func handleTimer(sender: NSTimer) {
         print(audioRecognizer.getPower() )
-        if audioRecognizer.getPower() > -35 {
+        if audioRecognizer.getPower() > -20 {
             
             self.soundPowerLabel.text = "Detected the sound"
             self.soundPowerLabel.textColor = UIColor.greenColor()
@@ -69,10 +69,10 @@ class TunerViewController: UIViewController {
             print("\(result.0), \(result.1), \(result.2), \(result.3)")
             let letterWidth: CGFloat = self.view.frame.size.width / 6
             if result.0 == result.1 {
-                self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth, 0), animated: true)
+                self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 1.5 * letterWidth, 0), animated: true)
             } else {
-                let position = TunerFunction.sharedInstance.calcPosition(result.0, range_max_HZ: result.1)
-                self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth + 2 * letterWidth * CGFloat(position), 0), animated: true)
+//                let position = TunerFunction.sharedInstance.calcPosition(result.0, range_max_HZ: result.1)
+//                self.frequencyScrollView.setContentOffset(CGPointMake(letterWidth / 2 + letterWidth * CGFloat((result.4 * 12 + result.5) * 2) - 2.5 * letterWidth + 2 * letterWidth * CGFloat(position), 0), animated: true)
             }
         } else {
             self.soundPowerLabel.text = "Sound is too small to detect"
