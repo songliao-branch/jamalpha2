@@ -952,21 +952,41 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="search" translatesAutoresizingMaskIntoConstraints="NO" id="UrQ-hg-AF5">
+                                                    <rect key="frame" x="281" y="17" width="25" height="25"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="25" id="DGt-ly-Y5s"/>
+                                                        <constraint firstAttribute="width" constant="25" id="GdY-kt-4X1"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="GhU-h9-jrk">
+                                                    <rect key="frame" x="281" y="20" width="20" height="20"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="20" id="Avh-4S-W5U"/>
+                                                        <constraint firstAttribute="width" constant="20" id="M11-e0-AmF"/>
+                                                    </constraints>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="dph-ax-qWi" firstAttribute="leading" secondItem="cWA-ad-v2E" secondAttribute="trailing" constant="1" id="3gN-l0-eEX"/>
+                                                <constraint firstItem="GhU-h9-jrk" firstAttribute="centerY" secondItem="rbr-pl-atA" secondAttribute="centerY" id="Han-3v-QBE"/>
                                                 <constraint firstItem="cWA-ad-v2E" firstAttribute="leading" secondItem="rbr-pl-atA" secondAttribute="leading" constant="3" id="IoR-Kt-tI6"/>
                                                 <constraint firstItem="o47-dv-pfY" firstAttribute="bottom" secondItem="rbr-pl-atA" secondAttribute="centerY" id="JUu-Wp-tZi"/>
+                                                <constraint firstItem="UrQ-hg-AF5" firstAttribute="centerY" secondItem="rbr-pl-atA" secondAttribute="centerY" id="Orp-VS-eZG"/>
                                                 <constraint firstAttribute="trailing" secondItem="dph-ax-qWi" secondAttribute="trailing" constant="8" id="PkC-1U-MIu"/>
                                                 <constraint firstAttribute="trailing" secondItem="o47-dv-pfY" secondAttribute="trailing" constant="8" id="Ssq-zR-H4D"/>
                                                 <constraint firstItem="cWA-ad-v2E" firstAttribute="centerY" secondItem="rbr-pl-atA" secondAttribute="centerY" id="d8I-nU-Z4h"/>
+                                                <constraint firstAttribute="trailing" secondItem="UrQ-hg-AF5" secondAttribute="trailing" constant="14" id="nI9-U4-bQs"/>
                                                 <constraint firstItem="dph-ax-qWi" firstAttribute="top" secondItem="rbr-pl-atA" secondAttribute="centerY" id="sSo-j7-j54"/>
+                                                <constraint firstAttribute="trailing" secondItem="GhU-h9-jrk" secondAttribute="trailing" constant="19" id="sla-hs-9wp"/>
                                                 <constraint firstItem="o47-dv-pfY" firstAttribute="leading" secondItem="cWA-ad-v2E" secondAttribute="trailing" constant="1" id="tzD-le-Zlz"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="artistLabel" destination="dph-ax-qWi" id="CVt-ay-VUE"/>
                                             <outlet property="numberLabel" destination="cWA-ad-v2E" id="W7m-uc-ndn"/>
+                                            <outlet property="searchIcon" destination="UrQ-hg-AF5" id="cAC-aO-fNp"/>
+                                            <outlet property="spinner" destination="GhU-h9-jrk" id="TKN-SS-P0K"/>
                                             <outlet property="titleLabel" destination="o47-dv-pfY" id="kLo-C3-sgl"/>
                                         </connections>
                                     </tableViewCell>
@@ -1147,7 +1167,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Song title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gsT-Aw-DN3">
-                                                    <rect key="frame" x="34" y="9.5" width="271" height="20.5"/>
+                                                    <rect key="frame" x="34" y="9" width="271" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -1158,22 +1178,42 @@
                                                     <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="search" translatesAutoresizingMaskIntoConstraints="NO" id="k4S-yU-jRx">
+                                                    <rect key="frame" x="280" y="17.5" width="25" height="25"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="25" id="cmL-9Z-s5E"/>
+                                                        <constraint firstAttribute="height" constant="25" id="elb-dF-hqR"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="krz-TA-Y6T">
+                                                    <rect key="frame" x="282" y="20" width="20" height="20"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="20" id="Vmr-UC-3s4"/>
+                                                        <constraint firstAttribute="height" constant="20" id="lB6-ib-IwD"/>
+                                                    </constraints>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="40J-Hf-f2i" firstAttribute="centerY" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="Afg-TF-6R5"/>
+                                                <constraint firstAttribute="trailing" secondItem="krz-TA-Y6T" secondAttribute="trailing" constant="18" id="GKA-2K-4Px"/>
+                                                <constraint firstItem="krz-TA-Y6T" firstAttribute="centerY" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="GXG-03-uf5"/>
                                                 <constraint firstAttribute="trailing" secondItem="Rez-N2-DUn" secondAttribute="trailing" constant="15" id="I8O-dZ-Ygp"/>
                                                 <constraint firstItem="Rez-N2-DUn" firstAttribute="leading" secondItem="40J-Hf-f2i" secondAttribute="trailing" constant="3" id="LyW-6e-vxP"/>
+                                                <constraint firstItem="k4S-yU-jRx" firstAttribute="centerY" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="Swm-lS-XcA"/>
                                                 <constraint firstAttribute="trailing" secondItem="gsT-Aw-DN3" secondAttribute="trailing" constant="15" id="Yrb-S8-6xc"/>
                                                 <constraint firstItem="gsT-Aw-DN3" firstAttribute="leading" secondItem="40J-Hf-f2i" secondAttribute="trailing" constant="3" id="cKI-T5-UPG"/>
                                                 <constraint firstItem="40J-Hf-f2i" firstAttribute="leading" secondItem="KfJ-NL-2sm" secondAttribute="leading" constant="8" id="dR8-62-koQ"/>
+                                                <constraint firstAttribute="trailing" secondItem="k4S-yU-jRx" secondAttribute="trailing" constant="15" id="eHg-UX-UbV"/>
                                                 <constraint firstItem="Rez-N2-DUn" firstAttribute="top" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="epi-5m-nDI"/>
                                                 <constraint firstItem="gsT-Aw-DN3" firstAttribute="bottom" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="yHT-WZ-UPc"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="numberLabel" destination="40J-Hf-f2i" id="SoK-kY-Hbj"/>
-                                            <outlet property="subtitleLabel" destination="Rez-N2-DUn" id="qSi-v7-PYZ"/>
-                                            <outlet property="titleLabel" destination="gsT-Aw-DN3" id="llb-W3-Fiw"/>
+                                            <outlet property="numberLabel" destination="40J-Hf-f2i" id="BHJ-X9-U7U"/>
+                                            <outlet property="searchIcon" destination="k4S-yU-jRx" id="uYj-P8-2BJ"/>
+                                            <outlet property="spinner" destination="krz-TA-Y6T" id="dYb-g7-2ek"/>
+                                            <outlet property="subtitleLabel" destination="Rez-N2-DUn" id="fCI-Fn-f9b"/>
+                                            <outlet property="titleLabel" destination="gsT-Aw-DN3" id="fjo-Mr-KID"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

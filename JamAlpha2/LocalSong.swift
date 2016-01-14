@@ -35,7 +35,7 @@ class LocalSong: NSObject {
         }.first
     }
     
-    func findSearchResult(completion: ((searchResult: SearchResult) -> Void)) {
+    func findSearchResult(completion: ((searchResult: SearchResult?) -> Void)) {
         if mediaItem == nil {
             SearchAPI.searchSong(title + " " + artist, completion: {
                 results in

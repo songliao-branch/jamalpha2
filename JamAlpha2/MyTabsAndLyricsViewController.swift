@@ -256,9 +256,13 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             song.findSearchResult( {
                 result in
                 
+                guard let song = result else {
+                    return
+                }
+                
                 songVC.isSongNeedPurchase = true
-                songVC.songNeedPurchase = result
-                songVC.reloadBackgroundImageAfterSearch(result)
+                songVC.songNeedPurchase = song
+                songVC.reloadBackgroundImageAfterSearch(song)
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: nil)

@@ -61,6 +61,13 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         cell.titleLabel.text = song.title
         cell.artistLabel.text = song.artist
         
+        cell.spinner.hidden = true
+        if let _ = song.mediaItem {
+            cell.searchIcon.hidden = true
+        } else {
+            cell.searchIcon.hidden = false
+        }
+        
         return cell
     }
     
@@ -149,16 +156,30 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             
             
         } else { //if the mediaItem is not found, and an searchResult is found
+            let cell = tableView.cellForRowAtIndexPath(indexPath) as! TopSongsCell
+            
+            cell.searchIcon.hidden = true
+            cell.spinner.hidden = false
+            cell.spinner.startAnimating()
+            
             song.findSearchResult( {
                 result in
                 
-                songVC.isSongNeedPurchase = true
-                songVC.songNeedPurchase = result
-                songVC.reloadBackgroundImageAfterSearch(result)
-                songVC.transitioningDelegate = self.animator
-                self.animator!.attachToViewController(songVC)
-                self.presentViewController(songVC, animated: true, completion: nil)
-                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                cell.spinner.stopAnimating()
+                
+                guard let song = result else {
+                    
+                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
+                    return
+                }
+                
+            songVC.isSongNeedPurchase = true
+            songVC.songNeedPurchase = song
+            songVC.reloadBackgroundImageAfterSearch(song)
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            self.presentViewController(songVC, animated: true, completion: nil)
+            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
                 
             })
         }
