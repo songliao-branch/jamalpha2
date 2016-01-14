@@ -157,10 +157,22 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         cell.numberLabel.text = "\(indexPath.row + 1)"
 
         cell.titleLabel.text = song.title
-        cell.artistLabel.text = song.artist
+        cell.subtitleLabel.text = song.artist
         
         cell.optionsButton.tag = indexPath.row
         cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
+        
+        cell.spinner.hidden = true
+        
+        if let _ = song.mediaItem {
+            cell.searchIcon.hidden = true
+            cell.titleRightConstraint.constant = 35
+            cell.subtitleRightConstraint.constant = 35
+        } else {
+            cell.searchIcon.hidden = false
+            cell.titleRightConstraint.constant = 75
+            cell.subtitleRightConstraint.constant = 75
+        }
         
         return cell
     }
@@ -253,10 +265,22 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
 
             
         } else { //if the mediaItem is not found, and an searchResult is found
+            let cell = tableView.cellForRowAtIndexPath(indexPath) as! UserTabsLyricsCell
+            
+            cell.searchIcon.hidden = true
+            cell.spinner.hidden = false
+            cell.spinner.startAnimating()
+            
             song.findSearchResult( {
                 result in
                 
+                cell.spinner.stopAnimating()
+                cell.spinner.hidden = true
+                cell.searchIcon.hidden = false
+                
                 guard let song = result else {
+                    
+                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
                     return
                 }
                 
