@@ -658,7 +658,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if isJiggling == false {
             self.changeMenuButtonStatus(true)
             var indexFret: Int = Int()
-            var indexString: Int = 5
+            var indexString: Int = Int()
             let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
             var original:CGFloat = string3Height  - self.string3Position[2]
             let location = sender.locationInView(self.collectionView)
@@ -677,6 +677,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     original = string3Height  - self.string3Position[index]
                 }
             }
+            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
             // open the editor view and add note button
             self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
         } else {
@@ -1960,6 +1961,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if !isJiggling{
             var inserted: Bool = false
             let index = sender.tag
+            let noteIndex = self.noteButtonWithTabArray[index].tab.index
+            PlayChordsManager.sharedInstance.playSingleNoteSound(Int(noteIndex))
             let returnValue = addTabViewOnMusicControlView(index)
             for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
                 if self.currentTime <= self.allTabsOnMusicLine[0].time {
@@ -2769,6 +2772,7 @@ extension TabsEditorViewController {
                     indexString = index
                 }
             }
+            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
             if indexString >= 3 {
                 let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
                 let buttonString = self.string6Position[indexString]
@@ -2837,6 +2841,7 @@ extension TabsEditorViewController {
                     indexString = index
                 }
             }
+            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
             var oldNoteButtonTag:Int = 0
             if indexString >= 3 {
                 self.stopJiggling()
@@ -2908,10 +2913,6 @@ extension TabsEditorViewController {
         }
     }
 
-    
-
-
-    
     func checkTheFingerPoint(newTag: Int, oldTag: Int, oldTagString4:Int, oldTagString5:Int) {
         let indexString = newTag / 100
         if indexString > oldTag / 100 {
