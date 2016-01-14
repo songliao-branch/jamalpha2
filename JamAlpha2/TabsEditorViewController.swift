@@ -15,7 +15,11 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
-    //var playButtonImageView: UIImageView!
+
+    var string3BackgroundImage: [String] = ["iPhone5_fret0", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret"]
+    
+    var playButtonImageView: UIImageView!
+
     
     var doubleArrowView: CustomizedView!
     var scrollTimer: NSTimer?
@@ -271,6 +275,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
+        
+        PlayChordsManager.sharedInstance.initialSoundBank()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -467,21 +473,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func stepUpPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
-        currentNote.stepUp()
-        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
-        let center = tuningValueLabels[button.tag].center
-        tuningValueLabels[button.tag].sizeToFit()
-        tuningValueLabels[button.tag].center = center
+        if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: true) {
+            currentNote.stepUp()
+            tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+            let center = tuningValueLabels[button.tag].center
+            tuningValueLabels[button.tag].sizeToFit()
+            tuningValueLabels[button.tag].center = center
+        }
     }
     
     func stepDownPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
-        currentNote.stepDown()
-        tuningValueLabels[button.tag].text = currentNote.toDisplayString()
-        let center = tuningValueLabels[button.tag].center
-
-        tuningValueLabels[button.tag].sizeToFit()
-         tuningValueLabels[button.tag].center = center
+        if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: false) {
+            currentNote.stepDown()
+            tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+            let center = tuningValueLabels[button.tag].center
+            tuningValueLabels[button.tag].sizeToFit()
+             tuningValueLabels[button.tag].center = center
+        }
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
@@ -711,6 +720,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.tabNameTextField.alpha = 1
             self.completeStringView.frame = CGRectMake(0, 3 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
         })
+        self.backButtonRotation(isLeft: false)
         self.view.userInteractionEnabled = true
 
     }
@@ -774,8 +784,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
-        cell.imageView.backgroundColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
+        cell.imageView.backgroundColor = UIColor.clearColor()
+        cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
+        
+        
         for subview in cell.contentView.subviews {
             if subview.isKindOfClass(UIButton){
                 subview.removeFromSuperview()
@@ -945,27 +958,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
     }
     
-    
+    // buttons
     var tuningButton: UIButton = UIButton()
     var resetButton: UIButton = UIButton()
     var playPauseButton: UIButton = UIButton()
     var addButton: UIButton = UIButton()
+    let backButton: UIButton = UIButton()
 
     func addObjectsOnMainView() {
         // views
         let menuView: UIView = UIView()
         let musicView: UIView = UIView()
 
-        // buttons
-        let backButton: UIButton = UIButton()
-
-        
         let doneButton: UIButton = UIButton()
         let privacyButton: UIButton = UIButton()
        
         menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
         //menuView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
-        menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!.imageWithColor(UIColor.darkGrayColor().colorWithAlphaComponent(0.8)))
+        menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!.imageWithColor(UIColor.darkGrayColor().colorWithAlphaComponent(0.9)))
 
         self.view.addSubview(menuView)
         
@@ -987,24 +997,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         backButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)//CGFloat(0.6 / 20) * self.trueHeight
         menuView.addSubview(backButton)
         
-        statusLabel.frame = CGRectMake(2 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, 4 * (buttonWidth + buttonSpace), 2 / 20 * self.trueHeight)
+        statusLabel.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, 4 * (buttonWidth + buttonSpace), 2 / 20 * self.trueHeight)
         self.statusLabel.text = "Tabs Editor"
         statusLabel.textColor = UIColor.whiteColor()
         statusLabel.hidden = true
         statusLabel.textAlignment = NSTextAlignment.Center
         menuView.addSubview(statusLabel)
         
-        resetButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        addButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        addButton.addTarget(self, action: "pressAddButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        addButton.setImage(UIImage(named: "addButton"), forState: UIControlState.Normal)
+        addButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
+        menuView.addSubview(addButton)
+        
+        resetButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
         resetButton.setImage(UIImage(named: "trashButton"), forState: UIControlState.Normal)
         resetButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(resetButton)
-        
-        tuningButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
-        tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        tuningButton.setImage(UIImage(named: "tuningButton"), forState: UIControlState.Normal)
-        tuningButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
-        menuView.addSubview(tuningButton)
         
         playPauseButton.frame = CGRectMake(3 * buttonWidth + 3 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         playPauseButton.addTarget(self, action: "singleTapOnMusicControlView:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -1012,11 +1022,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         playPauseButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(playPauseButton)
         
-        addButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
-        addButton.addTarget(self, action: "pressAddButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        addButton.setImage(UIImage(named: "addButton"), forState: UIControlState.Normal)
-        addButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
-        menuView.addSubview(addButton)
+        tuningButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        tuningButton.setImage(UIImage(named: "tuningButton"), forState: UIControlState.Normal)
+        tuningButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
+        menuView.addSubview(tuningButton)
+        
         
         let privacyDoneButtonContainer: UIImageView = UIImageView()
         privacyDoneButtonContainer.frame = CGRectMake(30.5 / 31 * self.trueWidth - 2.5 * 1.6 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight, 2.5 * 1.6 / 20 * self.trueHeight, 1.6 / 20 * self.trueHeight)
@@ -1072,7 +1083,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.completeStringView.backgroundColor = UIColor.clearColor()
         
         self.completeImageView.frame = CGRectMake(0, 0, 5 * self.trueWidth, 15 / 20 * self.trueHeight)
-        self.completeImageView.image = UIImage(named: "6-strings-new-with-numbers")
+        self.completeImageView.image = UIImage(named: "iPhone5_fullFretboard")
         self.completeStringView.addSubview(completeImageView)
         self.editView.addSubview(completeStringView)
         
@@ -1249,6 +1260,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if (indexString + 1) < self.currentBaseButton.tag / 100 {
                 moveFingerPoint(indexFret, indexString: indexString)
             }
+            print("index: \((indexString + 1) * 100 + indexFret))")
+            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
         } else {
             self.stopJiggling()
             stopSpecificJiggling()
@@ -1406,6 +1419,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.tabFingerPointChanged = false
         self.addSpecificFingerPoint = true
         self.currentNoteButton = sender
+        self.view.userInteractionEnabled = false
+        PlayChordsManager.sharedInstance.playChordArpeggio(self.currentSelectedSpecificTab.content, delay: 0.04, completion: {
+            complete in
+            self.view.userInteractionEnabled = true
+        })
         for item in self.fingerPoint {
             item.removeFromSuperview()
         }
@@ -1861,6 +1879,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let temp = self.mainViewDataArray[fromIndexPath.item]
         self.mainViewDataArray.removeAtIndex(fromIndexPath.item)
         self.mainViewDataArray.insert(temp, atIndex: toIndexPath.item)
+        let tempImage = self.string3BackgroundImage[fromIndexPath.item]
+        self.string3BackgroundImage.removeAtIndex(fromIndexPath.item)
+        self.string3BackgroundImage.insert(tempImage, atIndex: toIndexPath.item)
     }
     
 
@@ -1880,7 +1901,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 completed in
                 self.editView.removeFromSuperview()
         })
-        
+        self.backButtonRotation(isLeft: true)
         self.tabNameTextField.text = ""
         for item in self.fingerPoint {
             item.removeFromSuperview()
@@ -2125,6 +2146,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
             
         })
+        self.backButtonRotation(isLeft: false)
         self.createEditFingerPoint(400)
         self.view.userInteractionEnabled = true
     }
@@ -2614,7 +2636,7 @@ extension TabsEditorViewController {
     // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
     func addChordToEditorView(sender: Findable) {
         let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
-        var chord: [Chord] = tabs.0
+        let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
         let visible: Bool = tabs.4
@@ -3340,6 +3362,24 @@ extension TabsEditorViewController {
 
         }
         tempAllTabsOnMusicLine.removeAll()
+    }
+    
+    func backButtonRotation(isLeft isLeft:Bool){
+        print(self.backButton.imageView?.frame)
+        let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians(0)))
+        let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians(-90)))
+        
+        
+        UIView.animateWithDuration(0.3, delay: 0, options: [.AllowUserInteraction,.CurveEaseInOut], animations: {
+            if(isLeft){
+                self.backButton.imageView!.transform = leftWobble
+                self.backButton.imageView
+            }else{
+                self.backButton.imageView!.transform = rightWobble
+            }
+            
+            }, completion: nil)
+
     }
 }
 
