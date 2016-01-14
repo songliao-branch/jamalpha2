@@ -243,7 +243,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         backgroundImage.image = image != nil ? image : songViewController?.backgroundImage
         
-        let blurredImage:UIImage = backgroundImage.image!//.applyLightEffect()!
+        let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
 
@@ -1534,8 +1534,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func addMusicControlView() {
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
+        print(backgroundImage.image?.size)
         
-        let cropedImage: UIImage = (backgroundImage.image?.cropImageWithRect(CGRectMake(28 / 31 * self.trueWidth, 2 / 20 * self.trueHeight, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)))!
+        UIGraphicsBeginImageContext(backgroundImage.bounds.size);
+        backgroundImage.layer.renderInContext(UIGraphicsGetCurrentContext()!)
+        let screenShot = UIGraphicsGetImageFromCurrentImageContext() // return uiimage
+        UIGraphicsEndImageContext()
+        let cropedImage: UIImage = (screenShot.cropImageWithRect(CGRectMake(28 / 31 * self.trueWidth, 2 / 20 * self.trueHeight, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)))
         
         let previousButton: UIButton = UIButton()
         previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 0, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)
