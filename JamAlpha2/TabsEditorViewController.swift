@@ -2876,7 +2876,8 @@ extension TabsEditorViewController {
             }
             self.currentBaseButton.removeGestureRecognizer(jigglingLongPressGesture)
             self.jigglingChanged()
-            if abs(location.x - currentBaseButton.center.x) > 0 || abs(location.y - currentBaseButton.center.y) > 0 || oldNoteButtonTag != currentBaseButton.tag {
+            if abs(location.x - currentBaseButton.center.x) > 1 || abs(location.y - currentBaseButton.center.y) > 1 || oldNoteButtonTag != currentBaseButton.tag {
+                print("oldNoteButtonTag\(oldNoteButtonTag)     currentBaseButton.tag:\(currentBaseButton.tag) ")
                 self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
                 self.stopJiggling()
                 self.currentBaseButton.removeGestureRecognizer(jigglingPanGesture)
