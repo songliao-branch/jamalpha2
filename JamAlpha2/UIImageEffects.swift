@@ -259,4 +259,10 @@ extension UIImage {
         }
         return rect
     }
+    
+    func cropImageWithRect(sender: CGRect) -> UIImage {
+        let imageRef:CGImageRef = CGImageCreateWithImageInRect(self.CGImage, sender)!
+        let newImage:UIImage  = UIImage(CGImage: imageRef)
+        return newImage
+    }
 }

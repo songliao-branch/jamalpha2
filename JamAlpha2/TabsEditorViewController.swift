@@ -15,7 +15,7 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
-    var playButtonImageView: UIImageView!
+    //var playButtonImageView: UIImageView!
     
     var doubleArrowView: CustomizedView!
     var scrollTimer: NSTimer?
@@ -91,7 +91,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // musicPlayer playing mode for recover queue
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
     
-    var musicSingleTapRecognizer: UITapGestureRecognizer!
+//    var musicSingleTapRecognizer: UITapGestureRecognizer!
     // screen height and width
     var trueWidth: CGFloat = CGFloat()
     var trueHeight: CGFloat = CGFloat()
@@ -144,7 +144,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     //an attribtue corresponding to the visible attribute of tabsSet
     var isPublic = true
-    var privacyButton = UIButton()
     var isPlaying:Bool = false
     
     // count down section
@@ -211,6 +210,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         return true
     }
     
+    var backgroundImage: UIImageView = UIImageView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -230,7 +231,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.createSoundWave()
         
         // add the background image with blur
-        let backgroundImage: UIImageView = UIImageView()
+        
         backgroundImage.frame = CGRectMake(0, 0, self.trueWidth, self.trueWidth)
         let size: CGSize = CGSizeMake(self.trueWidth, self.trueWidth)
         var image:UIImage!
@@ -242,7 +243,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         backgroundImage.image = image != nil ? image : songViewController?.backgroundImage
         
-        let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
+        let blurredImage:UIImage = backgroundImage.image!//.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
 
@@ -304,12 +305,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.startTimer()
                 isPlaying = true
             }
-            self.playButtonImageView.hidden = true
+            //self.playButtonImageView.hidden = true
+            playPauseButton.setImage(UIImage(named: "pauseButton"), forState: UIControlState.Normal)
             if !self.intoEditView{
                 self.progressBlock.alpha = 1
             }
         } else if musicPlayer.playbackState == .Paused {
-            self.playButtonImageView.hidden = false
+            //self.playButtonImageView.hidden = false
+            playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
             isPlaying = false
             timer.invalidate()
             timer = NSTimer()
@@ -322,7 +325,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func currentSongChanged(sender: NSNotification){
         if musicPlayer.playbackState == .Playing && isPlaying{
             musicPlayer.pause()
-            self.playButtonImageView.hidden = false
+            //self.playButtonImageView.hidden = false
+            playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
         }
     }
     
@@ -645,6 +649,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
         if isJiggling == false {
+            self.changeMenuButtonStatus(true)
             var indexFret: Int = Int()
             var indexString: Int = 5
             let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
@@ -939,6 +944,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         
     }
+    
+    
+    var tuningButton: UIButton = UIButton()
+    var resetButton: UIButton = UIButton()
+    var playPauseButton: UIButton = UIButton()
+    var addButton: UIButton = UIButton()
 
     func addObjectsOnMainView() {
         // views
@@ -948,15 +959,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         // buttons
         let backButton: UIButton = UIButton()
 
-        let tuningButton: UIButton = UIButton()
-        let resetButton: UIButton = UIButton()
         
-        let addButton: UIButton = UIButton()
         let doneButton: UIButton = UIButton()
+        let privacyButton: UIButton = UIButton()
        
         menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
-        menuView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
-        menuView.backgroundColor = UIColor.clearColor()
+        //menuView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+        menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!.imageWithColor(UIColor.darkGrayColor().colorWithAlphaComponent(0.8)))
+
         self.view.addSubview(menuView)
         
         musicView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
@@ -967,44 +977,67 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.fretBoardView.backgroundColor = UIColor.clearColor()
         self.view.addSubview(fretBoardView)
         
-        let buttonWidth = 2 / 20 * self.trueHeight
+        let buttonWidth:CGFloat = 2.5 / 20 * self.trueHeight
+        let buttonSpace = (0.5 * self.trueWidth - 3.5 * buttonWidth - 0.5 / 31.0 * self.trueWidth) / 3.0
+        let buttonEdge: CGFloat = CGFloat(0.2 / 20) * self.trueHeight
         
         backButton.frame = CGRectMake(0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        backButton.setImage(UIImage(named: "icon-back"), forState: UIControlState.Normal)
+        backButton.setImage(UIImage(named: "backButton"), forState: UIControlState.Normal)
+        backButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)//CGFloat(0.6 / 20) * self.trueHeight
         menuView.addSubview(backButton)
         
-        statusLabel.frame = CGRectMake(2 / 31 * self.trueWidth, 0.25 / 20 * self.trueWidth, 14 / 31 * self.trueWidth, buttonWidth * 0.65)
+        statusLabel.frame = CGRectMake(2 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, 4 * (buttonWidth + buttonSpace), 2 / 20 * self.trueHeight)
         self.statusLabel.text = "Tabs Editor"
         statusLabel.textColor = UIColor.whiteColor()
+        statusLabel.hidden = true
         statusLabel.textAlignment = NSTextAlignment.Center
         menuView.addSubview(statusLabel)
         
-        tuningButton.frame = CGRectMake(19.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
-        tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        tuningButton.setImage(UIImage(named: "icon-tuning"), forState: UIControlState.Normal)
-        menuView.addSubview(tuningButton)
-        
-        resetButton.frame = CGRectMake(22.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        resetButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        resetButton.setImage(UIImage(named: "icon-reset"), forState: UIControlState.Normal)
+        resetButton.setImage(UIImage(named: "trashButton"), forState: UIControlState.Normal)
+        resetButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(resetButton)
         
-        addButton.frame = CGRectMake(25.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        tuningButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        tuningButton.setImage(UIImage(named: "tuningButton"), forState: UIControlState.Normal)
+        tuningButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
+        menuView.addSubview(tuningButton)
+        
+        playPauseButton.frame = CGRectMake(3 * buttonWidth + 3 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        playPauseButton.addTarget(self, action: "singleTapOnMusicControlView:", forControlEvents: UIControlEvents.TouchUpInside)
+        playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
+        playPauseButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
+        menuView.addSubview(playPauseButton)
+        
+        addButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
         addButton.addTarget(self, action: "pressAddButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        addButton.setImage(UIImage(named: "icon-add"), forState: UIControlState.Normal)
+        addButton.setImage(UIImage(named: "addButton"), forState: UIControlState.Normal)
+        addButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(addButton)
         
-        doneButton.frame = CGRectMake(28.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
-        doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        doneButton.setImage(UIImage(named: "icon-done"), forState: UIControlState.Normal)
-        menuView.addSubview(doneButton)
+        let privacyDoneButtonContainer: UIImageView = UIImageView()
+        privacyDoneButtonContainer.frame = CGRectMake(30.5 / 31 * self.trueWidth - 2.5 * 1.6 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight, 2.5 * 1.6 / 20 * self.trueHeight, 1.6 / 20 * self.trueHeight)
+        privacyDoneButtonContainer.image = UIImage(named: "frame")
+        privacyDoneButtonContainer.userInteractionEnabled = true
+        
+        menuView.addSubview(privacyDoneButtonContainer)
         
         //TODO: set button from the visible attribute itself
-        privacyButton = UIButton(frame: CGRect(x: 200, y: 0, width: 200, height: 30))
-        privacyButton.setTitle("Public", forState: .Normal)
+        privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight, 0, buttonWidth, buttonWidth)
+        privacyButton.backgroundColor = UIColor.clearColor()
+        privacyButton.setImage(UIImage(named: "privateButton"), forState: UIControlState.Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
-       // menuView.addSubview(privacyButton)
+        privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
+        menuView.addSubview(privacyButton)
+        
+        doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight, 0, 1.2 * buttonWidth, buttonWidth)
+        doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        doneButton.setImage(UIImage(named: "saveButton"), forState: UIControlState.Normal)
+        doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
+        menuView.addSubview(doneButton)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnEditView.addTarget(self, action: "tapOnEditView:")
@@ -1355,7 +1388,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 if (self.specificTabsScrollView.subviews.count == 0){
                     self.statusLabel.text = "Input Chord Name"
                 }else{
-                    self.statusLabel.text = "Choose Or input Chord Name"
+                    self.statusLabel.text = "Choose Chord Or Input Name"
                 }
             }
         )
@@ -1502,22 +1535,21 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
         
+        let cropedImage: UIImage = (backgroundImage.image?.cropImageWithRect(CGRectMake(28 / 31 * self.trueWidth, 2 / 20 * self.trueHeight, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)))!
+        
         let previousButton: UIButton = UIButton()
-        previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 3 / 20 * self.trueHeight - 1.5 / 31 * self.trueWidth, 3 / 31 * self.trueWidth, 3 / 31 * trueWidth)
+        previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 0, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)
+        previousButton.imageEdgeInsets = UIEdgeInsetsMake(3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth, 0, 3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth, 0)
+        previousButton.backgroundColor = UIColor(patternImage: cropedImage)
+        previousButton.userInteractionEnabled = true
         previousButton.addTarget(self, action: "pressPreviousButton:", forControlEvents: UIControlEvents.TouchUpInside)
         previousButton.setImage(UIImage(named: "backspace"), forState: UIControlState.Normal)
-        previousButton.backgroundColor = UIColor.clearColor()
         self.musicControlView.addSubview(previousButton)
 
-        musicSingleTapRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnMusicControlView:")
-        self.musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
         
         let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
         self.setUpTimeLabels()
-        self.playButtonImageView = UIImageView(frame: CGRectMake((1 - 3 / 31) / 2 * self.trueWidth, 3 / 20 * self.trueHeight - 1.5 / 31 * trueWidth, 3 / 31 * trueWidth, 3 / 31 * trueWidth))
-        self.playButtonImageView.image = UIImage(named: "playbutton")
-        self.musicControlView.addSubview(self.playButtonImageView)
     }
     
     func setUpTimeLabels() {
@@ -1622,7 +1654,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                 self.musicPlayer.currentPlaybackRate = speed
             }
-            self.playButtonImageView.hidden = true
+            //self.playButtonImageView.hidden = true
+            playPauseButton.setImage(UIImage(named: "pauseButton"), forState: UIControlState.Normal)
             self.removeDoubleArrowView()
             self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
              NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
@@ -1634,7 +1667,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         countdownView.setNumber(countDownStartSecond)
 
         if countDownStartSecond <= 0 {
-            musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
+//            musicControlView.addGestureRecognizer(musicSingleTapRecognizer)
             countdownTimer.invalidate()
             countdownView.hidden = true
             countDownStartSecond = 3
@@ -1643,6 +1676,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             } else {
                 self.musicPlayer.play()
             }
+            self.view.userInteractionEnabled = true
             toTime = self.duration + 1
             startTimer()
             countdownTimer.invalidate()
@@ -1652,10 +1686,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
 
     // pause the music or restart it, and count down
-    func singleTapOnMusicControlView(sender: UITapGestureRecognizer?=nil) {
+    func singleTapOnMusicControlView(sender: UIButton) {
         self.removeDoubleArrowView()
         if self.isDemoSong ? avPlayer.playing : (musicPlayer.playbackState == .Playing) {
-            self.playButtonImageView.hidden = false
+            //self.playButtonImageView.hidden = false
+            playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
             self.isPlaying = false
             //animate down progress block
             self.view.userInteractionEnabled = false
@@ -1670,9 +1705,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 musicPlayer.pause()
             }
             timer.invalidate()
+            timer = NSTimer()
             self.view.userInteractionEnabled = true
         } else {
-            self.playButtonImageView.hidden = true
+            //self.playButtonImageView.hidden = true
+            playPauseButton.setImage(UIImage(named: "pauseButton"), forState: UIControlState.Normal)
             self.isPlaying = true
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
             self.view.userInteractionEnabled = false
@@ -1681,13 +1718,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }, completion: nil)
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
-            musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
+//            musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
             countdownView.hidden = false
 
             countdownView.setNumber(countDownStartSecond)
             countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
-            self.view.userInteractionEnabled = true
         }
     }
     
@@ -1778,7 +1814,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }else{
                  musicPlayer.currentPlaybackTime = currentTime
             }
-            self.playButtonImageView.hidden = false
+            //self.playButtonImageView.hidden = false
+            playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
         }
 
         if !isPanning {
@@ -1825,6 +1862,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func backToMainView() {
         self.view.userInteractionEnabled = false
         self.collectionView.contentOffset = self.completeStringView.contentOffset
+        self.changeMenuButtonStatus(false)
         UIView.animateWithDuration(0.3, animations: {
             self.specificTabsScrollView.alpha = 0
             self.tabNameTextField.alpha = 0
@@ -2033,6 +2071,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         self.presentViewController(alertController, animated: true, completion: nil)
     }
+    
+    func changeMenuButtonStatus(sender: Bool) {
+        resetButton.hidden = sender
+        tuningButton.hidden = sender
+        playPauseButton.hidden = sender
+        addButton.hidden = sender
+        statusLabel.hidden = !sender
+    }
 
 
     func pressAddButton(sender: UIButton) {
@@ -2042,6 +2088,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if(self.doubleArrowView != nil){
             self.doubleArrowView.alpha = 0
         }
+        
+        self.changeMenuButtonStatus(true)
+        
         self.removeDoubleArrowView()
         self.view.userInteractionEnabled = false
         self.view.addSubview(self.editView)
@@ -2382,13 +2431,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func privacyButtonPressed(button: UIButton) {
-        if isPublic {
-            isPublic = false
-            privacyButton.setTitle("Private", forState: .Normal)
-        } else {
-            isPublic = true
-            privacyButton.setTitle("Public", forState: .Normal)
-        }
+//        if isPublic {
+//            isPublic = false
+//            privacyButton.setTitle("Private", forState: .Normal)
+//        } else {
+//            isPublic = true
+//            privacyButton.setTitle("Public", forState: .Normal)
+//        }
     }
     
     // find the current tab according to the current music time
@@ -2578,11 +2627,11 @@ extension TabsEditorViewController {
                 self.capoStepper.value = Double(capoValue)
                 self.capoLabel.text = "Capo: \(capoValue)"
                 self.isPublic = visible
-                if self.isPublic {
-                    self.privacyButton.setTitle("Public", forState: .Normal)
-                } else {
-                    self.privacyButton.setTitle("Private", forState: .Normal)
-                }
+//                if self.isPublic {
+//                    self.privacyButton.setTitle("Public", forState: .Normal)
+//                } else {
+//                    self.privacyButton.setTitle("Private", forState: .Normal)
+//                }
             })
             
             

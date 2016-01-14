@@ -95,7 +95,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             (presentVC as! TabsEditorViewController).removeNotification()
                         }
                         (presentVC as! TabsEditorViewController).isPlaying = false
-                        (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
+                        (presentVC as! TabsEditorViewController).playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
                         isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }
