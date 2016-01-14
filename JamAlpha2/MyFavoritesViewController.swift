@@ -155,8 +155,8 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
             
             
-        } else { //if the mediaItem is not found, and an searchResult is found
-            let cell = tableView.cellForRowAtIndexPath(indexPath) as! TopSongsCell
+        } else { //if the mediaItem is not found, and an searchResult is MyFavoritesCell
+            let cell = tableView.cellForRowAtIndexPath(indexPath) as! MyFavoritesCell
             
             cell.searchIcon.hidden = true
             cell.spinner.hidden = false
@@ -166,6 +166,8 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 result in
                 
                 cell.spinner.stopAnimating()
+                cell.spinner.hidden = true
+                cell.searchIcon.hidden = false
                 
                 guard let song = result else {
                     
@@ -173,13 +175,13 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                     return
                 }
                 
-            songVC.isSongNeedPurchase = true
-            songVC.songNeedPurchase = song
-            songVC.reloadBackgroundImageAfterSearch(song)
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            self.presentViewController(songVC, animated: true, completion: nil)
-            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                songVC.isSongNeedPurchase = true
+                songVC.songNeedPurchase = song
+                songVC.reloadBackgroundImageAfterSearch(song)
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: nil)
+                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
                 
             })
         }
