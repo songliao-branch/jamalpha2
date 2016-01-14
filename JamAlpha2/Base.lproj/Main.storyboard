@@ -931,7 +931,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="59.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cWA-ad-v2E">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cWA-ad-v2E">
                                                     <rect key="frame" x="3" y="20" width="37" height="18"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="37" id="yBW-SA-WuR"/>
@@ -940,14 +940,8 @@
                                                     <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dph-ax-qWi">
-                                                    <rect key="frame" x="41" y="30" width="271" height="18"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                    <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This Song has a super long title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o47-dv-pfY">
-                                                    <rect key="frame" x="41" y="10" width="271" height="20.5"/>
+                                                    <rect key="frame" x="41" y="10" width="264" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -966,6 +960,12 @@
                                                         <constraint firstAttribute="width" constant="20" id="M11-e0-AmF"/>
                                                     </constraints>
                                                 </activityIndicatorView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dph-ax-qWi">
+                                                    <rect key="frame" x="41" y="30" width="264" height="18"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <color key="textColor" red="0.47281634220000002" green="0.47281634220000002" blue="0.47281634220000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="dph-ax-qWi" firstAttribute="leading" secondItem="cWA-ad-v2E" secondAttribute="trailing" constant="1" id="3gN-l0-eEX"/>
@@ -973,8 +973,8 @@
                                                 <constraint firstItem="cWA-ad-v2E" firstAttribute="leading" secondItem="rbr-pl-atA" secondAttribute="leading" constant="3" id="IoR-Kt-tI6"/>
                                                 <constraint firstItem="o47-dv-pfY" firstAttribute="bottom" secondItem="rbr-pl-atA" secondAttribute="centerY" id="JUu-Wp-tZi"/>
                                                 <constraint firstItem="UrQ-hg-AF5" firstAttribute="centerY" secondItem="rbr-pl-atA" secondAttribute="centerY" id="Orp-VS-eZG"/>
-                                                <constraint firstAttribute="trailing" secondItem="dph-ax-qWi" secondAttribute="trailing" constant="8" id="PkC-1U-MIu"/>
-                                                <constraint firstAttribute="trailing" secondItem="o47-dv-pfY" secondAttribute="trailing" constant="8" id="Ssq-zR-H4D"/>
+                                                <constraint firstAttribute="trailing" secondItem="dph-ax-qWi" secondAttribute="trailing" constant="15" id="PkC-1U-MIu"/>
+                                                <constraint firstAttribute="trailing" secondItem="o47-dv-pfY" secondAttribute="trailing" constant="15" id="Ssq-zR-H4D"/>
                                                 <constraint firstItem="cWA-ad-v2E" firstAttribute="centerY" secondItem="rbr-pl-atA" secondAttribute="centerY" id="d8I-nU-Z4h"/>
                                                 <constraint firstAttribute="trailing" secondItem="UrQ-hg-AF5" secondAttribute="trailing" constant="14" id="nI9-U4-bQs"/>
                                                 <constraint firstItem="dph-ax-qWi" firstAttribute="top" secondItem="rbr-pl-atA" secondAttribute="centerY" id="sSo-j7-j54"/>
@@ -983,11 +983,13 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="artistLabel" destination="dph-ax-qWi" id="CVt-ay-VUE"/>
                                             <outlet property="numberLabel" destination="cWA-ad-v2E" id="W7m-uc-ndn"/>
                                             <outlet property="searchIcon" destination="UrQ-hg-AF5" id="cAC-aO-fNp"/>
                                             <outlet property="spinner" destination="GhU-h9-jrk" id="TKN-SS-P0K"/>
+                                            <outlet property="subtitleLabel" destination="dph-ax-qWi" id="GnP-5u-d0o"/>
+                                            <outlet property="subtitleRightConstraint" destination="PkC-1U-MIu" id="tO9-2s-apA"/>
                                             <outlet property="titleLabel" destination="o47-dv-pfY" id="kLo-C3-sgl"/>
+                                            <outlet property="titleRightConstraint" destination="Ssq-zR-H4D" id="kaY-q5-0xs"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1213,7 +1215,9 @@
                                             <outlet property="searchIcon" destination="k4S-yU-jRx" id="uYj-P8-2BJ"/>
                                             <outlet property="spinner" destination="krz-TA-Y6T" id="dYb-g7-2ek"/>
                                             <outlet property="subtitleLabel" destination="Rez-N2-DUn" id="fCI-Fn-f9b"/>
+                                            <outlet property="subtitleRightConstraint" destination="I8O-dZ-Ygp" id="hNn-bQ-5Sd"/>
                                             <outlet property="titleLabel" destination="gsT-Aw-DN3" id="fjo-Mr-KID"/>
+                                            <outlet property="titleRightConstraint" destination="Yrb-S8-6xc" id="YPB-Zc-iqa"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

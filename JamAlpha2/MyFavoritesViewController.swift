@@ -59,13 +59,17 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         let song = songs[indexPath.row]
         cell.numberLabel.text = "\(indexPath.row+1)"
         cell.titleLabel.text = song.title
-        cell.artistLabel.text = song.artist
+        cell.subtitleLabel.text = song.artist
         
         cell.spinner.hidden = true
         if let _ = song.mediaItem {
             cell.searchIcon.hidden = true
+            cell.titleRightConstraint.constant = 15
+            cell.subtitleRightConstraint.constant = 15
         } else {
             cell.searchIcon.hidden = false
+            cell.titleRightConstraint.constant = 50
+            cell.subtitleRightConstraint.constant = 50
         }
         
         return cell

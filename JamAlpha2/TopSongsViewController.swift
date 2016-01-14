@@ -69,9 +69,13 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         
         if let _ = song.mediaItem {
             cell.searchIcon.hidden = true
-            
+            cell.titleRightConstraint.constant = 15
+            cell.subtitleRightConstraint.constant = 15
+         
         } else {
             cell.searchIcon.hidden = false
+            cell.titleRightConstraint.constant = 55
+            cell.subtitleRightConstraint.constant = 55
         }
         return cell
     }
