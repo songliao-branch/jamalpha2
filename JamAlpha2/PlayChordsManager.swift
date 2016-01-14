@@ -89,6 +89,10 @@ class PlayChordsManager: NSObject {
         self.stopTimer()
     }
     
+    func changeVolumn() {
+    
+    }
+    
     func playSingleNoteSound(index: Int) {
         soundBank.allNotesOff()
         let midi = convertIndexToMidi(index)

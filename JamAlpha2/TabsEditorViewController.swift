@@ -286,6 +286,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    override func viewWillDisappear(animated: Bool) {
+        PlayChordsManager.sharedInstance.deinitialSoundBank()
+    }
+    
     // MARK: Notification
     func registerNotification() {
         if musicPlayer != nil {
@@ -1961,8 +1965,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if !isJiggling{
             var inserted: Bool = false
             let index = sender.tag
-            let noteIndex = self.noteButtonWithTabArray[index].tab.index
-            PlayChordsManager.sharedInstance.playSingleNoteSound(Int(noteIndex))
+            let content = self.noteButtonWithTabArray[index].tab.content
+            PlayChordsManager.sharedInstance.playChordArpeggio(content, delay: 0.04, completion: {
+                complete in
+            })
             let returnValue = addTabViewOnMusicControlView(index)
             for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
                 if self.currentTime <= self.allTabsOnMusicLine[0].time {
