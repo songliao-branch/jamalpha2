@@ -33,12 +33,6 @@
 		BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */; };
 		BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */; };
 		BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */; };
-		BFFD85A21C407BEF004E7803 /* TunerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD85A11C407BEF004E7803 /* TunerViewController.swift */; };
-		BFFD86201C4385C9004E7803 /* mo_audio.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD861C1C4385C9004E7803 /* mo_audio.mm */; };
-		BFFD86241C438605004E7803 /* TunerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86231C438605004E7803 /* TunerManager.mm */; };
-		BFFD86271C445C2E004E7803 /* TunerFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86261C445C2E004E7803 /* TunerFunction.swift */; };
-		BFFD862A1C455745004E7803 /* FFTHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86291C455745004E7803 /* FFTHelper.mm */; };
-		BFFD86351C45B870004E7803 /* ARAudioRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFD86341C45B870004E7803 /* ARAudioRecognizer.m */; };
 		BFFD86701C46D8C6004E7803 /* A3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD863E1C46D856004E7803 /* A3.aac */; };
 		BFFD86711C46D8C6004E7803 /* A3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD863F1C46D856004E7803 /* A3#.aac */; };
 		BFFD86721C46D8C6004E7803 /* A4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86401C46D856004E7803 /* A4.aac */; };
@@ -213,17 +207,6 @@
 		BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundBankPlayer.h; sourceTree = "<group>"; };
 		BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundBankPlayer.m; sourceTree = "<group>"; };
 		BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GuitarSoundFont.plist; sourceTree = "<group>"; };
-		BFFD85A11C407BEF004E7803 /* TunerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerViewController.swift; sourceTree = "<group>"; };
-		BFFD861B1C4385C9004E7803 /* mo_audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_audio.h; sourceTree = "<group>"; };
-		BFFD861C1C4385C9004E7803 /* mo_audio.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = mo_audio.mm; sourceTree = "<group>"; };
-		BFFD861D1C4385C9004E7803 /* mo_def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mo_def.h; sourceTree = "<group>"; };
-		BFFD86221C438605004E7803 /* TunerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TunerManager.h; sourceTree = "<group>"; };
-		BFFD86231C438605004E7803 /* TunerManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TunerManager.mm; sourceTree = "<group>"; };
-		BFFD86261C445C2E004E7803 /* TunerFunction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunerFunction.swift; sourceTree = "<group>"; };
-		BFFD86281C455745004E7803 /* FFTHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFTHelper.h; sourceTree = "<group>"; };
-		BFFD86291C455745004E7803 /* FFTHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFTHelper.mm; sourceTree = "<group>"; };
-		BFFD86331C45B870004E7803 /* ARAudioRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARAudioRecognizer.h; sourceTree = "<group>"; };
-		BFFD86341C45B870004E7803 /* ARAudioRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARAudioRecognizer.m; sourceTree = "<group>"; };
 		BFFD863E1C46D856004E7803 /* A3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A3.aac; sourceTree = "<group>"; };
 		BFFD863F1C46D856004E7803 /* A3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A3#.aac"; sourceTree = "<group>"; };
 		BFFD86401C46D856004E7803 /* A4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A4.aac; sourceTree = "<group>"; };
@@ -415,7 +398,6 @@
 		BFE49ECF1C1220C200F26877 /* SettingViewController */ = {
 			isa = PBXGroup;
 			children = (
-				BFFD85981C407B1E004E7803 /* Tuner */,
 				BFE49ED51C12471200F26877 /* AppConstant.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
@@ -512,56 +494,6 @@
 				BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */,
 			);
 			name = Helper;
-			sourceTree = "<group>";
-		};
-		BFFD85981C407B1E004E7803 /* Tuner */ = {
-			isa = PBXGroup;
-			children = (
-				BFFD85A11C407BEF004E7803 /* TunerViewController.swift */,
-				BFFD86261C445C2E004E7803 /* TunerFunction.swift */,
-				BFFD85991C407B26004E7803 /* Helper */,
-			);
-			name = Tuner;
-			sourceTree = "<group>";
-		};
-		BFFD85991C407B26004E7803 /* Helper */ = {
-			isa = PBXGroup;
-			children = (
-				BFFD86221C438605004E7803 /* TunerManager.h */,
-				BFFD86231C438605004E7803 /* TunerManager.mm */,
-				BFFD86361C45B878004E7803 /* AudioPower */,
-				BFFD86251C43860B004E7803 /* FFTHelper */,
-				BFFD861A1C438585004E7803 /* MoMu */,
-			);
-			name = Helper;
-			sourceTree = "<group>";
-		};
-		BFFD861A1C438585004E7803 /* MoMu */ = {
-			isa = PBXGroup;
-			children = (
-				BFFD861B1C4385C9004E7803 /* mo_audio.h */,
-				BFFD861C1C4385C9004E7803 /* mo_audio.mm */,
-				BFFD861D1C4385C9004E7803 /* mo_def.h */,
-			);
-			name = MoMu;
-			sourceTree = "<group>";
-		};
-		BFFD86251C43860B004E7803 /* FFTHelper */ = {
-			isa = PBXGroup;
-			children = (
-				BFFD86281C455745004E7803 /* FFTHelper.h */,
-				BFFD86291C455745004E7803 /* FFTHelper.mm */,
-			);
-			name = FFTHelper;
-			sourceTree = "<group>";
-		};
-		BFFD86361C45B878004E7803 /* AudioPower */ = {
-			isa = PBXGroup;
-			children = (
-				BFFD86331C45B870004E7803 /* ARAudioRecognizer.h */,
-				BFFD86341C45B870004E7803 /* ARAudioRecognizer.m */,
-			);
-			name = AudioPower;
 			sourceTree = "<group>";
 		};
 		E41D6CFC1BA149BF006A9993 /* Helper */ = {
@@ -1076,7 +1008,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFFD862A1C455745004E7803 /* FFTHelper.mm in Sources */,
 				BFE49ED61C12471200F26877 /* AppConstant.swift in Sources */,
 				E431BA9D1B913AE700E32A0B /* String+Utils.swift in Sources */,
 				E455E7291BA272AD00210BD6 /* Song.swift in Sources */,
@@ -1095,16 +1026,13 @@
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
 				E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */,
-				BFFD86271C445C2E004E7803 /* TunerFunction.swift in Sources */,
 				E42032E61BFE90CB00A5D36D /* User.swift in Sources */,
 				E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */,
 				E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */,
-				BFFD86241C438605004E7803 /* TunerManager.mm in Sources */,
 				E46EA8061BD0CAE8006EAB31 /* Tuning.swift in Sources */,
 				BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */,
 				E42032E81BFED9E300A5D36D /* UserProfileViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
-				BFFD86201C4385C9004E7803 /* mo_audio.mm in Sources */,
 				E4473CA31BF909E20061D4C9 /* BorderedCellView.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
@@ -1120,7 +1048,6 @@
 				E43DA1291B9FDCE1003180FB /* SearchHistory.swift in Sources */,
 				E43713EF1C34850200517D03 /* LocalSong.swift in Sources */,
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
-				BFFD85A21C407BEF004E7803 /* TunerViewController.swift in Sources */,
 				E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
@@ -1135,7 +1062,6 @@
 				E43713F51C34853600517D03 /* UserTabsLyricsCell.swift in Sources */,
 				BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
-				BFFD86351C45B870004E7803 /* ARAudioRecognizer.m in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
 				E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */,
