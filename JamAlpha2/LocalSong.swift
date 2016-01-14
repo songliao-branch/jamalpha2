@@ -28,10 +28,7 @@ class LocalSong: NSObject {
     func findMediaItem() {
         self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
             item in
-            if let itemTitle = item.title, itemArtist = item.artist {
-                return itemTitle.lowercaseString == title.lowercaseString && itemArtist.lowercaseString == artist.lowercaseString && abs((Float(item.playbackDuration) - duration)) < 1.5
-            }
-            return false
+            return MusicManager.sharedInstance.songsMatched(findableA: self, findableB: item)
         }.first
     }
     
@@ -40,10 +37,11 @@ class LocalSong: NSObject {
             SearchAPI.searchSong(title + " " + artist, completion: {
                 results in
                 for result in results {
-                    if result.getTitle().lowercaseString == self.title.lowercaseString && result.getArtist().lowercaseString == self.artist.lowercaseString && abs(result.getDuration() - self.duration) < 1.5 {
+                    if MusicManager.sharedInstance.songsMatched(findableA: self, findableB: result) {
                         completion(searchResult: result)
                         break
                     }
+                    completion(searchResult: nil)
                 }
             })
         }

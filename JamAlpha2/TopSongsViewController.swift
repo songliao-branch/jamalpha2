@@ -170,6 +170,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 result in
                 
                 cell.spinner.stopAnimating()
+                cell.spinner.hidden = true
+                cell.searchIcon.hidden = false
                 
                 guard let song = result else {
                 
