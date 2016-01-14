@@ -126,12 +126,17 @@ class PlayChordsManager: NSObject {
     }
     
     func startTimer() {
-        self.timer = NSTimer.scheduledTimerWithTimeInterval(0.05, target: self, selector: "handleTimer:", userInfo: nil, repeats: true)
+        if(self.timer == nil){
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.05, target: self, selector: "handleTimer:", userInfo: nil, repeats: true)
+        }
     }
     
     func stopTimer() {
-        self.timer.invalidate()
-        self.timer = nil
+        if(self.timer != nil){
+            self.timer.invalidate()
+            self.timer = nil
+        }
+       
     }
     
     func handleTimer(timer: NSTimer) {
