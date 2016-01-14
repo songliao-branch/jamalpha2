@@ -56,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
         AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
         NetworkManager.sharedInstance.reachability.isReachable()
-
+        PlayChordsManager.sharedInstance.initialSoundBank()
         return true
     }
     

@@ -275,8 +275,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
-        
-        PlayChordsManager.sharedInstance.initialSoundBank()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -1552,13 +1550,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func addMusicControlView() {
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
-        print(backgroundImage.image?.size)
         
-        UIGraphicsBeginImageContext(backgroundImage.bounds.size);
-        backgroundImage.layer.renderInContext(UIGraphicsGetCurrentContext()!)
-        let screenShot = UIGraphicsGetImageFromCurrentImageContext() // return uiimage
-        UIGraphicsEndImageContext()
-        let cropedImage: UIImage = (screenShot.cropImageWithRect(CGRectMake(28 / 31 * self.trueWidth, 2 / 20 * self.trueHeight, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)))
+        let cropedImage: UIImage = backgroundImage.cropViewWithRect(CGRectMake(28 / 31 * self.trueWidth, 2 / 20 * self.trueHeight, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight))
         
         let previousButton: UIButton = UIButton()
         previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 0, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)
@@ -2071,7 +2064,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressResetButton(sender: UIButton) {
-        let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to reset all tabs?", preferredStyle: UIAlertControllerStyle.Alert)
+        let alertController = UIAlertController(title: nil, message: "Are you sure you want to reset all tabs?", preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
         alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler: {
             action in
@@ -3365,12 +3358,11 @@ extension TabsEditorViewController {
     }
     
     func backButtonRotation(isLeft isLeft:Bool){
-        print(self.backButton.imageView?.frame)
         let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians(0)))
         let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians(-90)))
         
-        
-        UIView.animateWithDuration(0.3, delay: 0, options: [.AllowUserInteraction,.CurveEaseInOut], animations: {
+        self.backButton.userInteractionEnabled = false
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseInOut, animations: {
             if(isLeft){
                 self.backButton.imageView!.transform = leftWobble
                 self.backButton.imageView
@@ -3378,8 +3370,10 @@ extension TabsEditorViewController {
                 self.backButton.imageView!.transform = rightWobble
             }
             
-            }, completion: nil)
-
+            }, completion: {
+                completed in
+                self.backButton.userInteractionEnabled = true
+        })
     }
 }
 

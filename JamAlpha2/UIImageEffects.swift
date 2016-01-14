@@ -266,3 +266,13 @@ extension UIImage {
         return newImage
     }
 }
+
+extension UIView {
+    func cropViewWithRect(rect:CGRect) -> UIImage {
+        UIGraphicsBeginImageContext(self.bounds.size)
+        self.layer.renderInContext(UIGraphicsGetCurrentContext()!)
+        let screenShot = UIGraphicsGetImageFromCurrentImageContext() // return uiimage
+        UIGraphicsEndImageContext()
+       return screenShot.cropImageWithRect(rect)
+    }
+}
