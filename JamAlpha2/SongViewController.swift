@@ -2884,7 +2884,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     func productViewControllerDidFinish(viewController: SKStoreProductViewController) {
-        if let purchasedItem = (MusicManager.sharedInstance.isNeedReloadCollections(songNeedPurchase.trackName!, artist: songNeedPurchase.artistName!, duration: songNeedPurchase.trackTimeMillis!)){
+        if let purchasedItem = MusicManager.sharedInstance.itemFoundInCollection(songNeedPurchase){
                 MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
                 MusicManager.sharedInstance.setIndexInTheQueue(0)
 

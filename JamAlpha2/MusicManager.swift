@@ -59,13 +59,12 @@ class MusicManager: NSObject {
     }
     
     //check when search a cloud item, if it matches, we use the song we already have
-    func isNeedReloadCollections(title:String, artist:String, duration:Float) -> MPMediaItem? {
+    func itemFoundInCollection(songToCheck: Findable) -> MPMediaItem? {
         let result = uniqueSongs.filter{
-            (song: MPMediaItem) -> Bool in
-            if let tempTitle = song.title, tempArtist = song.artist {
-                return tempTitle.lowercaseString == title.lowercaseString && tempArtist.lowercaseString == artist.lowercaseString && abs((Float(song.playbackDuration) - duration))<1.5
-            }
-            return false
+            (item: MPMediaItem) -> Bool in
+            
+            return MusicManager.sharedInstance.songsMatched(findableA: songToCheck, findableB: item)
+
         }.first
         if(result != nil){
             return result!
@@ -111,7 +110,8 @@ class MusicManager: NSObject {
         if(currentVC.isKindOfClass(SongViewController)){
             let currentSongVC = currentVC as! SongViewController
             if (currentSongVC.isSongNeedPurchase) {
-                if let purchasedItem = (isNeedReloadCollections(currentSongVC.songNeedPurchase.trackName!, artist: currentSongVC.songNeedPurchase.artistName!, duration: currentSongVC.songNeedPurchase.trackTimeMillis!)){
+                
+                if let purchasedItem = (itemFoundInCollection(currentSongVC.songNeedPurchase)){
                     setPlayerQueue([purchasedItem])
                     setIndexInTheQueue(0)
                     currentSongVC.recoverToNormalSongVC(purchasedItem)
