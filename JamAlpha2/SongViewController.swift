@@ -2310,6 +2310,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         maxylocation = chordBase.frame.height - lenGoup - chordBase.frame.height / 40
     }
     
+    var playChordKey: Bool = false
     
     func refreshChordLabel(){
         if chords.count < minimumChordCount {
@@ -2349,6 +2350,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             activelabels.removeAtIndex(0)
             startdisappearing++
+            playChordKey = false
         }
         
         // Change the location of each label
@@ -2383,7 +2385,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             activelabels[i].ylocation = activelabel.ylocation + movePerstep
             
+            if (activelabels[i].ylocation > maxylocation - CGFloat(10 * speed) ) {
+                if !playChordKey {
+                    let content = chords[i + start + 1].tab.content
+                    PlayChordsManager.sharedInstance.playChordArpeggio(content, delay: 0.04, completion: {_ in })
+                    playChordKey = true
+                }
+            }
+            
             if( activelabels[i].ylocation > maxylocation){
+                
                 activelabels[i].ylocation = maxylocation
             }
         }
