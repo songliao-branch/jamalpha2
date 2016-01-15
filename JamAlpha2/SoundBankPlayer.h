@@ -46,7 +46,7 @@
  * terminate itself when it has played to the end of the sample.
  */
 @property (nonatomic, assign) BOOL loopNotes;
-
+@property (nonatomic, assign) float  volume;
 /*
  * Sets the sound bank that the sounds will be loaded from.
  *

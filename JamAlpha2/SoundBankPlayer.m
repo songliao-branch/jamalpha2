@@ -69,6 +69,7 @@ Note;
         _initialized = NO;
         _soundBankName = @"";
         _loopNotes = NO;
+        _volume = 5.0f;
         [self initNotes];
         [self setUpAudioSession];
     }
@@ -412,6 +413,7 @@ Note;
             alSourcei(source->sourceId, AL_LOOPING, self.loopNotes ? AL_TRUE : AL_FALSE);
             alSourcef(source->sourceId, AL_REFERENCE_DISTANCE, 100.0f);
             alSourcef(source->sourceId, AL_GAIN, gain);
+            alSourcef(source->sourceId, AL_GAIN, _volume); // changed volume
             
             float sourcePos[] = { note->panning, 0.0f, 0.0f };
             alSourcefv(source->sourceId, AL_POSITION, sourcePos);
@@ -428,6 +430,7 @@ Note;
         }
     }
 }
+
 
 - (void)playQueuedNotes
 {

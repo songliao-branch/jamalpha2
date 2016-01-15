@@ -89,8 +89,8 @@ class PlayChordsManager: NSObject {
         self.stopTimer()
     }
     
-    func changeVolumn() {
-    
+    func changeVolumn(newVolume:Float) {
+        self.soundBank.volume = newVolume
     }
     
     func playSingleNoteSound(index: Int) {
@@ -112,6 +112,7 @@ class PlayChordsManager: NSObject {
     
     func playChordArpeggio(content: String, delay: CFTimeInterval, completion: ((complete: Bool) -> Void)) {
         soundBank.allNotesOff()
+        self.stopTimer()
         self.startTimer()
         let midiArray: [Int32] = convertContentToIndexArray(content)
         if playingArpeggio == false {
@@ -128,6 +129,7 @@ class PlayChordsManager: NSObject {
     func startTimer() {
         if(self.timer == nil){
             self.timer = NSTimer.scheduledTimerWithTimeInterval(0.05, target: self, selector: "handleTimer:", userInfo: nil, repeats: true)
+             NSRunLoop.mainRunLoop().addTimer(self.timer, forMode: NSRunLoopCommonModes)
         }
     }
     
@@ -136,7 +138,6 @@ class PlayChordsManager: NSObject {
             self.timer.invalidate()
             self.timer = nil
         }
-       
     }
     
     func handleTimer(timer: NSTimer) {
@@ -149,6 +150,7 @@ class PlayChordsManager: NSObject {
                 if arpeggioIndex == arpeggioNotes.count {
                     playingArpeggio = false
                     arpeggioNotes.removeAllObjects()
+                    self.stopTimer()
                 } else {
                     arpeggioStartTime = now
                 }

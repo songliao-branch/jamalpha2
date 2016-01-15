@@ -275,6 +275,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
+        PlayChordsManager.sharedInstance.changeVolumn(10)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -663,6 +664,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.changeMenuButtonStatus(true)
             var indexFret: Int = Int()
             var indexString: Int = Int()
+            indexString = 5
             let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
             var original:CGFloat = string3Height  - self.string3Position[2]
             let location = sender.locationInView(self.collectionView)
