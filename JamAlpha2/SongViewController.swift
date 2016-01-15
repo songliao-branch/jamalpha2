@@ -1012,7 +1012,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
                 //如果是在线从来没有听过的queue切歌很快的时候duration是读不出来的
                 if progressBarWidth <= 0.1 {
-                    nowPlayingItemDuration = 1000
+                    nowPlayingItemDuration = 2000
                 }
                 KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
         
@@ -1258,7 +1258,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     KGLOBAL_progressBlock = nil
         }
         if (progressBarWidth <= 0.1){
-            nowPlayingItemDuration = 1000
+            nowPlayingItemDuration = 2000
         }
         KGLOBAL_progressBlock = SoundWaveView(frame: CGRect(x: self.view.center.x, y: 0, width: progressBarWidth >= 0.1 ? progressBarWidth : 401, height: soundwaveHeight))
         KGLOBAL_progressBlock.center.y = progressContainerHeight
@@ -2605,7 +2605,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
-                    if(!isDemoSong && nowPlayingItemDuration == 1000){
+                    if(!isDemoSong && nowPlayingItemDuration == 2000){
                         if(player.nowPlayingItem!.playbackDuration > 1){
                             if(KGLOBAL_progressBlock.frame.size.width > CGFloat(400)){
                                 nowPlayingMediaItem = player.nowPlayingItem
