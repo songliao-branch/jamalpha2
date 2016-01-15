@@ -11,6 +11,7 @@ import QuartzCore
 class PlayChordsManager: NSObject {
     var soundBank: SoundBankPlayer!
     var timer: NSTimer!
+    var playingArpeggio: Bool = false
     var arpeggioStartTime: CFTimeInterval = 0
     var arpeggioDelay: CFTimeInterval = 0
     var arpeggioNotes: NSMutableArray = NSMutableArray()
@@ -81,6 +82,7 @@ class PlayChordsManager: NSObject {
     func initialSoundBank() {
         self.soundBank = SoundBankPlayer()
         self.soundBank.setSoundBank("GuitarSoundFont")
+        self.playingArpeggio = false
     }
     
     func deinitialSoundBank() {
@@ -114,8 +116,8 @@ class PlayChordsManager: NSObject {
         self.startTimer()
         let midiArray: [Int32] = convertContentToIndexArray(content)
         
+        playingArpeggio = true
         arpeggioNotes.removeAllObjects()
-   
         for var i = midiArray.count - 1; i >= 0 ; i-- {
             arpeggioNotes.addObject(NSNumber(int:midiArray[i]))
         }
@@ -141,16 +143,20 @@ class PlayChordsManager: NSObject {
     }
     
     func handleTimer(timer: NSTimer) {
-            counter++
+        counter++
+        if playingArpeggio {
             let now: CFTimeInterval = CACurrentMediaTime()
             if now - arpeggioStartTime >= arpeggioDelay {
                 let number: NSNumber = arpeggioNotes[arpeggioIndex] as! NSNumber
                 soundBank.noteOn(number.intValue, gain: 0.4)
                 arpeggioIndex = arpeggioIndex + 1
-                if arpeggioIndex != arpeggioNotes.count {
+                if arpeggioIndex == arpeggioNotes.count {
+                    playingArpeggio = false
+                } else {
                     arpeggioStartTime = now
                 }
             }
+        }
         if(counter == 6){
             stopTimer()
             arpeggioNotes.removeAllObjects()
