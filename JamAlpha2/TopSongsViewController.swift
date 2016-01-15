@@ -12,7 +12,7 @@ import MediaPlayer
 //TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
 class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    @IBOutlet weak var topSongsTable: UITableView!
+    @IBOutlet weak var topSongsTable: UITableView?
     
     var songs = [LocalSong]()
     var animator: CustomTransitionAnimation?
@@ -41,7 +41,10 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             for song in songs {
                 song.findMediaItem()
             }
-            self.topSongsTable.reloadData()
+            //TODO: this crashes somehow, needs to find out how to reproduce the crash
+            if let table = self.topSongsTable {
+                table.reloadData()
+            }
         })
     }
     
@@ -160,7 +163,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             self.animator!.attachToViewController(songVC)
             
             self.presentViewController(songVC, animated: true, completion: nil)
-            self.topSongsTable.deselectRowAtIndexPath(indexPath, animated: true)
+            tableView.deselectRowAtIndexPath(indexPath, animated: true)
             
             
         } else { //if the mediaItem is not found, and an searchResult is found
@@ -189,7 +192,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: nil)
-                self.topSongsTable.deselectRowAtIndexPath(indexPath, animated: true)
+                tableView.deselectRowAtIndexPath(indexPath, animated: true)
                 
             })
         }

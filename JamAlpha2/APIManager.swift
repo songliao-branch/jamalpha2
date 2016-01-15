@@ -560,7 +560,6 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    
                     var songs = [LocalSong]()
                     for song in json["songs"].array! {
                         let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
