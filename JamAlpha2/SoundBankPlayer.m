@@ -211,7 +211,25 @@ Note;
     success = [session setActive:YES error:&error];
     if (!success) {
         NSLog(@"%@", [error localizedDescription]);
+    }else{
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioSessionWasInterrupted:)
+                                                     name:AVAudioSessionInterruptionNotification
+                                                   object:session];
     }
+}
+
+- (void)audioSessionWasInterrupted:(NSNotification *)notification {
+    if ([notification.name isEqualToString:AVAudioSessionInterruptionNotification]) {
+        if ([[notification.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
+            NSLog(@"Interrupted begin");
+            [self beginInterruption];
+        } else if ([[notification.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeEnded]]) {
+            NSLog(@"Interrupted ended");
+            [self endInterruption];
+        }
+    }
+  
 }
 
 - (void)tearDownAudioSession
