@@ -287,7 +287,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
         PlayChordsManager.sharedInstance.deinitialSoundBank()
     }
     

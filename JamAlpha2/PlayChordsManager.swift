@@ -86,7 +86,9 @@ class PlayChordsManager: NSObject {
     }
     
     func deinitialSoundBank() {
-        self.stopTimer()
+        stopTimer()
+        soundBank.allNotesOff()
+        arpeggioNotes.removeAllObjects()
     }
     
     func changeVolumn(newVolume:Float) {
@@ -159,6 +161,7 @@ class PlayChordsManager: NSObject {
         }
         if(counter == 6){
             stopTimer()
+            soundBank.allNotesOff()
             arpeggioNotes.removeAllObjects()
         }
     }
