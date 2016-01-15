@@ -11,7 +11,6 @@ import QuartzCore
 class PlayChordsManager: NSObject {
     var soundBank: SoundBankPlayer!
     var timer: NSTimer!
-    var playingArpeggio: Bool = false
     var arpeggioStartTime: CFTimeInterval = 0
     var arpeggioDelay: CFTimeInterval = 0
     var arpeggioNotes: NSMutableArray = NSMutableArray()
@@ -82,7 +81,6 @@ class PlayChordsManager: NSObject {
     func initialSoundBank() {
         self.soundBank = SoundBankPlayer()
         self.soundBank.setSoundBank("GuitarSoundFont")
-        self.playingArpeggio = false
     }
     
     func deinitialSoundBank() {
@@ -115,18 +113,19 @@ class PlayChordsManager: NSObject {
         self.stopTimer()
         self.startTimer()
         let midiArray: [Int32] = convertContentToIndexArray(content)
-        if playingArpeggio == false {
-            playingArpeggio = true
-            for var i = midiArray.count - 1; i >= 0 ; i-- {
-                arpeggioNotes.addObject(NSNumber(int:midiArray[i]))
-            }
-            arpeggioIndex = 0
-            arpeggioDelay = delay
-            arpeggioStartTime = CACurrentMediaTime()
+        
+        arpeggioNotes.removeAllObjects()
+   
+        for var i = midiArray.count - 1; i >= 0 ; i-- {
+            arpeggioNotes.addObject(NSNumber(int:midiArray[i]))
         }
+        arpeggioIndex = 0
+        arpeggioDelay = delay
+        arpeggioStartTime = CACurrentMediaTime()
     }
-    
+    var counter = 0
     func startTimer() {
+        counter = 0
         if(self.timer == nil){
             self.timer = NSTimer.scheduledTimerWithTimeInterval(0.05, target: self, selector: "handleTimer:", userInfo: nil, repeats: true)
              NSRunLoop.mainRunLoop().addTimer(self.timer, forMode: NSRunLoopCommonModes)
@@ -134,6 +133,7 @@ class PlayChordsManager: NSObject {
     }
     
     func stopTimer() {
+        counter = 0
         if(self.timer != nil){
             self.timer.invalidate()
             self.timer = nil
@@ -141,20 +141,19 @@ class PlayChordsManager: NSObject {
     }
     
     func handleTimer(timer: NSTimer) {
-        if playingArpeggio {
+            counter++
             let now: CFTimeInterval = CACurrentMediaTime()
             if now - arpeggioStartTime >= arpeggioDelay {
                 let number: NSNumber = arpeggioNotes[arpeggioIndex] as! NSNumber
                 soundBank.noteOn(number.intValue, gain: 0.4)
                 arpeggioIndex = arpeggioIndex + 1
-                if arpeggioIndex == arpeggioNotes.count {
-                    playingArpeggio = false
-                    arpeggioNotes.removeAllObjects()
-                    self.stopTimer()
-                } else {
+                if arpeggioIndex != arpeggioNotes.count {
                     arpeggioStartTime = now
                 }
             }
+        if(counter == 6){
+            stopTimer()
+            arpeggioNotes.removeAllObjects()
         }
     }
 }
