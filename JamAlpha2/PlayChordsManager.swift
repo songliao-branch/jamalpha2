@@ -161,7 +161,6 @@ class PlayChordsManager: NSObject {
         }
         if(counter == 6){
             stopTimer()
-            soundBank.allNotesOff()
             arpeggioNotes.removeAllObjects()
         }
     }
