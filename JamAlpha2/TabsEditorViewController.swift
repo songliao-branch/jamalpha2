@@ -275,7 +275,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
         // initial main view tab data array
         self.initialMainViewDataArray()
-        PlayChordsManager.sharedInstance.changeVolumn(10)
+        PlayChordsManager.sharedInstance.changeVolumn(1.0)
     }
     
     override func viewDidAppear(animated: Bool) {

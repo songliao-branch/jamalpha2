@@ -69,7 +69,7 @@ Note;
         _initialized = NO;
         _soundBankName = @"";
         _loopNotes = NO;
-        _volume = 5.0f;
+        _volume = 1.0f; // between 0.0 to 1.0
         [self initNotes];
         [self setUpAudioSession];
     }
