@@ -528,29 +528,21 @@ class MeLoginOrSignupViewController: UIViewController{
                   
                     let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!)!
                     let thumbnailImage = originImage.resize(35)
-                    // add request to upload array
-                    let thumbnailUrl = self.awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: facebookEmail)
                     
-                    //sending the cropped image to s3 in here
-                    for item in self.awsS3.uploadRequests {
-                        self.awsS3.upload(item!)
-                    }
-                    self.awsS3.uploadRequests.removeAll()
+                    let thumbnailFileName = AWSS3Manager.uploadImageReturningFileName(thumbnailImage, email: facebookEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
                     
-
                     let parameters = [
                         "attempt_login":"facebook",
                         "email": facebookEmail,
-                        "avatar_url_thumbnail": thumbnailUrl,
+                        "avatar_url_thumbnail": thumbnailFileName,
                         "avatar_url_medium": facebookAvatarUrl,
                         "password": (facebookEmail + facebookLoginSalt).md5() //IMPORTANT: DO NOT MODIFY THIS SALT
                     ]
                     
                     self.signUpLoginRequest(parameters, afterRetrievingUser: {
-                         id, email, authToken, nickname, avatarUrlMedium, avatarUrlThumbnail in
+                        id, email, authToken, nickname, avatarUrlMedium, avatarUrlThumbnail in
                         
-                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: (nickname.isEmpty ? facebookName : nickname), avatarUrl: (avatarUrlMedium.isEmpty ? facebookAvatarUrl : avatarUrlMedium), thumbnailUrl: (thumbnailUrl.isEmpty ? thumbnailUrl : avatarUrlThumbnail), fbToken: fbToken)
-                        
+                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: (nickname.isEmpty ? facebookName : nickname), avatarUrl: (avatarUrlMedium.isEmpty ? facebookAvatarUrl : avatarUrlMedium), thumbnailUrl: thumbnailFileName, fbToken: fbToken)
                         
                         KGLOBAL_queue.suspended = false
                         KGLOBAL_init_queue.suspended = self.suspended

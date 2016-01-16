@@ -21,10 +21,7 @@ class UserProfileEditViewController: UIViewController {
     var awsS3: AWSS3Manager = AWSS3Manager()
     
     var userEmail: String!
-    
-    var originFileName: String!
-    var croppedFileName: String!
-    var originImageData: NSData!
+
     var userProfile:UIImageView!
     
     override func viewDidLoad() {
@@ -225,35 +222,29 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
         // resize image, add request to upload array
-        let originImage: UIImage = croppedImage.resize(250)
-        self.originFileName = awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.userEmail)
-        self.originImageData = UIImagePNGRepresentation(originImage)
         
+        let originImage: UIImage = croppedImage.resize(250)
+        let originImageData = UIImagePNGRepresentation(originImage)
+
+        
+        let originFileName = AWSS3Manager.uploadImageReturningFileName(originImage, email: userEmail, imageSize: AWSS3Manager.ImageSize.origin)
+
         // resize image
         let thumbnailImage: UIImage = croppedImage.resize(80)
         let thumbnailImageData: NSData = UIImagePNGRepresentation(thumbnailImage)!
         
-        // add request to upload array
-        self.croppedFileName = awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: self.userEmail)
+        let thumbnailFileName = AWSS3Manager.uploadImageReturningFileName(thumbnailImage, email: userEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
         
-        //sending the cropped image to s3 in here
-        for item in awsS3.uploadRequests {
-            awsS3.upload(item!)
-        }
-        awsS3.uploadRequests.removeAll()
-        
-        
-        APIManager.updateUserAvatar(self.originFileName, avatarUrlThumbnail: self.croppedFileName, completion: {
+        APIManager.updateUserAvatar(originFileName, avatarUrlThumbnail: thumbnailFileName, completion: {
             completed in
             if completed {
                 print("uploaded newest avatar")
             }
         })
         
-        CoreDataManager.saveUserProfileImage(self.originFileName, thumbnailUrl: self.croppedFileName, profileImageData: self.originImageData, thumbnailData: thumbnailImageData)
+        CoreDataManager.saveUserProfileImage(originFileName, thumbnailUrl: thumbnailFileName, profileImageData: originImageData, thumbnailData: thumbnailImageData)
         
         self.tableView.reloadData()
-        
         
         self.navigationController?.popViewControllerAnimated(true)
     }

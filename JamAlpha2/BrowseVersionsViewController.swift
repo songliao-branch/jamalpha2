@@ -29,8 +29,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     var centerButton: UIButton!//to display "Add your own tabs or lyrics if none is found"
     
-    var awsS3: AWSS3Manager = AWSS3Manager()
-    
     override func viewDidLoad() {
 
         setUpHeader()
@@ -241,7 +239,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.profileName.text = tabsSet.editor.nickname
             
             cell.profileImage.image = nil
-            awsS3.downloadImage(tabsSet.editor.avatarUrlThumbnail, completion: {
+            AWSS3Manager.downloadImage(tabsSet.editor.avatarUrlThumbnail, completion: {
                 image in
                     dispatch_async(dispatch_get_main_queue()) {
                         cell.profileImage.image = image
@@ -292,7 +290,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             
         
             cell.profileImage.image = nil
-            awsS3.downloadImage(lyricsSet.editor.avatarUrlThumbnail, completion: {
+            AWSS3Manager.downloadImage(lyricsSet.editor.avatarUrlThumbnail, completion: {
                 image in
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.profileImage.image = image
