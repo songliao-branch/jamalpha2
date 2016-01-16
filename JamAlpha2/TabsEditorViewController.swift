@@ -111,6 +111,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var string6Position: [CGFloat] = [CGFloat]()
     var string6FretPosition: [CGFloat] = [CGFloat]()
     var string3FretPosition: [CGFloat] = [CGFloat]()
+    var string3FretChangeingPosition: [Int : CGFloat] = [Int : CGFloat]()
     
     // core data functions
     
@@ -659,8 +660,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.prepareMoveSwipeDownGesture.enabled = false
         }
     }
-    var originaloffset:CGFloat = 0
-    var baseNoteLocation:CGFloat = 0
+    var originaloffset:CGFloat = -1
+    var baseNoteLocation:CGFloat = -1
     
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
         if isJiggling == false {
@@ -673,18 +674,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let location = sender.locationInView(self.collectionView)
             // get the tap position for fret number and string number
             for var index = 0; index < self.string3FretPosition.count; index++ {
-                if location.x < self.string3FretPosition[self.string3FretPosition.count - 2] {
+                if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
                     if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
-                        if let tempIndex = findFret(sender.locationInView(self.view)){
-                            indexFret = tempIndex
-                            original.x = (self.string3FretPosition[index] + self.string3FretPosition[index + 1])/2.0
-//                            let toX = (self.string3FretPosition[tempIndex] + self.string3FretPosition[tempIndex + 1])/2.0
-                            if(index != tempIndex){
-                                self.isCompleteStringViewScroll = true
-                            }
-                            originaloffset = collectionView.contentOffset.x
-                            baseNoteLocation = original.x - collectionView.contentOffset.x
+                        let tempIndex = fretsNumber[index]
+                        indexFret = tempIndex
+                        original.x = (self.string3FretPosition[index] + self.string3FretPosition[index + 1])/2.0
+                        if(index != tempIndex){
+                            self.isCompleteStringViewScroll = true
                         }
+                        baseNoteLocation = original.x - collectionView.contentOffset.x
+                        
                         break
                     }
                 }
@@ -703,21 +702,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    func findFret(point:CGPoint) -> Int?{
-        if let ca = self.view {
-            if let cv = self.collectionView {
-                let pointPressedInCanvas = point
-                for cell in cv.visibleCells() {
-                    let cellInCanvasFrame = ca.convertRect(cell.frame, fromView: cv)
-                    if CGRectContainsPoint(cellInCanvasFrame, pointPressedInCanvas ) {
-                        return Int((cell as! FretCell).fretNumberLabel.text!)!
-                    }
-                }
-            }
-        }
-        return nil
-    }
-
     var isCompleteStringViewScroll = false
     
     func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int, original:CGPoint?=nil) {
@@ -746,13 +730,27 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.addNewTab = true
         self.addedNoteButtonOnCompleteView = true
         self.addNoteButton(indexFret, indexString: indexString, originalPosition: original)
+        let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
         self.completeStringView.contentOffset = self.collectionView.contentOffset
         UIView.animateWithDuration(0.2, animations: {
             self.completeStringView.alpha = 1
             self.specificTabsScrollView.alpha = 1
             self.tabNameTextField.alpha = 1
             self.completeStringView.frame = CGRectMake(0, 3 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
-            })
+            },completion: {
+                completed in
+                UIView.animateWithDuration(0.5, animations: {
+                    if(self.isCompleteStringViewScroll){
+                        if (buttonFret - self.baseNoteLocation < 0 ){
+                            self.completeStringView.contentOffset.x = 0
+                        }else if (buttonFret - self.baseNoteLocation > self.string6FretPosition[self.string6FretPosition.count-1]-self.trueWidth){
+                            self.completeStringView.contentOffset.x = self.string6FretPosition[self.string6FretPosition.count-1]-self.trueWidth
+                        }else{
+                            self.completeStringView.contentOffset.x = buttonFret - self.baseNoteLocation
+                        }
+                    }
+                })
+        })
         self.backButtonRotation(isLeft: false)
         self.view.userInteractionEnabled = true
 
@@ -953,7 +951,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 
                 self.doubleArrowView.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - kmovingMainNoteSliderHeight/2)
             }
-            if gesture.state == UIGestureRecognizerState.Ended {
+            if gesture.state == UIGestureRecognizerState.Ended || gesture.state == UIGestureRecognizerState.Cancelled {
                 self.doubleArrowView.center.x = bundle.sourceCell.center.x - self.collectionView.contentOffset.x
                 self.doubleArrowView.frame.origin.y = self.collectionView.frame.origin.y - kmovingMainNoteSliderHeight
                 bundle.sourceCell.hidden = false
@@ -967,6 +965,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.view.userInteractionEnabled = true
                 self.isPanning = false
                 self.collectionView.scrollEnabled = true
+                for i in 0..<fretsNumber.count {
+                    self.string3FretChangeingPosition[fretsNumber[i]] = string3FretPosition[i]
+                }
             }
         }
     }
@@ -1235,14 +1236,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: CGFloat(0.6/duration), initialSpringVelocity:CGFloat(0.6/duration), options: [.CurveEaseInOut,.AllowUserInteraction], animations: {
                     noteButton.alpha = 1
                     noteButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
-                }, completion: {
-                    complete in
-                    UIView.animateWithDuration(0.2, animations: {
-                        if(self.isCompleteStringViewScroll){
-                            self.completeStringView.contentOffset.x = buttonFret - self.baseNoteLocation > 1 ? buttonFret - self.baseNoteLocation : 0
-                        }
-                        })
-            })
+                }, completion: nil)
             
         }else{
             UIView.animateWithDuration(0.3, animations: {
@@ -1819,7 +1813,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let fret3Width = self.trueWidth / 5
         for var i = 0; i < 26; i++ {
             self.string3FretPosition.append(CGFloat(i) * fret3Width)
+            self.string3FretChangeingPosition[i] = CGFloat(i) * fret3Width
         }
+        
+        
     }
     
     func addString6View() {
@@ -1934,9 +1931,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             
         }
         
-        self.collectionView.contentOffset.x = self.originaloffset
-        self.originaloffset = 0
+        if(self.originaloffset != -1){
+            self.collectionView.contentOffset.x = self.originaloffset
+        }else{
+            self.collectionView.contentOffset.x = self.completeStringView.contentOffset.x
+        }
         
+        
+        self.originaloffset = -1
+        self.baseNoteLocation = -1
         
         self.changeMenuButtonStatus(false)
         UIView.animateWithDuration(0.3, animations: {
@@ -2072,26 +2075,55 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.backToMainView()
             self.view.userInteractionEnabled = true
         } else {
-            print("back to song view controller")
-            tuningMenu.hidden = true
-            self.progressBlock.hidden = true
-            removeNotification()
-            if self.isDemoSong {
-                self.avPlayer.pause()
-            } else {
-                self.musicPlayer.pause()
-            }
-            self.dismissViewControllerAnimated(true, completion: {
-                completed in
-                if let songVC = self.songViewController {
+            if self.noteButtonWithTabArray.count != 0 || self.allTabsOnMusicLine.count != 0 {
+                let alertController = UIAlertController(title: nil, message: "Do you want to discard all changes?", preferredStyle: UIAlertControllerStyle.Alert)
+                alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
+                alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler:{
+                    handle in
+                    print("back to song view controller")
+                    self.tuningMenu.hidden = true
+                    self.progressBlock.hidden = true
+                    self.removeNotification()
                     if self.isDemoSong {
-                        songVC.avPlayer.play()
+                        self.avPlayer.pause()
                     } else {
-                        MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                        songVC.player.play()
+                        self.musicPlayer.pause()
                     }
+                    self.dismissViewControllerAnimated(true, completion: {
+                        completed in
+                        if let songVC = self.songViewController {
+                            if self.isDemoSong {
+                                songVC.avPlayer.play()
+                            } else {
+                                MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                                songVC.player.play()
+                            }
+                        }
+                    })
+                }))
+                self.presentViewController(alertController, animated: true, completion: nil)
+            }else{
+                print("back to song view controller")
+                tuningMenu.hidden = true
+                self.progressBlock.hidden = true
+                removeNotification()
+                if self.isDemoSong {
+                    self.avPlayer.pause()
+                } else {
+                    self.musicPlayer.pause()
                 }
-            })
+                self.dismissViewControllerAnimated(true, completion: {
+                    completed in
+                    if let songVC = self.songViewController {
+                        if self.isDemoSong {
+                            songVC.avPlayer.play()
+                        } else {
+                            MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+                            songVC.player.play()
+                        }
+                    }
+                })
+            }
         }
     }
     
@@ -2125,7 +2157,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func pressResetButton(sender: UIButton) {
-        let alertController = UIAlertController(title: nil, message: "Are you sure you want to reset all tabs?", preferredStyle: UIAlertControllerStyle.Alert)
+        let alertController = UIAlertController(title: nil, message: "Do you want to reset all added chords?", preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
         alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler: {
             action in
@@ -2162,7 +2194,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
 
     func pressAddButton(sender: UIButton) {
-        self.originaloffset = self.collectionView.contentOffset.x
         if(isJiggling){
             self.stopMainViewJiggling()
         }
@@ -2422,6 +2453,16 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for item in self.mainViewDataArray {
             if item.fretNumber == Int(tempTab.index) - Int(tempTab.index) / 100 * 100 {
                 item.noteButtonsWithTab.append(tempNoteButtonWithTab)
+                let temp6offset = self.string6FretPosition[tempTab.index.integerValue%100] - self.completeStringView.contentOffset.x
+                print("tempTab.index.integerValue%100:\(self.string3FretChangeingPosition[tempTab.index.integerValue%100]!)")
+                let temp3offset = self.string3FretChangeingPosition[tempTab.index.integerValue%100]! - temp6offset
+                if (temp3offset < 0){
+                    self.originaloffset = 0
+                }else if (temp3offset > self.string6FretPosition[string6FretPosition.count-1]-self.trueWidth){
+                    self.originaloffset = self.string6FretPosition[string6FretPosition.count-1]-self.trueWidth
+                }else{
+                    self.originaloffset = temp3offset
+                }
             }
         }
         
@@ -2832,6 +2873,7 @@ extension TabsEditorViewController {
                 }
             }
             PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
+            
             if indexString >= 3 {
                 let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
                 let buttonString = self.string6Position[indexString]
@@ -2937,7 +2979,6 @@ extension TabsEditorViewController {
             }else{
                 self.currentBaseButton.addGestureRecognizer(jigglingPanGesture)
             }
-            
         }
     }
     
