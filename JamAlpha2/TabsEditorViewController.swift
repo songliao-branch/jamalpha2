@@ -2663,7 +2663,7 @@ extension TabsEditorViewController {
             }
         }
         
-        let current = NSTimeInterval(sender[sender.count - 1].time.toDecimalNumer()) + 0.1
+        let current = 0.0
         if isDemoSong {
             self.avPlayer.currentTime = current
         } else {
