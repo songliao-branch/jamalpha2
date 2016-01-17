@@ -91,10 +91,10 @@ class TunerViewController: UIViewController {
                         self.maxLabel.text = temp
                     }
                 })
-            
+      
                 moveIndicator(result.0, midHZ: result.1, maxHZ: result.2, detectedHZ: max_HZ)
                 
-                if HZArray.count > 4 {
+                if HZArray.count > 2 {
                     infoLabel.hidden = true
 
                     infoLabel.alpha = 1
@@ -136,7 +136,11 @@ class TunerViewController: UIViewController {
         if detectedHZ > midHZ * 0.98 && detectedHZ < midHZ * 1.02 {
             tempHZ = midHZ
         }
-        position = abs((tempHZ - midHZ) / (midHZ - minHZ))
+        if midHZ - minHZ > 0 {
+            position = abs((tempHZ - midHZ) / (midHZ - minHZ))
+        } else {
+            position = 0
+        }
         print("position: \(position)")
         UIView.animateWithDuration(0.4, animations: {
             animate in

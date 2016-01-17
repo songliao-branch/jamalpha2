@@ -3,7 +3,7 @@
 #import "FFTHelper.h"
 
 #define SAMPLE_RATE 44100  //22050 //44100
-#define FRAMESIZE  256
+#define FRAMESIZE  128
 #define NUMCHANNELS 2
 
 #define kOutputBus 0

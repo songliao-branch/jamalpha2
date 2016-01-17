@@ -87,6 +87,11 @@ class TunerFunction: NSObject {
                 }
             }
         }
+        if range_max_HZ < 65.41 {
+            range_min_Name = "C1"
+            range_mid_Name = "C#1"
+            range_max_Name = "D1"
+        }
         return (range_min_HZ, range_mid_HZ,range_max_HZ, range_min_Name, range_mid_Name, range_max_Name, noteI, noteN)
     }
     
