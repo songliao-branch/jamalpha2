@@ -553,6 +553,47 @@ class APIManager: NSObject {
         }
     }
 
+    
+    class func getSoundwaveUrl(findable: Findable, completion: ((url: String) -> Void)) {
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_soundwave_url", parameters: parameters).responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    
+                    let url = json["song_information"]["soundwave_url"].string!
+                    completion(url: url)
+                }
+            case .Failure(let error):
+                print("Get soundwave error: \(error)")
+            }
+        }
+    }
+    
+    class func updateSoundwaveUrl(findable: Findable, url: String) {
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration(), "soundwave_url": url]
+        
+        Alamofire.request(.GET, jamBaseURL + "/update_soundwave_url", parameters: parameters).responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    print(json)
+                    print("update soundwave url success")
+                }
+            case .Failure(let error):
+                print("Update soundwave error: \(error)")
+            }
+        }
+    }
 }
 
 
