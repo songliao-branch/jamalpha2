@@ -227,13 +227,17 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
         let originImageData = UIImagePNGRepresentation(originImage)
 
         
-        let originFileName = AWSS3Manager.uploadImageReturningFileName(originImage, email: userEmail, imageSize: AWSS3Manager.ImageSize.origin)
-
+        let originFileName = AWSS3Manager.concatenateFileNameForAvatar(userEmail, imageSize: AWSS3Manager.ImageSize.origin)
+        
+        AWSS3Manager.uploadImage(originImage, fileName: originFileName, isProfileBucket: true)
+        
         // resize image
         let thumbnailImage: UIImage = croppedImage.resize(80)
         let thumbnailImageData: NSData = UIImagePNGRepresentation(thumbnailImage)!
         
-        let thumbnailFileName = AWSS3Manager.uploadImageReturningFileName(thumbnailImage, email: userEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
+        let thumbnailFileName = AWSS3Manager.concatenateFileNameForAvatar(userEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
+        
+        AWSS3Manager.uploadImage(thumbnailImage, fileName: thumbnailFileName, isProfileBucket: true)
         
         APIManager.updateUserAvatar(originFileName, avatarUrlThumbnail: thumbnailFileName, completion: {
             completed in

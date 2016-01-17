@@ -529,7 +529,9 @@ class MeLoginOrSignupViewController: UIViewController{
                     let originImage = UIImage(data: NSData(contentsOfURL: NSURL(string: facebookAvatarUrl)!)!)!
                     let thumbnailImage = originImage.resize(35)
                     
-                    let thumbnailFileName = AWSS3Manager.uploadImageReturningFileName(thumbnailImage, email: facebookEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
+                    let thumbnailFileName = AWSS3Manager.concatenateFileNameForAvatar(facebookEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
+                    
+                    AWSS3Manager.uploadImage(thumbnailImage, fileName: thumbnailFileName, isProfileBucket: true)
                     
                     let parameters = [
                         "attempt_login":"facebook",
