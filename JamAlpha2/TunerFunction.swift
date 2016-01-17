@@ -37,36 +37,57 @@ class TunerFunction: NSObject {
         return Static.instance!
     }
     
-    func checkTheHZRange() -> (Float, Float, String, String, Int, Int) {
+    // min, mid, max, minname, midname, maxname, midIndex, midName
+    func checkTheHZRange() -> (Float, Float, Float, String!, String!, String!, Int, Int) {
         var range_min_HZ: Float = 0
+        var range_mid_HZ: Float = 0
         var range_max_HZ: Float = 0
         var range_min_Name: String = ""
+        var range_mid_Name: String = ""
         var range_max_Name: String = ""
         var noteI: Int = 0
         var noteN: Int = 0
-        for var i = 0; i < noteIndex.count - 1; i++ {
+        for var i = 1; i < noteIndex.count - 2; i++ {
             if max_HZ >= NOTE_HZ[i][0] && max_HZ < NOTE_HZ[i + 1][0] {
                 for var j = 0; j < noteName.count - 1; j++ {
                     if max_HZ >= NOTE_HZ[i][j] && max_HZ < NOTE_HZ[i][j + 1] {
-                        range_min_HZ = NOTE_HZ[i][j]
-                        range_max_HZ = NOTE_HZ[i][j + 1]
-                        range_min_Name = noteName[j] + noteIndex[i]
-                        range_max_Name = noteName[j + 1] + noteIndex[i]
-                        noteI = i
-                        noteN = j
-                        if max_HZ >= NOTE_HZ[i][j] * 0.99 && max_HZ <= NOTE_HZ[i][j] * 1.01 {
-                            range_max_HZ = range_min_HZ
-                            range_max_Name = range_min_Name
-                        } else if max_HZ >= NOTE_HZ[i][j + 1] * 0.99 && max_HZ <= NOTE_HZ[i][j + 1] * 1.01 {
-                            range_max_HZ = range_min_HZ
-                            range_max_Name = range_min_Name
+                        if (max_HZ - NOTE_HZ[i][j]) / (NOTE_HZ[i][j + 1] - NOTE_HZ[i][j]) >= 0.5 {
+                            range_min_HZ = NOTE_HZ[i][j]
+                            range_mid_HZ = NOTE_HZ[i][j + 1]
+                            if j + 2 > 11 {
+                                range_max_HZ = NOTE_HZ[i + 1][0]
+                                range_max_Name = noteName[0] + noteIndex[i + 1]
+                            } else {
+                                range_max_HZ = NOTE_HZ[i][j + 2]
+                                range_max_Name = noteName[j + 2] + noteIndex[i]
+                            }
+                            
+                            range_min_Name = noteName[j] + noteIndex[i]
+                            range_mid_Name = noteName[j + 1] + noteIndex[i]
+                            
+                            noteI = i
+                            noteN = j + 1
+                        } else {
+                            if j - 1 < 0 {
+                                range_min_HZ = NOTE_HZ[i - 1][11]
+                                range_min_Name = noteName[11] + noteIndex[i - 1]
+                            } else {
+                                range_min_HZ = NOTE_HZ[i][j - 1]
+                                range_min_Name = noteName[j - 1] + noteIndex[i]
+                            }
+                            range_mid_HZ = NOTE_HZ[i][j]
+                            range_max_HZ = NOTE_HZ[i][j + 1]
+                            range_mid_Name = noteName[j] + noteIndex[i]
+                            range_max_Name = noteName[j + 1] + noteIndex[i]
+                            noteI = i
+                            noteN = j
                         }
                         break
                     }
                 }
             }
         }
-        return (range_min_HZ, range_max_HZ, range_min_Name, range_max_Name, noteI, noteN)
+        return (range_min_HZ, range_mid_HZ,range_max_HZ, range_min_Name, range_mid_Name, range_max_Name, noteI, noteN)
     }
     
     func getMax_HZ(sender: Float) {
