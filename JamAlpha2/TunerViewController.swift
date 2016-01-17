@@ -20,6 +20,7 @@ class TunerViewController: UIViewController {
     
     var indicatorView: UIView!
     var infoLabel: UILabel!
+    var count: Int = 0
     
     var HZArray: [Float] = [Float]()
     
@@ -72,35 +73,59 @@ class TunerViewController: UIViewController {
             self.soundPowerLabel.textColor = UIColor.greenColor()
             
             HZArray.append(TunerManager.getMaxHZ())
+            count++
             if let max_HZ = HZArray.maxElement() {
                 TunerFunction.sharedInstance.getMax_HZ(max_HZ)
                 let result = TunerFunction.sharedInstance.checkTheHZRange()
                 print("\(result.0), \(result.1), \(result.2), \(result.3), \(result.4), \(result.5), \(result.6), \(result.7)")
 
-                if let temp = result.3 {
-                    minLabel.text = temp
-                }
-                if let temp = result.4{
-                    midLabel.text = temp
-                }
-                if let temp = result.5 {
-                    maxLabel.text = temp
-                }
-                
+                UIView.animateWithDuration(0.5, animations: {
+                    animate in
+                    if let temp = result.3 {
+                        self.minLabel.text = temp
+                    }
+                    if let temp = result.4 {
+                        self.midLabel.text = temp
+                    }
+                    if let temp = result.5 {
+                        self.maxLabel.text = temp
+                    }
+                })
+            
                 moveIndicator(result.0, midHZ: result.1, maxHZ: result.2, detectedHZ: max_HZ)
+                
+                if HZArray.count > 4 {
+                    infoLabel.hidden = true
+
+                    infoLabel.alpha = 1
+                    UIView.animateWithDuration(0.5, animations: {
+                            animate in
+                        self.minLabel.alpha = 1
+                        self.midLabel.alpha = 1
+                        self.maxLabel.alpha = 1
+                        self.infoLabel.alpha = 0
+                    })
+                }
             }
         } else {
+            count++
+            if count > 12   {
+                self.infoLabel.hidden = false
+                self.infoLabel.alpha = 0.1
+                UIView.animateWithDuration(0.5, animations: {
+                    animate in
+                    self.infoLabel.alpha = 1
+                    self.minLabel.alpha = 0.3
+                    self.midLabel.alpha = 0.3
+                    self.maxLabel.alpha = 0.3
+                    }, completion: {
+                        complete in
+                        self.HZArray.removeAll()
+                        self.count = 0
+                })
+            }
             self.soundPowerLabel.text = "Sound is too small to detect"
             self.soundPowerLabel.textColor = UIColor.redColor()
-        }
-        if HZArray.count > 3 {
-            infoLabel.hidden = true
-            for item in HZArray {
-                print(item)
-            }
-            HZArray.removeAll()
-        } else {
-            infoLabel.hidden = false
         }
     }
     
@@ -147,16 +172,23 @@ extension TunerViewController {
         minLabel = UILabel()
         minLabel.frame = CGRectMake(labelWidth + labelWidth * CGFloat(0), (self.view.centerY - labelWidth) / 2, labelWidth, labelWidth)
         minLabel.textAlignment = .Center
+        minLabel.alpha = 0.3
+        minLabel.text = "C3"
         self.view.addSubview(minLabel)
         
         midLabel = UILabel()
         midLabel.frame = CGRectMake(labelWidth + labelWidth * CGFloat(2), (self.view.centerY - labelWidth) / 2, labelWidth, labelWidth)
         midLabel.textAlignment = .Center
+        midLabel.font = UIFont.systemFontOfSize(18)
+        midLabel.alpha = 0.3
+        midLabel.text = "C#3"
         self.view.addSubview(midLabel)
         
         maxLabel = UILabel()
         maxLabel.frame = CGRectMake(labelWidth + labelWidth * CGFloat(4), (self.view.centerY - labelWidth) / 2, labelWidth, labelWidth)
         maxLabel.textAlignment = .Center
+        maxLabel.alpha = 0.3
+        maxLabel.text = "D3"
         self.view.addSubview(maxLabel)
     }
     
