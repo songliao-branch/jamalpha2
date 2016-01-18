@@ -18,21 +18,35 @@ let S3SoundwaveBucket = "songsoundwave"
 
 class AWSS3Manager: NSObject {
 
+    class func createAWSS3FilePath(){
+        // create temp file path to store upload image
+        let error = NSErrorPointer()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'upload' directory failed. Error: \(error)")
+        }
+    }
+    
     enum ImageSize: String {
         case origin = "origin", thumbnail = "thumbnail"
     }
     
-    class func uploadImage(image: UIImage, fileName: String, isProfileBucket: Bool) {
+    class func uploadImage(image: UIImage, fileName: String, isProfileBucket: Bool, completion: ((succeeded: Bool) -> Void)) {
         let imageData = UIImagePNGRepresentation(image)
         
-         let filePath = ((NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload") as NSString).stringByAppendingPathComponent(fileName)
+        let filePath = ((NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload") as NSString).stringByAppendingPathComponent(fileName)
         
         imageData!.writeToFile(filePath, atomically: true)
         
         let uploadRequest = AWSS3TransferManagerUploadRequest()
-        uploadRequest.body = NSURL(fileURLWithPath: filePath)
-        uploadRequest.key = fileName
         uploadRequest.bucket = isProfileBucket ? S3AvatarBucket : S3SoundwaveBucket
+        uploadRequest.key = fileName
+        uploadRequest.body = NSURL(fileURLWithPath: filePath)
         
         let transferManager = AWSS3TransferManager.defaultS3TransferManager()
         transferManager.upload(uploadRequest).continueWithExecutor(AWSExecutor.mainThreadExecutor(), withBlock: {
@@ -51,18 +65,21 @@ class AWSS3Manager: NSObject {
                 } else {
                     print("unknown upload error: \(error)")
                 }
+                completion(succeeded: false)
             }
             
             if let result = task.result {
                 let _ = result as! AWSS3TransferManagerUploadOutput
-                print("upload success")
+                completion(succeeded: true)
+            } else {
+                completion(succeeded: false)
             }
             return nil
         })
     }
     
 
-    class func downloadImage(url: String, completion: ((image: UIImage) -> Void)) {
+    class func downloadImage(url: String, isProfileBucket: Bool, completion: ((image: UIImage) -> Void)) {
         
         if url == "" {
             completion(image: UIImage(named: "kitten_profile")!)
@@ -70,7 +87,7 @@ class AWSS3Manager: NSObject {
         }
         
         let request = AWSS3TransferManagerDownloadRequest()
-        request.bucket = S3AvatarBucket
+        request.bucket = isProfileBucket ? S3AvatarBucket : S3SoundwaveBucket
         request.key = url
         
         var cachedFiles = [String]()
@@ -132,7 +149,7 @@ class AWSS3Manager: NSObject {
     
     
     class func concatenateFileNameForSoundwave(item: Findable) -> String {
-        return (randomStringWithLength(4) as String) + "-" + item.getTitle() + "-" + item.getArtist()
+        return (randomStringWithLength(4) as String) + "-" + item.getTitle().replaceAllSpecialCharacters() + "-" + item.getArtist().replaceAllSpecialCharacters()
     }
     
     private class func randomStringWithLength (len : Int) -> NSString {
@@ -145,5 +162,18 @@ class AWSS3Manager: NSObject {
         }
         return randomString
     }
+}
+
+extension String {
     
+    func replaceAllSpecialCharacters() -> String {
+        
+        let allowedCharacters = NSCharacterSet.URLQueryAllowedCharacterSet().mutableCopy() as! NSMutableCharacterSet
+        allowedCharacters.removeCharactersInString("+/=")
+        
+        if let result = stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters) {
+            return result
+        }
+        return ""
+    }
 }

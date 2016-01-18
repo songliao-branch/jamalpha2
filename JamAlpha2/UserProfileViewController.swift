@@ -50,7 +50,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 self.userTable.reloadData()
                 self.isCalledViewDidLoad = false
             } else {
-                AWSS3Manager.downloadImage(avatarUrl, completion: {
+                AWSS3Manager.downloadImage(avatarUrl, isProfileBucket: true, completion: {
                     image in
                     dispatch_async(dispatch_get_main_queue()) {
                         CoreDataManager.saveUserProfileImage(profileImageData: UIImagePNGRepresentation(image))

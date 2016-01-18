@@ -239,7 +239,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             cell.profileName.text = tabsSet.editor.nickname
             
             cell.profileImage.image = nil
-            AWSS3Manager.downloadImage(tabsSet.editor.avatarUrlThumbnail, completion: {
+            AWSS3Manager.downloadImage(tabsSet.editor.avatarUrlThumbnail, isProfileBucket: true,completion: {
                 image in
                     dispatch_async(dispatch_get_main_queue()) {
                         cell.profileImage.image = image
@@ -290,7 +290,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             
         
             cell.profileImage.image = nil
-            AWSS3Manager.downloadImage(lyricsSet.editor.avatarUrlThumbnail, completion: {
+            AWSS3Manager.downloadImage(lyricsSet.editor.avatarUrlThumbnail, isProfileBucket: true, completion: {
                 image in
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.profileImage.image = image

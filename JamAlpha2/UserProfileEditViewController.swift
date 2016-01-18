@@ -221,36 +221,55 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
     }
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
-        // resize image, add request to upload array
         
+        //origin image
         let originImage: UIImage = croppedImage.resize(250)
         let originImageData = UIImagePNGRepresentation(originImage)
-
-        
         let originFileName = AWSS3Manager.concatenateFileNameForAvatar(userEmail, imageSize: AWSS3Manager.ImageSize.origin)
+        var originFileNameToBeUploaded = ""
         
-        AWSS3Manager.uploadImage(originImage, fileName: originFileName, isProfileBucket: true)
-        
-        // resize image
+        //thumbnail image
         let thumbnailImage: UIImage = croppedImage.resize(80)
         let thumbnailImageData: NSData = UIImagePNGRepresentation(thumbnailImage)!
-        
         let thumbnailFileName = AWSS3Manager.concatenateFileNameForAvatar(userEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
+        var thumbnailFileNameToBeUploaded = ""
         
-        AWSS3Manager.uploadImage(thumbnailImage, fileName: thumbnailFileName, isProfileBucket: true)
-        
-        APIManager.updateUserAvatar(originFileName, avatarUrlThumbnail: thumbnailFileName, completion: {
-            completed in
-            if completed {
-                print("uploaded newest avatar")
-            }
+        // Create a group to wait for two aynschrous tasks to finish
+        let group = dispatch_group_create()
+       
+        dispatch_group_enter(group)
+        AWSS3Manager.uploadImage(originImage, fileName: originFileName, isProfileBucket: true, completion: {
+            succeeded in
+            
+            originFileNameToBeUploaded = succeeded ? originFileName : ""
+            dispatch_group_leave(group)
+            
         })
         
-        CoreDataManager.saveUserProfileImage(originFileName, thumbnailUrl: thumbnailFileName, profileImageData: originImageData, thumbnailData: thumbnailImageData)
-        
-        self.tableView.reloadData()
-        
-        self.navigationController?.popViewControllerAnimated(true)
+        dispatch_group_enter(group)
+        AWSS3Manager.uploadImage(thumbnailImage, fileName: thumbnailFileName, isProfileBucket: true, completion: {
+            succeeded in
+            thumbnailFileNameToBeUploaded = succeeded ? thumbnailFileName : ""
+            dispatch_group_leave(group)
+            
+        })
+        //when the above two upload images tasks are done
+        dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
+            
+            APIManager.updateUserAvatar(originFileNameToBeUploaded, avatarUrlThumbnail: thumbnailFileNameToBeUploaded, completion: {
+                completed in
+                if completed {
+                    print("uploaded newest avatar")
+                }
+            })
+            
+            CoreDataManager.saveUserProfileImage(originFileName, thumbnailUrl: thumbnailFileName, profileImageData: originImageData, thumbnailData: thumbnailImageData)
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                self.tableView.reloadData()
+                self.navigationController?.popViewControllerAnimated(true)
+            }
+        }
     }
     
     func imageCropViewControllerDidCancelCrop(controller: RSKImageCropViewController) {

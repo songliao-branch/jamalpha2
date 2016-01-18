@@ -55,9 +55,6 @@ class MeLoginOrSignupViewController: UIViewController{
     var fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
     var nextButton: UIButton = UIButton()
     
-    // AWS S3
-    var awsS3: AWSS3Manager = AWSS3Manager()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -65,7 +62,6 @@ class MeLoginOrSignupViewController: UIViewController{
         //TODO: check if user is signed in already.
         self.viewWidth = self.view.frame.size.width
         self.viewHeight = self.view.frame.size.height
-        self.createAWSS3FilePath()
         setUpTopView()
         setUpViews()
     }
@@ -88,20 +84,6 @@ class MeLoginOrSignupViewController: UIViewController{
     override func viewWillDisappear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBarHidden = false
-    }
-    
-    func createAWSS3FilePath(){
-        // create temp file path to store upload image
-        let error = NSErrorPointer()
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtPath(
-                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
-                withIntermediateDirectories: true,
-                attributes: nil)
-        } catch let error1 as NSError {
-            error.memory = error1
-            print("Creating 'upload' directory failed. Error: \(error)")
-        }
     }
     
     func setUpTopView() {
@@ -531,24 +513,30 @@ class MeLoginOrSignupViewController: UIViewController{
                     
                     let thumbnailFileName = AWSS3Manager.concatenateFileNameForAvatar(facebookEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
                     
-                    AWSS3Manager.uploadImage(thumbnailImage, fileName: thumbnailFileName, isProfileBucket: true)
-                    
-                    let parameters = [
-                        "attempt_login":"facebook",
-                        "email": facebookEmail,
-                        "avatar_url_thumbnail": thumbnailFileName,
-                        "avatar_url_medium": facebookAvatarUrl,
-                        "password": (facebookEmail + facebookLoginSalt).md5() //IMPORTANT: DO NOT MODIFY THIS SALT
-                    ]
-                    
-                    self.signUpLoginRequest(parameters, afterRetrievingUser: {
-                        id, email, authToken, nickname, avatarUrlMedium, avatarUrlThumbnail in
+                    AWSS3Manager.uploadImage(thumbnailImage, fileName: thumbnailFileName, isProfileBucket: true, completion: {
+                        succeeded in
+                        let thumbnailUrl = succeeded ? thumbnailFileName : ""
                         
-                        CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: (nickname.isEmpty ? facebookName : nickname), avatarUrl: (avatarUrlMedium.isEmpty ? facebookAvatarUrl : avatarUrlMedium), thumbnailUrl: thumbnailFileName, fbToken: fbToken)
+                        let parameters = [
+                            "attempt_login":"facebook",
+                            "email": facebookEmail,
+                            "avatar_url_thumbnail": thumbnailUrl,
+                            "avatar_url_medium": facebookAvatarUrl,
+                            "password": (facebookEmail + facebookLoginSalt).md5() //IMPORTANT: DO NOT MODIFY THIS SALT
+                        ]
                         
-                        KGLOBAL_queue.suspended = false
-                        KGLOBAL_init_queue.suspended = self.suspended
-                    })
+                        self.signUpLoginRequest(parameters, afterRetrievingUser: {
+                            id, email, authToken, nickname, avatarUrlMedium, avatarUrlThumbnail in
+                            
+                            CoreDataManager.initializeUser(id, email: email, authToken: authToken, nickname: (nickname.isEmpty ? facebookName : nickname), avatarUrl: (avatarUrlMedium.isEmpty ? facebookAvatarUrl : avatarUrlMedium), thumbnailUrl: thumbnailUrl, fbToken: fbToken)
+                            
+                            KGLOBAL_queue.suspended = false
+                            KGLOBAL_init_queue.suspended = self.suspended
+                        })
+                        
+
+                    })//end of upload function
+                    
                 }
             })
         }

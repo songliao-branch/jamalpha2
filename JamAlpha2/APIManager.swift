@@ -552,9 +552,9 @@ class APIManager: NSObject {
             }
         }
     }
-
     
-    class func getSoundwaveUrl(findable: Findable, completion: ((url: String) -> Void)) {
+    //get id and url
+    class func getSongInformation(findable: Findable, completion: ((id: Int, soundwaveUrl: String) -> Void)) {
         var parameters = [String: AnyObject]()
         
         parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
@@ -565,9 +565,9 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    
+                    let id = json["song_information"]["soundwave_url"].int!
                     let url = json["song_information"]["soundwave_url"].string!
-                    completion(url: url)
+                    completion(id: id, soundwaveUrl: url)
                 }
             case .Failure(let error):
                 print("Get soundwave error: \(error)")
@@ -575,12 +575,10 @@ class APIManager: NSObject {
         }
     }
     
-    class func updateSoundwaveUrl(findable: Findable, url: String) {
-        var parameters = [String: AnyObject]()
+    class func updateSoundwaveUrl(id: Int, url: String) {
+        let parameters = ["soundwave_url": url]
         
-        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration(), "soundwave_url": url]
-        
-        Alamofire.request(.GET, jamBaseURL + "/update_soundwave_url", parameters: parameters).responseJSON { response in
+        Alamofire.request(.PUT, jamBaseURL + "/songs/\(id)", parameters: parameters).responseJSON { response in
             print(response)
             switch response.result {
             case .Success:

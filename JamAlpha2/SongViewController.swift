@@ -19,10 +19,8 @@ let soundwaveHeight: CGFloat = 161
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate, SKStoreProductViewControllerDelegate {
     
+    var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!
-    
-
-    
     private var rwLock = pthread_rwlock_t()
     
     var searchAPI:SearchAPI! = SearchAPI()
@@ -1271,6 +1269,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 print("sound wave data found")
                 KGLOBAL_init_queue.suspended = false
                 isGenerated = true
+                
             }else{
                 //if didn't find it then we will generate then waveform later, in the viewdidappear method
                 // this is a flag to determine if the generateSoundWave function will be called
@@ -1299,11 +1298,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
     // to generate sound wave in a nsoperation thread
-    func generateSoundWave(nowPlayingItem:Findable){
+    func generateSoundWave(nowPlayingItem: Findable){
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
             guard let assetURL = nowPlayingItem.getURL() else {
                 print("sound url not available")
                 KGLOBAL_init_queue.suspended = false
+                
+                AWSS3Manager.downloadImage("AGsV-Complicated-Avril Lavigne", isProfileBucket: false, completion: {
+                    
+                    image in
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        let data = UIImagePNGRepresentation(image)
+                        
+                        KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                    }
+                })
+                
                 return
             }
             
@@ -2939,7 +2950,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
         }
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // MARK: Fix to portrait orientation
     override func shouldAutorotate() -> Bool {

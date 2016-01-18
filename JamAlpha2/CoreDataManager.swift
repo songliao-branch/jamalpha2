@@ -276,7 +276,7 @@ class CoreDataManager: NSObject {
     }
     
     //song-related
-    private class func findSong(item: Findable) -> Song? {
+    class func findSong(item: Findable) -> Song? {
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (playbackDuration <= '\(item.getDuration() + 1.5)') AND (playbackDuration >= '\(item.getDuration() - 1.5)')")
 
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
@@ -710,6 +710,13 @@ class CoreDataManager: NSObject {
             localSongs.append(song)
         }
         return localSongs
+    }
+    
+    class func setSongId(item: Findable, id: Int) {
+        if let matchedSong = findSong(item) {
+            matchedSong.id = id
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
     }
 }
 
