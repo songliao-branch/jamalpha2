@@ -718,6 +718,14 @@ class CoreDataManager: NSObject {
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
+    
+    // used to update soundwave_url
+    class func getSongId(item: Findable) -> Int {
+        if let matchedSong = findSong(item) {
+            return Int(matchedSong.id)
+        }
+        return 0
+    }
 }
 
 
