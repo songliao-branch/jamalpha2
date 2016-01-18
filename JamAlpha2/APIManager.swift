@@ -565,7 +565,7 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    let id = json["song_information"]["soundwave_url"].int!
+                    let id = json["song_information"]["id"].int!
                     let url = json["song_information"]["soundwave_url"].string!
                     completion(id: id, soundwaveUrl: url)
                 }
@@ -575,10 +575,10 @@ class APIManager: NSObject {
         }
     }
     
-    class func updateSoundwaveUrl(id: Int, url: String) {
+    class func updateSoundwaveUrl(songId: Int, url: String) {
         let parameters = ["soundwave_url": url]
         
-        Alamofire.request(.PUT, jamBaseURL + "/songs/\(id)", parameters: parameters).responseJSON { response in
+        Alamofire.request(.PUT, jamBaseURL + "/songs/\(songId)", parameters: parameters).responseJSON { response in
             print(response)
             switch response.result {
             case .Success:

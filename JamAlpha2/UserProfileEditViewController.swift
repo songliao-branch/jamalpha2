@@ -256,13 +256,15 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
         //when the above two upload images tasks are done
         dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
             
-            APIManager.updateUserAvatar(originFileNameToBeUploaded, avatarUrlThumbnail: thumbnailFileNameToBeUploaded, completion: {
-                completed in
-                if completed {
-                    print("uploaded newest avatar")
-                }
-            })
-            
+            if !originFileNameToBeUploaded.isEmpty && !thumbnailFileNameToBeUploaded.isEmpty {
+                APIManager.updateUserAvatar(originFileNameToBeUploaded, avatarUrlThumbnail: thumbnailFileNameToBeUploaded, completion: {
+                    completed in
+                    if completed {
+                        print("uploaded newest avatar")
+                    }
+                })
+            }
+           
             CoreDataManager.saveUserProfileImage(originFileName, thumbnailUrl: thumbnailFileName, profileImageData: originImageData, thumbnailData: thumbnailImageData)
             
             dispatch_async(dispatch_get_main_queue()) {

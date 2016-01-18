@@ -227,12 +227,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 avPlayer = MusicManager.sharedInstance.avPlayer
                 self.demoItem = avPlayer.currentItem
                 self.demoItemDuration = self.demoItem.getDuration()
+                self.getSongIdAndSoundwaveUrlFromCloud(demoItem)
                 removeAllObserver()
             } else {
                 player = MusicManager.sharedInstance.player
                 print("VIEWDIDLOAD: \(player.nowPlayingItem!.title!)")
                 self.nowPlayingMediaItem = player.nowPlayingItem
                 self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
+                self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingMediaItem)
                 removeAllObserver()
             }
             
@@ -249,6 +251,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.musicViewController = musicVC
             }
             KGLOBAL_nowView.stop()
+            self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase)
             CoreDataManager.initializeSongToDatabase(songNeedPurchase)
         }
         
@@ -966,6 +969,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             self.nowPlayingMediaItem = self.player.nowPlayingItem
+            self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingMediaItem)
             // if come back from Music app then this block will be called
             if(nowPlayingMediaItem == nil){
                 self.dismissViewControllerAnimated(true, completion: nil)
@@ -1304,16 +1308,19 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 print("sound url not available")
                 KGLOBAL_init_queue.suspended = false
                 
-                AWSS3Manager.downloadImage("AGsV-Complicated-Avril Lavigne", isProfileBucket: false, completion: {
-                    
-                    image in
-                    
-                    dispatch_async(dispatch_get_main_queue()) {
-                        let data = UIImagePNGRepresentation(image)
+                if !self.soundwaveUrl.isEmpty {
+                    AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
                         
-                        KGLOBAL_progressBlock.setWaveFormFromData(data!)
-                    }
-                })
+                        image in
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            let data = UIImagePNGRepresentation(image)
+                            
+                            KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                        }
+                    })
+                
+                }
                 
                 return
             }
@@ -2951,6 +2958,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    func getSongIdAndSoundwaveUrlFromCloud(item: Findable) {
+        APIManager.getSongInformation(item, completion: {
+            id, soundwave_url in
+            
+            CoreDataManager.setSongId(item, id: id)
+            self.soundwaveUrl = soundwave_url
+        })
+    }
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     
