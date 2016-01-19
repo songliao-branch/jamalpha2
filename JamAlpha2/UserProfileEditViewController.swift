@@ -21,10 +21,7 @@ class UserProfileEditViewController: UIViewController {
     var awsS3: AWSS3Manager = AWSS3Manager()
     
     var userEmail: String!
-    
-    var originFileName: String!
-    var croppedFileName: String!
-    var originImageData: NSData!
+
     var userProfile:UIImageView!
     
     override func viewDidLoad() {
@@ -224,38 +221,57 @@ extension UserProfileEditViewController: RSKImageCropViewControllerDelegate {
     }
     
     func imageCropViewController(controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
-        // resize image, add request to upload array
-        let originImage: UIImage = croppedImage.resize(250)
-        self.originFileName = awsS3.addUploadRequestToArray(originImage, style: "origin", email: self.userEmail)
-        self.originImageData = UIImagePNGRepresentation(originImage)
         
-        // resize image
+        //origin image
+        let originImage: UIImage = croppedImage.resize(250)
+        let originImageData = UIImagePNGRepresentation(originImage)
+        let originFileName = AWSS3Manager.concatenateFileNameForAvatar(userEmail, imageSize: AWSS3Manager.ImageSize.origin)
+        var originFileNameToBeUploaded = ""
+        
+        //thumbnail image
         let thumbnailImage: UIImage = croppedImage.resize(80)
         let thumbnailImageData: NSData = UIImagePNGRepresentation(thumbnailImage)!
+        let thumbnailFileName = AWSS3Manager.concatenateFileNameForAvatar(userEmail, imageSize: AWSS3Manager.ImageSize.thumbnail)
+        var thumbnailFileNameToBeUploaded = ""
         
-        // add request to upload array
-        self.croppedFileName = awsS3.addUploadRequestToArray(thumbnailImage, style: "thumbnail", email: self.userEmail)
-        
-        //sending the cropped image to s3 in here
-        for item in awsS3.uploadRequests {
-            awsS3.upload(item!)
-        }
-        awsS3.uploadRequests.removeAll()
-        
-        
-        APIManager.updateUserAvatar(self.originFileName, avatarUrlThumbnail: self.croppedFileName, completion: {
-            completed in
-            if completed {
-                print("uploaded newest avatar")
-            }
+        // Create a group to wait for two aynschrous tasks to finish
+        let group = dispatch_group_create()
+       
+        dispatch_group_enter(group)
+        AWSS3Manager.uploadImage(originImage, fileName: originFileName, isProfileBucket: true, completion: {
+            succeeded in
+            
+            originFileNameToBeUploaded = succeeded ? originFileName : ""
+            dispatch_group_leave(group)
+            
         })
         
-        CoreDataManager.saveUserProfileImage(self.originFileName, thumbnailUrl: self.croppedFileName, profileImageData: self.originImageData, thumbnailData: thumbnailImageData)
-        
-        self.tableView.reloadData()
-        
-        
-        self.navigationController?.popViewControllerAnimated(true)
+        dispatch_group_enter(group)
+        AWSS3Manager.uploadImage(thumbnailImage, fileName: thumbnailFileName, isProfileBucket: true, completion: {
+            succeeded in
+            thumbnailFileNameToBeUploaded = succeeded ? thumbnailFileName : ""
+            dispatch_group_leave(group)
+            
+        })
+        //when the above two upload images tasks are done
+        dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
+            
+            if !originFileNameToBeUploaded.isEmpty && !thumbnailFileNameToBeUploaded.isEmpty {
+                APIManager.updateUserAvatar(originFileNameToBeUploaded, avatarUrlThumbnail: thumbnailFileNameToBeUploaded, completion: {
+                    completed in
+                    if completed {
+                        print("uploaded newest avatar")
+                    }
+                })
+            }
+           
+            CoreDataManager.saveUserProfileImage(originFileName, thumbnailUrl: thumbnailFileName, profileImageData: originImageData, thumbnailData: thumbnailImageData)
+            
+            dispatch_async(dispatch_get_main_queue()) {
+                self.tableView.reloadData()
+                self.navigationController?.popViewControllerAnimated(true)
+            }
+        }
     }
     
     func imageCropViewControllerDidCancelCrop(controller: RSKImageCropViewController) {

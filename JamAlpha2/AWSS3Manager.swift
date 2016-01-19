@@ -4,85 +4,82 @@
 //
 //  Created by Jun Zhou on 11/30/15.
 //  Copyright © 2015 Song Liao. All rights reserved.
-//
+//  Refereneces: http://docs.aws.amazon.com/mobile/sdkforios/developerguide/s3transfermanager.html
 
 import Foundation
 import AWSS3
 
+let CognitoRegionType = AWSRegionType.USEast1  // e.g. AWSRegionType.USEast1
+let DefaultServiceRegionType = AWSRegionType.USEast1 // e.g. AWSRegionType.USEast1
+let CognitoIdentityPoolId = "us-east-1:eb3a9f5f-4c55-4e34-b12b-fd64ba59b8f5"
+let S3AvatarBucket = "userprofileimagebucket"
+let S3SoundwaveBucket = "songsoundwave"
+
+
 class AWSS3Manager: NSObject {
+
+    class func createAWSS3FilePath(){
+        // create temp file path to store upload image
+        let error = NSErrorPointer()
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(
+                (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload"),
+                withIntermediateDirectories: true,
+                attributes: nil)
+        } catch let error1 as NSError {
+            error.memory = error1
+            print("Creating 'upload' directory failed. Error: \(error)")
+        }
+    }
     
-    var uploadRequests: Array<AWSS3TransferManagerUploadRequest?> = Array<AWSS3TransferManagerUploadRequest?>()
-    var uploadFileURLs: Array<NSURL?> = Array<NSURL?>()
+    enum ImageSize: String {
+        case origin = "origin", thumbnail = "thumbnail"
+    }
     
-    func addUploadRequestToArray(sender: UIImage, style: String, email: String) -> String {
-        let formatter: NSDateFormatter = NSDateFormatter()
-        formatter.dateStyle = NSDateFormatterStyle.ShortStyle
-        formatter.timeStyle = NSDateFormatterStyle.ShortStyle
-        let dateString = formatter.stringFromDate(NSDate()).replace(" ", replacement: "-").replace(":", replacement: "-").replace(",", replacement: "-").replace("/", replacement: "-")
-    
-        let fileName = ((randomStringWithLength(4) as String) + "-" + dateString + "-" + email  + "-" + style).stringByAppendingString(".png")
+    class func uploadImage(image: UIImage, fileName: String, isProfileBucket: Bool, completion: ((succeeded: Bool) -> Void)) {
+        let imageData = UIImagePNGRepresentation(image)
+        
         let filePath = ((NSTemporaryDirectory() as NSString).stringByAppendingPathComponent("upload") as NSString).stringByAppendingPathComponent(fileName)
-        let imageData = UIImagePNGRepresentation(sender)
+        
         imageData!.writeToFile(filePath, atomically: true)
         
         let uploadRequest = AWSS3TransferManagerUploadRequest()
-        uploadRequest.body = NSURL(fileURLWithPath: filePath)
+        uploadRequest.bucket = isProfileBucket ? S3AvatarBucket : S3SoundwaveBucket
         uploadRequest.key = fileName
-        uploadRequest.bucket = S3BucketName
+        uploadRequest.body = NSURL(fileURLWithPath: filePath)
         
-        self.uploadRequests.append(uploadRequest)
-        self.uploadFileURLs.append(nil)
-        
-        return fileName
-    }
-    
-    func upload(uploadRequest: AWSS3TransferManagerUploadRequest) {
-
         let transferManager = AWSS3TransferManager.defaultS3TransferManager()
-        
-        transferManager.upload(uploadRequest).continueWithBlock { (task) -> AnyObject! in
+        transferManager.upload(uploadRequest).continueWithExecutor(AWSExecutor.mainThreadExecutor(), withBlock: {
+            (task) -> AnyObject! in
             if let error = task.error {
-                if error.domain == AWSS3TransferManagerErrorDomain as String {
-                    if let errorCode = AWSS3TransferManagerErrorType(rawValue: error.code) {
-                        switch (errorCode) {
-                        case .Cancelled, .Paused:
-                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                                // reload data
-                                
-                            })
-                            break;
-                            
-                        default:
-                            print("upload() failed: [\(error)]")
-                            break;
-                        }
-                    } else {
-                        print("upload() failed: [\(error)]")
+                if error.domain == AWSS3TransferManagerErrorDomain {
+                    switch error.code {
+                    case AWSS3TransferManagerErrorType.Cancelled.rawValue:
+                        break
+                    case AWSS3TransferManagerErrorType.Paused.rawValue:
+                        break
+                    default:
+                        print("upload error :\(error)")
+                        break
                     }
                 } else {
-                    print("upload() failed: [\(error)]")
+                    print("unknown upload error: \(error)")
                 }
+                completion(succeeded: false)
             }
             
-            if let exception = task.exception {
-                print("upload() failed: [\(exception)]")
-            }
-            
-            if task.result != nil {
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    if let index = self.indexOfUploadRequest(self.uploadRequests, uploadRequest: uploadRequest) {
-                        self.uploadRequests[index] = nil
-                        self.uploadFileURLs[index] = uploadRequest.body
-                    }
-                })
+            if let result = task.result {
+                let _ = result as! AWSS3TransferManagerUploadOutput
+                completion(succeeded: true)
+            } else {
+                completion(succeeded: false)
             }
             return nil
-        }
-        
+        })
     }
     
-    
-    func downloadImage(url: String, completion: ((image: UIImage) -> Void)) {
+
+    class func downloadImage(url: String, isProfileBucket: Bool, completion: ((image: UIImage) -> Void)) {
         
         if url == "" {
             completion(image: UIImage(named: "kitten_profile")!)
@@ -90,7 +87,7 @@ class AWSS3Manager: NSObject {
         }
         
         let request = AWSS3TransferManagerDownloadRequest()
-        request.bucket = S3BucketName
+        request.bucket = isProfileBucket ? S3AvatarBucket : S3SoundwaveBucket
         request.key = url
         
         var cachedFiles = [String]()
@@ -137,17 +134,25 @@ class AWSS3Manager: NSObject {
             return nil
         })
     }
-
-    func indexOfUploadRequest(array: Array<AWSS3TransferManagerUploadRequest?>, uploadRequest: AWSS3TransferManagerUploadRequest?) -> Int? {
-        for (index, object) in array.enumerate() {
-            if object == uploadRequest {
-                return index
-            }
-        }
-        return nil
+    
+    
+    //MARK: Helper methods
+    //customize a upload url for each different avatar based on the user email and image size
+    class func concatenateFileNameForAvatar(email: String, imageSize: ImageSize) -> String {
+        let formatter: NSDateFormatter = NSDateFormatter()
+        formatter.dateStyle = NSDateFormatterStyle.ShortStyle
+        formatter.timeStyle = NSDateFormatterStyle.ShortStyle
+        let dateString = formatter.stringFromDate(NSDate()).replace(" ", replacement: "-").replace(":", replacement: "-").replace(",", replacement: "-").replace("/", replacement: "-")
+        
+        return ((randomStringWithLength(4) as String) + "-" + dateString + "-" + email  + "-" + imageSize.rawValue).stringByAppendingString(".png")
     }
-
-    func randomStringWithLength (len : Int) -> NSString {
+    
+    
+    class func concatenateFileNameForSoundwave(item: Findable) -> String {
+        return (randomStringWithLength(4) as String) + "-" + item.getTitle().replace("/", replacement: "") + "-" + item.getArtist().replace("/", replacement: "")
+    }
+    
+    private class func randomStringWithLength (len : Int) -> NSString {
         let letters : NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         let randomString : NSMutableString = NSMutableString(capacity: len)
         for (var i=0; i < len; i++){
@@ -157,5 +162,4 @@ class AWSS3Manager: NSObject {
         }
         return randomString
     }
-
 }

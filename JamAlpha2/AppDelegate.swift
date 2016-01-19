@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         defaultsDictionary[kShowTutorial] = true
         defaultsDictionary[kShowTabsEditorTutorial] = true
         NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
-                
+        AWSS3Manager.createAWSS3FilePath()
         return true
     }
     
