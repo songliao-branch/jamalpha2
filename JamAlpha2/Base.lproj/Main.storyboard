@@ -1342,7 +1342,7 @@
         <scene sceneID="KIm-QS-ZYi">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="WoA-2F-8w5" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Search" image="search" selectedImage="search" id="acW-dT-cKf">
+                    <tabBarItem key="tabBarItem" title="Search" image="search" id="acW-dT-cKf">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
                                 <color key="value" red="0.94117647058823528" green="0.35686274509803922" blue="0.38039215686274508" alpha="1" colorSpace="calibratedRGB"/>
@@ -1452,11 +1452,18 @@
             </objects>
             <point key="canvasLocation" x="1546" y="1574"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Top Songs-->
         <scene sceneID="cpi-9D-fcB">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="bcS-KD-6jB" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" systemItem="topRated" id="c5L-l2-P69"/>
+                    <tabBarItem key="tabBarItem" title="Top Songs" image="top_songs" id="c5L-l2-P69">
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="image" keyPath="selectedImage" value="top_songs"/>
+                            <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
+                                <color key="value" red="0.94117647058823528" green="0.35686274509803922" blue="0.38039215686274508" alpha="1" colorSpace="calibratedRGB"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </tabBarItem>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Bah-ze-GMM">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -1481,6 +1488,7 @@
         <image name="search" width="23" height="25"/>
         <image name="speaker" width="24" height="19"/>
         <image name="three_dots" width="15" height="3"/>
+        <image name="top_songs" width="25" height="24"/>
         <image name="vote_down_gray" width="29" height="20"/>
         <image name="vote_up_gray" width="29" height="20"/>
     </resources>
