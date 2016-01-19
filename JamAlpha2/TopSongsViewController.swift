@@ -1,17 +1,18 @@
 //
-//  MyFavoritesViewController.swift
+//  TopSongsViewController.swift
 //  JamAlpha2
 //
-//  Created by Jun Zhou on 12/11/15.
-//  Copyright © 2015 Song Liao. All rights reserved.
+//  Created by Song Liao on 1/12/16.
+//  Copyright © 2016 Song Liao. All rights reserved.
 //
 
 import UIKit
 import MediaPlayer
 
-class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    @IBOutlet weak var tableView: UITableView!
+//TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
+class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
+    @IBOutlet weak var topSongsTable: UITableView?
     
     var songs = [LocalSong]()
     var animator: CustomTransitionAnimation?
@@ -32,53 +33,60 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             self.animator = CustomTransitionAnimation()
         }
     }
-
+    
     func loadData() {
-        
-        songs = CoreDataManager.getFavorites()
-        for song in songs {
-            song.findMediaItem()
-        }
-        self.tableView.reloadData()
-
+        APIManager.getTopSongs({
+            songs in
+            self.songs = songs
+            for song in songs {
+                song.findMediaItem()
+            }
+            //TODO: this crashes somehow, needs to find out how to reproduce the crash
+            if let table = self.topSongsTable {
+                table.reloadData()
+            }
+        })
     }
     
     func setUpNavigationBar() {
+        self.automaticallyAdjustsScrollViewInsets = false
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-        self.navigationItem.title = "My Favorites"
+        self.navigationItem.title = "Top Songs"
     }
-
+    
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return songs.count
+        return self.songs.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("MyFavoritesCell", forIndexPath: indexPath) as! MyFavoritesCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("TopSongsCell", forIndexPath: indexPath) as! TopSongsCell
         let song = songs[indexPath.row]
-        cell.numberLabel.text = "\(indexPath.row+1)"
+        cell.numberLabel.text = "\(indexPath.row + 1)"
         cell.titleLabel.text = song.title
         cell.subtitleLabel.text = song.artist
         
         cell.spinner.hidden = true
+        
         if let _ = song.mediaItem {
             cell.searchIcon.hidden = true
             cell.titleRightConstraint.constant = 15
             cell.subtitleRightConstraint.constant = 15
+         
         } else {
             cell.searchIcon.hidden = false
-            cell.titleRightConstraint.constant = 50
-            cell.subtitleRightConstraint.constant = 50
+            cell.titleRightConstraint.constant = 55
+            cell.subtitleRightConstraint.constant = 55
         }
-        
         return cell
     }
     
-
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         var isSeekingPlayerState = true
+        
         let song = songs[indexPath.row]
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
@@ -143,7 +151,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 self.showConnectInternet(tableView)
             }
             
-        }   else if song.artist == "Alex Lisell" { //if demo song
+        } else if song.artist == "Alex Lisell" { //if demo song
             
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
@@ -155,12 +163,11 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             self.animator!.attachToViewController(songVC)
             
             self.presentViewController(songVC, animated: true, completion: nil)
+            tableView.deselectRowAtIndexPath(indexPath, animated: true)
             
-            self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
             
-            
-        } else { //if the mediaItem is not found, and an searchResult is MyFavoritesCell
-            let cell = tableView.cellForRowAtIndexPath(indexPath) as! MyFavoritesCell
+        } else { //if the mediaItem is not found, and an searchResult is found
+            let cell = tableView.cellForRowAtIndexPath(indexPath) as! TopSongsCell
             
             cell.searchIcon.hidden = true
             cell.spinner.hidden = false
@@ -174,8 +181,8 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 cell.searchIcon.hidden = false
                 
                 guard let song = result else {
-                    
-                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
+                
+                self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
                     return
                 }
                 
@@ -185,10 +192,9 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: nil)
-                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                tableView.deselectRowAtIndexPath(indexPath, animated: true)
                 
             })
         }
-
     }
 }

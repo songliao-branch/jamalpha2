@@ -313,7 +313,7 @@ class CoreDataManager: NSObject {
     
 
     class func getSongWaveFormData(item: Findable) -> NSMutableArray? {
-        var findItme:Findable? = MusicManager.sharedInstance.isNeedReloadCollections(item.getTitle(), artist: item.getArtist(), duration: item.getDuration())
+        var findItme:Findable? = MusicManager.sharedInstance.itemFoundInCollection(item)
         if findItme == nil {
             findItme = item
         }
@@ -325,7 +325,7 @@ class CoreDataManager: NSObject {
     }
     
     class func getSongWaveFormImage(item: Findable) -> NSData? {
-        var findItme:Findable? = MusicManager.sharedInstance.isNeedReloadCollections(item.getTitle(), artist: item.getArtist(), duration: item.getDuration())
+        var findItme:Findable? = MusicManager.sharedInstance.itemFoundInCollection(item)
         if findItme == nil {
             findItme = item
         }

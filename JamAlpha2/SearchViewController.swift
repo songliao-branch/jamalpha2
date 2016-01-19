@@ -315,7 +315,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 let searchSong = searchResults[indexPath.row]
                 var isReload = true
                 
-                if let foundItem = MusicManager.sharedInstance.isNeedReloadCollections(searchSong.trackName!, artist: searchSong.artistName!, duration: searchSong.trackTimeMillis!){
+                if let foundItem = MusicManager.sharedInstance.itemFoundInCollection(searchSong){
                     MusicManager.sharedInstance.setPlayerQueue([foundItem])
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                     if(foundItem.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {

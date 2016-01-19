@@ -38,3 +38,8 @@ let kSongNames = ["Go"]
 let kLocalSetId = -1
 
 var KAVplayer: AVPlayer!
+
+let kIndexOfMyMusicPage = 0
+let kIndexOfSearchPage = 1
+let kIndexOfTopPage = 2
+let kIndexOfUserPage = 3
