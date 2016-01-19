@@ -474,6 +474,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func capoStepperValueChanged(stepper: UIStepper) {
         capoLabel.text = "Capo: \(Int(stepper.value))"
+        PlayChordsManager.sharedInstance.changeCapo(Int(stepper.value))
     }
     
     func stepUpPressed(button: UIButton) {
