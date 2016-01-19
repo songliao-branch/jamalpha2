@@ -74,6 +74,12 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         KGLOBAL_nowView.addGestureRecognizer(tapRecognizer)
         self.navigationController!.navigationBar.addSubview(KGLOBAL_nowView)
+        
+        if player.playbackState == .Playing {
+            KGLOBAL_nowView.start()
+        } else {
+            KGLOBAL_nowView.stop()
+        }
     }
     
     func setUpPageViewController(){

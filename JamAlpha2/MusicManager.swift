@@ -148,9 +148,11 @@ class MusicManager: NSObject {
         //save current playing time and time and reset player after it is being stopped
         var lastPlayingItem: MPMediaItem?
         var lastPlayTime: NSTimeInterval = 0
+        var isPlaying = false
         if let nowPlayingItem = player.nowPlayingItem {
             lastPlayingItem = nowPlayingItem
             lastPlayTime = player.currentPlaybackTime
+            isPlaying = (player.playbackState == .Playing)
         }
         
         player.stop()
@@ -159,11 +161,13 @@ class MusicManager: NSObject {
         
         self.setPlayerQueue(uniqueSongs)
         
-        
         if let lastItem = lastPlayingItem {
             player.nowPlayingItem = lastItem
             player.currentPlaybackTime = lastPlayTime + 0.32
-            player.play()
+            
+            if isPlaying {
+                player.play()
+            }
         }
         
         //initialize AVQueuePlayer
