@@ -46,17 +46,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Universal setting
         UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+        dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+            // fackbook
+            FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+            FBSDKProfile.enableUpdatesOnAccessTokenChange(true)
+            
+            // aws s3 and cognito
+            let credentialsProvider = AWSCognitoCredentialsProvider(regionType: CognitoRegionType, identityPoolId: CognitoIdentityPoolId)
+            let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
+            AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
+            NetworkManager.sharedInstance.reachability.isReachable()
+            PlayChordsManager.sharedInstance.initialSoundBank()
+        }
         
-        // fackbook
-        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-        FBSDKProfile.enableUpdatesOnAccessTokenChange(true)
-        
-        // aws s3 and cognito
-        let credentialsProvider = AWSCognitoCredentialsProvider(regionType: CognitoRegionType, identityPoolId: CognitoIdentityPoolId)
-        let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
-        AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
-        NetworkManager.sharedInstance.reachability.isReachable()
-
         return true
     }
     
@@ -95,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             (presentVC as! TabsEditorViewController).removeNotification()
                         }
                         (presentVC as! TabsEditorViewController).isPlaying = false
-                        (presentVC as! TabsEditorViewController).playButtonImageView.hidden = false
+                        (presentVC as! TabsEditorViewController).playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
                     }else if presentVC.isKindOfClass(LyricsTextViewController){
                         isDemoSong = (presentVC as! LyricsTextViewController).isDemoSong
                     }

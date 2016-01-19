@@ -115,6 +115,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             
             let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 3 : 4
             let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
+            let indexOfTunerMode = CoreDataManager.getCurrentUser() == nil ? 5 : 6
             if indexPath.item == 0 {
                 let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
                 self.navigationController?.pushViewController(aboutVC, animated: true)
