@@ -393,7 +393,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         capoStepper.center = CGPoint(x: speedStepper.center.x, y: speedStepper.center.y+rowHeight)
         capoStepper.tintColor = UIColor.mainPinkColor()
         capoStepper.minimumValue = 0
-        capoStepper.maximumValue = 12
+        capoStepper.maximumValue = 11
         capoStepper.stepValue = 1
         capoStepper.value = 0 //default
         capoStepper.addTarget(self, action: "capoStepperValueChanged:", forControlEvents: .ValueChanged)

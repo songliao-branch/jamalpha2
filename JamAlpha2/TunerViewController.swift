@@ -100,6 +100,7 @@ class TunerViewController: UIViewController {
                     infoLabel.alpha = 1
                     UIView.animateWithDuration(0.5, animations: {
                             animate in
+                        self.count = 0
                         self.minLabel.alpha = 1
                         self.midLabel.alpha = 1
                         self.maxLabel.alpha = 1
@@ -109,7 +110,7 @@ class TunerViewController: UIViewController {
             }
         } else {
             count++
-            if count > 12   {
+            if count > 5 {
                 self.infoLabel.hidden = false
                 self.infoLabel.alpha = 0.1
                 UIView.animateWithDuration(0.5, animations: {
@@ -183,7 +184,7 @@ extension TunerViewController {
         midLabel = UILabel()
         midLabel.frame = CGRectMake(labelWidth + labelWidth * CGFloat(2), (self.view.centerY - labelWidth) / 2, labelWidth, labelWidth)
         midLabel.textAlignment = .Center
-        midLabel.font = UIFont.systemFontOfSize(18)
+        midLabel.font = UIFont.systemFontOfSize(24)
         midLabel.alpha = 0.3
         midLabel.text = "C#3"
         self.view.addSubview(midLabel)
