@@ -821,7 +821,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
         cell.imageView.backgroundColor = UIColor.clearColor()
         cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
-        cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item] + Int(capoStepper.value))"
+        cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
         
         
         for subview in cell.contentView.subviews {
@@ -2205,7 +2205,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.doubleArrowView.alpha = 0
         }
         cropFullStringImageView(Int(capoStepper.value))
-        generateFretNumberOnFullStringView(Int(capoStepper.value))
+        //generateFretNumberOnFullStringView(Int(capoStepper.value))
         
         
         self.changeMenuButtonStatus(true)
