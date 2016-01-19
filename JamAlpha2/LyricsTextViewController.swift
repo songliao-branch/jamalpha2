@@ -208,7 +208,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     func addLyricsTextView() {
 
         self.lyricsTextView.frame = CGRect(x: 0, y: CGRectGetMaxY(titleView.frame), width: self.viewWidth, height: self.viewHeight - (20 + 44))
-        self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
         self.lyricsTextView.backgroundColor = UIColor.clearColor()
         self.lyricsTextView.textAlignment = .Left
         self.lyricsTextView.font = UIFont.systemFontOfSize(18)
@@ -354,9 +353,6 @@ extension LyricsTextViewController: UITextViewDelegate {
         }
     }
     
-    func textViewDidEndEditing(textView: UITextView) {
-        self.lyricsTextView.contentSize = CGSizeMake(self.viewWidth, self.viewHeight)
-    }
   
 }
 

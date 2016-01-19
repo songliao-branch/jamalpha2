@@ -149,7 +149,7 @@ class AWSS3Manager: NSObject {
     
     
     class func concatenateFileNameForSoundwave(item: Findable) -> String {
-        return (randomStringWithLength(4) as String) + "-" + item.getTitle().replaceAllSpecialCharacters() + "-" + item.getArtist().replaceAllSpecialCharacters()
+        return (randomStringWithLength(4) as String) + "-" + item.getTitle().replace("/", replacement: "") + "-" + item.getArtist().replace("/", replacement: "")
     }
     
     private class func randomStringWithLength (len : Int) -> NSString {
@@ -161,19 +161,5 @@ class AWSS3Manager: NSObject {
             randomString.appendFormat("%C", letters.characterAtIndex(Int(rand)))
         }
         return randomString
-    }
-}
-
-extension String {
-    
-    func replaceAllSpecialCharacters() -> String {
-        
-        let allowedCharacters = NSCharacterSet.URLQueryAllowedCharacterSet().mutableCopy() as! NSMutableCharacterSet
-        allowedCharacters.removeCharactersInString("+/=")
-        
-        if let result = stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters) {
-            return result
-        }
-        return ""
     }
 }

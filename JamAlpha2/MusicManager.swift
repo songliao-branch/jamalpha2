@@ -59,13 +59,12 @@ class MusicManager: NSObject {
     }
     
     //check when search a cloud item, if it matches, we use the song we already have
-    func isNeedReloadCollections(title:String, artist:String, duration:Float) -> MPMediaItem? {
+    func itemFoundInCollection(songToCheck: Findable) -> MPMediaItem? {
         let result = uniqueSongs.filter{
-            (song: MPMediaItem) -> Bool in
-            if let tempTitle = song.title, tempArtist = song.artist {
-                return tempTitle.lowercaseString == title.lowercaseString && tempArtist.lowercaseString == artist.lowercaseString && abs((Float(song.playbackDuration) - duration))<1.5
-            }
-            return false
+            (item: MPMediaItem) -> Bool in
+            
+            return MusicManager.sharedInstance.songsMatched(findableA: songToCheck, findableB: item)
+
         }.first
         if(result != nil){
             return result!
@@ -85,8 +84,12 @@ class MusicManager: NSObject {
         let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC
         let currentVC = (UIApplication.sharedApplication().delegate as! AppDelegate).topViewController(rootViewController)
         
-        let baseVC = ((rootViewController as! TabBarController).childViewControllers[0].childViewControllers[0]) as! BaseViewController
-        let searchVC = ((rootViewController as! TabBarController).childViewControllers[1].childViewControllers[0]) as! SearchViewController
+        let baseVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
+        let searchVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfSearchPage].childViewControllers[0]) as! SearchViewController
+        
+        let topSongVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfTopPage].childViewControllers[0]) as! TopSongsViewController
+        
+        let userBarItemVC = (rootViewController as! TabBarController).childViewControllers[kIndexOfUserPage]
         
         // if the collection is different i.e. new songs are added/old songs are removed
         // we manually reload MusicViewController table
@@ -107,18 +110,18 @@ class MusicManager: NSObject {
         if(currentVC.isKindOfClass(SongViewController)){
             let currentSongVC = currentVC as! SongViewController
             if (currentSongVC.isSongNeedPurchase) {
-                if let purchasedItem = (isNeedReloadCollections(currentSongVC.songNeedPurchase.trackName!, artist: currentSongVC.songNeedPurchase.artistName!, duration: currentSongVC.songNeedPurchase.trackTimeMillis!)){
+                
+                if let purchasedItem = (itemFoundInCollection(currentSongVC.songNeedPurchase)){
                     setPlayerQueue([purchasedItem])
                     setIndexInTheQueue(0)
                     currentSongVC.recoverToNormalSongVC(purchasedItem)
                 }
             }
         }
+       
         
-        let thirdBarItemVC = (rootViewController as! TabBarController).childViewControllers[2]
-        
-        if thirdBarItemVC.childViewControllers.count > 1 { //means navigation controller has at least pushed one view controller (the root navigation controller is UserProfileViewController)
-            let firstPushedVC = thirdBarItemVC.childViewControllers[1]
+        if userBarItemVC.childViewControllers.count > 1 { //means navigation controller has at least pushed one view controller (the root navigation controller is UserProfileViewController)
+            let firstPushedVC = userBarItemVC.childViewControllers[1]
             if firstPushedVC.isKindOfClass(MyTabsAndLyricsViewController) {
                 let myTabsLyricsVC = firstPushedVC as! MyTabsAndLyricsViewController
                 myTabsLyricsVC.loadData()
@@ -127,6 +130,8 @@ class MusicManager: NSObject {
                 myFavoritesVC.loadData()
             }
         }
+        
+        topSongVC.loadData()
     }
     
     func reloadCollections() {
@@ -347,5 +352,14 @@ class MusicManager: NSObject {
         player.repeatMode = sender.0
         player.shuffleMode = sender.1
         player.currentPlaybackTime = sender.2
+    }
+    
+    func songsMatched(findableA findableA: Findable, findableB: Findable) -> Bool {
+        if findableA.getTitle().lowercaseString == findableB.getTitle().lowercaseString &&
+        findableA.getArtist().lowercaseString == findableB.getArtist().lowercaseString &&
+            abs(findableA.getDuration() - findableB.getDuration()) < 2 {
+                return true
+        }
+        return false
     }
 }

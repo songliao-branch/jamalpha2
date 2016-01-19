@@ -560,6 +560,7 @@ class APIManager: NSObject {
         parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
         
         Alamofire.request(.GET, jamBaseURL + "/get_soundwave_url", parameters: parameters).responseJSON { response in
+
             print(response)
             switch response.result {
             case .Success:
@@ -589,6 +590,26 @@ class APIManager: NSObject {
                 }
             case .Failure(let error):
                 print("Update soundwave error: \(error)")
+            }
+        }
+    }
+    
+    class func getTopSongs(completion: (( songs: [LocalSong]) -> Void)) {
+        Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    var songs = [LocalSong]()
+                    for song in json["songs"].array! {
+                        let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
+                        songs.append(s)
+                    }
+                    completion(songs: songs)
+                }
+            case .Failure(let error):
+                print("favorite song error: \(error)")
             }
         }
     }

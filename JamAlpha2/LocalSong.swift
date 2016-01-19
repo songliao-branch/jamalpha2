@@ -28,22 +28,20 @@ class LocalSong: NSObject {
     func findMediaItem() {
         self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
             item in
-            if let itemTitle = item.title, itemArtist = item.artist {
-                return itemTitle == title && itemArtist == artist && abs((Float(item.playbackDuration) - duration)) < 1.5
-            }
-            return false
+            return MusicManager.sharedInstance.songsMatched(findableA: self, findableB: item)
         }.first
     }
     
-    func findSearchResult(completion: ((searchResult: SearchResult) -> Void)) {
+    func findSearchResult(completion: ((searchResult: SearchResult?) -> Void)) {
         if mediaItem == nil {
             SearchAPI.searchSong(title + " " + artist, completion: {
                 results in
                 for result in results {
-                    if result.getTitle() == self.title && result.getArtist() == self.artist && abs(result.getDuration() - self.duration) < 1.5 {
+                    if MusicManager.sharedInstance.songsMatched(findableA: self, findableB: result) {
                         completion(searchResult: result)
                         break
                     }
+                    completion(searchResult: nil)
                 }
             })
         }

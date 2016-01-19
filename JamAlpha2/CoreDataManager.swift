@@ -301,31 +301,15 @@ class CoreDataManager: NSObject {
     }
     
     // MARK: save, retrieve soundwaves
-    class func saveSoundWave(item: Findable, soundwaveData: NSMutableArray, soundwaveImage: NSData) {
-        
+    class func saveSoundWave(item: Findable, soundwaveImage: NSData) {
         if let matchedSong = findSong(item) {
-            let data: NSData = NSKeyedArchiver.archivedDataWithRootObject(soundwaveData as AnyObject)
-            matchedSong.soundwaveData = data
             matchedSong.soundwaveImage = soundwaveImage
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
-    
 
-    class func getSongWaveFormData(item: Findable) -> NSMutableArray? {
-        var findItme:Findable? = MusicManager.sharedInstance.isNeedReloadCollections(item.getTitle(), artist: item.getArtist(), duration: item.getDuration())
-        if findItme == nil {
-            findItme = item
-        }
-        if let matchedSong = findSong(findItme!) {
-         //   print("sound wave data found for song")
-            return NSKeyedUnarchiver.unarchiveObjectWithData(matchedSong.soundwaveData as! NSData) as? NSMutableArray
-        }
-        return nil
-    }
-    
     class func getSongWaveFormImage(item: Findable) -> NSData? {
-        var findItme:Findable? = MusicManager.sharedInstance.isNeedReloadCollections(item.getTitle(), artist: item.getArtist(), duration: item.getDuration())
+        var findItme:Findable? = MusicManager.sharedInstance.itemFoundInCollection(item)
         if findItme == nil {
             findItme = item
         }

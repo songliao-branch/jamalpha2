@@ -14,5 +14,15 @@ class MyFavoritesCell: UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     
-    @IBOutlet weak var artistLabel: UILabel!
+    
+    @IBOutlet weak var subtitleLabel: UILabel!
+    
+    @IBOutlet weak var searchIcon: UIImageView!
+    
+    @IBOutlet weak var spinner: UIActivityIndicatorView!
+    
+    
+    @IBOutlet weak var titleRightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var subtitleRightConstraint: NSLayoutConstraint!
+    
 }

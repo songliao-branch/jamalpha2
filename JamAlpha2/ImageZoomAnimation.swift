@@ -53,7 +53,7 @@ class ImageZoomAnimation: NSObject, UIViewControllerAnimatedTransitioning {
         
         //perform the transition using a spring motion effect
         let duration:NSTimeInterval = self.transitionDuration(transitionContext)
-        let tempVC = (((fromViewController as! TabBarController).viewControllers![2] as! UINavigationController).viewControllers[1] as! UserProfileEditViewController)
+        let tempVC = (((fromViewController as! TabBarController).viewControllers![kIndexOfUserPage] as! UINavigationController).viewControllers[1] as! UserProfileEditViewController)
         tempVC.userProfile.hidden = true
         
         UIView.animateWithDuration(duration, animations: {

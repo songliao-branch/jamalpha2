@@ -14,7 +14,6 @@ class Song: NSManagedObject {
     @NSManaged var artist: String
     @NSManaged var album: String
     @NSManaged var playbackDuration: NSNumber
-    @NSManaged var soundwaveData: AnyObject // used for image generation in TabsEditor
     @NSManaged var albumCover: NSData
     @NSManaged var soundwaveImage: NSData //used for image in SongViewController
     @NSManaged var tabsSets: NSSet

@@ -29,6 +29,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         isCalledViewDidLoad = true
         refreshUserImage()
     }
+
     
     //called after sign in or sign up
     func refreshUserImage() {
@@ -123,9 +124,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 if let name = user.nickname {
                     cell.titleLabel.text = name
                 }
-                
                 cell.subtitleLabel.text = user.email
-                
                 if let profileData = user.profileImage {
                     let imageLayer: CALayer = cell.avatarImageView.layer
                     imageLayer.cornerRadius = 0.5 * cell.avatarImageView.frame.size.width

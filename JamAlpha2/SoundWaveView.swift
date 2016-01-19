@@ -31,14 +31,11 @@ class SoundWaveView: UIView {
     var generatedNormalImage:UIImage!
     var generatedProgressImage:UIImage!
     
-    var averageSampleBuffer: NSMutableArray?
     var originalSampleBuffer:NSMutableArray?
     
-    let tabEditorSampleRate:CGFloat = 8
-    let songVCSampleRate:CGFloat = 1
+    let songVCSampleRate:CGFloat = 8
     let lineWidth:CGFloat = 2.5
     
-    var isForTabsEditor = false
     var backgroundTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
     override init(frame: CGRect)  {
@@ -92,7 +89,6 @@ class SoundWaveView: UIView {
     
      func getSampleDateFromAudio(asset:AVAsset?, size:CGSize){
         self.registerBackgroundTask()
-        self.averageSampleBuffer = NSMutableArray()
         self.originalSampleBuffer = NSMutableArray()
         
         if(asset != nil ){
@@ -147,8 +143,6 @@ class SoundWaveView: UIView {
 
                 var bigSample:Double = 0
                 var bigSampleCount:NSInteger = 0
-                var bigSampleforTabAndChord:Double = 0
-                var bigSampleforTabAndChordCount:NSInteger = 0
                 let data:NSMutableData = NSMutableData(length: 32768)!
                 
                 //var currentX:CGFloat = 0
@@ -196,19 +190,8 @@ class SoundWaveView: UIView {
                             bigSample += Double(sample)
                             bigSampleCount++
                             
-                            bigSampleforTabAndChord += Double(sample)
-                            bigSampleforTabAndChordCount++
                             
-                            if(bigSampleforTabAndChordCount == Int(songVCSampleRate) * samplesPerPixel){
-                                let averageSample:Double = bigSampleforTabAndChord / Double(bigSampleforTabAndChordCount)
-                                
-                                self.averageSampleBuffer!.addObject(averageSample)
-                                bigSampleforTabAndChord = 0
-                                bigSampleforTabAndChordCount = 0
-                                
-                            }
-                            
-                            if(bigSampleCount == Int(tabEditorSampleRate)*samplesPerPixel){
+                            if(bigSampleCount == Int(songVCSampleRate)*samplesPerPixel){
                                 let averageSample:Double = bigSample / Double(bigSampleCount)
                                 self.originalSampleBuffer!.addObject(averageSample)
                                 bigSample = 0
@@ -242,34 +225,12 @@ class SoundWaveView: UIView {
         var currentX:CGFloat = 0
         for averageSample in self.originalSampleBuffer!
         {
-            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*tabEditorSampleRate+0.5)
+            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*self.songVCSampleRate+0.5)
             
             currentX++
         }
     }
     
-    
-    // render sound wave from the NSMutableArray we saved in SongViewController
-    func renderWavefromForTab(context:CGContextRef, color:UIColor, size:CGSize, antialiasingEnabled:Bool){
-        let pixelRatio:CGFloat = UIScreen.mainScreen().scale
-
-        let heightInPixels:CGFloat = size.height*pixelRatio
-    
-        CGContextSetAllowsAntialiasing(context, antialiasingEnabled)
-        CGContextSetLineWidth(context, lineWidth)
-        CGContextSetStrokeColorWithColor(context, color.CGColor)
-        CGContextSetFillColorWithColor(context, color.CGColor)
-
-        let halfGraphHeight:Float = Float(heightInPixels) / 2
-
-        var currentX:CGFloat = 0
-        for averageSample in self.averageSampleBuffer!
-        {
-            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*tabEditorSampleRate+0.5)
-            
-            currentX++
-        }
-    }
 
     /*******************************************************/
     
@@ -281,11 +242,8 @@ class SoundWaveView: UIView {
         let ratio:CGFloat = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width * ratio, size.height * ratio), false, 1);
         
-            if(self.originalSampleBuffer != nil && !isForTabsEditor){
-                self.renderWavefromForSongVC(UIGraphicsGetCurrentContext()!, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
-            }else if(self.averageSampleBuffer != nil){
-                self.renderWavefromForTab(UIGraphicsGetCurrentContext()!, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
-            }
+        self.renderWavefromForSongVC(UIGraphicsGetCurrentContext()!, color: color, size: size, antialiasingEnabled: antialiasingEnabled)
+            
         
         let image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
         
@@ -330,11 +288,6 @@ class SoundWaveView: UIView {
             self.generatedNormalImage = self.generateWaveformImage(self.normalColor, size: CGSizeMake(rect.size.width, rect.size.height), antialiasingEnabled: self.antialiasingEnabled)
             self.normalImageView.image = generatedNormalImage
             normalColorDirty = false
-        if(isForTabsEditor){
-            self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
-            self.progressImageView.image = generatedProgressImage
-        }
-       
     }
     
     func applyProgressToSubviews(){
@@ -378,10 +331,9 @@ class SoundWaveView: UIView {
     }
     
     
-    func SetSoundURL(soundURL:NSURL, isForTabsEditor:Bool)
+    func SetSoundURL(soundURL:NSURL)
     {
         self.asset = AVURLAsset(URL: soundURL, options: nil)
-        self.isForTabsEditor = isForTabsEditor
         let rect:CGRect = self.bounds
         self.getSampleDateFromAudio(self.asset, size: CGSizeMake(rect.size.width, rect.size.height))
     }

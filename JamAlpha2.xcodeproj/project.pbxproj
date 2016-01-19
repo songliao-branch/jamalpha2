@@ -29,6 +29,60 @@
 		BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED01C1220E700F26877 /* AboutViewController.swift */; };
 		BFE49ED61C12471200F26877 /* AppConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED51C12471200F26877 /* AppConstant.swift */; };
 		BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */; };
+		BFFAA5131C3CE0D400DC3253 /* PlayChordsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */; };
+		BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */; };
+		BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */; };
+		BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */; };
+		BFFD86701C46D8C6004E7803 /* A3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD863E1C46D856004E7803 /* A3.aac */; };
+		BFFD86711C46D8C6004E7803 /* A3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD863F1C46D856004E7803 /* A3#.aac */; };
+		BFFD86721C46D8C6004E7803 /* A4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86401C46D856004E7803 /* A4.aac */; };
+		BFFD86731C46D8C6004E7803 /* A4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86411C46D856004E7803 /* A4#.aac */; };
+		BFFD86741C46D8C6004E7803 /* A5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86421C46D856004E7803 /* A5.aac */; };
+		BFFD86751C46D8C6004E7803 /* A5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86431C46D856004E7803 /* A5#.aac */; };
+		BFFD86761C46D8C6004E7803 /* A6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86441C46D856004E7803 /* A6.aac */; };
+		BFFD86771C46D8C6004E7803 /* A6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86451C46D856004E7803 /* A6#.aac */; };
+		BFFD86781C46D8C6004E7803 /* B2.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86461C46D85F004E7803 /* B2.aac */; };
+		BFFD86791C46D8C6004E7803 /* B3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86471C46D85F004E7803 /* B3.aac */; };
+		BFFD867A1C46D8C6004E7803 /* B4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86481C46D85F004E7803 /* B4.aac */; };
+		BFFD867B1C46D8C6004E7803 /* B5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86491C46D85F004E7803 /* B5.aac */; };
+		BFFD867C1C46D8C6004E7803 /* B6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864A1C46D85F004E7803 /* B6.aac */; };
+		BFFD867D1C46D8C6004E7803 /* C3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864B1C46D86B004E7803 /* C3.aac */; };
+		BFFD867E1C46D8C6004E7803 /* C3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864C1C46D86B004E7803 /* C3#.aac */; };
+		BFFD867F1C46D8C6004E7803 /* C4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864D1C46D86B004E7803 /* C4.aac */; };
+		BFFD86801C46D8C6004E7803 /* C4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864E1C46D86B004E7803 /* C4#.aac */; };
+		BFFD86811C46D8C6004E7803 /* C5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD864F1C46D86B004E7803 /* C5.aac */; };
+		BFFD86821C46D8C6004E7803 /* C5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86501C46D86B004E7803 /* C5#.aac */; };
+		BFFD86831C46D8C6004E7803 /* C6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86511C46D86B004E7803 /* C6.aac */; };
+		BFFD86841C46D8C6004E7803 /* C6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86521C46D86B004E7803 /* C6#.aac */; };
+		BFFD86851C46D8C6004E7803 /* C7.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86531C46D86B004E7803 /* C7.aac */; };
+		BFFD86861C46D8C6004E7803 /* D3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86541C46D879004E7803 /* D3.aac */; };
+		BFFD86871C46D8C6004E7803 /* D3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86551C46D879004E7803 /* D3#.aac */; };
+		BFFD86881C46D8C6004E7803 /* D4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86561C46D879004E7803 /* D4.aac */; };
+		BFFD86891C46D8C6004E7803 /* D4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86571C46D879004E7803 /* D4#.aac */; };
+		BFFD868A1C46D8C6004E7803 /* D5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86581C46D879004E7803 /* D5.aac */; };
+		BFFD868B1C46D8C6004E7803 /* D5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86591C46D879004E7803 /* D5#.aac */; };
+		BFFD868C1C46D8C6004E7803 /* D6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865A1C46D879004E7803 /* D6.aac */; };
+		BFFD868D1C46D8C6004E7803 /* D6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865B1C46D879004E7803 /* D6#.aac */; };
+		BFFD868E1C46D8C6004E7803 /* E3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865C1C46D880004E7803 /* E3.aac */; };
+		BFFD868F1C46D8C6004E7803 /* E4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865D1C46D880004E7803 /* E4.aac */; };
+		BFFD86901C46D8C6004E7803 /* E5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865E1C46D880004E7803 /* E5.aac */; };
+		BFFD86911C46D8C6004E7803 /* E6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD865F1C46D880004E7803 /* E6.aac */; };
+		BFFD86921C46D8C6004E7803 /* F3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86601C46D880004E7803 /* F3.aac */; };
+		BFFD86931C46D8C6004E7803 /* F3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86611C46D880004E7803 /* F3#.aac */; };
+		BFFD86941C46D8C6004E7803 /* F4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86621C46D880004E7803 /* F4.aac */; };
+		BFFD86951C46D8C6004E7803 /* F4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86631C46D880004E7803 /* F4#.aac */; };
+		BFFD86961C46D8C6004E7803 /* F5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86641C46D880004E7803 /* F5.aac */; };
+		BFFD86971C46D8C6004E7803 /* F5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86651C46D880004E7803 /* F5#.aac */; };
+		BFFD86981C46D8C6004E7803 /* F6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86661C46D880004E7803 /* F6.aac */; };
+		BFFD86991C46D8C6004E7803 /* F6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86671C46D880004E7803 /* F6#.aac */; };
+		BFFD869A1C46D8C6004E7803 /* G3.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86681C46D889004E7803 /* G3.aac */; };
+		BFFD869B1C46D8C6004E7803 /* G3#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD86691C46D889004E7803 /* G3#.aac */; };
+		BFFD869C1C46D8C6004E7803 /* G4.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866A1C46D889004E7803 /* G4.aac */; };
+		BFFD869D1C46D8C6004E7803 /* G4#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866B1C46D889004E7803 /* G4#.aac */; };
+		BFFD869E1C46D8C6004E7803 /* G5.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866C1C46D889004E7803 /* G5.aac */; };
+		BFFD869F1C46D8C6004E7803 /* G5#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866D1C46D889004E7803 /* G5#.aac */; };
+		BFFD86A01C46D8C6004E7803 /* G6.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866E1C46D889004E7803 /* G6.aac */; };
+		BFFD86A11C46D8C6004E7803 /* G6#.aac in Resources */ = {isa = PBXBuildFile; fileRef = BFFD866F1C46D889004E7803 /* G6#.aac */; };
 		C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */; };
 		C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82A4E961B81B668008B6AFC /* VisualizerView.swift */; };
 		C84435281B79239200E8823A /* UIImageEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84435271B79239200E8823A /* UIImageEffects.swift */; };
@@ -60,6 +114,7 @@
 		E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */; };
 		E455E7291BA272AD00210BD6 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E7281BA272AD00210BD6 /* Song.swift */; };
 		E455E72B1BA2760300210BD6 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E455E72A1BA2760300210BD6 /* CoreDataManager.swift */; };
+		E45604421C472218004CA96B /* TopSongsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45604411C472218004CA96B /* TopSongsCell.swift */; };
 		E456457E1B3BB15C00276287 /* ChordBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456457D1B3BB15C00276287 /* ChordBase.swift */; };
 		E45F6BB81B16C1860018645D /* ArtistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45F6BB71B16C1860018645D /* ArtistViewController.swift */; };
 		E46949B31B59DEB9003F0C5F /* CustomTransitionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */; };
@@ -84,6 +139,7 @@
 		E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */; };
 		E4BE9F1A1B8ABDAF00C87960 /* AlbumTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */; };
 		E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */; };
+		E4C2A4C11C45BD5700F92A1A /* TopSongsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C2A4C01C45BD5700F92A1A /* TopSongsViewController.swift */; };
 		E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */; };
 		E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBBFF61B9E88A600473FC4 /* FretCell.swift */; };
 		E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */; };
@@ -147,6 +203,62 @@
 		BFE49ED01C1220E700F26877 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		BFE49ED51C12471200F26877 /* AppConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConstant.swift; sourceTree = "<group>"; };
 		BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingFBLikeCell.swift; sourceTree = "<group>"; };
+		BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayChordsManager.swift; sourceTree = "<group>"; };
+		BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OpenALSupport.c; sourceTree = "<group>"; };
+		BFFAA5161C3CE12400DC3253 /* OpenALSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenALSupport.h; sourceTree = "<group>"; };
+		BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundBankPlayer.h; sourceTree = "<group>"; };
+		BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundBankPlayer.m; sourceTree = "<group>"; };
+		BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GuitarSoundFont.plist; sourceTree = "<group>"; };
+		BFFD863E1C46D856004E7803 /* A3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A3.aac; sourceTree = "<group>"; };
+		BFFD863F1C46D856004E7803 /* A3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A3#.aac"; sourceTree = "<group>"; };
+		BFFD86401C46D856004E7803 /* A4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A4.aac; sourceTree = "<group>"; };
+		BFFD86411C46D856004E7803 /* A4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A4#.aac"; sourceTree = "<group>"; };
+		BFFD86421C46D856004E7803 /* A5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A5.aac; sourceTree = "<group>"; };
+		BFFD86431C46D856004E7803 /* A5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A5#.aac"; sourceTree = "<group>"; };
+		BFFD86441C46D856004E7803 /* A6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = A6.aac; sourceTree = "<group>"; };
+		BFFD86451C46D856004E7803 /* A6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "A6#.aac"; sourceTree = "<group>"; };
+		BFFD86461C46D85F004E7803 /* B2.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B2.aac; sourceTree = "<group>"; };
+		BFFD86471C46D85F004E7803 /* B3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B3.aac; sourceTree = "<group>"; };
+		BFFD86481C46D85F004E7803 /* B4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B4.aac; sourceTree = "<group>"; };
+		BFFD86491C46D85F004E7803 /* B5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B5.aac; sourceTree = "<group>"; };
+		BFFD864A1C46D85F004E7803 /* B6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = B6.aac; sourceTree = "<group>"; };
+		BFFD864B1C46D86B004E7803 /* C3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C3.aac; sourceTree = "<group>"; };
+		BFFD864C1C46D86B004E7803 /* C3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C3#.aac"; sourceTree = "<group>"; };
+		BFFD864D1C46D86B004E7803 /* C4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C4.aac; sourceTree = "<group>"; };
+		BFFD864E1C46D86B004E7803 /* C4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C4#.aac"; sourceTree = "<group>"; };
+		BFFD864F1C46D86B004E7803 /* C5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C5.aac; sourceTree = "<group>"; };
+		BFFD86501C46D86B004E7803 /* C5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C5#.aac"; sourceTree = "<group>"; };
+		BFFD86511C46D86B004E7803 /* C6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C6.aac; sourceTree = "<group>"; };
+		BFFD86521C46D86B004E7803 /* C6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "C6#.aac"; sourceTree = "<group>"; };
+		BFFD86531C46D86B004E7803 /* C7.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = C7.aac; sourceTree = "<group>"; };
+		BFFD86541C46D879004E7803 /* D3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D3.aac; sourceTree = "<group>"; };
+		BFFD86551C46D879004E7803 /* D3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D3#.aac"; sourceTree = "<group>"; };
+		BFFD86561C46D879004E7803 /* D4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D4.aac; sourceTree = "<group>"; };
+		BFFD86571C46D879004E7803 /* D4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D4#.aac"; sourceTree = "<group>"; };
+		BFFD86581C46D879004E7803 /* D5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D5.aac; sourceTree = "<group>"; };
+		BFFD86591C46D879004E7803 /* D5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D5#.aac"; sourceTree = "<group>"; };
+		BFFD865A1C46D879004E7803 /* D6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = D6.aac; sourceTree = "<group>"; };
+		BFFD865B1C46D879004E7803 /* D6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "D6#.aac"; sourceTree = "<group>"; };
+		BFFD865C1C46D880004E7803 /* E3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E3.aac; sourceTree = "<group>"; };
+		BFFD865D1C46D880004E7803 /* E4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E4.aac; sourceTree = "<group>"; };
+		BFFD865E1C46D880004E7803 /* E5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E5.aac; sourceTree = "<group>"; };
+		BFFD865F1C46D880004E7803 /* E6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = E6.aac; sourceTree = "<group>"; };
+		BFFD86601C46D880004E7803 /* F3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F3.aac; sourceTree = "<group>"; };
+		BFFD86611C46D880004E7803 /* F3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F3#.aac"; sourceTree = "<group>"; };
+		BFFD86621C46D880004E7803 /* F4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F4.aac; sourceTree = "<group>"; };
+		BFFD86631C46D880004E7803 /* F4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F4#.aac"; sourceTree = "<group>"; };
+		BFFD86641C46D880004E7803 /* F5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F5.aac; sourceTree = "<group>"; };
+		BFFD86651C46D880004E7803 /* F5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F5#.aac"; sourceTree = "<group>"; };
+		BFFD86661C46D880004E7803 /* F6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = F6.aac; sourceTree = "<group>"; };
+		BFFD86671C46D880004E7803 /* F6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F6#.aac"; sourceTree = "<group>"; };
+		BFFD86681C46D889004E7803 /* G3.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G3.aac; sourceTree = "<group>"; };
+		BFFD86691C46D889004E7803 /* G3#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G3#.aac"; sourceTree = "<group>"; };
+		BFFD866A1C46D889004E7803 /* G4.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G4.aac; sourceTree = "<group>"; };
+		BFFD866B1C46D889004E7803 /* G4#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G4#.aac"; sourceTree = "<group>"; };
+		BFFD866C1C46D889004E7803 /* G5.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G5.aac; sourceTree = "<group>"; };
+		BFFD866D1C46D889004E7803 /* G5#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G5#.aac"; sourceTree = "<group>"; };
+		BFFD866E1C46D889004E7803 /* G6.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = G6.aac; sourceTree = "<group>"; };
+		BFFD866F1C46D889004E7803 /* G6#.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = "G6#.aac"; sourceTree = "<group>"; };
 		C820A3CC1B817E1F0029A253 /* MarqueeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		C82A4E961B81B668008B6AFC /* VisualizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualizerView.swift; sourceTree = "<group>"; };
 		C84435271B79239200E8823A /* UIImageEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageEffects.swift; sourceTree = "<group>"; };
@@ -178,6 +290,7 @@
 		E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		E455E7281BA272AD00210BD6 /* Song.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
 		E455E72A1BA2760300210BD6 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CoreDataManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		E45604411C472218004CA96B /* TopSongsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSongsCell.swift; sourceTree = "<group>"; };
 		E456457D1B3BB15C00276287 /* ChordBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordBase.swift; sourceTree = "<group>"; };
 		E45F6BB71B16C1860018645D /* ArtistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistViewController.swift; sourceTree = "<group>"; };
 		E46949B21B59DEB9003F0C5F /* CustomTransitionAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTransitionAnimation.swift; sourceTree = "<group>"; };
@@ -206,6 +319,7 @@
 		E4BE9F171B8A7F8200C87960 /* AlbumSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumSectionCell.swift; sourceTree = "<group>"; };
 		E4BE9F191B8ABDAF00C87960 /* AlbumTrackCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumTrackCell.swift; sourceTree = "<group>"; };
 		E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+comparison.swift"; sourceTree = "<group>"; };
+		E4C2A4C01C45BD5700F92A1A /* TopSongsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSongsViewController.swift; sourceTree = "<group>"; };
 		E4CBBFF51B9E88A600473FC4 /* TabsDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsDataManager.swift; sourceTree = "<group>"; };
 		E4CBBFF61B9E88A600473FC4 /* FretCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FretCell.swift; sourceTree = "<group>"; };
 		E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TabsEditorViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -277,6 +391,7 @@
 		BF0B3AF51C33C99D003F0541 /* TabsEdtiorViewController */ = {
 			isa = PBXGroup;
 			children = (
+				BFFAA5141C3CE0DD00DC3253 /* PlayChordsManager */,
 				105B2EC61C316E20002BC17A /* CustomizedView.swift */,
 				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
 			);
@@ -311,6 +426,85 @@
 				E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */,
 			);
 			name = MeViewController;
+			sourceTree = "<group>";
+		};
+		BFFAA5141C3CE0DD00DC3253 /* PlayChordsManager */ = {
+			isa = PBXGroup;
+			children = (
+				BFFD85971C406ACE004E7803 /* Helper */,
+				BFFAA51D1C3DB7C200DC3253 /* SourceFiles */,
+				BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */,
+			);
+			name = PlayChordsManager;
+			sourceTree = "<group>";
+		};
+		BFFAA51D1C3DB7C200DC3253 /* SourceFiles */ = {
+			isa = PBXGroup;
+			children = (
+				BFFD863E1C46D856004E7803 /* A3.aac */,
+				BFFD863F1C46D856004E7803 /* A3#.aac */,
+				BFFD86401C46D856004E7803 /* A4.aac */,
+				BFFD86411C46D856004E7803 /* A4#.aac */,
+				BFFD86421C46D856004E7803 /* A5.aac */,
+				BFFD86431C46D856004E7803 /* A5#.aac */,
+				BFFD86441C46D856004E7803 /* A6.aac */,
+				BFFD86451C46D856004E7803 /* A6#.aac */,
+				BFFD86461C46D85F004E7803 /* B2.aac */,
+				BFFD86471C46D85F004E7803 /* B3.aac */,
+				BFFD86481C46D85F004E7803 /* B4.aac */,
+				BFFD86491C46D85F004E7803 /* B5.aac */,
+				BFFD864A1C46D85F004E7803 /* B6.aac */,
+				BFFD864B1C46D86B004E7803 /* C3.aac */,
+				BFFD864C1C46D86B004E7803 /* C3#.aac */,
+				BFFD864D1C46D86B004E7803 /* C4.aac */,
+				BFFD864E1C46D86B004E7803 /* C4#.aac */,
+				BFFD864F1C46D86B004E7803 /* C5.aac */,
+				BFFD86501C46D86B004E7803 /* C5#.aac */,
+				BFFD86511C46D86B004E7803 /* C6.aac */,
+				BFFD86521C46D86B004E7803 /* C6#.aac */,
+				BFFD86531C46D86B004E7803 /* C7.aac */,
+				BFFD86541C46D879004E7803 /* D3.aac */,
+				BFFD86551C46D879004E7803 /* D3#.aac */,
+				BFFD86561C46D879004E7803 /* D4.aac */,
+				BFFD86571C46D879004E7803 /* D4#.aac */,
+				BFFD86581C46D879004E7803 /* D5.aac */,
+				BFFD86591C46D879004E7803 /* D5#.aac */,
+				BFFD865A1C46D879004E7803 /* D6.aac */,
+				BFFD865B1C46D879004E7803 /* D6#.aac */,
+				BFFD865C1C46D880004E7803 /* E3.aac */,
+				BFFD865D1C46D880004E7803 /* E4.aac */,
+				BFFD865E1C46D880004E7803 /* E5.aac */,
+				BFFD865F1C46D880004E7803 /* E6.aac */,
+				BFFD86601C46D880004E7803 /* F3.aac */,
+				BFFD86611C46D880004E7803 /* F3#.aac */,
+				BFFD86621C46D880004E7803 /* F4.aac */,
+				BFFD86631C46D880004E7803 /* F4#.aac */,
+				BFFD86641C46D880004E7803 /* F5.aac */,
+				BFFD86651C46D880004E7803 /* F5#.aac */,
+				BFFD86661C46D880004E7803 /* F6.aac */,
+				BFFD86671C46D880004E7803 /* F6#.aac */,
+				BFFD86681C46D889004E7803 /* G3.aac */,
+				BFFD86691C46D889004E7803 /* G3#.aac */,
+				BFFD866A1C46D889004E7803 /* G4.aac */,
+				BFFD866B1C46D889004E7803 /* G4#.aac */,
+				BFFD866C1C46D889004E7803 /* G5.aac */,
+				BFFD866D1C46D889004E7803 /* G5#.aac */,
+				BFFD866E1C46D889004E7803 /* G6.aac */,
+				BFFD866F1C46D889004E7803 /* G6#.aac */,
+				BFFAA51B1C3CE28C00DC3253 /* GuitarSoundFont.plist */,
+			);
+			name = SourceFiles;
+			sourceTree = "<group>";
+		};
+		BFFD85971C406ACE004E7803 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */,
+				BFFAA5161C3CE12400DC3253 /* OpenALSupport.h */,
+				BFFAA5181C3CE13100DC3253 /* SoundBankPlayer.h */,
+				BFFAA5191C3CE13100DC3253 /* SoundBankPlayer.m */,
+			);
+			name = Helper;
 			sourceTree = "<group>";
 		};
 		E41D6CFC1BA149BF006A9993 /* Helper */ = {
@@ -426,6 +620,7 @@
 				BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */,
 				E43713F41C34853600517D03 /* UserTabsLyricsCell.swift */,
 				E43713F01C34851200517D03 /* MyFavoritesCell.swift */,
+				E45604411C472218004CA96B /* TopSongsCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -574,6 +769,7 @@
 				E49AF0961B2699C800DD3342 /* BaseViewController.swift */,
 				1045413E1BCAFBB300A4590B /* TabBarController.swift */,
 				E48877441B151628004785D3 /* SearchViewController.swift */,
+				E4C2A4C01C45BD5700F92A1A /* TopSongsViewController.swift */,
 			);
 			name = TabItemControllers;
 			sourceTree = "<group>";
@@ -655,7 +851,7 @@
 				TargetAttributes = {
 					E488773C1B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 3ME9DMV2GU;
+						DevelopmentTeam = 978SMNLLT3;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -693,8 +889,59 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFFD86701C46D8C6004E7803 /* A3.aac in Resources */,
+				BFFD86711C46D8C6004E7803 /* A3#.aac in Resources */,
+				BFFD86721C46D8C6004E7803 /* A4.aac in Resources */,
+				BFFD86731C46D8C6004E7803 /* A4#.aac in Resources */,
+				BFFD86741C46D8C6004E7803 /* A5.aac in Resources */,
+				BFFD86751C46D8C6004E7803 /* A5#.aac in Resources */,
+				BFFD86761C46D8C6004E7803 /* A6.aac in Resources */,
+				BFFD86771C46D8C6004E7803 /* A6#.aac in Resources */,
+				BFFD86781C46D8C6004E7803 /* B2.aac in Resources */,
+				BFFD86791C46D8C6004E7803 /* B3.aac in Resources */,
+				BFFD867A1C46D8C6004E7803 /* B4.aac in Resources */,
+				BFFD867B1C46D8C6004E7803 /* B5.aac in Resources */,
+				BFFD867C1C46D8C6004E7803 /* B6.aac in Resources */,
+				BFFD867D1C46D8C6004E7803 /* C3.aac in Resources */,
+				BFFD867E1C46D8C6004E7803 /* C3#.aac in Resources */,
+				BFFD867F1C46D8C6004E7803 /* C4.aac in Resources */,
+				BFFD86801C46D8C6004E7803 /* C4#.aac in Resources */,
+				BFFD86811C46D8C6004E7803 /* C5.aac in Resources */,
+				BFFD86821C46D8C6004E7803 /* C5#.aac in Resources */,
+				BFFD86831C46D8C6004E7803 /* C6.aac in Resources */,
+				BFFD86841C46D8C6004E7803 /* C6#.aac in Resources */,
+				BFFD86851C46D8C6004E7803 /* C7.aac in Resources */,
+				BFFD86861C46D8C6004E7803 /* D3.aac in Resources */,
+				BFFD86871C46D8C6004E7803 /* D3#.aac in Resources */,
+				BFFD86881C46D8C6004E7803 /* D4.aac in Resources */,
+				BFFD86891C46D8C6004E7803 /* D4#.aac in Resources */,
+				BFFD868A1C46D8C6004E7803 /* D5.aac in Resources */,
+				BFFD868B1C46D8C6004E7803 /* D5#.aac in Resources */,
+				BFFD868C1C46D8C6004E7803 /* D6.aac in Resources */,
+				BFFD868D1C46D8C6004E7803 /* D6#.aac in Resources */,
+				BFFD868E1C46D8C6004E7803 /* E3.aac in Resources */,
+				BFFD868F1C46D8C6004E7803 /* E4.aac in Resources */,
+				BFFD86901C46D8C6004E7803 /* E5.aac in Resources */,
+				BFFD86911C46D8C6004E7803 /* E6.aac in Resources */,
+				BFFD86921C46D8C6004E7803 /* F3.aac in Resources */,
+				BFFD86931C46D8C6004E7803 /* F3#.aac in Resources */,
+				BFFD86941C46D8C6004E7803 /* F4.aac in Resources */,
+				BFFD86951C46D8C6004E7803 /* F4#.aac in Resources */,
+				BFFD86961C46D8C6004E7803 /* F5.aac in Resources */,
+				BFFD86971C46D8C6004E7803 /* F5#.aac in Resources */,
+				BFFD86981C46D8C6004E7803 /* F6.aac in Resources */,
+				BFFD86991C46D8C6004E7803 /* F6#.aac in Resources */,
+				BFFD869A1C46D8C6004E7803 /* G3.aac in Resources */,
+				BFFD869B1C46D8C6004E7803 /* G3#.aac in Resources */,
+				BFFD869C1C46D8C6004E7803 /* G4.aac in Resources */,
+				BFFD869D1C46D8C6004E7803 /* G4#.aac in Resources */,
+				BFFD869E1C46D8C6004E7803 /* G5.aac in Resources */,
+				BFFD869F1C46D8C6004E7803 /* G5#.aac in Resources */,
+				BFFD86A01C46D8C6004E7803 /* G6.aac in Resources */,
+				BFFD86A11C46D8C6004E7803 /* G6#.aac in Resources */,
 				E475311B1C2228360072E791 /* Go.mp3 in Resources */,
 				E488776F1B152742004785D3 /* Main.storyboard in Resources */,
+				BFFAA51C1C3CE28C00DC3253 /* GuitarSoundFont.plist in Resources */,
 				E488774F1B151628004785D3 /* LaunchScreen.xib in Resources */,
 				E488774C1B151628004785D3 /* Images.xcassets in Resources */,
 			);
@@ -813,6 +1060,7 @@
 				E4CBC0041B9E88BA00473FC4 /* TabsEditorViewController.swift in Sources */,
 				E4399C361B90041900906DBD /* SoundWaveView.swift in Sources */,
 				E43DA1291B9FDCE1003180FB /* SearchHistory.swift in Sources */,
+				E45604421C472218004CA96B /* TopSongsCell.swift in Sources */,
 				E43713EF1C34850200517D03 /* LocalSong.swift in Sources */,
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
 				E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */,
@@ -821,12 +1069,14 @@
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
 				E43713FD1C34871300517D03 /* MyTabsAndLyricsViewController.swift in Sources */,
 				E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */,
+				E4C2A4C11C45BD5700F92A1A /* TopSongsViewController.swift in Sources */,
 				E455E72B1BA2760300210BD6 /* CoreDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				10AC35A61C215BE300749744 /* DemoCell.swift in Sources */,
 				BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */,
 				10AC35A41C21509D00749744 /* DemoViewController.swift in Sources */,
 				E43713F51C34853600517D03 /* UserTabsLyricsCell.swift in Sources */,
+				BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
@@ -842,11 +1092,13 @@
 				E4CBBFFA1B9E88A600473FC4 /* FretCell.swift in Sources */,
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
+				BFFAA5131C3CE0D400DC3253 /* PlayChordsManager.swift in Sources */,
 				E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */,
 				E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */,
 				E44359021B1947660091E926 /* Album.swift in Sources */,
+				BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */,
 				BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */,
 				BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,
