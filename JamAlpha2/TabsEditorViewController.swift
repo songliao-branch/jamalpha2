@@ -15,6 +15,7 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
+    var fretNumberOnFullStringView: UIView!
 
     var string3BackgroundImage: [String] = ["iPhone5_fret0", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret"]
     
@@ -263,6 +264,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         // add objects on main view and edit view
         self.addObjectsOnMainView()
         self.createStringAndFretPosition()
+        // initial main view tab data array
+        self.initialMainViewDataArray(0)
         self.addObjectsOnEditView()
         self.addMusicControlView()
         
@@ -274,8 +277,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.collectionView.delegate = self
         setUpTuningControlMenu()
 
-        // initial main view tab data array
-        self.initialMainViewDataArray()
         PlayChordsManager.sharedInstance.changeVolumn(1.0)
     }
     
@@ -475,6 +476,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func capoStepperValueChanged(stepper: UIStepper) {
         capoLabel.text = "Capo: \(Int(stepper.value))"
         PlayChordsManager.sharedInstance.changeCapo(Int(stepper.value))
+        updateCollectionView(Int(stepper.value))
+        
     }
     
     func stepUpPressed(button: UIButton) {
@@ -500,8 +503,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
-    func initialMainViewDataArray() {
-        for var i = 0; i < 25; i++ {
+    func initialMainViewDataArray(sender: Int) {
+        for var i = sender; i < 25; i++ {
             let temp: mainViewData = mainViewData()
             temp.fretNumber = i
             let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
@@ -787,7 +790,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 25
+        return mainViewDataArray.count
     }
     
     
@@ -818,7 +821,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
         cell.imageView.backgroundColor = UIColor.clearColor()
         cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
-        cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
+        cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item] + Int(capoStepper.value))"
         
         
         for subview in cell.contentView.subviews {
@@ -2201,6 +2204,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if(self.doubleArrowView != nil){
             self.doubleArrowView.alpha = 0
         }
+        cropFullStringImageView(Int(capoStepper.value))
+        generateFretNumberOnFullStringView(Int(capoStepper.value))
+        
         
         self.changeMenuButtonStatus(true)
         
@@ -3501,6 +3507,50 @@ extension TabsEditorViewController {
             tempSoundArray.append(tempSound!)
         }
         
+    }
+}
+
+extension TabsEditorViewController {
+    func generateFretNumberOnFullStringView(sender: Int) {
+        let count = 25
+        fretNumberOnFullStringView = UIView()
+        for item in fretNumberOnFullStringView.subviews {
+            item.removeFromSuperview()
+        }
+        fretNumberOnFullStringView.frame = CGRectMake(0, 14 / 20 * self.trueHeight, self.trueWidth / 5 * CGFloat(count - sender), 1 / 20 * self.trueHeight)
+        fretNumberOnFullStringView.backgroundColor = UIColor.clearColor()
+        let labelWidth: CGFloat = 1 / 20 * self.trueHeight
+        for var i = 0; i < count - sender; i++ {
+            let tempLabel: UILabel = UILabel()
+            let positionX = (self.string6FretPosition[i] + self.string6FretPosition[i + 1]) / 2
+            tempLabel.frame = CGRectMake(positionX - labelWidth / 2, 0, labelWidth, labelWidth)
+            tempLabel.text = "\(sender + i)"
+            tempLabel.backgroundColor = UIColor.clearColor()
+            tempLabel.textAlignment = .Center
+            tempLabel.font = UIFont.systemFontOfSize(10)
+            fretNumberOnFullStringView.addSubview(tempLabel)
+        }
+        self.completeImageView.addSubview(fretNumberOnFullStringView)
+    }
+    
+    func cropFullStringImageView(sender: Int) {
+        let count = 25
+        let croppedLength: CGFloat = self.trueWidth / 5 * CGFloat(count - sender)
+        let cropRect: CGRect = CGRectMake(0, 0, croppedLength, self.completeStringView.frame.size.height)
+        let image = self.completeImageView.cropViewWithRect(cropRect)
+        
+        self.completeStringView.contentSize = CGSizeMake(croppedLength, 15 / 20 * self.trueHeight)
+        self.completeImageView.frame = CGRectMake(0, 0, croppedLength, 15 / 20 * self.trueHeight)
+        self.completeImageView.image = image
+    }
+    
+    func updateCollectionView(sender: Int) {
+        let count = self.mainViewDataArray.count
+        self.initialMainViewDataArray(count)
+        for var i = 24; i > 24 - sender; i-- {
+            self.mainViewDataArray.removeAtIndex(i)
+        }
+        self.collectionView.reloadData()
     }
 }
 
