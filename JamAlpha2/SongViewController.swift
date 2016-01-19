@@ -251,7 +251,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.musicViewController = musicVC
             }
             KGLOBAL_nowView.stop()
-            self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {succeed in Void()})
             CoreDataManager.initializeSongToDatabase(songNeedPurchase)
         }
         
@@ -329,6 +328,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         if(!isGenerated && !isSongNeedPurchase){
             generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
+        }else if (!isGenerated && isSongNeedPurchase) {
+                self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
+                    succeed in
+                    if !self.soundwaveUrl.isEmpty {
+                        AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
+                            image in
+                            dispatch_async(dispatch_get_main_queue()) {
+                                let data = UIImagePNGRepresentation(image)
+                                KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data!)
+                                self.isGenerated = true
+                                return
+                            }
+                        })
+                    }
+                })
         }
         isViewDidAppear = true
     }
@@ -1321,6 +1336,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                     KGLOBAL_operationCache.removeValueForKey(tempkeyString)
                                     KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
+                                    self.isGenerated = true
                                     return
                                 }
                         })
