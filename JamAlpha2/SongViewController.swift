@@ -328,7 +328,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         if(!isGenerated && !isSongNeedPurchase){
             generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
-        }else if (!isGenerated && isSongNeedPurchase) {
+        }
+        if (!isGenerated && isSongNeedPurchase) {
                 self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
                     succeed in
                     if !self.soundwaveUrl.isEmpty {
