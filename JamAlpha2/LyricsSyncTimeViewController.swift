@@ -183,9 +183,12 @@ class LyricsSyncViewController: UIViewController  {
         titleView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(titleView)
         
-        let buttonWidth: CGFloat = 2.0 / 20 * self.viewWidth
+        let spacing: CGFloat = 0.5 / 20 * self.viewWidth
+        
+        let buttonWidth: CGFloat = 3.0 / 20 * self.viewWidth
         let backButton: UIButton = UIButton()
-        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 0, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
+        backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         backButton.setTitle("B", forState: UIControlState.Normal)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -193,8 +196,9 @@ class LyricsSyncViewController: UIViewController  {
         titleView.addSubview(backButton)
         
         let doneButton: UIButton = UIButton()
-        doneButton.frame = CGRectMake(17.5
+        doneButton.frame = CGRectMake(17
             / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        doneButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         doneButton.setTitle("D", forState: UIControlState.Normal)
         doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -209,16 +213,25 @@ class LyricsSyncViewController: UIViewController  {
         titleView.addSubview(titleLabel)
         
         let speedUpButton: UIButton = UIButton()
-        speedUpButton.frame = CGRectMake(15 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        speedUpButton.frame = CGRectMake(14 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        speedUpButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
+        speedUpButton.layer.borderColor = UIColor.whiteColor().CGColor
+        speedUpButton.layer.borderWidth = 1
+        speedUpButton.layer.cornerRadius = 0.5 * buttonWidth
         speedUpButton.setTitle("+", forState: UIControlState.Normal)
+        speedUpButton.titleLabel?.font = UIFont.systemFontOfSize(15)
         speedUpButton.addTarget(self, action: "pressSpeedUpButton:", forControlEvents: UIControlEvents.TouchUpInside)
         
         titleView.addSubview(speedUpButton)
         
         let speedDownButton: UIButton = UIButton()
         speedDownButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        speedDownButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
+        speedUpButton.layer.borderColor = UIColor.whiteColor().CGColor
+        speedUpButton.layer.borderWidth = 1
+        speedUpButton.layer.cornerRadius = 0.5 * buttonWidth
         speedDownButton.setTitle("-", forState: UIControlState.Normal)
-        //speedDownButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
+        speedDownButton.titleLabel?.font = UIFont.systemFontOfSize(15)
         speedDownButton.addTarget(self, action: "pressSpeedDownButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(speedDownButton)
     }
