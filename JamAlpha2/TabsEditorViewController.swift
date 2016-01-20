@@ -84,7 +84,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // music section
     //MARK: decide the progress block width
     let tabsEditorProgressWidthMultiplier: CGFloat = 10
-    var progressBlock: SoundWaveView!
+    var progressBlock: UIView!
     var theSong: Findable!
     var currentTime: NSTimeInterval = NSTimeInterval()
     var avPlayer: AVAudioPlayer!
@@ -1700,7 +1700,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.currentTime = self.toTime
                 startTime.setTime(Float(self.currentTime))
                 let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
-                self.progressBlock.setProgress(persent)
+                //
+                
+                
+                //self.progressBlock.setProgress(persent)
+                
+                
+                //
                 self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
                 
                 self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
@@ -1840,7 +1846,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     func createSoundWave() {
         let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
-        self.progressBlock = SoundWaveView(frame: frame)
+        self.progressBlock = UIView(frame: frame)//SoundWaveView(frame: frame)
         if(theSong == nil){
             print("the song is empty")
         }
@@ -1855,9 +1861,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
             self.duration = (theSong as! MPMediaItem).playbackDuration
         }
-        progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
-        self.progressBlock.isForTabsEditor = true
-        self.progressBlock.generateWaveforms()
+        //progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
+        //self.progressBlock.isForTabsEditor = true
+        //self.progressBlock.generateWaveforms()
         self.progressBlock!.alpha = 0.5
 
     }
@@ -1904,8 +1910,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTimeLabel.text = TimeNumber(time: Float(currentTime)).toDisplayString()
         //refresh progress block
         let presentPosition = CGFloat(Float(currentTime) / Float(self.duration))
-        self.progressBlock.setProgress(presentPosition)
         
+        //
+        //self.progressBlock.setProgress(presentPosition)
+        //
         
         //MARK: progessBlock width
         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
@@ -2659,7 +2667,11 @@ extension TabsEditorViewController {
                 if normalTab.name == noteButtonWithTabArray[i].tab.name && normalTab.index == noteButtonWithTabArray[i].tab.index && normalTab.content == noteButtonWithTabArray[i].tab.content {
                     self.currentTime = Double(item.time.toDecimalNumer())
                     let presentPosition = CGFloat(self.currentTime / self.duration)
-                    self.progressBlock.setProgress(presentPosition)
+                    //
+                    
+                    //self.progressBlock.setProgress(presentPosition)
+                    
+                    //
                     self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
                     
                     let returnValue = addTabViewOnMusicControlView(i)
