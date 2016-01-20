@@ -1003,17 +1003,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var addButton: UIButton = UIButton()
     let backButton: UIButton = UIButton()
     var privacyButton: UIButton = UIButton()
+    let doneButton: UIButton = UIButton()
+    
     func addObjectsOnMainView() {
         // views
         let menuView: UIView = UIView()
         let musicView: UIView = UIView()
 
-        let doneButton: UIButton = UIButton()
-        
        
         menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
         //menuView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
-        menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!.imageWithColor(UIColor.darkGrayColor().colorWithAlphaComponent(0.9)))
+        menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!)
 
         self.view.addSubview(menuView)
         
@@ -1077,15 +1077,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         //TODO: set button from the visible attribute itself
         privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight, 0, buttonWidth, buttonWidth)
         privacyButton.backgroundColor = UIColor.clearColor()
-        privacyButton.setImage(UIImage(named: "privateButton"), forState: UIControlState.Normal)
+        privacyButton.setImage(UIImage(named: "globeIcon"), forState: UIControlState.Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
-        privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
+        privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
         menuView.addSubview(privacyButton)
         
         doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight, 0, 1.2 * buttonWidth, buttonWidth)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        doneButton.setImage(UIImage(named: "saveButton"), forState: UIControlState.Normal)
-        doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
+        doneButton.setImage(UIImage(named: "saveText"), forState: UIControlState.Normal)
+        doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.4 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.7 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
         menuView.addSubview(doneButton)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
@@ -2154,11 +2154,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     func pressTuningButton(sender: UIButton) {
         print("press tuning button")
+        let tempx = self.collectionView.contentOffset.x
         self.view.userInteractionEnabled = false
         self.backToMainView()
         self.view.userInteractionEnabled = true
         self.view.userInteractionEnabled = false
         self.actionDismissLayerButton.hidden = false // what is this button?
+        self.collectionView.contentOffset.x = tempx
+        self.removeDoubleArrowView()
         UIView.animateWithDuration(0.3, animations: {
             self.tuningMenu.frame = CGRect(x: 0, y: 0, width: self.tuningMenu.frame.width, height: self.trueHeight)
             self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
@@ -2202,6 +2205,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         playPauseButton.hidden = sender
         addButton.hidden = sender
         statusLabel.hidden = !sender
+        if sender {
+            //savebutton
+            doneButton.setImage(UIImage(named: "saveButton"), forState: UIControlState.Normal)
+            doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
+        }else{
+            //savetext
+            self.doneButton.setImage(UIImage(named: "saveText"), forState: UIControlState.Normal)
+            self.doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.4 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.7 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
+        }
     }
 
 
@@ -2569,10 +2581,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func privacyButtonPressed(button: UIButton) {
         if isPublic {
             isPublic = false
-            privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
+            privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
+            privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
         } else {
             isPublic = true
-            privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
+            privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
+            privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
         }
     }
     
@@ -2769,8 +2783,10 @@ extension TabsEditorViewController {
                 self.isPublic = visible
                 if self.isPublic {
                     self.privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
+                    self.privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
                 } else {
                     self.privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
+                    self.privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
                 }
             })
             
