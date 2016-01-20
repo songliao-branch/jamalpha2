@@ -223,6 +223,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         pthread_rwlock_init(&rwLock, nil)
         
         if(!isSongNeedPurchase){
+            if (KAVplayer != nil && KAVplayer.rate > 0){
+                KAVplayer.rate = 0
+                KAVplayer = nil
+            }
             if isDemoSong {
                 avPlayer = MusicManager.sharedInstance.avPlayer
                 self.demoItem = avPlayer.currentItem
