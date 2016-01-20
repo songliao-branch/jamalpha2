@@ -215,9 +215,6 @@ class LyricsSyncViewController: UIViewController  {
         let speedUpButton: UIButton = UIButton()
         speedUpButton.frame = CGRectMake(14 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedUpButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        speedUpButton.layer.borderColor = UIColor.whiteColor().CGColor
-        speedUpButton.layer.borderWidth = 1
-        speedUpButton.layer.cornerRadius = 0.5 * buttonWidth
         speedUpButton.setTitle("+", forState: UIControlState.Normal)
         speedUpButton.titleLabel?.font = UIFont.systemFontOfSize(15)
         speedUpButton.addTarget(self, action: "pressSpeedUpButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -227,9 +224,6 @@ class LyricsSyncViewController: UIViewController  {
         let speedDownButton: UIButton = UIButton()
         speedDownButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedDownButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        speedUpButton.layer.borderColor = UIColor.whiteColor().CGColor
-        speedUpButton.layer.borderWidth = 1
-        speedUpButton.layer.cornerRadius = 0.5 * buttonWidth
         speedDownButton.setTitle("-", forState: UIControlState.Normal)
         speedDownButton.titleLabel?.font = UIFont.systemFontOfSize(15)
         speedDownButton.addTarget(self, action: "pressSpeedDownButton:", forControlEvents: UIControlEvents.TouchUpInside)
