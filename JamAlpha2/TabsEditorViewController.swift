@@ -2213,9 +2213,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.doubleArrowView.alpha = 0
         }
         cropFullStringImageView(Int(capoStepper.value))
-        //generateFretNumberOnFullStringView(Int(capoStepper.value))
-        
-        
+    
         self.changeMenuButtonStatus(true)
         
         self.removeDoubleArrowView()
@@ -3549,6 +3547,7 @@ extension TabsEditorViewController {
         let count = 25
         let croppedLength: CGFloat = self.trueWidth / 5 * CGFloat(count - sender)
         let cropRect: CGRect = CGRectMake(0, 0, croppedLength, self.completeStringView.frame.size.height)
+        self.completeImageView.image = UIImage(named: "iPhone5_fullFretboard")
         let image = self.completeImageView.cropViewWithRect(cropRect)
         
         self.completeStringView.contentSize = CGSizeMake(croppedLength, 15 / 20 * self.trueHeight)
@@ -3558,9 +3557,30 @@ extension TabsEditorViewController {
     
     func updateCollectionView(sender: Int) {
         let count = self.mainViewDataArray.count
-        self.initialMainViewDataArray(count)
-        for var i = 24; i > 24 - sender; i-- {
-            self.mainViewDataArray.removeAtIndex(i)
+        if 25 - sender == count + 1 {
+            let maxFretNumber = count - 1
+            for var i = 0; i < count; i++ {
+                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
+                    let temp: mainViewData = mainViewData()
+                    temp.fretNumber = maxFretNumber + 1
+                    let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
+                    temp.noteButtonsWithTab = tempButton
+                    self.mainViewDataArray.insert(temp, atIndex: i + 1)
+                    self.string3BackgroundImage.insert("iPhone5_fret", atIndex: i + 1)
+                    self.fretsNumber.insert(maxFretNumber + 1, atIndex: i + 1)
+                    break
+                }
+            }
+        } else if 25 - sender == count - 1 {
+            let maxFretNumber = count - 1
+            for var i = 0; i < count; i++ {
+                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
+                    self.mainViewDataArray.removeAtIndex(i)
+                    self.string3BackgroundImage.removeAtIndex(i)
+                    self.fretsNumber.removeAtIndex(i)
+                    break
+                }
+            }
         }
         self.collectionView.reloadData()
     }
