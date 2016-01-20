@@ -1002,14 +1002,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var playPauseButton: UIButton = UIButton()
     var addButton: UIButton = UIButton()
     let backButton: UIButton = UIButton()
-
+    var privacyButton: UIButton = UIButton()
     func addObjectsOnMainView() {
         // views
         let menuView: UIView = UIView()
         let musicView: UIView = UIView()
 
         let doneButton: UIButton = UIButton()
-        let privacyButton: UIButton = UIButton()
+        
        
         menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
         //menuView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
@@ -2567,13 +2567,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func privacyButtonPressed(button: UIButton) {
-//        if isPublic {
-//            isPublic = false
-//            privacyButton.setTitle("Private", forState: .Normal)
-//        } else {
-//            isPublic = true
-//            privacyButton.setTitle("Public", forState: .Normal)
-//        }
+        if isPublic {
+            isPublic = false
+            privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
+        } else {
+            isPublic = true
+            privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
+        }
     }
     
     // find the current tab according to the current music time
@@ -2767,11 +2767,11 @@ extension TabsEditorViewController {
                 self.capoStepper.value = Double(capoValue)
                 self.capoLabel.text = "Capo: \(capoValue)"
                 self.isPublic = visible
-//                if self.isPublic {
-//                    self.privacyButton.setTitle("Public", forState: .Normal)
-//                } else {
-//                    self.privacyButton.setTitle("Private", forState: .Normal)
-//                }
+                if self.isPublic {
+                    self.privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
+                } else {
+                    self.privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
+                }
             })
             
             
