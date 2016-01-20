@@ -256,9 +256,10 @@ class LyricsSyncViewController: UIViewController  {
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
         
-        playButtonImageView.frame = CGRectMake((viewWidth - progressContainerHeight / 1.5) / 2, progressContainerHeight / 3, progressContainerHeight / 1.5, progressContainerHeight / 1.5)
+        playButtonImageView.frame = CGRectMake((viewWidth - progressContainerHeight / 1.5) / 2, viewHeight - progressContainerHeight / 1.5, progressContainerHeight / 1.5, progressContainerHeight / 1.5)
         playButtonImageView.image = UIImage(named: "playbutton")
-        self.progressBlockContainer.addSubview(playButtonImageView)
+        self.view.addSubview(playButtonImageView)
+        self.view.bringSubviewToFront(playButtonImageView)
 
         self.progressBlock = SoundWaveView(frame: CGRectMake(self.view.center.x, 0, CGFloat(theSong.getDuration()) * 2, soundwaveHeight))
         
@@ -336,6 +337,7 @@ class LyricsSyncViewController: UIViewController  {
             playButtonImageView.hidden = true
         } else {
             playButtonImageView.hidden = false
+            
             self.isPlaying = false
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)

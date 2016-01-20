@@ -747,8 +747,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     if(self.isCompleteStringViewScroll){
                         if (buttonFret - self.baseNoteLocation < 0 ){
                             self.completeStringView.contentOffset.x = 0
-                        }else if (buttonFret - self.baseNoteLocation > self.string6FretPosition[self.string6FretPosition.count-1]-self.trueWidth){
-                            self.completeStringView.contentOffset.x = self.string6FretPosition[self.string6FretPosition.count-1]-self.trueWidth
+                        }else if (buttonFret - self.baseNoteLocation > self.string6FretPosition[self.string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth){
+                            self.completeStringView.contentOffset.x = self.string6FretPosition[self.string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth
                         }else{
                             self.completeStringView.contentOffset.x = buttonFret - self.baseNoteLocation
                         }
@@ -2465,8 +2465,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 let temp3offset = self.string3FretChangeingPosition[tempTab.index.integerValue%100]! - temp6offset
                 if (temp3offset < 0){
                     self.originaloffset = 0
-                }else if (temp3offset > self.string6FretPosition[string6FretPosition.count-1]-self.trueWidth){
-                    self.originaloffset = self.string6FretPosition[string6FretPosition.count-1]-self.trueWidth
+                }else if (temp3offset > self.string6FretPosition[string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth){
+                    self.originaloffset = self.string6FretPosition[string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth
                 }else{
                     self.originaloffset = temp3offset
                 }
