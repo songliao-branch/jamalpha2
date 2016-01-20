@@ -328,8 +328,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         if(!isGenerated && !isSongNeedPurchase){
             generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
-        }
-        if (!isGenerated && isSongNeedPurchase) {
+        }else if (!isGenerated && isSongNeedPurchase) {
                 self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
                     succeed in
                     if !self.soundwaveUrl.isEmpty {
@@ -340,6 +339,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                 CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data!)
                                 self.isGenerated = true
+                                self.soundwaveUrl = ""
                                 return
                             }
                         })
@@ -1288,6 +1288,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 print("sound wave data found")
                 KGLOBAL_init_queue.suspended = false
                 isGenerated = true
+                self.soundwaveUrl = ""
                 
             }else{
                 //if didn't find it then we will generate then waveform later, in the viewdidappear method
@@ -1300,6 +1301,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 print("sound wave data found")
                 KGLOBAL_init_queue.suspended = false
                 isGenerated = true
+                self.soundwaveUrl = ""
             }else{
                 //if didn't find it then we will generate then waveform later, in the viewdidappear method
                 // this is a flag to determine if the generateSoundWave function will be called
@@ -1338,6 +1340,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                     KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
                                     self.isGenerated = true
+                                    self.soundwaveUrl = ""
                                     return
                                 }
                         })
@@ -1355,6 +1358,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         
                         tempProgressBlock.SetSoundURL(assetURL as! NSURL)
                         self.isGenerated = true
+                        self.soundwaveUrl = ""
                         
                         dispatch_async(dispatch_get_main_queue()) {
                             KGLOBAL_operationCache.removeValueForKey(tempkeyString)
@@ -2665,6 +2669,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
                                     KGLOBAL_init_queue.suspended = false
                                     isGenerated = true
+                                    self.soundwaveUrl = ""
                                 }else{
                                     self.getSongIdAndSoundwaveUrlFromCloud(self.nowPlayingMediaItem, completion: {
                                         successed in
