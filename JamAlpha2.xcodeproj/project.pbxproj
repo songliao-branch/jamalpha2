@@ -410,7 +410,6 @@
 		BFE49ECF1C1220C200F26877 /* SettingViewController */ = {
 			isa = PBXGroup;
 			children = (
-				BFE49ED51C12471200F26877 /* AppConstant.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
 				10AC35A31C21509D00749744 /* DemoViewController.swift */,
@@ -707,6 +706,7 @@
 		E48877641B151A58004785D3 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				BFE49ED51C12471200F26877 /* AppConstant.swift */,
 				BFFA248C1BE866F60037D9C0 /* MeViewController */,
 				E47FF6861BAD1AC500028F2D /* SongViewController */,
 				E431BA9E1B91552400E32A0B /* MusicListControllers */,

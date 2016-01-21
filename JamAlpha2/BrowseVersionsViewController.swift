@@ -126,8 +126,8 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
         artistNameLabel.text = findable.getArtist()
         
         
-        songNameLabel.font = UIFont.systemFontOfSize(18)
-        artistNameLabel.font = UIFont.systemFontOfSize(12)
+        songNameLabel.font = UIFont(name: fontName, size: 18)
+        artistNameLabel.font = UIFont(name: fontName, size: 12)
         
         //increase edge width
         //TODO: set a max of width to avoid clashing with pulldown and tuning button
@@ -150,7 +150,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
     
     func setUpCenterButton() {
         centerButton = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 60))
-        centerButton.titleLabel?.font = UIFont.systemFontOfSize(18)
+        centerButton.titleLabel?.font = UIFont(name: fontName, size: 18)
         centerButton.titleLabel?.numberOfLines = 2
         centerButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         centerButton.layer.borderWidth = 2

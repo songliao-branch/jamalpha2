@@ -12,3 +12,6 @@ import Foundation
 let FACEBOOK_PAGE_URL = "https://www.facebook.com/twistjam"
 let VERSION_NUMBER = "1.0.0"
 let COPYRIGHTYEAR = "2015"
+
+let fontName = "HelveticaNeue-Light"
+let boldFontName = "HelveticaNeue-Bold"

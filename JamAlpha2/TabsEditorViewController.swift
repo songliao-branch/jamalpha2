@@ -1110,7 +1110,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.tabNameTextField.autocorrectionType = UITextAutocorrectionType.No
         self.tabNameTextField.delegate = self
         self.tabNameTextField.attributedPlaceholder = NSAttributedString(string:"Input Name",
-            attributes:[NSForegroundColorAttributeName: UIColor(white: 0.8, alpha: 1), NSFontAttributeName: UIFont.boldSystemFontOfSize(17)])
+            attributes:[NSForegroundColorAttributeName: UIColor(white: 0.8, alpha: 1), NSFontAttributeName: UIFont(name: boldFontName, size: 17)!])
         self.tabNameTextField.returnKeyType = .Done
         self.tabNameTextField.textAlignment = .Center
         self.editView.addSubview(tabNameTextField)
@@ -1628,7 +1628,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         musicControlView.addSubview(wrapper)
         
         currentTimeLabel = UILabel(frame: CGRect(x: 0, y: 0, width: labelWidth, height: labelFontSize))
-        currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        currentTimeLabel.font = UIFont(name: fontName, size: labelFontSize)
         currentTimeLabel.text = "0:00.0"
         currentTimeLabel.sizeToFit()
         
@@ -1645,7 +1645,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         totalTimeLabel = UILabel(frame: CGRect(x: 0, y:0, width: labelWidth, height: labelFontSize))
         totalTimeLabel.textColor = UIColor.whiteColor()
-        totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        totalTimeLabel.font = UIFont(name: fontName, size: labelFontSize)
         totalTimeLabel.center.y = wrapper.center.y
         totalTimeLabel.text = TimeNumber(time: Float(theSong.getDuration())).toDisplayString()
         totalTimeLabel.sizeToFit()
@@ -2066,7 +2066,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         tempLabelView.frame = CGRectMake(0, 0, tempView.frame.width, tempView.frame.height)
         tempLabelView.layer.cornerRadius = 2
-        tempLabelView.font = UIFont.systemFontOfSize(11)
+        tempLabelView.font = UIFont(name: fontName, size: 11)
         tempLabelView.textAlignment = NSTextAlignment.Center
         tempLabelView.numberOfLines = 3
         tempLabelView.text = name
@@ -2282,7 +2282,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             let addBaseNoteLabel: UILabel = UILabel()
                             addBaseNoteLabel.frame = CGRectMake(0, 0, self.specificTabsScrollView.frame.size.width, self.specificTabsScrollView.frame.size.height)
                             addBaseNoteLabel.text = "Please input a valid chord name"
-                            addBaseNoteLabel.font = UIFont.systemFontOfSize(17)
+                            addBaseNoteLabel.font = UIFont(name: fontName, size: 17)
                             addBaseNoteLabel.backgroundColor = UIColor(white: 0.7, alpha: 0.3)
                             addBaseNoteLabel.textAlignment = .Center
                             addBaseNoteLabel.textColor = UIColor.whiteColor()
@@ -2369,7 +2369,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 let addBaseNoteLabel: UILabel = UILabel()
                 addBaseNoteLabel.frame = CGRectMake(0, 0, self.specificTabsScrollView.frame.size.width, self.specificTabsScrollView.frame.size.height)
                 addBaseNoteLabel.text = "Please select a base note on the bottom three strings"
-                addBaseNoteLabel.font = UIFont.systemFontOfSize(15)
+                addBaseNoteLabel.font = UIFont(name: fontName, size: 15)
                 addBaseNoteLabel.backgroundColor = UIColor(white: 0.7, alpha: 0.3)
                 addBaseNoteLabel.textAlignment = .Center
                 addBaseNoteLabel.textColor = UIColor.whiteColor()
@@ -2522,19 +2522,19 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 if tempButtonArray.count == 1 {
                     tempButtonArray[0].noteButton.frame = CGRectMake(self.trueWidth / 5 / 2 - buttonWidth / 2, self.string3Position[Int(tempButtonArray[0].tab.index) / 100 - 4] - buttonWidth / 2, buttonWidth, buttonWidth)
                     tempButtonArray[0].noteButton.layer.cornerRadius = 0.5 * buttonWidth
-                    tempButtonArray[0].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+                    tempButtonArray[0].noteButton.titleLabel!.font = UIFont(name: fontName, size: UIFont.smallSystemFontSize())
                 }
                 if tempButtonArray.count == 2 {
                     for var j = 0; j < tempButtonArray.count; j++ {
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX2[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth2 / 2, buttonWidth2, buttonWidth2)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth2
-                        tempButtonArray[j].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+                        tempButtonArray[j].noteButton.titleLabel!.font = UIFont(name: fontName, size: UIFont.smallSystemFontSize())
                     }
                 } else if tempButtonArray.count == 3 {
                     for var j = 0; j < tempButtonArray.count; j++ {
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX3[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth3 / 2, buttonWidth3, buttonWidth3)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth3
-                        tempButtonArray[j].noteButton.titleLabel!.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+                        tempButtonArray[j].noteButton.titleLabel!.font = UIFont(name: fontName, size: UIFont.smallSystemFontSize())
                     }
                 }
             }
@@ -3553,7 +3553,7 @@ extension TabsEditorViewController {
             tempLabel.text = "\(sender + i)"
             tempLabel.backgroundColor = UIColor.clearColor()
             tempLabel.textAlignment = .Center
-            tempLabel.font = UIFont.systemFontOfSize(10)
+            tempLabel.font = UIFont(name: fontName, size: 10)
             fretNumberOnFullStringView.addSubview(tempLabel)
         }
         self.completeImageView.addSubview(fretNumberOnFullStringView)

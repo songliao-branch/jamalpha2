@@ -180,7 +180,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
         titleLabel.textColor = UIColor.whiteColor()
-        titleLabel.font = UIFont.systemFontOfSize(20)
+        titleLabel.font = UIFont(name: fontName, size: 20)
         titleLabel.text = "Add lyrics"
         titleLabel.sizeToFit()
         titleLabel.center = CGPoint(x: titleView.center.x, y: 44/2 + 20)
@@ -216,7 +216,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         self.lyricsTextView.frame = CGRect(x: 0, y: CGRectGetMaxY(titleView.frame), width: self.viewWidth, height: self.viewHeight - (20 + 44))
         self.lyricsTextView.backgroundColor = UIColor.clearColor()
         self.lyricsTextView.textAlignment = .Left
-        self.lyricsTextView.font = UIFont.systemFontOfSize(18)
+        self.lyricsTextView.font = UIFont(name: fontName, size: 18)
         self.lyricsTextView.textColor = UIColor.whiteColor()
         self.lyricsTextView.tintColor = UIColor.mainPinkColor()
         self.lyricsTextView.delegate = self

@@ -206,7 +206,7 @@ class LyricsSyncViewController: UIViewController  {
         
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
         titleLabel.textColor = UIColor.whiteColor()
-        titleLabel.font = UIFont.systemFontOfSize(20)
+        titleLabel.font = UIFont(name: fontName, size: 20)
         titleLabel.text = "Sync lyrics"
         titleLabel.sizeToFit()
         titleLabel.center = CGPoint(x: titleView.center.x, y: 44/2 + 20)
@@ -216,7 +216,7 @@ class LyricsSyncViewController: UIViewController  {
         speedUpButton.frame = CGRectMake(14 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedUpButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         speedUpButton.setTitle("+", forState: UIControlState.Normal)
-        speedUpButton.titleLabel?.font = UIFont.systemFontOfSize(15)
+        speedUpButton.titleLabel?.font = UIFont(name: fontName, size: 15)
         speedUpButton.addTarget(self, action: "pressSpeedUpButton:", forControlEvents: UIControlEvents.TouchUpInside)
         
         titleView.addSubview(speedUpButton)
@@ -225,7 +225,7 @@ class LyricsSyncViewController: UIViewController  {
         speedDownButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedDownButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         speedDownButton.setTitle("-", forState: UIControlState.Normal)
-        speedDownButton.titleLabel?.font = UIFont.systemFontOfSize(15)
+        speedDownButton.titleLabel?.font = UIFont(name: fontName, size: 15)
         speedDownButton.addTarget(self, action: "pressSpeedDownButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(speedDownButton)
     }
@@ -299,7 +299,7 @@ class LyricsSyncViewController: UIViewController  {
         self.view.addSubview(wrapper)
         
         currentTimeLabel = UILabel(frame: CGRect(x: self.view.center.x-labelWidth, y: timeLabelOriginY , width: labelWidth, height: labelHeight))
-        currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        currentTimeLabel.font = UIFont(name: fontName, size: labelFontSize)
         currentTimeLabel.text = "0:00.0"
         currentTimeLabel.textAlignment = .Left
         currentTimeLabel.textColor = UIColor.whiteColor()
@@ -314,7 +314,7 @@ class LyricsSyncViewController: UIViewController  {
         
         totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
         totalTimeLabel.textColor = UIColor.whiteColor()
-        totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        totalTimeLabel.font = UIFont(name: fontName, size: labelFontSize)
         
         totalTimeLabel.text = TimeNumber(time: Float(theSong.getDuration())).toDisplayString()
         totalTimeLabel.textAlignment = .Right

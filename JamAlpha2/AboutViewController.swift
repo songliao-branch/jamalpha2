@@ -49,7 +49,7 @@ class AboutViewController: UIViewController, UITextFieldDelegate {
         let imageWidth: CGFloat = 200
         
         let string = "Copyright \(COPYRIGHTYEAR) Twistjam. All Rights Reserved"
-        let text = NSMutableAttributedString(string: string, attributes: [NSFontAttributeName: UIFont.systemFontOfSize(16)])
+        let text = NSMutableAttributedString(string: string, attributes: [NSFontAttributeName: UIFont(name: fontName, size: 16)!])
         text.addAttribute(NSLinkAttributeName, value: "https://www.twistjam.com", range: NSMakeRange(15, 8))
         text.addAttribute(NSLinkAttributeName, value: "https://www.twistjam.com", range: NSMakeRange(29, 6))
         

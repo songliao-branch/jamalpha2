@@ -328,7 +328,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         statusLabel = UILabel(frame: CGRect(x: 0, y: 55, width: 100, height: 35))
         statusLabel.textColor = UIColor.whiteColor()
         statusLabel.textAlignment = .Center
-        statusLabel.font = UIFont.systemFontOfSize(16)
+        statusLabel.font = UIFont(name: fontName, size: 16)
         statusLabel.center.x = statusView.frame.width/2
         statusView.addSubview(statusLabel)
     }

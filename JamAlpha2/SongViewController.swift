@@ -533,7 +533,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         capoLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
         capoLabel.textColor = UIColor.whiteColor()
-        capoLabel.font = UIFont.systemFontOfSize(16)
+        capoLabel.font = UIFont(name: fontName, size: 16)
         capoLabel.center = capoButton.center
         capoLabel.userInteractionEnabled = false
         capoLabel.textAlignment = .Center
@@ -564,7 +564,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         for i in 1..<topPoints.count{
             let tuningLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 15))
             tuningLabel.textColor = UIColor.whiteColor()
-            tuningLabel.font = UIFont.systemFontOfSize(minfont-5)
+            tuningLabel.font = UIFont(name: fontName, size: minfont-5)
             tuningLabel.textAlignment = .Center
             tuningLabel.center = CGPoint(x: topPoints[i]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
             self.view.addSubview(tuningLabel)
@@ -612,8 +612,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         songNameLabel.attributedText = attributedString
         songNameLabel.textAlignment = NSTextAlignment.Center
         
-        songNameLabel!.font = UIFont.systemFontOfSize(18)
-        artistNameLabel!.font = UIFont.systemFontOfSize(12)
+        songNameLabel!.font = UIFont(name: fontName, size: 18)
+        artistNameLabel!.font = UIFont(name: fontName, size: 12)
         
         //increase edge width
         //TODO: set a max of width to avoid clashing with pulldown and tuning button
@@ -859,7 +859,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         addTabsPrompt = UIButton(frame: CGRect(x: 0, y: chordBase.frame.height-30, width: 200, height: 25))
         addTabsPrompt.setTitle("Add tabs here", forState: .Normal)
-        addTabsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
+        addTabsPrompt.titleLabel?.font = UIFont(name: fontName, size: 20)
         addTabsPrompt.center.x = chordBase.frame.width/2
         addTabsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
         addTabsPrompt.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
@@ -887,7 +887,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topLyricLabel.center.y = lyricbase.frame.height / 3
         topLyricLabel.numberOfLines = 3
         topLyricLabel.textAlignment = NSTextAlignment.Center
-        topLyricLabel.font = UIFont.systemFontOfSize(23)
+        topLyricLabel.font = UIFont(name: fontName, size: 23)
         topLyricLabel.lineBreakMode = .ByWordWrapping
         topLyricLabel.textColor = UIColor.silverGray()
         lyricbase.addSubview(topLyricLabel)
@@ -896,14 +896,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
         bottomLyricLabel.numberOfLines = 3
         bottomLyricLabel.textAlignment = NSTextAlignment.Center
-        bottomLyricLabel.font = UIFont.systemFontOfSize(16)
+        bottomLyricLabel.font = UIFont(name: fontName, size: 16)
         bottomLyricLabel.lineBreakMode = .ByWordWrapping
         bottomLyricLabel.textColor = UIColor.silverGray()
         lyricbase.addSubview(bottomLyricLabel)
         
         addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
         addLyricsPrompt.setTitle("Add lyrics here", forState: .Normal)
-        addLyricsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
+        addLyricsPrompt.titleLabel?.font = UIFont(name: fontName, size: 20)
         addLyricsPrompt.center = CGPoint(x: lyricbase.frame.width/2, y: lyricbase.frame.height/2)
         addLyricsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
         addLyricsPrompt.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
@@ -1551,7 +1551,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.view.addSubview(wrapper)
         
         currentTimeLabel = UILabel(frame: CGRect(x: self.view.center.x-labelWidth, y: timeLabelOriginY , width: labelWidth, height: labelHeight))
-        currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        currentTimeLabel.font = UIFont(name: fontName, size: labelFontSize)
         currentTimeLabel.text = "0:00.0"
         currentTimeLabel.textAlignment = .Left
         currentTimeLabel.textColor = UIColor.whiteColor()
@@ -1566,7 +1566,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         totalTimeLabel = UILabel(frame: CGRect(x: self.view.center.x+1, y:timeLabelOriginY, width: labelWidth, height: labelHeight))
         totalTimeLabel.textColor = UIColor.whiteColor()
-        totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
+        totalTimeLabel.font = UIFont(name: fontName, size: labelFontSize)
         if(isSongNeedPurchase){
             totalTimeLabel.text = TimeNumber(time: songNeedPurchase.getDuration()).toDisplayString()
         }else{
@@ -2360,7 +2360,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         let labelExample = UILabel()
         labelExample.text = "1"
-        labelExample.font = UIFont.systemFontOfSize(minfont * chordBase.frame.width / widthofbasetop)
+        labelExample.font = UIFont(name: fontName, size: minfont * chordBase.frame.width / widthofbasetop)
         labelExample.sizeToFit()
         let lenGoup = labelExample.frame.width / 2;
         
@@ -2717,7 +2717,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordNameLabel.textColor = UIColor.whiteColor()
         chordNameLabel.sizeToFit()
         chordNameLabel.textAlignment = NSTextAlignment.Center
-        chordNameLabel.font = UIFont.systemFontOfSize(minfont)
+        chordNameLabel.font = UIFont(name: fontName, size: minfont)
         res.append(chordNameLabel)
         self.chordBase.addSubview(chordNameLabel)
         
@@ -2727,7 +2727,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isTabsShown {
             for i in 0..<fretPositions.count {
                 let label = UILabel(frame: CGRectMake(0, 0, 0, 0))
-                label.font = UIFont.systemFontOfSize(CGFloat(minfont))
+                label.font = UIFont(name: fontName, size: minfont)
                 label.text = fretPositions[i]
                 label.sizeToFit()
                 label.textColor = UIColor.silverGray()
@@ -2755,13 +2755,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isChordShown && isTabsShown {
             //make the text glow
             chordLabel.textColor = UIColor.whiteColor()
-            chordLabel.font = UIFont.systemFontOfSize(17)
+            chordLabel.font = UIFont(name: fontName, size: 17)
 
         //showing only chord in the center
         } else if isChordShown && !isTabsShown {
           
             chordLabel.textColor = UIColor.silverGray()
-            chordLabel.font = UIFont.systemFontOfSize(20)
+            chordLabel.font = UIFont(name: fontName, size: 20)
             chordLabel.sizeToFit()
         }
     }
