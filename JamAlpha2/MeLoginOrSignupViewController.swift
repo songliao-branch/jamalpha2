@@ -155,8 +155,9 @@ class MeLoginOrSignupViewController: UIViewController{
         closeButton.addTarget(self, action: "closeButtonPressed", forControlEvents: .TouchUpInside)
         topView.addSubview(closeButton)
         
-        settingsButton = UIButton(frame: CGRect(x: self.view.frame.width-25-25, y: 25, width: 25, height: 25))
+        settingsButton = UIButton(frame: CGRect(x: self.view.frame.width - 25 - 50, y: 25, width: 50, height: 50))
         settingsButton.setImage(UIImage(named: "settings_icon"), forState: .Normal)
+        settingsButton.imageEdgeInsets = UIEdgeInsetsMake(0, 25, 25, 0)
         settingsButton.addTarget(self, action: "settingsButtonPressed", forControlEvents: .TouchUpInside)
         topView.addSubview(settingsButton)
         

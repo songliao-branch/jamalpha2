@@ -28,7 +28,7 @@ FFTHelperRef *fftConverter = NULL;
 
 //Accumulator Buffer=====================
 
-const UInt32 accumulatorDataLenght = 131072;  //16384; //32768; 65536; 131072;
+const UInt32 accumulatorDataLenght = 65536;  //16384; //32768; 65536; 131072;
 UInt32 accumulatorFillIndex = 0;
 Float32 *dataAccumulator = nil;
 static void initializeAccumulator() {

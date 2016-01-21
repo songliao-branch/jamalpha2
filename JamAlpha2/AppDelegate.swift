@@ -106,6 +106,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
+        
+        if currentVC.isKindOfClass(TunerViewController) {
+            print("tuner view controller back")
+            let currentTunerVC = currentVC as! TunerViewController
+            currentTunerVC.navigationController?.popToRootViewControllerAnimated(true)
+        }
+        
         if(MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
             MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
             MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
@@ -117,7 +124,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         shuffleMode = MusicManager.sharedInstance.player.shuffleMode
         repeatMode = MusicManager.sharedInstance.player.repeatMode
         
+        
+        
         print("Go into Background suspend nsoperationqueue:\(self.suspended)")
+        
+        
+        
     }
     
     func applicationWillEnterForeground(application: UIApplication) {
