@@ -40,7 +40,7 @@ class SearchResult: NSObject {
 class SearchAPI: NSObject {
 
     enum ImageSize: String {
-        case Thumbnail = "100x100", Large = "300x300"
+        case Thumbnail = "54x54", Large = "300x300", medSize = "80x80"
     }
     
     static var musicRequest: Request?
@@ -111,6 +111,7 @@ class SearchAPI: NSObject {
             if let data = response.result.value {
                 
                 let json = JSON(data)
+                print(json)
                 
                 if json["resultCount"] > 0 {
                     let firstValue = json["results"].array![0]

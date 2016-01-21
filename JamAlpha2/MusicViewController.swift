@@ -262,11 +262,11 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 } else { //this happens somewhow when songs load too fast
                     //TODO: load something else
                     cell.coverImage.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: song)
+                    loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
             } else {
                 cell.coverImage.image = UIImage(named: "liweng")
-                loadAPISearchImageToCell(cell, song: song)
+                loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
             }
             cell.mainTitle.text = song.getTitle()
             cell.subtitle.text = song.getArtist()
@@ -300,17 +300,28 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let theArtist = artistsByFirstAlphabet[indexPath.section].1[indexPath.row]
             
             cell.coverImage.image = nil
+            cell.imageWidth.constant = 80
+            cell.imageHeight.constant = 80
             
             //get the first album cover
             for album in theArtist.getAlbums() {
                 if let cover = album.coverImage {
-                    let image = cover.imageWithSize(CGSize(width: 85, height: 85))
-                    cell.coverImage.image = image
-                    cell.imageWidth.constant = 80
-                    cell.imageHeight.constant = 80
+                    let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                    if let img = image {
+                        cell.coverImage.image = img
+                    } else { //this happens somewhow when songs load too fast
+                            //TODO: load something else
+                            cell.coverImage.image = UIImage(named: "liweng")
+                            loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.medSize)
+                    }
                     
                     break
                 }
+            }
+            
+            if(cell.coverImage.image == nil){
+                cell.coverImage.image = UIImage(named: "liweng")
+                loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.medSize)
             }
             
             cell.loudspeakerImage.hidden = true
@@ -326,11 +337,25 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         } else if pageIndex == 2 {
 
             let theAlbum = albumsByFirstAlphabet[indexPath.section].1[indexPath.row]
+            cell.imageWidth.constant = 80
+            cell.imageHeight.constant = 80
             
             if let cover = theAlbum.coverImage {
-                cell.imageWidth.constant = 80
-                cell.imageHeight.constant = 80
+                
                 cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                if let img = image {
+                    cell.coverImage.image = img
+                } else { //this happens somewhow when songs load too fast
+                    //TODO: load something else
+                    cell.coverImage.image = UIImage(named: "liweng")
+                    loadAPISearchImageToCell(cell, song: theAlbum.songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.medSize)
+                }
+            }
+            
+            if(cell.coverImage.image == nil){
+                cell.coverImage.image = UIImage(named: "liweng")
+                loadAPISearchImageToCell(cell, song: theAlbum.songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.medSize)
             }
             
             cell.loudspeakerImage.hidden = true
@@ -580,9 +605,9 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
     
     
-    func loadAPISearchImageToCell(cell: MusicCell, song: Findable) {
+    func loadAPISearchImageToCell(cell: MusicCell, song: Findable, imageSize: SearchAPI.ImageSize) {
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-            SearchAPI.getBackgroundImageForSong(song.getArtist() + " " + song.getTitle(), imageSize: SearchAPI.ImageSize.Thumbnail, completion: {
+            SearchAPI.getBackgroundImageForSong(song.getArtist() + " " + song.getTitle(), imageSize: imageSize, completion: {
                 image in
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.coverImage.image = image
