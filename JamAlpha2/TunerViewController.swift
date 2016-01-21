@@ -122,53 +122,111 @@ class TunerViewController: UIViewController, UIActionSheetDelegate {
         return averageNumber / Float(mostArrayCount)
     }
     
-    func handleTimer(sender: NSTimer) {
-        infoLabel.text = "\(TunerManager.getMaxHZ()) HZ"
-        if audioRecognizer.getPower() > sensitivity && count < 3 {
-            count++
-            self.soundPowerLabel.text = "Detected the sound"
-            self.soundPowerLabel.textColor = UIColor.greenColor()
-            
-            HZArray.append(TunerManager.getMaxHZ())
-            if HZArray.count > 5 {
-                HZArray.removeAll()
-            }
-            if let max_HZ = countSimilarNumber(HZArray) {
-                if max_HZ != previousMax_HZ {
-                    previousMax_HZ = max_HZ
-                    count = 0
-                    TunerFunction.sharedInstance.getMax_HZ(max_HZ)
+//    func handleTimer(sender: NSTimer) {
+//        infoLabel.text = "\(TunerManager.getMaxHZ()) HZ"
+//        if audioRecognizer.getPower() > sensitivity && count < 3 {
+//            count++
+//            self.soundPowerLabel.text = "Detected the sound"
+//            self.soundPowerLabel.textColor = UIColor.greenColor()
+//            
+//            HZArray.append(TunerManager.getMaxHZ())
+//            if HZArray.count > 5 {
+//                HZArray.removeAll()
+//            }
+//            if let max_HZ = countSimilarNumber(HZArray) {
+//                if max_HZ != previousMax_HZ {
+//                    previousMax_HZ = max_HZ
+//                    count = 0
+//                    TunerFunction.sharedInstance.getMax_HZ(max_HZ)
+//                    let result = TunerFunction.sharedInstance.checkTheHZRange()
+//                    print("\(result.0), \(result.1), \(result.2), \(result.3), \(result.4), \(result.5), \(result.6), \(result.7)")
+//
+//                    UIView.animateWithDuration(0.5, animations: {
+//                        animate in
+//                        if let temp = result.3 {
+//                            self.minLabel.text = temp
+//                        }
+//                        if let temp = result.4 {
+//                            self.midLabel.text = temp
+//                        }
+//                        if let temp = result.5 {
+//                            self.maxLabel.text = temp
+//                        }
+//                    })
+//          
+//                    moveIndicator(result.0, midHZ: result.1, maxHZ: result.2, detectedHZ: max_HZ)
+//                    
+//                    infoLabel.textColor = UIColor.greenColor()
+//                    UIView.animateWithDuration(0.5, animations: {
+//                            animate in
+//                        self.count = 0
+//                        self.minLabel.alpha = 1
+//                        self.midLabel.alpha = 1
+//                        self.maxLabel.alpha = 1
+//                    })
+//                }
+//            }
+//        } else {
+//            count++
+//            if count > 3 {
+//                UIView.animateWithDuration(0.5, animations: {
+//                    animate in
+//                    self.minLabel.alpha = 0.3
+//                    self.midLabel.alpha = 0.3
+//                    self.maxLabel.alpha = 0.3
+//                    }, completion: {
+//                        complete in
+//                        self.HZArray.removeAll()
+//                        self.previousMax_HZ = 0
+//                        self.count = 0
+//                })
+//                self.soundPowerLabel.text = "Please pick one string"
+//                self.soundPowerLabel.textColor = UIColor.redColor()
+//                self.infoLabel.textColor = UIColor.redColor()
+//                for item in progressBlockArray {
+//                    item.backgroundColor = UIColor.whiteColor()
+//                }
+//            }
+//        }
+//    }
+    
+        func handleTimer(sender: NSTimer) {
+            infoLabel.text = "\(TunerManager.getMaxHZ()) HZ"
+            if audioRecognizer.getPower() > sensitivity {
+                HZArray.append(TunerManager.getMaxHZ())
+                if TunerManager.getMaxHZ() != HZArray.maxElement() {
+                    TunerFunction.sharedInstance.getMax_HZ(TunerManager.getMaxHZ())
                     let result = TunerFunction.sharedInstance.checkTheHZRange()
                     print("\(result.0), \(result.1), \(result.2), \(result.3), \(result.4), \(result.5), \(result.6), \(result.7)")
-
-                    UIView.animateWithDuration(0.5, animations: {
-                        animate in
-                        if let temp = result.3 {
-                            self.minLabel.text = temp
-                        }
-                        if let temp = result.4 {
-                            self.midLabel.text = temp
-                        }
-                        if let temp = result.5 {
-                            self.maxLabel.text = temp
-                        }
-                    })
-          
-                    moveIndicator(result.0, midHZ: result.1, maxHZ: result.2, detectedHZ: max_HZ)
-                    
+                    if result.1 != previousMax_HZ {
+                        previousMax_HZ = result.1
+                        HZArray.removeAll()
+                    }
+                            UIView.animateWithDuration(0.5, animations: {
+                                animate in
+                                if let temp = result.3 {
+                                    self.minLabel.text = temp
+                                }
+                                if let temp = result.4 {
+                                    self.midLabel.text = temp
+                                }
+                                if let temp = result.5 {
+                                    self.maxLabel.text = temp
+                                }
+                            })
+        
+                    moveIndicator(result.0, midHZ: result.1, maxHZ: result.2, detectedHZ: TunerManager.getMaxHZ())
+        
                     infoLabel.textColor = UIColor.greenColor()
                     UIView.animateWithDuration(0.5, animations: {
-                            animate in
-                        self.count = 0
-                        self.minLabel.alpha = 1
-                        self.midLabel.alpha = 1
-                        self.maxLabel.alpha = 1
+                                    animate in
+                                self.count = 0
+                                self.minLabel.alpha = 1
+                                self.midLabel.alpha = 1
+                                self.maxLabel.alpha = 1
                     })
                 }
-            }
-        } else {
-            count++
-            if count > 3 {
+            } else {
                 UIView.animateWithDuration(0.5, animations: {
                     animate in
                     self.minLabel.alpha = 0.3
@@ -188,12 +246,9 @@ class TunerViewController: UIViewController, UIActionSheetDelegate {
                 }
             }
         }
-    }
+
     
     func moveIndicator(minHZ: Float, midHZ: Float, maxHZ: Float, detectedHZ: Float) {
-        for item in progressBlockArray {
-            item.backgroundColor = UIColor.whiteColor()
-        }
         let labelWidth: CGFloat = self.view.frame.size.width / 7
         
         let tempView: UIView = UIView()
