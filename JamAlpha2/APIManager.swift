@@ -613,6 +613,24 @@ class APIManager: NSObject {
             }
         }
     }
+
+    class func sendPasswordResetInstructions(email: String, completion: ((message: String) -> Void)) {
+        
+        Alamofire.request(.POST, jamBaseURL + "/password_resets", parameters: ["email": email], encoding: .JSON).responseJSON
+            {
+                response in
+                switch response.result {
+                case .Success:
+                    if let data = response.result.value {
+                        let json = JSON(data)
+                        completion(message: json["message"].string!)
+                    }
+                case .Failure(_):
+                    print("Failed to get a password reset request")
+                }
+        }
+    }
+
 }
 
 

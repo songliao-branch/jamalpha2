@@ -52,6 +52,8 @@ class MeLoginOrSignupViewController: UIViewController{
     var passwordTextField: UITextField!
     var submitButton: UIButton!
     
+    var forgetPasswordButton: UIButton!
+    
     var fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
     var nextButton: UIButton = UIButton()
     
@@ -253,6 +255,13 @@ class MeLoginOrSignupViewController: UIViewController{
         passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(passwordTextFieldUnderline)
         
+        forgetPasswordButton = UIButton(frame: CGRect(x: 15, y: passwordTextField.frame.origin.y, width: 80, height: passwordTextField.frame.height))
+        forgetPasswordButton.setTitle("forget", forState: .Normal)
+        forgetPasswordButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        forgetPasswordButton.addTarget(self, action: "forgetPasswordPressed", forControlEvents: .TouchUpInside)
+        forgetPasswordButton.hidden = true
+        scrollView.addSubview(forgetPasswordButton)
+        
         submitButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: 120, height: 44))
         submitButton.setTitle("Sign Up", forState: .Normal)
         submitButton.addTarget(self, action: "submitPressed", forControlEvents: .TouchUpInside)
@@ -273,6 +282,7 @@ class MeLoginOrSignupViewController: UIViewController{
         
         
         self.passwordTextField.placeholder = "Password (Mininum 6 characters)"
+        self.forgetPasswordButton.hidden = true
         self.submitButton.setTitle("Sign up", forState: .Normal)
         
         self.emailTextField.resignFirstResponder()
@@ -291,9 +301,9 @@ class MeLoginOrSignupViewController: UIViewController{
         }
         isSignUpSelected = false
         
-        
-        self.submitButton.setTitle("Log in", forState: .Normal)
         self.passwordTextField.placeholder = "Password"
+        self.forgetPasswordButton.hidden = false
+        self.submitButton.setTitle("Log in", forState: .Normal)
         
         self.emailTextField.resignFirstResponder()
         self.passwordTextField.resignFirstResponder()
@@ -320,9 +330,34 @@ class MeLoginOrSignupViewController: UIViewController{
             }, completion: nil)
     }
 
+    func forgetPasswordPressed() {
+
+        let alert = UIAlertController(title: "", message: "Enter your email so we can send password reset instructions.", preferredStyle: .Alert)
+        
+        alert.addTextFieldWithConfigurationHandler { (textField) in
+            textField.placeholder = "Email"
+            if self.emailTextField.text?.characters.count > 0  {
+                textField.text = self.emailTextField.text!
+            }
+        }
+        
+        alert.addAction(UIAlertAction(title: "Send", style: .Default, handler: {
+            _ in
+            let emailTextField = alert.textFields![0]
+            
+            if emailTextField.text?.characters.count > 0 {
+                APIManager.sendPasswordResetInstructions(emailTextField.text!, completion: {
+                    message in
+                    self.showMessage("", message: message, actionTitle: "OK", completion: nil)
+                })
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
     
     func submitPressed() {
-        
         if isSignUpSelected && nickNameTextField.text == nil {
             self.showMessage("Nick Name field is empty", message: "", actionTitle: "OK", completion: nil)
             return
