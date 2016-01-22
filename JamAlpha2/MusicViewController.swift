@@ -454,7 +454,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
             
             //We use a background thread to constantly check player's current playing item, and we only pop up
-            if((songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() && !isDemoSong) {
+            if(!isDemoSong && songsSorted.count > 0 && (songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                     while (isSeekingPlayerState) {
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
@@ -488,7 +488,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                         }
                     }
                 }
-            }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem || isDemoSong ){
+            }else if (isDemoSong || NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem ){
                     isSeekingPlayerState = false
                     if(!isDemoSong){
                         if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
@@ -506,7 +506,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                         //reload table to show loudspeaker icon on current selected row
                         tableView.reloadData()
                     })
-            } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && songsSorted[indexToBePlayed].cloudItem) {
+            } else if ( songsSorted.count > 0 && !NetworkManager.sharedInstance.reachability.isReachable() && songsSorted[indexToBePlayed].cloudItem) {
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 self.showConnectInternet(tableView)
@@ -654,6 +654,12 @@ extension MusicViewController {
                 var op:NSBlockOperation?
                 op = KGLOBAL_init_operationCache[keyString]
                 if(op == nil){
+                    
+                    if nowPlayingItem.artist == nil {
+                        self.incrementSongCountInThread()
+                        return
+                    }
+                    
                     self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
                         url in
                         if url == "" || url.isEmpty {
