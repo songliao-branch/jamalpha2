@@ -15,6 +15,7 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
+    var fretNumberOnFullStringView: UIView!
 
     var string3BackgroundImage: [String] = ["iPhone5_fret0", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret"]
     
@@ -83,7 +84,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // music section
     //MARK: decide the progress block width
     let tabsEditorProgressWidthMultiplier: CGFloat = 10
-    var progressBlock: SoundWaveView!
+    var progressBlock: UIView!
     var theSong: Findable!
     var currentTime: NSTimeInterval = NSTimeInterval()
     var avPlayer: AVAudioPlayer!
@@ -263,6 +264,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         // add objects on main view and edit view
         self.addObjectsOnMainView()
         self.createStringAndFretPosition()
+        // initial main view tab data array
+        self.initialMainViewDataArray(0)
         self.addObjectsOnEditView()
         self.addMusicControlView()
         
@@ -274,8 +277,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.collectionView.delegate = self
         setUpTuningControlMenu()
 
-        // initial main view tab data array
-        self.initialMainViewDataArray()
         PlayChordsManager.sharedInstance.changeVolumn(1.0)
     }
     
@@ -474,6 +475,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func capoStepperValueChanged(stepper: UIStepper) {
         capoLabel.text = "Capo: \(Int(stepper.value))"
+        PlayChordsManager.sharedInstance.changeCapo(Int(stepper.value))
+        updateCollectionView(Int(stepper.value))
+        
     }
     
     func stepUpPressed(button: UIButton) {
@@ -499,8 +503,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     // MARK: Main view data array, to store the tabs added on main view.
-    func initialMainViewDataArray() {
-        for var i = 0; i < 25; i++ {
+    func initialMainViewDataArray(sender: Int) {
+        for var i = sender; i < 25; i++ {
             let temp: mainViewData = mainViewData()
             temp.fretNumber = i
             let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
@@ -743,8 +747,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     if(self.isCompleteStringViewScroll){
                         if (buttonFret - self.baseNoteLocation < 0 ){
                             self.completeStringView.contentOffset.x = 0
-                        }else if (buttonFret - self.baseNoteLocation > self.string6FretPosition[self.string6FretPosition.count-1]-self.trueWidth){
-                            self.completeStringView.contentOffset.x = self.string6FretPosition[self.string6FretPosition.count-1]-self.trueWidth
+                        }else if (buttonFret - self.baseNoteLocation > self.string6FretPosition[self.string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth){
+                            self.completeStringView.contentOffset.x = self.string6FretPosition[self.string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth
                         }else{
                             self.completeStringView.contentOffset.x = buttonFret - self.baseNoteLocation
                         }
@@ -786,7 +790,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 25
+        return mainViewDataArray.count
     }
     
     
@@ -998,18 +1002,18 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var playPauseButton: UIButton = UIButton()
     var addButton: UIButton = UIButton()
     let backButton: UIButton = UIButton()
-
+    var privacyButton: UIButton = UIButton()
+    let doneButton: UIButton = UIButton()
+    
     func addObjectsOnMainView() {
         // views
         let menuView: UIView = UIView()
         let musicView: UIView = UIView()
 
-        let doneButton: UIButton = UIButton()
-        let privacyButton: UIButton = UIButton()
        
         menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
         //menuView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
-        menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!.imageWithColor(UIColor.darkGrayColor().colorWithAlphaComponent(0.9)))
+        menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!)
 
         self.view.addSubview(menuView)
         
@@ -1073,15 +1077,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         //TODO: set button from the visible attribute itself
         privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight, 0, buttonWidth, buttonWidth)
         privacyButton.backgroundColor = UIColor.clearColor()
-        privacyButton.setImage(UIImage(named: "privateButton"), forState: UIControlState.Normal)
+        privacyButton.setImage(UIImage(named: "globeIcon"), forState: UIControlState.Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
-        privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
+        privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
         menuView.addSubview(privacyButton)
         
         doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight, 0, 1.2 * buttonWidth, buttonWidth)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        doneButton.setImage(UIImage(named: "saveButton"), forState: UIControlState.Normal)
-        doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
+        doneButton.setImage(UIImage(named: "saveText"), forState: UIControlState.Normal)
+        doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.4 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.7 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
         menuView.addSubview(doneButton)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
@@ -1696,7 +1700,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.currentTime = self.toTime
                 startTime.setTime(Float(self.currentTime))
                 let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
-                self.progressBlock.setProgress(persent)
+                //
+                
+                
+                //self.progressBlock.setProgress(persent)
+                
+                
+                //
                 self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
                 
                 self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
@@ -1836,7 +1846,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
 
     func createSoundWave() {
         let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
-        self.progressBlock = SoundWaveView(frame: frame)
+        self.progressBlock = UIView(frame: frame)//SoundWaveView(frame: frame)
         if(theSong == nil){
             print("the song is empty")
         }
@@ -1851,9 +1861,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
             self.duration = (theSong as! MPMediaItem).playbackDuration
         }
-        progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
-        self.progressBlock.isForTabsEditor = true
-        self.progressBlock.generateWaveforms()
+        //progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
+        //self.progressBlock.isForTabsEditor = true
+        //self.progressBlock.generateWaveforms()
         self.progressBlock!.alpha = 0.5
 
     }
@@ -1900,8 +1910,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.currentTimeLabel.text = TimeNumber(time: Float(currentTime)).toDisplayString()
         //refresh progress block
         let presentPosition = CGFloat(Float(currentTime) / Float(self.duration))
-        self.progressBlock.setProgress(presentPosition)
         
+        //
+        //self.progressBlock.setProgress(presentPosition)
+        //
         
         //MARK: progessBlock width
         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
@@ -2142,11 +2154,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     func pressTuningButton(sender: UIButton) {
         print("press tuning button")
+        let tempx = self.collectionView.contentOffset.x
         self.view.userInteractionEnabled = false
         self.backToMainView()
         self.view.userInteractionEnabled = true
         self.view.userInteractionEnabled = false
         self.actionDismissLayerButton.hidden = false // what is this button?
+        self.collectionView.contentOffset.x = tempx
+        self.removeDoubleArrowView()
         UIView.animateWithDuration(0.3, animations: {
             self.tuningMenu.frame = CGRect(x: 0, y: 0, width: self.tuningMenu.frame.width, height: self.trueHeight)
             self.actionDismissLayerButton.backgroundColor = UIColor.darkGrayColor()
@@ -2190,6 +2205,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         playPauseButton.hidden = sender
         addButton.hidden = sender
         statusLabel.hidden = !sender
+        if sender {
+            //savebutton
+            doneButton.setImage(UIImage(named: "saveButton"), forState: UIControlState.Normal)
+            doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
+        }else{
+            //savetext
+            self.doneButton.setImage(UIImage(named: "saveText"), forState: UIControlState.Normal)
+            self.doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.4 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.7 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
+        }
     }
 
 
@@ -2200,7 +2224,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if(self.doubleArrowView != nil){
             self.doubleArrowView.alpha = 0
         }
-        
+        cropFullStringImageView(Int(capoStepper.value))
+    
         self.changeMenuButtonStatus(true)
         
         self.removeDoubleArrowView()
@@ -2458,8 +2483,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 let temp3offset = self.string3FretChangeingPosition[tempTab.index.integerValue%100]! - temp6offset
                 if (temp3offset < 0){
                     self.originaloffset = 0
-                }else if (temp3offset > self.string6FretPosition[string6FretPosition.count-1]-self.trueWidth){
-                    self.originaloffset = self.string6FretPosition[string6FretPosition.count-1]-self.trueWidth
+                }else if (temp3offset > self.string6FretPosition[string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth){
+                    self.originaloffset = self.string6FretPosition[string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth
                 }else{
                     self.originaloffset = temp3offset
                 }
@@ -2554,13 +2579,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func privacyButtonPressed(button: UIButton) {
-//        if isPublic {
-//            isPublic = false
-//            privacyButton.setTitle("Private", forState: .Normal)
-//        } else {
-//            isPublic = true
-//            privacyButton.setTitle("Public", forState: .Normal)
-//        }
+        if isPublic {
+            isPublic = false
+            privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
+            privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
+        } else {
+            isPublic = true
+            privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
+            privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
+        }
     }
     
     // find the current tab according to the current music time
@@ -2652,7 +2679,11 @@ extension TabsEditorViewController {
                 if normalTab.name == noteButtonWithTabArray[i].tab.name && normalTab.index == noteButtonWithTabArray[i].tab.index && normalTab.content == noteButtonWithTabArray[i].tab.content {
                     self.currentTime = Double(item.time.toDecimalNumer())
                     let presentPosition = CGFloat(self.currentTime / self.duration)
-                    self.progressBlock.setProgress(presentPosition)
+                    //
+                    
+                    //self.progressBlock.setProgress(presentPosition)
+                    
+                    //
                     self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
                     
                     let returnValue = addTabViewOnMusicControlView(i)
@@ -2750,11 +2781,13 @@ extension TabsEditorViewController {
                 self.capoStepper.value = Double(capoValue)
                 self.capoLabel.text = "Capo: \(capoValue)"
                 self.isPublic = visible
-//                if self.isPublic {
-//                    self.privacyButton.setTitle("Public", forState: .Normal)
-//                } else {
-//                    self.privacyButton.setTitle("Private", forState: .Normal)
-//                }
+                if self.isPublic {
+                    self.privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
+                    self.privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
+                } else {
+                    self.privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
+                    self.privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
+                }
             })
             
             
@@ -3500,6 +3533,72 @@ extension TabsEditorViewController {
             tempSoundArray.append(tempSound!)
         }
         
+    }
+}
+
+extension TabsEditorViewController {
+    func generateFretNumberOnFullStringView(sender: Int) {
+        let count = 25
+        fretNumberOnFullStringView = UIView()
+        for item in fretNumberOnFullStringView.subviews {
+            item.removeFromSuperview()
+        }
+        fretNumberOnFullStringView.frame = CGRectMake(0, 14 / 20 * self.trueHeight, self.trueWidth / 5 * CGFloat(count - sender), 1 / 20 * self.trueHeight)
+        fretNumberOnFullStringView.backgroundColor = UIColor.clearColor()
+        let labelWidth: CGFloat = 1 / 20 * self.trueHeight
+        for var i = 0; i < count - sender; i++ {
+            let tempLabel: UILabel = UILabel()
+            let positionX = (self.string6FretPosition[i] + self.string6FretPosition[i + 1]) / 2
+            tempLabel.frame = CGRectMake(positionX - labelWidth / 2, 0, labelWidth, labelWidth)
+            tempLabel.text = "\(sender + i)"
+            tempLabel.backgroundColor = UIColor.clearColor()
+            tempLabel.textAlignment = .Center
+            tempLabel.font = UIFont.systemFontOfSize(10)
+            fretNumberOnFullStringView.addSubview(tempLabel)
+        }
+        self.completeImageView.addSubview(fretNumberOnFullStringView)
+    }
+    
+    func cropFullStringImageView(sender: Int) {
+        let count = 25
+        let croppedLength: CGFloat = self.trueWidth / 5 * CGFloat(count - sender)
+        let cropRect: CGRect = CGRectMake(0, 0, croppedLength, self.completeStringView.frame.size.height)
+        self.completeImageView.image = UIImage(named: "iPhone5_fullFretboard")
+        let image = self.completeImageView.cropViewWithRect(cropRect)
+        
+        self.completeStringView.contentSize = CGSizeMake(croppedLength, 15 / 20 * self.trueHeight)
+        self.completeImageView.frame = CGRectMake(0, 0, croppedLength, 15 / 20 * self.trueHeight)
+        self.completeImageView.image = image
+    }
+    
+    func updateCollectionView(sender: Int) {
+        let count = self.mainViewDataArray.count
+        if 25 - sender == count + 1 {
+            let maxFretNumber = count - 1
+            for var i = 0; i < count; i++ {
+                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
+                    let temp: mainViewData = mainViewData()
+                    temp.fretNumber = maxFretNumber + 1
+                    let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
+                    temp.noteButtonsWithTab = tempButton
+                    self.mainViewDataArray.insert(temp, atIndex: i + 1)
+                    self.string3BackgroundImage.insert("iPhone5_fret", atIndex: i + 1)
+                    self.fretsNumber.insert(maxFretNumber + 1, atIndex: i + 1)
+                    break
+                }
+            }
+        } else if 25 - sender == count - 1 {
+            let maxFretNumber = count - 1
+            for var i = 0; i < count; i++ {
+                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
+                    self.mainViewDataArray.removeAtIndex(i)
+                    self.string3BackgroundImage.removeAtIndex(i)
+                    self.fretsNumber.removeAtIndex(i)
+                    break
+                }
+            }
+        }
+        self.collectionView.reloadData()
     }
 }
 

@@ -553,6 +553,47 @@ class APIManager: NSObject {
         }
     }
     
+    //get id and url
+    class func getSongInformation(findable: Findable, completion: ((id: Int, soundwaveUrl: String) -> Void)) {
+        var parameters = [String: AnyObject]()
+        
+        parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
+   
+        Alamofire.request(.GET, jamBaseURL + "/get_soundwave_url", parameters: parameters).responseJSON { response in
+
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    let id = json["song_information"]["id"].int!
+                    let url = json["song_information"]["soundwave_url"].string!
+                    completion(id: id, soundwaveUrl: url)
+                }
+            case .Failure(let error):
+                print("Get soundwave error: \(error)")
+            }
+        }
+    }
+    
+    class func updateSoundwaveUrl(songId: Int, url: String) {
+        let parameters = ["soundwave_url": url]
+        
+        Alamofire.request(.PUT, jamBaseURL + "/songs/\(songId)", parameters: parameters).responseJSON { response in
+            print(response)
+            switch response.result {
+            case .Success:
+                if let data = response.result.value {
+                    let json = JSON(data)
+                    print(json)
+                    print("update soundwave url success")
+                }
+            case .Failure(let error):
+                print("Update soundwave error: \(error)")
+            }
+        }
+    }
+    
     class func getTopSongs(completion: (( songs: [LocalSong]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
             print(response)
@@ -572,7 +613,6 @@ class APIManager: NSObject {
             }
         }
     }
-
 }
 
 

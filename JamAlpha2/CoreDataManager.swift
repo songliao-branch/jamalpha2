@@ -276,7 +276,7 @@ class CoreDataManager: NSObject {
     }
     
     //song-related
-    private class func findSong(item: Findable) -> Song? {
+    class func findSong(item: Findable) -> Song? {
         let predicate: NSPredicate = NSPredicate(format: "(title == '\(item.getTitle().replaceApostrophe())') AND (artist == '\(item.getArtist().replaceApostrophe())') AND (playbackDuration <= '\(item.getDuration() + 1.5)') AND (playbackDuration >= '\(item.getDuration() - 1.5)')")
 
         let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
@@ -301,41 +301,40 @@ class CoreDataManager: NSObject {
     }
     
     // MARK: save, retrieve soundwaves
-    class func saveSoundWave(item: Findable, soundwaveData: NSMutableArray, soundwaveImage: NSData) {
-        
+    class func saveSoundWave(item: Findable, soundwaveImage: NSData) {
         if let matchedSong = findSong(item) {
-            let data: NSData = NSKeyedArchiver.archivedDataWithRootObject(soundwaveData as AnyObject)
-            matchedSong.soundwaveData = data
             matchedSong.soundwaveImage = soundwaveImage
             SwiftCoreDataHelper.saveManagedObjectContext(moc)
         }
     }
-    
 
-    class func getSongWaveFormData(item: Findable) -> NSMutableArray? {
-        var findItme:Findable? = MusicManager.sharedInstance.itemFoundInCollection(item)
-        if findItme == nil {
-            findItme = item
-        }
-        if let matchedSong = findSong(findItme!) {
-         //   print("sound wave data found for song")
-            return NSKeyedUnarchiver.unarchiveObjectWithData(matchedSong.soundwaveData as! NSData) as? NSMutableArray
-        }
-        return nil
-    }
-    
     class func getSongWaveFormImage(item: Findable) -> NSData? {
-        var findItme:Findable? = MusicManager.sharedInstance.itemFoundInCollection(item)
-        if findItme == nil {
-            findItme = item
-        }
-        if let matchedSong = findSong(findItme!) {
+        if let matchedSong = findSong(item) {
            // print("sound wave image found for song")
             return matchedSong.soundwaveImage
         }
         
         return nil
 
+    }
+    
+    
+    class func saveCoverImage(item: Findable, coverImage: UIImage) {
+        let imageData = UIImagePNGRepresentation(coverImage)
+        if let matchedSong = findSong(item) {
+            matchedSong.albumCover = imageData!
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    class func getCoverImage(item: Findable) -> UIImage? {
+        if let matchedSong = findSong(item) {
+            // print("sound wave image found for song")
+            return   UIImage(data: matchedSong.albumCover)
+        }
+        
+        return nil
+        
     }
     
     // MARK: save, retrieve lyrics, userId can be either localuserId or downloaded lyricsSet's user id
@@ -710,6 +709,21 @@ class CoreDataManager: NSObject {
             localSongs.append(song)
         }
         return localSongs
+    }
+    
+    class func setSongId(item: Findable, id: Int) {
+        if let matchedSong = findSong(item) {
+            matchedSong.id = id
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    // used to update soundwave_url
+    class func getSongId(item: Findable) -> Int {
+        if let matchedSong = findSong(item) {
+            return Int(matchedSong.id)
+        }
+        return 0
     }
 }
 
