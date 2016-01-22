@@ -1006,10 +1006,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     let backButton: UIButton = UIButton()
     var privacyButton: UIButton = UIButton()
     let doneButton: UIButton = UIButton()
+    let menuView: UIView = UIView()
     
     func addObjectsOnMainView() {
-        // views
-        let menuView: UIView = UIView()
+        // view
         let musicView: UIView = UIView()
 
        
@@ -1604,7 +1604,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 20, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight-20)
-        previousButton.imageEdgeInsets = UIEdgeInsetsMake(3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth-10, 0, 3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth+10, 0)
+        previousButton.imageEdgeInsets = UIEdgeInsetsMake(3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth - 10, 0, 3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth - 10, 0)
         previousButton.userInteractionEnabled = true
         previousButton.addTarget(self, action: "pressPreviousButton:", forControlEvents: UIControlEvents.TouchUpInside)
         previousButton.setImage(UIImage(named: "backspace"), forState: UIControlState.Normal)
@@ -1649,7 +1649,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         indicatorView.addSubview(indicator)
         let line: UIView = UIView()
         line.frame = CGRectMake(9, 20, 2, 6 / 20 * self.trueHeight - 30)
-        line.backgroundColor = UIColor.darkGrayColor()
+        line.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.9)
         indicatorView.insertSubview(line, belowSubview: indicator)
         
         self.view.insertSubview(backgroundView, belowSubview: progressBlock)
@@ -2663,6 +2663,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             return
         }
         if self.allTabsOnMusicLine.count > 1 {
+            self.view.userInteractionEnabled = false
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
             self.currentTabViewIndex = --self.currentTabViewIndex
@@ -2671,104 +2672,108 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.currentTabViewIndex = 0
             }
             if isDemoSong {
+                let temprate = self.avPlayer.rate
                 self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.avPlayer.currentTime
-                if self.avPlayer.rate == 0 {
-                    self.previousButton.userInteractionEnabled = false
+                    self.avPlayer.rate = 0
+                    self.previousButton.enabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
-                            self.previousButton.userInteractionEnabled = true
+                            self.previousButton.enabled = true
+                            self.avPlayer.rate = temprate
+                            self.view.userInteractionEnabled = true
                     })
-                }else{
-                    findCurrentTabView()
-                }
-                
             } else {
+                let temprate = self.musicPlayer.currentPlaybackRate
                 self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.musicPlayer.currentPlaybackTime
-                if self.musicPlayer.currentPlaybackRate == 0 {
-                    self.previousButton.userInteractionEnabled = false
+                
+                    self.previousButton.enabled = false
+                    self.musicPlayer.currentPlaybackRate = 0
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
-                            self.previousButton.userInteractionEnabled = true
+                            self.previousButton.enabled = true
+                            self.musicPlayer.currentPlaybackRate = temprate
+                            self.view.userInteractionEnabled = true
                     })
-                }else{
-                    self.findCurrentTabView()
-                }
+               
             }
            
         } else if self.allTabsOnMusicLine.count == 1 && currentTabViewIndex  == 0{
+            self.view.userInteractionEnabled = false
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
             self.currentTabViewIndex = 0
             self.currentTime = 0
             if isDemoSong {
+                let temprate = self.avPlayer.rate
                 self.avPlayer.currentTime = 0
-                if self.avPlayer.rate == 0 {
-                    self.previousButton.userInteractionEnabled = false
+                self.avPlayer.rate = 0
+                    self.previousButton.enabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
-                            self.previousButton.userInteractionEnabled = true
+                            self.previousButton.enabled = true
+                            self.avPlayer.rate = temprate
+                            self.view.userInteractionEnabled = true
                     })
-                }else{
-                    findCurrentTabView()
-                }
+
             } else {
+                let temprate = self.musicPlayer.currentPlaybackRate
                 self.musicPlayer.currentPlaybackTime = 0
-                if self.musicPlayer.currentPlaybackRate == 0 {
-                    self.previousButton.userInteractionEnabled = false
+                self.musicPlayer.currentPlaybackRate = 0
+                    self.previousButton.enabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
-                            self.previousButton.userInteractionEnabled = true
+                            self.previousButton.enabled = true
+                            self.musicPlayer.currentPlaybackRate = temprate
+                            self.view.userInteractionEnabled = true
                     })
-                }else{
-                    self.findCurrentTabView()
-                }
             }
             
         } else {
+            self.view.userInteractionEnabled = false
             self.currentTime = 0
             currentTabViewIndex  == 0
             if isDemoSong {
+                let temprate = self.avPlayer.rate
                 self.avPlayer.currentTime = 0
-                if self.avPlayer.rate == 0 {
-                    self.previousButton.userInteractionEnabled = false
-                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
-                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
-                        }, completion: {
-                            completed in
-                            self.findCurrentTabView()
-                            self.previousButton.userInteractionEnabled = true
-                    })
-                }else{
-                    findCurrentTabView()
-                }
+                self.avPlayer.rate = 0
+                self.previousButton.enabled = false
+                UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+                    }, completion: {
+                        completed in
+                        self.findCurrentTabView()
+                        self.previousButton.enabled = true
+                        self.avPlayer.rate = temprate
+                        self.view.userInteractionEnabled = true
+                })
             } else {
+                let temprate = self.musicPlayer.currentPlaybackRate
                 self.musicPlayer.currentPlaybackTime = 0
-                if self.musicPlayer.currentPlaybackRate == 0 {
-                    self.previousButton.userInteractionEnabled = false
+                self.musicPlayer.currentPlaybackRate = 0
+                    self.previousButton.enabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
-                            self.previousButton.userInteractionEnabled = true
+                            self.previousButton.enabled = true
+                            self.musicPlayer.currentPlaybackRate = temprate
+                            self.view.userInteractionEnabled = true
                     })
-                }else{
-                    self.findCurrentTabView()
-                }
             }
         }
 

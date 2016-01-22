@@ -111,7 +111,6 @@ class SearchAPI: NSObject {
             if let data = response.result.value {
                 
                 let json = JSON(data)
-                print(json)
                 
                 if json["resultCount"] > 0 {
                     let firstValue = json["results"].array![0]
