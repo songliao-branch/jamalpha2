@@ -1595,13 +1595,14 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    let previousButton: UIButton = UIButton()
     // music control view, include progressblock, timelabel, previous button, pan gesture, update, count down
     func addMusicControlView() {
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
         
         
-        let previousButton: UIButton = UIButton()
+        
         previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 20, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight-20)
         previousButton.imageEdgeInsets = UIEdgeInsetsMake(3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth-10, 0, 3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth+10, 0)
         previousButton.userInteractionEnabled = true
@@ -1631,10 +1632,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     
     // 1 second = 10 px
-    
+    let backgroundView: UIView = UIView()
     
     func setUpTopLine() {
-        let backgroundView: UIView = UIView()
         backgroundView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 20)
         backgroundView.backgroundColor = UIColor(red: 32 / 255, green: 32 / 255, blue: 32 / 255, alpha: 1)
         
@@ -1643,6 +1643,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         indicatorView.backgroundColor = UIColor.clearColor()
         
         let indicator: UIImageView = UIImageView()
+        indicator.alpha = 0.9
         indicator.frame = CGRectMake(0, 0, 20, 20)
         indicator.image = UIImage(named: "pointer")
         indicatorView.addSubview(indicator)
@@ -1666,7 +1667,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var i = 0; i < numberOfLine; i++ {
             var frame: CGRect!
             if i % 2 == 0 {
-                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 10, 1, 10)
+                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 11, 2, 9)
                 let timeLabel: UILabel = UILabel()
                 timeLabel.frame = CGRectMake(CGFloat(i * 5 * scaleNumber) - 15, 0, 30, 10)
                 let min: Int = i * 5 / 60
@@ -1684,12 +1685,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         timeLabel.text = "0\(min):\(sec)"
                     }
                 }
-                timeLabel.font = UIFont.systemFontOfSize(8)
+                timeLabel.font = UIFont.systemFontOfSize(9)
                 timeLabel.textColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
                 timeLabel.textAlignment = .Center
                 topLineView.addSubview(timeLabel)
             } else {
-                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 15, 2, 5)
+                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 15, 1, 5)
             }
             let tempView: UIView = UIView(frame: frame)
             tempView.backgroundColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
@@ -1702,10 +1703,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let labelWidth: CGFloat = 40
         let wrapperHeight: CGFloat = 12
         let labelFontSize: CGFloat = 10
-        let wrapperWidth: CGFloat = 80
-        wrapper = UIView(frame: CGRect(x: 14 / 31 * trueWidth - 40, y: 20, width: wrapperWidth, height: wrapperHeight))
-        wrapper.backgroundColor = UIColor.darkGrayColor()
-        wrapper.alpha = 0.7
+        let wrapperWidth: CGFloat = 90
+        wrapper = UIView(frame: CGRect(x: 0.5 * trueWidth - 45, y: 20, width: wrapperWidth, height: wrapperHeight))
+        wrapper.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.5)
         wrapper.layer.cornerRadius = wrapperHeight / 5
         musicControlView.addSubview(wrapper)
         
@@ -1716,20 +1716,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         currentTimeLabel.text = "0:00.0"
         currentTimeLabel.textColor = UIColor.whiteColor()
         currentTimeLabel.textAlignment = .Center
+        currentTimeLabel.backgroundColor = UIColor.clearColor()
         //i'm not wrapper i'm a singer with a cash flow-> ed sheeran :)
         //make it glow
-        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
-        currentTimeLabel.layer.shadowRadius = 3.0
-        currentTimeLabel.layer.shadowOpacity = 1.0
-        currentTimeLabel.layer.shadowOffset = CGSizeZero
-        currentTimeLabel.layer.masksToBounds = false
+//        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
+//        currentTimeLabel.layer.shadowRadius = 3.0
+//        currentTimeLabel.layer.shadowOpacity = 1.0
+//        currentTimeLabel.layer.shadowOffset = CGSizeZero
+//        currentTimeLabel.layer.masksToBounds = false
         wrapper.addSubview(currentTimeLabel)
         
-        totalTimeLabel = UILabel(frame: CGRect(x: labelWidth, y: 0, width: labelWidth, height: labelFontSize))
+        totalTimeLabel = UILabel(frame: CGRect(x: labelWidth + 10, y: 0, width: labelWidth, height: labelFontSize))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         totalTimeLabel.text = TimeNumber(time: Float(theSong.getDuration())).toDisplayString()
         totalTimeLabel.textAlignment = .Center
+        totalTimeLabel.backgroundColor = UIColor.clearColor()
 
         wrapper.addSubview(totalTimeLabel)
     }
@@ -2036,9 +2038,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.baseNoteLocation = -1
         
         self.changeMenuButtonStatus(false)
+        self.specificTabsScrollView.alpha = 0
+        self.tabNameTextField.alpha = 0
         UIView.animateWithDuration(0.3, animations: {
-            self.specificTabsScrollView.alpha = 0
-            self.tabNameTextField.alpha = 0
             self.musicControlView.alpha = 1
             self.progressBlock.alpha = 0.5
             self.completeStringView.alpha = 0
@@ -2301,6 +2303,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         playPauseButton.hidden = sender
         addButton.hidden = sender
         statusLabel.hidden = !sender
+        if (sender) {
+            self.backgroundView.alpha = 0
+        }else{
+            self.backgroundView.alpha = 1
+        }
+        
         if sender {
             //savebutton
             doneButton.setImage(UIImage(named: "saveButton"), forState: UIControlState.Normal)
@@ -2338,6 +2346,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         self.addSpecificFingerPoint = false
         self.musicControlView.alpha = 0
+        self.backgroundView.alpha = 0
         self.progressBlock.alpha = 0
         self.collectionView.alpha = 0
         self.statusLabel.text = "Add New Chords"
@@ -2653,11 +2662,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.avPlayer.currentTime
                 if self.avPlayer.rate == 0 {
+                    self.previousButton.userInteractionEnabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
+                            self.previousButton.userInteractionEnabled = true
                     })
                 }else{
                     findCurrentTabView()
@@ -2667,11 +2678,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.musicPlayer.currentPlaybackTime
                 if self.musicPlayer.currentPlaybackRate == 0 {
+                    self.previousButton.userInteractionEnabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
+                            self.previousButton.userInteractionEnabled = true
                     })
                 }else{
                     self.findCurrentTabView()
@@ -2686,11 +2699,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if isDemoSong {
                 self.avPlayer.currentTime = 0
                 if self.avPlayer.rate == 0 {
+                    self.previousButton.userInteractionEnabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
+                            self.previousButton.userInteractionEnabled = true
                     })
                 }else{
                     findCurrentTabView()
@@ -2698,11 +2713,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             } else {
                 self.musicPlayer.currentPlaybackTime = 0
                 if self.musicPlayer.currentPlaybackRate == 0 {
+                    self.previousButton.userInteractionEnabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
+                            self.previousButton.userInteractionEnabled = true
                     })
                 }else{
                     self.findCurrentTabView()
@@ -2715,11 +2732,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if isDemoSong {
                 self.avPlayer.currentTime = 0
                 if self.avPlayer.rate == 0 {
+                    self.previousButton.userInteractionEnabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
+                            self.previousButton.userInteractionEnabled = true
                     })
                 }else{
                     findCurrentTabView()
@@ -2727,11 +2746,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             } else {
                 self.musicPlayer.currentPlaybackTime = 0
                 if self.musicPlayer.currentPlaybackRate == 0 {
+                    self.previousButton.userInteractionEnabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
+                            self.previousButton.userInteractionEnabled = true
                     })
                 }else{
                     self.findCurrentTabView()
