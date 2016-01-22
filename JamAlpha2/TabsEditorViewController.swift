@@ -1627,7 +1627,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     var topLineView: UIView!
-    var scaleNumber: Int = 0
+    var scaleNumber: Int = 10
+    
+    
+    // 1 second = 10 px
+    
     
     func setUpTopLine() {
         topLineView = UIView()
@@ -1638,7 +1642,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         //topLineImageView.image = tempImage
         musicControlView.addSubview(topLineView)
-        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / 5
+        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / scaleNumber / 2
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
         } else {
@@ -1647,15 +1651,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var i = 0; i < numberOfLine; i++ {
             var frame: CGRect!
             if i % 2 == 0 {
-                frame = CGRectMake(CGFloat(i * 50), 0, 2, 10)
+                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 0, 2, 10)
                 let timeLabel: UILabel = UILabel()
-                timeLabel.frame = CGRectMake(CGFloat(i * 50) - 10, 10, 20, 10)
+                timeLabel.frame = CGRectMake(CGFloat(i * 5 * scaleNumber) - 10, 10, 20, 10)
                 timeLabel.text = "\(i * 5)"
                 timeLabel.font = UIFont.systemFontOfSize(8)
                 timeLabel.textAlignment = .Center
                 topLineView.addSubview(timeLabel)
             } else {
-                frame = CGRectMake(CGFloat(i * 50), 0, 2, 5)
+                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 0, 2, 5)
             }
             let tempView: UIView = UIView(frame: frame)
             tempView.backgroundColor = UIColor.yellowColor()
