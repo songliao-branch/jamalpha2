@@ -558,7 +558,7 @@ class APIManager: NSObject {
         var parameters = [String: AnyObject]()
         
         parameters = ["title": findable.getTitle(), "artist": findable.getArtist(), "duration": findable.getDuration()]
-        
+   
         Alamofire.request(.GET, jamBaseURL + "/get_soundwave_url", parameters: parameters).responseJSON { response in
 
             print(response)

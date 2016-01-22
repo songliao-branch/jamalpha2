@@ -241,7 +241,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingMediaItem,completion: {succeed in Void()})
                 removeAllObserver()
             }
-            
         } else {
             MusicManager.sharedInstance.player.stop()
             if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
@@ -1336,7 +1335,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 op = NSBlockOperation(block: {
                     if !self.soundwaveUrl.isEmpty {
                         AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
-                            
                             image in
                                 dispatch_async(dispatch_get_main_queue()) {
                                     let data = UIImagePNGRepresentation(image)
@@ -3007,6 +3005,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func getSongIdAndSoundwaveUrlFromCloud(item: Findable, completion: ((successed:Bool) -> Void)) {
         self.soundwaveUrl = ""
+        if(item.getArtist().isEmpty){
+            return
+        }
         APIManager.getSongInformation(item, completion: {
             id, soundwave_url in
             CoreDataManager.setSongId(item, id: id)
