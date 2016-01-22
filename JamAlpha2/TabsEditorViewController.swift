@@ -1609,31 +1609,79 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         previousButton.setImage(UIImage(named: "backspace"), forState: UIControlState.Normal)
         self.musicControlView.addSubview(previousButton)
 
+        let musicPinchRecognizer: UIPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: "pinchOnMusicControlView:")
+        self.musicControlView.addGestureRecognizer(musicPinchRecognizer)
+        
         
         let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
         self.setUpTimeLabels()
+        
+        setUpTopLine()
     }
     
+    func pinchOnMusicControlView(sender: UIPinchGestureRecognizer) {
+        if sender.numberOfTouches() == 2 {
+            
+        }
+    }
+    
+    var topLineView: UIView!
+    var scaleNumber: Int = 0
+    
+    func setUpTopLine() {
+        topLineView = UIView()
+        topLineView.frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth, 0, (3 / 31) * self.trueWidth + tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
+        
+        //let frame: CGRect = CGRectMake(0, 0, self.trueWidth / 2 + tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
+        //let tempImage:UIImage = UIImage(named: "top_line_bar")!.cropImageWithRect(frame)
+        
+        //topLineImageView.image = tempImage
+        musicControlView.addSubview(topLineView)
+        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / 5
+        if numberOfLine % 2 == 0 {
+            numberOfLine += 3
+        } else {
+            numberOfLine += 2
+        }
+        for var i = 0; i < numberOfLine; i++ {
+            var frame: CGRect!
+            if i % 2 == 0 {
+                frame = CGRectMake(CGFloat(i * 50), 0, 2, 10)
+                let timeLabel: UILabel = UILabel()
+                timeLabel.frame = CGRectMake(CGFloat(i * 50) - 10, 10, 20, 10)
+                timeLabel.text = "\(i * 5)"
+                timeLabel.font = UIFont.systemFontOfSize(8)
+                timeLabel.textAlignment = .Center
+                topLineView.addSubview(timeLabel)
+            } else {
+                frame = CGRectMake(CGFloat(i * 50), 0, 2, 5)
+            }
+            let tempView: UIView = UIView(frame: frame)
+            tempView.backgroundColor = UIColor.yellowColor()
+            topLineView.addSubview(tempView)
+        }
+    }
+    
+    var wrapper: UIView!
     func setUpTimeLabels() {
         let labelWidth: CGFloat = 40
         let wrapperHeight: CGFloat = 12
         let labelFontSize: CGFloat = 10
         let wrapperWidth: CGFloat = 80
-        let wrapper = UIView(frame: CGRect(x: 0, y: musicControlView.frame.height / 2 - wrapperHeight, width: wrapperWidth, height: wrapperHeight))
-        wrapper.center.x = trueWidth/2
+        wrapper = UIView(frame: CGRect(x: 14 / 31 * trueWidth - 40, y: 20, width: wrapperWidth, height: wrapperHeight))
         wrapper.backgroundColor = UIColor.darkGrayColor()
         wrapper.alpha = 0.7
-        wrapper.layer.cornerRadius = wrapperHeight/5
+        wrapper.layer.cornerRadius = wrapperHeight / 5
         musicControlView.addSubview(wrapper)
+        
+        wrapper.hidden = true
         
         currentTimeLabel = UILabel(frame: CGRect(x: 0, y: 0, width: labelWidth, height: labelFontSize))
         currentTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
         currentTimeLabel.text = "0:00.0"
-        currentTimeLabel.sizeToFit()
-        
-        currentTimeLabel.center = CGPoint(x: wrapper.center.x-currentTimeLabel.frame.width/2-2, y: wrapper.center.y)
         currentTimeLabel.textColor = UIColor.whiteColor()
+        currentTimeLabel.textAlignment = .Center
         //i'm not wrapper i'm a singer with a cash flow-> ed sheeran :)
         //make it glow
         currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
@@ -1641,16 +1689,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         currentTimeLabel.layer.shadowOpacity = 1.0
         currentTimeLabel.layer.shadowOffset = CGSizeZero
         currentTimeLabel.layer.masksToBounds = false
-        musicControlView.addSubview(currentTimeLabel)
+        wrapper.addSubview(currentTimeLabel)
         
-        totalTimeLabel = UILabel(frame: CGRect(x: 0, y:0, width: labelWidth, height: labelFontSize))
+        totalTimeLabel = UILabel(frame: CGRect(x: labelWidth, y: 0, width: labelWidth, height: labelFontSize))
         totalTimeLabel.textColor = UIColor.whiteColor()
         totalTimeLabel.font = UIFont.systemFontOfSize(labelFontSize)
-        totalTimeLabel.center.y = wrapper.center.y
         totalTimeLabel.text = TimeNumber(time: Float(theSong.getDuration())).toDisplayString()
-        totalTimeLabel.sizeToFit()
-        totalTimeLabel.center = CGPoint(x: wrapper.center.x+totalTimeLabel.frame.width/2+2, y: wrapper.center.y)
-        musicControlView.addSubview(totalTimeLabel)
+        totalTimeLabel.textAlignment = .Center
+
+        wrapper.addSubview(totalTimeLabel)
     }
     
     func setUpCountdownView() {
@@ -1670,9 +1717,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.isPanning = true
             self.timer.invalidate()
             self.timer = NSTimer()
+            
+            wrapper.hidden = false
+            wrapper.alpha = 0.1
+            UIView.animateWithDuration(0.25, animations: {
+                animate in
+                self.wrapper.alpha = 1
+            })
         } else if sender.state == .Ended {
             self.isPanning = false
             startTime.setTime(Float(self.currentTime))
+            wrapper.hidden = true
             if isDemoSong {
                 self.avPlayer.currentTime = self.currentTime
                 if self.avPlayer.playing {
@@ -1701,13 +1756,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 startTime.setTime(Float(self.currentTime))
                 let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
                 //
-                
+                topLineView.frame.origin.x = (0.5 - 1.5 / 31) * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
                 
                 //self.progressBlock.setProgress(persent)
                 
                 
                 //
-                self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
+                self.progressBlock.frame.origin.x = (0.5 - 3 / 31) * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
                 
                 self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
                 // find the current tab according to the current time and make the current tab view to yellow
@@ -1763,9 +1818,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.isPlaying = false
             //animate down progress block
             self.view.userInteractionEnabled = false
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
-                self.progressBlock!.alpha = 0.5
-                }, completion: nil)
+//            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+//                self.progressBlock!.alpha = 0.5
+//                }, completion: nil)
             
             //pause music and stop timer
             if self.isDemoSong {
@@ -1782,9 +1837,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.isPlaying = true
             //animate up progress block in 3 seconds, because of the the limited height we are not doing the jump animation
             self.view.userInteractionEnabled = false
-            UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-                self.progressBlock!.alpha = 1.0
-            }, completion: nil)
+//            UIView.animateWithDuration(3.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+//                self.progressBlock!.alpha = 1.0
+//            }, completion: nil)
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
 //            musicControlView.removeGestureRecognizer(musicSingleTapRecognizer)
@@ -1864,7 +1919,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         //progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
         //self.progressBlock.isForTabsEditor = true
         //self.progressBlock.generateWaveforms()
-        self.progressBlock!.alpha = 0.5
+//        self.progressBlock!.alpha = 0.5
 
     }
     
@@ -1880,7 +1935,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer = NSTimer()
             startTime.setTime(0)
             self.currentTime = 0
-            self.progressBlock.alpha = 0.5
+//            self.progressBlock.alpha = 0.5
             if isDemoSong {
                 avPlayer.currentTime = currentTime
             }else{
@@ -1958,7 +2013,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.specificTabsScrollView.alpha = 0
             self.tabNameTextField.alpha = 0
             self.musicControlView.alpha = 1
-            self.progressBlock.alpha = 0.5
+//            self.progressBlock.alpha = 0.5
             self.completeStringView.alpha = 0
             self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
             self.collectionView.alpha = 1
@@ -1995,7 +2050,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // correctly put the tabs on music line
     func setMainViewTabPositionInRange(tab: NormalTabs, endIndex: Int, allTabsOnMusicLine: [tabOnMusicLine]) -> CGRect {
-        let labelHeight = self.progressBlock.frame.height / 2 / 4
+        let labelHeight = self.progressBlock.frame.height / 4
         let width = self.trueWidth / 16
         var frame: CGRect = CGRect()
         for var i = 0; i < endIndex; i++ {
