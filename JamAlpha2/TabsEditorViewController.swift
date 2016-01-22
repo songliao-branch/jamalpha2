@@ -1628,8 +1628,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     var topLineView: UIView!
-    var scaleNumber: Int = 10
-    
     
     // 1 second = 10 px
     let backgroundView: UIView = UIView()
@@ -1658,7 +1656,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         topLineView.backgroundColor = UIColor.clearColor()
         self.progressBlock.addSubview(topLineView)
         self.musicControlView.addSubview(indicatorView)
-        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / (scaleNumber / 2)
+        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / (Int(tabsEditorProgressWidthMultiplier) / 2)
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
         } else {
@@ -1667,9 +1665,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var i = 0; i < numberOfLine; i++ {
             var frame: CGRect!
             if i % 2 == 0 {
-                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 11, 2, 9)
+                frame = CGRectMake(CGFloat(i * 5 * Int(tabsEditorProgressWidthMultiplier)), 11, 2, 9)
                 let timeLabel: UILabel = UILabel()
-                timeLabel.frame = CGRectMake(CGFloat(i * 5 * scaleNumber) - 15, 0, 30, 10)
+                timeLabel.frame = CGRectMake(CGFloat(i * 5 * Int(tabsEditorProgressWidthMultiplier)) - 15, 0, 30, 10)
                 let min: Int = i * 5 / 60
                 let sec: Int = (i * 5) % 60
                 if min < 10 {
@@ -1690,7 +1688,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 timeLabel.textAlignment = .Center
                 topLineView.addSubview(timeLabel)
             } else {
-                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 15, 1, 5)
+                frame = CGRectMake(CGFloat(i * 5 * Int(tabsEditorProgressWidthMultiplier)), 15, 1, 5)
             }
             let tempView: UIView = UIView(frame: frame)
             tempView.backgroundColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
@@ -1781,7 +1779,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.currentBaseButton.center = CGPointMake(self.currentBaseButton.center.x, self.currentBaseButton.center.y)
             sender.setTranslation(CGPointZero, inView: self.view)
             if self.currentTime >= -0.1 && self.currentTime <= self.duration + 0.1 {
-                let timeChange = NSTimeInterval(-translation.x / 10)
+                let timeChange = NSTimeInterval(-translation.x / tabsEditorProgressWidthMultiplier)
                 self.toTime = self.currentTime + timeChange
                 if self.toTime < 0 {
                     self.toTime = 0
@@ -2102,7 +2100,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let tempSender = CGFloat(numberOfUnrepeatedTab % labelHeightNumber)
         
         let dynamicHeight = labelHeight * tempSender + 20
-        frame = CGRectMake(CGFloat(self.currentTime*10-1), dynamicHeight, width, labelHeight)
+        frame = CGRectMake(CGFloat(self.currentTime*Double(tabsEditorProgressWidthMultiplier)-1), dynamicHeight, width, labelHeight)
         return frame
     }
 
@@ -2673,12 +2671,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             if isDemoSong {
                 let temprate = self.avPlayer.rate
-                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
+                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
                 self.currentTime = self.avPlayer.currentTime
                     self.avPlayer.rate = 0
                     self.previousButton.enabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
-                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
@@ -2688,13 +2686,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     })
             } else {
                 let temprate = self.musicPlayer.currentPlaybackRate
-                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
+                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
                 self.currentTime = self.musicPlayer.currentPlaybackTime
                 
                     self.previousButton.enabled = false
                     self.musicPlayer.currentPlaybackRate = 0
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
-                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
                         }, completion: {
                             completed in
                             self.findCurrentTabView()
@@ -2793,24 +2791,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // find the current tab according to the current music time
     func findCurrentTabView() {
+        let stepper:Double = 10.0 / Double(self.tabsEditorProgressWidthMultiplier)
         for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
             self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.9)
         }
         if self.allTabsOnMusicLine.count == 1 {
-            if self.currentTime >= self.allTabsOnMusicLine[0].time-0.1 &&  self.currentTime <= self.allTabsOnMusicLine[0].time + 3.2 {
+            if self.currentTime >= (self.allTabsOnMusicLine[0].time - 0.1 * stepper) && self.currentTime <= (self.allTabsOnMusicLine[0].time + 3.2 * stepper) {
                 self.allTabsOnMusicLine[0].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
                 self.currentTabViewIndex = 0
             }
         } else {
             for var i = 1; i < self.allTabsOnMusicLine.count + 1; i++ {
                 if i < self.allTabsOnMusicLine.count {
-                    if self.currentTime > self.allTabsOnMusicLine[i - 1].time - 0.1 && self.currentTime <= self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i - 1].time + 3.2  {
+                    if self.currentTime > (self.allTabsOnMusicLine[i - 1].time - 0.1 * stepper) && (self.currentTime <= self.allTabsOnMusicLine[i].time) && self.currentTime <= (self.allTabsOnMusicLine[i - 1].time + 3.2 * stepper) {
                         self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
                         self.currentTabViewIndex = i - 1
                         break
                     }
                 } else if i == self.allTabsOnMusicLine.count {
-                    if self.currentTime > self.allTabsOnMusicLine[i - 1].time - 0.1 && self.currentTime <= self.allTabsOnMusicLine[i - 1].time + 3.2   {
+                    if self.currentTime > (self.allTabsOnMusicLine[i - 1].time - 0.1 * stepper) && self.currentTime <= (self.allTabsOnMusicLine[i - 1].time + 3.2 * stepper)   {
                         self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
                         self.currentTabViewIndex = i - 1
                         break
