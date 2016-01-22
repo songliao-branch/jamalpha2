@@ -165,4 +165,10 @@ class PlayChordsManager: NSObject {
             soundBank.allNotesOff()
         }
     }
+    
+    func changeCapo(sender: Int) {
+        for var i = 0; i < fret0Midi.count; i++ {
+            fret0Midi[i] = standardFret0Midi[i] + sender
+        }
+    }
 }
