@@ -110,18 +110,19 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             return
         }
         
-        if let _ = MusicManager.sharedInstance.player.nowPlayingItem {
-            MusicManager.sharedInstance.player.pause()
-        }
+        
+        MusicManager.sharedInstance.player.pause()
+        MusicManager.sharedInstance.setPlayerQueue([item])
+        MusicManager.sharedInstance.setIndexInTheQueue(0)
+        
         if isViewingTabs {
             let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
             
             CoreDataManager.setUserTabsMostRecent(item)
             tabsEditorVC.theSong = item
             
-            //  tabsEditorVC.isDemoSong = false
-            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
             
+            self.presentViewController(tabsEditorVC, animated: true, completion: nil)
             
         } else {
             let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")
