@@ -1649,9 +1649,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         indicator.image = UIImage(named: "pointer")
         indicatorView.addSubview(indicator)
         let line: UIView = UIView()
-        line.frame = CGRectMake(9, 5, 2, 6 / 20 * self.trueHeight - 15)
+        line.frame = CGRectMake(9, 20, 2, 6 / 20 * self.trueHeight - 30)
         line.backgroundColor = UIColor.darkGrayColor()
-        indicatorView.addSubview(line)
+        indicatorView.insertSubview(line, belowSubview: indicator)
         
         musicControlView.addSubview(backgroundView)
         topLineView = UIView()
