@@ -129,7 +129,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var totalTimeLabel: UILabel = UILabel()
 
     var string6View: [UIView] = [UIView]()
-    var currentTabViewIndex: Int = Int()
+    var currentTabViewIndex: Int = -1
     var currentBaseButton: UIButton = UIButton()
     
     // music timer
@@ -1600,12 +1600,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.musicControlView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 6 / 20 * self.trueHeight)
         self.view.addSubview(musicControlView)
         
-        let cropedImage: UIImage = backgroundImage.cropViewWithRect(CGRectMake(28 / 31 * self.trueWidth, 2 / 20 * self.trueHeight, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight))
         
         let previousButton: UIButton = UIButton()
-        previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 0, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight)
-        previousButton.imageEdgeInsets = UIEdgeInsetsMake(3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth, 0, 3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth, 0)
-        previousButton.backgroundColor = UIColor(patternImage: cropedImage)
+        previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 20, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight-20)
+        previousButton.imageEdgeInsets = UIEdgeInsetsMake(3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth-10, 0, 3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth+10, 0)
         previousButton.userInteractionEnabled = true
         previousButton.addTarget(self, action: "pressPreviousButton:", forControlEvents: UIControlEvents.TouchUpInside)
         previousButton.setImage(UIImage(named: "backspace"), forState: UIControlState.Normal)
@@ -1637,11 +1635,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func setUpTopLine() {
         let backgroundView: UIView = UIView()
-        backgroundView.frame = CGRectMake(0, 0, self.trueWidth, 20)
+        backgroundView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 20)
         backgroundView.backgroundColor = UIColor(red: 32 / 255, green: 32 / 255, blue: 32 / 255, alpha: 1)
         
         let indicatorView: UIView = UIView()
-        indicatorView.frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth - 10, 10, 20, 6 / 20 * self.trueHeight - 10)
+        indicatorView.frame = CGRectMake(0.5 * self.trueWidth - 10, 10, 20, 6 / 20 * self.trueHeight - 10)
         indicatorView.backgroundColor = UIColor.clearColor()
         
         let indicator: UIImageView = UIImageView()
@@ -1653,11 +1651,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         line.backgroundColor = UIColor.darkGrayColor()
         indicatorView.insertSubview(line, belowSubview: indicator)
         
-        musicControlView.addSubview(backgroundView)
+        self.view.insertSubview(backgroundView, belowSubview: progressBlock)
         topLineView = UIView()
-        topLineView.frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
+        topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
         topLineView.backgroundColor = UIColor.clearColor()
-        musicControlView.addSubview(topLineView)
+        self.progressBlock.addSubview(topLineView)
         self.musicControlView.addSubview(indicatorView)
         var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / (scaleNumber / 2)
         if numberOfLine % 2 == 0 {
@@ -1791,14 +1789,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.currentTime = self.toTime
                 startTime.setTime(Float(self.currentTime))
                 let persent = CGFloat(self.currentTime) / CGFloat(self.duration)
-                //
-                topLineView.frame.origin.x = (0.5 - 1.5 / 31) * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
-                
-                //self.progressBlock.setProgress(persent)
-                
-                
-                //
-                self.progressBlock.frame.origin.x = (0.5 - 1.5 / 31) * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
+            
+                self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - persent * (CGFloat(theSong.getDuration() * Float(tabsEditorProgressWidthMultiplier)))
                 
                 self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
                 // find the current tab according to the current time and make the current tab view to yellow
@@ -1936,7 +1928,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
 
     func createSoundWave() {
-        let frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth, 2 / 20 * self.trueHeight + 20, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight - 20)
+        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
         self.progressBlock = UIView(frame: frame)
         if(theSong == nil){
             print("the song is empty")
@@ -2007,8 +1999,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         //
         
         //MARK: progessBlock width
-        self.progressBlock.frame.origin.x = (0.5 - 1.5 / 31) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
-        self.topLineView.frame.origin.x = (0.5 - 1.5 / 31) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
+        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
         self.findCurrentTabView()
         
     }
@@ -2095,7 +2086,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         } else if UIDevice.currentDevice().modelName == "iPhone 6 Plus" || UIDevice.currentDevice().modelName == "iPhone 6s Plus" {
             labelHeightNumber = 8
         }
-        let labelHeight = self.progressBlock.frame.height / CGFloat(labelHeightNumber)
+        let labelHeight = ( self.progressBlock.frame.height - 20 ) / CGFloat(labelHeightNumber)
         let width = self.trueWidth / 18
         var frame: CGRect = CGRect()
         for var i = 0; i < endIndex; i++ {
@@ -2108,8 +2099,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let numberOfUnrepeatedTab: Int = numberOfUnrepeatedTabOnMainView(endIndex, allTabsOnMusicLine: allTabsOnMusicLine)
         let tempSender = CGFloat(numberOfUnrepeatedTab % labelHeightNumber)
         
-        let dynamicHeight = labelHeight * tempSender
-        frame = CGRectMake(0 + CGFloat(self.currentTime / self.duration) * ((28 / 31 ) * self.progressBlock.frame.width), dynamicHeight, width, labelHeight)
+        let dynamicHeight = labelHeight * tempSender + 20
+        frame = CGRectMake(CGFloat(self.currentTime*10-1), dynamicHeight, width, labelHeight)
         return frame
     }
 
@@ -2152,12 +2143,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.allTabsOnMusicLine.append(returnValue.1)
             }
             self.progressBlock.addSubview(returnValue.0)
+            self.findCurrentTabView()
         }
     }
     
     func addTabViewOnMusicControlView(sender: Int) -> (UIView, tabOnMusicLine) {
         let tempView: UIView = UIView()
-        tempView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
+        tempView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.9)//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
         tempView.layer.cornerRadius = 2
         var tempStruct: tabOnMusicLine = tabOnMusicLine()
         let name = self.noteButtonWithTabArray[sender].tab.name
@@ -2180,7 +2172,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tempStruct.tabView = tempView
         tempStruct.time = self.currentTime
         tempStruct.tab = self.noteButtonWithTabArray[sender].tab
-        
         return (tempView, tempStruct)
     }
     
@@ -2647,38 +2638,106 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func pressPreviousButton(sender: UIButton) {
         self.removeDoubleArrowView()
+        if(currentTabViewIndex == -1) {
+            return
+        }
         if self.allTabsOnMusicLine.count > 1 {
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
-            self.currentTabViewIndex = self.currentTabViewIndex--
-            findCurrentTabView()
+            self.currentTabViewIndex = --self.currentTabViewIndex
+            
+            if (self.currentTabViewIndex < 0) {
+                self.currentTabViewIndex = 0
+            }
             if isDemoSong {
                 self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
-                 self.currentTime = self.avPlayer.currentTime
+                self.currentTime = self.avPlayer.currentTime
+                if self.avPlayer.rate == 0 {
+                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
+                        }, completion: {
+                            completed in
+                            self.findCurrentTabView()
+                    })
+                }else{
+                    findCurrentTabView()
+                }
+                
             } else {
                 self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1
                 self.currentTime = self.musicPlayer.currentPlaybackTime
+                if self.musicPlayer.currentPlaybackRate == 0 {
+                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * 10)
+                        }, completion: {
+                            completed in
+                            self.findCurrentTabView()
+                    })
+                }else{
+                    self.findCurrentTabView()
+                }
             }
            
-        } else if self.allTabsOnMusicLine.count == 1 {
+        } else if self.allTabsOnMusicLine.count == 1 && currentTabViewIndex  == 0{
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
             self.currentTabViewIndex = 0
+            self.currentTime = 0
             if isDemoSong {
                 self.avPlayer.currentTime = 0
+                if self.avPlayer.rate == 0 {
+                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+                        }, completion: {
+                            completed in
+                            self.findCurrentTabView()
+                    })
+                }else{
+                    findCurrentTabView()
+                }
             } else {
                 self.musicPlayer.currentPlaybackTime = 0
+                if self.musicPlayer.currentPlaybackRate == 0 {
+                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+                        }, completion: {
+                            completed in
+                            self.findCurrentTabView()
+                    })
+                }else{
+                    self.findCurrentTabView()
+                }
             }
-            self.currentTime = 0
+            
         } else {
+            self.currentTime = 0
+            currentTabViewIndex  == 0
             if isDemoSong {
                 self.avPlayer.currentTime = 0
+                if self.avPlayer.rate == 0 {
+                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+                        }, completion: {
+                            completed in
+                            self.findCurrentTabView()
+                    })
+                }else{
+                    findCurrentTabView()
+                }
             } else {
                 self.musicPlayer.currentPlaybackTime = 0
+                if self.musicPlayer.currentPlaybackRate == 0 {
+                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+                        }, completion: {
+                            completed in
+                            self.findCurrentTabView()
+                    })
+                }else{
+                    self.findCurrentTabView()
+                }
             }
-            self.currentTime = 0
         }
-        update()
 
     }
     
@@ -2697,23 +2756,23 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // find the current tab according to the current music time
     func findCurrentTabView() {
         for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.9)
         }
         if self.allTabsOnMusicLine.count == 1 {
-            if self.currentTime >= self.allTabsOnMusicLine[0].time {
-                self.allTabsOnMusicLine[0].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
+            if self.currentTime >= self.allTabsOnMusicLine[0].time-0.1 &&  self.currentTime <= self.allTabsOnMusicLine[0].time + 3.2 {
+                self.allTabsOnMusicLine[0].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
                 self.currentTabViewIndex = 0
             }
         } else {
             for var i = 1; i < self.allTabsOnMusicLine.count + 1; i++ {
                 if i < self.allTabsOnMusicLine.count {
-                    if self.currentTime > self.allTabsOnMusicLine[i - 1].time && self.currentTime <= self.allTabsOnMusicLine[i].time {
+                    if self.currentTime > self.allTabsOnMusicLine[i - 1].time - 0.1 && self.currentTime <= self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i - 1].time + 3.2  {
                         self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
                         self.currentTabViewIndex = i - 1
                         break
                     }
                 } else if i == self.allTabsOnMusicLine.count {
-                    if self.currentTime > self.allTabsOnMusicLine[i - 1].time {
+                    if self.currentTime > self.allTabsOnMusicLine[i - 1].time - 0.1 && self.currentTime <= self.allTabsOnMusicLine[i - 1].time + 3.2   {
                         self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
                         self.currentTabViewIndex = i - 1
                         break
@@ -2805,6 +2864,7 @@ extension TabsEditorViewController {
             self.musicPlayer.currentPlaybackTime = current
         }
         update()
+        self.findCurrentTabView()
     }
 
     func checkChordsWithCoredata(chords: [Chord], completion: ((complete: [Chord]) -> Void)) {
