@@ -583,6 +583,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
     }
+
     func setUpNameAndArtistButtons(){
        
         songNameLabel = MarqueeLabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 20)))
@@ -1967,7 +1968,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func lyricsSwitchChanged(uiswitch: UISwitch) {
         isLyricsShown = uiswitch.on
-         toggleLyrics()
+        toggleLyrics()
     }
     
     func toggleLyrics() {
@@ -2013,8 +2014,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 })
             }
         } else if (!isChordShown && !isTabsShown && !isLyricsShown && isBlurred) { // center the image
+            
             dispatch_async(dispatch_get_main_queue()) {
                 self.backgroundImageView.image = self.backgroundImage
+            }
+            
+            for label in tuningLabels {
+                label.hidden = true
             }
            
             self.isBlurred = false

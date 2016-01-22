@@ -189,7 +189,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         }
                     }
                 }
-            }else {
+            } else {
                 if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
                     // if go outside Twistjam and close Music App, nowPlayingItem is set to nil
                     // we force to dismiss SongViewController and re-initialize player

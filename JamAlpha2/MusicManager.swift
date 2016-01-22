@@ -142,20 +142,38 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-            print("\(_TAG) Initialize Player")
-            player = MPMusicPlayerController.systemMusicPlayer()
+        print("\(_TAG) Initialize Player")
+        player = MPMusicPlayerController.systemMusicPlayer()
+        
+        //save current playing time and time and reset player after it is being stopped
+        var lastPlayingItem: MPMediaItem?
+        var lastPlayTime: NSTimeInterval = 0
+        var isPlaying = false
+        if let nowPlayingItem = player.nowPlayingItem {
+            lastPlayingItem = nowPlayingItem
+            lastPlayTime = player.currentPlaybackTime
+            isPlaying = (player.playbackState == .Playing)
+        }
+        
+        player.stop()
+        player.repeatMode = .All
+        player.shuffleMode = .Off
+        
+        self.setPlayerQueue(uniqueSongs)
+        
+        if let lastItem = lastPlayingItem {
+            player.nowPlayingItem = lastItem
+            player.currentPlaybackTime = lastPlayTime + 0.32
             
-            player.stop() // 如果不stop 有出现bug，让player还在播放状态时重启，点击now item, 滑动 progress bar, 自动变成TheAteam (列表里第一首歌)， 点击别的歌也是The A Team， 可能原因是没通过setIndex的任何set player.nowPlayingItem
-            // 暂时解决方法 App每次start就是先停下来
-            
-            player.repeatMode = .All
-            player.shuffleMode = .Off
-            self.setPlayerQueue(uniqueSongs)
+            if isPlaying {
+                player.play()
+            }
+        }
         
         //initialize AVQueuePlayer
-            self.avPlayer = AVQueuePlayer()
-            self.avPlayer.actionAtItemEnd = .None
-            self.setSessionActiveWithMixing()
+        self.avPlayer = AVQueuePlayer()
+        self.avPlayer.actionAtItemEnd = .None
+        self.setSessionActiveWithMixing()
     }
     
     //for playing mode and background mode
@@ -230,7 +248,6 @@ class MusicManager: NSObject {
     }
     
     func setIndexInTheQueue(selectedIndex: Int){
-        // player.stop()
         // 如果单曲循环的话 切出去 再换一首歌的话 还是之前那个首歌
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
