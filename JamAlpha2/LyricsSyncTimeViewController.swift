@@ -78,6 +78,9 @@ class LyricsSyncViewController: UIViewController  {
     var countDownStartSecond = 3 //will count down from 3 to 1
     var countdownView: CountdownView!
     
+    
+    var playButtonImageView: UIImageView = UIImageView()
+    
     // MARK: UIGestures
     var addedLyricsWithTime: lyricsWithTime!
     
@@ -255,15 +258,14 @@ class LyricsSyncViewController: UIViewController  {
         self.view.addSubview(self.lyricsTableView)
     }
 
-    
-    var playButtonImageView: UIImageView = UIImageView()
     func setUpProgressBlock() {
         progressChangedOrigin = self.view.center.x
         progressBlockContainer = UIView(frame: CGRect(x: 0, y: viewHeight-progressContainerHeight, width: self.view.frame.width, height: progressContainerHeight))
         progressBlockContainer.backgroundColor = UIColor.clearColor()
         self.view.addSubview(progressBlockContainer)
         
-        playButtonImageView.frame = CGRectMake((viewWidth - progressContainerHeight / 1.5) / 2, viewHeight - progressContainerHeight / 1.5, progressContainerHeight / 1.5, progressContainerHeight / 1.5)
+        playButtonImageView.frame = CGRect(x: 0, y: self.view.frame.height - 50, width: 30, height: 30)
+        playButtonImageView.center.x = self.view.center.x
         playButtonImageView.image = UIImage(named: "playbutton")
         self.view.addSubview(playButtonImageView)
         self.view.bringSubviewToFront(playButtonImageView)
