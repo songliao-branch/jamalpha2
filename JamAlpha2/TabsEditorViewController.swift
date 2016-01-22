@@ -2132,16 +2132,28 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let returnValue = addTabViewOnMusicControlView(index)
             for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
                 if self.currentTime <= self.allTabsOnMusicLine[0].time {
+                    if(returnValue.1.tab.content == self.allTabsOnMusicLine[0].tab.content && returnValue.1.time == self.allTabsOnMusicLine[0].time){
+                        return
+                    }
                     self.allTabsOnMusicLine.insert(returnValue.1, atIndex: 0)
                     inserted = true
                     break
                 } else if self.currentTime > self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i + 1].time {
+                    if(returnValue.1.tab.content == self.allTabsOnMusicLine[i+1].tab.content && returnValue.1.time == self.allTabsOnMusicLine[i+1].time){
+                        return
+                    }
                     self.allTabsOnMusicLine.insert(returnValue.1, atIndex: i + 1)
                     inserted = true
                     break
                 }
             }
             if !inserted {
+                if(self.allTabsOnMusicLine.count > 0){
+                    if(returnValue.1.tab.content == self.allTabsOnMusicLine[0].tab.content && returnValue.1.time == self.allTabsOnMusicLine[0].time){
+                        return
+                    }
+                }
+                
                 self.allTabsOnMusicLine.append(returnValue.1)
             }
             self.progressBlock.addSubview(returnValue.0)
