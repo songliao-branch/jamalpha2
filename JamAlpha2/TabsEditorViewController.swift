@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Jun Zhou. All rights reserved.
 //
 
+
+
 import UIKit
 import MediaPlayer
 import AVFoundation
@@ -1634,15 +1636,30 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     
     func setUpTopLine() {
+        let backgroundView: UIView = UIView()
+        backgroundView.frame = CGRectMake(0, 0, self.trueWidth, 20)
+        backgroundView.backgroundColor = UIColor(red: 32 / 255, green: 32 / 255, blue: 32 / 255, alpha: 1)
+        
+        let indicatorView: UIView = UIView()
+        indicatorView.frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth - 10, 10, 20, 6 / 20 * self.trueHeight - 10)
+        indicatorView.backgroundColor = UIColor.clearColor()
+        
+        let indicator: UIImageView = UIImageView()
+        indicator.frame = CGRectMake(0, 0, 20, 20)
+        indicator.image = UIImage(named: "pointer")
+        indicatorView.addSubview(indicator)
+        let line: UIView = UIView()
+        line.frame = CGRectMake(9, 5, 2, 6 / 20 * self.trueHeight - 15)
+        line.backgroundColor = UIColor.darkGrayColor()
+        indicatorView.addSubview(line)
+        
+        musicControlView.addSubview(backgroundView)
         topLineView = UIView()
-        topLineView.frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth, 0, (3 / 31) * self.trueWidth + tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
-        
-        //let frame: CGRect = CGRectMake(0, 0, self.trueWidth / 2 + tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
-        //let tempImage:UIImage = UIImage(named: "top_line_bar")!.cropImageWithRect(frame)
-        
-        //topLineImageView.image = tempImage
+        topLineView.frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
+        topLineView.backgroundColor = UIColor.clearColor()
         musicControlView.addSubview(topLineView)
-        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / scaleNumber / 2
+        self.musicControlView.addSubview(indicatorView)
+        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / (scaleNumber / 2)
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
         } else {
@@ -1651,18 +1668,33 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var i = 0; i < numberOfLine; i++ {
             var frame: CGRect!
             if i % 2 == 0 {
-                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 0, 2, 10)
+                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 10, 1, 10)
                 let timeLabel: UILabel = UILabel()
-                timeLabel.frame = CGRectMake(CGFloat(i * 5 * scaleNumber) - 10, 10, 20, 10)
-                timeLabel.text = "\(i * 5)"
+                timeLabel.frame = CGRectMake(CGFloat(i * 5 * scaleNumber) - 15, 0, 30, 10)
+                let min: Int = i * 5 / 60
+                let sec: Int = (i * 5) % 60
+                if min < 10 {
+                    if sec < 10 {
+                        timeLabel.text = "0\(min):0\(sec)"
+                    } else {
+                        timeLabel.text = "0\(min):\(sec)"
+                    }
+                } else {
+                    if sec < 10 {
+                        timeLabel.text = "0\(min):0\(sec)"
+                    } else {
+                        timeLabel.text = "0\(min):\(sec)"
+                    }
+                }
                 timeLabel.font = UIFont.systemFontOfSize(8)
+                timeLabel.textColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
                 timeLabel.textAlignment = .Center
                 topLineView.addSubview(timeLabel)
             } else {
-                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 0, 2, 5)
+                frame = CGRectMake(CGFloat(i * 5 * scaleNumber), 15, 2, 5)
             }
             let tempView: UIView = UIView(frame: frame)
-            tempView.backgroundColor = UIColor.yellowColor()
+            tempView.backgroundColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
             topLineView.addSubview(tempView)
         }
     }
@@ -1904,8 +1936,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
 
     func createSoundWave() {
-        let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
-        self.progressBlock = UIView(frame: frame)//SoundWaveView(frame: frame)
+        let frame = CGRectMake((0.5 - 1.5 / 31) * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight - 20)
+        self.progressBlock = UIView(frame: frame)
         if(theSong == nil){
             print("the song is empty")
         }
@@ -2054,7 +2086,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // correctly put the tabs on music line
     func setMainViewTabPositionInRange(tab: NormalTabs, endIndex: Int, allTabsOnMusicLine: [tabOnMusicLine]) -> CGRect {
-        let labelHeight = self.progressBlock.frame.height / 4
+        var labelHeight = self.progressBlock.frame.height / 4
+        
+        if UIDevice.currentDevice().modelName == "iPhone 5" || UIDevice.currentDevice().modelName == "iPhone 5s" {
+            labelHeight = self.progressBlock.frame.height / 6
+        } else if UIDevice.currentDevice().modelName == "iPhone 6" || UIDevice.currentDevice().modelName == "iPhone 6s" {
+            labelHeight = self.progressBlock.frame.height / 7
+        } else if UIDevice.currentDevice().modelName == "iPhone 6 Plus" || UIDevice.currentDevice().modelName == "iPhone 6s Plus" {
+            labelHeight = self.progressBlock.frame.height / 8
+        }
         let width = self.trueWidth / 16
         var frame: CGRect = CGRect()
         for var i = 0; i < endIndex; i++ {
@@ -2128,7 +2168,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tempLabelView.font = UIFont.systemFontOfSize(11)
         tempLabelView.textAlignment = NSTextAlignment.Center
         tempLabelView.numberOfLines = 3
-        tempLabelView.text = name
+        
+        let underlineAttribute = [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue]
+        let underlineAttributedString = NSAttributedString(string: name, attributes: underlineAttribute)
+        tempLabelView.attributedText = underlineAttributedString
         tempView.addSubview(tempLabelView)
         
         tempStruct.tabView = tempView
