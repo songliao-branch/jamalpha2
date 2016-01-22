@@ -52,6 +52,8 @@ class MeLoginOrSignupViewController: UIViewController{
     var passwordTextField: UITextField!
     var submitButton: UIButton!
     
+    var forgetPasswordButton: UIButton!
+    
     var fbLoginButton: FBSDKLoginButton = FBSDKLoginButton()
     var nextButton: UIButton = UIButton()
     
@@ -271,6 +273,12 @@ class MeLoginOrSignupViewController: UIViewController{
         passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(passwordTextFieldUnderline)
         
+        forgetPasswordButton = UIButton(frame: CGRect(x: self.view.frame.width-100, y: passwordTextField.frame.origin.y, width: 100, height: passwordTextField.frame.height))
+        forgetPasswordButton.setTitle("forget?", forState: .Normal)
+        forgetPasswordButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        forgetPasswordButton.addTarget(self, action: "forgetPasswordPressed", forControlEvents: .TouchUpInside)
+        scrollView.addSubview(forgetPasswordButton)
+        
         submitButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: 120, height: 44))
         submitButton.setTitle("Sign Up", forState: .Normal)
         submitButton.addTarget(self, action: "submitPressed", forControlEvents: .TouchUpInside)
@@ -278,6 +286,8 @@ class MeLoginOrSignupViewController: UIViewController{
         submitButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         submitButton.setTitleColor(UIColor.grayColor(), forState: .Disabled)
         scrollView.addSubview(submitButton)
+        
+      
     }
     
     func signUpTabPressed() {
@@ -338,6 +348,10 @@ class MeLoginOrSignupViewController: UIViewController{
             }, completion: nil)
     }
 
+    func forgetPasswordPressed() {
+        var email = emailTextField.text
+        
+    }
     
     func submitPressed() {
         
