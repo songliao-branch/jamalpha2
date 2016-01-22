@@ -2157,7 +2157,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func addTabViewOnMusicControlView(sender: Int) -> (UIView, tabOnMusicLine) {
         let tempView: UIView = UIView()
-        tempView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
+        tempView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
         tempView.layer.cornerRadius = 2
         var tempStruct: tabOnMusicLine = tabOnMusicLine()
         let name = self.noteButtonWithTabArray[sender].tab.name
@@ -2171,10 +2171,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tempLabelView.textAlignment = NSTextAlignment.Center
         tempLabelView.numberOfLines = 1
         
-//        let underlineAttribute = [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue]
-//        let underlineAttributedString = NSAttributedString(string: name, attributes: underlineAttribute)
-//        tempLabelView.attributedText = underlineAttributedString
-        tempLabelView.text = name
+        let underlineAttribute = [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue]
+        let underlineAttributedString = NSAttributedString(string: name, attributes: underlineAttribute)
+        tempLabelView.attributedText = underlineAttributedString
+        //tempLabelView.text = name
         tempView.addSubview(tempLabelView)
         
         tempStruct.tabView = tempView
@@ -2697,24 +2697,24 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // find the current tab according to the current music time
     func findCurrentTabView() {
         for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
+            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
         }
         if self.allTabsOnMusicLine.count == 1 {
             if self.currentTime >= self.allTabsOnMusicLine[0].time {
-                self.allTabsOnMusicLine[0].tabView.backgroundColor = UIColor.brownColor()
+                self.allTabsOnMusicLine[0].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
                 self.currentTabViewIndex = 0
             }
         } else {
             for var i = 1; i < self.allTabsOnMusicLine.count + 1; i++ {
                 if i < self.allTabsOnMusicLine.count {
                     if self.currentTime > self.allTabsOnMusicLine[i - 1].time && self.currentTime <= self.allTabsOnMusicLine[i].time {
-                        self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor.brownColor()
+                        self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
                         self.currentTabViewIndex = i - 1
                         break
                     }
                 } else if i == self.allTabsOnMusicLine.count {
                     if self.currentTime > self.allTabsOnMusicLine[i - 1].time {
-                        self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor.brownColor()
+                        self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
                         self.currentTabViewIndex = i - 1
                         break
                     }
