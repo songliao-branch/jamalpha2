@@ -2673,7 +2673,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if isDemoSong {
                 let temprate = self.avPlayer.rate
                 self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
-                self.currentTime = self.avPlayer.currentTime
+                self.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                     self.avPlayer.rate = 0
                     self.previousButton.enabled = false
                     UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
@@ -2688,7 +2688,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             } else {
                 let temprate = self.musicPlayer.currentPlaybackRate
                 self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
-                self.currentTime = self.musicPlayer.currentPlaybackTime
+                self.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                 
                     self.previousButton.enabled = false
                     self.musicPlayer.currentPlaybackRate = 0
