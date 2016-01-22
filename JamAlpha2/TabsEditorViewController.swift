@@ -2660,6 +2660,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if(currentTabViewIndex == -1) {
             return
         }
+        let stepper = 10.0 / Double(self.tabsEditorProgressWidthMultiplier)
         if self.allTabsOnMusicLine.count > 1 {
             self.view.userInteractionEnabled = false
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
@@ -2671,7 +2672,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             if isDemoSong {
                 let temprate = self.avPlayer.rate
-                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                 self.currentTime = self.avPlayer.currentTime
                     self.avPlayer.rate = 0
                     self.previousButton.enabled = false
@@ -2686,7 +2687,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     })
             } else {
                 let temprate = self.musicPlayer.currentPlaybackRate
-                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time
+                self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                 self.currentTime = self.musicPlayer.currentPlaybackTime
                 
                     self.previousButton.enabled = false
