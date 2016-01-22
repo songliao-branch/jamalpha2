@@ -22,7 +22,6 @@
 		BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B83E21BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift */; };
 		BF4B83E51BFA776200AF8A2A /* MeUserProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */; };
 		BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */; };
-		BF4B843C1C0CF94900AF8A2A /* AWSConstent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */; };
 		BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
@@ -197,7 +196,6 @@
 		BF4B83E41BFA776200AF8A2A /* MeUserProfileTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeUserProfileTableViewCell.swift; sourceTree = "<group>"; };
 		BF4B84361C09938900AF8A2A /* JamAlpha2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JamAlpha2-Bridging-Header.h"; sourceTree = "<group>"; };
 		BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSS3Manager.swift; sourceTree = "<group>"; };
-		BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSConstent.swift; sourceTree = "<group>"; };
 		BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeLoginOrSignupViewController.swift; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
@@ -424,7 +422,6 @@
 			isa = PBXGroup;
 			children = (
 				BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */,
-				E4D5EEE81C10DAC0000FA35E /* Helper */,
 				BFE49ECF1C1220C200F26877 /* SettingViewController */,
 				E4D5EEE71C10DAB0000FA35E /* UserProfileViewController */,
 			);
@@ -722,6 +719,7 @@
 		E48AE2D01B955BA30044CFDB /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				E4D5EEE81C10DAC0000FA35E /* S3 */,
 				10FFBAAE1C3F9973003DF489 /* NetworkManager */,
 				E48F22651BF5920300F24962 /* Models */,
 				E48AE2D11B955BB40044CFDB /* APIManager.swift */,
@@ -789,13 +787,12 @@
 			name = UserProfileViewController;
 			sourceTree = "<group>";
 		};
-		E4D5EEE81C10DAC0000FA35E /* Helper */ = {
+		E4D5EEE81C10DAC0000FA35E /* S3 */ = {
 			isa = PBXGroup;
 			children = (
 				BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */,
-				BF4B843B1C0CF94900AF8A2A /* AWSConstent.swift */,
 			);
-			name = Helper;
+			name = S3;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -854,7 +851,7 @@
 				TargetAttributes = {
 					E488773C1B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 3ME9DMV2GU;
+						DevelopmentTeam = 978SMNLLT3;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -1035,7 +1032,6 @@
 				E443B91B1BBBA2F20074A4E1 /* LyricsSet.swift in Sources */,
 				E46F39E51BCCB816004B36EB /* TabsSet.swift in Sources */,
 				1045413F1BCAFBB300A4590B /* TabBarController.swift in Sources */,
-				BF4B843C1C0CF94900AF8A2A /* AWSConstent.swift in Sources */,
 				E42032EA1BFEEDB800A5D36D /* SettingsViewController.swift in Sources */,
 				E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */,
 				E42032EC1BFEF31E00A5D36D /* AvatarCell.swift in Sources */,

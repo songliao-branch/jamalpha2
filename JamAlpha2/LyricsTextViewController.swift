@@ -158,9 +158,12 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         titleView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(titleView)
         
-        let buttonWidth: CGFloat = 2.0 / 20 * self.viewWidth
+        let spacing: CGFloat = 0.5 / 20 * self.viewWidth
+        
+        let buttonWidth: CGFloat = 3.0 / 20 * self.viewWidth
         let backButton: UIButton = UIButton()
-        backButton.frame = CGRectMake(0.5 / 20 * self.viewWidth, 0, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
+        backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         backButton.setTitle("B", forState: UIControlState.Normal)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -168,7 +171,8 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         titleView.addSubview(backButton)
         
         let doneButton: UIButton = UIButton()
-        doneButton.frame = CGRectMake(17.5 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        doneButton.frame = CGRectMake(17 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        doneButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         doneButton.setTitle("D", forState: UIControlState.Normal)
         doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -184,13 +188,15 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         
         let deleteAllButton: UIButton = UIButton()
         deleteAllButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        deleteAllButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         deleteAllButton.setTitle("D", forState: UIControlState.Normal)
         deleteAllButton.setImage(UIImage(named: "lyrics_delete_circle"), forState: UIControlState.Normal)
         deleteAllButton.addTarget(self, action: "pressDeleteAllButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(deleteAllButton)
         
         let reorganizeButton: UIButton = UIButton()
-        reorganizeButton.frame = CGRectMake(15 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        reorganizeButton.frame = CGRectMake(14 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        reorganizeButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         reorganizeButton.setTitle("R", forState: UIControlState.Normal)
         reorganizeButton.setImage(UIImage(named: "lyrics_reorganize_circle"), forState: UIControlState.Normal)
         reorganizeButton.addTarget(self, action: "pressReorganizeButton:", forControlEvents: UIControlEvents.TouchUpInside)
