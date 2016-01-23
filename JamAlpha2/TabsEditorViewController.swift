@@ -2032,7 +2032,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
             self.duration = (theSong as! MPMediaItem).playbackDuration
         }
-        self.progressBlock!.alpha = 0.5
+        //self.progressBlock!.alpha = 0.5
 
     }
     
@@ -2125,7 +2125,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.tabNameTextField.alpha = 0
         UIView.animateWithDuration(0.3, animations: {
             self.musicControlView.alpha = 1
-//            self.progressBlock.alpha = 0.5
+            self.progressBlock.alpha = 1.0
             self.completeStringView.alpha = 0
             self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
             self.collectionView.alpha = 1
