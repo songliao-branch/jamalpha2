@@ -333,9 +333,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             isPlaying = false
             timer.invalidate()
             timer = NSTimer()
-            if !self.intoEditView{
-                self.progressBlock.alpha = 0.5
-            }
+//            if !self.intoEditView{
+//                self.progressBlock.alpha = 0.5
+//            }
         }
     }
     
@@ -2048,7 +2048,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             timer = NSTimer()
             startTime.setTime(0)
             self.currentTime = 0
-            self.progressBlock.alpha = 0.5
+//            self.progressBlock.alpha = 0.5
             if isDemoSong {
                 avPlayer.currentTime = currentTime
             }else{
@@ -2125,7 +2125,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.tabNameTextField.alpha = 0
         UIView.animateWithDuration(0.3, animations: {
             self.musicControlView.alpha = 1
-            self.progressBlock.alpha = 0.5
+//            self.progressBlock.alpha = 0.5
             self.completeStringView.alpha = 0
             self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
             self.collectionView.alpha = 1
