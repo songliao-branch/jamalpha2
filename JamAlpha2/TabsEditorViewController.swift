@@ -1934,9 +1934,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.isPlaying = false
             //animate down progress block
             self.view.userInteractionEnabled = false
-            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
-                self.progressBlock!.alpha = 0.5
-                }, completion: nil)
+//            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+//                self.progressBlock!.alpha = 0.5
+//                }, completion: nil)
             
             //pause music and stop timer
             if self.isDemoSong {
