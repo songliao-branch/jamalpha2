@@ -1693,7 +1693,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func setUpTopLine() {
         let presentPosition = CGFloat(Float(currentTime) / Float(self.duration))
         
-        progressBlock.frame.origin.x = (0.5) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
+        progressBlock.frame = CGRectMake((0.5) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier), progressBlock.frame.origin.y, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), progressBlock.frame.size.height)
         
         topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
         
