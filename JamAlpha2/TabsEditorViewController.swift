@@ -17,6 +17,9 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
     
+    let maxScaleNumber: CGFloat = 20
+    let minScaleNumber: CGFloat = 5
+    
     var fretNumberOnFullStringView: UIView!
 
     var string3BackgroundImage: [String] = ["iPhone5_fret0", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret"]
@@ -85,7 +88,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // music section
     //MARK: decide the progress block width
-    let tabsEditorProgressWidthMultiplier: CGFloat = 10
+    var tabsEditorProgressWidthMultiplier: CGFloat = 10
     var progressBlock: UIView!
     var theSong: Findable!
     var currentTime: NSTimeInterval = NSTimeInterval()
@@ -1618,21 +1621,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
         self.setUpTimeLabels()
         
-        setUpTopLine()
-    }
-    
-    func pinchOnMusicControlView(sender: UIPinchGestureRecognizer) {
-        if sender.numberOfTouches() == 2 {
-            
-        }
-    }
-    
-    var topLineView: UIView!
-    
-    // 1 second = 10 px
-    let backgroundView: UIView = UIView()
-    
-    func setUpTopLine() {
         backgroundView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 20)
         backgroundView.backgroundColor = UIColor(red: 32 / 255, green: 32 / 255, blue: 32 / 255, alpha: 1)
         
@@ -1652,10 +1640,64 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         self.view.insertSubview(backgroundView, belowSubview: progressBlock)
         topLineView = UIView()
-        topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
         topLineView.backgroundColor = UIColor.clearColor()
         self.progressBlock.addSubview(topLineView)
         self.musicControlView.addSubview(indicatorView)
+        
+        setUpTopLine()
+    }
+    
+    func pinchOnMusicControlView(sender: UIPinchGestureRecognizer) {
+        if sender.numberOfTouches() == 2 {
+            var tempScaleNumber: CGFloat = tabsEditorProgressWidthMultiplier
+            if sender.state == .Began {
+                tempScaleNumber = tabsEditorProgressWidthMultiplier
+            } else if sender.state == .Changed {
+                print(tabsEditorProgressWidthMultiplier)
+                print(sender.scale)
+                if tabsEditorProgressWidthMultiplier < maxScaleNumber && tabsEditorProgressWidthMultiplier > minScaleNumber {
+                    tabsEditorProgressWidthMultiplier = tempScaleNumber * sender.scale
+                } else if tabsEditorProgressWidthMultiplier <= minScaleNumber {
+                    if sender.scale > 1 {
+                        tabsEditorProgressWidthMultiplier = tempScaleNumber * sender.scale
+                    }
+                } else if tabsEditorProgressWidthMultiplier >= maxScaleNumber {
+                    if sender.scale < 1 {
+                        tabsEditorProgressWidthMultiplier = tempScaleNumber * sender.scale
+                    }
+                }
+                updateFramePosition()
+            }
+        }
+    }
+    
+    
+    // 1 second = 10 px
+    func updateFramePosition() {
+        for item in topLineView.subviews {
+            item.removeFromSuperview()
+        }
+        for item in allTabsOnMusicLine {
+            let presentPosition = CGFloat(Float(item.time) / Float(self.duration))
+            item.tabView.frame.origin = CGPointMake(presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier), item.tabView.frame.origin.y)
+        }
+        setUpTopLine()
+        
+    }
+    
+    var topLineView: UIView!
+    
+    // 1 second = 10 px
+    let backgroundView: UIView = UIView()
+    
+    func setUpTopLine() {
+        let presentPosition = CGFloat(Float(currentTime) / Float(self.duration))
+        
+        progressBlock.frame.origin.x = (0.5) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
+        
+        topLineView.frame = CGRectMake((0.5) * self.trueWidth, 0, tabsEditorProgressWidthMultiplier / 10 * CGFloat(theSong.getDuration()), 20)
+        
+
         var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / (Int(tabsEditorProgressWidthMultiplier) / 2)
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
