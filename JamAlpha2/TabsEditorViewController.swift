@@ -2246,7 +2246,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func addTabViewOnMusicControlView(sender: Int) -> (UIView, tabOnMusicLine) {
         let tempView: UIView = UIView()
-        tempView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
+        tempView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.6)//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
         tempView.layer.cornerRadius = 2
         var tempStruct: tabOnMusicLine = tabOnMusicLine()
         let name = self.noteButtonWithTabArray[sender].tab.name
@@ -2917,7 +2917,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func findCurrentTabView() {
         let stepper:Double = 10.0 / Double(self.tabsEditorProgressWidthMultiplier)
         for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)
+            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.6)
         }
         if self.allTabsOnMusicLine.count == 1 {
             if self.currentTime >= (self.allTabsOnMusicLine[0].time - 0.1 * stepper) && self.currentTime <= (self.allTabsOnMusicLine[0].time + 3.2 * stepper) {
