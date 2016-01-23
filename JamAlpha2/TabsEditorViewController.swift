@@ -1695,7 +1695,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         progressBlock.frame.origin.x = (0.5) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
         
-        topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier / 10 * CGFloat(theSong.getDuration()), 20)
+        topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
         
 
         var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) * Int(tabsEditorProgressWidthMultiplier) / 5
@@ -1986,9 +1986,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
             self.duration = (theSong as! MPMediaItem).playbackDuration
         }
-        //progressBlock.averageSampleBuffer = CoreDataManager.getSongWaveFormData(theSong)
-        //self.progressBlock.isForTabsEditor = true
-        //self.progressBlock.generateWaveforms()
         self.progressBlock!.alpha = 0.5
 
     }
