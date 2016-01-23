@@ -1647,26 +1647,25 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         setUpTopLine()
     }
     
+    var endScaleNumber: CGFloat = 10
+    var beginScale:CGFloat!
     func pinchOnMusicControlView(sender: UIPinchGestureRecognizer) {
         if sender.numberOfTouches() == 2 {
-            var tempScaleNumber: CGFloat = tabsEditorProgressWidthMultiplier
             if sender.state == .Began {
-                tempScaleNumber = tabsEditorProgressWidthMultiplier
+                beginScale = sender.scale
+                endScaleNumber = tabsEditorProgressWidthMultiplier
             } else if sender.state == .Changed {
-                print(tabsEditorProgressWidthMultiplier)
-                print(sender.scale)
-                if tabsEditorProgressWidthMultiplier < maxScaleNumber && tabsEditorProgressWidthMultiplier > minScaleNumber {
-                    tabsEditorProgressWidthMultiplier = tempScaleNumber * sender.scale
-                } else if tabsEditorProgressWidthMultiplier <= minScaleNumber {
-                    if sender.scale > 1 {
-                        tabsEditorProgressWidthMultiplier = tempScaleNumber * sender.scale
-                    }
-                } else if tabsEditorProgressWidthMultiplier >= maxScaleNumber {
-                    if sender.scale < 1 {
-                        tabsEditorProgressWidthMultiplier = tempScaleNumber * sender.scale
-                    }
+                let scaleChange = sender.scale - beginScale
+                
+                tabsEditorProgressWidthMultiplier = endScaleNumber + (endScaleNumber*scaleChange)
+                if(tabsEditorProgressWidthMultiplier > maxScaleNumber){
+                    tabsEditorProgressWidthMultiplier = maxScaleNumber
+                }else if (tabsEditorProgressWidthMultiplier < minScaleNumber) {
+                    tabsEditorProgressWidthMultiplier = minScaleNumber
                 }
                 updateFramePosition()
+            }else if (sender.state == .Ended || sender.state == .Cancelled){
+                endScaleNumber = tabsEditorProgressWidthMultiplier
             }
         }
     }
