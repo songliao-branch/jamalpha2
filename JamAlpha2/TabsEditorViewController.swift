@@ -1620,6 +1620,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
         self.setUpTimeLabels()
+        self.setUpPinchLable()
         
         backgroundView.frame = CGRectMake(0, 2 / 20 * self.trueHeight, self.trueWidth, 20)
         backgroundView.backgroundColor = UIColor(red: 32 / 255, green: 32 / 255, blue: 32 / 255, alpha: 1)
@@ -1654,6 +1655,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if sender.state == .Began {
                 beginScale = sender.scale
                 endScaleNumber = tabsEditorProgressWidthMultiplier
+                currentScale.text = NSString(format: "%.1f", self.tabsEditorProgressWidthMultiplier) as String
+                pinchWrapper.hidden = false
             } else if sender.state == .Changed {
                 let scaleChange = sender.scale - beginScale
                 
@@ -1663,10 +1666,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }else if (tabsEditorProgressWidthMultiplier < minScaleNumber) {
                     tabsEditorProgressWidthMultiplier = minScaleNumber
                 }
+                currentScale.text = NSString(format: "%.1f", self.tabsEditorProgressWidthMultiplier) as String
                 updateFramePosition()
-            }else if (sender.state == .Ended || sender.state == .Cancelled){
-                endScaleNumber = tabsEditorProgressWidthMultiplier
             }
+        }
+        if (sender.state == .Ended || sender.state == .Cancelled){
+            endScaleNumber = tabsEditorProgressWidthMultiplier
+            pinchWrapper.hidden = true
         }
     }
     
@@ -1744,7 +1750,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let labelFontSize: CGFloat = 10
         let wrapperWidth: CGFloat = 90
         wrapper = UIView(frame: CGRect(x: 0.5 * trueWidth - 45, y: 20, width: wrapperWidth, height: wrapperHeight))
-        wrapper.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.5)
+        wrapper.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.3)
         wrapper.layer.cornerRadius = wrapperHeight / 5
         musicControlView.addSubview(wrapper)
         
@@ -1758,7 +1764,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         currentTimeLabel.backgroundColor = UIColor.clearColor()
         //i'm not wrapper i'm a singer with a cash flow-> ed sheeran :)
         //make it glow
-        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
+        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().colorWithAlphaComponent(0.8).CGColor
         currentTimeLabel.layer.shadowRadius = 3.0
         currentTimeLabel.layer.shadowOpacity = 1.0
         currentTimeLabel.layer.shadowOffset = CGSizeZero
@@ -1773,6 +1779,47 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         totalTimeLabel.backgroundColor = UIColor.clearColor()
 
         wrapper.addSubview(totalTimeLabel)
+    }
+    
+    var pinchWrapper: UIView!
+    var currentScale: UILabel = UILabel()
+    var originalScale: UILabel = UILabel()
+    func setUpPinchLable() {
+        let labelWidth: CGFloat = 35
+        let wrapperHeight: CGFloat = 10
+        let labelFontSize: CGFloat = 10
+        let wrapperWidth: CGFloat = 70
+        pinchWrapper = UIView(frame: CGRect(x: 0.5 * trueWidth - 35, y: musicControlView.frame.height - wrapperHeight, width: wrapperWidth, height: wrapperHeight))
+        pinchWrapper.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.3)
+        pinchWrapper.layer.cornerRadius = wrapperHeight / 5
+        musicControlView.addSubview(pinchWrapper)
+        
+        pinchWrapper.hidden = true
+        
+        currentScale = UILabel(frame: CGRect(x: 0, y: 0, width: labelWidth, height: labelFontSize))
+        currentScale.font = UIFont.systemFontOfSize(labelFontSize)
+        currentScale.text = NSString(format: "%.1f", self.tabsEditorProgressWidthMultiplier) as String
+        currentScale.textColor = UIColor.whiteColor()
+        currentScale.textAlignment = .Center
+        currentScale.backgroundColor = UIColor.clearColor()
+        //i'm not wrapper i'm a singer with a cash flow-> ed sheeran :)
+        //make it glow
+        currentScale.layer.shadowColor = UIColor.whiteColor().colorWithAlphaComponent(0.8).CGColor
+        currentScale.layer.shadowRadius = 3.0
+        currentScale.layer.shadowOpacity = 1.0
+        currentScale.layer.shadowOffset = CGSizeZero
+        currentScale.layer.masksToBounds = false
+    
+        pinchWrapper.addSubview(currentScale)
+        
+        originalScale = UILabel(frame: CGRect(x: labelWidth, y: 0, width: labelWidth, height: labelFontSize))
+        originalScale.textColor = UIColor.whiteColor()
+        originalScale.font = UIFont.systemFontOfSize(labelFontSize)
+        originalScale.text = NSString(format: "%.1f", self.tabsEditorProgressWidthMultiplier) as String
+        originalScale.textAlignment = .Center
+        originalScale.backgroundColor = UIColor.clearColor()
+        
+        pinchWrapper.addSubview(originalScale)
     }
     
     func setUpCountdownView() {
@@ -2199,7 +2246,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func addTabViewOnMusicControlView(sender: Int) -> (UIView, tabOnMusicLine) {
         let tempView: UIView = UIView()
-        tempView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.9)//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
+        tempView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 0.6)
         tempView.layer.cornerRadius = 2
         var tempStruct: tabOnMusicLine = tabOnMusicLine()
         let name = self.noteButtonWithTabArray[sender].tab.name
@@ -2213,10 +2260,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         tempLabelView.textAlignment = NSTextAlignment.Center
         tempLabelView.numberOfLines = 1
         
-        let underlineAttribute = [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue]
-        let underlineAttributedString = NSAttributedString(string: name, attributes: underlineAttribute)
-        tempLabelView.attributedText = underlineAttributedString
-        //tempLabelView.text = name
+//        let underlineAttribute = [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue]
+//        let underlineAttributedString = NSAttributedString(string: name, attributes: underlineAttribute)
+//        tempLabelView.attributedText = underlineAttributedString
+        tempLabelView.text = name
         tempView.addSubview(tempLabelView)
         
         tempStruct.tabView = tempView
@@ -2870,7 +2917,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func findCurrentTabView() {
         let stepper:Double = 10.0 / Double(self.tabsEditorProgressWidthMultiplier)
         for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.9)
+            self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.8)
         }
         if self.allTabsOnMusicLine.count == 1 {
             if self.currentTime >= (self.allTabsOnMusicLine[0].time - 0.1 * stepper) && self.currentTime <= (self.allTabsOnMusicLine[0].time + 3.2 * stepper) {
