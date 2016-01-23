@@ -1695,10 +1695,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         progressBlock.frame.origin.x = (0.5) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
         
-        topLineView.frame = CGRectMake((0.5) * self.trueWidth, 0, tabsEditorProgressWidthMultiplier / 10 * CGFloat(theSong.getDuration()), 20)
+        topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier / 10 * CGFloat(theSong.getDuration()), 20)
         
 
-        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) / (Int(tabsEditorProgressWidthMultiplier) / 2)
+        var numberOfLine: Int = Int(CGFloat(theSong.getDuration())) * Int(tabsEditorProgressWidthMultiplier) / 5
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
         } else {
@@ -1707,9 +1707,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var i = 0; i < numberOfLine; i++ {
             var frame: CGRect!
             if i % 2 == 0 {
-                frame = CGRectMake(CGFloat(i * 5 * Int(tabsEditorProgressWidthMultiplier)), 11, 2, 9)
+                frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier, 11, 2, 9)
                 let timeLabel: UILabel = UILabel()
-                timeLabel.frame = CGRectMake(CGFloat(i * 5 * Int(tabsEditorProgressWidthMultiplier)) - 15, 0, 30, 10)
+                timeLabel.frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier - 15, 0, 30, 10)
                 let min: Int = i * 5 / 60
                 let sec: Int = (i * 5) % 60
                 if min < 10 {
@@ -1730,7 +1730,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 timeLabel.textAlignment = .Center
                 topLineView.addSubview(timeLabel)
             } else {
-                frame = CGRectMake(CGFloat(i * 5 * Int(tabsEditorProgressWidthMultiplier)), 15, 1, 5)
+                frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier, 15, 1, 5)
             }
             let tempView: UIView = UIView(frame: frame)
             tempView.backgroundColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
@@ -1759,11 +1759,11 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         currentTimeLabel.backgroundColor = UIColor.clearColor()
         //i'm not wrapper i'm a singer with a cash flow-> ed sheeran :)
         //make it glow
-//        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
-//        currentTimeLabel.layer.shadowRadius = 3.0
-//        currentTimeLabel.layer.shadowOpacity = 1.0
-//        currentTimeLabel.layer.shadowOffset = CGSizeZero
-//        currentTimeLabel.layer.masksToBounds = false
+        currentTimeLabel.layer.shadowColor = UIColor.whiteColor().CGColor
+        currentTimeLabel.layer.shadowRadius = 3.0
+        currentTimeLabel.layer.shadowOpacity = 1.0
+        currentTimeLabel.layer.shadowOffset = CGSizeZero
+        currentTimeLabel.layer.masksToBounds = false
         wrapper.addSubview(currentTimeLabel)
         
         totalTimeLabel = UILabel(frame: CGRect(x: labelWidth + 10, y: 0, width: labelWidth, height: labelFontSize))
