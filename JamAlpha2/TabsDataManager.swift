@@ -132,12 +132,9 @@ class TabsDataManager: NSObject {
                 for var j = 0; j < 25; j++ {
                     let index = NSNumber(integer: i * 10000 + j * 100)
                     let note = fretsBoard[i - 1][j]
-                    print("\(note)")
                     insertInitialTabs(index, name: note, dict: dict)
                 }
             }
-        } else {
-            print("Original tabs already in place")
         }
     }
     
@@ -172,7 +169,6 @@ class TabsDataManager: NSObject {
                     let tempItem: Tabs = item as Tabs
                     let tempTab: NormalTabs = NormalTabs()
                     tempTab.name = tempItem.name
-                    print("\(tempItem.index)")
                     tempTab.index = tempItem.index
                     tempTab.content = tempItem.content
                     tempTab.isOriginal = tempItem.isOriginal
@@ -198,9 +194,6 @@ class TabsDataManager: NSObject {
                     let tempItem: Tabs = item as Tabs
                     let tempTab: NormalTabs = NormalTabs()
                     tempTab.name = tempItem.name
-                    print("...\(tempItem.index)")
-                    print("...\(tempItem.name)")
-                    print("...\(tempItem.content)")
                     tempTab.index = tempItem.index
                     tempTab.content = tempItem.content
                     tempTab.isOriginal = tempItem.isOriginal
@@ -228,7 +221,6 @@ class TabsDataManager: NSObject {
 
     class func removeTabs(tabs: Tabs) {
         if tabs.isOriginal {
-            print("cannot remove original tabs")
             return
         }
         moc.deleteObject(tabs)

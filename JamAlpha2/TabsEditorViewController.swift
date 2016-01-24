@@ -178,6 +178,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var tutorialOverlay: UIView!
     var videoPlayerView: YouTubePlayerView!
     
+    var isShowDiscardAlert:Bool = false
+    
     
     // Mark: Main view data array structure
     class mainViewData {
@@ -1323,7 +1325,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             let buttonX = (string6FretPosition[indexFret] + string6FretPosition[indexFret + 1]) / 2 - buttonWidth / 2
             let buttonY = string6Position[indexString] - buttonWidth / 2
             self.fingerPoint[5 - indexString].frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
-            self.fingerPoint[5 - indexString].alpha = 0
+            //self.fingerPoint[5 - indexString].alpha = 0
             self.fingerPoint[5 - indexString].tag = indexFret
             self.fingerPoint[5 - indexString].hidden = false
             UIView.animateWithDuration(0.3, animations: {
@@ -1511,9 +1513,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     maxButtonX = buttonX + buttonWidth
                 }
             }
-            
             fingerButton.addTarget(self, action: "pressEditFingerButton:", forControlEvents: UIControlEvents.TouchUpInside)
-            let stringNumber = Int(self.specificTabSets[sender].index) / 100
             fingerButton.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
             fingerButton.setImage(image, forState: UIControlState.Normal)
             fingerButton.alpha = 0
@@ -1524,11 +1524,17 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 fingerButton.alpha = 1
             })
             
-            if i / 2 < stringNumber - 1 {
+            if i / 2 < 6 {
                 self.completeStringView.addSubview(fingerButton)
             }
             self.view.userInteractionEnabled = true
         }
+        
+        let stringNumber = Int(self.specificTabSets[sender].index) / 100
+        for var i = 0 ; i <= 6 - stringNumber ; i++ {
+            self.fingerPoint[i].hidden = true
+        }
+        
         var midButtonX:CGFloat = 0
         if(maxButtonX - miniButtonX <= trueWidth){
            midButtonX = (miniButtonX + maxButtonX)/2.0
@@ -2220,6 +2226,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         return
                     }
                     self.allTabsOnMusicLine.insert(returnValue.1, atIndex: 0)
+                    self.isShowDiscardAlert = true
                     inserted = true
                     break
                 } else if self.currentTime > self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i + 1].time {
@@ -2228,6 +2235,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         return
                     }
                     self.allTabsOnMusicLine.insert(returnValue.1, atIndex: i + 1)
+                    self.isShowDiscardAlert = true
                     inserted = true
                     break
                 }
@@ -2241,6 +2249,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }
                 
                 self.allTabsOnMusicLine.append(returnValue.1)
+                self.isShowDiscardAlert = true
             }
             self.progressBlock.addSubview(returnValue.0)
             self.findCurrentTabView()
@@ -2283,7 +2292,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.backToMainView()
             self.view.userInteractionEnabled = true
         } else {
-            if self.noteButtonWithTabArray.count != 0 || self.allTabsOnMusicLine.count != 0 {
+            if self.isShowDiscardAlert {
                 let alertController = UIAlertController(title: nil, message: "Do you want to discard all changes?", preferredStyle: UIAlertControllerStyle.Alert)
                 alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
                 alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler:{
@@ -2694,6 +2703,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         
         self.noteButtonWithTabArray.append(tempNoteButtonWithTab)
+        self.isShowDiscardAlert = true
         tempNoteButtonWithTab.noteButton.tag = self.noteButtonWithTabArray.count - 1
     }
     // compare the tab whether equals
@@ -2805,6 +2815,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
+            self.isShowDiscardAlert = true
             self.currentTabViewIndex = --self.currentTabViewIndex
             
             if (self.currentTabViewIndex < 0) {
@@ -2860,6 +2871,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         } else if self.allTabsOnMusicLine.count == 1 && currentTabViewIndex  == 0{
             self.view.userInteractionEnabled = false
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
+            self.isShowDiscardAlert = true
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
             self.currentTabViewIndex = 0
             self.currentTime = 0
@@ -2971,6 +2983,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
             privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
         }
+        self.isShowDiscardAlert = true
     }
     
     // find the current tab according to the current music time
@@ -3052,6 +3065,7 @@ extension TabsEditorViewController {
         for item in unrepeatTabs {
             self.addTabsToMainViewDataArray(item)
         }
+        self.isShowDiscardAlert = false
         reorganizeMainViewDataArray()
         collectionView.reloadData()
     }
@@ -3447,8 +3461,8 @@ extension TabsEditorViewController {
                 self.fingerPoint[2].accessibilityIdentifier = "grayButton"
                 self.fingerPoint[2].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
                 if indexString == 6 {
-                    self.fingerPoint[1].hidden = false
                     self.moveFingerPoint(oldTagString5, indexString: 4)
+                    self.fingerPoint[1].hidden = false
                     self.fingerPoint[1].accessibilityIdentifier = "grayButton"
                     self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
                 }
@@ -3776,6 +3790,7 @@ extension TabsEditorViewController {
             alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
                 action in
                 self.deleteActionOnSpecificTabView()
+                
             }))
             self.presentViewController(alertController, animated: true, completion: nil)
         } else {
@@ -3784,6 +3799,7 @@ extension TabsEditorViewController {
     }
     
     func deleteActionOnSpecificTabView() {
+        self.isShowDiscardAlert = true
         self.deleteChordOnMainViewWhenDeleteOnEditView(Int(self.currentSelectedSpecificTab.index), name: self.currentSelectedSpecificTab.name, content: self.currentSelectedSpecificTab.content)
         self.removeObjectsOnSpecificTabsScrollView()
         TabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
@@ -3793,6 +3809,7 @@ extension TabsEditorViewController {
     }
     
     func deleteChordOnMainView(sender: UITapGestureRecognizer) {
+        self.isShowDiscardAlert = true
         let index: Int = (sender.view?.tag)!
         self.stopNormalJinggling(longPressMainViewNoteButton[self.noteButtonWithTabArray[index].noteButton]!, button: self.noteButtonWithTabArray[index].noteButton)
         let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
