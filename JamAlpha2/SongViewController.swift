@@ -383,17 +383,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         tutorialScrollView.contentSize = CGSize(width: CGFloat(numberOfTutorialPages) * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
         
-        var originX = 0
         let diameter = 6
-        
-        if numberOfTutorialPages % 2 == 0 {//even
-            originX = (numberOfTutorialPages/2) * diameter + (numberOfTutorialPages/2)*diameter/2
-        } else {
-            originX = (numberOfTutorialPages/2) * diameter + (numberOfTutorialPages/2)*diameter/2 + diameter/2
-        }
+        let range = diameter * 2
+        let totalWidth = numberOfTutorialPages * diameter + Int(ceil(Float(numberOfTutorialPages/2))) * range
+        let firstOx = self.view.centerX - CGFloat(totalWidth/2)
         
         for i in 0..<numberOfTutorialPages {
-            let circle = UIView(frame: CGRect(x: self.view.center.x - CGFloat(originX) + CGFloat(i * diameter * 3 / 2), y: self.view.frame.height - 20, width: CGFloat(diameter), height: CGFloat(diameter)))
+            let circle = UIView(frame: CGRect(x: firstOx + CGFloat(i * range), y: self.view.frame.height - 20, width: CGFloat(diameter), height: CGFloat(diameter)))
             circle.backgroundColor = UIColor.whiteColor()
             
             if i == 0 {
