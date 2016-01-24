@@ -34,7 +34,7 @@ class lyricsWithTime {
     }
 }
 
-class LyricsSyncViewController: UIViewController  {
+class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
 
     var currentTime: NSTimeInterval = 0
     var isDemoSong = false
@@ -81,6 +81,13 @@ class LyricsSyncViewController: UIViewController  {
     
     var playButtonImageView: UIImageView = UIImageView()
     
+    
+    // MARK: tutorial
+    var tutorialScrollView: UIScrollView!
+    var numberOfTutorialPages = 2
+    var tutorialIndicators = [UIView]()
+    var indicatorOriginXPositions = [CGFloat]()
+    
     // MARK: UIGestures
     var addedLyricsWithTime: lyricsWithTime!
     
@@ -98,6 +105,7 @@ class LyricsSyncViewController: UIViewController  {
         setUpProgressBlock()
         setUpTimeLabels()
         setUpCountdownView()
+        setUpTutorial()
         if tempLyricsTimeTuple.count > 0 {
             addUnfinishedLyrivsAndTime()
         } else {
@@ -330,6 +338,46 @@ class LyricsSyncViewController: UIViewController  {
         countdownView.backgroundColor = UIColor.clearColor()
         countdownView.hidden = true
         self.view.addSubview(countdownView)
+    }
+    
+    func setUpTutorial() {
+        tutorialScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        tutorialScrollView.backgroundColor = UIColor.clearColor()
+        self.view.addSubview(tutorialScrollView)
+        
+        tutorialScrollView.bounces = false
+        tutorialScrollView.pagingEnabled = true
+        tutorialScrollView.delegate = self
+        for i in 0..<numberOfTutorialPages{
+            let tutorialImage = UIImageView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: view.frame.height))
+            
+            tutorialImage.image = UIImage(named: "lyrics_tutorial_\(i+1)")
+            
+            tutorialScrollView.addSubview(tutorialImage)
+            
+        }
+        tutorialScrollView.contentSize = CGSize(width: 5 * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
+        
+        var originX = 0
+        if numberOfTutorialPages % 2 == 0 {//even
+            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5
+        } else {
+            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5 + 5
+        }
+        
+        for i in 0..<numberOfTutorialPages {
+            let circle = UIView(frame: CGRect(x: self.view.center.x - CGFloat(originX) + CGFloat(i * 15), y: self.view.frame.height - 20, width: 10, height: 10))
+            circle.backgroundColor = UIColor.whiteColor()
+            
+            if i == 0 {
+                circle.backgroundColor = UIColor.mainPinkColor()
+            }
+            circle.layer.cornerRadius = 5
+            tutorialScrollView.addSubview(circle)
+            tutorialIndicators.append(circle)
+            indicatorOriginXPositions.append(circle.frame.origin.x)
+        }
+    
     }
     
     var currentSelectIndex: Int = 0

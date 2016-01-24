@@ -46,6 +46,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var numberOfTutorialPages = 5
     var tutorialIndicators = [UIView]()
     var indicatorOriginXPositions = [CGFloat]()
+    var tutorialCloseButton: UIButton!
     
     var backgroundImageView: UIImageView!
     var backgroundScaleFactor: CGFloat = 0.4
@@ -371,17 +372,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         for i in 0..<numberOfTutorialPages{
             let tutorialImage = UIImageView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: view.frame.height))
             tutorialImage.image = UIImage(named: "tutorial_\(i+1)_iPhone6")
-            
             tutorialScrollView.addSubview(tutorialImage)
-            
-            if i == 4 {
-                let startButton = UIButton(frame: CGRect(x: 0, y: 0, width: 101, height: 43))
-                startButton.center = CGPoint(x: 4.5 * self.view.frame.width, y: self.view.center.y-100)
-                startButton.setImage(UIImage(named: "start_button"), forState: .Normal)
-                startButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
-                tutorialScrollView.addSubview(startButton)
-            }
         }
+        
+        
+        tutorialCloseButton = UIButton(frame: CGRect(x: 30, y: 25, width: 50, height: 50))
+        tutorialCloseButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
+        tutorialCloseButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
+        self.view.addSubview(tutorialCloseButton)
+        
         tutorialScrollView.contentSize = CGSize(width: 5 * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
         
         var originX = 0
@@ -432,6 +431,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func hideTutorial() {
         tutorialScrollView.hidden = true
+        tutorialCloseButton.hidden = true
         if isDemoSong {
             avPlayer.play()
         } else {
@@ -1217,7 +1217,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
     func resumeSong() {
         if selectedFromTable {
-            if isDemoSong && NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial) {
+            if NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial) {
                 showTutorial()
             } else {
                 if isDemoSong {
