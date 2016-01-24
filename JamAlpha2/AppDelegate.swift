@@ -34,6 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         defaultsDictionary[kShowDemoSong] = true
         defaultsDictionary[kShowTutorial] = true
         defaultsDictionary[kShowTabsEditorTutorial] = true
+        defaultsDictionary[kShowLyricsTutorial] = true
         NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
         AWSS3Manager.createAWSS3FilePath()
         return true
