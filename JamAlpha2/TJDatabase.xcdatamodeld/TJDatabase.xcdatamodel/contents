@@ -19,7 +19,6 @@
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="isFavorited" optional="YES" attributeType="Boolean" defaultValueString="NotCalled" syncable="YES"/>
         <attribute name="playbackDuration" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="soundwaveData" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="soundwaveImage" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="lyricsSets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LyricsSet" inverseName="song" inverseEntity="LyricsSet" syncable="YES"/>

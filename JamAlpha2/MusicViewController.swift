@@ -254,20 +254,29 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 cell.loudspeakerImage.hidden = true
             }
             
-            // some song does not have an album cover
-            if let cover = song.getArtWork() {
-                let image = cover.imageWithSize(CGSize(width: 54, height: 54))
-                if let img = image {
-                    cell.coverImage.image = img
-                } else { //this happens somewhow when songs load too fast
-                    //TODO: load something else
+            
+            CoreDataManager.initializeSongToDatabase(song)
+            
+            if let coverimage = CoreDataManager.getCoverImage(song){
+                cell.coverImage.image = coverimage
+            }else{
+                // some song does not have an album cover
+                if let cover = song.getArtWork() {
+                    let image = cover.imageWithSize(CGSize(width: 54, height: 54))
+                    if let img = image {
+                        cell.coverImage.image = img
+                    } else { //this happens somewhow when songs load too fast
+                        //TODO: load something else
+                        cell.coverImage.image = UIImage(named: "liweng")
+                        loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
+                    }
+                } else {
                     cell.coverImage.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: song)
+                    loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
-            } else {
-                cell.coverImage.image = UIImage(named: "liweng")
-                loadAPISearchImageToCell(cell, song: song)
+
             }
+            
             cell.mainTitle.text = song.getTitle()
             cell.subtitle.text = song.getArtist()
             
@@ -300,16 +309,32 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let theArtist = artistsByFirstAlphabet[indexPath.section].1[indexPath.row]
             
             cell.coverImage.image = nil
+            cell.imageWidth.constant = 80
+            cell.imageHeight.constant = 80
             
-            //get the first album cover
-            for album in theArtist.getAlbums() {
-                if let cover = album.coverImage {
-                    let image = cover.imageWithSize(CGSize(width: 85, height: 85))
-                    cell.coverImage.image = image
-                    cell.imageWidth.constant = 80
-                    cell.imageHeight.constant = 80
-                    
-                    break
+            CoreDataManager.initializeSongToDatabase(theArtist.getSongs()[0])
+            if let coverImage = CoreDataManager.getCoverImage(theArtist.getSongs()[0]){
+                cell.coverImage.image = coverImage
+            }else{
+                //get the first album cover
+                for album in theArtist.getAlbums() {
+                    if let cover = album.coverImage {
+                        let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                        if let img = image {
+                            cell.coverImage.image = img
+                        } else { //this happens somewhow when songs load too fast
+                            //TODO: load something else
+                            cell.coverImage.image = UIImage(named: "liweng")
+                            loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                        }
+                        
+                        break
+                    }
+                }
+                
+                if(cell.coverImage.image == nil){
+                    cell.coverImage.image = UIImage(named: "liweng")
+                    loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
             }
             
@@ -326,12 +351,34 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         } else if pageIndex == 2 {
 
             let theAlbum = albumsByFirstAlphabet[indexPath.section].1[indexPath.row]
+            cell.imageWidth.constant = 80
+            cell.imageHeight.constant = 80
             
-            if let cover = theAlbum.coverImage {
-                cell.imageWidth.constant = 80
-                cell.imageHeight.constant = 80
-                cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
+            CoreDataManager.initializeSongToDatabase(theAlbum.songsIntheAlbum[0])
+            
+            if let coverimage = CoreDataManager.getCoverImage(theAlbum.songsIntheAlbum[0]){
+                cell.coverImage.image = coverimage
+            }else{
+                if let cover = theAlbum.coverImage {
+                    
+                    cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                    let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                    if let img = image {
+                        cell.coverImage.image = img
+                    } else { //this happens somewhow when songs load too fast
+                        //TODO: load something else
+                        cell.coverImage.image = UIImage(named: "liweng")
+                        loadAPISearchImageToCell(cell, song: theAlbum.songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                    }
+                }
+                
+                if(cell.coverImage.image == nil){
+                    cell.coverImage.image = UIImage(named: "liweng")
+                    loadAPISearchImageToCell(cell, song: theAlbum.songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                }
             }
+            
+            
             
             cell.loudspeakerImage.hidden = true
             
@@ -407,7 +454,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
             
             //We use a background thread to constantly check player's current playing item, and we only pop up
-            if((songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() && !isDemoSong) {
+            if(!isDemoSong && songsSorted.count > 0 && (songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                     while (isSeekingPlayerState) {
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
@@ -441,7 +488,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                         }
                     }
                 }
-            }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem || isDemoSong ){
+            }else if (isDemoSong || NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem ){
                     isSeekingPlayerState = false
                     if(!isDemoSong){
                         if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
@@ -459,7 +506,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                         //reload table to show loudspeaker icon on current selected row
                         tableView.reloadData()
                     })
-            } else if ( !NetworkManager.sharedInstance.reachability.isReachable() && songsSorted[indexToBePlayed].cloudItem) {
+            } else if ( songsSorted.count > 0 && !NetworkManager.sharedInstance.reachability.isReachable() && songsSorted[indexToBePlayed].cloudItem) {
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 self.showConnectInternet(tableView)
@@ -580,12 +627,13 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
     
     
-    func loadAPISearchImageToCell(cell: MusicCell, song: Findable) {
+    func loadAPISearchImageToCell(cell: MusicCell, song: Findable, imageSize: SearchAPI.ImageSize) {
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-            SearchAPI.getBackgroundImageForSong(song.getArtist() + " " + song.getTitle(), imageSize: SearchAPI.ImageSize.Thumbnail, completion: {
+            SearchAPI.getBackgroundImageForSong(song.getArtist() + " " + song.getTitle(), imageSize: imageSize, completion: {
                 image in
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.coverImage.image = image
+                    CoreDataManager.saveCoverImage(song, coverImage: image)
                 }
             })
         }
@@ -606,6 +654,12 @@ extension MusicViewController {
                 var op:NSBlockOperation?
                 op = KGLOBAL_init_operationCache[keyString]
                 if(op == nil){
+                    
+                    if nowPlayingItem.artist == nil {
+                        self.incrementSongCountInThread()
+                        return
+                    }
+                    
                     self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
                         url in
                         if url == "" || url.isEmpty {

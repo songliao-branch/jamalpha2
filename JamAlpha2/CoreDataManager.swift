@@ -309,17 +309,32 @@ class CoreDataManager: NSObject {
     }
 
     class func getSongWaveFormImage(item: Findable) -> NSData? {
-        var findItme:Findable? = MusicManager.sharedInstance.itemFoundInCollection(item)
-        if findItme == nil {
-            findItme = item
-        }
-        if let matchedSong = findSong(findItme!) {
+        if let matchedSong = findSong(item) {
            // print("sound wave image found for song")
             return matchedSong.soundwaveImage
         }
         
         return nil
 
+    }
+    
+    
+    class func saveCoverImage(item: Findable, coverImage: UIImage) {
+        let imageData = UIImagePNGRepresentation(coverImage)
+        if let matchedSong = findSong(item) {
+            matchedSong.albumCover = imageData!
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    class func getCoverImage(item: Findable) -> UIImage? {
+        if let matchedSong = findSong(item) {
+            // print("sound wave image found for song")
+            return   UIImage(data: matchedSong.albumCover)
+        }
+        
+        return nil
+        
     }
     
     // MARK: save, retrieve lyrics, userId can be either localuserId or downloaded lyricsSet's user id
@@ -578,15 +593,11 @@ class CoreDataManager: NSObject {
         
         //song id is used to determine which tabs
         if let matchedSong = findSong(item) {
-            print("has \(matchedSong.tabsSets.count) set of tabs")
             
             let sets = matchedSong.tabsSets.allObjects as! [TabsSet]
             
             var foundTabsSet: TabsSet!
             
-            for set in sets {
-                print("set id: \(set.id) || capo is:\(set.capo)")
-            }
             
             if fetchingUsers {
                 foundTabsSet = sets.filter({ $0.userId == CoreDataManager.getCurrentUser()!.id }).first

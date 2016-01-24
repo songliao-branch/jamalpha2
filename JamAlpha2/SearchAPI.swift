@@ -40,7 +40,7 @@ class SearchResult: NSObject {
 class SearchAPI: NSObject {
 
     enum ImageSize: String {
-        case Thumbnail = "100x100", Large = "300x300"
+        case Thumbnail = "80x80", Large = "300x300"
     }
     
     static var musicRequest: Request?
