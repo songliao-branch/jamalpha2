@@ -2216,6 +2216,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
                 if self.currentTime <= self.allTabsOnMusicLine[0].time {
                     if(returnValue.1.tab.content == self.allTabsOnMusicLine[0].tab.content && returnValue.1.time == self.allTabsOnMusicLine[0].time){
+                        self.findCurrentTabView()
                         return
                     }
                     self.allTabsOnMusicLine.insert(returnValue.1, atIndex: 0)
@@ -2223,6 +2224,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     break
                 } else if self.currentTime > self.allTabsOnMusicLine[i].time && self.currentTime <= self.allTabsOnMusicLine[i + 1].time {
                     if(returnValue.1.tab.content == self.allTabsOnMusicLine[i+1].tab.content && returnValue.1.time == self.allTabsOnMusicLine[i+1].time){
+                        self.findCurrentTabView()
                         return
                     }
                     self.allTabsOnMusicLine.insert(returnValue.1, atIndex: i + 1)
@@ -2233,6 +2235,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if !inserted {
                 if(self.allTabsOnMusicLine.count > 0){
                     if(returnValue.1.tab.content == self.allTabsOnMusicLine[0].tab.content && returnValue.1.time == self.allTabsOnMusicLine[0].time){
+                        self.findCurrentTabView()
                         return
                     }
                 }
@@ -2747,15 +2750,20 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         let stepper = 10.0 / Double(self.tabsEditorProgressWidthMultiplier)
         if self.allTabsOnMusicLine.count > 1 {
+            self.view.userInteractionEnabled = false
             if (self.currentTabViewIndex == self.allTabsOnMusicLine.count-1) {
                 if(self.currentTime > self.allTabsOnMusicLine[self.currentTabViewIndex].time + 3.2 * stepper){
                     if isDemoSong {
                         let temprate = self.avPlayer.rate
                         self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                         self.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
+                        self.toTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                         self.avPlayer.rate = 0
+                        self.timer.invalidate()
+                        self.timer = NSTimer()
+                        startTime.setTime(Float(self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper))
                         self.previousButton.enabled = false
-                        UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
                             self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
                             }, completion: {
                                 completed in
@@ -2763,15 +2771,22 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                                 self.previousButton.enabled = true
                                 self.avPlayer.rate = temprate
                                 self.view.userInteractionEnabled = true
+                                if(temprate > 0) {
+                                    self.startTimer()
+                                }
+                                
                         })
                     } else {
                         let temprate = self.musicPlayer.currentPlaybackRate
                         self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                         self.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
-                        
+                        self.timer.invalidate()
+                        self.timer = NSTimer()
+                        startTime.setTime(Float(self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper))
+                        self.toTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                         self.previousButton.enabled = false
                         self.musicPlayer.currentPlaybackRate = 0
-                        UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                        UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
                             self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
                             }, completion: {
                                 completed in
@@ -2779,13 +2794,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                                 self.previousButton.enabled = true
                                 self.musicPlayer.currentPlaybackRate = temprate
                                 self.view.userInteractionEnabled = true
+                                if(temprate > 0) {
+                                    self.startTimer()
+                                }
                         })
                         
                     }
                     return
                 }
             }
-            self.view.userInteractionEnabled = false
             self.allTabsOnMusicLine[self.currentTabViewIndex].tabView.removeFromSuperview()
             self.allTabsOnMusicLine.removeAtIndex(self.currentTabViewIndex)
             self.currentTabViewIndex = --self.currentTabViewIndex
@@ -2797,33 +2814,46 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 let temprate = self.avPlayer.rate
                 self.avPlayer.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                 self.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
-                    self.avPlayer.rate = 0
-                    self.previousButton.enabled = false
-                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
-                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
-                        }, completion: {
-                            completed in
-                            self.findCurrentTabView()
-                            self.previousButton.enabled = true
-                            self.avPlayer.rate = temprate
-                            self.view.userInteractionEnabled = true
-                    })
+                self.avPlayer.rate = 0
+                self.toTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
+                self.previousButton.enabled = false
+                self.timer.invalidate()
+                self.timer = NSTimer()
+                startTime.setTime(Float(self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper))
+                UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
+                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
+                    }, completion: {
+                        completed in
+                        self.findCurrentTabView()
+                        self.previousButton.enabled = true
+                        self.avPlayer.rate = temprate
+                        self.view.userInteractionEnabled = true
+                        if(temprate > 0) {
+                            self.startTimer()
+                        }
+                })
             } else {
                 let temprate = self.musicPlayer.currentPlaybackRate
                 self.musicPlayer.currentPlaybackTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
                 self.currentTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
-                
-                    self.previousButton.enabled = false
-                    self.musicPlayer.currentPlaybackRate = 0
-                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
-                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
-                        }, completion: {
-                            completed in
-                            self.findCurrentTabView()
-                            self.previousButton.enabled = true
-                            self.musicPlayer.currentPlaybackRate = temprate
-                            self.view.userInteractionEnabled = true
-                    })
+                self.previousButton.enabled = false
+                self.musicPlayer.currentPlaybackRate = 0
+                self.toTime = self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper
+                self.timer.invalidate()
+                self.timer = NSTimer()
+                startTime.setTime(Float(self.allTabsOnMusicLine[self.currentTabViewIndex].time + 0.1 * stepper))
+                UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
+                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - CGFloat(self.currentTime * Double(self.tabsEditorProgressWidthMultiplier))
+                    }, completion: {
+                        completed in
+                        self.findCurrentTabView()
+                        self.previousButton.enabled = true
+                        self.musicPlayer.currentPlaybackRate = temprate
+                        self.view.userInteractionEnabled = true
+                        if(temprate > 0) {
+                            self.startTimer()
+                        }
+                })
                
             }
            
@@ -2837,8 +2867,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 let temprate = self.avPlayer.rate
                 self.avPlayer.currentTime = 0
                 self.avPlayer.rate = 0
+                self.toTime = 0
+                self.timer.invalidate()
+                self.timer = NSTimer()
+                startTime.setTime(0)
                     self.previousButton.enabled = false
-                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                    UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
                         self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                         }, completion: {
                             completed in
@@ -2846,22 +2880,34 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                             self.previousButton.enabled = true
                             self.avPlayer.rate = temprate
                             self.view.userInteractionEnabled = true
+                            if(temprate > 0) {
+                                self.startTimer()
+                            }
+
                     })
 
             } else {
                 let temprate = self.musicPlayer.currentPlaybackRate
                 self.musicPlayer.currentPlaybackTime = 0
                 self.musicPlayer.currentPlaybackRate = 0
-                    self.previousButton.enabled = false
-                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
-                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
-                        }, completion: {
-                            completed in
-                            self.findCurrentTabView()
-                            self.previousButton.enabled = true
-                            self.musicPlayer.currentPlaybackRate = temprate
-                            self.view.userInteractionEnabled = true
-                    })
+                self.timer.invalidate()
+                self.timer = NSTimer()
+                startTime.setTime(0)
+                self.toTime = 0
+                self.previousButton.enabled = false
+                UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
+                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+                    }, completion: {
+                        completed in
+                        self.findCurrentTabView()
+                        self.previousButton.enabled = true
+                        self.musicPlayer.currentPlaybackRate = temprate
+                        self.view.userInteractionEnabled = true
+                        if(temprate > 0) {
+                            self.startTimer()
+                        }
+
+                })
             }
             
         } else {
@@ -2872,8 +2918,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 let temprate = self.avPlayer.rate
                 self.avPlayer.currentTime = 0
                 self.avPlayer.rate = 0
+                self.timer.invalidate()
+                self.timer = NSTimer()
+                startTime.setTime(0)
+                self.toTime = 0
                 self.previousButton.enabled = false
-                UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
+                UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
                     self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
                     }, completion: {
                         completed in
@@ -2881,21 +2931,31 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.previousButton.enabled = true
                         self.avPlayer.rate = temprate
                         self.view.userInteractionEnabled = true
+                        if(temprate > 0) {
+                            self.startTimer()
+                        }
                 })
             } else {
                 let temprate = self.musicPlayer.currentPlaybackRate
                 self.musicPlayer.currentPlaybackTime = 0
                 self.musicPlayer.currentPlaybackRate = 0
-                    self.previousButton.enabled = false
-                    UIView.animateWithDuration(0.1, delay: 0, options: .CurveEaseInOut, animations: {
-                        self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
-                        }, completion: {
-                            completed in
-                            self.findCurrentTabView()
-                            self.previousButton.enabled = true
-                            self.musicPlayer.currentPlaybackRate = temprate
-                            self.view.userInteractionEnabled = true
-                    })
+                self.timer.invalidate()
+                self.timer = NSTimer()
+                startTime.setTime(0)
+                self.toTime = 0
+                self.previousButton.enabled = false
+                UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: {
+                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth
+                    }, completion: {
+                        completed in
+                        self.findCurrentTabView()
+                        self.previousButton.enabled = true
+                        self.musicPlayer.currentPlaybackRate = temprate
+                        self.view.userInteractionEnabled = true
+                        if(temprate > 0) {
+                            self.startTimer()
+                        }
+                })
             }
         }
 
