@@ -87,6 +87,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     var numberOfTutorialPages = 2
     var tutorialIndicators = [UIView]()
     var indicatorOriginXPositions = [CGFloat]()
+    var tutorialCloseButton: UIButton!
     
     // MARK: UIGestures
     var addedLyricsWithTime: lyricsWithTime!
@@ -107,7 +108,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         setUpCountdownView()
         setUpTutorial()
         if tempLyricsTimeTuple.count > 0 {
-            addUnfinishedLyrivsAndTime()
+            addUnfinishedLyricsAndTime()
         } else {
             self.addLyricsToEditorView(theSong)
         }
@@ -356,28 +357,66 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             tutorialScrollView.addSubview(tutorialImage)
             
         }
-        tutorialScrollView.contentSize = CGSize(width: 5 * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
+        
+        tutorialScrollView.contentSize = CGSize(width: CGFloat(numberOfTutorialPages) * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
+        
+        tutorialCloseButton = UIButton(frame: CGRect(x: 30, y: 25, width: 50, height: 50))
+        tutorialCloseButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
+        tutorialCloseButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
+        self.view.addSubview(tutorialCloseButton)
         
         var originX = 0
+        let diameter = 6
+        
         if numberOfTutorialPages % 2 == 0 {//even
-            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5
+            originX = (numberOfTutorialPages/2) * diameter + (numberOfTutorialPages/2)*diameter/2
         } else {
-            originX = (numberOfTutorialPages/2) * 10 + (numberOfTutorialPages/2)*5 + 5
+            originX = (numberOfTutorialPages/2) * diameter + (numberOfTutorialPages/2)*diameter/2 + diameter/2
         }
         
         for i in 0..<numberOfTutorialPages {
-            let circle = UIView(frame: CGRect(x: self.view.center.x - CGFloat(originX) + CGFloat(i * 15), y: self.view.frame.height - 20, width: 10, height: 10))
+            let circle = UIView(frame: CGRect(x: self.view.center.x - CGFloat(originX) + CGFloat(i * diameter * 3 / 2), y: self.view.frame.height - 20, width: CGFloat(diameter), height: CGFloat(diameter)))
             circle.backgroundColor = UIColor.whiteColor()
             
             if i == 0 {
                 circle.backgroundColor = UIColor.mainPinkColor()
             }
-            circle.layer.cornerRadius = 5
+            circle.layer.cornerRadius = CGFloat(diameter)/2
             tutorialScrollView.addSubview(circle)
             tutorialIndicators.append(circle)
             indicatorOriginXPositions.append(circle.frame.origin.x)
         }
+    }
     
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if  tutorialScrollView.hidden {
+            return
+        }
+        
+        for i in 0..<numberOfTutorialPages {
+            tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
+        }
+    }
+    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        if  tutorialScrollView.hidden {
+            return
+        }
+        
+        let currentPage = scrollView.contentOffset.x / self.view.frame.width
+        for i in 0..<numberOfTutorialPages {
+            if i == Int(currentPage) {
+                tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
+            } else {
+                tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
+            }
+        }
+    }
+    
+    func hideTutorial() {
+        tutorialScrollView.hidden = true
+        tutorialCloseButton.hidden = true
+        
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowLyricsTutorial)
     }
     
     var currentSelectIndex: Int = 0
@@ -759,7 +798,7 @@ extension LyricsSyncViewController {
 // read the exsit song's lyrics from coredata
 extension LyricsSyncViewController {
     
-    func addUnfinishedLyrivsAndTime() {
+    func addUnfinishedLyricsAndTime() {
         if lyricsOrganizedArray.count > 0 {
             var lyrics: [String] = [String]()
             var time: [NSTimeInterval] = [NSTimeInterval]()

@@ -381,7 +381,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tutorialCloseButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
         self.view.addSubview(tutorialCloseButton)
         
-        tutorialScrollView.contentSize = CGSize(width: 5 * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
+        tutorialScrollView.contentSize = CGSize(width: CGFloat(numberOfTutorialPages) * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
         
         var originX = 0
         let diameter = 6
