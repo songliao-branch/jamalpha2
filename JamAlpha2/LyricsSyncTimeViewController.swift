@@ -165,7 +165,7 @@ class LyricsSyncViewController: UIViewController  {
         if isDemoSong {
             avPlayer = AVAudioPlayer()
             self.duration = NSTimeInterval(MusicManager.sharedInstance.avPlayer.currentItem!.getDuration())
-            
+            avPlayer.currentTime = 0.0
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
             self.avPlayer.volume = 1
@@ -174,6 +174,7 @@ class LyricsSyncViewController: UIViewController  {
             
         } else {
             musicPlayer = MusicManager.sharedInstance.player
+            musicPlayer.currentPlaybackTime = 0.0
             registerNotification()
             self.duration = musicPlayer.nowPlayingItem?.playbackDuration
         }
@@ -539,7 +540,8 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.row == 0 || (addedLyricsWithTime.timeAdded[indexPath.item - 1] && addedLyricsWithTime.time[indexPath.item - 1] < self.currentTime) == true {
+        
+        if indexPath.row == 0 || addedLyricsWithTime.timeAdded[indexPath.item - 1]  {
             if self.addedLyricsWithTime.timeAdded[indexPath.item] == false {
                 
                 self.addedLyricsWithTime.time[indexPath.item] = self.currentTime
@@ -552,7 +554,6 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
                 } else {
                     musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item]
                 }
-                //  self.currentTime = player.currentTime
             }
         } else {
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
@@ -591,7 +592,6 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
                 } else {
                     musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item - 1]
                 }
-                // self.currentTime = player.currentTime
             }
         }
     }
@@ -725,11 +725,6 @@ extension LyricsSyncViewController {
             self.addedLyricsWithTime.addExistLyrics(tempLyricsTimeTuple.count, lyrics: lyrics, time: time, timeAdded: timeAdded)
         }
         tempLyricsTimeTuple.removeAll()
-        if isDemoSong {
-            self.avPlayer.currentTime = self.addedLyricsWithTime.time.last!
-        } else {
-            self.musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time.last!
-        }
     }
     
     func addLyricsToEditorView(sender: Findable) {
