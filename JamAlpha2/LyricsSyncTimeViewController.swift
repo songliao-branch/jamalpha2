@@ -281,7 +281,7 @@ class LyricsSyncViewController: UIViewController  {
         self.progressBlock!.alpha = 0.5
         progressBlockContainer.addSubview(self.progressBlock)
         
-        tapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        tapGesture = UITapGestureRecognizer(target: self, action: "playPause")
         panGesture = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
         progressBlockContainer.addGestureRecognizer(tapGesture)
         progressBlockContainer.addGestureRecognizer(panGesture)
@@ -334,7 +334,7 @@ class LyricsSyncViewController: UIViewController  {
     
     var currentSelectIndex: Int = 0
     
-    func playPause(sender: UITapGestureRecognizer) {
+    func playPause() {
         if self.isDemoSong ? !avPlayer.playing : (musicPlayer.playbackState != .Playing) {
             //start counting down 3 seconds
             //disable tap gesture that inadvertly starts timer
@@ -551,8 +551,14 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
             }else {
                 if isDemoSong {
                     avPlayer.currentTime = self.addedLyricsWithTime.time[indexPath.item]
+                    if !avPlayer.playing {
+                        playPause()
+                    }
                 } else {
                     musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[indexPath.item]
+                    if musicPlayer.playbackState == .Paused {
+                        playPause()
+                    }
                 }
             }
         } else {
@@ -760,11 +766,6 @@ extension LyricsSyncViewController {
         }
         if i == 0 {
             i = 1 // if don't have the same line of lyrics, make the time equals to 0
-        }
-        if isDemoSong {
-            self.avPlayer.currentTime = self.addedLyricsWithTime.time[i - 1]
-        } else {
-            self.musicPlayer.currentPlaybackTime = self.addedLyricsWithTime.time[i - 1]
         }
     }
 }
