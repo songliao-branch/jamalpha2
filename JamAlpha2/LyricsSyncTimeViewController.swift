@@ -113,6 +113,10 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         } else {
             self.addLyricsToEditorView(theSong)
         }
+        
+        self.lyricsTableView.preservesSuperviewLayoutMargins = false
+        self.lyricsTableView.separatorInset = UIEdgeInsetsZero
+        self.lyricsTableView.layoutMargins = UIEdgeInsetsZero
     }
     
     override func viewDidDisappear(animated: Bool) {
