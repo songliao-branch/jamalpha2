@@ -39,10 +39,10 @@ class LocalSong: NSObject {
                 for result in results {
                     if MusicManager.sharedInstance.songsMatched(findableA: self, findableB: result) {
                         completion(searchResult: result)
-                        break
+                        return
                     }
-                    completion(searchResult: nil)
                 }
+                completion(searchResult: nil)
             })
         }
     }
