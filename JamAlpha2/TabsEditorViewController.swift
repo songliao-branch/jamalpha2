@@ -529,7 +529,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         //var flowLayout:UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         let scrollDirection = UICollectionViewScrollDirection.Horizontal
         layout.scrollDirection = scrollDirection
-        let frame = CGRectMake(0, self.trueHeight * 8 / 20, self.trueWidth, 12 / 20 * self.trueHeight)
+        let frame = CGRectMake(-1, self.trueHeight * 8 / 20, self.trueWidth+1, 12 / 20 * self.trueHeight)
         collectionView = UICollectionView(frame: frame, collectionViewLayout: layout)
         collectionView.registerClass(FretCell.self, forCellWithReuseIdentifier: "fretcell")
         collectionView.bounces = true
@@ -695,7 +695,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             self.completeStringView.alpha = 1
             self.specificTabsScrollView.alpha = 1
             self.tabNameTextField.alpha = 1
-            self.completeStringView.frame = CGRectMake(0, 3 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
+            self.completeStringView.frame = CGRectMake(-1, 3 / 20 * self.trueHeight, self.trueWidth+1, 15 / 20 * self.trueHeight)
             },completion: {
                 completed in
                 UIView.animateWithDuration(0.5, animations: {
