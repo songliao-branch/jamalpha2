@@ -1708,13 +1708,10 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
         var numberOfLine: Int = Int(CGFloat(theSong.getDuration()) / 10 * 2)
         var lineSpace: CGFloat = 5
-        var lineNumber: Int = 2
         if tabsEditorProgressWidthMultiplier >= 15 {
            numberOfLine = Int(CGFloat(theSong.getDuration()) / 10 * 4)
             lineSpace = 2.5
-            lineNumber = 4
         }
-        
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
         } else {
