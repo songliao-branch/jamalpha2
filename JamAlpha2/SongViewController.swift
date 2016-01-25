@@ -1346,7 +1346,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                             image in
                                 dispatch_async(dispatch_get_main_queue()) {
                                     let data = UIImagePNGRepresentation(image)
-                                    KGLOBAL_operationCache.removeValueForKey(tempkeyString)
+                                    if (KGLOBAL_operationCache[tempkeyString] != nil){
+                                        KGLOBAL_operationCache.removeValueForKey(tempkeyString)
+                                    }
                                     if (KGLOBAL_defaultProgressBar != nil){
                                         KGLOBAL_defaultProgressBar.removeFromSuperview()
                                         KGLOBAL_defaultProgressBar = nil
@@ -1364,6 +1366,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                             print("sound url not available")
                             KGLOBAL_init_queue.suspended = false
                             self.setupDefaultProgressBar()
+                            if (KGLOBAL_operationCache[tempkeyString] != nil){
+                               KGLOBAL_operationCache.removeValueForKey(tempkeyString)
+                            }
                             return
                         }
                     
@@ -1381,6 +1386,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 tempProgressBlock.generateWaveforms()
                                 let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                                 CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
+                                
                                 //when we get the soundwave we will upload it to the cloud
                                 let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
                                 AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
@@ -2306,10 +2312,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(KGLOBAL_progressBlock != nil ){
                 KGLOBAL_progressBlock.removeFromSuperview()
                 KGLOBAL_progressBlock = nil
-                if (KGLOBAL_defaultProgressBar != nil){
-                    KGLOBAL_defaultProgressBar.removeFromSuperview()
-                    KGLOBAL_defaultProgressBar = nil
-                }
+            }
+            if (KGLOBAL_defaultProgressBar != nil){
+                KGLOBAL_defaultProgressBar.removeFromSuperview()
+                KGLOBAL_defaultProgressBar = nil
             }
             if isSongNeedPurchase{
                 self.displayLink.paused = true

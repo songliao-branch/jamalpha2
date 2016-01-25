@@ -656,6 +656,9 @@ extension MusicViewController {
                 if(op == nil){
                     
                     if nowPlayingItem.artist == nil {
+                        if(KGLOBAL_init_operationCache[keyString] != nil){
+                            KGLOBAL_init_operationCache.removeValueForKey(keyString)
+                        }
                         self.incrementSongCountInThread()
                         return
                     }
@@ -663,13 +666,16 @@ extension MusicViewController {
                     self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
                         url in
                         if url == "" || url.isEmpty {
+                            let tempNowPlayingItem = nowPlayingItem
+                            let tempkeyString:String = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
                             guard let assetURL = nowPlayingItem.getURL() else {
+                                if(KGLOBAL_init_operationCache[tempkeyString] != nil){
+                                    KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
+                                }
                                 self.incrementSongCountInThread()
                                 return
                             }
                             // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-                            let tempNowPlayingItem = nowPlayingItem
-                            let tempkeyString:String = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
                             var progressBarWidth:CGFloat!
                             progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
                             let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
@@ -706,7 +712,9 @@ extension MusicViewController {
                             AWSS3Manager.downloadImage(url, isProfileBucket: false, completion: {
                                 image in
                                     let data = UIImagePNGRepresentation(image)
-                                    KGLOBAL_init_operationCache.removeValueForKey(keyString)
+                                    if(KGLOBAL_init_operationCache[keyString] != nil){
+                                        KGLOBAL_init_operationCache.removeValueForKey(keyString)
+                                    }
                                     CoreDataManager.saveSoundWave(nowPlayingItem, soundwaveImage: data!)
                                     self.incrementSongCountInThread()
                                     return
