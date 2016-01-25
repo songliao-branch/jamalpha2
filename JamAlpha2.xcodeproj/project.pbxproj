@@ -28,6 +28,7 @@
 		BFC136251C55F70D00D05899 /* TabsEditorJinggling.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */; };
 		BFC136271C55F79600D05899 /* TabsEditorAddExistTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */; };
 		BFC136291C55F8A400D05899 /* TabsEditorYouTube.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */; };
+		BFC1362D1C56B11100D05899 /* TabsEditorCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */; };
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */; };
 		BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED01C1220E700F26877 /* AboutViewController.swift */; };
@@ -206,6 +207,7 @@
 		BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorJinggling.swift; sourceTree = "<group>"; };
 		BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorAddExistTabs.swift; sourceTree = "<group>"; };
 		BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorYouTube.swift; sourceTree = "<group>"; };
+		BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorCollectionView.swift; sourceTree = "<group>"; };
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateNickNameViewController.swift; sourceTree = "<group>"; };
 		BFE49ED01C1220E700F26877 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -423,6 +425,7 @@
 				BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */,
 				BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */,
 				BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */,
+				BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */,
 			);
 			name = TabsEditor;
 			sourceTree = "<group>";
@@ -1087,6 +1090,7 @@
 				E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */,
 				E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */,
 				E49AF0971B2699C800DD3342 /* BaseViewController.swift in Sources */,
+				BFC1362D1C56B11100D05899 /* TabsEditorCollectionView.swift in Sources */,
 				E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */,
 				E4FCACEF1BC5A7C3000E3661 /* Tabs.swift in Sources */,
 				E43713FD1C34871300517D03 /* MyTabsAndLyricsViewController.swift in Sources */,
