@@ -24,6 +24,10 @@
 		BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */; };
 		BF5A77D81BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */; };
 		BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC080D41BCAED9D009CD755 /* NormalTab.swift */; };
+		BFC136231C55F6C000D05899 /* TabsEditorCapo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136221C55F6C000D05899 /* TabsEditorCapo.swift */; };
+		BFC136251C55F70D00D05899 /* TabsEditorJinggling.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */; };
+		BFC136271C55F79600D05899 /* TabsEditorAddExistTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */; };
+		BFC136291C55F8A400D05899 /* TabsEditorYouTube.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */; };
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */; };
 		BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED01C1220E700F26877 /* AboutViewController.swift */; };
@@ -198,6 +202,10 @@
 		BF4B84391C0CE80F00AF8A2A /* AWSS3Manager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSS3Manager.swift; sourceTree = "<group>"; };
 		BF5A77D71BEFFA5600BCE723 /* MeLoginOrSignupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeLoginOrSignupViewController.swift; sourceTree = "<group>"; };
 		BFC080D41BCAED9D009CD755 /* NormalTab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NormalTab.swift; sourceTree = "<group>"; };
+		BFC136221C55F6C000D05899 /* TabsEditorCapo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorCapo.swift; sourceTree = "<group>"; };
+		BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorJinggling.swift; sourceTree = "<group>"; };
+		BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorAddExistTabs.swift; sourceTree = "<group>"; };
+		BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorYouTube.swift; sourceTree = "<group>"; };
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateNickNameViewController.swift; sourceTree = "<group>"; };
 		BFE49ED01C1220E700F26877 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -391,6 +399,7 @@
 		BF0B3AF51C33C99D003F0541 /* TabsEdtiorViewController */ = {
 			isa = PBXGroup;
 			children = (
+				BFC136211C55F69D00D05899 /* TabsEditor */,
 				BFFAA5141C3CE0DD00DC3253 /* PlayChordsManager */,
 				105B2EC61C316E20002BC17A /* CustomizedView.swift */,
 				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
@@ -405,6 +414,17 @@
 				E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */,
 			);
 			name = LyricsEditorViewController;
+			sourceTree = "<group>";
+		};
+		BFC136211C55F69D00D05899 /* TabsEditor */ = {
+			isa = PBXGroup;
+			children = (
+				BFC136221C55F6C000D05899 /* TabsEditorCapo.swift */,
+				BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */,
+				BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */,
+				BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */,
+			);
+			name = TabsEditor;
 			sourceTree = "<group>";
 		};
 		BFE49ECF1C1220C200F26877 /* SettingViewController */ = {
@@ -1036,6 +1056,8 @@
 				E4CBC0051B9E88BA00473FC4 /* SwiftCoreDataHelper.swift in Sources */,
 				E42032EC1BFEF31E00A5D36D /* AvatarCell.swift in Sources */,
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
+				BFC136251C55F70D00D05899 /* TabsEditorJinggling.swift in Sources */,
+				BFC136291C55F8A400D05899 /* TabsEditorYouTube.swift in Sources */,
 				E43713FB1C3486BE00517D03 /* MyFavoritesViewController.swift in Sources */,
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,
@@ -1073,6 +1095,7 @@
 				E455E72B1BA2760300210BD6 /* CoreDataManager.swift in Sources */,
 				E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */,
 				10AC35A61C215BE300749744 /* DemoCell.swift in Sources */,
+				BFC136271C55F79600D05899 /* TabsEditorAddExistTabs.swift in Sources */,
 				BF4B843A1C0CE80F00AF8A2A /* AWSS3Manager.swift in Sources */,
 				10AC35A41C21509D00749744 /* DemoViewController.swift in Sources */,
 				E43713F51C34853600517D03 /* UserTabsLyricsCell.swift in Sources */,
@@ -1081,6 +1104,7 @@
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,
 				E488776A1B1520A0004785D3 /* SongViewController.swift in Sources */,
+				BFC136231C55F6C000D05899 /* TabsEditorCapo.swift in Sources */,
 				C82A4E971B81B668008B6AFC /* VisualizerView.swift in Sources */,
 				E48F22671BF5924000F24962 /* DownloadedTabsSet.swift in Sources */,
 				105B2EC71C316E20002BC17A /* CustomizedView.swift in Sources */,
