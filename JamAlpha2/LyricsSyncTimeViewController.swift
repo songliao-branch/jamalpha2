@@ -144,6 +144,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             self.defaultProgressBar.progress = 1.0
             self.defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
             self.defaultProgressBar.progressTintColor = UIColor.whiteColor()
+            self.defaultProgressBar.alpha = 0.5
             self.progressBlockContainer.insertSubview(  self.defaultProgressBar , aboveSubview: self.progressBlock)
         }
         
