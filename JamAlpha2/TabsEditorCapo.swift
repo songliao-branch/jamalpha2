@@ -34,14 +34,16 @@ extension TabsEditorViewController {
     
     func cropFullStringImageView(sender: Int) {
         let count = 25
-        let croppedLength: CGFloat = self.trueWidth / 5 * CGFloat(count - sender)
-        let cropRect: CGRect = CGRectMake(0, 0, croppedLength, self.completeStringView.frame.size.height)
-        self.completeImageView.image = UIImage(named: "iPhone5_fullFretboard")
-        let image = self.completeImageView.cropViewWithRect(cropRect)
+        let croppedLength: CGFloat = 3409 * CGFloat(count - sender) / 25
+        let cropRect: CGRect = CGRectMake(0, 0, croppedLength, 282)
+        let croppedImage =  UIImage(named: "iPhone5_fullFretboard")?.cropImageWithRect(cropRect)
         
-        self.completeStringView.contentSize = CGSizeMake(croppedLength, 15 / 20 * self.trueHeight)
-        self.completeImageView.frame = CGRectMake(0, 0, croppedLength, 15 / 20 * self.trueHeight)
-        self.completeImageView.image = image
+        let croppedViewLength: CGFloat = self.trueWidth / 5 * CGFloat(count - sender)
+        self.completeStringView.contentSize = CGSizeMake(croppedViewLength, 15 / 20 * self.trueHeight)
+        self.completeImageView.frame = CGRectMake(0, 0, croppedViewLength, 15 / 20 * self.trueHeight)
+        self.completeImageView.image = croppedImage
+
+        
     }
     
     func updateCollectionView(sender: Int) {

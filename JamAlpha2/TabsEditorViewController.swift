@@ -284,6 +284,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.collectionView.delegate = self
         setUpTuningControlMenu()
 
+        PlayChordsManager.sharedInstance.fret0Midi = PlayChordsManager.sharedInstance.standardFret0Midi
         PlayChordsManager.sharedInstance.changeVolumn(1.0)
     }
     
@@ -625,6 +626,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
         if isJiggling == false {
             self.changeMenuButtonStatus(true)
+            self.cropFullStringImageView(Int(capoStepper.value))
             var indexFret: Int = Int()
             var indexString: Int = Int()
             indexString = 5
