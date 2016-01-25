@@ -966,7 +966,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let musicView: UIView = UIView()
 
        
-        menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
+        menuView.frame = CGRectMake(-1, 0, self.trueWidth+1, 2 / 20 * self.trueHeight)
         //menuView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
         menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!)
 
@@ -984,38 +984,38 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let buttonSpace = (0.5 * self.trueWidth - 3.5 * buttonWidth - 0.5 / 31.0 * self.trueWidth) / 3.0
         let buttonEdge: CGFloat = CGFloat(0.2 / 20) * self.trueHeight
         
-        backButton.frame = CGRectMake(0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
         backButton.setImage(UIImage(named: "backButton"), forState: UIControlState.Normal)
         backButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)//CGFloat(0.6 / 20) * self.trueHeight
         menuView.addSubview(backButton)
         
-        statusLabel.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, 4 * (buttonWidth + buttonSpace), 2 / 20 * self.trueHeight)
+        statusLabel.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, 4 * (buttonWidth + buttonSpace), 2 / 20 * self.trueHeight)
         self.statusLabel.text = "Tabs Editor"
         statusLabel.textColor = UIColor.whiteColor()
         statusLabel.hidden = true
         statusLabel.textAlignment = NSTextAlignment.Center
         menuView.addSubview(statusLabel)
         
-        addButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        addButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         addButton.addTarget(self, action: "pressAddButton:", forControlEvents: UIControlEvents.TouchUpInside)
         addButton.setImage(UIImage(named: "addButton"), forState: UIControlState.Normal)
         addButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(addButton)
         
-        resetButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        resetButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
         resetButton.setImage(UIImage(named: "trashButton"), forState: UIControlState.Normal)
         resetButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(resetButton)
         
-        playPauseButton.frame = CGRectMake(3 * buttonWidth + 3 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        playPauseButton.frame = CGRectMake(3 * buttonWidth + 3 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         playPauseButton.addTarget(self, action: "singleTapOnMusicControlView:", forControlEvents: UIControlEvents.TouchUpInside)
         playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
         playPauseButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(playPauseButton)
         
-        tuningButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        tuningButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
         tuningButton.setImage(UIImage(named: "tuningButton"), forState: UIControlState.Normal)
         tuningButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
@@ -1023,21 +1023,21 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         let privacyDoneButtonContainer: UIImageView = UIImageView()
-        privacyDoneButtonContainer.frame = CGRectMake(30.5 / 31 * self.trueWidth - 2.5 * 1.6 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight, 2.5 * 1.6 / 20 * self.trueHeight, 1.6 / 20 * self.trueHeight)
+        privacyDoneButtonContainer.frame = CGRectMake(30.5 / 31 * self.trueWidth - 2.5 * 1.6 / 20 * self.trueHeight+1, 0.2 / 20 * self.trueHeight, 2.5 * 1.6 / 20 * self.trueHeight, 1.6 / 20 * self.trueHeight)
         privacyDoneButtonContainer.image = UIImage(named: "frame")
         privacyDoneButtonContainer.userInteractionEnabled = true
         
         menuView.addSubview(privacyDoneButtonContainer)
         
         //TODO: set button from the visible attribute itself
-        privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight, 0, buttonWidth, buttonWidth)
+        privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight+1, 0, buttonWidth, buttonWidth)
         privacyButton.backgroundColor = UIColor.clearColor()
         privacyButton.setImage(UIImage(named: "globeIcon"), forState: UIControlState.Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
         privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
         menuView.addSubview(privacyButton)
         
-        doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight, 0, 1.2 * buttonWidth, buttonWidth)
+        doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight+1, 0, 1.2 * buttonWidth, buttonWidth)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         doneButton.setImage(UIImage(named: "saveText"), forState: UIControlState.Normal)
         doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.4 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.7 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
