@@ -81,6 +81,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     
     var playButtonImageView: UIImageView = UIImageView()
     
+    var defaultProgressBar:UIProgressView!
     
     // MARK: tutorial
     var tutorialScrollView: UIScrollView!
@@ -113,7 +114,14 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             self.addLyricsToEditorView(theSong)
         }
     }
-
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if (self.defaultProgressBar != nil) {
+            self.defaultProgressBar.removeFromSuperview()
+            self.defaultProgressBar = nil
+        }
+    }
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
@@ -124,6 +132,17 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
         return UIStatusBarStyle.LightContent;
+    }
+    
+    func setupDefaultProgressBar(){
+        dispatch_async(dispatch_get_main_queue()) {
+            self.defaultProgressBar = UIProgressView(frame: CGRectMake(0,self.progressBlockContainer.frame.height - 36,self.view.width,10))
+            self.defaultProgressBar.progress = 1.0
+            self.defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
+            self.defaultProgressBar.progressTintColor = UIColor.whiteColor()
+            self.progressBlockContainer.insertSubview(  self.defaultProgressBar , aboveSubview: self.progressBlock)
+        }
+        
     }
     
     
@@ -284,6 +303,8 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         
         if let soundWaveData = CoreDataManager.getSongWaveFormImage(theSong) {
             progressBlock.setWaveFormFromData(soundWaveData)
+        }else{
+            self.setupDefaultProgressBar()
         }
         
         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -532,6 +553,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
                 self.progressBlock.frame.origin.x = 0.5 * self.view.frame.size.width - persent * (CGFloat(theSong.getDuration() * Float(progressWidthMultiplier)))
                 
                 self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+                if(self.defaultProgressBar != nil){
+                    self.defaultProgressBar.progress = 1 - Float(persent)
+                }
             }
         }
     }
@@ -583,6 +607,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             self.progressBlock.setProgress(newProgressPosition)
         }
         self.progressBlock.frame.origin.x = newOriginX
+        if(self.defaultProgressBar != nil){
+            self.defaultProgressBar.progress = 1 - Float(newProgressPosition)
+        }
     }
 
     func refreshTimeLabel(time: NSTimeInterval) {

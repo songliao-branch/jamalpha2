@@ -2497,7 +2497,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             KGLOBAL_progressBlock.frame.origin.x = newOriginX
            // print("\(startTime) = \(startTime.toDecimalNumer())")
         if(KGLOBAL_defaultProgressBar != nil){
-            KGLOBAL_defaultProgressBar.progress = 1 - (startTime.toDecimalNumer() / Float(self.nowPlayingItemDuration))
+            KGLOBAL_defaultProgressBar.progress = 1 - Float(newProgressPosition)
         }
     }
     
