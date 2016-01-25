@@ -270,9 +270,9 @@ class MusicManager: NSObject {
             } else {
                 if queueChanged { // if we selected the same song from a different queue this time
                     let lastPlaybackTime = player.currentPlaybackTime
+                    player.nowPlayingItem = nil
                     player.prepareToPlay() // set current playing index to zero
                     player.nowPlayingItem = lastPlayerQueue[selectedIndex] // this has a really short time lag
-                    
                     player.currentPlaybackTime = lastPlaybackTime + 0.32
                 }
             }
