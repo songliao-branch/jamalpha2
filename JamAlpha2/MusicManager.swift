@@ -143,31 +143,35 @@ class MusicManager: NSObject {
     
     func initializePlayer(){
         print("\(_TAG) Initialize Player")
-        player = MPMusicPlayerController.systemMusicPlayer()
         
         //save current playing time and time and reset player after it is being stopped
         var lastPlayingItem: MPMediaItem?
         var lastPlayTime: NSTimeInterval = 0
-        var isPlaying = false
-        if let nowPlayingItem = player.nowPlayingItem {
+        var rate:Float = 0
+        if let nowPlayingItem = MPMusicPlayerController.systemMusicPlayer().nowPlayingItem {
             lastPlayingItem = nowPlayingItem
-            lastPlayTime = player.currentPlaybackTime
-            isPlaying = (player.playbackState == .Playing)
+            lastPlayTime = MPMusicPlayerController.systemMusicPlayer().currentPlaybackTime
+            rate = MPMusicPlayerController.systemMusicPlayer().currentPlaybackRate
         }
         
-        player.stop()
+        MPMusicPlayerController.systemMusicPlayer().nowPlayingItem = nil
+        player = MPMusicPlayerController.systemMusicPlayer()
         player.repeatMode = .All
         player.shuffleMode = .Off
         
-        self.setPlayerQueue(uniqueSongs)
-        
         if let lastItem = lastPlayingItem {
+            self.setPlayerQueue([lastPlayingItem!])
             player.nowPlayingItem = lastItem
             player.currentPlaybackTime = lastPlayTime + 0.32
+            player.prepareToPlay()
             
-            if isPlaying {
-                player.play()
+            if rate > 0 {
+                player.currentPlaybackRate = rate
+            }else{
+                player.pause()
             }
+        }else{
+            self.setPlayerQueue(uniqueSongs)
         }
         
         //initialize AVQueuePlayer
@@ -266,9 +270,9 @@ class MusicManager: NSObject {
             } else {
                 if queueChanged { // if we selected the same song from a different queue this time
                     let lastPlaybackTime = player.currentPlaybackTime
+                    player.nowPlayingItem = nil
                     player.prepareToPlay() // set current playing index to zero
                     player.nowPlayingItem = lastPlayerQueue[selectedIndex] // this has a really short time lag
-                    
                     player.currentPlaybackTime = lastPlaybackTime + 0.32
                 }
             }

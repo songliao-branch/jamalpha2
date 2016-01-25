@@ -1239,6 +1239,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.speed = 1  //restore to original speed
                 }
             } else {
+                print(player.playbackState.rawValue)
                 if player.playbackState == MPMusicPlaybackState.Playing {
                     startTimer()
                     startTime.setTime(Float(player.currentPlaybackTime))
