@@ -167,6 +167,8 @@ class MusicManager: NSObject {
             
             if rate > 0 {
                 player.currentPlaybackRate = rate
+            }else{
+                player.pause()
             }
         }else{
             self.setPlayerQueue(uniqueSongs)
