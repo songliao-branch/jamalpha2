@@ -29,6 +29,8 @@
 		BFC136271C55F79600D05899 /* TabsEditorAddExistTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */; };
 		BFC136291C55F8A400D05899 /* TabsEditorYouTube.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */; };
 		BFC1362D1C56B11100D05899 /* TabsEditorCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */; };
+		BFC136311C56C46A00D05899 /* FAQViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136301C56C46A00D05899 /* FAQViewController.swift */; };
+		BFC136331C56D06200D05899 /* FAQDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136321C56D06200D05899 /* FAQDetailViewController.swift */; };
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */; };
 		BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED01C1220E700F26877 /* AboutViewController.swift */; };
@@ -208,6 +210,8 @@
 		BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorAddExistTabs.swift; sourceTree = "<group>"; };
 		BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorYouTube.swift; sourceTree = "<group>"; };
 		BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorCollectionView.swift; sourceTree = "<group>"; };
+		BFC136301C56C46A00D05899 /* FAQViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FAQViewController.swift; sourceTree = "<group>"; };
+		BFC136321C56D06200D05899 /* FAQDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FAQDetailViewController.swift; sourceTree = "<group>"; };
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateNickNameViewController.swift; sourceTree = "<group>"; };
 		BFE49ED01C1220E700F26877 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -437,6 +441,8 @@
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				10AC35A31C21509D00749744 /* DemoViewController.swift */,
+				BFC136301C56C46A00D05899 /* FAQViewController.swift */,
+				BFC136321C56D06200D05899 /* FAQDetailViewController.swift */,
 			);
 			name = SettingViewController;
 			sourceTree = "<group>";
@@ -1072,6 +1078,7 @@
 				BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */,
 				E42032E81BFED9E300A5D36D /* UserProfileViewController.swift in Sources */,
 				E48877431B151628004785D3 /* AppDelegate.swift in Sources */,
+				BFC136311C56C46A00D05899 /* FAQViewController.swift in Sources */,
 				E4473CA31BF909E20061D4C9 /* BorderedCellView.swift in Sources */,
 				E4BFA9301B86CAA00061CA48 /* NSDate+comparison.swift in Sources */,
 				842DB0251B55EA8B00B4E165 /* TimeNumber.swift in Sources */,
@@ -1104,6 +1111,7 @@
 				10AC35A41C21509D00749744 /* DemoViewController.swift in Sources */,
 				E43713F51C34853600517D03 /* UserTabsLyricsCell.swift in Sources */,
 				BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */,
+				BFC136331C56D06200D05899 /* FAQDetailViewController.swift in Sources */,
 				C84435281B79239200E8823A /* UIImageEffects.swift in Sources */,
 				BFC080D51BCAED9D009CD755 /* NormalTab.swift in Sources */,
 				E44FB4011B1D6B8A000D2053 /* AlbumViewController.swift in Sources */,

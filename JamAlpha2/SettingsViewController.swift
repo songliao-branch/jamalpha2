@@ -16,9 +16,9 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var isFromUnLoginVC: Bool = false
     
-    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo", "Tutorial"]
+    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Contact Us","Demo Mode", "Tutorial"]
     
-    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode", "Tutorial"]
+    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Demo Mode", "Tutorial"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,15 +113,17 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
             
-            let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 3 : 4
-            let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
-            let indexOfTunerMode = CoreDataManager.getCurrentUser() == nil ? 5 : 6
+            let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
+            let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 5 : 6
             if indexPath.item == 0 {
                 let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
                 self.navigationController?.pushViewController(aboutVC, animated: true)
             } else if indexPath.item == 2 {
                 self.rateTwistjam()
-            } else if indexPath.item == 3 && CoreDataManager.getCurrentUser() != nil {
+            } else if indexPath.item == 3  {
+                let faqVC: FAQViewController = self.storyboard?.instantiateViewControllerWithIdentifier("faqVC") as! FAQViewController
+                self.navigationController?.pushViewController(faqVC, animated: true)
+            } else if indexPath.item == 4 && CoreDataManager.getCurrentUser() != nil {
                 self.contactUs()
             } else if indexPath.item == indexofDemoMode {
                 let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
