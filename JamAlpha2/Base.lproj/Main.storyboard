@@ -168,7 +168,7 @@
                                                 <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="demo_icon" translatesAutoresizingMaskIntoConstraints="NO" id="R4C-Sk-k3T">
                                                     <rect key="frame" x="262" y="25" width="43" height="19"/>
                                                 </imageView>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="l0m-7s-bJf">
+                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="l0m-7s-bJf">
                                                     <rect key="frame" x="80" y="15" width="15" height="15"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="15" id="JQ4-3a-Qia"/>
@@ -494,10 +494,18 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="lpB-mW-sJY">
+                                                    <rect key="frame" x="45" y="14" width="15" height="15"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="15" id="HIO-sn-UIc"/>
+                                                        <constraint firstAttribute="height" constant="15" id="U06-dW-RQS"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="agB-RW-TiU" firstAttribute="top" secondItem="bwO-A9-gcZ" secondAttribute="top" constant="11" id="1bj-Ks-QgW"/>
                                                 <constraint firstItem="agB-RW-TiU" firstAttribute="leading" secondItem="bwO-A9-gcZ" secondAttribute="leading" constant="15" id="IgR-rI-b0u"/>
+                                                <constraint firstItem="lpB-mW-sJY" firstAttribute="leading" secondItem="agB-RW-TiU" secondAttribute="trailing" constant="5" id="OQ3-me-WE2"/>
                                                 <constraint firstAttribute="bottom" secondItem="agB-RW-TiU" secondAttribute="bottom" constant="11.5" id="SvD-ve-1Ka"/>
                                                 <constraint firstAttribute="bottom" secondItem="kNe-qL-QWU" secondAttribute="bottom" constant="11.5" id="T2y-bO-Lfq"/>
                                                 <constraint firstItem="kNe-qL-QWU" firstAttribute="top" secondItem="bwO-A9-gcZ" secondAttribute="top" constant="11" id="fkh-Yz-Ge2"/>
@@ -505,11 +513,14 @@
                                                 <constraint firstItem="kNe-qL-QWU" firstAttribute="leading" secondItem="agB-RW-TiU" secondAttribute="trailing" constant="5" id="h1a-dT-f9M"/>
                                                 <constraint firstAttribute="trailing" secondItem="nYo-w0-5cJ" secondAttribute="trailing" constant="15" id="jCZ-Fw-jNx"/>
                                                 <constraint firstAttribute="trailing" secondItem="kNe-qL-QWU" secondAttribute="trailing" constant="15" id="jVI-ul-dnO"/>
+                                                <constraint firstItem="lpB-mW-sJY" firstAttribute="centerY" secondItem="kNe-qL-QWU" secondAttribute="centerY" id="lI5-4m-ukb"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="cloudImage" destination="lpB-mW-sJY" id="eGB-Vz-bci"/>
                                             <outlet property="loudspeakerImage" destination="nYo-w0-5cJ" id="A8J-yu-BeZ"/>
                                             <outlet property="titleLabel" destination="kNe-qL-QWU" id="nlJ-hJ-vx0"/>
+                                            <outlet property="titleLeadingConstraint" destination="h1a-dT-f9M" id="ZUU-iZ-XBi"/>
                                             <outlet property="titleTrailingConstant" destination="jVI-ul-dnO" id="A1n-x6-MJA"/>
                                             <outlet property="trackNumberLabel" destination="agB-RW-TiU" id="3h3-az-AEK"/>
                                         </connections>
@@ -627,6 +638,13 @@
                                                         <constraint firstAttribute="height" constant="25" id="otY-mc-HzG"/>
                                                     </constraints>
                                                 </imageView>
+                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="6oM-pH-gPp">
+                                                    <rect key="frame" x="45" y="14" width="15" height="15"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="15" id="eRA-HV-3Wy"/>
+                                                        <constraint firstAttribute="width" constant="15" id="lZQ-2r-Jr4"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="bJa-Jg-5VE" secondAttribute="bottom" constant="11.5" id="74b-YA-fAr"/>
@@ -637,12 +655,16 @@
                                                 <constraint firstItem="VhA-Y7-0ob" firstAttribute="leading" secondItem="bJa-Jg-5VE" secondAttribute="trailing" constant="5" id="JU7-er-V1y"/>
                                                 <constraint firstAttribute="centerY" secondItem="Thk-el-uwo" secondAttribute="centerY" id="Rqg-rc-Rub"/>
                                                 <constraint firstItem="bJa-Jg-5VE" firstAttribute="leading" secondItem="gil-mD-dEv" secondAttribute="leading" constant="15" id="eI5-KU-c59"/>
+                                                <constraint firstItem="6oM-pH-gPp" firstAttribute="centerY" secondItem="VhA-Y7-0ob" secondAttribute="centerY" id="i9N-fU-VOn"/>
                                                 <constraint firstItem="bJa-Jg-5VE" firstAttribute="top" secondItem="gil-mD-dEv" secondAttribute="top" constant="11" id="kcx-A4-1Kp"/>
+                                                <constraint firstItem="6oM-pH-gPp" firstAttribute="leading" secondItem="bJa-Jg-5VE" secondAttribute="trailing" constant="5" id="uIX-dP-ZWB"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="cloudImage" destination="6oM-pH-gPp" id="3QH-aN-28d"/>
                                             <outlet property="loudspeakerImage" destination="Thk-el-uwo" id="jJU-0c-eoP"/>
                                             <outlet property="titleLabel" destination="VhA-Y7-0ob" id="EdG-eA-tPj"/>
+                                            <outlet property="titleLeadingConstraint" destination="JU7-er-V1y" id="cnE-Qg-OcX"/>
                                             <outlet property="titleTrailingConstant" destination="8dQ-yG-UCM" id="SAU-xV-neg"/>
                                             <outlet property="trackNumberLabel" destination="bJa-Jg-5VE" id="fTh-3d-G3O"/>
                                         </connections>

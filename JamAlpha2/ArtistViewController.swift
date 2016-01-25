@@ -138,19 +138,24 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         let song = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
         
+        cell.titleTrailingConstant.constant = 15
+        cell.loudspeakerImage.hidden = true
         if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
                 cell.titleTrailingConstant.constant = 50
                 cell.loudspeakerImage.hidden = false
             }
-            else {
-                cell.titleTrailingConstant.constant = 15
-                cell.loudspeakerImage.hidden = true
-            }
-        } else {
-            cell.titleTrailingConstant.constant = 15
-            cell.loudspeakerImage.hidden = true
+           
         }
+        
+        if let _ = song.getURL() {
+            cell.cloudImage.hidden = true
+            cell.titleLeadingConstraint.constant = 5
+        } else {
+            cell.cloudImage.hidden = false
+            cell.titleLeadingConstraint.constant = 25
+        }
+        
         
         cell.titleLabel.text = song.title
         

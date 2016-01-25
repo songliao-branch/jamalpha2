@@ -217,6 +217,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
         cell.demoImage.hidden = true
+        cell.cloudImage.hidden = true
         
         if pageIndex == 0 {
     
