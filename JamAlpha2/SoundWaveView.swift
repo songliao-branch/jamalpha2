@@ -34,7 +34,7 @@ class SoundWaveView: UIView {
     var originalSampleBuffer:NSMutableArray?
     
     let songVCSampleRate:CGFloat = 8
-    let lineWidth:CGFloat = 2.5
+    let lineWidth:CGFloat = 3.5
     
     var backgroundTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
@@ -225,7 +225,7 @@ class SoundWaveView: UIView {
         var currentX:CGFloat = 0
         for averageSample in self.originalSampleBuffer!
         {
-            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*self.songVCSampleRate+0.5)
+            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*self.songVCSampleRate+1.5)
             
             currentX++
         }
