@@ -17,6 +17,7 @@ let KGLOBAL_init_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_init_operationCache = [String:NSBlockOperation]()
 
 var KGLOBAL_progressBlock: SoundWaveView!
+var KGLOBAL_defaultProgressBar:UIProgressView!
 
 var KGLOBAL_timer:NSTimer!
 

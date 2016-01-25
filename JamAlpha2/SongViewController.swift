@@ -1039,6 +1039,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
                 if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem!) {
+                    if (KGLOBAL_defaultProgressBar != nil){
+                        KGLOBAL_defaultProgressBar.removeFromSuperview()
+                        KGLOBAL_defaultProgressBar = nil
+                    }
                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
                     print("sound wave data found")
                     KGLOBAL_init_queue.suspended = false
@@ -1121,6 +1125,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
         if let soundWaveData = CoreDataManager.getSongWaveFormImage(demoItem!) {
+            if (KGLOBAL_defaultProgressBar != nil){
+                KGLOBAL_defaultProgressBar.removeFromSuperview()
+                KGLOBAL_defaultProgressBar = nil
+            }
             KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
             KGLOBAL_init_queue.suspended = false
@@ -1339,6 +1347,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 dispatch_async(dispatch_get_main_queue()) {
                                     let data = UIImagePNGRepresentation(image)
                                     KGLOBAL_operationCache.removeValueForKey(tempkeyString)
+                                    if (KGLOBAL_defaultProgressBar != nil){
+                                        KGLOBAL_defaultProgressBar.removeFromSuperview()
+                                        KGLOBAL_defaultProgressBar = nil
+                                    }
                                     KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
                                     self.isGenerated = true
@@ -1351,6 +1363,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         guard let assetURL = nowPlayingItem.getURL() else {
                             print("sound url not available")
                             KGLOBAL_init_queue.suspended = false
+                            self.setupDefaultProgressBar()
                             return
                         }
                     
@@ -1381,6 +1394,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 if self.isDemoSong {
                                     if((tempNowPlayingItem as! AVPlayerItem) == self.avPlayer.currentItem){
                                         if(KGLOBAL_progressBlock != nil ){
+                                            if (KGLOBAL_defaultProgressBar != nil){
+                                                KGLOBAL_defaultProgressBar.removeFromSuperview()
+                                                KGLOBAL_defaultProgressBar = nil
+                                            }
                                             KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                         }
                                         if(!KGLOBAL_queue.suspended){
@@ -1390,6 +1407,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 }else{
                                     if((tempNowPlayingItem as! MPMediaItem) == self.player.nowPlayingItem){
                                         if(KGLOBAL_progressBlock != nil ){
+                                            if (KGLOBAL_defaultProgressBar != nil){
+                                                KGLOBAL_defaultProgressBar.removeFromSuperview()
+                                                KGLOBAL_defaultProgressBar = nil
+                                            }
                                             KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                         }
                                         if(!KGLOBAL_queue.suspended){
@@ -1408,6 +1429,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
             }
         }
+    }
+    
+    func setupDefaultProgressBar(){
+        dispatch_async(dispatch_get_main_queue()) {
+            KGLOBAL_defaultProgressBar = UIProgressView(frame: CGRectMake(0,self.progressBlockContainer.frame.height * 3 / 7,self.view.width,10))
+            KGLOBAL_defaultProgressBar.progress = 1.0
+            KGLOBAL_defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
+            KGLOBAL_defaultProgressBar.progressTintColor = UIColor.whiteColor()
+            self.progressBlockContainer.insertSubview( KGLOBAL_defaultProgressBar , aboveSubview: KGLOBAL_progressBlock)
+        }
+        
     }
     
     var newPosition:CGFloat! = 0
@@ -2274,6 +2306,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if(KGLOBAL_progressBlock != nil ){
                 KGLOBAL_progressBlock.removeFromSuperview()
                 KGLOBAL_progressBlock = nil
+                if (KGLOBAL_defaultProgressBar != nil){
+                    KGLOBAL_defaultProgressBar.removeFromSuperview()
+                    KGLOBAL_defaultProgressBar = nil
+                }
             }
             if isSongNeedPurchase{
                 self.displayLink.paused = true
@@ -2460,6 +2496,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             KGLOBAL_progressBlock.frame.origin.x = newOriginX
            // print("\(startTime) = \(startTime.toDecimalNumer())")
+        if(KGLOBAL_defaultProgressBar != nil){
+            KGLOBAL_defaultProgressBar.progress = 1 - (startTime.toDecimalNumer() / Float(self.nowPlayingItemDuration))
+        }
     }
     
     func refreshTimeLabel(){
