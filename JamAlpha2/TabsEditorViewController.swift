@@ -1680,7 +1680,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             endScaleNumber = tabsEditorProgressWidthMultiplier
             pinchWrapper.hidden = true
         }
-    }    
+    }
     
     // 1 second = 10 px
     func updateFramePosition() {
@@ -1706,9 +1706,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         progressBlock.frame = CGRectMake((0.5) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier), progressBlock.frame.origin.y, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), progressBlock.frame.size.height)
         
         topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
-        
-
         var numberOfLine: Int = Int(CGFloat(theSong.getDuration()) / 10 * 2)
+        var lineSpace: CGFloat = 5
+        var lineNumber: Int = 2
+        if tabsEditorProgressWidthMultiplier >= 15 {
+           numberOfLine = Int(CGFloat(theSong.getDuration()) / 10 * 4)
+            lineSpace = 2.5
+            lineNumber = 4
+        }
+        
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
         } else {
@@ -1717,11 +1723,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         for var i = 0; i < numberOfLine; i++ {
             var frame: CGRect!
             if i % 2 == 0 {
-                frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier, 11, 2, 9)
+                frame = CGRectMake(CGFloat(i) * lineSpace * tabsEditorProgressWidthMultiplier, 11, 2, 9)
                 let timeLabel: UILabel = UILabel()
-                timeLabel.frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier - 15, 0, 30, 10)
-                let min: Int = i * 5 / 60
-                let sec: Int = (i * 5) % 60
+                timeLabel.frame = CGRectMake(CGFloat(i) * lineSpace * tabsEditorProgressWidthMultiplier - 15, 0, 30, 10)
+                var min: Int = (i * 5) / 60
+                var sec: Int = (i * 5) % 60
+                if lineSpace >= 2.4 && lineSpace <= 2.6 {
+                    min = (i * 5) / 2 / 60
+                    sec = ((i * 5) / 2) % 60
+                }
                 if min < 10 {
                     if sec < 10 {
                         timeLabel.text = "0\(min):0\(sec)"
@@ -1740,7 +1750,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 timeLabel.textAlignment = .Center
                 topLineView.addSubview(timeLabel)
             } else {
-                frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier, 15, 1, 5)
+                frame = CGRectMake(CGFloat(i) * lineSpace * tabsEditorProgressWidthMultiplier, 15, 1, 5)
             }
             let tempView: UIView = UIView(frame: frame)
             tempView.backgroundColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
