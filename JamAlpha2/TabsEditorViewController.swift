@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Jun Zhou. All rights reserved.
 //
 
-
-
 import UIKit
 import MediaPlayer
 import AVFoundation

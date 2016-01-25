@@ -434,8 +434,8 @@
 			isa = PBXGroup;
 			children = (
 				BFE49ED51C12471200F26877 /* AppConstant.swift */,
-				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
+				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				10AC35A31C21509D00749744 /* DemoViewController.swift */,
 			);
 			name = SettingViewController;
