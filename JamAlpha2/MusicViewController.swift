@@ -235,31 +235,34 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             }
             
+            cell.mainTitle.text = song.getTitle()
+            cell.subtitle.text = song.getArtist()
+            
+            cell.titleTrailingConstraint.constant = 12
+            cell.loudspeakerImage.hidden = true
+            
             if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
                 if let item = song as? MPMediaItem {
                     if item == MusicManager.sharedInstance.player.nowPlayingItem {
                         cell.titleTrailingConstraint.constant = 50
                         cell.loudspeakerImage.hidden = false
                     }
-                    else {
-                        cell.titleTrailingConstraint.constant = 15
-                        cell.loudspeakerImage.hidden = true
-                    }
-                } else {
-                    cell.titleTrailingConstraint.constant = 15
-                    cell.loudspeakerImage.hidden = true
-                }               
-            } else {
-                cell.titleTrailingConstraint.constant = 15
-                cell.loudspeakerImage.hidden = true
+                }
             }
             
+            if let _ = song.getURL() {
+                cell.cloudImage.hidden = true
+                cell.titleLeftConstraint.constant = 11
+            } else {
+                cell.cloudImage.hidden = false
+                cell.titleLeftConstraint.constant = 30
+            }
             
             CoreDataManager.initializeSongToDatabase(song)
             
             if let coverimage = CoreDataManager.getCoverImage(song){
                 cell.coverImage.image = coverimage
-            }else{
+            } else {
                 // some song does not have an album cover
                 if let cover = song.getArtWork() {
                     let image = cover.imageWithSize(CGSize(width: 54, height: 54))
@@ -274,11 +277,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     cell.coverImage.image = UIImage(named: "liweng")
                     loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
-
             }
-            
-            cell.mainTitle.text = song.getTitle()
-            cell.subtitle.text = song.getArtist()
             
             if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable()){
                 if(song.isKindOfClass(MPMediaItem)){

@@ -158,15 +158,6 @@
                                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Main Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z1R-2h-uq0">
-                                                    <rect key="frame" x="80" y="10" width="225" height="25"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="25" id="Myp-nQ-5iB"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="speaker" translatesAutoresizingMaskIntoConstraints="NO" id="l6i-W8-1hA">
                                                     <rect key="frame" x="280" y="22" width="25" height="25"/>
                                                     <constraints>
@@ -177,11 +168,29 @@
                                                 <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="demo_icon" translatesAutoresizingMaskIntoConstraints="NO" id="R4C-Sk-k3T">
                                                     <rect key="frame" x="262" y="25" width="43" height="19"/>
                                                 </imageView>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="l0m-7s-bJf">
+                                                    <rect key="frame" x="80" y="15" width="15" height="15"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="15" id="JQ4-3a-Qia"/>
+                                                        <constraint firstAttribute="height" constant="15" id="m6c-BT-zs6"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Main Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z1R-2h-uq0">
+                                                    <rect key="frame" x="80" y="10" width="228" height="25"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="25" id="Myp-nQ-5iB"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstItem="l0m-7s-bJf" firstAttribute="leading" secondItem="Fr8-BH-Ncz" secondAttribute="trailing" constant="11" id="25P-Jx-FEy"/>
                                                 <constraint firstAttribute="centerY" secondItem="VXR-6p-k1c" secondAttribute="top" id="2dw-sN-eQH"/>
-                                                <constraint firstAttribute="trailing" secondItem="Z1R-2h-uq0" secondAttribute="trailing" constant="15" id="2iL-x0-5YK"/>
+                                                <constraint firstAttribute="trailing" secondItem="Z1R-2h-uq0" secondAttribute="trailing" constant="12" id="2iL-x0-5YK"/>
                                                 <constraint firstItem="Z1R-2h-uq0" firstAttribute="leading" secondItem="Fr8-BH-Ncz" secondAttribute="trailing" constant="11" id="86z-5z-P1m"/>
+                                                <constraint firstItem="l0m-7s-bJf" firstAttribute="centerY" secondItem="Z1R-2h-uq0" secondAttribute="centerY" id="8jC-W0-3DY"/>
                                                 <constraint firstItem="VXR-6p-k1c" firstAttribute="leading" secondItem="Fr8-BH-Ncz" secondAttribute="trailing" constant="11" id="AUN-tv-Vn7"/>
                                                 <constraint firstAttribute="centerY" secondItem="Z1R-2h-uq0" secondAttribute="bottom" id="CJG-4b-irN"/>
                                                 <constraint firstAttribute="centerY" secondItem="l6i-W8-1hA" secondAttribute="centerY" id="Ocd-So-xLn"/>
@@ -194,6 +203,7 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="cloudImage" destination="l0m-7s-bJf" id="e5C-pR-wP8"/>
                                             <outlet property="coverImage" destination="Fr8-BH-Ncz" id="hsJ-x8-QgD"/>
                                             <outlet property="demoImage" destination="R4C-Sk-k3T" id="9C5-gq-8xE"/>
                                             <outlet property="imageHeight" destination="ko5-ea-bU7" id="0Oq-Z7-THq"/>
@@ -201,6 +211,7 @@
                                             <outlet property="loudspeakerImage" destination="l6i-W8-1hA" id="OQk-NN-Cs4"/>
                                             <outlet property="mainTitle" destination="Z1R-2h-uq0" id="fUl-nS-b5p"/>
                                             <outlet property="subtitle" destination="VXR-6p-k1c" id="u8b-dt-Bmz"/>
+                                            <outlet property="titleLeftConstraint" destination="86z-5z-P1m" id="bUP-c5-9it"/>
                                             <outlet property="titleTrailingConstraint" destination="2iL-x0-5YK" id="EtG-om-Qjn"/>
                                         </connections>
                                     </tableViewCell>
@@ -1480,6 +1491,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="cloud" width="25" height="25"/>
         <image name="demo_icon" width="43" height="19"/>
         <image name="kitten_profile" width="50" height="50"/>
         <image name="me" width="20" height="25"/>
