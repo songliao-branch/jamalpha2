@@ -1680,8 +1680,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             endScaleNumber = tabsEditorProgressWidthMultiplier
             pinchWrapper.hidden = true
         }
-    }
-    
+    }    
     
     // 1 second = 10 px
     func updateFramePosition() {
