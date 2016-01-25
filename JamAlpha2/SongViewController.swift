@@ -1168,6 +1168,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     KGLOBAL_progressBlock!.alpha = 0.5
+                    if (KGLOBAL_defaultProgressBar != nil){
+                        KGLOBAL_defaultProgressBar.alpha = 0.5
+                    }
                     }, completion: nil)
             }else{
                 updateAll(Float(avPlayer.currentTime().seconds))
@@ -1176,6 +1179,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
                     KGLOBAL_progressBlock!.alpha = 1.0
+                    if (KGLOBAL_defaultProgressBar != nil){
+                        KGLOBAL_defaultProgressBar.alpha = 1
+                    }
                     }, completion: { finished in
                         if(KGLOBAL_progressBlock == nil){
                             return
@@ -1205,6 +1211,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     KGLOBAL_progressBlock!.alpha = 0.5
+                    if (KGLOBAL_defaultProgressBar != nil){
+                        KGLOBAL_defaultProgressBar.alpha = 0.5
+                    }
                 }, completion: nil)
             
         }
@@ -1215,6 +1224,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
                 KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 KGLOBAL_progressBlock!.alpha = 1.0
+                if (KGLOBAL_defaultProgressBar != nil){
+                    KGLOBAL_defaultProgressBar.alpha = 1
+                }
                 }, completion: nil
             )
         }
@@ -1244,6 +1256,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     // progress bar should be lowered
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     KGLOBAL_progressBlock!.alpha = 0.5
+                    if (KGLOBAL_defaultProgressBar != nil){
+                        KGLOBAL_defaultProgressBar.alpha = 0.5
+                    }
                     self.speed = 1  //restore to original speed
                 }
             } else {
@@ -1258,6 +1273,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     // progress bar should be lowered
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     KGLOBAL_progressBlock!.alpha = 0.5
+                    if (KGLOBAL_defaultProgressBar != nil){
+                        KGLOBAL_defaultProgressBar.alpha = 0.5
+                    }
                     self.speed = 1  //restore to original speed
                 }
                 
@@ -2183,11 +2201,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
+            if (KGLOBAL_defaultProgressBar != nil){
+                KGLOBAL_defaultProgressBar.alpha = 0.5
+            }
         } else {
             self.player.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
+            if (KGLOBAL_defaultProgressBar != nil){
+                KGLOBAL_defaultProgressBar.alpha = 0.5
+            }
         }
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = isDemoSong ? demoItem : nowPlayingMediaItem
@@ -2240,11 +2264,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
+            if (KGLOBAL_defaultProgressBar != nil){
+                KGLOBAL_defaultProgressBar.alpha = 0.5
+            }
         } else {
             self.player.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
+            if (KGLOBAL_defaultProgressBar != nil){
+                KGLOBAL_defaultProgressBar.alpha = 0.5
+            }
         }
         self.clearActions()
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")

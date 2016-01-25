@@ -175,12 +175,18 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             }
             playButtonImageView.hidden = true
             self.progressBlock.alpha = 1
+            if (self.defaultProgressBar != nil){
+                self.defaultProgressBar.alpha = 1
+            }
         } else if musicPlayer.playbackState == .Paused {
             isPlaying = false
             playButtonImageView.hidden = false
             updateTimer.invalidate()
             updateTimer = NSTimer()
             self.progressBlock.alpha = 0.5
+            if (self.defaultProgressBar != nil){
+                self.defaultProgressBar.alpha = 0.5
+            }
         }
     }
     
@@ -313,6 +319,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         
         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
         self.progressBlock!.alpha = 0.5
+        if (self.defaultProgressBar != nil){
+            self.defaultProgressBar.alpha = 0.5
+        }
         progressBlockContainer.addSubview(self.progressBlock)
         
         tapGesture = UITapGestureRecognizer(target: self, action: "playPause")
@@ -460,6 +469,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
+                if (self.defaultProgressBar != nil){
+                    self.defaultProgressBar.alpha = 0.5
+                }
                 }, completion: nil)
             if isDemoSong {
                 self.avPlayer.pause()
@@ -500,6 +512,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 self.progressBlock!.alpha = 1.0
+                if (self.defaultProgressBar != nil){
+                    self.defaultProgressBar.alpha = 1
+                }
                 }, completion: { finished in
                     if self.isDemoSong {
                         self.avPlayer.play()
@@ -576,6 +591,10 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             startTime.setTime(0)
             self.currentTime = 0
             self.progressBlock.alpha = 0.5
+            if (self.defaultProgressBar != nil){
+                self.defaultProgressBar.alpha = 0.5
+            }
+            
             if isDemoSong {
                 avPlayer.currentTime = currentTime
             }else{
