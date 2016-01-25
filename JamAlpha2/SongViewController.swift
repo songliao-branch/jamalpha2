@@ -1354,6 +1354,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                         KGLOBAL_defaultProgressBar = nil
                                     }
                                     KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                    KGLOBAL_init_queue.suspended = false
                                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
                                     self.isGenerated = true
                                     self.soundwaveUrl = ""
