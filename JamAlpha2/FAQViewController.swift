@@ -14,6 +14,11 @@ class FAQViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
+        self.navigationItem.title = "FAQ"
+
         setUpTableView()
     }
 
@@ -69,6 +74,8 @@ extension FAQViewController: UITableViewDelegate, UITableViewDataSource {
         cell.textLabel?.font = UIFont.boldSystemFontOfSize(12)
         cell.textLabel?.numberOfLines = 0;
         cell.textLabel?.lineBreakMode = .ByWordWrapping
+        cell.selectionStyle = .None
+        cell.accessoryType = .DisclosureIndicator
         cell.textLabel?.text = faqs[indexPath.item]
         return cell
     }

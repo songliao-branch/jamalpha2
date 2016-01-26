@@ -13,7 +13,10 @@ class FAQDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        // Do any additional setup after loading the view.self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.translucent = false
+        self.navigationItem.title = "Detail"
         setUpMainView()
     }
 
@@ -43,9 +46,10 @@ extension FAQDetailViewController {
 //        bottomBorder.frame = CGRectMake(-1, titleLabel.frame.size.height-1, titleLabel.frame.size.width, 1)
         
         let textView: UITextView = UITextView()
-        textView.frame = CGRectMake(10, 44, self.view.frame.size.width - 10, self.view.frame.size.height - 64 - 60)
+        textView.frame = CGRectMake(10, 44, self.view.frame.size.width - 20, self.view.frame.size.height - 64 - 60)
         textView.textAlignment = .Left
         textView.font = UIFont.systemFontOfSize(14)
+        textView.textAlignment = .Justified
         textView.text = answer
         self.view.addSubview(textView)
     }
