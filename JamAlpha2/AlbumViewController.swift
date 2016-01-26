@@ -10,6 +10,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     var theAlbum:Album!
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
+    var isSeekingPlayerState = true
 
     @IBOutlet weak var albumTable: UITableView!
     
@@ -53,7 +54,9 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
             
             if player.nowPlayingItem != nil {
                 if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                    self.albumTable.reloadData()
+                    if !self.isSeekingPlayerState {
+                        self.albumTable.reloadData()
+                    }
                 }
             }
         }
@@ -112,7 +115,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         KGLOBAL_init_queue.suspended = true
        
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
@@ -126,7 +129,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         ///////////////////////////////////////////
         if((songsInTheAlbum[indexPath.row]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                while (isSeekingPlayerState){
+                while (self.isSeekingPlayerState){
                     
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
@@ -134,7 +137,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)
                         }
-                        isSeekingPlayerState = false
+                        self.isSeekingPlayerState = false
                         break
                     }
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -150,7 +153,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                                     tableView.reloadData()
                                 })
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                     }

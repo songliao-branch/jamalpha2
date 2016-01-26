@@ -26,6 +26,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     var pageIndex = 0
     var searchAPI:SearchAPI! = SearchAPI()
+    var isSeekingPlayerState = true
     
     @IBOutlet weak var musicTable: UITableView!
     
@@ -102,7 +103,9 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
             if player.nowPlayingItem != nil {
                 if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                    self.musicTable.reloadData()
+                    if !self.isSeekingPlayerState {
+                        self.musicTable.reloadData()
+                    }
                 }
             }
         }
@@ -409,7 +412,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var isDemoSong = false
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         if pageIndex == 0 {
             KGLOBAL_init_queue.suspended = true
             
@@ -450,14 +453,14 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             //We use a background thread to constantly check player's current playing item, and we only pop up
             if(!isDemoSong && songsSorted.count > 0 && (songsSorted[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    while (isSeekingPlayerState) {
+                    while (self.isSeekingPlayerState) {
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                               self.showCellularEnablesStreaming(tableView)
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                         
                             break
                         }
@@ -476,7 +479,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                                         tableView.reloadData()
                                     })
                                 }
-                                isSeekingPlayerState = false
+                                self.isSeekingPlayerState = false
                                 break
                             }
                         }
