@@ -35,7 +35,7 @@ class FAQViewController: UIViewController {
         "Who has the right to use the tabs and lyrics I edited?",
         "How to hide the demo song?",
         "How to turn on the tutorial again?",
-        "How to learn edit tabs and lyrics by Tabs Editor and Lyrics Editor?"
+        "How to learn editing tabs and lyrics by Tabs Editor and Lyrics Editor?"
     ]
     
     let answer1: String = "At the music view, you will see four options on the bottom of the view. Touch the third button and you will open a action sheet. \n\nYou can choose different style for music view. You can hidden chord content or lyrics by turn off the switch. \n\nIf you turned off all three switch, the music view will be a pure music player with the song's cover image."

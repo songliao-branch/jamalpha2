@@ -16,7 +16,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     var songs = [LocalSong]()
     var animator: CustomTransitionAnimation?
-    var refreshControl: UIRefreshControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,15 +31,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func setUpRefreshControl() {
-        refreshControl = UIRefreshControl()
-        refreshControl.attributedTitle = NSAttributedString(string: "Refresh Top Song", attributes: [NSForegroundColorAttributeName: UIColor.mainPinkColor()])
-        
-        refreshControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
-        topSongsTable!.addSubview(refreshControl)
-    }
-    
-    func refresh(sender: UIRefreshControl) {
-        loadData()
+        topSongsTable?.addPullToRefresh({ [weak self] in
+            // some code
+            sleep(1)
+            self!.loadData()
+            
+            })
     }
     
     func createTransitionAnimation(){
@@ -58,7 +54,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             }
             //TODO: this crashes somehow, needs to find out how to reproduce the crash
             if let table = self.topSongsTable {
-                self.refreshControl.endRefreshing()
                 table.reloadData()
             }
         })
