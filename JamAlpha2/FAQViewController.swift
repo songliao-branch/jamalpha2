@@ -48,11 +48,13 @@ class FAQViewController: UIViewController {
     
     let answer5: String = "You own the rights for tabs and lyrics you edited. If you make them public, other users can use them. \n\nTwistjam encourage you to make your tabs and lyrics public, so other users will have more high quality tabs and lyrics to use."
     
-    let answer6: String = "Go to setting, and go to Demo Mode. Turn off the switch"
+    let answer6: String = "Go to setting, and go to Demo Mode. Turn off the switch."
     
-    let answer7: String = "If you want to watch the tutorial again, go to setting, and go to Tutorial. Turn on the switch"
+    let answer7: String = "If you want to watch the tutorial again, go to setting, and go to Tutorial. Turn on the switch."
     
-    let answer8: String = "Please go to Twitjam Youtube official channel to watch more tutorials about how to edit tabs and lyrics by Tabs Editor and Lyrics Editor"
+    let answer8: String = "Please go to Twitjam Youtube official channel to watch more tutorials about how to edit tabs and lyrics by Tabs Editor and Lyrics Editor."
+    
+    let end: String = "\n\nIf you have any questions, go to setting, touch Contact Us. Send us your questions and we will reply as soon as possible."
     
     var answers: [String]!
     var tableView: UITableView!
@@ -88,7 +90,7 @@ extension FAQViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let faqdetailVC: FAQDetailViewController = self.storyboard?.instantiateViewControllerWithIdentifier("faqdetailVC") as! FAQDetailViewController
         faqdetailVC.question = faqs[indexPath.item]
-        faqdetailVC.answer = answers[indexPath.item]
+        faqdetailVC.answer = answers[indexPath.item] + end
         self.navigationController?.pushViewController(faqdetailVC, animated: true)
     }
     

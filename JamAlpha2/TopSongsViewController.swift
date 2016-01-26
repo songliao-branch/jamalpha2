@@ -32,7 +32,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func setUpRefreshControl() {
         refreshControl = UIRefreshControl()
-        refreshControl.attributedTitle = NSAttributedString(string: "Refresh Top Song", attributes: [NSForegroundColorAttributeName: UIColor.mainPinkColor()])        
+        refreshControl.attributedTitle = NSAttributedString(string: "Refresh Top Song", attributes: [NSForegroundColorAttributeName: UIColor.mainPinkColor()])
+        
         refreshControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
         topSongsTable!.addSubview(refreshControl)
     }
