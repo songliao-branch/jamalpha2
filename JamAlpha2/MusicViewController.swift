@@ -102,8 +102,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             }
             if player.nowPlayingItem != nil {
                 if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
-                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                        self.musicTable.reloadData()
+                    if(NetworkManager.sharedInstance.reachability.isReachableViaWiFi()){
+                        if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                            self.musicTable.reloadData()
+                        }
+                    }else{
+                          self.musicTable.reloadData()
                     }
                 }else{
                     if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {

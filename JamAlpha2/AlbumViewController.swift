@@ -53,7 +53,11 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
             
             if player.nowPlayingItem != nil {
                 if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
-                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                    if(NetworkManager.sharedInstance.reachability.isReachableViaWiFi()){
+                        if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                            self.albumTable.reloadData()
+                        }
+                    }else{
                         self.albumTable.reloadData()
                     }
                 }else{
