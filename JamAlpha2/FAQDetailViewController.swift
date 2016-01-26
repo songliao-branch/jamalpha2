@@ -32,25 +32,26 @@ class FAQDetailViewController: UIViewController {
 
 extension FAQDetailViewController {
     func setUpMainView() {
+        self.view.backgroundColor = UIColor.groupTableViewBackgroundColor()
+        
         let titleLabel: UILabel = UILabel()
-        titleLabel.frame = CGRectMake(12, 0, self.view.frame.size.width - 12, 44)
-        titleLabel.textAlignment = .Left
+        titleLabel.frame = CGRectMake(12, 11, self.view.frame.size.width - 24, 44)
+        titleLabel.textAlignment = .Justified
         titleLabel.numberOfLines = 0;
         titleLabel.lineBreakMode = .ByWordWrapping
         titleLabel.font = UIFont.boldSystemFontOfSize(13)
         titleLabel.text = question
         self.view.addSubview(titleLabel)
         
-//        let bottomBorder:CALayer = titleLabel.layer
-//        bottomBorder.borderWidth = 1
-//        bottomBorder.frame = CGRectMake(-1, titleLabel.frame.size.height-1, titleLabel.frame.size.width, 1)
-        
         let textView: UITextView = UITextView()
-        textView.frame = CGRectMake(10, 44, self.view.frame.size.width - 20, self.view.frame.size.height - 64 - 60)
+        textView.frame = CGRectMake(10, 55, self.view.frame.size.width - 20, self.view.frame.size.height - 64)
         textView.textAlignment = .Left
         textView.font = UIFont.systemFontOfSize(14)
         textView.textAlignment = .Justified
         textView.text = answer
+        textView.sizeToFit()
+        textView.backgroundColor = UIColor.clearColor()
+        textView.userInteractionEnabled = false
         self.view.addSubview(textView)
     }
 }

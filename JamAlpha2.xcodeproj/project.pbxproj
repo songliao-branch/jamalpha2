@@ -405,10 +405,9 @@
 		BF0B3AF51C33C99D003F0541 /* TabsEdtiorViewController */ = {
 			isa = PBXGroup;
 			children = (
+				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
 				BFC136211C55F69D00D05899 /* TabsEditor */,
 				BFFAA5141C3CE0DD00DC3253 /* PlayChordsManager */,
-				105B2EC61C316E20002BC17A /* CustomizedView.swift */,
-				E4CBC0001B9E88BA00473FC4 /* TabsEditorViewController.swift */,
 			);
 			name = TabsEdtiorViewController;
 			sourceTree = "<group>";
@@ -430,6 +429,7 @@
 				BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */,
 				BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */,
 				BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */,
+				105B2EC61C316E20002BC17A /* CustomizedView.swift */,
 			);
 			name = TabsEditor;
 			sourceTree = "<group>";
