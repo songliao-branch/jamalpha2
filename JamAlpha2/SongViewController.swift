@@ -1040,8 +1040,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem!) {
                     if (KGLOBAL_defaultProgressBar != nil){
-                        KGLOBAL_defaultProgressBar.removeFromSuperview()
-                        KGLOBAL_defaultProgressBar = nil
+                        dispatch_async(dispatch_get_main_queue()){
+                            KGLOBAL_defaultProgressBar.removeFromSuperview()
+                            KGLOBAL_defaultProgressBar = nil
+                        }
                     }
                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
                     print("sound wave data found")
@@ -1126,8 +1128,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         if let soundWaveData = CoreDataManager.getSongWaveFormImage(demoItem!) {
             if (KGLOBAL_defaultProgressBar != nil){
-                KGLOBAL_defaultProgressBar.removeFromSuperview()
-                KGLOBAL_defaultProgressBar = nil
+                dispatch_async(dispatch_get_main_queue()){
+                    KGLOBAL_defaultProgressBar.removeFromSuperview()
+                    KGLOBAL_defaultProgressBar = nil
+                }
             }
             KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
             print("sound wave data found")
@@ -1462,11 +1466,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func setupDefaultProgressBar(){
         dispatch_async(dispatch_get_main_queue()) {
-            KGLOBAL_defaultProgressBar = UIProgressView(frame: CGRectMake(0,self.progressBlockContainer.frame.height * 3 / 7,self.view.width,10))
-            KGLOBAL_defaultProgressBar.progress = 1.0
-            KGLOBAL_defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
-            KGLOBAL_defaultProgressBar.progressTintColor = UIColor.whiteColor()
-            self.progressBlockContainer.insertSubview( KGLOBAL_defaultProgressBar , aboveSubview: KGLOBAL_progressBlock)
+            if (KGLOBAL_defaultProgressBar == nil){
+                KGLOBAL_defaultProgressBar = UIProgressView(frame: CGRectMake(0,self.progressBlockContainer.frame.height * 3 / 7,self.view.width,10))
+                if(!self.selectedFromTable){
+                    KGLOBAL_defaultProgressBar.progress = 1.0 - self.startTime.toDecimalNumer()/Float(self.nowPlayingItemDuration)
+                }else{
+                    KGLOBAL_defaultProgressBar.progress = 1.0
+                }
+                
+                KGLOBAL_defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
+                KGLOBAL_defaultProgressBar.progressTintColor = UIColor.whiteColor()
+                self.progressBlockContainer.insertSubview( KGLOBAL_defaultProgressBar , aboveSubview: KGLOBAL_progressBlock)
+            }
         }
         
     }
