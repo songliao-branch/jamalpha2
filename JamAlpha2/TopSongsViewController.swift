@@ -23,6 +23,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         createTransitionAnimation()
         setUpNavigationBar()
         setUpRefreshControl()
+        songs = MusicManager.sharedInstance.songs
     }
     
     override func viewWillAppear(animated: Bool) {
