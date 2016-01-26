@@ -159,7 +159,7 @@ class PlayChordsManager: NSObject {
                 }
             }
         }
-        if(counter == 40){
+        if(counter == 100){
             stopTimer()
             arpeggioNotes.removeAllObjects()
             soundBank.allNotesOff()
