@@ -61,8 +61,9 @@ class FAQViewController: UIViewController {
 extension FAQViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpTableView() {
         answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
-        tableView = UITableView()
-        tableView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 64)
+        let frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 64)
+        tableView = UITableView(frame: frame, style: .Grouped)
+        //tableView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 64)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
@@ -89,6 +90,10 @@ extension FAQViewController: UITableViewDelegate, UITableViewDataSource {
         faqdetailVC.question = faqs[indexPath.item]
         faqdetailVC.answer = answers[indexPath.item]
         self.navigationController?.pushViewController(faqdetailVC, animated: true)
+    }
+    
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 22
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
