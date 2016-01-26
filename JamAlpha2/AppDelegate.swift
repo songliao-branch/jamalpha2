@@ -189,6 +189,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             MusicManager.sharedInstance.player.pause()
                         }
                     }
+                    KGLOBAL_queue.suspended = false
+                    KGLOBAL_init_queue.suspended = self.suspended
                 }
             } else {
                 if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
@@ -231,6 +233,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }else{
                 KGLOBAL_nowView.stop()
             }
+            KGLOBAL_queue.suspended = false
+            KGLOBAL_init_queue.suspended = self.suspended
         }
         
         KGLOBAL_isNeedToCheckIndex = true

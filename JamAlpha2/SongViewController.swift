@@ -1353,8 +1353,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             var op:NSBlockOperation?
             let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
             op = KGLOBAL_operationCache[keyString]
+            print("\(op)  \(keyString)")
             if(op == nil){
                 KGLOBAL_init_queue.suspended = true
+                KGLOBAL_queue.suspended = false
                 let tempNowPlayingItem = nowPlayingItem
                 let tempProgressBlock = KGLOBAL_progressBlock
                 let tempkeyString = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
@@ -1365,6 +1367,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 dispatch_async(dispatch_get_main_queue()) {
                                     let data = UIImagePNGRepresentation(image)
                                     if (KGLOBAL_operationCache[tempkeyString] != nil){
+                                        KGLOBAL_operationCache[tempkeyString]!.cancel()
                                         KGLOBAL_operationCache.removeValueForKey(tempkeyString)
                                     }
                                     if (KGLOBAL_defaultProgressBar != nil){
@@ -1386,6 +1389,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                             KGLOBAL_init_queue.suspended = false
                             self.setupDefaultProgressBar()
                             if (KGLOBAL_operationCache[tempkeyString] != nil){
+                                KGLOBAL_operationCache[tempkeyString]!.cancel()
                                KGLOBAL_operationCache.removeValueForKey(tempkeyString)
                             }
                             return
