@@ -342,6 +342,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func setUpTutorial() {
+        if !NSUserDefaults.standardUserDefaults().boolForKey(kShowLyricsTutorial) {
+            return
+        }
         tutorialScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         tutorialScrollView.backgroundColor = UIColor.clearColor()
         self.view.addSubview(tutorialScrollView)
