@@ -1254,9 +1254,9 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     }
                 } else {
                     if sec < 10 {
-                        timeLabel.text = "0\(min):0\(sec)"
+                        timeLabel.text = "\(min):0\(sec)"
                     } else {
-                        timeLabel.text = "0\(min):\(sec)"
+                        timeLabel.text = "\(min):\(sec)"
                     }
                 }
                 timeLabel.font = UIFont.systemFontOfSize(9)
