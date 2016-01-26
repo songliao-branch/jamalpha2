@@ -22,7 +22,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     var allTabsSets = [DownloadedTabsSet]()
     var allLyricsSets = [DownloadedLyricsSet]()
-    
+    var isSeekingPlayerState = true
     
     //status view pop up
     var statusView: UIView!
@@ -181,7 +181,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
 
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         
         let song = songs[indexPath.row]
         
@@ -198,7 +198,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             
             if(item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    while (isSeekingPlayerState){
+                    while (self.isSeekingPlayerState){
                         
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
@@ -206,7 +206,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -221,7 +221,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                                         tableView.reloadData()
                                     })
                                 }
-                                isSeekingPlayerState = false
+                                self.isSeekingPlayerState = false
                                 break
                             }
                         }
@@ -250,7 +250,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
 
             
         }  else if song.artist == "Alex Lisell" { //if demo song
-            
+            isSeekingPlayerState = false
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
             MusicManager.sharedInstance.player.pause()
@@ -271,7 +271,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             cell.searchIcon.hidden = true
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
-            
+            isSeekingPlayerState = false
             song.findSearchResult( {
                 result in
                 
