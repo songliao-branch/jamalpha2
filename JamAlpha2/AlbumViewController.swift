@@ -52,18 +52,8 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
             }
             
             if player.nowPlayingItem != nil {
-                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
-                    if(NetworkManager.sharedInstance.reachability.isReachableViaWiFi()){
-                        if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                            self.albumTable.reloadData()
-                        }
-                    }else{
-                        self.albumTable.reloadData()
-                    }
-                }else{
-                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                        self.albumTable.reloadData()
-                    }
+                if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                    self.albumTable.reloadData()
                 }
             }
         }

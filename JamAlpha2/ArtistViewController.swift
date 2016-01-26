@@ -54,18 +54,8 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
             }
             
             if player.nowPlayingItem != nil {
-                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
-                    if(NetworkManager.sharedInstance.reachability.isReachableViaWiFi()){
-                        if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                            self.artistTable.reloadData()
-                        }
-                    }else{
-                        self.artistTable.reloadData()
-                    }
-                }else{
-                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                        self.artistTable.reloadData()
-                    }
+                if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                    self.artistTable.reloadData()
                 }
             }
         }
