@@ -867,6 +867,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         calculateXPoints()
     }
     
+    func setUpSingleLyricsView() {
+        
+    }
+    
     func setUpLyricsBase(){
         //Lyric labels
         currentLyricsIndex = -1

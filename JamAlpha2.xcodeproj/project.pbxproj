@@ -445,7 +445,6 @@
 			children = (
 				BFC136641C580E8A00D05899 /* PullToRefreshConst.swift */,
 				BFC136651C580E8A00D05899 /* PullToRefreshView.swift */,
-				BFC136681C580EA000D05899 /* UIScrollViewExtension.swift */,
 			);
 			name = TopSongPullRefresh;
 			sourceTree = "<group>";
@@ -791,6 +790,7 @@
 				C8F505071B9101920077F508 /* UIWindowEffects.swift */,
 				E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */,
 				E431BA9C1B913AE700E32A0B /* String+Utils.swift */,
+				BFC136681C580EA000D05899 /* UIScrollViewExtension.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
