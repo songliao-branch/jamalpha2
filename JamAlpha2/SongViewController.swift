@@ -405,6 +405,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func scrollViewDidScroll(scrollView: UIScrollView) {
+        if tutorialScrollView == nil {
+            return
+        }
+        
         if  tutorialScrollView.hidden {
             return
         }
@@ -414,6 +418,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        if tutorialScrollView == nil {
+            return
+        }
+        
         if  tutorialScrollView.hidden {
             return
         }
