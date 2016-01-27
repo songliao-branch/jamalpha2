@@ -512,7 +512,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         topView = UIView(frame: CGRect(x: 0, y: statusBarHeight, width: self.view.frame.width, height: topViewHeight))
         self.view.addSubview(topView)
         
-     
         let buttonCenterY: CGFloat = topViewHeight/2
         let buttonMargin: CGFloat = self.view.frame.width / 12
         pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))

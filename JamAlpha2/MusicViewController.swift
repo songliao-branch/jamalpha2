@@ -214,6 +214,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
         cell.demoImage.hidden = true
+        cell.cloudImage.hidden = true
         
         if pageIndex == 0 {
     
@@ -232,31 +233,34 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             }
             
+            cell.mainTitle.text = song.getTitle()
+            cell.subtitle.text = song.getArtist()
+            
+            cell.titleTrailingConstraint.constant = 12
+            cell.loudspeakerImage.hidden = true
+            
             if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
                 if let item = song as? MPMediaItem {
                     if item == MusicManager.sharedInstance.player.nowPlayingItem {
                         cell.titleTrailingConstraint.constant = 50
                         cell.loudspeakerImage.hidden = false
                     }
-                    else {
-                        cell.titleTrailingConstraint.constant = 15
-                        cell.loudspeakerImage.hidden = true
-                    }
-                } else {
-                    cell.titleTrailingConstraint.constant = 15
-                    cell.loudspeakerImage.hidden = true
-                }               
-            } else {
-                cell.titleTrailingConstraint.constant = 15
-                cell.loudspeakerImage.hidden = true
+                }
             }
             
+            if let _ = song.getURL() {
+                cell.cloudImage.hidden = true
+                cell.titleLeftConstraint.constant = 11
+            } else {
+                cell.cloudImage.hidden = false
+                cell.titleLeftConstraint.constant = 30
+            }
             
             CoreDataManager.initializeSongToDatabase(song)
             
             if let coverimage = CoreDataManager.getCoverImage(song){
                 cell.coverImage.image = coverimage
-            }else{
+            } else {
                 // some song does not have an album cover
                 if let cover = song.getArtWork() {
                     let image = cover.imageWithSize(CGSize(width: 54, height: 54))
@@ -271,11 +275,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     cell.coverImage.image = UIImage(named: "liweng")
                     loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
-
             }
-            
-            cell.mainTitle.text = song.getTitle()
-            cell.subtitle.text = song.getArtist()
             
             if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable()){
                 if(song.isKindOfClass(MPMediaItem)){
@@ -308,32 +308,38 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.coverImage.image = nil
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
-            
-            CoreDataManager.initializeSongToDatabase(theArtist.getSongs()[0])
-            if let coverImage = CoreDataManager.getCoverImage(theArtist.getSongs()[0]){
-                cell.coverImage.image = coverImage
-            }else{
-                //get the first album cover
-                for album in theArtist.getAlbums() {
-                    if let cover = album.coverImage {
-                        let image = cover.imageWithSize(CGSize(width: 80, height: 80))
-                        if let img = image {
-                            cell.coverImage.image = img
-                        } else { //this happens somewhow when songs load too fast
-                            //TODO: load something else
-                            cell.coverImage.image = UIImage(named: "liweng")
-                            loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+            if theArtist.getSongs().count > 0 {
+                CoreDataManager.initializeSongToDatabase(theArtist.getSongs()[0])
+                if let coverImage = CoreDataManager.getCoverImage(theArtist.getSongs()[0]){
+                    cell.coverImage.image = coverImage
+                }else{
+                    //get the first album cover
+                    for album in theArtist.getAlbums() {
+                        if let cover = album.coverImage {
+                            let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                            if let img = image {
+                                cell.coverImage.image = img
+                            } else { //this happens somewhow when songs load too fast
+                                //TODO: load something else
+                                cell.coverImage.image = UIImage(named: "liweng")
+                                loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                            }
+                            
+                            break
                         }
-                        
-                        break
+                    }
+                    
+                    if(cell.coverImage.image == nil){
+                        cell.coverImage.image = UIImage(named: "liweng")
+                        loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
                     }
                 }
-                
+            }else{
                 if(cell.coverImage.image == nil){
                     cell.coverImage.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
             }
+            
             
             cell.loudspeakerImage.hidden = true
 

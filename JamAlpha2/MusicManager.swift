@@ -311,7 +311,9 @@ class MusicManager: NSObject {
         albumQuery.groupingType = MPMediaGrouping.Album
         for album in albumQuery.collections!{
             let representativeItem = album.representativeItem!
-            
+            if (representativeItem.getArtist().isEmpty){
+                continue
+            }
             //there is no song shorter than 30 seconds
             if representativeItem.playbackDuration < 30 { continue }
             
