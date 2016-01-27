@@ -28,6 +28,9 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     var searchAPI:SearchAPI! = SearchAPI()
     var isSeekingPlayerState = true
     
+    var initQueueSuspended = false
+    var queueSuspended = false
+    
     @IBOutlet weak var musicTable: UITableView!
     
     //for transition view animator
@@ -638,6 +641,25 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 }
 
 extension MusicViewController {
+    
+    override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        initQueueSuspended = KGLOBAL_init_queue.suspended
+        queueSuspended = KGLOBAL_queue.suspended
+        KGLOBAL_init_queue.suspended = true
+        KGLOBAL_queue.suspended = true
+    }
+    
+    override func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+             KGLOBAL_init_queue.suspended = initQueueSuspended
+            KGLOBAL_queue.suspended = queueSuspended
+        }
+    }
+    
+    override func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        KGLOBAL_init_queue.suspended = initQueueSuspended
+        KGLOBAL_queue.suspended = queueSuspended
+    }
     
     func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
         
