@@ -820,6 +820,15 @@ extension LyricsSyncViewController {
         }
         
         //check if lyricsSet id is bigger than 0, if so, means this lyrics has been saved to the cloud, then we use same lyricsSetId, otherwise if less than one, it means it's new
+        
+        if (lyricsTimesTuple.count < 3) {
+            let alertController = UIAlertController(title: nil, message: "Please add at least THREE single lines in your lyric", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)
+            return
+        }
+
+        
         let savedLyricsSetId = CoreDataManager.getLyrics(theSong, fetchingUsers: true).1
         
         CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times, userId: Int(CoreDataManager.getCurrentUser()!.id), lyricsSetId: savedLyricsSetId > 0 ? savedLyricsSetId: kLocalSetId ,lastEditedDate: NSDate())
