@@ -1547,9 +1547,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     func createSoundWave() {
         let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
         self.progressBlock = UIView(frame: frame)
-        if(theSong == nil){
-            print("the song is empty")
-        }
         if isDemoSong {
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
@@ -1819,7 +1816,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
                 alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler:{
                     handle in
-                    print("back to song view controller")
                     self.tuningMenu.hidden = true
                     self.progressBlock.hidden = true
                     self.removeNotification()
@@ -1842,7 +1838,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 }))
                 self.presentViewController(alertController, animated: true, completion: nil)
             }else{
-                print("back to song view controller")
                 tuningMenu.hidden = true
                 self.progressBlock.hidden = true
                 removeNotification()
@@ -2056,7 +2051,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                         self.currentSelectedSpecificTab.index = index
                         self.currentSelectedSpecificTab.name = name
                         self.currentSelectedSpecificTab.content = content
-                        print("successfully add to database")
                         addSuccessed = true
                         self.addSpecificFingerPoint = true
                         self.backToMainView()

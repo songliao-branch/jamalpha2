@@ -879,8 +879,6 @@ extension LyricsSyncViewController {
             var time: [NSTimeInterval] = [NSTimeInterval]()
             var timeAdded: [Bool] = [Bool]()
             for line in lyric.lyric {
-                print(line.str)
-                print(self.lyricsOrganizedArray[i])
                 if line.str == self.lyricsOrganizedArray[i] {
                     lyrics.append(line.str)
                     time.append(NSTimeInterval(line.time.toDecimalNumer()))

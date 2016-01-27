@@ -48,7 +48,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         synced(self) {
             let player = MusicManager.sharedInstance.player
             if player.repeatMode == .One {
-                print("\(player.nowPlayingItem!.title) is repeating")
                 return
             }
             

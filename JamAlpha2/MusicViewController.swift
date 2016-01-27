@@ -40,9 +40,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
-        print(songCount)
-        
-        print("musicVC shouldShowDemoSong: \(NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong))")
         loadAndSortMusic()
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
@@ -538,14 +535,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
   
     // MARK: called from SongViewController action sheets
     func goToArtist(theArtist: String) {
-        print("we want to go to \(theArtist)")
         for artist in MusicManager.sharedInstance.uniqueArtists {
             if theArtist == artist.artistName {
                 let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
                 artistVC.musicViewController = self
                 artistVC.theArtist = artist
                 self.showViewController(artistVC, sender: self)
-                print("jumping to artist \(theArtist)")
                 break
             }
         }
@@ -558,7 +553,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 albumVC.musicViewController = self
                 albumVC.theAlbum = album
                 self.showViewController(albumVC, sender: self)
-                print("jumping to album \(theAlbum)")
                 break
             }
         }
@@ -710,12 +704,12 @@ extension MusicViewController {
                                         tempProgressBlock.generateWaveforms()
                                         let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                                         CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
-                                        //                                print("Soundwave generated for \(nowPlayingItem.title!) in background")
                                         let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
                                         AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
                                             succeeded in
                                             if succeeded {
                                                 APIManager.updateSoundwaveUrl(CoreDataManager.getSongId(tempNowPlayingItem), url: soundwaveName)
+                                                print("uploaded image to AWS and updated the url for song \(tempNowPlayingItem.getTitle())")
                                             }
                                         })
                                         self.incrementSongCountInThread()

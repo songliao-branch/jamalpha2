@@ -141,14 +141,12 @@ class PhotoViewerViewController: UIViewController, UIScrollViewDelegate, UIPopov
                         }else{
                             self.showStatusView(false)
                             self.startHideStatusViewTimer()
-                            print(error)
                         }
                 })
             })
             
             let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: {
                 (alert: UIAlertAction!) -> Void in
-                print("Cancelled")
             })
             
             optionMenu.addAction(saveAction)

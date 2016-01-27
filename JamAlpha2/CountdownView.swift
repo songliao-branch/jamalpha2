@@ -45,7 +45,6 @@ class CountdownView: UIView {
         numberLabel!.sizeToFit()
         numberLabel!.center = CGPoint(x: rect.width/2, y: rect.height/2)
         self.addSubview(numberLabel!)
-        print("count down label added")
     }
 
     func setNumber(number: Int) {

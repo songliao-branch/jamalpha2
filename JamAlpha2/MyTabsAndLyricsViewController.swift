@@ -106,7 +106,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func goToEditor(index: Int) {
         let song = songs[index]
         guard let item = song.mediaItem else {
-            print("no media item found for \(song.title)")
             return
         }
         

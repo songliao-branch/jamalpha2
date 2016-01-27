@@ -144,8 +144,6 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-        print("\(_TAG) Initialize Player")
-        
         //save current playing time and time and reset player after it is being stopped
         var lastPlayingItem: MPMediaItem?
         var lastPlayTime: NSTimeInterval = 0
@@ -208,15 +206,10 @@ class MusicManager: NSObject {
     func setPlayerQueue(collection: [MPMediaItem]){
 
         if lastPlayerQueue == collection { // if we are the same queue
-           print("\(_TAG) same collection")
             queueChanged = false
         } else { //if different queue, means we are getting a new collection, reset the player queue
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
-            print("\(_TAG) setting a new queue")
-            
-            print(MPMediaItemPropertyReleaseDate)
-            
             queueChanged = true
             return
         }
@@ -225,8 +218,6 @@ class MusicManager: NSObject {
         if(!queueChanged && player.nowPlayingItem == nil){
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
-            print("Coming from Music app with no playing item \(_TAG) setting a new queue")
-        
             queueChanged = true
             KGLOBAL_isNeedToCheckIndex = false
             return
@@ -243,8 +234,6 @@ class MusicManager: NSObject {
             if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? Int(lastPlayerQueue.indexOf(player.nowPlayingItem!)!) : -1) != player.indexOfNowPlayingItem {
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
-                print("Queue is different,  now reset queue")
-                
                 queueChanged = true
             }
             KGLOBAL_isNeedToCheckIndex = false
@@ -258,7 +247,6 @@ class MusicManager: NSObject {
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
-                print("\(_TAG)  ")
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
             player.repeatMode = .One

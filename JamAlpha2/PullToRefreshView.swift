@@ -84,8 +84,6 @@ public class PullToRefreshView: UIView {
             superView.addObserver(self, forKeyPath: contentOffsetKeyPath, options: .Initial, context: &kvoContext)
             scrollViewBounces = (superView as! UIScrollView).bounces
             scrollViewInsets = (superView as! UIScrollView).contentInset
-            print((superView as! UIScrollView).contentOffset.y)
-            print((superView as! UIScrollView).contentInset.top)
         }
     }
     
