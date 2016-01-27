@@ -23,7 +23,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var searchBackgroundLabel = UILabel()
     
     var searchHistoryManager =  SearchHistoryManager()
-    var isSeekingPlayerState = true
+    var isSeekingPlayerState = false
 
     @IBOutlet weak var searchResultTableView: UITableView!
 

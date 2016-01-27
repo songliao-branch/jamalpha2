@@ -16,7 +16,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     var songs = [LocalSong]()
     var animator: CustomTransitionAnimation?
-    var isSeekingPlayerState = true
+    var isSeekingPlayerState = false
     
     override func viewDidLoad() {
         super.viewDidLoad()

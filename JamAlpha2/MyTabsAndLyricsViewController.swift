@@ -22,7 +22,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     var allTabsSets = [DownloadedTabsSet]()
     var allLyricsSets = [DownloadedLyricsSet]()
-    var isSeekingPlayerState = true
+    var isSeekingPlayerState = false
     
     //status view pop up
     var statusView: UIView!

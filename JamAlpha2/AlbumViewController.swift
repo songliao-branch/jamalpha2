@@ -10,7 +10,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     var theAlbum:Album!
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
-    var isSeekingPlayerState = true
+    var isSeekingPlayerState = false
 
     @IBOutlet weak var albumTable: UITableView!
     

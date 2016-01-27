@@ -13,7 +13,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     var theArtist:Artist!
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
-    var isSeekingPlayerState = true
+    var isSeekingPlayerState = false
     
     @IBOutlet weak var artistTable: UITableView!
     

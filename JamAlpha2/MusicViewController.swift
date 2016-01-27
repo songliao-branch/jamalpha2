@@ -26,7 +26,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     var pageIndex = 0
     var searchAPI:SearchAPI! = SearchAPI()
-    var isSeekingPlayerState = true
+    var isSeekingPlayerState = false
     
     var queueSuspended = false
     
