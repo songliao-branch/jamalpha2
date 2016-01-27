@@ -1585,11 +1585,15 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         }
 
         if !isPanning {
+            let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
             if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {
                 startTime.addTime(Int(100 / stepPerSecond))
                 self.currentTime = NSTimeInterval(startTime.toDecimalNumer()) - 0.01
+                if (tempPlaytime.isNaN || tempPlaytime == 0){
+                    startTime.setTime(0)
+                    self.currentTime = 0
+                }
             } else {
-                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                     self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
