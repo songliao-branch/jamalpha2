@@ -13,15 +13,22 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpLyricsArray(height: CGFloat) {
         numberOfLineInSingleLyricsView = Int(height / 66) / 2 + 1
         lyricsArray = [(str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat)]()
-        for var i = 0; i < lyric.lyric.count + 2 * numberOfLineInSingleLyricsView; i++ {
-            if i < numberOfLineInSingleLyricsView {
-                lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 22))
-            } else if i < lyric.lyric.count + numberOfLineInSingleLyricsView {
-                let temp: (str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat) = (lyric.lyric[i - numberOfLineInSingleLyricsView].str, NSTimeInterval(lyric.lyric[i - numberOfLineInSingleLyricsView].time.toDecimalNumer()), 0.5, CGFloat(i * 66) + 22)
-                lyricsArray.append(temp)
-            } else {
-                lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 22))
+        if lyric.lyric.count > 0 {
+            for var i = 0; i < lyric.lyric.count + 2 * numberOfLineInSingleLyricsView; i++ {
+                if i < numberOfLineInSingleLyricsView {
+                    lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 11))
+                } else if i < lyric.lyric.count + numberOfLineInSingleLyricsView {
+                    let temp: (str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat) = (lyric.lyric[i - numberOfLineInSingleLyricsView].str, NSTimeInterval(lyric.lyric[i - numberOfLineInSingleLyricsView].time.toDecimalNumer()), 0.5, CGFloat(i * 66) + 11)
+                    lyricsArray.append(temp)
+                } else {
+                    lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 11))
+                }
             }
+        } else {
+            for var i = 0; i < numberOfLineInSingleLyricsView; i++ {
+                lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 11))
+            }
+            lyricsArray.append(("You don't have any lyric for this song, please add it in Lyrics Editor or select one from others", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + 11))
         }
     }
     
@@ -82,7 +89,13 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             singleLyricsTableView.separatorStyle = .None
             singleLyricsTableView.showsHorizontalScrollIndicator = false
             singleLyricsTableView.showsVerticalScrollIndicator = false
-            self.view.addSubview(singleLyricsTableView)
+            
+            let tapOnTableView: UITapGestureRecognizer = UITapGestureRecognizer()
+            tapOnTableView.addTarget(self, action: "tapOnTableView:")
+            singleLyricsTableView.addGestureRecognizer(tapOnTableView)
+            
+            
+            self.view.insertSubview(singleLyricsTableView, belowSubview: guitarActionView)
             
             for label in tuningLabels {
                 label.hidden = true
@@ -104,6 +117,10 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             lyricsArray.removeAll()
             lyricsArray = nil
         }
+    }
+    
+    func tapOnTableView(sender: UITapGestureRecognizer) {
+        dismissAction()
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
