@@ -425,7 +425,30 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if tempScrollLine != nil {
             disapperCount = 0
             let centerPoint: CGPoint = self.tempScrollLine.center
-//            let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(<#T##indexPath: NSIndexPath##NSIndexPath#>)
+            for var i = 0; i < self.lyricsArray.count; i++ {
+                let tempIndex: NSIndexPath = NSIndexPath(forItem: i, inSection: 0)
+                let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
+                let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
+                if CGRectContainsPoint(superViewRect, centerPoint) {
+                    tempScrollTime = self.lyricsArray[i].time
+                    let min: Int = Int(tempScrollTime) / 60
+                    let sec: Int = Int(tempScrollTime) % 60
+                    if min < 10 {
+                        if sec < 10 {
+                            tempScrollTimeLabel.text = "0\(min):0\(sec)"
+                        } else {
+                            tempScrollTimeLabel.text = "0\(min):\(sec)"
+                        }
+                    } else {
+                        if sec < 10 {
+                            tempScrollTimeLabel.text = "\(min):0\(sec)"
+                        } else {
+                            tempScrollTimeLabel.text = "\(min):\(sec)"
+                        }
+                    }
+                    break
+                }
+            }
         }
     }
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
@@ -458,12 +481,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             print("did end dragging")
             disapperTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "disapperCount:", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(disapperTimer, forMode: NSRunLoopCommonModes)
-//            let delay = 2 * Double(NSEC_PER_SEC)
-//            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-//            dispatch_after(time, dispatch_get_main_queue()) {
-//                self.hideTempScrollLyricsView()
-//            }
-//            
         }
     }
     

@@ -74,7 +74,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         tempScrollTimeLabel.hidden = true
         self.view.insertSubview(tempScrollTimeLabel, belowSubview: guitarActionView)
     }
-    
+
     func pressTempPlayButton(sender: UIButton) {
         let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
         if !tempPlaytime.isNaN {
