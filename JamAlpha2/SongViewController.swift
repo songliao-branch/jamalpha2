@@ -283,6 +283,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpBottomViewWithButtons()
         setUpActionViews()
         setUpCountdownView()
+        setUpScrollLine()
         
         if(!isSongNeedPurchase){
             updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
@@ -416,14 +417,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             if  tutorialScrollView.hidden {
                 return
             }
-            
             for i in 0..<numberOfTutorialPages {
                 tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
             }
         }
     }
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        if singleLyricsTableView != nil {            
+        if singleLyricsTableView != nil {
             showTempScrollLyricsView()
         }
     }
@@ -441,13 +441,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
         }
-        if singleLyricsTableView != nil {
-            hideTempScrollLyricsView()
-        }
     }
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if singleLyricsTableView != nil {
-            hideTempScrollLyricsView()
+            let delay = 2 * Double(NSEC_PER_SEC)
+            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+            dispatch_after(time, dispatch_get_main_queue()) {
+                self.hideTempScrollLyricsView()
+            }
+            
         }
     }
     
@@ -481,7 +483,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func loadBackgroundImageFromMediaItem(item: Findable) {
-        
         if let artwork = item.getArtWork() {
             currentImage = artwork.imageWithSize(CGSize(width: self.view.frame.height/8, height: self.view.frame.height/8))
             if currentImage == nil {
@@ -503,7 +504,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                self.reloadBackgroundImageAfterSearch(item)
             }
         }
-       
     }
 
     
@@ -605,8 +605,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
 
-    func setUpNameAndArtistButtons(){
-       
+    func setUpNameAndArtistButtons(){       
         songNameLabel = MarqueeLabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: 180, height: 20)))
         songNameLabel.type = .Continuous
         songNameLabel.scrollDuration = 15.0
@@ -2797,7 +2796,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if KGLOBAL_progressBlock == nil {
             return
         }
-        
         if !isPanning && !isSongNeedPurchase {
             if !self.selectedFromSearchTab && (!isViewDidAppear || startTime.toDecimalNumer() < 2 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 2 || startTime.toDecimalNumer() - toTime < (1 * speed)) {
                 startTime.addTime(Int(100 / stepPerSecond))

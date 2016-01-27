@@ -38,6 +38,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         tempPlayButton.setImage(UIImage(named: "playbutton"), forState: .Normal)
         tempPlayButton.imageEdgeInsets = UIEdgeInsetsMake(12, 5, 12, 19)
         tempPlayButton.hidden = true
+        tempPlayButton.addTarget(self, action: "pressTempPlayButton:", forControlEvents: .TouchUpInside)
         self.view.insertSubview(tempPlayButton, belowSubview: guitarActionView)
         
         tempScrollLine = UIView()
@@ -68,6 +69,13 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         }
         tempScrollTimeLabel.hidden = true
         self.view.insertSubview(tempScrollTimeLabel, belowSubview: guitarActionView)
+    }
+    
+    func pressTempPlayButton(sender: UIButton) {
+        let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
+        if !tempPlaytime.isNaN {
+            startTime.setTime(Float(tempPlaytime))
+        }
     }
     
     func showTempScrollLyricsView() {
@@ -145,7 +153,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             gradient.frame = frame2
             gradient.colors = [UIColor.clearColor().CGColor, UIColor.baseColor().CGColor, UIColor.clearColor().CGColor]
             setUpLyricsArray(frame.size.height)
-            setUpScrollLine()
             singleLyricsTableView = UITableView(frame: frame, style: .Plain)
             singleLyricsTableView.backgroundColor = UIColor.clearColor()
             singleLyricsTableView.delegate = self
@@ -158,7 +165,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             let tapOnTableView: UITapGestureRecognizer = UITapGestureRecognizer()
             tapOnTableView.addTarget(self, action: "tapOnTableView:")
             singleLyricsTableView.addGestureRecognizer(tapOnTableView)
-            
             
             self.view.insertSubview(singleLyricsTableView, belowSubview: guitarActionView)
             
@@ -201,7 +207,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         cell.selectionStyle = .None
         cell.updateLyricsLabel(self.lyricsArray[indexPath.item].str, labelAlpha: self.lyricsArray[indexPath.item].alpha)
         let tempRowRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(indexPath)
-        let temp : CGRect = singleLyricsTableView.convertRect(tempRowRect, toView: singleLyricsTableView.superview)
 //        print(temp.origin.y)
 //        print(singleLyricsTableView.frame.origin.y)
 //        print(singleLyricsTableView.frame.origin.y + singleLyricsTableView.frame.size.height)
