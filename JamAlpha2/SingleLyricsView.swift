@@ -12,6 +12,9 @@ import UIKit
 extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpLyricsArray(height: CGFloat) {
         numberOfLineInSingleLyricsView = Int(height / 66) / 2 + 1
+        if lyricsArray != nil {
+            lyricsArray.removeAll()
+        }
         lyricsArray = [(str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat)]()
         if lyric.lyric.count > 0 {
             for var i = 0; i < lyric.lyric.count + 2 * numberOfLineInSingleLyricsView; i++ {

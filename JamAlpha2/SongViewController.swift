@@ -833,6 +833,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             })
         }
+        setUpLyricsArray(basesHeight + 20)
+        singleLyricsTableView.reloadData()
     }
     
     //for testing
