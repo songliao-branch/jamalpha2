@@ -69,15 +69,20 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         cell.titleLabel.text = song.trackName!
         cell.subtitleLabel.text = song.artistName!
         
-        if let _ = song.mediaItem {
+        cell.speaker.hidden = true
+        if let item = song.mediaItem {
             cell.searchIcon.hidden = true
             cell.titleRightConstraint.constant = 15
-         
+            
+            if let nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem where nowPlayingItem == item {
+                cell.speaker.hidden = false
+            }
         } else {
             cell.searchIcon.hidden = false
             cell.titleRightConstraint.constant = 55
         }
         
+
         if let imageURL = song.artworkUrl100 {
             cell.albumImage.image = nil
             let url = NSURL(string: imageURL)!

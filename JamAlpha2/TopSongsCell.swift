@@ -25,4 +25,5 @@ class TopSongsCell: UITableViewCell {
     @IBOutlet weak var albumImage: UIImageView!
 
     
+    @IBOutlet weak var speaker: UIImageView!
 }
