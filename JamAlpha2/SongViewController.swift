@@ -19,6 +19,12 @@ let soundwaveHeight: CGFloat = 161
 
 class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate, SKStoreProductViewControllerDelegate {
     
+    //MARK: When display lyrics only
+    var singleLyricsTableView: UITableView!
+    var lyricsArray: [(str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat)]!
+    var numberOfLineInSingleLyricsView: Int = 0
+    var tempCurrentLyricsIndex: Int = 0
+    
     var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!
     private var rwLock = pthread_rwlock_t()
@@ -402,25 +408,29 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
 
     func scrollViewDidScroll(scrollView: UIScrollView) {
-        if  tutorialScrollView.hidden {
-            return
-        }
-        
-        for i in 0..<numberOfTutorialPages {
-            tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
+        if tutorialScrollView != nil {
+            if  tutorialScrollView.hidden {
+                return
+            }
+            
+            for i in 0..<numberOfTutorialPages {
+                tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
+            }
         }
     }
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        if  tutorialScrollView.hidden {
-            return
-        }
-        
-        let currentPage = scrollView.contentOffset.x / self.view.frame.width
-        for i in 0..<numberOfTutorialPages {
-            if i == Int(currentPage) {
-                tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
-            } else {
-                tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
+        if tutorialScrollView != nil {
+            if  tutorialScrollView.hidden {
+                return
+            }
+            
+            let currentPage = scrollView.contentOffset.x / self.view.frame.width
+            for i in 0..<numberOfTutorialPages {
+                if i == Int(currentPage) {
+                    tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
+                } else {
+                    tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
+                }
             }
         }
     }
@@ -865,10 +875,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBase.addSubview(addTabsPrompt)
         
         calculateXPoints()
-    }
-    
-    func setUpSingleLyricsView() {
-        
     }
     
     func setUpLyricsBase(){
@@ -1999,11 +2005,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //MARK: functions called from guitar action views
     func chordsSwitchChanged(uiswitch: UISwitch) {
         isChordShown = uiswitch.on
+        if isChordShown {
+            releaseSingleLyricsView()
+        }
         toggleChordsDisplayMode()
     }
     
     func tabsSwitchChanged(uiswitch: UISwitch) {
         isTabsShown = uiswitch.on
+        if isTabsShown {
+            releaseSingleLyricsView()
+        }
         toggleChordsDisplayMode()
     }
     
@@ -2024,7 +2036,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             chordBase.hidden = false
         }
-        
+        if isChordShown == false && isTabsShown == false && isLyricsShown {
+            lyricbase.hidden = true
+            setUpSingleLyricsView()
+            
+        }
         if(!isSongNeedPurchase){
             let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
             if !tempPlaytime.isNaN {
@@ -2041,6 +2057,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func lyricsSwitchChanged(uiswitch: UISwitch) {
         isLyricsShown = uiswitch.on
+        if isLyricsShown == false {
+            releaseSingleLyricsView()
+        }
+        
         toggleLyrics()
     }
     
@@ -2050,6 +2070,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             lyricbase.hidden = false
         } else {
             lyricbase.hidden = true
+        }
+        if isChordShown == false && isTabsShown == false && isLyricsShown {
+            lyricbase.hidden = true
+            setUpSingleLyricsView()
         }
         // set to user defaults
         if isLyricsShown {
@@ -2574,7 +2598,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if currentLyricsIndex + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(currentLyricsIndex+1).time) {
             currentLyricsIndex++
             topLyricLabel.text = lyric.get(currentLyricsIndex).str
-            
+
             if currentLyricsIndex + 1 < lyric.lyric.count {
                 bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
             }
@@ -2803,6 +2827,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         refreshLyrics()
         refreshProgressBlock()
         refreshTimeLabel()
+        refreshLyricsTableView()
+    }
+    
+    func refreshLyricsTableView() {
+        if singleLyricsTableView != nil && lyricsArray.count > 0 {
+            //updateSingleLyricsArray()
+            if tempCurrentLyricsIndex != currentLyricsIndex {
+                tempCurrentLyricsIndex = currentLyricsIndex
+                updateSingleLyricsPosition()
+            }
+        }
     }
     
     
@@ -3129,3 +3164,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     
 }
+
+
+
