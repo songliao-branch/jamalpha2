@@ -28,7 +28,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     var searchAPI:SearchAPI! = SearchAPI()
     var isSeekingPlayerState = true
     
-    var initQueueSuspended = false
     var queueSuspended = false
     
     @IBOutlet weak var musicTable: UITableView!
@@ -643,7 +642,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 extension MusicViewController {
     
     override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        initQueueSuspended = KGLOBAL_init_queue.suspended
         queueSuspended = KGLOBAL_queue.suspended
         KGLOBAL_init_queue.suspended = true
         KGLOBAL_queue.suspended = true
@@ -651,14 +649,28 @@ extension MusicViewController {
     
     override func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-             KGLOBAL_init_queue.suspended = initQueueSuspended
+             KGLOBAL_init_queue.suspended = false
             KGLOBAL_queue.suspended = queueSuspended
+            if (!KGLOBAL_init_queue.suspended){
+                if Int(songCount) > 0 {
+                    if(!uniqueSongs.isEmpty){
+                        generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
+                    }
+                }
+            }
         }
     }
     
     override func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        KGLOBAL_init_queue.suspended = initQueueSuspended
+        KGLOBAL_init_queue.suspended = false
         KGLOBAL_queue.suspended = queueSuspended
+        if (!KGLOBAL_init_queue.suspended){
+            if songCount > 0 {
+                if(!uniqueSongs.isEmpty){
+                    generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
+                }
+            }
+        }
     }
     
     func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
@@ -698,7 +710,6 @@ extension MusicViewController {
                             var progressBarWidth:CGFloat!
                             progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
                             let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
-                            
                             op = NSBlockOperation(block: {
                                 
                                 if(op!.cancelled){
