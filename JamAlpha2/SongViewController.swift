@@ -1902,7 +1902,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             result in
             if result == "liked" {
                 CoreDataManager.favoriteTheSong(findable, shouldFavorite: true)
-                self.favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
+                self.favoriateButton.setImage(UIImage(named: "favorited")?.imageWithColor(UIColor.mainPinkColor()), forState: UIControlState.Normal)
             } else  {
                 CoreDataManager.favoriteTheSong(findable, shouldFavorite: false)
                 self.favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
@@ -3085,7 +3085,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func updateFavoriteStatus(item: Findable) {
         //check core data only
         if CoreDataManager.isFavorited(item) && CoreDataManager.getCurrentUser() != nil {
-            favoriateButton.setImage(UIImage(named: "favorited"), forState: UIControlState.Normal)
+            favoriateButton.setImage(UIImage(named: "favorited")?.imageWithColor(UIColor.mainPinkColor()), forState: UIControlState.Normal)
         } else {
             favoriateButton.setImage(UIImage(named: "notfavorited"), forState: UIControlState.Normal)
         }
