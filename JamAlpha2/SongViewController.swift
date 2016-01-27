@@ -324,6 +324,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         super.viewDidAppear(animated)
         if(!isRemoveProgressBlock){
             isRemoveProgressBlock = true
+            if(!isSongNeedPurchase){
+                self.removeAllObserver()
+                self.registerMediaPlayerNotification()
+            }
         }else{
             if(!isSongNeedPurchase){
                 self.registerMediaPlayerNotification()
