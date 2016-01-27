@@ -594,19 +594,21 @@ class APIManager: NSObject {
         }
     }
     
-    class func getTopSongs(completion: (( songs: [LocalSong]) -> Void)) {
+    class func getTopSongs(completion: (( songs: [SearchResult]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
             print(response)
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    var songs = [LocalSong]()
+                    var results = [SearchResult]()
                     for song in json["songs"].array! {
-                        let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
-                        songs.append(s)
+                        
+                        let result = SearchResult(id: song["track_id"].int!, title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!, previewUrl: song["preview_url"].string!, trackViewUrl: song["store_link"].string!, artwork: song["artwork_url"].string!, titleAliases: song["title_aliases"].string!, artistAliases: song["artist_aliases"].string!)
+                        
+                        results.append(result)
                     }
-                    completion(songs: songs)
+                    completion(songs: results)
                 }
             case .Failure(let error):
                 print("favorite song error: \(error)")

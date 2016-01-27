@@ -17,12 +17,12 @@ class TopSongsCell: UITableViewCell {
     
     @IBOutlet weak var subtitleLabel: UILabel!
     
-    @IBOutlet weak var spinner: UIActivityIndicatorView!
     
     @IBOutlet weak var searchIcon: UIImageView!
 
     @IBOutlet weak var titleRightConstraint: NSLayoutConstraint!
     
-    @IBOutlet weak var subtitleRightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var albumImage: UIImageView!
+
     
 }

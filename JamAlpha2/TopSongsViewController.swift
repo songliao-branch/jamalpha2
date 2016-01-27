@@ -8,13 +8,14 @@
 
 import UIKit
 import MediaPlayer
+import Haneke
 
 //TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
 class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var topSongsTable: UITableView?
     
-    var songs = [LocalSong]()
+    var songs = [SearchResult]()
     var animator: CustomTransitionAnimation?
     
     override func viewDidLoad() {
@@ -65,21 +66,29 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier("TopSongsCell", forIndexPath: indexPath) as! TopSongsCell
         let song = songs[indexPath.row]
         cell.numberLabel.text = "\(indexPath.row + 1)"
-        cell.titleLabel.text = song.title
-        cell.subtitleLabel.text = song.artist
-        
-        cell.spinner.hidden = true
+        cell.titleLabel.text = song.trackName!
+        cell.subtitleLabel.text = song.artistName!
         
         if let _ = song.mediaItem {
             cell.searchIcon.hidden = true
             cell.titleRightConstraint.constant = 15
-            cell.subtitleRightConstraint.constant = 15
          
         } else {
             cell.searchIcon.hidden = false
             cell.titleRightConstraint.constant = 55
-            cell.subtitleRightConstraint.constant = 55
         }
+        
+        if let imageURL = song.artworkUrl100 {
+            cell.albumImage.image = nil
+            let url = NSURL(string: imageURL)!
+            let fetcher = NetworkFetcher<UIImage>(URL: url)
+            
+            let cache = Shared.imageCache
+            cache.fetch(fetcher: fetcher).onSuccess { image in
+                cell.albumImage.image = image
+            }
+        }
+        
         return cell
     }
     
@@ -151,50 +160,19 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 self.showConnectInternet(tableView)
             }
             
-        } else if song.artist == "Alex Lisell" { //if demo song
-            
-            MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
-            songVC.selectedRow = 0
-            MusicManager.sharedInstance.player.pause()
-            MusicManager.sharedInstance.player.currentPlaybackTime = 0
-            songVC.isDemoSong = true
-            
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            
-            self.presentViewController(songVC, animated: true, completion: nil)
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
-            
-            
         } else { //if the mediaItem is not found, and an searchResult is found
             let cell = tableView.cellForRowAtIndexPath(indexPath) as! TopSongsCell
             
             cell.searchIcon.hidden = true
-            cell.spinner.hidden = false
-            cell.spinner.startAnimating()
             
-            song.findSearchResult( {
-                result in
-                
-                cell.spinner.stopAnimating()
-                cell.spinner.hidden = true
-                cell.searchIcon.hidden = false
-                
-                guard let song = result else {
-                
-                self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
-                    return
-                }
-                
-                songVC.isSongNeedPurchase = true
-                songVC.songNeedPurchase = song
-                songVC.reloadBackgroundImageAfterSearch(song)
-                songVC.transitioningDelegate = self.animator
-                self.animator!.attachToViewController(songVC)
-                self.presentViewController(songVC, animated: true, completion: nil)
-                tableView.deselectRowAtIndexPath(indexPath, animated: true)
-                
-            })
+            songVC.isSongNeedPurchase = true
+            songVC.songNeedPurchase = song
+            songVC.reloadBackgroundImageAfterSearch(song)
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            self.presentViewController(songVC, animated: true, completion: nil)
+            tableView.deselectRowAtIndexPath(indexPath, animated: true)
+
         }
     }
 }
