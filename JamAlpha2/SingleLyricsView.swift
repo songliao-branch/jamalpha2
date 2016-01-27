@@ -32,6 +32,72 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    func setUpScrollLine() {
+        tempPlayButton = UIButton()
+        tempPlayButton.frame = CGRectMake(0, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 + 11 + 33 - 22, 44, 44)
+        tempPlayButton.setImage(UIImage(named: "playbutton"), forState: .Normal)
+        tempPlayButton.imageEdgeInsets = UIEdgeInsetsMake(12, 5, 12, 19)
+        tempPlayButton.hidden = true
+        self.view.insertSubview(tempPlayButton, belowSubview: guitarActionView)
+        
+        tempScrollLine = UIView()
+        tempScrollLine.frame = CGRectMake(30, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 + 11 + 33, self.view.frame.size.width - 60, 1)
+        tempScrollLine.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.3)
+        tempScrollLine.hidden = true
+        self.view.insertSubview(tempScrollLine, belowSubview: guitarActionView)
+        
+        tempScrollTime = NSTimeInterval(startTime.toDecimalNumer())
+        
+        tempScrollTimeLabel = UILabel()
+        tempScrollTimeLabel.frame = CGRectMake(self.view.frame.size.width - 25, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 + 11 + 33 - 7.5, 20, 15)
+        tempScrollTimeLabel.font = UIFont.systemFontOfSize(6)
+        let min: Int = Int(tempScrollTime) / 60
+        let sec: Int = Int(tempScrollTime) % 60
+        if min < 10 {
+            if sec < 10 {
+                tempScrollTimeLabel.text = "0\(min):0\(sec)"
+            } else {
+                tempScrollTimeLabel.text = "0\(min):\(sec)"
+            }
+        } else {
+            if sec < 10 {
+                tempScrollTimeLabel.text = "\(min):0\(sec)"
+            } else {
+                tempScrollTimeLabel.text = "\(min):\(sec)"
+            }
+        }
+        tempScrollTimeLabel.hidden = true
+        self.view.insertSubview(tempScrollTimeLabel, belowSubview: guitarActionView)
+    }
+    
+    func showTempScrollLyricsView() {
+        tempPlayButton.hidden = false
+        tempScrollLine.hidden = false
+        tempScrollTimeLabel.hidden = false
+        tempScrollTime = NSTimeInterval(startTime.toDecimalNumer())
+        let min: Int = Int(tempScrollTime) / 60
+        let sec: Int = Int(tempScrollTime) % 60
+        if min < 10 {
+            if sec < 10 {
+                tempScrollTimeLabel.text = "0\(min):0\(sec)"
+            } else {
+                tempScrollTimeLabel.text = "0\(min):\(sec)"
+            }
+        } else {
+            if sec < 10 {
+                tempScrollTimeLabel.text = "\(min):0\(sec)"
+            } else {
+                tempScrollTimeLabel.text = "\(min):\(sec)"
+            }
+        }
+    }
+    
+    func hideTempScrollLyricsView() {
+        tempPlayButton.hidden = true
+        tempScrollLine.hidden = true
+        tempScrollTimeLabel.hidden = true
+    }
+    
     func updateSingleLyricsPosition() {
         self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView - 2].alpha = 0.5
         self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView - 1].alpha = 0.75
@@ -42,7 +108,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         
         singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
         if currentLyricsIndex > 0{
-            print("move")
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: true)
         } else {
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
@@ -71,7 +136,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     
     func setUpSingleLyricsView() {
         if singleLyricsTableView == nil {
-            
             let sideMargin: CGFloat = 20
             let marginToTopView: CGFloat = 0
             let frame: CGRect = CGRectMake(sideMargin, CGRectGetMaxY(topView.frame) + marginToTopView, self.view.frame.size.width - 2 * sideMargin, basesHeight + 20)
@@ -81,6 +145,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             gradient.frame = frame2
             gradient.colors = [UIColor.clearColor().CGColor, UIColor.baseColor().CGColor, UIColor.clearColor().CGColor]
             setUpLyricsArray(frame.size.height)
+            setUpScrollLine()
             singleLyricsTableView = UITableView(frame: frame, style: .Plain)
             singleLyricsTableView.backgroundColor = UIColor.clearColor()
             singleLyricsTableView.delegate = self
@@ -115,22 +180,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }
             self.lyricsArray.removeAll()
             self.lyricsArray = nil
-//            singleLyricsTableView.alpha = 1
-//            UIView.animateWithDuration(0.2, animations: {
-//                animate in
-//                self.singleLyricsTableView.alpha = 0.1
-//                }, completion: {
-//                    complete in
-//                    completion(complete: true)
-//                    print("release")
-//                    self.singleLyricsTableView.removeFromSuperview()
-//                    self.singleLyricsTableView = nil                    
-//                    for label in self.tuningLabels {
-//                        label.hidden = false
-//                    }
-//                    self.lyricsArray.removeAll()
-//                    self.lyricsArray = nil
-//            })
         }
     }
     

@@ -24,6 +24,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var lyricsArray: [(str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat)]!
     var numberOfLineInSingleLyricsView: Int = 0
     var tempCurrentLyricsIndex: Int = 0
+    var tempPlayButton: UIButton!
+    var tempScrollTimeLabel: UILabel!
+    var tempScrollTime: NSTimeInterval!
+    var tempScrollLine: UIView!
     
     var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!
@@ -406,7 +410,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             indicatorOriginXPositions.append(circle.frame.origin.x)
         }
     }
-
+    
     func scrollViewDidScroll(scrollView: UIScrollView) {
         if tutorialScrollView != nil {
             if  tutorialScrollView.hidden {
@@ -418,12 +422,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
     }
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        if singleLyricsTableView != nil {            
+            showTempScrollLyricsView()
+        }
+    }
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         if tutorialScrollView != nil {
             if  tutorialScrollView.hidden {
                 return
-            }
-            
+            }            
             let currentPage = scrollView.contentOffset.x / self.view.frame.width
             for i in 0..<numberOfTutorialPages {
                 if i == Int(currentPage) {
@@ -433,8 +441,15 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
         }
+        if singleLyricsTableView != nil {
+            hideTempScrollLyricsView()
+        }
     }
-
+    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if singleLyricsTableView != nil {
+            hideTempScrollLyricsView()
+        }
+    }
     
     func hideTutorial() {
         tutorialScrollView.hidden = true
@@ -444,7 +459,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             player.play()
         }
-        
         NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTutorial)
     }
     
