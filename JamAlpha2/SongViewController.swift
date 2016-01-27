@@ -2007,6 +2007,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         isChordShown = uiswitch.on
         if isChordShown {
             releaseSingleLyricsView()
+            if self.isTabsShown && self.isLyricsShown {
+                self.lyricbase.hidden = false
+            }
         }
         toggleChordsDisplayMode()
     }
@@ -2015,6 +2018,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         isTabsShown = uiswitch.on
         if isTabsShown {
             releaseSingleLyricsView()
+            if self.isChordShown && self.isLyricsShown {
+                self.lyricbase.hidden = false
+            }
         }
         toggleChordsDisplayMode()
     }
@@ -2060,7 +2066,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if isLyricsShown == false {
             releaseSingleLyricsView()
         }
-        
         toggleLyrics()
     }
     
@@ -2071,10 +2076,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             lyricbase.hidden = true
         }
+        
         if isChordShown == false && isTabsShown == false && isLyricsShown {
             lyricbase.hidden = true
             setUpSingleLyricsView()
         }
+        
         // set to user defaults
         if isLyricsShown {
             NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isLyricsShownKey)

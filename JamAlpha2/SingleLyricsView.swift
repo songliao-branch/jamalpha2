@@ -108,14 +108,29 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func releaseSingleLyricsView() {
         if singleLyricsTableView != nil {
             print("release")
-            singleLyricsTableView.removeFromSuperview()
-            singleLyricsTableView = nil
-            
-            for label in tuningLabels {
+            self.singleLyricsTableView.removeFromSuperview()
+            self.singleLyricsTableView = nil
+            for label in self.tuningLabels {
                 label.hidden = false
             }
-            lyricsArray.removeAll()
-            lyricsArray = nil
+            self.lyricsArray.removeAll()
+            self.lyricsArray = nil
+//            singleLyricsTableView.alpha = 1
+//            UIView.animateWithDuration(0.2, animations: {
+//                animate in
+//                self.singleLyricsTableView.alpha = 0.1
+//                }, completion: {
+//                    complete in
+//                    completion(complete: true)
+//                    print("release")
+//                    self.singleLyricsTableView.removeFromSuperview()
+//                    self.singleLyricsTableView = nil                    
+//                    for label in self.tuningLabels {
+//                        label.hidden = false
+//                    }
+//                    self.lyricsArray.removeAll()
+//                    self.lyricsArray = nil
+//            })
         }
     }
     
