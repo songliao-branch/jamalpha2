@@ -40,6 +40,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
+        print(songCount)
         
         print("musicVC shouldShowDemoSong: \(NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong))")
         loadAndSortMusic()
@@ -651,26 +652,12 @@ extension MusicViewController {
         if !decelerate {
              KGLOBAL_init_queue.suspended = false
             KGLOBAL_queue.suspended = queueSuspended
-            if (!KGLOBAL_init_queue.suspended){
-                if Int(songCount) > 0 {
-                    if(!uniqueSongs.isEmpty){
-                        generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-                    }
-                }
-            }
         }
     }
     
     override func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         KGLOBAL_init_queue.suspended = false
         KGLOBAL_queue.suspended = queueSuspended
-        if (!KGLOBAL_init_queue.suspended){
-            if songCount > 0 {
-                if(!uniqueSongs.isEmpty){
-                    generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-                }
-            }
-        }
     }
     
     func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
