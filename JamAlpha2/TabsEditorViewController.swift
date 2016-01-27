@@ -2132,7 +2132,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             
             //check if tabsSet id is bigger than 0, if so, means this tabs has been saved to the cloud, then we use same tabsSetid, otherwise if less than one, it means it's new
             if (allChords.count < 3) {
-                let alertController = UIAlertController(title: nil, message: "Please add at least THREE chords on the your music timeline", preferredStyle: UIAlertControllerStyle.Alert)
+                let alertController = UIAlertController(title: nil, message: "Please add at least THREE chords into your tab", preferredStyle: UIAlertControllerStyle.Alert)
                 alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
                 self.presentViewController(alertController, animated: true, completion: nil)
                 return
