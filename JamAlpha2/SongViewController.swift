@@ -422,7 +422,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
             }
         }
-        if tempScrollLine != nil {
+        if tempScrollLine != nil && tempScrollLine.hidden == false {
             disapperCount = 0
             let centerPoint: CGPoint = self.tempScrollLine.center
             for var i = 0; i < self.lyricsArray.count; i++ {
@@ -430,6 +430,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
                 let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
                 if CGRectContainsPoint(superViewRect, centerPoint) {
+                    if self.lyricsArray[i - 1].alpha < 1 {
+                        self.lyricsArray[i - 1].alpha = 0.5
+                    }
+                    if self.lyricsArray[i].alpha < 1 {
+                        self.lyricsArray[i].alpha = 0.8
+                    }
+                    if self.lyricsArray[i + 1].alpha < 1 {
+                        self.lyricsArray[i + 1].alpha = 0.5
+                    }
+                    let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: i - 1, inSection: 0), NSIndexPath(forItem: i, inSection: 0), NSIndexPath(forItem: i + 1, inSection: 0)]
+                    singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
+
                     tempScrollTime = self.lyricsArray[i].time
                     let min: Int = Int(tempScrollTime) / 60
                     let sec: Int = Int(tempScrollTime) % 60
@@ -487,7 +499,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func disapperCount(sender: NSTimer) {
         disapperCount++
         print("keep runing")
-        if disapperCount >= 3 {
+        if disapperCount >= 2 {
             print("diapper")
             disapperCount = 0
             self.hideTempScrollLyricsView()
@@ -2901,7 +2913,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             //updateSingleLyricsArray()
             if tempCurrentLyricsIndex != currentLyricsIndex {
                 tempCurrentLyricsIndex = currentLyricsIndex
-                updateSingleLyricsPosition()
+                if tempScrollLine.hidden == true {
+                    updateSingleLyricsPosition()
+                }
             }
         }
     }
