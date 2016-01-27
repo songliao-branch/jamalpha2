@@ -1222,7 +1222,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
         }
         else if playbackState == .Playing {
-            updateAll(Float(player.currentPlaybackTime))
+            if !player.currentPlaybackTime.isNaN {
+                updateAll(Float(player.currentPlaybackTime))
+            }
+            
             startTimer()
             //bring up the soundwave, give it a little jump animation
             UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
