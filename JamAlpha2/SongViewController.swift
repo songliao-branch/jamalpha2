@@ -413,6 +413,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
     }
     
+    var currentSelectTempIndex: NSIndexPath!
     func scrollViewDidScroll(scrollView: UIScrollView) {
         if tutorialScrollView != nil {
             if  tutorialScrollView.hidden {
@@ -430,6 +431,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
                 let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
                 if CGRectContainsPoint(superViewRect, centerPoint) {
+                    currentSelectTempIndex = NSIndexPath(forItem: i, inSection: 0)
                     if self.lyricsArray[i - 1].alpha < 1 {
                         self.lyricsArray[i - 1].alpha = 0.5
                     }
@@ -503,6 +505,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             print("diapper")
             disapperCount = 0
             self.hideTempScrollLyricsView()
+            self.lyricsArray[currentSelectTempIndex.item].alpha = 0.5
+            singleLyricsTableView.reloadRowsAtIndexPaths([currentSelectTempIndex], withRowAnimation: .None)
             disapperTimer.invalidate()
             disapperTimer = nil
         }

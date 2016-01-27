@@ -111,13 +111,21 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func updateSingleLyricsPosition() {
-        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView - 1].alpha = 0.5
-        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
-        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView + 1].alpha = 0.5
+//        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView - 1].alpha = 0.5
+//        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
+//        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView + 1].alpha = 0.5
+//        
+//        let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView - 1, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView + 1, inSection: 0)]
+//        
+//        singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
         
-        let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView - 1, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView + 1, inSection: 0)]
-        
-        singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
+        for var i = 0; i < lyricsArray.count; i++ {
+            self.lyricsArray[i].alpha = 0.5
+            if i == currentLyricsIndex + numberOfLineInSingleLyricsView {
+                self.lyricsArray[i].alpha = 1
+            }
+        }
+        singleLyricsTableView.reloadData()
         if currentLyricsIndex > 0{
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: true)
         } else {
