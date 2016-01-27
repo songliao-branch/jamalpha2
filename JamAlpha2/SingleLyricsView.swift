@@ -115,8 +115,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView - 1].alpha = 0.75
         self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
         self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView + 1].alpha = 0.75
+        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView + 2].alpha = 0.5
         
-        let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView - 2, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView - 1, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView + 1, inSection: 0)]
+        let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView - 2, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView - 1, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView + 1, inSection: 0), NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView + 2, inSection: 0)]
         
         singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
         if currentLyricsIndex > 0{

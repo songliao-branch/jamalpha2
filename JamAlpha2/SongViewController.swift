@@ -28,6 +28,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var tempScrollTimeLabel: UILabel!
     var tempScrollTime: NSTimeInterval!
     var tempScrollLine: UIView!
+    var disapperTimer: NSTimer!
+    var disapperCount: Int = 0
     
     var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!
@@ -421,12 +423,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
         if tempScrollLine != nil {
+            disapperCount = 0
             let centerPoint: CGPoint = self.tempScrollLine.center
 //            let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(<#T##indexPath: NSIndexPath##NSIndexPath#>)
         }
     }
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         if singleLyricsTableView != nil {
+            print("will begin scroll")
+            if disapperTimer != nil {
+                disapperTimer.invalidate()
+                disapperTimer = nil
+            }
             showTempScrollLyricsView()
         }
     }
@@ -447,12 +455,27 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if singleLyricsTableView != nil {
-            let delay = 2 * Double(NSEC_PER_SEC)
-            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-            dispatch_after(time, dispatch_get_main_queue()) {
-                self.hideTempScrollLyricsView()
-            }
-            
+            print("did end dragging")
+            disapperTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "disapperCount:", userInfo: nil, repeats: true)
+            NSRunLoop.mainRunLoop().addTimer(disapperTimer, forMode: NSRunLoopCommonModes)
+//            let delay = 2 * Double(NSEC_PER_SEC)
+//            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+//            dispatch_after(time, dispatch_get_main_queue()) {
+//                self.hideTempScrollLyricsView()
+//            }
+//            
+        }
+    }
+    
+    func disapperCount(sender: NSTimer) {
+        disapperCount++
+        print("keep runing")
+        if disapperCount >= 3 {
+            print("diapper")
+            disapperCount = 0
+            self.hideTempScrollLyricsView()
+            disapperTimer.invalidate()
+            disapperTimer = nil
         }
     }
     
