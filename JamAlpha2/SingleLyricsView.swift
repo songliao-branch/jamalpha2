@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 
 extension SongViewController: UITableViewDelegate, UITableViewDataSource {
-    func setUpLyricsArray(height: CGFloat) {
-        numberOfLineInSingleLyricsView = Int(height / 66) / 2 + 1
+    func setUpLyricsArray() {
+        numberOfLineInSingleLyricsView = Int((basesHeight + 20) / 66) / 2 + 1
         if lyricsArray != nil {
             lyricsArray.removeAll()
         }
@@ -31,11 +31,12 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             for var i = 0; i < numberOfLineInSingleLyricsView; i++ {
                 lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 11))
             }
-            lyricsArray.append(("You don't have any lyric for this song, please add it in Lyrics Editor or select one from others", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + 11))
+            lyricsArray.append(("You don't have any lyric, please add it in Lyrics Editor or select one from others", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + 11))
         }
     }
     
     func setUpScrollLine() {
+        numberOfLineInSingleLyricsView = Int((basesHeight + 20) / 66) / 2 + 1
         tempPlayButton = UIButton()
         tempPlayButton.frame = CGRectMake(0, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 + 11 + 33 - 22, 44, 44)
         tempPlayButton.setImage(UIImage(named: "playbutton"), forState: .Normal)
@@ -155,7 +156,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             let gradient = CAGradientLayer()
             gradient.frame = frame2
             gradient.colors = [UIColor.clearColor().CGColor, UIColor.baseColor().CGColor, UIColor.clearColor().CGColor]
-            setUpLyricsArray(frame.size.height)
+            setUpLyricsArray()
             singleLyricsTableView = UITableView(frame: frame, style: .Plain)
             singleLyricsTableView.backgroundColor = UIColor.clearColor()
             singleLyricsTableView.delegate = self

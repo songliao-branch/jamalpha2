@@ -284,7 +284,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         setUpActionViews()
         setUpCountdownView()
         setUpScrollLine()
-        
         if(!isSongNeedPurchase){
             updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
             updateFavoriteStatus(isDemoSong ? demoItem : nowPlayingMediaItem)
@@ -420,6 +419,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             for i in 0..<numberOfTutorialPages {
                 tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
             }
+        }
+        if tempScrollLine != nil {
+            let centerPoint: CGPoint = self.tempScrollLine.center
+//            let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(<#T##indexPath: NSIndexPath##NSIndexPath#>)
         }
     }
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
@@ -833,8 +836,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             })
         }
-        setUpLyricsArray(basesHeight + 20)
-        singleLyricsTableView.reloadData()
+        setUpLyricsArray()
+        if singleLyricsTableView != nil {
+            singleLyricsTableView.reloadData()
+        }
     }
     
     //for testing
