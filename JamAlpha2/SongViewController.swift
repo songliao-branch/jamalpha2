@@ -510,6 +510,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.lyricsArray[currentSelectTempIndex.item].alpha = 0.5
                 singleLyricsTableView.reloadRowsAtIndexPaths([currentSelectTempIndex], withRowAnimation: .None)
             }
+            updateSingleLyricsPosition()
             disapperTimer.invalidate()
             disapperTimer = nil
         }
@@ -822,6 +823,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         var lyric = Lyric()
         (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: false)
         
+        self.setUpLyricsArray()
+        if self.singleLyricsTableView != nil {
+            self.singleLyricsTableView.reloadData()
+        }
+        
         if lyric.lyric.count > 1 {
             self.lyric = lyric
             self.addLyricsPrompt.hidden = true
@@ -880,7 +886,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     times.append(Float(t))
                 }
                 CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, userId: download.editor.userId, lyricsSetId: download.id)
-                
+                self.setUpLyricsArray()
+                if self.singleLyricsTableView != nil {
+                    self.singleLyricsTableView.reloadData()
+                }
                 if self.canFindLyricsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
                         let tempPlaytime = self.isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
@@ -895,10 +904,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             })
         }
-        setUpLyricsArray()
-        if singleLyricsTableView != nil {
-            singleLyricsTableView.reloadData()
-        }
+
     }
     
     //for testing

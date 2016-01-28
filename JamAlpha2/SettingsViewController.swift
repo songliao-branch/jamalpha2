@@ -15,7 +15,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var tableView: UITableView!
     
     var isFromUnLoginVC: Bool = false
-    
+    var mc: MFMailComposeViewController!
     let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Contact Us","Demo Mode", "Tutorial"]
     
     let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Demo Mode", "Tutorial"]
@@ -155,7 +155,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         let messageBody = ""
         let toRecipents = ["jun@twistjam.com"]
         
-        let mc: MFMailComposeViewController = MFMailComposeViewController()
+        mc = MFMailComposeViewController()
         mc.navigationBar.tintColor = UIColor.mainPinkColor()
         
         if MFMailComposeViewController.canSendMail() {
@@ -164,26 +164,44 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             mc.setSubject(emailTitle)
             mc.setMessageBody(messageBody, isHTML: false)
             mc.setToRecipients(toRecipents)
-            
-            
-            UIApplication.sharedApplication().keyWindow?.rootViewController?.presentViewController(mc, animated: true, completion: nil)
+            self.presentViewController(mc, animated: true, completion: nil)
+            //UIApplication.sharedApplication().keyWindow?.rootViewController?.presentViewController(mc, animated: true, completion: nil)
         }
     }
     
     func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
         switch result.rawValue {
         case MFMailComposeResultCancelled.rawValue:
-            print("Mail cancelled")
+            print("cancel")
         case MFMailComposeResultSaved.rawValue:
-            print("Mail saved")
+            print("saved")
         case MFMailComposeResultSent.rawValue:
-            print("Mail sent")
+            print("sent")
         case MFMailComposeResultFailed.rawValue:
-            print("Mail sent failure: \(error!.localizedDescription)")
+            print("failed")
         default:
             break
         }
-        UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
+        self.mc.dismissViewControllerAnimated(true, completion: nil)
+        //UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
+    }
+    
+    func show() {
+//        let alertController = UIAlertController(title: nil, message: "You have cancelled the email.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//        
+//        let alertController = UIAlertController(title: nil, message: "You have saved the email.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//        
+//        let alertController = UIAlertController(title: nil, message: "The email has been sent.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//        
+//        let alertController = UIAlertController(title: nil, message: "Sorry, please check your networking and account setting and try again.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
     }
 
     func rateTwistjam() {

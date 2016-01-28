@@ -76,10 +76,18 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func pressTempPlayButton(sender: UIButton) {
-        let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
-        if !tempPlaytime.isNaN {
-            startTime.setTime(Float(tempPlaytime))
+        stopTimer()
+        self.toTime = Float(tempScrollTime)
+        updateAll(self.toTime)
+        if isDemoSong {
+            self.avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(self.toTime), 1))
+            
+        }else{
+            if(self.player != nil){
+                self.player.currentPlaybackTime = tempScrollTime
+            }
         }
+        startTimer()
     }
     
     func showTempScrollLyricsView() {
