@@ -215,6 +215,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }
             self.lyricsArray.removeAll()
             self.lyricsArray = nil
+            self.lyricbase.hidden = false
         }
     }
     
