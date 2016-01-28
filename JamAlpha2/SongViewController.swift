@@ -3038,7 +3038,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!self.chordBase.hidden){
             refreshChordLabel()
         }
-        
         refreshLyrics()
         if(self.chordBase.hidden) {
             if (!isScrolling){

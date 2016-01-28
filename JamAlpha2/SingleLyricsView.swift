@@ -155,6 +155,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                 self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
             }
         }
+        
         singleLyricsTableView.reloadData()
     }
     
@@ -197,10 +198,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             singleLyricsTableView.showsHorizontalScrollIndicator = false
             singleLyricsTableView.showsVerticalScrollIndicator = false
             
-            let tapOnTableView: UITapGestureRecognizer = UITapGestureRecognizer()
-            tapOnTableView.addTarget(self, action: "tapOnTableView:")
-            singleLyricsTableView.addGestureRecognizer(tapOnTableView)
-            
             self.view.insertSubview(singleLyricsTableView, aboveSubview: self.backgroundImageView)
             
             for label in tuningLabels {
@@ -224,10 +221,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             self.lyricsArray = nil
             self.lyricbase.hidden = false
         }
-    }
-    
-    func tapOnTableView(sender: UITapGestureRecognizer) {
-        playPause(sender)
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
