@@ -474,7 +474,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if singleLyricsTableView != nil {
             print("will begin scroll")
             self.stopDisapperTimer()
-            showTempScrollLyricsView()
+            if lyricsArray.count != numberOfLineInSingleLyricsView + 1 {
+                showTempScrollLyricsView()
+            }
         }
     }
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
@@ -871,9 +873,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.lyric = lyric
             self.addLyricsPrompt.hidden = true
             self.setUpLyricsArray()
-            if self.singleLyricsTableView != nil {
-                self.singleLyricsTableView.reloadData()
-            }
             return true
         }
         return false
@@ -921,9 +920,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         self.addLyricsPrompt.hidden = false
                     }
                     self.setUpLyricsArray()
-                    if self.singleLyricsTableView != nil {
-                        self.singleLyricsTableView.reloadData()
-                    }
                     return
                 }
                 self.addLyricsPrompt.hidden = true
@@ -935,9 +931,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, userId: download.editor.userId, lyricsSetId: download.id)
                 
                 self.setUpLyricsArray()
-                if self.singleLyricsTableView != nil {
-                    self.singleLyricsTableView.reloadData()
-                }
                 
                 if self.canFindLyricsFromCoreData(song) {
                     if(!self.isSongNeedPurchase){
@@ -1157,6 +1150,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
 
                 self.updateMusicData(nowPlayingMediaItem!)
                 self.updateFavoriteStatus(nowPlayingMediaItem!)
+                if self.singleLyricsTableView != nil {
+                    self.singleLyricsTableView.reloadData()
+                }
                 // The following won't run when selected from table
                 // update the progressblockWidth
                 
@@ -1312,6 +1308,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if keyPath == "rate"{
             if self.avPlayer.rate == 0 {
                 stopTimer()
+                if singleLyricsTableView != nil && lyricsArray.count != numberOfLineInSingleLyricsView + 1 {
+                    self.stopDisapperTimer()
+                    showTempScrollLyricsView()
+                }
                 //fade down the soundwave
                 UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -1355,6 +1355,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let playbackState = player.playbackState
         if playbackState == .Paused {
             stopTimer()
+            if singleLyricsTableView != nil && lyricsArray.count != numberOfLineInSingleLyricsView + 1 {
+                self.stopDisapperTimer()
+                showTempScrollLyricsView()
+            }
             //fade down the soundwave
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
