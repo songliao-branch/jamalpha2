@@ -2194,7 +2194,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         toggleChordsDisplayMode()
     }
-    
+    var isPauseChordRefresh = false
     func toggleChordsDisplayMode() {
         if isChordShown {
           NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isChordShownKey)
@@ -2208,12 +2208,36 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
           NSUserDefaults.standardUserDefaults().setInteger(2, forKey: isTabsShownKey)
         }
         if !isChordShown && !isTabsShown { //hide the chordbase if we are showing chords and tabs
-            chordBase.hidden = true
+            if (!chordBase.hidden){
+                UIView.animateWithDuration(0.15, delay: 0, options: .CurveEaseOut, animations: {
+                    self.chordBase.alpha = 0
+                    }, completion: {
+                        completed in
+                        self.chordBase.hidden = true
+                })
+            }
         } else {
-            chordBase.hidden = false
+            if (chordBase.hidden){
+                self.chordBase.hidden = false
+                var delay:NSTimeInterval = 0
+                if (self.singleLyricsTableView != nil){
+                    delay = 0.15
+                }
+                UIView.animateWithDuration(0.15, delay: delay, options: .CurveEaseIn, animations: {
+                    self.chordBase.alpha = 1
+                    }, completion: nil)
+            }
         }
         if isChordShown == false && isTabsShown == false && isLyricsShown {
-            lyricbase.hidden = true
+            
+            if (!lyricbase.hidden) {
+                UIView.animateWithDuration(0.15, delay: 0, options: .CurveEaseOut, animations: {
+                    self.lyricbase.alpha = 0
+                    }, completion: {
+                        completed in
+                        self.lyricbase.hidden = true
+                })
+            }
             setUpSingleLyricsView()
             
         }
@@ -2245,13 +2269,36 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     func toggleLyrics() {
         // show lyrics if the boolean is not hidden
         if isLyricsShown {
-            lyricbase.hidden = false
+            if (lyricbase.hidden){
+                self.lyricbase.hidden = false
+                var delay:NSTimeInterval = 0
+                if (self.singleLyricsTableView != nil){
+                    delay = 0.15
+                }
+                UIView.animateWithDuration(0.15, delay: delay, options: .CurveEaseIn, animations: {
+                    self.lyricbase.alpha = 1
+                    }, completion: nil)
+            }
         } else {
-            lyricbase.hidden = true
+            if (!lyricbase.hidden){
+                UIView.animateWithDuration(0.15, delay: 0, options: .CurveEaseOut, animations: {
+                    self.lyricbase.alpha = 0
+                    }, completion: {
+                        completed in
+                        self.lyricbase.hidden = true
+                })
+            }
         }
         
         if isChordShown == false && isTabsShown == false && isLyricsShown {
-            lyricbase.hidden = true
+            if (!lyricbase.hidden){
+                UIView.animateWithDuration(0.15, delay: 0, options: .CurveEaseOut, animations: {
+                    self.lyricbase.alpha = 0
+                    }, completion: {
+                        completed in
+                        self.lyricbase.hidden = true
+                })
+            }
             setUpSingleLyricsView()
         }
         
@@ -2281,7 +2328,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // we dont' need animation when changing song
             if !changeSong {
                 UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
-                    
                     self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
                     }, completion: {
                         finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {

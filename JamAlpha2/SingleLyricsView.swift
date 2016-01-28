@@ -14,19 +14,33 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         backgroundBlurView = UIVisualEffectView()
         backgroundBlurView.frame = CGRectMake(0, 0, backgroundImageView.frame.size.width, backgroundImageView.frame.size.height)
         backgroundBlurView.effect = UIBlurEffect(style: .Dark)
+        backgroundBlurView.alpha = 0
         backgroundImageView.addSubview(backgroundBlurView)
         
         bottomBlurView = UIView(frame: CGRect(x: 11, y: singleLyricsTableView.frame.origin.y + singleLyricsTableView.frame.size.height, width: self.view.frame.width-11*2, height: 0.5 ))
         bottomBlurView.backgroundColor = UIColor.baseColor()
+        bottomBlurView.alpha = 0
         self.view.insertSubview(bottomBlurView, aboveSubview: singleLyricsTableView)
+        
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
+            self.backgroundBlurView.alpha = 1
+            self.bottomBlurView.alpha = 1
+            }, completion: nil)
     }
     
     func releaseBackgroundEffect() {
-        backgroundBlurView.removeFromSuperview()
-        backgroundBlurView = nil
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.backgroundBlurView.alpha = 0
+            self.bottomBlurView.alpha = 0
+            }, completion: {
+                completed in
+                self.backgroundBlurView.removeFromSuperview()
+                self.backgroundBlurView = nil
+                
+                self.bottomBlurView.removeFromSuperview()
+                self.bottomBlurView = nil
+        })
         
-        bottomBlurView.removeFromSuperview()
-        bottomBlurView = nil
     }
     
     func setUpLyricsArray() {
@@ -213,6 +227,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             singleLyricsTableView.separatorStyle = .None
             singleLyricsTableView.showsHorizontalScrollIndicator = false
             singleLyricsTableView.showsVerticalScrollIndicator = false
+            singleLyricsTableView.alpha = 0
             setUpBackgroundEffect()
             self.view.insertSubview(singleLyricsTableView, aboveSubview: self.backgroundImageView)
             
@@ -221,22 +236,36 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }
             self.updateSingleLyricsAlpha()
             self.updateSingleLyricsPosition(false)
+            
+            UIView.animateWithDuration(0.15, delay: 0.15, options: .CurveEaseIn, animations: {
+                self.singleLyricsTableView.alpha = 1
+                }, completion: nil)
+            
         }
     }
-    
     func releaseSingleLyricsView() {
         if singleLyricsTableView != nil {
-            print("release")
-            self.singleLyricsTableView.removeFromSuperview()
-            self.singleLyricsTableView = nil
-            for label in self.tuningLabels {
-                label.hidden = false
-            }
-            self.lyricsArray.removeAll()
-            self.lyricsArray = nil
-            self.lyricbase.hidden = false
-            hideTempScrollLyricsView()
             releaseBackgroundEffect()
+            UIView.animateWithDuration(0.15, delay: 0, options: .CurveEaseIn, animations: {
+                self.singleLyricsTableView.alpha = 0
+                }, completion: {
+                    completd in
+                    print("release")
+                    self.singleLyricsTableView.removeFromSuperview()
+                    self.singleLyricsTableView = nil
+                    for label in self.tuningLabels {
+                        label.hidden = false
+                    }
+                    self.lyricsArray.removeAll()
+                    self.lyricsArray = nil
+                    if (self.lyricbase.hidden){
+                        self.lyricbase.hidden = false
+                        UIView.animateWithDuration(0.15, delay: 0, options: .CurveEaseIn, animations: {
+                            self.lyricbase.alpha = 1
+                            }, completion: nil)
+                    }
+                    self.hideTempScrollLyricsView()
+            })
         }
     }
     
