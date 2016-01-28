@@ -140,12 +140,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func updateSingleLyricsPosition(animated:Bool) {
-        if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count {
+        if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count - numberOfLineInSingleLyricsView {
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: animated)
-        } else {
-            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: animated)
         }
-
     }
     
     func updateSingleLyricsAlpha() {
@@ -206,7 +203,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             self.updateSingleLyricsAlpha()
             self.updateSingleLyricsPosition(false)
         }
-        
     }
     
     func releaseSingleLyricsView() {

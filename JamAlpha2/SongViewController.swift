@@ -430,7 +430,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             
             var min_loop = 0
-            var max_loop = self.lyricsArray.count - 1
+            var max_loop = self.lyricsArray.count - numberOfLineInSingleLyricsView
             
             while min_loop <= max_loop {
                 let mid = Int((max_loop + min_loop) / 2)
@@ -450,6 +450,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         self.lyricsArray[mid + 1].alpha = 0.5
                     }
                     let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: mid - 1, inSection: 0), NSIndexPath(forItem: mid, inSection: 0), NSIndexPath(forItem: mid + 1, inSection: 0)]
+                    
                     singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
                     
                     tempScrollTime = self.lyricsArray[mid].time
@@ -480,45 +481,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     }
                 }
             }
-            
-//            for var i = 0; i < self.lyricsArray.count - 1; i++ {
-//                let tempIndex: NSIndexPath = NSIndexPath(forItem: i, inSection: 0)
-//                let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
-//                let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
-//                if CGRectContainsPoint(superViewRect, centerPoint) {
-//                    currentSelectTempIndex = NSIndexPath(forItem: i, inSection: 0)
-//                    if self.lyricsArray[i - 1].alpha < 1 {
-//                        self.lyricsArray[i - 1].alpha = 0.5
-//                    }
-//                    if self.lyricsArray[i].alpha < 1 {
-//                        self.lyricsArray[i].alpha = 0.7
-//                    }
-//                    if self.lyricsArray[i + 1].alpha < 1 {
-//                        self.lyricsArray[i + 1].alpha = 0.5
-//                    }
-//                    let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: i - 1, inSection: 0), NSIndexPath(forItem: i, inSection: 0), NSIndexPath(forItem: i + 1, inSection: 0)]
-//                    singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
-//
-//                    tempScrollTime = self.lyricsArray[i].time
-//                    let min: Int = Int(tempScrollTime) / 60
-//                    let sec: Int = Int(tempScrollTime) % 60
-//                    if min < 10 {
-//                        if sec < 10 {
-//                            tempScrollTimeLabel.text = "0\(min):0\(sec)"
-//                        } else {
-//                            tempScrollTimeLabel.text = "0\(min):\(sec)"
-//                        }
-//                    } else {
-//                        if sec < 10 {
-//                            tempScrollTimeLabel.text = "\(min):0\(sec)"
-//                        } else {
-//                            tempScrollTimeLabel.text = "\(min):\(sec)"
-//                        }
-//                    }
-//                    break
-//                }
-//            }
-            
         }
     }
     
