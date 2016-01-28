@@ -69,6 +69,12 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
         
+        let titleImageView: UIImageView = UIImageView()
+        titleImageView.frame = CGRectMake(0, 0, 15, 15)
+        titleImageView.image = UIImage(named: "meText")
+        titleImageView.contentMode = .ScaleAspectFit
+        self.navigationItem.titleView = titleImageView
+        
         showSignUpLoginScreen()
         userTable.reloadData()
     }

@@ -77,20 +77,30 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
 
     func pressTempPlayButton(sender: UIButton) {
         stopTimer()
+        hideTempScrollLyricsView()
         self.toTime = Float(tempScrollTime)
         updateAll(self.toTime)
+        var isPlaying = false
         if isDemoSong {
             self.avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(self.toTime), 1))
-            
+            isPlaying = avPlayer.rate > 0
         }else{
             if(self.player != nil){
                 self.player.currentPlaybackTime = tempScrollTime
+                isPlaying = self.player.playbackState == .Playing
             }
         }
-        self.lyricsArray[currentLyricsIndex].alpha = 0.5
-        self.lyricsArray[self.currentSelectTempIndex.item].alpha = 1
-        self.singleLyricsTableView.reloadRowsAtIndexPaths([self.currentSelectTempIndex, NSIndexPath(forItem: currentLyricsIndex, inSection: 0) ], withRowAnimation: .None)
-        self.currentLyricsIndex = self.currentSelectTempIndex.item
+        if (!isPlaying){
+            if isDemoSong {
+                self.avPlayer.rate = self.speed
+            }else{
+                if(self.player != nil){
+                    self.player.currentPlaybackRate = self.speed
+                }
+            }
+
+        }
+        self.isScrolling = false
         startTimer()
     }
     
@@ -117,18 +127,23 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func hideTempScrollLyricsView() {
-        tempPlayButton.hidden = true
-        tempScrollLine.hidden = true
-        tempScrollTimeLabel.hidden = true
+        if singleLyricsTableView != nil {
+            tempPlayButton.hidden = true
+            tempScrollLine.hidden = true
+            tempScrollTimeLabel.hidden = true
+        }
     }
     
     func updateSingleLyricsPosition() {
         for var i = 0; i < lyricsArray.count; i++ {
             self.lyricsArray[i].alpha = 0.5
+            if i == currentLyricsIndex + numberOfLineInSingleLyricsView {
+                self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
+            }
         }
-        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
+        
         singleLyricsTableView.reloadData()
-        if currentLyricsIndex > 0{
+        if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count {
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: true)
         } else {
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)

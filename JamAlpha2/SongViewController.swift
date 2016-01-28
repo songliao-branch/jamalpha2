@@ -427,7 +427,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if tempScrollLine != nil && tempScrollLine.hidden == false {
             disapperCount = 0
             let centerPoint: CGPoint = self.tempScrollLine.center
-            for var i = 0; i < self.lyricsArray.count; i++ {
+            for var i = 0; i < self.lyricsArray.count - 1; i++ {
                 let tempIndex: NSIndexPath = NSIndexPath(forItem: i, inSection: 0)
                 let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
                 let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
@@ -493,17 +493,40 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         if singleLyricsTableView != nil {
-            print("did end dragging")
-            startDisapperTimer()
+            var isPlaying = false
+            if isDemoSong {
+                isPlaying = avPlayer.rate > 0
+            }else{
+                if(self.player != nil){
+                    isPlaying = self.player.playbackState == .Playing
+                }
+            }
+            if isPlaying {
+                print("did end dragging")
+                startDisapperTimer()
+            }else{
+                isScrolling = false
+            }
         }
     }
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if singleLyricsTableView != nil {
             print("did end dragging")
             if !decelerate {
-                startDisapperTimer()
+                var isPlaying = false
+                if isDemoSong {
+                    isPlaying = avPlayer.rate > 0
+                }else{
+                    if(self.player != nil){
+                        isPlaying = self.player.playbackState == .Playing
+                    }
+                }
+                if isPlaying {
+                    startDisapperTimer()
+                }else{
+                    isScrolling = false
+                }
             }
-            
         }
     }
     
@@ -2884,6 +2907,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             // make sure the timer is not interfered by scrollview scrolling
             NSRunLoop.mainRunLoop().addTimer(KGLOBAL_timer, forMode: NSRunLoopCommonModes)
         }
+        self.hideTempScrollLyricsView()
     }
     
     func stopTimer(){
