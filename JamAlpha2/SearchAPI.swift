@@ -12,59 +12,6 @@ import Haneke
 import SwiftyJSON
 import MediaPlayer
 
-class SearchResult: NSObject {
-    
-    var wrapperType: String!
-    var kind: String!
-    
-    var trackId:Int?
-    var trackName: String?
-    var artistName: String?
-    var collectionName: String?
-    var trackTimeMillis: Float?
-    
-    
-    var artworkUrl100: String?//large 100
-    var previewUrl: String?
-    var trackViewUrl: String? // link to apple music or iTunes
-    
-    init(wrapperType: String, kind: String){
-        self.wrapperType = wrapperType
-        self.kind = kind
-    }
-    
-    var image: UIImage?
-    
-    
-    //MARK: for top songs
-    private var titleAliases = "" //the result returned from server may has name in many forms, if either of the name matches the mediaItem, we count it as a match
-    private var artistAliases = ""
-
-    var mediaItem: MPMediaItem?
-    init(id: Int, title: String, artist: String, duration: Float, previewUrl: String, trackViewUrl: String, artwork: String, titleAliases: String, artistAliases: String) {
-        self.trackId = id
-        self.trackName = title
-        self.artistName = artist
-        self.trackTimeMillis = duration
-        self.previewUrl = previewUrl
-        self.trackViewUrl = trackViewUrl
-        self.artworkUrl100 = artwork
-        self.titleAliases = titleAliases
-        self.artistAliases = artistAliases
-    }
-    
-    func findMediaItem() {
-        self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
-            item in
-            let findable = item as Findable
-            if self.titleAliases.lowercaseString.containsString(findable.getTitle().lowercaseString) && self.artistAliases.lowercaseString.containsString(findable.getArtist().lowercaseString) && abs(self.getDuration() - findable.getDuration()) < 2 {
-                return true
-            }
-            return false
-        }.first
-    }
-}
-
 
 class SearchAPI: NSObject {
 
@@ -90,7 +37,8 @@ class SearchAPI: NSObject {
                 let json = JSON(data)
                 
                 for item in json["results"].array! {
-                    let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
+
+                    let searchResponse = SearchResult()
                     
                     if let trackId = item["trackId"].number {
                         searchResponse.trackId = Int(trackId)
@@ -143,7 +91,7 @@ class SearchAPI: NSObject {
                 
                 if json["resultCount"] > 0 {
                     let firstValue = json["results"].array![0]
-                    let searchResponse = SearchResult(wrapperType: firstValue["wrapperType"].string!, kind: firstValue["kind"].string!)
+                    let searchResponse = SearchResult()
                     
                     if let artwork = firstValue["artworkUrl100"].string {
                         let newString = artwork.replace("100x100", replacement: imageSize.rawValue)

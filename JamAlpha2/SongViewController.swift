@@ -597,13 +597,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             title = isDemoSong ? demoItem.getTitle() : nowPlayingMediaItem.title!
             artistNameLabel.text = isDemoSong ? demoItem .getArtist() : nowPlayingMediaItem.artist
         } else {
-            if let track = songNeedPurchase.trackName {
-                title = track
-            }
-            if let artist = songNeedPurchase.artistName {
-                artistNameLabel.text = artist
-            }
-
+            title = songNeedPurchase.trackName
+            artistNameLabel.text = songNeedPurchase.artistName
         }
         
         let attributedString = NSMutableAttributedString(string:title)
@@ -2780,7 +2775,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         playPreveiwButton.setImage((UIImage(named: "playbutton")), forState: UIControlState.Normal)
         playPreveiwButton.addTarget(self, action: "showPreviewActionView", forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(playPreveiwButton)
-        let url: NSURL = NSURL(string: songNeedPurchase.previewUrl!)!
+        let url: NSURL = NSURL(string: songNeedPurchase.previewUrl)!
         let playerItem = AVPlayerItem( URL:url)
         KAVplayer = AVPlayer(playerItem:playerItem)
         displayLink = CADisplayLink(target: self, selector: ("updateSliderProgress"))
@@ -2908,7 +2903,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         storeViewController.delegate = self
 
         let parameters = [SKStoreProductParameterITunesItemIdentifier :
-            NSNumber(integer: songNeedPurchase.trackId!)]
+            NSNumber(integer: songNeedPurchase.trackId)]
         storeViewController.loadProductWithParameters(parameters,
             completionBlock: {result, error in
                 if error != nil {
@@ -2923,7 +2918,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func goToAppleMusic(){
         self.dismissAction()
-        UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl!)!)
+        UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl)!)
     }
     
     func updateSliderProgress(){

@@ -69,30 +69,18 @@ extension MPMediaItem: Findable {
 
 extension SearchResult: Findable {
     func getTitle() -> String {
-        if let title = self.trackName {
-            return title
-        }
-        return ""
+        return self.trackName
     }
     func getArtist() -> String {
-        if let artist = self.artistName {
-            return artist
-        }
-        return ""
+        return artistName
     }
     
     func getAlbum() -> String {
-        if let album = self.collectionName {
-            return album
-        }
-        return ""
+        return collectionName
     }
     
     func getDuration() -> Float {
-        if let time = self.trackTimeMillis {
-            return time
-        }
-        return 0.0
+        return trackTimeMillis
     }
     
     func getURL() -> AnyObject? {

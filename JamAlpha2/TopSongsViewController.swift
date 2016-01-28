@@ -66,8 +66,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier("TopSongsCell", forIndexPath: indexPath) as! TopSongsCell
         let song = songs[indexPath.row]
         cell.numberLabel.text = "\(indexPath.row + 1)"
-        cell.titleLabel.text = song.trackName!
-        cell.subtitleLabel.text = song.artistName!
+        cell.titleLabel.text = song.trackName
+        cell.subtitleLabel.text = song.artistName
         
         cell.speaker.hidden = true
         if let item = song.mediaItem {
@@ -82,17 +82,14 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             cell.titleRightConstraint.constant = 55
         }
         
-
-        if let imageURL = song.artworkUrl100 {
-            cell.albumImage.image = nil
-            let url = NSURL(string: imageURL)!
-            let fetcher = NetworkFetcher<UIImage>(URL: url)
-            
-            let cache = Shared.imageCache
-            cache.fetch(fetcher: fetcher).onSuccess { image in
-                cell.albumImage.image = image
-            }
-        }
+        cell.albumImage.image = nil
+        let url = NSURL(string: song.artworkUrl100)!
+        let fetcher = NetworkFetcher<UIImage>(URL: url)
+        
+        let cache = Shared.imageCache
+        cache.fetch(fetcher: fetcher).onSuccess { image in
+            cell.albumImage.image = image
+        }        
         
         return cell
     }
