@@ -355,6 +355,9 @@ class MeLoginOrSignupViewController: UIViewController{
                     self.showMessage("", message: message, actionTitle: "OK", completion: nil)
                 })
             }
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+                }, completion: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: {
