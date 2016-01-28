@@ -87,6 +87,10 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                 self.player.currentPlaybackTime = tempScrollTime
             }
         }
+        self.lyricsArray[currentLyricsIndex].alpha = 0.5
+        self.lyricsArray[self.currentSelectTempIndex.item].alpha = 1
+        self.singleLyricsTableView.reloadRowsAtIndexPaths([self.currentSelectTempIndex, NSIndexPath(forItem: currentLyricsIndex, inSection: 0) ], withRowAnimation: .None)
+        self.currentLyricsIndex = self.currentSelectTempIndex.item
         startTimer()
     }
     
@@ -121,10 +125,8 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func updateSingleLyricsPosition() {
         for var i = 0; i < lyricsArray.count; i++ {
             self.lyricsArray[i].alpha = 0.5
-            if i == currentLyricsIndex + numberOfLineInSingleLyricsView {
-                self.lyricsArray[i].alpha = 1
-            }
         }
+        self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
         singleLyricsTableView.reloadData()
         if currentLyricsIndex > 0{
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: true)

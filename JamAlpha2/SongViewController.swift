@@ -466,13 +466,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
         }
     }
+    
+    var isScrolling = false
+    
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        isScrolling = true
         if singleLyricsTableView != nil {
             print("will begin scroll")
-            if disapperTimer != nil {
-                disapperTimer.invalidate()
-                disapperTimer = nil
-            }
+            self.stopDisapperTimer()
             showTempScrollLyricsView()
         }
     }
@@ -490,29 +491,53 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
         }
+        
+        if singleLyricsTableView != nil {
+            print("did end dragging")
+            startDisapperTimer()
+        }
     }
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if singleLyricsTableView != nil {
             print("did end dragging")
+            if !decelerate {
+                startDisapperTimer()
+            }
+            
+        }
+    }
+    
+    func startDisapperTimer(){
+        if disapperTimer == nil{
             disapperTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "disapperCount:", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(disapperTimer, forMode: NSRunLoopCommonModes)
         }
     }
     
+    func stopDisapperTimer(){
+        if disapperTimer != nil {
+            disapperTimer.invalidate()
+            disapperTimer = nil
+        }
+    }
+    
+    
     func disapperCount(sender: NSTimer) {
         disapperCount++
         print("keep runing")
-        if disapperCount >= 2 {
+        if disapperCount >= 1 {
             print("diapper")
+            isScrolling = false
             disapperCount = 0
-            self.hideTempScrollLyricsView()
             if self.lyricsArray.count > 0 {
-                self.lyricsArray[currentSelectTempIndex.item].alpha = 0.5
-                singleLyricsTableView.reloadRowsAtIndexPaths([currentSelectTempIndex], withRowAnimation: .None)
+                self.hideTempScrollLyricsView()
+                if self.lyricsArray.count > 0 {
+                    self.lyricsArray[currentSelectTempIndex.item].alpha = 0.5
+                    singleLyricsTableView.reloadRowsAtIndexPaths([currentSelectTempIndex], withRowAnimation: .None)
+                }
+                updateSingleLyricsPosition()
             }
-            updateSingleLyricsPosition()
-            disapperTimer.invalidate()
-            disapperTimer = nil
+            self.stopDisapperTimer()
         }
     }
     
@@ -1632,6 +1657,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     if player.playbackState == .Playing {
                         startTimer()
                     }
+                }
+                if(self.chordBase.hidden){
+                    refreshLyrics()
+                    refreshLyricsTableView()
                 }
             }
             break
@@ -2853,7 +2882,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             KGLOBAL_timer = NSTimer()
             KGLOBAL_timer = NSTimer.scheduledTimerWithTimeInterval( 1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
             // make sure the timer is not interfered by scrollview scrolling
-            //NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
+            NSRunLoop.mainRunLoop().addTimer(KGLOBAL_timer, forMode: NSRunLoopCommonModes)
         }
     }
     
@@ -2915,10 +2944,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
 
         refreshChordLabel()
-        refreshLyrics()
+        if(self.chordBase.hidden){
+            if (!isScrolling){
+                if(!isPanning){
+                    refreshLyrics()
+                    refreshLyricsTableView()
+                }
+            }
+        }else{
+            refreshLyrics()
+        }
         refreshProgressBlock()
         refreshTimeLabel()
-        refreshLyricsTableView()
     }
     
     func refreshLyricsTableView() {
