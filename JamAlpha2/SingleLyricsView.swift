@@ -10,8 +10,23 @@ import Foundation
 import UIKit
 
 extension SongViewController: UITableViewDelegate, UITableViewDataSource {
-    func setUpBlurView() {
+    func setUpBackgroundEffect() {
+        backgroundBlurView = UIVisualEffectView()
+        backgroundBlurView.frame = CGRectMake(0, 0, backgroundImageView.frame.size.width, backgroundImageView.frame.size.height)
+        backgroundBlurView.effect = UIBlurEffect(style: .Dark)
+        backgroundImageView.addSubview(backgroundBlurView)
         
+        bottomBlurView = UIView(frame: CGRect(x: 11, y: singleLyricsTableView.frame.origin.y + singleLyricsTableView.frame.size.height, width: self.view.frame.width-11*2, height: 0.5 ))
+        bottomBlurView.backgroundColor = UIColor.baseColor()
+        self.view.insertSubview(bottomBlurView, aboveSubview: singleLyricsTableView)
+    }
+    
+    func releaseBackgroundEffect() {
+        backgroundBlurView.removeFromSuperview()
+        backgroundBlurView = nil
+        
+        bottomBlurView.removeFromSuperview()
+        bottomBlurView = nil
     }
     
     func setUpLyricsArray() {
@@ -20,37 +35,40 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             lyricsArray.removeAll()
         }
         lyricsArray = [(str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat)]()
+        
+        let contentOff: CGFloat = 33
+        
         if lyric.lyric.count > 0 {
             for var i = 0; i < lyric.lyric.count + 2 * numberOfLineInSingleLyricsView; i++ {
                 if i < numberOfLineInSingleLyricsView {
-                    lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 11))
+                    lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + contentOff))
                 } else if i < lyric.lyric.count + numberOfLineInSingleLyricsView {
-                    let temp: (str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat) = (lyric.lyric[i - numberOfLineInSingleLyricsView].str, NSTimeInterval(lyric.lyric[i - numberOfLineInSingleLyricsView].time.toDecimalNumer()), 0.5, CGFloat(i * 66) + 11)
+                    let temp: (str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat) = (lyric.lyric[i - numberOfLineInSingleLyricsView].str, NSTimeInterval(lyric.lyric[i - numberOfLineInSingleLyricsView].time.toDecimalNumer()), 0.5, CGFloat(i * 66) + contentOff)
                     lyricsArray.append(temp)
                 } else {
-                    lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 11))
+                    lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + contentOff))
                 }
             }
         } else {
             for var i = 0; i < numberOfLineInSingleLyricsView; i++ {
-                lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + 11))
+                lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + contentOff))
             }
-            lyricsArray.append(("You don't have any lyric, please add it in Lyrics Editor or select one from others", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + 11))
+            lyricsArray.append(("You don't have any lyric, please add it in Lyrics Editor or select one from others", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + contentOff))
         }
     }
     
     func setUpScrollLine() {
         numberOfLineInSingleLyricsView = Int((basesHeight + 20) / 66) / 2 + 1
         tempPlayButton = UIButton()
-        tempPlayButton.frame = CGRectMake(0, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 + 11 + 33 - 22, 44, 44)
+        tempPlayButton.frame = CGRectMake(0, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 - 22, 44, 44)
         tempPlayButton.setImage(UIImage(named: "playbutton"), forState: .Normal)
-        tempPlayButton.imageEdgeInsets = UIEdgeInsetsMake(12, 5, 12, 19)
+        tempPlayButton.imageEdgeInsets = UIEdgeInsetsMake(9.5, 2.5, 9.5, 16.5)
         tempPlayButton.hidden = true
         tempPlayButton.addTarget(self, action: "pressTempPlayButton:", forControlEvents: .TouchUpInside)
         self.view.insertSubview(tempPlayButton, belowSubview: guitarActionView)
         
         tempScrollLine = UIView()
-        tempScrollLine.frame = CGRectMake(30, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 + 11 + 33, self.view.frame.size.width - 60, 1)
+        tempScrollLine.frame = CGRectMake(30, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66, self.view.frame.size.width - 60, 1)
         tempScrollLine.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.3)
         tempScrollLine.hidden = true
         self.view.insertSubview(tempScrollLine, belowSubview: guitarActionView)
@@ -58,8 +76,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         tempScrollTime = NSTimeInterval(startTime.toDecimalNumer())
         
         tempScrollTimeLabel = UILabel()
-        tempScrollTimeLabel.frame = CGRectMake(self.view.frame.size.width - 25, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 + 11 + 33 - 7.5, 20, 15)
-        tempScrollTimeLabel.font = UIFont.systemFontOfSize(6)
+        tempScrollTimeLabel.frame = CGRectMake(self.view.frame.size.width - 22.5, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 - 7.5, 25, 15)
+        tempScrollTimeLabel.font = UIFont.systemFontOfSize(8)
+        tempScrollTimeLabel.textColor = UIColor.whiteColor()
         let min: Int = Int(tempScrollTime) / 60
         let sec: Int = Int(tempScrollTime) % 60
         if min < 10 {
@@ -152,7 +171,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                 self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
             }
         }
-        
         singleLyricsTableView.reloadData()
     }
     
@@ -177,6 +195,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     
     func setUpSingleLyricsView() {
         if singleLyricsTableView == nil {
+            
             let sideMargin: CGFloat = 20
             let marginToTopView: CGFloat = 0
             let frame: CGRect = CGRectMake(sideMargin, CGRectGetMaxY(topView.frame) + marginToTopView, self.view.frame.size.width - 2 * sideMargin, basesHeight + 20)
@@ -194,7 +213,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             singleLyricsTableView.separatorStyle = .None
             singleLyricsTableView.showsHorizontalScrollIndicator = false
             singleLyricsTableView.showsVerticalScrollIndicator = false
-            
+            setUpBackgroundEffect()
             self.view.insertSubview(singleLyricsTableView, aboveSubview: self.backgroundImageView)
             
             for label in tuningLabels {
@@ -216,6 +235,8 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             self.lyricsArray.removeAll()
             self.lyricsArray = nil
             self.lyricbase.hidden = false
+            hideTempScrollLyricsView()
+            releaseBackgroundEffect()
         }
     }
     

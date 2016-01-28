@@ -31,6 +31,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var disapperTimer: NSTimer!
     var disapperCount: Int = 0
     
+    var backgroundBlurView: UIVisualEffectView!
+    var bottomBlurView: UIView!
+    
     var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!
     private var rwLock = pthread_rwlock_t()
@@ -430,7 +433,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             
             var min_loop = 0
-            var max_loop = self.lyricsArray.count - numberOfLineInSingleLyricsView
+            var max_loop = self.lyricsArray.count - numberOfLineInSingleLyricsView - 1
             
             while min_loop <= max_loop {
                 let mid = Int((max_loop + min_loop) / 2)
@@ -440,8 +443,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 if CGRectContainsPoint(superViewRect, centerPoint) {
                     currentSelectTempIndex = NSIndexPath(forItem: mid, inSection: 0)
-                    if self.lyricsArray[mid - 1].alpha < 1 {
-                        self.lyricsArray[mid - 1].alpha = 0.5
+                    if mid > 0 {
+                        if self.lyricsArray[mid - 1].alpha < 1 {
+                            self.lyricsArray[mid - 1].alpha = 0.5
+                        }
                     }
                     if self.lyricsArray[mid].alpha < 1 {
                         self.lyricsArray[mid].alpha = 0.7
@@ -449,6 +454,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     if self.lyricsArray[mid + 1].alpha < 1 {
                         self.lyricsArray[mid + 1].alpha = 0.5
                     }
+                    
                     let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: mid - 1, inSection: 0), NSIndexPath(forItem: mid, inSection: 0), NSIndexPath(forItem: mid + 1, inSection: 0)]
                     
                     singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
