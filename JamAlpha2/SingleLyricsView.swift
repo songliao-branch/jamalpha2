@@ -131,10 +131,11 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             tempPlayButton.hidden = true
             tempScrollLine.hidden = true
             tempScrollTimeLabel.hidden = true
+            updateSingleLyricsPosition(true)
         }
     }
     
-    func updateSingleLyricsPosition() {
+    func updateSingleLyricsPosition(animated:Bool) {
         for var i = 0; i < lyricsArray.count; i++ {
             self.lyricsArray[i].alpha = 0.5
             if i == currentLyricsIndex + numberOfLineInSingleLyricsView {
@@ -144,9 +145,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         
         singleLyricsTableView.reloadData()
         if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count {
-            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: true)
+            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: animated)
         } else {
-            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
+            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: animated)
         }
 
     }
@@ -199,7 +200,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             for label in tuningLabels {
                 label.hidden = true
             }
-            
+            self.updateSingleLyricsPosition(false)
         }
         
     }
