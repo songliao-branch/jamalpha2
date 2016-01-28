@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 
 extension SongViewController: UITableViewDelegate, UITableViewDataSource {
+    func setUpBlurView() {
+        
+    }
+    
     func setUpLyricsArray() {
         numberOfLineInSingleLyricsView = Int((basesHeight + 20) / 66) / 2 + 1
         if lyricsArray != nil {
@@ -77,16 +81,30 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
 
     func pressTempPlayButton(sender: UIButton) {
         stopTimer()
+        hideTempScrollLyricsView()
         self.toTime = Float(tempScrollTime)
         updateAll(self.toTime)
+        var isPlaying = false
         if isDemoSong {
             self.avPlayer.seekToTime(CMTimeMakeWithSeconds(Float64(self.toTime), 1))
-            
+            isPlaying = avPlayer.rate > 0
         }else{
             if(self.player != nil){
                 self.player.currentPlaybackTime = tempScrollTime
+                isPlaying = self.player.playbackState == .Playing
             }
         }
+        if (!isPlaying){
+            if isDemoSong {
+                self.avPlayer.rate = self.speed
+            }else{
+                if(self.player != nil){
+                    self.player.currentPlaybackRate = self.speed
+                }
+            }
+
+        }
+        self.isScrolling = false
         startTimer()
     }
     
@@ -113,25 +131,31 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func hideTempScrollLyricsView() {
-        tempPlayButton.hidden = true
-        tempScrollLine.hidden = true
-        tempScrollTimeLabel.hidden = true
+        if singleLyricsTableView != nil {
+            tempPlayButton.hidden = true
+            tempScrollLine.hidden = true
+            tempScrollTimeLabel.hidden = true
+            updateSingleLyricsPosition(true)
+        }
     }
     
-    func updateSingleLyricsPosition() {
+    func updateSingleLyricsPosition(animated:Bool) {
+        if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count {
+            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: animated)
+        } else {
+            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: animated)
+        }
+
+    }
+    
+    func updateSingleLyricsAlpha() {
         for var i = 0; i < lyricsArray.count; i++ {
             self.lyricsArray[i].alpha = 0.5
             if i == currentLyricsIndex + numberOfLineInSingleLyricsView {
-                self.lyricsArray[i].alpha = 1
+                self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
             }
         }
         singleLyricsTableView.reloadData()
-        if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count {
-            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: true)
-        } else {
-            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
-        }
-
     }
     
     func updateSingleLyricsArray() {
@@ -177,12 +201,13 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             tapOnTableView.addTarget(self, action: "tapOnTableView:")
             singleLyricsTableView.addGestureRecognizer(tapOnTableView)
             
-            self.view.insertSubview(singleLyricsTableView, belowSubview: guitarActionView)
+            self.view.insertSubview(singleLyricsTableView, aboveSubview: self.backgroundImageView)
             
             for label in tuningLabels {
                 label.hidden = true
             }
-            
+            self.updateSingleLyricsAlpha()
+            self.updateSingleLyricsPosition(false)
         }
         
     }
@@ -197,11 +222,12 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }
             self.lyricsArray.removeAll()
             self.lyricsArray = nil
+            self.lyricbase.hidden = false
         }
     }
     
     func tapOnTableView(sender: UITapGestureRecognizer) {
-        dismissAction()
+        playPause(sender)
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -217,7 +243,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         cell.backgroundColor = UIColor.clearColor()
         cell.selectionStyle = .None
         cell.updateLyricsLabel(self.lyricsArray[indexPath.item].str, labelAlpha: self.lyricsArray[indexPath.item].alpha)
-        let tempRowRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(indexPath)
         return cell
     }
     
