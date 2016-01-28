@@ -468,7 +468,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         if singleLyricsTableView != nil {
-            print("will begin scroll")
             if disapperTimer != nil {
                 disapperTimer.invalidate()
                 disapperTimer = nil
@@ -493,7 +492,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if singleLyricsTableView != nil {
-            print("did end dragging")
             disapperTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "disapperCount:", userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(disapperTimer, forMode: NSRunLoopCommonModes)
         }
@@ -501,9 +499,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func disapperCount(sender: NSTimer) {
         disapperCount++
-        print("keep runing")
         if disapperCount >= 2 {
-            print("diapper")
             disapperCount = 0
             self.hideTempScrollLyricsView()
             if self.lyricsArray.count > 0 {
