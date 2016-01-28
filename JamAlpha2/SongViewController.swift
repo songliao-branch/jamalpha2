@@ -2980,8 +2980,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
         }
-
-        refreshChordLabel()
+        if(!self.chordBase.hidden){
+            refreshChordLabel()
+        }
         if(self.chordBase.hidden){
             if (!isScrolling){
                 if(!isPanning){
