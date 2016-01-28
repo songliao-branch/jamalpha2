@@ -126,7 +126,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
         singleLyricsTableView.reloadData()
-        if currentLyricsIndex > 0{
+        if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count {
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: true)
         } else {
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)

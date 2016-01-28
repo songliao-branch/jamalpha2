@@ -427,7 +427,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if tempScrollLine != nil && tempScrollLine.hidden == false {
             disapperCount = 0
             let centerPoint: CGPoint = self.tempScrollLine.center
-            for var i = 0; i < self.lyricsArray.count; i++ {
+            for var i = 0; i < self.lyricsArray.count - 1; i++ {
                 let tempIndex: NSIndexPath = NSIndexPath(forItem: i, inSection: 0)
                 let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
                 let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
