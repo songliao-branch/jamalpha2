@@ -772,16 +772,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 CoreDataManager.saveTabs(song, chords: download.chords, tabs: download.tabs, times: download.times, tuning: download.tuning, capo: download.capo, userId: download.editor.userId, tabsSetId: download.id, visible: true)
                 
                 if self.canFindTabsFromCoreData(song) {
-                    if(!self.isSongNeedPurchase){
-                        let tempPlaytime = self.isDemoSong ?  self.avPlayer.currentTime().seconds
-                            : self.player.currentPlaybackTime
-                        if !tempPlaytime.isNaN {
-                            self.updateAll(Float(tempPlaytime))
-                        } else {
+                    dispatch_async(dispatch_get_main_queue()){
+                        if(!self.isSongNeedPurchase){
+                            let tempPlaytime = self.isDemoSong ?  self.avPlayer.currentTime().seconds
+                                : self.player.currentPlaybackTime
+                            if !tempPlaytime.isNaN {
+                                self.updateAll(Float(tempPlaytime))
+                            } else {
+                                self.updateAll(0)
+                            }
+                        }else{
                             self.updateAll(0)
                         }
-                    }else{
-                        self.updateAll(0)
                     }
                 }
             })
@@ -806,15 +808,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, userId: download.editor.userId, lyricsSetId: download.id)
                 
                 if self.canFindLyricsFromCoreData(song) {
-                    if(!self.isSongNeedPurchase){
-                        let tempPlaytime = self.isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
-                        if !tempPlaytime.isNaN {
-                            self.updateAll(Float(tempPlaytime))
-                        } else {
+                    dispatch_async(dispatch_get_main_queue()){
+                        if(!self.isSongNeedPurchase){
+                            let tempPlaytime = self.isDemoSong ?  self.avPlayer.currentTime().seconds
+                                : self.player.currentPlaybackTime
+                            if !tempPlaytime.isNaN {
+                                self.updateAll(Float(tempPlaytime))
+                            } else {
+                                self.updateAll(0)
+                            }
+                        }else{
                             self.updateAll(0)
                         }
-                    }else{
-                        self.updateAll(0)
                     }
                 }
             })
@@ -2021,15 +2026,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             chordBase.hidden = false
         }
         
-        if(!isSongNeedPurchase){
-            let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
-            if !tempPlaytime.isNaN {
-                self.updateAll(Float(tempPlaytime))
-            } else {
+        dispatch_async(dispatch_get_main_queue()){
+            if(!self.isSongNeedPurchase){
+                let tempPlaytime = self.isDemoSong ?  self.avPlayer.currentTime().seconds
+                    : self.player.currentPlaybackTime
+                if !tempPlaytime.isNaN {
+                    self.updateAll(Float(tempPlaytime))
+                } else {
+                    self.updateAll(0)
+                }
+            }else{
                 self.updateAll(0)
             }
-        }else{
-            updateAll(0)
         }
         
         applyEffectsToBackgroundImage(changeSong: false)
