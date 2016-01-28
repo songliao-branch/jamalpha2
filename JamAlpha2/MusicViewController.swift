@@ -280,30 +280,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 }
             }
             
-            if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable()){
-                if(song.isKindOfClass(MPMediaItem)){
-                    if (song as! MPMediaItem).cloudItem{
-                        cell.coverImage.alpha = 0.8
-                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(0.5)
-                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(0.5)
-                    }else{
-                        cell.coverImage.alpha = 1
-                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
-                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
-                    }
-                }else{
-                    cell.coverImage.alpha = 1
-                    cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
-                    cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
-                }
-            }else{
-                if(song.isKindOfClass(MPMediaItem)){
-                        cell.coverImage.alpha = 1
-                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
-                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
-                }
-            }
-            
         } else if pageIndex == 1  {
             
             let theArtist = artistsByFirstAlphabet[indexPath.section].1[indexPath.row]
