@@ -263,6 +263,7 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
         cell.imageView.backgroundColor = UIColor.clearColor()
         cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
+        cell.imageView.contentMode = .ScaleAspectFill
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
         
         

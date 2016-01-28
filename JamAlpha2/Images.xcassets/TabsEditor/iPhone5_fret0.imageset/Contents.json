@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "iPhone5_fret1_wide2.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "iPhone5_fret0.png",
       "scale" : "2x"
     },
     {
