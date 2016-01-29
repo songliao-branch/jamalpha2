@@ -1080,8 +1080,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
                 
                 if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem!) {
-                    if (KGLOBAL_defaultProgressBar != nil){
-                        dispatch_async(dispatch_get_main_queue()){
+                    dispatch_async(dispatch_get_main_queue()){
+                        if (KGLOBAL_defaultProgressBar != nil){
                             KGLOBAL_defaultProgressBar.removeFromSuperview()
                             KGLOBAL_defaultProgressBar = nil
                         }
@@ -1169,12 +1169,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
         
         if let soundWaveData = CoreDataManager.getSongWaveFormImage(demoItem!) {
-            if (KGLOBAL_defaultProgressBar != nil){
                 dispatch_async(dispatch_get_main_queue()){
-                    KGLOBAL_defaultProgressBar.removeFromSuperview()
-                    KGLOBAL_defaultProgressBar = nil
+                    if (KGLOBAL_defaultProgressBar != nil){
+                        KGLOBAL_defaultProgressBar.removeFromSuperview()
+                        KGLOBAL_defaultProgressBar = nil
+                    }
                 }
-            }
             KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
             KGLOBAL_init_queue.suspended = false
         } else {
