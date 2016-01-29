@@ -93,7 +93,13 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                     lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + contentOff))
                 }
             }
+            if (self.singleLyricsTableView != nil){
+                self.singleLyricsTableView.scrollEnabled = true
+            }
         } else {
+            if (self.singleLyricsTableView != nil){
+                self.singleLyricsTableView.scrollEnabled = false
+            }
             for i in 0..<numberOfLineInSingleLyricsView {
                 lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + contentOff))
             }
@@ -266,6 +272,11 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }
             self.updateSingleLyricsAlpha()
             self.updateSingleLyricsPosition(false)
+            if (lyric.lyric.count) == 0 {
+                self.singleLyricsTableView.scrollEnabled = false
+            }else {
+                self.singleLyricsTableView.scrollEnabled = true
+            }
         }
     }
     
