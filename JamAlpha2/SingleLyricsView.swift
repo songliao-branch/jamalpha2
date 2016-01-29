@@ -328,6 +328,14 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         return 1
     }
     
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if lyric.lyric.count == 0 {
+            if indexPath.item == numberOfLineInSingleLyricsView {
+                self.goToLyricsEditor()
+            }
+        }
+    }
+    
     func lyricDidScroll(){
         if tempScrollLine != nil && tempScrollLine.hidden == false {
             disapperCount = 0
