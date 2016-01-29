@@ -81,9 +81,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             lyricsArray.removeAll()
         }
         lyricsArray = [(str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat)]()
-        
         let contentOff: CGFloat = 33
-        
         if lyric.lyric.count > 0 {
             for  i in 0..<(lyric.lyric.count + 2 * numberOfLineInSingleLyricsView) {
                 if i < numberOfLineInSingleLyricsView {
@@ -207,6 +205,8 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func updateSingleLyricsPosition(animated:Bool) {
         if currentLyricsIndex > 0 && currentLyricsIndex < self.lyricsArray.count - numberOfLineInSingleLyricsView {
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[currentLyricsIndex].offSet), animated: animated)
+        } else if currentLyricsIndex == -1 {
+            singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: animated)
         }
     }
     
@@ -241,7 +241,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     
     func setUpSingleLyricsView() {
         if singleLyricsTableView == nil {
-            
             let sideMargin: CGFloat = 20
             let marginToTopView: CGFloat = 0
             let frame: CGRect = CGRectMake(sideMargin, CGRectGetMaxY(topView.frame) + marginToTopView, self.view.frame.size.width - 2 * sideMargin, basesHeight + 20)
