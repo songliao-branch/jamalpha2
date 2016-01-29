@@ -244,6 +244,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 KAVplayer.rate = 0
                 KAVplayer = nil
             }
+            
             if isDemoSong {
                 avPlayer = MusicManager.sharedInstance.avPlayer
                 self.demoItem = avPlayer.currentItem
@@ -251,6 +252,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.getSongIdAndSoundwaveUrlFromCloud(demoItem,completion: {succeed in Void()})
                 removeAllObserver()
             } else {
+                if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+                    MusicManager.sharedInstance.avPlayer.pause()
+                    MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+                    MusicManager.sharedInstance.avPlayer.removeAllItems()
+                }
                 player = MusicManager.sharedInstance.player
                 self.nowPlayingMediaItem = player.nowPlayingItem
                 self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
