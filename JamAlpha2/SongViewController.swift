@@ -1209,7 +1209,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if keyPath == "rate"{
             if self.avPlayer.rate == 0 {
                 stopTimer()
-                if singleLyricsTableView != nil && lyricsArray.count != numberOfLineInSingleLyricsView + 1 {
+                if singleLyricsTableView != nil && self.lyric.lyric.count > 0 {
                     self.stopDisapperTimer()
                     showTempScrollLyricsView()
                 }
@@ -1256,7 +1256,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         let playbackState = player.playbackState
         if playbackState == .Paused {
             stopTimer()
-            if singleLyricsTableView != nil && lyricsArray.count != numberOfLineInSingleLyricsView + 1 {
+            if singleLyricsTableView != nil && self.lyric.lyric.count > 0 {
                 self.stopDisapperTimer()
                 showTempScrollLyricsView()
             }

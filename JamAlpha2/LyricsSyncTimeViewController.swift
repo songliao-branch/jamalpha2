@@ -843,7 +843,12 @@ extension LyricsSyncViewController {
             
             CoreDataManager.saveCloudIdToLyrics(self.isDemoSong ? MusicManager.sharedInstance.demoSongs[0]: self.theSong, cloudId: cloudId)
         })
-        
+        if let songVC = self.lyricsTextViewController.songViewController {
+            if songVC.singleLyricsTableView != nil {
+                songVC.updateSingleLyricsAlpha()
+                songVC.updateSingleLyricsPosition(false)
+            }
+        }
         self.presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: {
             
             completed in

@@ -237,7 +237,12 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     
     func pressBackButton(sender: UIButton) {
         tempLyricsTimeTuple.removeAll()
-       
+        if let songVC = self.songViewController {
+            if songVC.singleLyricsTableView != nil {
+                songVC.updateSingleLyricsAlpha()
+                songVC.updateSingleLyricsPosition(false)
+            }
+        }
         self.dismissViewControllerAnimated(true, completion: {
             completed in
             if let songVC = self.songViewController {
