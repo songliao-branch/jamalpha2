@@ -31,6 +31,18 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         loadData()
     }
     
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if(MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
+            let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+            for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                musicVC.musicTable.reloadData()
+            }
+
+        }
+        
+    }
+    
     func setUpRefreshControl() {
         topSongsTable?.addPullToRefresh({ [weak self] in
             // some code
