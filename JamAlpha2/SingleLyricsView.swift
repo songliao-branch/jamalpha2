@@ -53,7 +53,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         self.singleLyricsTableView.transform = CGAffineTransformMakeScale(0.95, 0.95)
         UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
             self.backgroundBlurView.alpha = 1
-            self.bottomBlurView.alpha = 1
+            if self.lyric.lyric.count > 0 {
+                self.bottomBlurView.alpha = 1
+            }
             self.singleLyricsTableView.transform = CGAffineTransformMakeScale(1, 1)
             }, completion: nil)
         UIView.animateWithDuration(0.3, delay: 0.1, options: .CurveEaseIn, animations: {
@@ -71,7 +73,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         self.singleLyricsTableView.transform = CGAffineTransformMakeScale(1, 1)
         UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
             self.backgroundBlurView.alpha = 0
-            self.bottomBlurView.alpha = 0
+            if self.lyric.lyric.count > 0 {
+                self.bottomBlurView.alpha = 0
+            }
             self.singleLyricsTableView.alpha = 0
             self.singleLyricsTableView.transform = CGAffineTransformMakeScale(0.95, 0.95)
             }, completion: nil)
