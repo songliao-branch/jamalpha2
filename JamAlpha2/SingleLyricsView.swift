@@ -50,11 +50,11 @@ extension SongViewController {
 extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpBackgroundEffect() {
         self.singleLyricsTableView.alpha = 0
-        
-        bottomBlurView.frame.origin.y = self.singleLyricsTableView.frame.origin.y + self.singleLyricsTableView.frame.size.height
+        self.singleLyricsTableView.transform = CGAffineTransformMakeScale(0.95, 0.95)
         UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
             self.backgroundBlurView.alpha = 1
             self.bottomBlurView.alpha = 1
+            self.singleLyricsTableView.transform = CGAffineTransformMakeScale(1, 1)
             }, completion: nil)
         UIView.animateWithDuration(0.3, delay: 0.1, options: .CurveEaseIn, animations: {
             self.singleLyricsTableView.alpha = 1
@@ -68,11 +68,17 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                 self.chordBase.alpha = 1
                 }, completion: nil)
         }
+        self.singleLyricsTableView.transform = CGAffineTransformMakeScale(1, 1)
         UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
             self.backgroundBlurView.alpha = 0
             self.bottomBlurView.alpha = 0
             self.singleLyricsTableView.alpha = 0
+            self.singleLyricsTableView.transform = CGAffineTransformMakeScale(0.95, 0.95)
             }, completion: nil)
+        stopDisapperTimer()
+        if self.lyricsArray.count > 0 {
+            self.hideTempScrollLyricsView()
+        }
     }
     
     func setUpLyricsArray() {
@@ -259,6 +265,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             gradient.colors = [UIColor.clearColor().CGColor, UIColor.baseColor().CGColor, UIColor.clearColor().CGColor]
             setUpLyricsArray()
             singleLyricsTableView = UITableView(frame: frame, style: .Plain)
+            bottomBlurView.frame.origin.y = self.singleLyricsTableView.frame.origin.y + self.singleLyricsTableView.frame.size.height
             singleLyricsTableView.backgroundColor = UIColor.clearColor()
             singleLyricsTableView.delegate = self
             singleLyricsTableView.dataSource = self
@@ -441,19 +448,22 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             disapperTimer.invalidate()
             disapperTimer = nil
             disapperCount = 0
+            self.isScrolling = false
         }
     }
     
     
     func disapperCount(sender: NSTimer) {
-        disapperCount++
-        if disapperCount >= 1 {
-            isScrolling = false
-            disapperCount = 0
-            if self.lyricsArray.count > 0 {
-                self.hideTempScrollLyricsView()
+        if (self.singleLyricsTableView != nil){
+            disapperCount++
+            if disapperCount >= 1 {
+                isScrolling = false
+                disapperCount = 0
+                if self.lyricsArray.count > 0 {
+                    self.hideTempScrollLyricsView()
+                }
+                self.stopDisapperTimer()
             }
-            self.stopDisapperTimer()
         }
     }
 
