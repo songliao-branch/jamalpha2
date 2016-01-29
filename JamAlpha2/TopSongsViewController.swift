@@ -64,7 +64,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-        self.navigationItem.title = "Top Songs"
+        
+        let titleImageView: UIImageView = UIImageView()
+        titleImageView.frame = CGRectMake(0, 0, self.view.frame.width/2, 22)
+        titleImageView.image = UIImage(named: "topSongsText")
+        titleImageView.contentMode = .ScaleAspectFit
+        self.navigationItem.titleView = titleImageView
     }
     
     

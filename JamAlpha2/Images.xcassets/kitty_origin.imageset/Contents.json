@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "kitty_profileImage.jpeg",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "kitty_profileImage.jpeg",
       "scale" : "2x"
     },
     {

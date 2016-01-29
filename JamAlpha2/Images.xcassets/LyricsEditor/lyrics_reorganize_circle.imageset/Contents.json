@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "reorganize_circle.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "reorganize_circle.png",
       "scale" : "2x"
     },
     {

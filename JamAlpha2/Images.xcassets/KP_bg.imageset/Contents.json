@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "KP_bg.png"
+      "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "KP_bg.png",
       "scale" : "2x"
     },
     {
