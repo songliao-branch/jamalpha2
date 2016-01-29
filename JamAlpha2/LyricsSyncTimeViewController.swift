@@ -232,7 +232,6 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         let backButton: UIButton = UIButton()
         backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
         backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        backButton.setTitle("B", forState: UIControlState.Normal)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
         backButton.center.y = 20 + 44/2
@@ -242,7 +241,6 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         doneButton.frame = CGRectMake(17
             / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         doneButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        doneButton.setTitle("D", forState: UIControlState.Normal)
         doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(doneButton)
@@ -258,8 +256,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         let speedUpButton: UIButton = UIButton()
         speedUpButton.frame = CGRectMake(14 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedUpButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        speedUpButton.setTitle("+", forState: UIControlState.Normal)
-        speedUpButton.titleLabel?.font = UIFont.systemFontOfSize(15)
+        speedUpButton.setImage(UIImage(named: "increase"), forState: UIControlState.Normal)
         speedUpButton.addTarget(self, action: "pressSpeedUpButton:", forControlEvents: UIControlEvents.TouchUpInside)
         
         titleView.addSubview(speedUpButton)
@@ -267,8 +264,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         let speedDownButton: UIButton = UIButton()
         speedDownButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         speedDownButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        speedDownButton.setTitle("-", forState: UIControlState.Normal)
-        speedDownButton.titleLabel?.font = UIFont.systemFontOfSize(15)
+        speedDownButton.setImage(UIImage(named: "decrease"), forState: UIControlState.Normal)
         speedDownButton.addTarget(self, action: "pressSpeedDownButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(speedDownButton)
     }
