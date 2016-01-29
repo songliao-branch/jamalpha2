@@ -241,7 +241,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
             
             lyricsArray[topRowIndex.item].alpha = -singleLyricsTableView.rectForRowAtIndexPath(topRowIndex).origin.y / 66 * 0.5
-            print("alpha: \(lyricsArray[topRowIndex.item].alpha)")
             lyricsArray[bottomRowIndex.item].alpha = (singleLyricsTableView.frame.size.height - singleLyricsTableView.rectForRowAtIndexPath(topRowIndex).origin.y) / 66 * 0.5
             
             singleLyricsTableView.reloadRowsAtIndexPaths([topRowIndex, bottomRowIndex], withRowAnimation: .None)
@@ -285,7 +284,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     
     func releaseSingleLyricsView() {
         if singleLyricsTableView != nil {
-            print("release")
             releaseBackgroundEffect()
             self.singleLyricsTableView.removeFromSuperview()
             self.singleLyricsTableView = nil
@@ -386,7 +384,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func lyricWillScroll(){
         isScrolling = true
         if singleLyricsTableView != nil {
-            print("will begin scroll")
             self.stopDisapperTimer()
             if lyricsArray.count != numberOfLineInSingleLyricsView + 1 {
                 showTempScrollLyricsView()
@@ -405,7 +402,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                 }
             }
             if isPlaying {
-                print("did end dragging")
                 startDisapperTimer()
             }else{
                 isScrolling = false
@@ -415,7 +411,6 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     
     func lyricEndDraggin(decelerate:Bool){
         if singleLyricsTableView != nil {
-            print("did end dragging")
             if !decelerate {
                 var isPlaying = false
                 if isDemoSong {
@@ -452,9 +447,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     
     func disapperCount(sender: NSTimer) {
         disapperCount++
-        print("keep runing")
         if disapperCount >= 1 {
-            print("diapper")
             isScrolling = false
             disapperCount = 0
             if self.lyricsArray.count > 0 {

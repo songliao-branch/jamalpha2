@@ -203,10 +203,10 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     func setUpPlayer() {
         if isDemoSong {
             avPlayer = AVAudioPlayer()
-            self.duration = NSTimeInterval(MusicManager.sharedInstance.avPlayer.currentItem!.getDuration())
-            avPlayer.currentTime = 0.0
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
+            self.duration = NSTimeInterval(MusicManager.sharedInstance.avPlayer.currentItem!.getDuration())
+            avPlayer.currentTime = 0.0
             self.avPlayer.volume = 1
             self.avPlayer.enableRate = true
             self.avPlayer.rate = 1
@@ -373,6 +373,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func setUpTutorial() {
+        if !NSUserDefaults.standardUserDefaults().boolForKey(kShowLyricsTutorial) {
+            return
+        }
         tutorialScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         tutorialScrollView.backgroundColor = UIColor.clearColor()
         self.view.addSubview(tutorialScrollView)
@@ -416,6 +419,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
+        if tutorialScrollView == nil {
+            return
+        }
         if  tutorialScrollView.hidden {
             return
         }
@@ -425,6 +431,11 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         }
     }
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        
+        if tutorialScrollView == nil {
+            return
+        }
+        
         if  tutorialScrollView.hidden {
             return
         }
@@ -599,11 +610,15 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             }
         }
         if !isPanning {
+            let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
             if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {
                 startTime.addTime(Int(100 / stepPerSecond))
                 self.currentTime = NSTimeInterval(startTime.toDecimalNumer())-0.01
+                if (tempPlaytime.isNaN || tempPlaytime == 0){
+                    startTime.setTime(0)
+                    self.currentTime = 0
+                }
             } else {
-                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                     self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
@@ -809,6 +824,15 @@ extension LyricsSyncViewController {
         }
         
         //check if lyricsSet id is bigger than 0, if so, means this lyrics has been saved to the cloud, then we use same lyricsSetId, otherwise if less than one, it means it's new
+        
+        if (lyricsTimesTuple.count < 3) {
+            let alertController = UIAlertController(title: nil, message: "Please add at least THREE single lines into your lyric", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)
+            return
+        }
+
+        
         let savedLyricsSetId = CoreDataManager.getLyrics(theSong, fetchingUsers: true).1
         
         CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times, userId: Int(CoreDataManager.getCurrentUser()!.id), lyricsSetId: savedLyricsSetId > 0 ? savedLyricsSetId: kLocalSetId ,lastEditedDate: NSDate())
@@ -875,8 +899,6 @@ extension LyricsSyncViewController {
             var time: [NSTimeInterval] = [NSTimeInterval]()
             var timeAdded: [Bool] = [Bool]()
             for line in lyric.lyric {
-                print(line.str)
-                print(self.lyricsOrganizedArray[i])
                 if line.str == self.lyricsOrganizedArray[i] {
                     lyrics.append(line.str)
                     time.append(NSTimeInterval(line.time.toDecimalNumer()))

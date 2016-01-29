@@ -84,8 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let currentSongVC = currentVC as! SongViewController
             if(!currentSongVC.isSongNeedPurchase){
                 currentSongVC.stopTimer()
-            }       
-            print("Song VC entering background")
+            }
             
             // save music state if exit Twistjam when in Editor mode
             if(currentVC.presentedViewController != nil){
@@ -120,8 +119,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         KGLOBAL_init_queue.suspended = true
         shuffleMode = MusicManager.sharedInstance.player.shuffleMode
         repeatMode = MusicManager.sharedInstance.player.repeatMode
-        
-        print("Go into Background suspend nsoperationqueue:\(self.suspended)")
     }
     
     func applicationWillEnterForeground(application: UIApplication) {
@@ -217,7 +214,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         currentSongVC.currentSongChanged()
                         currentSongVC.resumeSong()
                     }
-                    print("Song VC entering forground")
                     KGLOBAL_queue.suspended = false
                     KGLOBAL_init_queue.suspended = self.suspended
                 }

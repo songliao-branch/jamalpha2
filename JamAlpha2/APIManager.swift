@@ -418,7 +418,6 @@ class APIManager: NSObject {
         let parameters = ["nickname": nickname]
         
         Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)" , parameters: parameters).responseJSON { response in
-            print(response)
             switch response.result {
             case .Success:
                 completion(completed: true)
@@ -517,7 +516,6 @@ class APIManager: NSObject {
         
         //user/:id/favorite_a_song body: {"title":"", "artist": "", "duration": ""}
         Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_a_song" , parameters: parameters).responseJSON { response in
-            print(response)
             switch response.result {
             case .Success:
                 if let data = response.result.value {
@@ -534,12 +532,10 @@ class APIManager: NSObject {
     
     class func getFavorites(completion: (( songs: [LocalSong]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_songs").responseJSON { response in
-            print(response)
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
                     var songs = [LocalSong]()
                     for song in json["users"].array! {
                         let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
@@ -561,7 +557,6 @@ class APIManager: NSObject {
    
         Alamofire.request(.GET, jamBaseURL + "/get_soundwave_url", parameters: parameters).responseJSON { response in
 
-            print(response)
             switch response.result {
             case .Success:
                 if let data = response.result.value {
@@ -580,12 +575,10 @@ class APIManager: NSObject {
         let parameters = ["soundwave_url": url]
         
         Alamofire.request(.PUT, jamBaseURL + "/songs/\(songId)", parameters: parameters).responseJSON { response in
-            print(response)
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
                     print("update soundwave url success")
                 }
             case .Failure(let error):
@@ -596,7 +589,6 @@ class APIManager: NSObject {
     
     class func getTopSongs(completion: (( songs: [LocalSong]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
-            print(response)
             switch response.result {
             case .Success:
                 if let data = response.result.value {

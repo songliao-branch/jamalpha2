@@ -32,14 +32,12 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
     }
     
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
-        //println("duration");
         return 0.5
     }
     
     //var rectStatusBarig
     
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
-        //println("here")
         //获取containerView视图
         let containerView:UIView  = transitionContext.containerView()!
         

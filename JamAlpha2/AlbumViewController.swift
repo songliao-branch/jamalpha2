@@ -10,6 +10,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     var theAlbum:Album!
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
+    var isSeekingPlayerState = false
 
     @IBOutlet weak var albumTable: UITableView!
     
@@ -47,13 +48,14 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         synced(self) {
             let player = MusicManager.sharedInstance.player
             if player.repeatMode == .One {
-                print("\(player.nowPlayingItem!.title) is repeating")
                 return
             }
             
             if player.nowPlayingItem != nil {
                 if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                    self.albumTable.reloadData()
+                    if !self.isSeekingPlayerState {
+                        self.albumTable.reloadData()
+                    }
                 }
             }
         }
@@ -74,19 +76,23 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
         let song = theAlbum.songsIntheAlbum[indexPath.row]
 
+        cell.titleTrailingConstant.constant = 15
+        cell.loudspeakerImage.hidden = true
+        
         if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
                 
                 cell.titleTrailingConstant.constant = 50
                 cell.loudspeakerImage.hidden = false
             }
-            else {
-                cell.titleTrailingConstant.constant = 15
-                cell.loudspeakerImage.hidden = true
-            }
+        }
+        
+        if let _ = song.getURL() {
+            cell.cloudImage.hidden = true
+            cell.titleLeadingConstraint.constant = 5
         } else {
-            cell.titleTrailingConstant.constant = 15
-            cell.loudspeakerImage.hidden = true
+            cell.cloudImage.hidden = false
+            cell.titleLeadingConstraint.constant = 25
         }
         
         cell.titleLabel.text = song.title
@@ -112,7 +118,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         KGLOBAL_init_queue.suspended = true
        
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
@@ -126,7 +132,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         ///////////////////////////////////////////
         if((songsInTheAlbum[indexPath.row]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                while (isSeekingPlayerState){
+                while (self.isSeekingPlayerState){
                     
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
@@ -134,7 +140,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)
                         }
-                        isSeekingPlayerState = false
+                        self.isSeekingPlayerState = false
                         break
                     }
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -150,7 +156,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
                                     tableView.reloadData()
                                 })
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                     }

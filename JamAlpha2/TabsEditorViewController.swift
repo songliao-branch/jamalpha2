@@ -1547,9 +1547,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     func createSoundWave() {
         let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
         self.progressBlock = UIView(frame: frame)
-        if(theSong == nil){
-            print("the song is empty")
-        }
         if isDemoSong {
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
@@ -1588,11 +1585,15 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         }
 
         if !isPanning {
+            let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
             if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {
                 startTime.addTime(Int(100 / stepPerSecond))
                 self.currentTime = NSTimeInterval(startTime.toDecimalNumer()) - 0.01
+                if (tempPlaytime.isNaN || tempPlaytime == 0){
+                    startTime.setTime(0)
+                    self.currentTime = 0
+                }
             } else {
-                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                     self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
@@ -1819,7 +1820,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
                 alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler:{
                     handle in
-                    print("back to song view controller")
                     self.tuningMenu.hidden = true
                     self.progressBlock.hidden = true
                     self.removeNotification()
@@ -1842,7 +1842,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 }))
                 self.presentViewController(alertController, animated: true, completion: nil)
             }else{
-                print("back to song view controller")
                 tuningMenu.hidden = true
                 self.progressBlock.hidden = true
                 removeNotification()
@@ -2056,7 +2055,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                         self.currentSelectedSpecificTab.index = index
                         self.currentSelectedSpecificTab.name = name
                         self.currentSelectedSpecificTab.content = content
-                        print("successfully add to database")
                         addSuccessed = true
                         self.addSpecificFingerPoint = true
                         self.backToMainView()
@@ -2133,6 +2131,13 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             }
             
             //check if tabsSet id is bigger than 0, if so, means this tabs has been saved to the cloud, then we use same tabsSetid, otherwise if less than one, it means it's new
+            if (allChords.count < 3) {
+                let alertController = UIAlertController(title: nil, message: "Please add at least THREE chords into your tab", preferredStyle: UIAlertControllerStyle.Alert)
+                alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+                self.presentViewController(alertController, animated: true, completion: nil)
+                return
+            }
+
             let savedTabsSetId = CoreDataManager.getTabs(theSong, fetchingUsers: true).3
             
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
