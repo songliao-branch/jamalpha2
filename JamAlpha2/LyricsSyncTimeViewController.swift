@@ -870,7 +870,7 @@ extension LyricsSyncViewController {
             var lyrics: [String] = [String]()
             var time: [NSTimeInterval] = [NSTimeInterval]()
             var timeAdded: [Bool] = [Bool]()
-            for var i = 0; i < lyricsOrganizedArray.count; i++ {
+            for i in 0..<lyricsOrganizedArray.count {
                 if i < tempLyricsTimeTuple.count {
                     lyrics.append(tempLyricsTimeTuple[i].0)
                     time.append(tempLyricsTimeTuple[i].1)
@@ -908,7 +908,7 @@ extension LyricsSyncViewController {
                     break
                 }
             }
-            for var j = i; j < self.lyricsOrganizedArray.count; j++ {
+            for _ in i..<self.lyricsOrganizedArray.count {
                 lyrics.append(self.lyricsOrganizedArray[i])
                 time.append(self.addedLyricsWithTime.time[i])
                 timeAdded.append(self.addedLyricsWithTime.timeAdded[i])

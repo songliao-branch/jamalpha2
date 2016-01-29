@@ -2656,7 +2656,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         
         // Change the location of each label
-        for var i = 0; i < activelabels.count; ++i {
+        for i in 0..<activelabels.count {
             let activelabel = activelabels[i]
             let yPosition = activelabel.ylocation
             let labels: [UIView] = activelabel.labels
@@ -2830,7 +2830,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             startdisappearing = start
             
             //set the location of labels
-            for var i = 0; i < activelabels.count; i++ {
+            for i in 0..<activelabels.count {
                 activelabels[i].ylocation = movePerstep * CGFloat((startTime.toDecimalNumer() + freefallTime - chords[start+i].time.toDecimalNumer()) * stepPerSecond)
                 if activelabels[i].ylocation > maxylocation {
                     activelabels[i].ylocation = maxylocation

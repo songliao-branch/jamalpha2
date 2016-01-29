@@ -281,7 +281,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let lineArray: [String] = lyric.characters.split{$0 == "\n"}.map { String($0) }
         let letterOrnumber = NSCharacterSet.alphanumericCharacterSet()
         var result: [String] = [String]()
-        for var j = 0; j < lineArray.count; j++ {
+        for j in 0..<lineArray.count {
             var str = lineArray[j].stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()).unicodeScalars
             if str.count == 0{
                 continue
@@ -337,7 +337,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
 
     func array2String(sender: [String]) -> String {
         var tempString: String = String()
-        for var index = 0; index < sender.count; index++ {
+        for index in 0..<sender.count {
             tempString += sender[index]
             tempString += "\n"
         }

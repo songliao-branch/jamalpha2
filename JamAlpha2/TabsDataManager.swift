@@ -32,7 +32,7 @@ class TabsDataManager: NSObject {
         commonChords["40003"] = "xxxx00020101"
         commonChords["40300"] = "xxxx03020101"//F
         //5th string
-        for var i = 0; i < 4; i++ {
+        for i in 0..<4 {
             for var j = 0; j < 23; j++ {
                 if i == 0 { // major chords, e,g, A major -> xx 00 22 22 22 00
                     if j == 3 {

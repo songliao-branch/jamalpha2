@@ -240,7 +240,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             let topRowIndex: NSIndexPath = NSIndexPath(forItem: currentLyricsIndex, inSection: 0)
             let bottomRowIndex: NSIndexPath = NSIndexPath(forItem: currentLyricsIndex + numberOfLineInSingleLyricsView * 2 - 1, inSection: 0)
             
-            for var i = 0; i < lyricsArray.count; i++ {
+            for i in 0..<lyricsArray.count {
                 self.lyricsArray[i].alpha = 0.5
             }
             

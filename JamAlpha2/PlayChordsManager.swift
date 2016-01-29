@@ -166,7 +166,7 @@ class PlayChordsManager: NSObject {
     }
     
     func changeCapo(sender: Int) {
-        for var i = 0; i < fret0Midi.count; i++ {
+        for i in 0..<fret0Midi.count {
             fret0Midi[i] = standardFret0Midi[i] + sender
         }
     }
