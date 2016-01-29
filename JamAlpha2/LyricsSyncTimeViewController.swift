@@ -855,6 +855,10 @@ extension LyricsSyncViewController {
             
             if let songVC = self.lyricsTextViewController.songViewController {
                 songVC.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
+                if songVC.singleLyricsTableView != nil {
+                    songVC.setUpLyricsArray()
+                    songVC.singleLyricsTableView.reloadData()
+                }
                 songVC.addLyricsPrompt.hidden = true
                 if songVC.isDemoSong {
                     songVC.avPlayer.play()
