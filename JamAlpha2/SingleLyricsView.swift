@@ -174,6 +174,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
 
         }
         self.isScrolling = false
+        if (self.currentLyricsIndex == 0 ){
+            self.currentLyricsIndex = -1
+        }
         startTimer()
     }
     
@@ -217,13 +220,13 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func updateSingleLyricsAlpha() {
-        for i in 0..<lyricsArray.count {
-            self.lyricsArray[i].alpha = 0.5
-            if i == currentLyricsIndex + numberOfLineInSingleLyricsView {
-                self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
+            for i in 0..<lyricsArray.count {
+                self.lyricsArray[i].alpha = 0.5
+                if i == currentLyricsIndex + numberOfLineInSingleLyricsView {
+                    self.lyricsArray[currentLyricsIndex + numberOfLineInSingleLyricsView].alpha = 1
+                }
             }
-        }
-        singleLyricsTableView.reloadData()
+            singleLyricsTableView.reloadData()
     }
     
     func updateSingleLyricsArray() {
@@ -268,7 +271,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             self.view.insertSubview(singleLyricsTableView, aboveSubview: self.backgroundImageView)
             
             for label in tuningLabels {
-                label.hidden = true
+                label.alpha = 0
             }
             self.updateSingleLyricsAlpha()
             self.updateSingleLyricsPosition(false)
@@ -286,8 +289,8 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             releaseBackgroundEffect()
             self.singleLyricsTableView.removeFromSuperview()
             self.singleLyricsTableView = nil
-            for label in self.tuningLabels {
-                label.hidden = false
+            for label in tuningLabels {
+                label.alpha = 1
             }
             self.lyricsArray.removeAll()
             self.lyricsArray = nil

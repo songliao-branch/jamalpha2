@@ -1044,10 +1044,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.updateMusicData(nowPlayingMediaItem!)
                 self.updateFavoriteStatus(nowPlayingMediaItem!)
                 if self.singleLyricsTableView != nil {
-                    self.singleLyricsTableView.reloadData()
                     singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
-                    currentLyricsIndex = 0
-                    self.updateSingleLyricsAlpha()
+                    currentLyricsIndex = -1
                 }
                 // The following won't run when selected from table
                 // update the progressblockWidth
@@ -1143,10 +1141,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // if they are not equal, i.e. not the same song
         self.updateMusicData(demoItem!)
         if self.singleLyricsTableView != nil {
-            self.singleLyricsTableView.reloadData()
             singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
-            currentLyricsIndex = 0
-            self.updateSingleLyricsAlpha()
+            currentLyricsIndex = -1
         }
         
         // The following won't run when selected from table
@@ -2150,6 +2146,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
                         self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8
                         self.chordBase.alpha = 1
+                        for i in 0..<self.tuningLabels.count {
+                            self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y:  CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8 - 10)
+                        }
                         }, completion: {
                             finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
                                 self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
@@ -2161,6 +2160,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.chordBase.alpha = 1
                     self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
                     self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                    for i in 0..<self.tuningLabels.count {
+                        self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y:  CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8 - 10)
+                    }
                 }
             }
         } else if (isLyricsShown) {
@@ -2168,6 +2170,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 if (self.isViewDidAppear){
                     UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
                         self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
+                        for i in 0..<self.tuningLabels.count {
+                            self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y:  CGRectGetMaxY(self.topView.frame) + 20 - 10)
+                        }
                         }, completion: {
                             finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
                                 self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
@@ -2178,11 +2183,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
                     self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
                     self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                    for i in 0..<self.tuningLabels.count {
+                        self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y:  CGRectGetMaxY(self.topView.frame) + 20 - 10)
+                    }
                 }
             }
         } else if (!isChordShown && !isTabsShown && !isLyricsShown) {
             self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8
             self.chordBase.alpha = 0
+            for i in 0..<self.tuningLabels.count {
+                self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y:  CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8 - 10)
+            }
         }
     }
     
