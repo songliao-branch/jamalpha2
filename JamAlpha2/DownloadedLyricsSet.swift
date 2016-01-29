@@ -31,6 +31,9 @@ class DownloadedLyricsSet: NSObject {
     var artist = ""
     var duration: Float = 0
     
+    var titleAliases = ""
+    var artistAliases = ""
+    
     init(id: Int, lyricsPreview: String, numberOfLines: Int, votesScore: Int, voteStatus: String, editor: Editor, lastEdited: String) {
         self.id = id
         self.lyricsPreview = lyricsPreview

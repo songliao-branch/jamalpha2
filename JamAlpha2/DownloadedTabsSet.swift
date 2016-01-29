@@ -39,7 +39,10 @@ class DownloadedTabsSet: NSObject {
     var title = ""
     var artist = ""
     var duration: Float = 0
-
+    
+    var titleAliases = ""
+    var artistAliases = ""
+    
     //this is only used for current user's tabs
     var visible = true
     

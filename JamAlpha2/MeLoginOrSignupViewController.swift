@@ -461,6 +461,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
                                     //initialize the song just in case we don't find it in existing core data
                                     CoreDataManager.initializeSongToDatabase(localSong)
+                                    CoreDataManager.saveAliases(localSong, titleAliases: set.titleAliases, artistAliases: set.artistAliases)
                                     
                                     CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible, lastEditedDate: set.lastEdited)
                                 }
@@ -469,6 +470,7 @@ class MeLoginOrSignupViewController: UIViewController{
                                     let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
                                     //initialize the song just in case we don't find it in
                                     CoreDataManager.initializeSongToDatabase(localSong)
+                                    CoreDataManager.saveAliases(localSong, titleAliases: set.titleAliases, artistAliases: set.artistAliases)
 
                                     CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id, lastEditedDate: set.lastEdited)
                                 }

@@ -288,6 +288,28 @@ class CoreDataManager: NSObject {
         }
     }
     
+    class func saveAliases(item: Findable, titleAliases: String, artistAliases: String) {
+        if let matchedSong = findSong(item) {
+            matchedSong.titleAliases = titleAliases
+            matchedSong.artistAliases = artistAliases
+            SwiftCoreDataHelper.saveManagedObjectContext(moc)
+        }
+    }
+    
+    class func getTitleAliases(item: Findable) -> String {
+        if let matchedSong = findSong(item) {
+           return matchedSong.titleAliases
+        }
+        return item.getTitle()
+    }
+
+    
+    class func getArtistAliases(item: Findable) -> String {
+        if let matchedSong = findSong(item) {
+            return matchedSong.artistAliases
+        }
+        return item.getArtist()
+    }
     // MARK: save, retrieve soundwaves
     class func saveSoundWave(item: Findable, soundwaveImage: NSData) {
         if let matchedSong = findSong(item) {

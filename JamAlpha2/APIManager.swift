@@ -475,6 +475,8 @@ class APIManager: NSObject {
                         t.title = set["song"]["title"].string!
                         t.artist = set["song"]["artist"].string!
                         t.duration = set["song"]["duration"].float!
+                        t.titleAliases = set["song"]["title_aliases"].string!
+                        t.artistAliases = set["song"]["artist_aliases"].string!
                         for time in set["times"].arrayObject as! [String] {
                             theTimes.append(Float(time)!)
                         }
@@ -498,6 +500,8 @@ class APIManager: NSObject {
                         l.title = set["song"]["title"].string!
                         l.artist = set["song"]["artist"].string!
                         l.duration = set["song"]["duration"].float!
+                        l.titleAliases = set["song"]["title_aliases"].string!
+                        l.artistAliases = set["song"]["artist_aliases"].string!
                         myLyricsSets.append(l)
                     }
                    completion(downloadedTabsSets: myTabsSets, downloadedLyricsSets: myLyricsSets)

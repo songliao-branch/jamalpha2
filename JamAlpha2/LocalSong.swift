@@ -28,7 +28,10 @@ class LocalSong: NSObject {
     func findMediaItem() {
         self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
             item in
-            return MusicManager.sharedInstance.songsMatched(findableA: self, findableB: item)
+            if  CoreDataManager.getTitleAliases(self).lowercaseString.containsString(item.getTitle().lowercaseString) && CoreDataManager.getArtistAliases(self).lowercaseString.containsString(item.getArtist().lowercaseString) && abs(self.duration-item.getDuration()) < 2 {
+                return true
+            }
+            return false
         }.first
     }
     

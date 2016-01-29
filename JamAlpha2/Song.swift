@@ -20,4 +20,7 @@ class Song: NSManagedObject {
     @NSManaged var lyricsSets: NSSet
     @NSManaged var id: NSNumber //retrieved from cloud
     @NSManaged var isFavorited: Bool
+    
+    @NSManaged var titleAliases: String
+    @NSManaged var artistAliases: String
 }
