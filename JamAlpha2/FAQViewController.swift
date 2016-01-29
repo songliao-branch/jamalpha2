@@ -65,7 +65,6 @@ extension FAQViewController: UITableViewDelegate, UITableViewDataSource {
         answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
         let frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 64)
         tableView = UITableView(frame: frame, style: .Grouped)
-        //tableView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 64)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")

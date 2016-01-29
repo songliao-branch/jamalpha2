@@ -11,7 +11,7 @@ import UIKit
 
 extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate {
     func initCollectionView() {
-        for var i = 0; i < 25; i++ {
+        for i in 0..<25 {
             fretsNumber.append(i)
         }
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
@@ -72,7 +72,7 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
             self.startScrolling = false
             let location = sender.locationInView(collectionView)
             var positionX: CGFloat = 0
-            for var index = 0; index < self.string3FretPosition.count; index++ {
+            for index in 0..<self.string3FretPosition.count {
                 if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
                     if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
                         positionX = self.string3FretPosition[index] - self.collectionView.contentOffset.x
@@ -120,7 +120,7 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
             var original:CGPoint = CGPointMake(0,string3Height  - self.string3Position[2])
             let location = sender.locationInView(self.collectionView)
             // get the tap position for fret number and string number
-            for var index = 0; index < self.string3FretPosition.count; index++ {
+            for index in 0..<self.string3FretPosition.count {
                 if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
                     if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
                         let tempIndex = fretsNumber[index]
@@ -135,7 +135,7 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
                     }
                 }
             }
-            for var index = 0; index < self.string3Position.count; index++ {
+            for index in 0..<self.string3Position.count {
                 if location.y >= self.string3Position[index] - string3Height && location.y <= self.string3Position[index] + string3Height {
                     indexString = index + 3
                     original.y = string3Height  - self.string3Position[index]

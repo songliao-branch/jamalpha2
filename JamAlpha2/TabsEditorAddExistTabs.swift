@@ -13,7 +13,7 @@ import UIKit
 extension TabsEditorViewController {
     // get tabs from coredata and show it on tab editor
     func getBasicNoteIndex(sender: [String]) -> Int {
-        for var i = 0; i < 6; i++ {
+        for i in 0..<6 {
             if sender[i] != "x" {
                 let stringIndex = 6 - i
                 let fretIndex = Int(sender[i])
@@ -61,7 +61,7 @@ extension TabsEditorViewController {
     
     func addTabsFromCoreDataToMusicControlView(sender: [Chord]) {
         for item in sender {
-            for var i = 0; i < noteButtonWithTabArray.count; i++ {
+            for i in 0..<noteButtonWithTabArray.count {
                 let normalTab = getNormalTabFromChord(item)
                 if normalTab.name == noteButtonWithTabArray[i].tab.name && normalTab.index == noteButtonWithTabArray[i].tab.index && normalTab.content == noteButtonWithTabArray[i].tab.content {
                     self.currentTime = Double(item.time.toDecimalNumer())

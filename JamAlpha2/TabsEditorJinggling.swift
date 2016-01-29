@@ -105,7 +105,7 @@ extension TabsEditorViewController {
             var indexFret: Int = Int()
             var indexString: Int = Int()
             let location = self.currentBaseButton.center
-            for var index = 0; index < self.string6FretPosition.count; index++ {
+            for index in 0..<self.string6FretPosition.count {
                 if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
                     if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
                         indexFret = index
@@ -113,7 +113,7 @@ extension TabsEditorViewController {
                     }
                 }
             }
-            for var index = 0; index < 6; index++ {
+            for index in 0..<6 {
                 if CGRectContainsPoint(self.string6View[index].frame, location) {
                     indexString = index
                 }
@@ -175,7 +175,7 @@ extension TabsEditorViewController {
             var indexFret: Int = Int()
             var indexString: Int = Int()
             let location = self.currentBaseButton.center
-            for var index = 0; index < self.string6FretPosition.count; index++ {
+            for index in 0..<self.string6FretPosition.count {
                 if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
                     if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
                         indexFret = index
@@ -183,7 +183,7 @@ extension TabsEditorViewController {
                     }
                 }
             }
-            for var index = 0; index < 6; index++ {
+            for index in 0..<6 {
                 if CGRectContainsPoint(self.string6View[index].frame, location) {
                     indexString = index
                 }
@@ -579,14 +579,14 @@ extension TabsEditorViewController {
     
     func deleteChordOnSpecificTabView(sender: UITapGestureRecognizer) {
         var needAlert: Bool = false
-        for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
+        for i in 0..<self.noteButtonWithTabArray.count{
             if self.noteButtonWithTabArray[i].tab.index == Int(self.currentSelectedSpecificTab.index) && self.noteButtonWithTabArray[i].tab.name == self.currentSelectedSpecificTab.name && self.noteButtonWithTabArray[i].tab.content == self.currentSelectedSpecificTab.content {
                 needAlert = true
                 break
             }
         }
         if needAlert == false {
-            for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+            for i in 0..<self.allTabsOnMusicLine.count {
                 if self.allTabsOnMusicLine[i].tab.index == Int(self.currentSelectedSpecificTab.index) && self.allTabsOnMusicLine[i].tab.name == self.currentSelectedSpecificTab.name && self.allTabsOnMusicLine[i].tab.content == self.currentSelectedSpecificTab.content {
                     needAlert = true
                     break
@@ -625,9 +625,9 @@ extension TabsEditorViewController {
         let index: Int = (sender.view?.tag)!
         self.stopNormalJinggling(longPressMainViewNoteButton[self.noteButtonWithTabArray[index].noteButton]!, button: self.noteButtonWithTabArray[index].noteButton)
         let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
-        for var i = 0; i < self.mainViewDataArray.count; i++ {
+        for i in 0..<self.mainViewDataArray.count {
             if self.mainViewDataArray[i].fretNumber == fretNumber {
-                for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
+                for j in 0..<self.mainViewDataArray[i].noteButtonsWithTab.count {
                     if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[index].tab) {
                         self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
                         self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
@@ -636,7 +636,7 @@ extension TabsEditorViewController {
             }
         }
         self.noteButtonWithTabArray.removeAtIndex(index)
-        for var i = 0; i < noteButtonWithTabArray.count; i++ {
+        for i in 0..<noteButtonWithTabArray.count {
             noteButtonWithTabArray[i].noteButton.tag = i
         }
         if(self.noteButtonWithTabArray.count == 0){
@@ -656,7 +656,7 @@ extension TabsEditorViewController {
     
     // need to check whether the main view contain the delete tab
     func deleteChordOnMainViewWhenDeleteOnEditView(index: Int, name: String, content: String) {
-        for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
+        for i in 0..<self.noteButtonWithTabArray.count {
             if self.noteButtonWithTabArray[i].tab.index == index && self.noteButtonWithTabArray[i].tab.name == name && self.noteButtonWithTabArray[i].tab.content == content {
                 self.deleteChordOnString3View(i)
             }
@@ -666,9 +666,9 @@ extension TabsEditorViewController {
     
     func deleteChordOnString3View(sender: Int) {
         let fretNumber = Int(noteButtonWithTabArray[sender].tab.index) - Int(noteButtonWithTabArray[sender].tab.index) / 100 * 100
-        for var i = 0; i < self.mainViewDataArray.count; i++ {
+        for i in 0..<self.mainViewDataArray.count {
             if self.mainViewDataArray[i].fretNumber == fretNumber {
-                for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
+                for j in 0..<self.mainViewDataArray[i].noteButtonsWithTab.count {
                     if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[sender].tab)  {
                         self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
                         self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
@@ -677,7 +677,7 @@ extension TabsEditorViewController {
             }
         }
         self.noteButtonWithTabArray.removeAtIndex(sender)
-        for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
+        for i in 0..<self.noteButtonWithTabArray.count {
             self.noteButtonWithTabArray[i].noteButton.tag = i
         }
         reorganizeMainViewDataArray()
@@ -696,7 +696,7 @@ extension TabsEditorViewController {
     
     func reorganizeAllTabsOnMusicLine() {
         var tempAllTabsOnMusicLine: [tabOnMusicLine] = [tabOnMusicLine]()
-        for var j = 0; j < self.allTabsOnMusicLine.count; j++ {
+        for j in 0..<self.allTabsOnMusicLine.count {
             self.currentTime = self.allTabsOnMusicLine[j].time
             self.allTabsOnMusicLine[j].tabView.frame = self.setMainViewTabPositionInRange(self.allTabsOnMusicLine[j].tab, endIndex: tempAllTabsOnMusicLine.count, allTabsOnMusicLine: tempAllTabsOnMusicLine)
             

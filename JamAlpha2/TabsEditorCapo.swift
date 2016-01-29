@@ -19,7 +19,7 @@ extension TabsEditorViewController {
         fretNumberOnFullStringView.frame = CGRectMake(0, 14 / 20 * self.trueHeight, self.trueWidth / 5 * CGFloat(count - sender), 1 / 20 * self.trueHeight)
         fretNumberOnFullStringView.backgroundColor = UIColor.clearColor()
         let labelWidth: CGFloat = 1 / 20 * self.trueHeight
-        for var i = 0; i < count - sender; i++ {
+        for i in 0..<(count - sender) {
             let tempLabel: UILabel = UILabel()
             let positionX = (self.string6FretPosition[i] + self.string6FretPosition[i + 1]) / 2
             tempLabel.frame = CGRectMake(positionX - labelWidth / 2, 0, labelWidth, labelWidth)
@@ -50,7 +50,7 @@ extension TabsEditorViewController {
         let count = self.mainViewDataArray.count
         if 25 - sender == count + 1 {
             let maxFretNumber = count - 1
-            for var i = 0; i < count; i++ {
+            for i in 0..<count {
                 if self.mainViewDataArray[i].fretNumber == maxFretNumber {
                     let temp: mainViewData = mainViewData()
                     temp.fretNumber = maxFretNumber + 1
@@ -64,7 +64,7 @@ extension TabsEditorViewController {
             }
         } else if 25 - sender == count - 1 {
             let maxFretNumber = count - 1
-            for var i = 0; i < count; i++ {
+            for i in 0..<count {
                 if self.mainViewDataArray[i].fretNumber == maxFretNumber {
                     self.mainViewDataArray.removeAtIndex(i)
                     self.string3BackgroundImage.removeAtIndex(i)

@@ -511,7 +511,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     
     // MARK: Main view data array, to store the tabs added on main view.
     func initialMainViewDataArray(sender: Int) {
-        for var i = sender; i < 25; i++ {
+        for i in sender..<25 {
             let temp: mainViewData = mainViewData()
             temp.fretNumber = i
             let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
@@ -781,7 +781,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         if addedNoteButtonOnCompleteView == true {
             self.createEditFingerPoint(noteButton.tag)
         }
-        for var i = 6 - indexString; i <= 5; i++ {
+        for i in(6 - indexString)...5 {
             self.fingerPoint[i].hidden = false
         }
         
@@ -797,7 +797,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             var indexFret: Int = Int()
             var indexString: Int = Int()
             let location = sender.locationInView(self.completeStringView)
-            for var index = 0; index < self.string6FretPosition.count; index++ {
+            for index in 0..<self.string6FretPosition.count {
                 if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
                     if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
                         indexFret = index
@@ -805,7 +805,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     }
                 }
             }
-            for var index = 0; index < 6; index++ {
+            for index in 0..<6 {
                 if CGRectContainsPoint(self.string6View[index].frame, location) {
                     indexString = index
                 }
@@ -916,7 +916,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 self.buttonOnSpecificScrollView.removeAll()
                 self.removeObjectsOnSpecificTabsScrollView()
                 self.longPressSpecificTabButton.removeAll()
-                for var i = 0; i < self.specificTabSets.count; i++ {
+                for i in 0..<self.specificTabSets.count {
                     if self.specificTabSets[i].content != "" {
                         let specificButton: UIButton = UIButton()
                         specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
@@ -1049,7 +1049,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         }
         
         let stringNumber = Int(self.specificTabSets[sender].index) / 100
-        for var i = 0 ; i <= 6 - stringNumber ; i++ {
+        for i in 0...(6 - stringNumber) {
             self.fingerPoint[i].hidden = true
         }
         
@@ -1234,7 +1234,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         } else {
             numberOfLine += 2
         }
-        for var i = 0; i < numberOfLine; i++ {
+        for i in 0..<numberOfLine {
             var frame: CGRect!
             if i % 2 == 0 {
                 frame = CGRectMake(CGFloat(i) * lineSpace * tabsEditorProgressWidthMultiplier, 11, 2, 9)
@@ -1500,30 +1500,28 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     func createStringAndFretPosition() {
         // the postion for 6 string view
         let string6Height: CGFloat = 7 / 60 * self.trueHeight
-        for var i = 0; i < 6; i++ {
-            if i == 0 {
-                self.string6Position.append(string6Height / 2)
-            } else {
-                self.string6Position.append(self.string6Position[i - 1] + string6Height)
-            }
-        }
         let fret6Width = self.trueWidth / 5
-        for var i = 0; i < 26; i++ {
-            self.string6FretPosition.append(CGFloat(i) * fret6Width)
-        }
         // the position for 3 string view
         let string3Height: CGFloat = 11 / 60 * self.trueHeight
-        for var i = 0; i < 3; i++ {
-            if i == 0 {
-                self.string3Position.append(string3Height / 2)
-            } else {
-                self.string3Position.append(self.string3Position[i - 1] + string3Height)
-            }
-        }
         let fret3Width = self.trueWidth / 5
-        for var i = 0; i < 26; i++ {
+        for i in 0..<26 {
+            self.string6FretPosition.append(CGFloat(i) * fret6Width)
             self.string3FretPosition.append(CGFloat(i) * fret3Width)
             self.string3FretChangeingPosition[i] = CGFloat(i) * fret3Width
+            if i < 6 {
+                if i == 0 {
+                    self.string6Position.append(string6Height / 2)
+                } else {
+                    self.string6Position.append(self.string6Position[i - 1] + string6Height)
+                }
+            }
+            if i < 3 {
+                if i == 0 {
+                    self.string3Position.append(string3Height / 2)
+                } else {
+                    self.string3Position.append(self.string3Position[i - 1] + string3Height)
+                }
+            }
         }
         
         
@@ -1531,7 +1529,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     
     func addString6View() {
         let string6Height: CGFloat = 7 / 60 * self.trueHeight
-        for var i = 0; i < 6; i++ {
+        for i in 0..<6 {
             let tempStringView: UIView = UIView()
             tempStringView.frame = CGRectMake(0, CGFloat(i) * string6Height, self.trueWidth * 5, string6Height)
             if i == 5 {
@@ -1703,7 +1701,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         let labelHeight = ( self.progressBlock.frame.height - 20 ) / CGFloat(labelHeightNumber)
         let width = self.trueWidth / 18
         var frame: CGRect = CGRect()
-        for var i = 0; i < endIndex; i++ {
+        for i in 0..<endIndex {
             if self.compareTabs(allTabsOnMusicLine[i].tab, tab2: tab) {
                 let tempFrame = CGRectMake(0 + CGFloat(self.currentTime / self.duration) * (self.progressBlock.frame.width), allTabsOnMusicLine[i].tabView.frame.origin.y, allTabsOnMusicLine[i].tabView.frame.width, allTabsOnMusicLine[i].tabView.frame.height)
                 return tempFrame
@@ -1721,7 +1719,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     // caluclate the tab on music line without repeat
     func numberOfUnrepeatedTabOnMainView(endIndex: Int, allTabsOnMusicLine: [tabOnMusicLine]) -> Int{
         var set = [String: Int]()
-        for var i = 0; i < endIndex; i++ {
+        for i in 0..<endIndex {
             if let val = set["\(allTabsOnMusicLine[i].tab.index) \(allTabsOnMusicLine[i].tab.name)"] {
                 set["\(allTabsOnMusicLine[i].tab.index) \(allTabsOnMusicLine[i].tab.name)"] = val + 1
             }
@@ -1903,12 +1901,12 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             action in
             self.view.userInteractionEnabled = false
                 UIView.animateWithDuration(0.3, animations: {
-                    for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+                    for i in 0..<self.allTabsOnMusicLine.count {
                         self.allTabsOnMusicLine[i].tabView.alpha = 0
                     }
                     }, completion: {
                         completed in
-                        for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+                        for i in 0..<self.allTabsOnMusicLine.count {
                             self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
                         }
                         self.allTabsOnMusicLine.removeAll()
@@ -2033,7 +2031,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                         }
                         addSuccessed = false
                     } else {
-                        for var i = 0; i < 6; i++ {
+                        for i in 0..<6 {
                             if self.fingerPoint[i].accessibilityIdentifier == "blackX" {
                                 content = content + "xx"
                             } else {
@@ -2065,9 +2063,9 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     var addNew: Bool = true
                     if let _ = self.currentSelectedSpecificTab {
                         let fretNumber = Int(self.currentSelectedSpecificTab.index) - Int(self.currentSelectedSpecificTab.index) / 100 * 100
-                        for var i = 0; i < self.mainViewDataArray.count; i++ {
+                        for i in 0..<self.mainViewDataArray.count {
                             if self.mainViewDataArray[i].fretNumber == fretNumber {
-                                for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
+                                for j in 0..<self.mainViewDataArray[i].noteButtonsWithTab.count {
                                     if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.currentSelectedSpecificTab) {
                                         let alertController = UIAlertController(title: "Warning", message: "This tab already exist on Main View", preferredStyle: UIAlertControllerStyle.Alert)
                                         alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: { action in
@@ -2247,7 +2245,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             var buttonX2: [CGFloat] = [self.trueWidth / 5 / 2 - buttonWidth2, self.trueWidth / 5 / 2]
             var buttonX3: [CGFloat] = [0, self.trueWidth / 5 / 2 - buttonWidth3 / 2, self.trueWidth / 5 / 2 + buttonWidth3 / 2]
             
-            for var i = 4; i <= 6; i++ {
+            for i in 4...6 {
                 var tempButtonArray: [noteButtonWithTab] = [noteButtonWithTab]()
                 for buttonWithTab in item.noteButtonsWithTab {
                     if Int(buttonWithTab.tab.index) / 100 == i {
@@ -2260,13 +2258,13 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     tempButtonArray[0].noteButton.titleLabel!.font = UIFont.boldSystemFontOfSize(UIFont.smallSystemFontSize())
                 }
                 if tempButtonArray.count == 2 {
-                    for var j = 0; j < tempButtonArray.count; j++ {
+                    for j in 0..<tempButtonArray.count {
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX2[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth2 / 2, buttonWidth2, buttonWidth2)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth2
                         tempButtonArray[j].noteButton.titleLabel!.font = UIFont.boldSystemFontOfSize(UIFont.smallSystemFontSize())
                     }
                 } else if tempButtonArray.count == 3 {
-                    for var j = 0; j < tempButtonArray.count; j++ {
+                    for j in 0..<tempButtonArray.count {
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX3[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth3 / 2, buttonWidth3, buttonWidth3)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth3
                         tempButtonArray[j].noteButton.titleLabel!.font = UIFont.boldSystemFontOfSize(UIFont.smallSystemFontSize())
@@ -2512,7 +2510,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     // find the current tab according to the current music time
     func findCurrentTabView() {
         let stepper:Double = 10.0 / Double(self.tabsEditorProgressWidthMultiplier)
-        for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+        for i in 0..<self.allTabsOnMusicLine.count {
             self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.6)
         }
         if self.allTabsOnMusicLine.count == 1 {
@@ -2521,7 +2519,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 self.currentTabViewIndex = 0
             }
         } else {
-            for var i = 1; i < self.allTabsOnMusicLine.count + 1; i++ {
+            for i in 1..<(self.allTabsOnMusicLine.count + 1) {
                 if i < self.allTabsOnMusicLine.count {
                     if self.currentTime > (self.allTabsOnMusicLine[i - 1].time - 0.1 * stepper) && (self.currentTime <= self.allTabsOnMusicLine[i].time) && self.currentTime <= (self.allTabsOnMusicLine[i - 1].time + 3.2 * stepper) {
                         self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
