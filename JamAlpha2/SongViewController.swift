@@ -30,9 +30,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var tempScrollLine: UIView!
     var disapperTimer: NSTimer!
     var disapperCount: Int = 0
-    
+    var isScrolling = false
     var backgroundBlurView: UIVisualEffectView!
     var bottomBlurView: UIView!
+    
     
     var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!
@@ -418,171 +419,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var currentSelectTempIndex: NSIndexPath = NSIndexPath(forItem: 0, inSection: 0)
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        if tutorialScrollView != nil {
-            if  tutorialScrollView.hidden {
-                return
-            }
-            for i in 0..<numberOfTutorialPages {
-                tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
-            }
-        }
-        if tempScrollLine != nil && tempScrollLine.hidden == false {
-            disapperCount = 0
-            let centerPoint: CGPoint = self.tempScrollLine.center
-            
-            
-            var min_loop = 0
-            var max_loop = self.lyricsArray.count - numberOfLineInSingleLyricsView - 1
-            
-            while min_loop <= max_loop {
-                let mid = Int((max_loop + min_loop) / 2)
-                let tempIndex: NSIndexPath = NSIndexPath(forItem: mid, inSection: 0)
-                let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
-                let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
-                
-                if CGRectContainsPoint(superViewRect, centerPoint) {
-                    currentSelectTempIndex = NSIndexPath(forItem: mid, inSection: 0)
-                    if mid > 0 {
-                        if self.lyricsArray[mid - 1].alpha < 1 {
-                            self.lyricsArray[mid - 1].alpha = 0.5
-                        }
-                    }
-                    if self.lyricsArray[mid].alpha < 1 {
-                        self.lyricsArray[mid].alpha = 0.7
-                    }
-                    if self.lyricsArray[mid + 1].alpha < 1 {
-                        self.lyricsArray[mid + 1].alpha = 0.5
-                    }
-                    
-                    let tempIndexPath: [NSIndexPath] = [NSIndexPath(forItem: mid - 1, inSection: 0), NSIndexPath(forItem: mid, inSection: 0), NSIndexPath(forItem: mid + 1, inSection: 0)]
-                    
-                    singleLyricsTableView.reloadRowsAtIndexPaths(tempIndexPath, withRowAnimation: .None)
-                    
-                    tempScrollTime = self.lyricsArray[mid].time
-                    let min: Int = Int(tempScrollTime) / 60
-                    let sec: Int = Int(tempScrollTime) % 60
-                    if min < 10 {
-                        if sec < 10 {
-                            tempScrollTimeLabel.text = "0\(min):0\(sec)"
-                        } else {
-                            tempScrollTimeLabel.text = "0\(min):\(sec)"
-                        }
-                    } else {
-                        if sec < 10 {
-                            tempScrollTimeLabel.text = "\(min):0\(sec)"
-                        } else {
-                            tempScrollTimeLabel.text = "\(min):\(sec)"
-                        }
-                    }
-                    break
-                }else {
-                    if superViewRect.origin.y > centerPoint.y {
-                        max_loop = mid - 1
-                    } else {
-                        min_loop = mid
-                        if (min_loop >= max_loop - 1){
-                            min_loop = mid + 1
-                        }
-                    }
-                }
-            }
-        }
-    }
     
-    var isScrolling = false
-    
-    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        isScrolling = true
-        if singleLyricsTableView != nil {
-            print("will begin scroll")
-            self.stopDisapperTimer()
-            if lyricsArray.count != numberOfLineInSingleLyricsView + 1 {
-                showTempScrollLyricsView()
-            }
-        }
-    }
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        if tutorialScrollView != nil {
-            if  tutorialScrollView.hidden {
-                return
-            }            
-            let currentPage = scrollView.contentOffset.x / self.view.frame.width
-            for i in 0..<numberOfTutorialPages {
-                if i == Int(currentPage) {
-                    tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
-                } else {
-                    tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
-                }
-            }
-        }
-        
-        if singleLyricsTableView != nil {
-            var isPlaying = false
-            if isDemoSong {
-                isPlaying = avPlayer.rate > 0
-            }else{
-                if(self.player != nil){
-                    isPlaying = self.player.playbackState == .Playing
-                }
-            }
-            if isPlaying {
-                print("did end dragging")
-                startDisapperTimer()
-            }else{
-                isScrolling = false
-            }
-        }
-    }
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if singleLyricsTableView != nil {
-            print("did end dragging")
-            if !decelerate {
-                var isPlaying = false
-                if isDemoSong {
-                    isPlaying = avPlayer.rate > 0
-                }else{
-                    if(self.player != nil){
-                        isPlaying = self.player.playbackState == .Playing
-                    }
-                }
-                if isPlaying {
-                    startDisapperTimer()
-                }else{
-                    isScrolling = false
-                }
-            }
-        }
-    }
-    
-    func startDisapperTimer(){
-        if disapperTimer == nil{
-            disapperTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "disapperCount:", userInfo: nil, repeats: true)
-            NSRunLoop.mainRunLoop().addTimer(disapperTimer, forMode: NSRunLoopCommonModes)
-        }
-    }
-    
-    func stopDisapperTimer(){
-        if disapperTimer != nil {
-            disapperTimer.invalidate()
-            disapperTimer = nil
-            disapperCount = 0
-        }
-    }
-    
-    
-    func disapperCount(sender: NSTimer) {
-        disapperCount++
-        print("keep runing")
-        if disapperCount >= 1 {
-            print("diapper")
-            isScrolling = false
-            disapperCount = 0
-            if self.lyricsArray.count > 0 {
-                self.hideTempScrollLyricsView()
-            }
-            self.stopDisapperTimer()
-        }
+        self.lyricEndDraggin(decelerate)
     }
     
     func hideTutorial() {
@@ -612,6 +451,17 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         backgroundImageView.center.x = self.view.center.x
         backgroundImageView.image = blurredImage
+        
+        backgroundBlurView = UIVisualEffectView()
+        backgroundBlurView.frame = CGRectMake(0, 0, self.view.frame.size.height, backgroundImageView.frame.size.height)
+        backgroundBlurView.effect = UIBlurEffect(style: .Dark)
+        backgroundBlurView.alpha = 0
+        backgroundImageView.addSubview(backgroundBlurView)
+        
+        bottomBlurView = UIView(frame: CGRect(x: 11, y: 0, width: self.view.frame.width-11*2, height: 0.5 ))
+        bottomBlurView.backgroundColor = UIColor.baseColor()
+        bottomBlurView.alpha = 0
+        self.view.insertSubview(bottomBlurView, aboveSubview: backgroundImageView)
     }
     
     func loadBackgroundImageFromMediaItem(item: Findable) {
@@ -896,6 +746,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.lyric = lyric
             self.addLyricsPrompt.hidden = true
             self.setUpLyricsArray()
+            dispatch_async(dispatch_get_main_queue()){
+                if(self.singleLyricsTableView != nil) {
+                    self.singleLyricsTableView.reloadData()
+                }
+            }
             return true
         }
         return false
@@ -945,6 +800,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         self.addLyricsPrompt.hidden = false
                     }
                     self.setUpLyricsArray()
+                    dispatch_async(dispatch_get_main_queue()){
+                        if(self.singleLyricsTableView != nil) {
+                            self.singleLyricsTableView.reloadData()
+                        }
+                    }
                     return
                 }
                 self.addLyricsPrompt.hidden = true
@@ -956,6 +816,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, userId: download.editor.userId, lyricsSetId: download.id)
                 
                 self.setUpLyricsArray()
+                dispatch_async(dispatch_get_main_queue()){
+                    if(self.singleLyricsTableView != nil) {
+                        self.singleLyricsTableView.reloadData()
+                    }
+                }
                 
                 if self.canFindLyricsFromCoreData(song) {
                     dispatch_async(dispatch_get_main_queue()){
