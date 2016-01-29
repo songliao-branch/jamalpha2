@@ -1045,6 +1045,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 self.updateFavoriteStatus(nowPlayingMediaItem!)
                 if self.singleLyricsTableView != nil {
                     self.singleLyricsTableView.reloadData()
+                    self.updateSingleLyricsAlpha()
+                    self.updateSingleLyricsPosition(true)
                 }
                 // The following won't run when selected from table
                 // update the progressblockWidth
@@ -1139,6 +1141,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         // use current item's playbackduration to validate nowPlayingItem duration
         // if they are not equal, i.e. not the same song
         self.updateMusicData(demoItem!)
+        if self.singleLyricsTableView != nil {
+            self.singleLyricsTableView.reloadData()
+            self.updateSingleLyricsAlpha()
+            self.updateSingleLyricsPosition(true)
+        }
         
         // The following won't run when selected from table
         // update the progressblockWidth
@@ -2077,6 +2084,36 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else {
             chordBase.hidden = false
         }
+        
+        if ((isChordShown || isTabsShown) && !isLyricsShown) {
+            if (self.chordBase.frame.origin.y <= CGRectGetMaxY(self.topView.frame) + 21){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
+                    self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8
+                    self.chordBase.alpha = 1
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
+                            self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                            }, completion: nil)
+                })
+            }
+        } else if (isLyricsShown) {
+            if (self.chordBase.frame.origin.y > CGRectGetMaxY(self.topView.frame) + 20){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
+                    self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
+                            self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                            }, completion: nil)
+                })
+            }
+        } else if (!isChordShown && !isTabsShown && !isLyricsShown) {
+            self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8
+            self.chordBase.alpha = 0
+        }
+
+        
         if isChordShown == false && isTabsShown == false && isLyricsShown {
             lyricbase.hidden = true
             setUpSingleLyricsView()
@@ -2115,6 +2152,34 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             lyricbase.hidden = true
         }
         
+        if ((isChordShown || isTabsShown) && !isLyricsShown) {
+            if (self.chordBase.frame.origin.y <= CGRectGetMaxY(self.topView.frame) + 21){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
+                    self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8
+                    self.chordBase.alpha = 1
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
+                            self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                            }, completion: nil)
+                })
+            }
+        } else if (isLyricsShown) {
+            if (self.chordBase.frame.origin.y > CGRectGetMaxY(self.topView.frame) + 20){
+                UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
+                    self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
+                    }, completion: {
+                        finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
+                            self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
+                            }, completion: nil)
+                })
+            }
+        } else if (!isChordShown && !isTabsShown && !isLyricsShown) {
+            self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20 + self.view.frame.height/8
+            self.chordBase.alpha = 0
+        }
+        
         if isChordShown == false && isTabsShown == false && isLyricsShown {
             lyricbase.hidden = true
             setUpSingleLyricsView()
@@ -2148,6 +2213,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut , animations: {
                     
                     self.backgroundImageView.transform = CGAffineTransformMakeScale(1,1)
+                    self.chordBase.alpha = 1
                     }, completion: {
                         finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
                             self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
