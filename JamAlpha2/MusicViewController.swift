@@ -541,6 +541,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
   
     // MARK: called from SongViewController action sheets
     func goToArtist(theArtist: String) {
+        self.view.alpha = 1
         for artist in MusicManager.sharedInstance.uniqueArtists {
             if theArtist == artist.artistName {
                 let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
@@ -553,6 +554,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
     
     func goToAlbum(theAlbum: String) {
+        self.view.alpha = 1
         for album in MusicManager.sharedInstance.uniqueAlbums {
             if theAlbum == album.albumTitle {
                 let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
