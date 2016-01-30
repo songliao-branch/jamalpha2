@@ -49,6 +49,8 @@ class SearchAPI: NSObject {
     
     class func searchSong(searchText: String, completion: ((results: [SearchResult]) -> Void)) {
         if searchText.characters.count < 1 {
+            let searchResults = [SearchResult]()
+            completion(results: searchResults)
             return
         }
         musicRequest?.cancel()
@@ -101,6 +103,7 @@ class SearchAPI: NSObject {
 
     class func getBackgroundImageForSong(searchText: String, imageSize: ImageSize, completion: ((image: UIImage) -> Void)) {
         if searchText.characters.count < 1 {
+            completion(image: UIImage(named: "liwengbg")!)
             return
         }
         musicRequest?.cancel()

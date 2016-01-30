@@ -199,6 +199,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     cell.albumCover.image = UIImage(named: "liweng")
                 }
             } else { //web search in section 1
+                if searchResults.isEmpty{
+                    return cell
+                }
                 if let track = searchResults[indexPath.row].trackName {
                     cell.titleLabel.text = track
                 }
