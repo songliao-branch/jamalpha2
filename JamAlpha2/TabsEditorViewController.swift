@@ -1826,6 +1826,12 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     } else {
                         self.musicPlayer.pause()
                     }
+                    if let songVC = self.songViewController {
+                        if songVC.singleLyricsTableView != nil {
+                            songVC.updateSingleLyricsAlpha()
+                            songVC.updateSingleLyricsPosition(false)
+                        }
+                    }
                     self.dismissViewControllerAnimated(true, completion: {
                         completed in
                         if let songVC = self.songViewController {
@@ -1847,6 +1853,12 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     self.avPlayer.pause()
                 } else {
                     self.musicPlayer.pause()
+                }
+                if let songVC = self.songViewController {
+                    if songVC.singleLyricsTableView != nil {
+                        songVC.updateSingleLyricsAlpha()
+                        songVC.updateSingleLyricsPosition(false)
+                    }
                 }
                 self.dismissViewControllerAnimated(true, completion: {
                     completed in
@@ -2161,6 +2173,13 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 
                 CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? demoItem : self.theSong, cloudId: cloudId)
             })
+            
+            if let songVC = self.songViewController {
+                if songVC.singleLyricsTableView != nil {
+                    songVC.updateSingleLyricsAlpha()
+                    songVC.updateSingleLyricsPosition(false)
+                }
+            }
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
