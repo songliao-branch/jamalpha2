@@ -547,6 +547,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
                 artistVC.musicViewController = self
                 artistVC.theArtist = artist
+                self.navigationController?.popToRootViewControllerAnimated(false)
                 self.showViewController(artistVC, sender: self)
                 break
             }
@@ -560,6 +561,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
                 albumVC.musicViewController = self
                 albumVC.theAlbum = album
+                self.navigationController?.popToRootViewControllerAnimated(false)
                 self.showViewController(albumVC, sender: self)
                 break
             }
