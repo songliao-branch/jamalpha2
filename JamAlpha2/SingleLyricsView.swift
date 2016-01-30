@@ -8,6 +8,8 @@
 
 import Foundation
 import UIKit
+import MediaPlayer
+import AVFoundation
 
 extension SongViewController {
     func scrollViewDidScroll(scrollView: UIScrollView) {
@@ -50,35 +52,58 @@ extension SongViewController {
 extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpBackgroundEffect() {
         self.singleLyricsTableView.alpha = 0
+        self.bottomBlurView.alpha = 0
         self.singleLyricsTableView.transform = CGAffineTransformMakeScale(0.95, 0.95)
-        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
+        if (isViewDidAppear) {
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
+                self.backgroundBlurView.alpha = 1
+                if self.lyric.lyric.count > 0 {
+                    self.bottomBlurView.alpha = 1
+                }
+                self.singleLyricsTableView.transform = CGAffineTransformMakeScale(1, 1)
+                }, completion: nil)
+            UIView.animateWithDuration(0.3, delay: 0.1, options: .CurveEaseIn, animations: {
+                self.singleLyricsTableView.alpha = 1
+                }, completion: nil)
+        }else{
             self.backgroundBlurView.alpha = 1
             if self.lyric.lyric.count > 0 {
                 self.bottomBlurView.alpha = 1
             }
-            self.singleLyricsTableView.transform = CGAffineTransformMakeScale(1, 1)
-            }, completion: nil)
-        UIView.animateWithDuration(0.3, delay: 0.1, options: .CurveEaseIn, animations: {
             self.singleLyricsTableView.alpha = 1
-            }, completion: nil)
+        }
     }
     
     func releaseBackgroundEffect() {
         if ( (isChordShown || isTabsShown ) && isLyricsShown){
             self.chordBase.alpha = 0
-            UIView.animateWithDuration(0.2, delay: 0.1, options: [.CurveEaseIn, .AllowUserInteraction], animations: {
+            if (isViewDidAppear) {
+                UIView.animateWithDuration(0.2, delay: 0.1, options: [.CurveEaseIn, .AllowUserInteraction], animations: {
+                    self.chordBase.alpha = 1
+                    }, completion: nil)
+            }else{
                 self.chordBase.alpha = 1
-                }, completion: nil)
+            }
         }
         self.singleLyricsTableView.transform = CGAffineTransformMakeScale(1, 1)
-        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+        if (isViewDidAppear) {
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.backgroundBlurView.alpha = 0
+                if self.lyric.lyric.count > 0 {
+                    self.bottomBlurView.alpha = 0
+                }
+                self.singleLyricsTableView.alpha = 0
+                self.singleLyricsTableView.transform = CGAffineTransformMakeScale(0.95, 0.95)
+                }, completion: nil)
+        }else{
             self.backgroundBlurView.alpha = 0
             if self.lyric.lyric.count > 0 {
                 self.bottomBlurView.alpha = 0
             }
             self.singleLyricsTableView.alpha = 0
             self.singleLyricsTableView.transform = CGAffineTransformMakeScale(0.95, 0.95)
-            }, completion: nil)
+        }
+        
         stopDisapperTimer()
         if self.lyricsArray.count > 0 {
             self.hideTempScrollLyricsView()
@@ -105,6 +130,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }
             if (self.singleLyricsTableView != nil){
                 self.singleLyricsTableView.scrollEnabled = true
+                self.bottomBlurView.alpha = 1
             }
         } else {
             if (self.singleLyricsTableView != nil){
@@ -114,6 +140,10 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                 lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + contentOff))
             }
             lyricsArray.append(("You don't have any lyric, please add it in Lyrics Editor or select one from others", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + contentOff))
+            if (self.singleLyricsTableView != nil){
+                singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
+            }
+            self.bottomBlurView.alpha = 0
         }
     }
     
@@ -169,6 +199,8 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             isPlaying = avPlayer.rate > 0
         }else{
             if(self.player != nil){
+                MusicManager.sharedInstance.player.nowPlayingItem = MPMusicPlayerController().nowPlayingItem
+                self.player.nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
                 self.player.currentPlaybackTime = tempScrollTime
                 isPlaying = self.player.playbackState == .Playing
             }

@@ -757,6 +757,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             dispatch_async(dispatch_get_main_queue()){
                 if(self.singleLyricsTableView != nil) {
                     self.singleLyricsTableView.reloadData()
+                    self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
                 }
             }
             return true
@@ -811,6 +812,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     dispatch_async(dispatch_get_main_queue()){
                         if(self.singleLyricsTableView != nil) {
                             self.singleLyricsTableView.reloadData()
+                            self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
                         }
                     }
                     return
@@ -827,6 +829,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 dispatch_async(dispatch_get_main_queue()){
                     if(self.singleLyricsTableView != nil) {
                         self.singleLyricsTableView.reloadData()
+                        self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
                     }
                 }
                 
@@ -1523,7 +1526,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 
                 KGLOBAL_defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
                 KGLOBAL_defaultProgressBar.progressTintColor = UIColor.whiteColor()
-                self.progressBlockContainer.insertSubview( KGLOBAL_defaultProgressBar , aboveSubview: KGLOBAL_progressBlock)
+                if (KGLOBAL_progressBlock == nil){
+                    self.progressBlockContainer.addSubview(KGLOBAL_defaultProgressBar)
+                }else{
+                    self.progressBlockContainer.insertSubview( KGLOBAL_defaultProgressBar , aboveSubview: KGLOBAL_progressBlock)
+                }
+                
             }
         }
         
