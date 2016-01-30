@@ -352,7 +352,11 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         let cell: SingleLyricsTableViewCell = self.singleLyricsTableView.dequeueReusableCellWithIdentifier("cell") as! SingleLyricsTableViewCell
         cell.backgroundColor = UIColor.clearColor()
         cell.selectionStyle = .None
-        cell.updateLyricsLabel(self.lyricsArray[indexPath.item].str, labelAlpha: self.lyricsArray[indexPath.item].alpha)
+        if (indexPath.item < self.lyricsArray.count){
+            cell.updateLyricsLabel(self.lyricsArray[indexPath.item].str, labelAlpha: self.lyricsArray[indexPath.item].alpha)
+        }else{
+            cell.updateLyricsLabel("", labelAlpha: 0.5)
+        }
         return cell
     }
     
