@@ -26,14 +26,8 @@ class DownloadedLyricsSet: NSObject {
     var times = [Float]()
 
     //only needed when in buck list for a user 
-    var song_id = -1
-    var title = ""
-    var artist = ""
-    var duration: Float = 0
-    
-    var titleAliases = ""
-    var artistAliases = ""
-    
+    var song: SearchResult!
+
     init(id: Int, lyricsPreview: String, numberOfLines: Int, votesScore: Int, voteStatus: String, editor: Editor, lastEdited: String) {
         self.id = id
         self.lyricsPreview = lyricsPreview

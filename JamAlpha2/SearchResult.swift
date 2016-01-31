@@ -9,6 +9,31 @@
 import UIKit
 import MediaPlayer
 
+extension SearchResult: Findable {
+    func getTitle() -> String {
+        return self.trackName
+    }
+    func getArtist() -> String {
+        return artistName
+    }
+    
+    func getAlbum() -> String {
+        return collectionName
+    }
+    
+    func getDuration() -> Float {
+        return trackTimeMillis
+    }
+    
+    func getURL() -> AnyObject? {
+        return nil
+    }
+    
+    func getArtWork() -> MPMediaItemArtwork? {
+        return nil
+    }
+}
+
 class SearchResult: NSObject {
     
     var songId = 0 //jamApi's song id, used to match core data song database
@@ -28,6 +53,12 @@ class SearchResult: NSObject {
     
     override init() {
         
+    }
+    
+    init(title: String, artist: String, duration: Float){
+        self.trackName = title
+        self.artistName = artist
+        self.trackTimeMillis = duration
     }
     
     init(songId: Int, trackId: Int, title: String, artist: String, duration: Float, previewUrl: String, trackViewUrl: String, artwork: String) {
@@ -50,6 +81,7 @@ class SearchResult: NSObject {
                 }
                 return false
             }.first
+        } else {//TODO: songId might not have retrieved yet, find songId in cloud
             
         }
     }

@@ -67,31 +67,6 @@ extension MPMediaItem: Findable {
     }
 }
 
-extension SearchResult: Findable {
-    func getTitle() -> String {
-        return self.trackName
-    }
-    func getArtist() -> String {
-        return artistName
-    }
-    
-    func getAlbum() -> String {
-        return collectionName
-    }
-    
-    func getDuration() -> Float {
-        return trackTimeMillis
-    }
-    
-    func getURL() -> AnyObject? {
-        return nil
-    }
-    
-    func getArtWork() -> MPMediaItemArtwork? {
-        return nil
-    }
-}
-
 extension AVPlayerItem: Findable {
     func getTitle() -> String {
         if let title = self.asset.commonMetadata[0].stringValue {
@@ -143,33 +118,6 @@ extension AVPlayerItem: Findable {
         return nil
     }
 }
-
-extension LocalSong: Findable {
-    func getTitle() -> String {
-        return title
-    }
-    
-    func getArtist() -> String {
-        return artist
-    }
-    
-    func getAlbum() -> String {
-        return ""
-    }
-    
-    func getDuration() -> Float {
-        return self.duration
-    }
-    
-    func getURL() -> AnyObject? {
-        return nil
-    }
-    
-    func getArtWork() -> MPMediaItemArtwork? {
-        return nil
-    }
-}
-
 
 class CoreDataManager: NSObject {
     
@@ -545,9 +493,7 @@ class CoreDataManager: NSObject {
             t.times = theTimes
             t.visible = temp.visible
             //used to display in the table
-            t.title = temp.song.title
-            t.artist = temp.song.artist
-            t.duration = Float(temp.song.playbackDuration)
+            t.song = SearchResult(title: temp.song.title, artist: temp.song.artist, duration: Float(temp.song.playbackDuration))
             
             sets.append(t)
         }
@@ -578,9 +524,7 @@ class CoreDataManager: NSObject {
             l.times = times
             
             //used to display in the table
-            l.title = temp.song.title
-            l.artist = temp.song.artist
-            l.duration = Float(temp.song.playbackDuration)
+            l.song = SearchResult(title: temp.song.title, artist: temp.song.artist, duration: Float(temp.song.playbackDuration))
             sets.append(l)
         }
         return sets
@@ -698,14 +642,14 @@ class CoreDataManager: NSObject {
         return false
     }
     
-    class func getFavorites() -> [LocalSong] {
+    class func getFavorites() -> [SearchResult] {
         let favorites = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: NSPredicate(format: " isFavorited == true"), managedObjectContext: moc) as! [Song]
-        var localSongs = [LocalSong]()
+        var songs = [SearchResult]()
         for fav in favorites {
-            let song = LocalSong(title: fav.title, artist: fav.artist, duration: Float(fav.playbackDuration))
-            localSongs.append(song)
+            let song = SearchResult(title: fav.title, artist: fav.artist, duration: Float(fav.playbackDuration))
+            songs.append(song)
         }
-        return localSongs
+        return songs
     }
     
     class func setSongId(item: Findable, id: Int) {

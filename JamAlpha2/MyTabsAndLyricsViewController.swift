@@ -18,7 +18,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     let cellHeight: CGFloat = 60
   
-    var songs = [LocalSong]()//for showing title and artist for the tableview
+    var songs = [SearchResult]()//for showing title and artist for the tableview
     
     var allTabsSets = [DownloadedTabsSet]()
     var allLyricsSets = [DownloadedLyricsSet]()
@@ -58,18 +58,19 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     //also called when a set is deleted
     func loadData() {
-        songs = [LocalSong]()
+        songs = [SearchResult]()
         if isViewingTabs {
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             for t in self.allTabsSets {
-                let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
+
+                let song = SearchResult(title: t.song.getTitle(), artist: t.song.getArtist(), duration: t.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
         } else {
             self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
             for l in self.allLyricsSets {
-                let song = LocalSong(title: l.title, artist: l.artist, duration: l.duration)
+                let song = SearchResult(title: l.song.getTitle(), artist: l.song.getArtist(), duration: l.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
@@ -106,7 +107,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func goToEditor(index: Int) {
         let song = songs[index]
         guard let item = song.mediaItem else {
-            print("no media item found for \(song.title)")
+            print("no media item found for \(song.getTitle())")
             return
         }
         
@@ -157,8 +158,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
         cell.numberLabel.text = "\(indexPath.row + 1)"
 
-        cell.titleLabel.text = song.title
-        cell.subtitleLabel.text = song.artist
+        cell.titleLabel.text = song.getTitle()
+        cell.subtitleLabel.text = song.getArtist()
         
         cell.optionsButton.tag = indexPath.row
         cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
@@ -249,7 +250,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             
 
             
-        }  else if song.artist == "Alex Lisell" { //if demo song
+        }  else if song.getArtist() == "Alex Lisell" { //if demo song
             
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
@@ -272,28 +273,28 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
             
-            song.findSearchResult( {
-                result in
-                
-                cell.spinner.stopAnimating()
-                cell.spinner.hidden = true
-                cell.searchIcon.hidden = false
-                
-                guard let song = result else {
-                    
-                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
-                    return
-                }
-                
-                songVC.isSongNeedPurchase = true
-                songVC.songNeedPurchase = song
-                songVC.reloadBackgroundImageAfterSearch(song)
-                songVC.transitioningDelegate = self.animator
-                self.animator!.attachToViewController(songVC)
-                self.presentViewController(songVC, animated: true, completion: nil)
-                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
-                
-            })
+//            song.findSearchResult( {
+//                result in
+//                
+//                cell.spinner.stopAnimating()
+//                cell.spinner.hidden = true
+//                cell.searchIcon.hidden = false
+//                
+//                guard let song = result else {
+//                    
+//                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
+//                    return
+//                }
+//                
+//                songVC.isSongNeedPurchase = true
+//                songVC.songNeedPurchase = song
+//                songVC.reloadBackgroundImageAfterSearch(song)
+//                songVC.transitioningDelegate = self.animator
+//                self.animator!.attachToViewController(songVC)
+//                self.presentViewController(songVC, animated: true, completion: nil)
+//                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+//                
+//            })
         }
     }
 

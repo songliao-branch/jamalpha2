@@ -13,7 +13,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     
     @IBOutlet weak var tableView: UITableView!
     
-    var songs = [LocalSong]()
+    var songs = [SearchResult]()
     var animator: CustomTransitionAnimation?
     
     override func viewDidLoad() {
@@ -58,8 +58,8 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         let cell = tableView.dequeueReusableCellWithIdentifier("MyFavoritesCell", forIndexPath: indexPath) as! MyFavoritesCell
         let song = songs[indexPath.row]
         cell.numberLabel.text = "\(indexPath.row+1)"
-        cell.titleLabel.text = song.title
-        cell.subtitleLabel.text = song.artist
+        cell.titleLabel.text = song.getTitle()
+        cell.subtitleLabel.text = song.getArtist()
         
         cell.spinner.hidden = true
         if let _ = song.mediaItem {
@@ -143,7 +143,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 self.showConnectInternet(tableView)
             }
             
-        }   else if song.artist == "Alex Lisell" { //if demo song
+        }   else if song.getArtist() == "Alex Lisell" { //if demo song
             
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
@@ -166,28 +166,28 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
             
-            song.findSearchResult( {
-                result in
-                
-                cell.spinner.stopAnimating()
-                cell.spinner.hidden = true
-                cell.searchIcon.hidden = false
-                
-                guard let song = result else {
-                    
-                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
-                    return
-                }
-                
-                songVC.isSongNeedPurchase = true
-                songVC.songNeedPurchase = song
-                songVC.reloadBackgroundImageAfterSearch(song)
-                songVC.transitioningDelegate = self.animator
-                self.animator!.attachToViewController(songVC)
-                self.presentViewController(songVC, animated: true, completion: nil)
-                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
-                
-            })
+//            song.findSearchResult( {
+//                result in
+//                
+//                cell.spinner.stopAnimating()
+//                cell.spinner.hidden = true
+//                cell.searchIcon.hidden = false
+//                
+//                guard let song = result else {
+//                    
+//                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
+//                    return
+//                }
+//                
+//                songVC.isSongNeedPurchase = true
+//                songVC.songNeedPurchase = song
+//                songVC.reloadBackgroundImageAfterSearch(song)
+//                songVC.transitioningDelegate = self.animator
+//                self.animator!.attachToViewController(songVC)
+//                self.presentViewController(songVC, animated: true, completion: nil)
+//                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+//                
+//            })
         }
 
     }
