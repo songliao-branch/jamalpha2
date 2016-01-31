@@ -259,7 +259,6 @@ class CoreDataManager: NSObject {
 
     class func getSongWaveFormImage(item: Findable) -> NSData? {
         if let matchedSong = findSong(item) {
-           // print("sound wave image found for song")
             return matchedSong.soundwaveImage
         }
         
@@ -278,7 +277,6 @@ class CoreDataManager: NSObject {
     
     class func getCoverImage(item: Findable) -> UIImage? {
         if let matchedSong = findSong(item) {
-            // print("sound wave image found for song")
             return   UIImage(data: matchedSong.albumCover)
         }
         
@@ -342,7 +340,6 @@ class CoreDataManager: NSObject {
     class func getLyrics(item: Findable, fetchingUsers: Bool) -> (Lyric, Int) { //return lyrics count and lyrics set id
         
         if let matchedSong = findSong(item) {
-            print("has \(matchedSong.lyricsSets.count) set of lyrics")
         
             let sets = matchedSong.lyricsSets.allObjects as! [LyricsSet]
             

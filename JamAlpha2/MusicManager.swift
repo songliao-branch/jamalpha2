@@ -36,7 +36,6 @@ class MusicManager: NSObject {
     var lastPlayingItem: MPMediaItem!
     var lastPlayingTime: NSTimeInterval!
 
-    
     class var sharedInstance: MusicManager {
         struct Static {
             static var onceToken: dispatch_once_t = 0
@@ -142,32 +141,34 @@ class MusicManager: NSObject {
     }
     
     func initializePlayer(){
-        print("\(_TAG) Initialize Player")
-        player = MPMusicPlayerController.systemMusicPlayer()
-        
         //save current playing time and time and reset player after it is being stopped
         var lastPlayingItem: MPMediaItem?
         var lastPlayTime: NSTimeInterval = 0
-        var isPlaying = false
-        if let nowPlayingItem = player.nowPlayingItem {
+        var rate:Float = 0
+        if let nowPlayingItem = MPMusicPlayerController.systemMusicPlayer().nowPlayingItem {
             lastPlayingItem = nowPlayingItem
-            lastPlayTime = player.currentPlaybackTime
-            isPlaying = (player.playbackState == .Playing)
+            lastPlayTime = MPMusicPlayerController.systemMusicPlayer().currentPlaybackTime
+            rate = MPMusicPlayerController.systemMusicPlayer().currentPlaybackRate
         }
         
-        player.stop()
+        MPMusicPlayerController.systemMusicPlayer().nowPlayingItem = nil
+        player = MPMusicPlayerController.systemMusicPlayer()
         player.repeatMode = .All
         player.shuffleMode = .Off
         
-        self.setPlayerQueue(uniqueSongs)
-        
         if let lastItem = lastPlayingItem {
+            self.setPlayerQueue([lastPlayingItem!])
             player.nowPlayingItem = lastItem
             player.currentPlaybackTime = lastPlayTime + 0.32
+            player.prepareToPlay()
             
-            if isPlaying {
-                player.play()
+            if rate > 0 {
+                player.currentPlaybackRate = rate
+            }else{
+                player.pause()
             }
+        }else{
+            self.setPlayerQueue(uniqueSongs)
         }
         
         //initialize AVQueuePlayer
@@ -202,15 +203,10 @@ class MusicManager: NSObject {
     func setPlayerQueue(collection: [MPMediaItem]){
 
         if lastPlayerQueue == collection { // if we are the same queue
-           print("\(_TAG) same collection")
             queueChanged = false
         } else { //if different queue, means we are getting a new collection, reset the player queue
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
-            print("\(_TAG) setting a new queue")
-            
-            print(MPMediaItemPropertyReleaseDate)
-            
             queueChanged = true
             return
         }
@@ -219,8 +215,6 @@ class MusicManager: NSObject {
         if(!queueChanged && player.nowPlayingItem == nil){
             player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
             lastPlayerQueue = collection
-            print("Coming from Music app with no playing item \(_TAG) setting a new queue")
-        
             queueChanged = true
             KGLOBAL_isNeedToCheckIndex = false
             return
@@ -237,8 +231,6 @@ class MusicManager: NSObject {
             if (player.nowPlayingItem == nil) || (lastPlayerQueue.indexOf(player.nowPlayingItem!) != nil ? Int(lastPlayerQueue.indexOf(player.nowPlayingItem!)!) : -1) != player.indexOfNowPlayingItem {
                 player.setQueueWithItemCollection(MPMediaItemCollection(items: collection))
                 lastPlayerQueue = collection
-                print("Queue is different,  now reset queue")
-                
                 queueChanged = true
             }
             KGLOBAL_isNeedToCheckIndex = false
@@ -252,7 +244,6 @@ class MusicManager: NSObject {
         if player.repeatMode == .One && player.shuffleMode == .Off {
             player.repeatMode = .All  //暂时让他变成列表循环
             if player.nowPlayingItem != lastPlayerQueue[selectedIndex] || player.nowPlayingItem == nil {
-                print("\(_TAG)  ")
                 player.nowPlayingItem = lastPlayerQueue[selectedIndex]
             }
             player.repeatMode = .One
@@ -266,9 +257,9 @@ class MusicManager: NSObject {
             } else {
                 if queueChanged { // if we selected the same song from a different queue this time
                     let lastPlaybackTime = player.currentPlaybackTime
+                    player.nowPlayingItem = nil
                     player.prepareToPlay() // set current playing index to zero
                     player.nowPlayingItem = lastPlayerQueue[selectedIndex] // this has a really short time lag
-                    
                     player.currentPlaybackTime = lastPlaybackTime + 0.32
                 }
             }
@@ -310,7 +301,9 @@ class MusicManager: NSObject {
         albumQuery.groupingType = MPMediaGrouping.Album
         for album in albumQuery.collections!{
             let representativeItem = album.representativeItem!
-            
+            if (representativeItem.getArtist().isEmpty){
+                continue
+            }
             //there is no song shorter than 30 seconds
             if representativeItem.playbackDuration < 30 { continue }
             

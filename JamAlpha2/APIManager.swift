@@ -417,7 +417,6 @@ class APIManager: NSObject {
         let parameters = ["nickname": nickname]
         
         Alamofire.request(.PUT, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)" , parameters: parameters).responseJSON { response in
-            print(response)
             switch response.result {
             case .Success:
                 completion(completed: true)
@@ -537,7 +536,6 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
                     var songs = [SearchResult]()
                     for song in json["users"].array! {
                         let s = SearchResult(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
@@ -577,12 +575,10 @@ class APIManager: NSObject {
         let parameters = ["soundwave_url": url]
         
         Alamofire.request(.PUT, jamBaseURL + "/songs/\(songId)", parameters: parameters).responseJSON { response in
-
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    print(json)
                     print("update soundwave url success")
                 }
             case .Failure(let error):
@@ -593,7 +589,6 @@ class APIManager: NSObject {
     
     class func getTopSongs(completion: (( songs: [SearchResult]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
- 
             switch response.result {
             case .Success:
                 if let data = response.result.value {

@@ -449,9 +449,6 @@ class MeLoginOrSignupViewController: UIViewController{
                                 userProfileVC.refreshUserImage()
                             }
 
-                            
-                            print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
-
                             //TODO: maybe put this in a background thread?
                             APIManager.downloadCurrentUserTabsAndLyrics({
                                 tabsSets, lyricsSets in
@@ -484,8 +481,6 @@ class MeLoginOrSignupViewController: UIViewController{
                                     
                                     CoreDataManager.saveLyrics(song, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id, lastEditedDate: set.lastEdited)
                                 }
-                                
-                                print("user has \(tabsSets.count) tabs and \(lyricsSets.count) lyrics")
                             })
                             
                             //mark all the user's favorite songs in the core data
@@ -547,8 +542,6 @@ class MeLoginOrSignupViewController: UIViewController{
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
                 (connection, result, error) -> Void in
                 if error == nil {
-                
-                    print(result)
                     let facebookEmail = result.valueForKey("email") as! String
                     let facebookName  = result.valueForKey("name") as! String
                     

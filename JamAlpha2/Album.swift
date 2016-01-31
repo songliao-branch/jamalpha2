@@ -23,9 +23,9 @@ class Album: NSObject, Sortable{
      
         self.representativeItem = theItem
         self.albumTitle = representativeItem.albumTitle!
-        self.artistName = representativeItem.artist!
+        self.artistName = representativeItem.getArtist()
         
-        if let cover = representativeItem.artwork {
+        if let cover = representativeItem.getArtWork()  {
             self.coverImage = cover
         }
         

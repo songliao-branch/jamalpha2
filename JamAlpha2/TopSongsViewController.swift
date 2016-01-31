@@ -17,16 +17,27 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     var songs = [SearchResult]()
     var animator: CustomTransitionAnimation?
+    var isSeekingPlayerState = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         createTransitionAnimation()
         setUpNavigationBar()
+        setUpRefreshControl()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         loadData()
+    }
+    
+    func setUpRefreshControl() {
+        topSongsTable?.addPullToRefresh({ [weak self] in
+            // some code
+            sleep(1)
+            self!.loadData()
+            
+            })
     }
     
     func createTransitionAnimation(){
@@ -96,7 +107,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         
         let song = songs[indexPath.row]
         
@@ -113,7 +124,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             
             if(item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    while (isSeekingPlayerState){
+                    while (self.isSeekingPlayerState){
                         
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
@@ -121,7 +132,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -136,7 +147,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                                         tableView.reloadData()
                                     })
                                 }
-                                isSeekingPlayerState = false
+                                self.isSeekingPlayerState = false
                                 break
                             }
                         }
@@ -166,6 +177,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             let cell = tableView.cellForRowAtIndexPath(indexPath) as! TopSongsCell
             
             cell.searchIcon.hidden = true
+
             
             songVC.isSongNeedPurchase = true
             songVC.songNeedPurchase = song
@@ -174,7 +186,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
-
         }
     }
+
 }

@@ -13,6 +13,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     var theArtist:Artist!
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
+    var isSeekingPlayerState = false
     
     @IBOutlet weak var artistTable: UITableView!
     
@@ -49,17 +50,12 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         synced(self) {
             let player = MusicManager.sharedInstance.player
             if player.repeatMode == .One {
-                print("\(player.nowPlayingItem!.title) is repeating")
                 return
             }
             
             if player.nowPlayingItem != nil {
-                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
-                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                        self.artistTable.reloadData()
-                    }
-                }else{
-                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                    if !self.isSeekingPlayerState {
                         self.artistTable.reloadData()
                     }
                 }
@@ -172,7 +168,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     // when selecting section 2 2nd song, we iterate through all previous albums tracks
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         KGLOBAL_init_queue.suspended = true
         
         let albumIndex = indexPath.section
@@ -193,14 +189,14 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         ///////////////////////////////////////////
         if((artistAllSongs[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                while (isSeekingPlayerState){
+                while (self.isSeekingPlayerState){
                     
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
                         KGLOBAL_nowView.stop()
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)                        }
-                        isSeekingPlayerState = false
+                        self.isSeekingPlayerState = false
                         break
                     }
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -216,7 +212,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                                     tableView.reloadData()
                                 })
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                     }

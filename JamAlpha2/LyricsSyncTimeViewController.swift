@@ -81,6 +81,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     
     var playButtonImageView: UIImageView = UIImageView()
     
+    var defaultProgressBar:UIProgressView!
     
     // MARK: tutorial
     var tutorialScrollView: UIScrollView!
@@ -112,8 +113,19 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         } else {
             self.addLyricsToEditorView(theSong)
         }
+        
+        self.lyricsTableView.preservesSuperviewLayoutMargins = false
+        self.lyricsTableView.separatorInset = UIEdgeInsetsZero
+        self.lyricsTableView.layoutMargins = UIEdgeInsetsZero
     }
-
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        if (self.defaultProgressBar != nil) {
+            self.defaultProgressBar.removeFromSuperview()
+            self.defaultProgressBar = nil
+        }
+    }
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
@@ -124,6 +136,18 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
         return UIStatusBarStyle.LightContent;
+    }
+    
+    func setupDefaultProgressBar(){
+        dispatch_async(dispatch_get_main_queue()) {
+            self.defaultProgressBar = UIProgressView(frame: CGRectMake(0,self.progressBlockContainer.frame.height - 36,self.view.width,10))
+            self.defaultProgressBar.progress = 1.0
+            self.defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
+            self.defaultProgressBar.progressTintColor = UIColor.whiteColor()
+            self.defaultProgressBar.alpha = 0.5
+            self.progressBlockContainer.insertSubview(  self.defaultProgressBar , aboveSubview: self.progressBlock)
+        }
+        
     }
     
     
@@ -152,12 +176,18 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             }
             playButtonImageView.hidden = true
             self.progressBlock.alpha = 1
+            if (self.defaultProgressBar != nil){
+                self.defaultProgressBar.alpha = 1
+            }
         } else if musicPlayer.playbackState == .Paused {
             isPlaying = false
             playButtonImageView.hidden = false
             updateTimer.invalidate()
             updateTimer = NSTimer()
             self.progressBlock.alpha = 0.5
+            if (self.defaultProgressBar != nil){
+                self.defaultProgressBar.alpha = 0.5
+            }
         }
     }
     
@@ -286,10 +316,15 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         
         if let soundWaveData = CoreDataManager.getSongWaveFormImage(theSong) {
             progressBlock.setWaveFormFromData(soundWaveData)
+        }else{
+            self.setupDefaultProgressBar()
         }
         
         self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
         self.progressBlock!.alpha = 0.5
+        if (self.defaultProgressBar != nil){
+            self.defaultProgressBar.alpha = 0.5
+        }
         progressBlockContainer.addSubview(self.progressBlock)
         
         tapGesture = UITapGestureRecognizer(target: self, action: "playPause")
@@ -440,6 +475,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                 self.progressBlock!.alpha = 0.5
+                if (self.defaultProgressBar != nil){
+                    self.defaultProgressBar.alpha = 0.5
+                }
                 }, completion: nil)
             if isDemoSong {
                 self.avPlayer.pause()
@@ -480,6 +518,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 self.progressBlock!.alpha = 1.0
+                if (self.defaultProgressBar != nil){
+                    self.defaultProgressBar.alpha = 1
+                }
                 }, completion: { finished in
                     if self.isDemoSong {
                         self.avPlayer.play()
@@ -537,6 +578,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
                 self.progressBlock.frame.origin.x = 0.5 * self.view.frame.size.width - persent * (CGFloat(theSong.getDuration() * Float(progressWidthMultiplier)))
                 
                 self.currentTimeLabel.text = TimeNumber(time: Float(self.currentTime)).toDisplayString()
+                if(self.defaultProgressBar != nil){
+                    self.defaultProgressBar.progress = 1 - Float(persent)
+                }
             }
         }
     }
@@ -553,6 +597,10 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             startTime.setTime(0)
             self.currentTime = 0
             self.progressBlock.alpha = 0.5
+            if (self.defaultProgressBar != nil){
+                self.defaultProgressBar.alpha = 0.5
+            }
+            
             if isDemoSong {
                 avPlayer.currentTime = currentTime
             }else{
@@ -560,11 +608,15 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             }
         }
         if !isPanning {
+            let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
             if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {
                 startTime.addTime(Int(100 / stepPerSecond))
                 self.currentTime = NSTimeInterval(startTime.toDecimalNumer())-0.01
+                if (tempPlaytime.isNaN || tempPlaytime == 0){
+                    startTime.setTime(0)
+                    self.currentTime = 0
+                }
             } else {
-                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                     self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
@@ -588,6 +640,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             self.progressBlock.setProgress(newProgressPosition)
         }
         self.progressBlock.frame.origin.x = newOriginX
+        if(self.defaultProgressBar != nil){
+            self.defaultProgressBar.progress = 1 - Float(newProgressPosition)
+        }
     }
 
     func refreshTimeLabel(time: NSTimeInterval) {
@@ -767,6 +822,15 @@ extension LyricsSyncViewController {
         }
         
         //check if lyricsSet id is bigger than 0, if so, means this lyrics has been saved to the cloud, then we use same lyricsSetId, otherwise if less than one, it means it's new
+        
+        if (lyricsTimesTuple.count < 3) {
+            let alertController = UIAlertController(title: nil, message: "Please add at least THREE single lines into your lyric", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)
+            return
+        }
+
+        
         let savedLyricsSetId = CoreDataManager.getLyrics(theSong, fetchingUsers: true).1
         
         CoreDataManager.saveLyrics(theSong, lyrics: addedLyricsWithTime.lyrics, times: times, userId: Int(CoreDataManager.getCurrentUser()!.id), lyricsSetId: savedLyricsSetId > 0 ? savedLyricsSetId: kLocalSetId ,lastEditedDate: NSDate())
@@ -833,8 +897,6 @@ extension LyricsSyncViewController {
             var time: [NSTimeInterval] = [NSTimeInterval]()
             var timeAdded: [Bool] = [Bool]()
             for line in lyric.lyric {
-                print(line.str)
-                print(self.lyricsOrganizedArray[i])
                 if line.str == self.lyricsOrganizedArray[i] {
                     lyrics.append(line.str)
                     time.append(NSTimeInterval(line.time.toDecimalNumer()))

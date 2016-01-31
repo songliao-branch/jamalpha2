@@ -41,24 +41,25 @@ class AboutViewController: UIViewController, UITextFieldDelegate {
         let versionLabel: UILabel = UILabel()
         versionLabel.frame = CGRectMake((self.viewWidth - imageWidth) / 2, 40 + imageWidth, imageWidth, 44)
         versionLabel.textAlignment = NSTextAlignment.Center
-        versionLabel.text = "Version " + VERSION_NUMBER
+        versionLabel.font = UIFont.systemFontOfSize(15)
+        versionLabel.text = "Twistjam " + VERSION_NUMBER
         self.view.addSubview(versionLabel)
     }
     
     func setUpCopyrightView() {
         let imageWidth: CGFloat = 200
         
-        let string = "Copyright \(COPYRIGHTYEAR) Twistjam. All Rights Reserved"
-        let text = NSMutableAttributedString(string: string, attributes: [NSFontAttributeName: UIFont.systemFontOfSize(16)])
-        text.addAttribute(NSLinkAttributeName, value: "https://www.twistjam.com", range: NSMakeRange(15, 8))
-        text.addAttribute(NSLinkAttributeName, value: "https://www.twistjam.com", range: NSMakeRange(29, 6))
+        let string = "Copyright \(COPYRIGHTYEAR) Twistjam™. All Rights Reserved."
+        let text = NSMutableAttributedString(string: string, attributes: [NSFontAttributeName: UIFont.systemFontOfSize(12)])
+        text.addAttribute(NSLinkAttributeName, value: "https://www.twistjam.com", range: NSMakeRange(20, 9))
+        text.addAttribute(NSLinkAttributeName, value: "https://www.twistjam.com", range: NSMakeRange(35, 6))
         
         let copyrightLabel: UILabel = UILabel()
         copyrightLabel.userInteractionEnabled = true
         let tapOnLabel: UITapGestureRecognizer = UITapGestureRecognizer()
         tapOnLabel.addTarget(self, action: "handleTapGesture:")
         copyrightLabel.addGestureRecognizer(tapOnLabel)
-        copyrightLabel.frame = CGRectMake((self.viewWidth - imageWidth) / 2, 80 + imageWidth, imageWidth, 88)
+        copyrightLabel.frame = CGRectMake((self.viewWidth - imageWidth) / 2, self.view.frame.size.height - 88 - 64 - 80, imageWidth , 88)
         copyrightLabel.textAlignment = NSTextAlignment.Center
         copyrightLabel.numberOfLines = 2
         copyrightLabel.lineBreakMode = NSLineBreakMode.ByWordWrapping
