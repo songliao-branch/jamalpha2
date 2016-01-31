@@ -1258,11 +1258,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         let playbackState = player.playbackState
         if playbackState == .Paused {
-            stopTimer()
             if singleLyricsTableView != nil && self.lyric.lyric.count > 0 {
                 self.stopDisapperTimer()
                 showTempScrollLyricsView()
+                self.isScrolling = false
             }
+            stopTimer()
             //fade down the soundwave
             UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
