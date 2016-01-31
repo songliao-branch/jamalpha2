@@ -25,10 +25,12 @@ class LocalSong: NSObject {
         self.duration = duration
     }
     
+    
     func findMediaItem() {
+        //use a simple match first, make it faster, this is acceptable
         self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
             item in
-            if  CoreDataManager.getTitleAliases(self).lowercaseString.containsString(item.getTitle().lowercaseString) && CoreDataManager.getArtistAliases(self).lowercaseString.containsString(item.getArtist().lowercaseString) && abs(self.duration-item.getDuration()) < 2 {
+            if title.lowercaseString == item.getTitle().lowercaseString && artist.lowercaseString == item.getArtist().lowercaseString && abs(duration - item.getDuration()) < 2 {
                 return true
             }
             return false

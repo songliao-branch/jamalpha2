@@ -276,6 +276,19 @@ class CoreDataManager: NSObject {
         }
     }
     
+    //all songs with an ID are local songs with MPMediaItem
+    class func findSongById(songId: Int) -> Song? {
+        let predicate: NSPredicate = NSPredicate(format: "id == '\(songId)'")
+        
+        let results = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: predicate, managedObjectContext: moc)
+        
+        if results.count == 0 {
+            return nil
+        } else {
+            return results.lastObject! as? Song
+        }
+    }
+    
     class func initializeSongToDatabase(item: Findable) {
         // if we don't have the song in the database
         if findSong(item) == nil {
@@ -288,28 +301,6 @@ class CoreDataManager: NSObject {
         }
     }
     
-    class func saveAliases(item: Findable, titleAliases: String, artistAliases: String) {
-        if let matchedSong = findSong(item) {
-            matchedSong.titleAliases = titleAliases
-            matchedSong.artistAliases = artistAliases
-            SwiftCoreDataHelper.saveManagedObjectContext(moc)
-        }
-    }
-    
-    class func getTitleAliases(item: Findable) -> String {
-        if let matchedSong = findSong(item) {
-           return matchedSong.titleAliases
-        }
-        return item.getTitle()
-    }
-
-    
-    class func getArtistAliases(item: Findable) -> String {
-        if let matchedSong = findSong(item) {
-            return matchedSong.artistAliases
-        }
-        return item.getArtist()
-    }
     // MARK: save, retrieve soundwaves
     class func saveSoundWave(item: Findable, soundwaveImage: NSData) {
         if let matchedSong = findSong(item) {
@@ -731,6 +722,8 @@ class CoreDataManager: NSObject {
         }
         return 0
     }
+    
+    
 }
 
 

@@ -608,8 +608,8 @@ class APIManager: NSObject {
                     var results = [SearchResult]()
                     for song in json["songs"].array! {
                         
-                        let result = SearchResult(id: song["track_id"].int!, title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!, previewUrl: song["preview_url"].string!, trackViewUrl: song["store_link"].string!, artwork: song["artwork_url"].string!, titleAliases: song["title_aliases"].string!, artistAliases: song["artist_aliases"].string!)
-                        
+                        let result = SearchResult(songId: song["id"].int!, trackId: song["track_id"].int!, title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!, previewUrl: song["preview_url"].string!, trackViewUrl: song["store_link"].string!, artwork: song["artwork_url"].string!)
+
                         results.append(result)
                     }
                     completion(songs: results)

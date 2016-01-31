@@ -24,36 +24,34 @@ class SearchResult: NSObject {
     
     var image: UIImage?
     
-    //MARK: for top songs
-    private var titleAliases = "" //the result returned from server may has name in many forms, if either of the name matches the mediaItem, we count it as a match
-    private var artistAliases = ""
-    
     var mediaItem: MPMediaItem?
     
     override init() {
         
     }
     
-    init(id: Int, title: String, artist: String, duration: Float, previewUrl: String, trackViewUrl: String, artwork: String, titleAliases: String, artistAliases: String) {
-        self.trackId = id
+    init(songId: Int, trackId: Int, title: String, artist: String, duration: Float, previewUrl: String, trackViewUrl: String, artwork: String) {
+        self.songId = songId
+        self.trackId = trackId
         self.trackName = title
         self.artistName = artist
         self.trackTimeMillis = duration
         self.previewUrl = previewUrl
         self.trackViewUrl = trackViewUrl
         self.artworkUrl100 = artwork
-        self.titleAliases = titleAliases
-        self.artistAliases = artistAliases
     }
     
     func findMediaItem() {
-        self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
-            item in
-            let findable = item as Findable
-            if self.titleAliases.lowercaseString.containsString(findable.getTitle().lowercaseString) && self.artistAliases.lowercaseString.containsString(findable.getArtist().lowercaseString) && abs(self.getDuration() - findable.getDuration()) < 2 {
-                return true
-            }
-            return false
-        }.first
+        if let song = CoreDataManager.findSongById(songId) {
+            self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
+                item in
+                if song.title.lowercaseString == item.getTitle().lowercaseString && song.artist.lowercaseString == item.getArtist().lowercaseString && abs(Float(song.playbackDuration) - item.getDuration()) < 2 {
+                    return true
+                }
+                return false
+            }.first
+            
+        }
     }
+
 }
