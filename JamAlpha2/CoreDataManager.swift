@@ -247,6 +247,9 @@ class CoreDataManager: NSObject {
     }
     
     class func saveUserProfileImage(avatarUrl: String?=nil, thumbnailUrl:String?=nil, profileImageData: NSData?=nil, thumbnailData: NSData?=nil){
+        if CoreDataManager.getCurrentUser() == nil {
+            return
+        }
         let currentUser = CoreDataManager.getCurrentUser()!
         
         if let avatarUrl = avatarUrl {

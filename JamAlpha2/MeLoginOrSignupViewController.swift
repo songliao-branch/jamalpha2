@@ -84,7 +84,7 @@ class MeLoginOrSignupViewController: UIViewController{
     }
     
     override func viewWillDisappear(animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewWillDisappear(animated)
         self.navigationController?.navigationBarHidden = false
     }
     
