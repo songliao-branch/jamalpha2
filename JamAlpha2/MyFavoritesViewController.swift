@@ -34,13 +34,11 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     }
 
     func loadData() {
-        
         songs = CoreDataManager.getFavorites()
         for song in songs {
             song.findMediaItem()
         }
         self.tableView.reloadData()
-
     }
     
     func setUpNavigationBar() {

@@ -54,13 +54,22 @@ class SearchResult: NSObject {
     override init() {
         
     }
-    
+    //used for tabs/lyrics of a song
     init(title: String, artist: String, duration: Float){
         self.trackName = title
         self.artistName = artist
         self.trackTimeMillis = duration
     }
     
+    //used for my Tabs lyrics, my favorites, need the songId to match local songs
+    init(songId: Int, title: String, artist: String, duration: Float){
+        self.songId = songId
+        self.trackName = title
+        self.artistName = artist
+        self.trackTimeMillis = duration
+    }
+    
+    //used for Top Songs, everytime we retrieve all iTunes information from the server
     init(songId: Int, trackId: Int, title: String, artist: String, duration: Float, previewUrl: String, trackViewUrl: String, artwork: String) {
         self.songId = songId
         self.trackId = trackId

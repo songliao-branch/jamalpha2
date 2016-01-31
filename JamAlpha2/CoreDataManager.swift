@@ -493,7 +493,8 @@ class CoreDataManager: NSObject {
             t.times = theTimes
             t.visible = temp.visible
             //used to display in the table
-            t.song = SearchResult(title: temp.song.title, artist: temp.song.artist, duration: Float(temp.song.playbackDuration))
+            
+            t.song = SearchResult(songId: Int(temp.song.id), title: temp.song.title, artist: temp.song.artist, duration: Float(temp.song.playbackDuration))
             
             sets.append(t)
         }
@@ -524,7 +525,8 @@ class CoreDataManager: NSObject {
             l.times = times
             
             //used to display in the table
-            l.song = SearchResult(title: temp.song.title, artist: temp.song.artist, duration: Float(temp.song.playbackDuration))
+            l.song = SearchResult(songId: Int(temp.song.id), title: temp.song.title, artist: temp.song.artist, duration: Float(temp.song.playbackDuration))
+            
             sets.append(l)
         }
         return sets
@@ -646,7 +648,7 @@ class CoreDataManager: NSObject {
         let favorites = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Song), withPredicate: NSPredicate(format: " isFavorited == true"), managedObjectContext: moc) as! [Song]
         var songs = [SearchResult]()
         for fav in favorites {
-            let song = SearchResult(title: fav.title, artist: fav.artist, duration: Float(fav.playbackDuration))
+            let song = SearchResult(songId: Int(fav.id), title: fav.title, artist: fav.artist, duration: Float(fav.playbackDuration))
             songs.append(song)
         }
         return songs
@@ -666,8 +668,6 @@ class CoreDataManager: NSObject {
         }
         return 0
     }
-    
-    
 }
 
 

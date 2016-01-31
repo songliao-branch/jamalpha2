@@ -54,7 +54,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-    }
+    } 
     
     //also called when a set is deleted
     func loadData() {
@@ -62,15 +62,16 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         if isViewingTabs {
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             for t in self.allTabsSets {
+                print("MY Tabs song: \(t.song.songId),\(t.song.getTitle()),\(t.song.getArtist()),\(t.song.getDuration())")
 
-                let song = SearchResult(title: t.song.getTitle(), artist: t.song.getArtist(), duration: t.song.getDuration())
+                let song = SearchResult(songId: t.song.songId, title: t.song.getTitle(), artist: t.song.getArtist(), duration: t.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
         } else {
             self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
             for l in self.allLyricsSets {
-                let song = SearchResult(title: l.song.getTitle(), artist: l.song.getArtist(), duration: l.song.getDuration())
+                let song = SearchResult(songId: l.song.songId, title: l.song.getTitle(), artist: l.song.getArtist(), duration: l.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
@@ -93,7 +94,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
         
-        
         optionMenu.addAction(editAction)
         optionMenu.addAction(deleteAction)
         optionMenu.addAction(cancelAction)
@@ -110,7 +110,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             print("no media item found for \(song.getTitle())")
             return
         }
-        
         
         MusicManager.sharedInstance.player.pause()
         MusicManager.sharedInstance.setPlayerQueue([item])

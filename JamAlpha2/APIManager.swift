@@ -472,7 +472,7 @@ class APIManager: NSObject {
                         
                         var theTimes = [Float]()
                         
-                        let song = SearchResult(songId: set["song"]["id"].int!, trackId: set["song"]["track_id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!, previewUrl: set["song"]["preview_url"].string!, trackViewUrl: set["song"]["store_link"].string!, artwork: set["song"]["artwork"].string!)
+                        let song = SearchResult(songId: set["song"]["id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!)
 
                         t.song = song
                         for time in set["times"].arrayObject as! [String] {
@@ -496,7 +496,7 @@ class APIManager: NSObject {
                         
                         l.times = theTimes
                         
-                       let song = SearchResult(songId: set["song"]["id"].int!, trackId: set["song"]["track_id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!, previewUrl: set["song"]["preview_url"].string!, trackViewUrl: set["song"]["store_link"].string!, artwork: set["song"]["artwork"].string!)
+                        let song = SearchResult(songId: set["song"]["id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!)
                         l.song = song
                         myLyricsSets.append(l)
                     }

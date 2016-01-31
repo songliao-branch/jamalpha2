@@ -458,24 +458,30 @@ class MeLoginOrSignupViewController: UIViewController{
                                 
                                 for set in tabsSets {
                                     
-                                    let song = SearchResult(title: set.song.getTitle(), artist: set.song.getArtist(), duration: set.song.getDuration())
+                                    var song = SearchResult(title: set.song.getTitle(), artist: set.song.getArtist(), duration: set.song.getDuration())
 
                                     //initialize the song just in case we don't find it in existing core data
                                     
-                                    CoreDataManager.getSongId(song)//this must be the same song
+                                    if let songOnDevice = CoreDataManager.findSongById(set.song.songId) {
+                                        song = SearchResult(title: songOnDevice.title, artist: songOnDevice.artist, duration: Float(songOnDevice.playbackDuration))
+                                    } else {
+                                        CoreDataManager.initializeSongToDatabase(song)
+                                    }
                                     
                                     
-                                    CoreDataManager.initializeSongToDatabase(song)
-                                
                                     CoreDataManager.saveTabs(song, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible, lastEditedDate: set.lastEdited)
                                 }
                                 
                                 for set in lyricsSets {
                                     
-                                    let song = SearchResult(title: set.song.getTitle(), artist: set.song.getArtist(), duration: set.song.getDuration())
+                                    var song = SearchResult(title: set.song.getTitle(), artist: set.song.getArtist(), duration: set.song.getDuration())
                                     
-                                    //initialize the song just in case we don't find it in
-                                    CoreDataManager.initializeSongToDatabase(song)
+                                    if let songOnDevice = CoreDataManager.findSongById(set.song.songId) {
+                                        song = SearchResult(title: songOnDevice.title, artist: songOnDevice.artist, duration: Float(songOnDevice.playbackDuration))
+                                    } else {
+                                        CoreDataManager.initializeSongToDatabase(song)
+                                    }
+                                    
                                     CoreDataManager.saveLyrics(song, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id, lastEditedDate: set.lastEdited)
                                 }
                                 
