@@ -174,9 +174,11 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         if isDemoSong {
             avPlayer = AVAudioPlayer()
             self.duration = NSTimeInterval(MusicManager.sharedInstance.avPlayer.currentItem!.getDuration())
-            avPlayer.currentTime = 0.0
+         
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
+            
+            self.avPlayer.currentTime = 0.0
             self.avPlayer.volume = 1
             self.avPlayer.enableRate = true
             self.avPlayer.rate = 1
@@ -342,6 +344,9 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func setUpTutorial() {
+        if !NSUserDefaults.standardUserDefaults().boolForKey(kShowLyricsTutorial) {
+            return
+        }
         tutorialScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
         tutorialScrollView.backgroundColor = UIColor.clearColor()
         self.view.addSubview(tutorialScrollView)
@@ -385,27 +390,27 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
-        if  tutorialScrollView.hidden {
-            return
-        }
-        
-        for i in 0..<numberOfTutorialPages {
-            tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
-        }
+//        if  tutorialScrollView.hidden {
+//            return
+//        }
+//        
+//        for i in 0..<numberOfTutorialPages {
+//            tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
+//        }
     }
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        if  tutorialScrollView.hidden {
-            return
-        }
-        
-        let currentPage = scrollView.contentOffset.x / self.view.frame.width
-        for i in 0..<numberOfTutorialPages {
-            if i == Int(currentPage) {
-                tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
-            } else {
-                tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
-            }
-        }
+//        if  tutorialScrollView.hidden {
+//            return
+//        }
+//        
+//        let currentPage = scrollView.contentOffset.x / self.view.frame.width
+//        for i in 0..<numberOfTutorialPages {
+//            if i == Int(currentPage) {
+//                tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
+//            } else {
+//                tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
+//            }
+//        }
     }
     
     func hideTutorial() {

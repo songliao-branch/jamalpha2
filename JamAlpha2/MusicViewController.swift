@@ -217,6 +217,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("musiccell", forIndexPath: indexPath) as! MusicCell
         cell.demoImage.hidden = true
+        cell.cloudImage.hidden = true
         
         if pageIndex == 0 {
     
@@ -235,31 +236,34 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 song = songsByFirstAlphabet[indexPath.section].1[indexPath.row]
             }
             
+            cell.mainTitle.text = song.getTitle()
+            cell.subtitle.text = song.getArtist()
+            
+            cell.titleTrailingConstraint.constant = 12
+            cell.loudspeakerImage.hidden = true
+            
             if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
                 if let item = song as? MPMediaItem {
                     if item == MusicManager.sharedInstance.player.nowPlayingItem {
                         cell.titleTrailingConstraint.constant = 50
                         cell.loudspeakerImage.hidden = false
                     }
-                    else {
-                        cell.titleTrailingConstraint.constant = 15
-                        cell.loudspeakerImage.hidden = true
-                    }
-                } else {
-                    cell.titleTrailingConstraint.constant = 15
-                    cell.loudspeakerImage.hidden = true
-                }               
-            } else {
-                cell.titleTrailingConstraint.constant = 15
-                cell.loudspeakerImage.hidden = true
+                }
             }
             
+            if let _ = song.getURL() {
+                cell.cloudImage.hidden = true
+                cell.titleLeftConstraint.constant = 11
+            } else {
+                cell.cloudImage.hidden = false
+                cell.titleLeftConstraint.constant = 30
+            }
             
             CoreDataManager.initializeSongToDatabase(song)
             
             if let coverimage = CoreDataManager.getCoverImage(song){
                 cell.coverImage.image = coverimage
-            }else{
+            } else {
                 // some song does not have an album cover
                 if let cover = song.getArtWork() {
                     let image = cover.imageWithSize(CGSize(width: 54, height: 54))
@@ -273,34 +277,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 } else {
                     cell.coverImage.image = UIImage(named: "liweng")
                     loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
-                }
-
-            }
-            
-            cell.mainTitle.text = song.getTitle()
-            cell.subtitle.text = song.getArtist()
-            
-            if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable()){
-                if(song.isKindOfClass(MPMediaItem)){
-                    if (song as! MPMediaItem).cloudItem{
-                        cell.coverImage.alpha = 0.8
-                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(0.5)
-                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(0.5)
-                    }else{
-                        cell.coverImage.alpha = 1
-                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
-                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
-                    }
-                }else{
-                    cell.coverImage.alpha = 1
-                    cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
-                    cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
-                }
-            }else{
-                if(song.isKindOfClass(MPMediaItem)){
-                        cell.coverImage.alpha = 1
-                        cell.mainTitle.textColor = cell.mainTitle.textColor.colorWithAlphaComponent(1)
-                        cell.subtitle.textColor = cell.subtitle.textColor.colorWithAlphaComponent(1)
                 }
             }
             
