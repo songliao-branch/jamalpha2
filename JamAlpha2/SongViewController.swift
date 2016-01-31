@@ -3007,9 +3007,14 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(item.getArtist().isEmpty){
             return
         }
+        
         APIManager.getSongInformation(item, completion: {
             id, soundwave_url in
-            CoreDataManager.setSongId(item, id: id)
+            
+            //we only save songid for those songs with items on device, because in Tops Songs we are using the songId to retrieve the local title and artist name to match corresponding MPMediaItem
+            if !self.isSongNeedPurchase {
+              CoreDataManager.setSongId(item, id: id)
+            }
             self.soundwaveUrl = soundwave_url
             completion(successed: true)
         })
