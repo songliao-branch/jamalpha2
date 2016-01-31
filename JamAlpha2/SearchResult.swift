@@ -94,5 +94,19 @@ class SearchResult: NSObject {
             
         }
     }
-
+    
+    func findSearchResult(completion: ((searchResult: SearchResult?) -> Void)) {
+        if mediaItem == nil {
+            SearchAPI.searchSong(trackName + " " + artistName, completion: {
+                results in
+                for result in results {
+                    if MusicManager.sharedInstance.songsMatched(findableA: self, findableB: result) {
+                        completion(searchResult: result)
+                        return
+                    }
+                }
+                completion(searchResult: nil)
+            })
+        }
+    }
 }

@@ -272,28 +272,28 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
             
-//            song.findSearchResult( {
-//                result in
-//                
-//                cell.spinner.stopAnimating()
-//                cell.spinner.hidden = true
-//                cell.searchIcon.hidden = false
-//                
-//                guard let song = result else {
-//                    
-//                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
-//                    return
-//                }
-//                
-//                songVC.isSongNeedPurchase = true
-//                songVC.songNeedPurchase = song
-//                songVC.reloadBackgroundImageAfterSearch(song)
-//                songVC.transitioningDelegate = self.animator
-//                self.animator!.attachToViewController(songVC)
-//                self.presentViewController(songVC, animated: true, completion: nil)
-//                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
-//                
-//            })
+            song.findSearchResult( {
+                result in
+                
+                cell.spinner.stopAnimating()
+                cell.spinner.hidden = true
+                cell.searchIcon.hidden = false
+                
+                guard let song = result else {
+                    
+                    self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
+                    return
+                }
+                
+                songVC.isSongNeedPurchase = true
+                songVC.songNeedPurchase = song
+                songVC.reloadBackgroundImageAfterSearch(song)
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: nil)
+                self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                
+            })
         }
     }
 
