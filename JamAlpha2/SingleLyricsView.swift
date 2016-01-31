@@ -322,6 +322,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             }else {
                 self.singleLyricsTableView.scrollEnabled = true
             }
+            self.isScrolling = false
         }
     }
     
