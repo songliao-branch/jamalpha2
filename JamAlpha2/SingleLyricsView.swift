@@ -149,9 +149,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpScrollLine() {
         numberOfLineInSingleLyricsView = Int((basesHeight + 20) / 66) / 2 + 1
         tempPlayButton = UIButton()
-        tempPlayButton.frame = CGRectMake(0, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 - 22, 44, 44)
+        tempPlayButton.frame = CGRectMake(0, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 - 30, 60, 60)
         tempPlayButton.setImage(UIImage(named: "playbutton"), forState: .Normal)
-        tempPlayButton.imageEdgeInsets = UIEdgeInsetsMake(9.5, 2.5, 9.5, 16.5)
+        tempPlayButton.imageEdgeInsets = UIEdgeInsetsMake(17.5, 2.5, 17.5, 32.5)
         tempPlayButton.hidden = true
         tempPlayButton.addTarget(self, action: "pressTempPlayButton:", forControlEvents: .TouchUpInside)
         self.view.insertSubview(tempPlayButton, belowSubview: guitarActionView)

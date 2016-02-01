@@ -62,6 +62,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         addBackground()
         addTitleView()
         addLyricsTextView()
+        addGotoSafariButton()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -235,6 +236,29 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addSubview(self.lyricsTextView)
     }
     
+    func addGotoSafariButton() {
+        let safariButton: UIButton = UIButton()
+        safariButton.frame = CGRectMake(self.view.frame.width - 60, self.view.frame.height - 60, 60, 60)
+        safariButton.imageEdgeInsets = UIEdgeInsetsMake(20, 20, 5, 5)
+        safariButton.setImage(UIImage(named: "safari"), forState: .Normal)
+        safariButton.addTarget(self, action: "pressSafariButton:", forControlEvents: .TouchUpInside)
+        self.view.addSubview(safariButton)
+        
+        if isDemoSong {
+            safariButton.removeFromSuperview()
+        }
+    }
+
+    func pressSafariButton(sender: UIButton) {
+        if !isDemoSong {
+            let name = theSong.getTitle().replace(" ", replacement: "+") + "+" + theSong.getArtist().replace(" ", replacement: "+")
+            let url:NSURL = NSURL(string: "x-web-search://?\(name)+lyrics")!
+            if !UIApplication.sharedApplication().openURL(url) {
+                print("cannot open")
+            }
+        }
+    }
+
     func pressBackButton(sender: UIButton) {
         tempLyricsTimeTuple.removeAll()
         if let songVC = self.songViewController {

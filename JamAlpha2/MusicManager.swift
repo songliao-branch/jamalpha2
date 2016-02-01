@@ -31,6 +31,8 @@ class MusicManager: NSObject {
     var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
     
+     var songs = [SearchResult]()
+    
     //in case mediaItem was changed outside the app when exit to background from Editor screen
     //we save these two so that when we come back we always have the correct item
     var lastPlayingItem: MPMediaItem!
@@ -279,6 +281,14 @@ class MusicManager: NSObject {
         for song in uniqueSongs {
             CoreDataManager.initializeSongToDatabase(song)
         }
+        
+        APIManager.getTopSongs({
+            songs in
+            self.songs = songs
+            for song in songs {
+                song.findMediaItem()
+            }
+        })
     }
     
     func loadDemoSongs() {

@@ -24,6 +24,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         createTransitionAnimation()
         setUpNavigationBar()
         setUpRefreshControl()
+        songs = MusicManager.sharedInstance.songs
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -194,8 +195,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             let cell = tableView.cellForRowAtIndexPath(indexPath) as! TopSongsCell
             
             cell.searchIcon.hidden = true
-
-            
+            isSeekingPlayerState = false
             songVC.isSongNeedPurchase = true
             songVC.songNeedPurchase = song
             songVC.reloadBackgroundImageAfterSearch(song)
