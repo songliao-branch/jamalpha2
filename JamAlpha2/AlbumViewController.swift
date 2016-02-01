@@ -100,19 +100,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         // assign empty string if no track number
         cell.trackNumberLabel.text = song.albumTrackNumber > 0 ? String(song.albumTrackNumber) : ""
         
-        if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable() ){
-            if (song ).cloudItem{
-                cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(0.5)
-                cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(0.5)
-            }else{
-                cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
-                cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
-            }
-        }else{
-            cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
-            cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
-        }
-        
         return cell
     }
     

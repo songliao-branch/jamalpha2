@@ -14,7 +14,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     @IBOutlet weak var tableView: UITableView!
     var isSeekingPlayerState = false
     
-    var songs = [LocalSong]()
+    var songs = [SearchResult]()
     var animator: CustomTransitionAnimation?
     
     override func viewDidLoad() {
@@ -35,13 +35,11 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     }
 
     func loadData() {
-        
         songs = CoreDataManager.getFavorites()
         for song in songs {
             song.findMediaItem()
         }
         self.tableView.reloadData()
-
     }
     
     func setUpNavigationBar() {
@@ -59,8 +57,8 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         let cell = tableView.dequeueReusableCellWithIdentifier("MyFavoritesCell", forIndexPath: indexPath) as! MyFavoritesCell
         let song = songs[indexPath.row]
         cell.numberLabel.text = "\(indexPath.row+1)"
-        cell.titleLabel.text = song.title
-        cell.subtitleLabel.text = song.artist
+        cell.titleLabel.text = song.getTitle()
+        cell.subtitleLabel.text = song.getArtist()
         
         cell.spinner.hidden = true
         if let _ = song.mediaItem {
@@ -143,8 +141,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 KGLOBAL_nowView.stop()
                 self.showConnectInternet(tableView)
             }
-            
-        }   else if song.artist == "Alex Lisell" { //if demo song
+        }   else if song.getArtist() == "Alex Lisell" { //if demo song
             isSeekingPlayerState = false
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0

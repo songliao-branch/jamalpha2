@@ -203,10 +203,13 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     func setUpPlayer() {
         if isDemoSong {
             avPlayer = AVAudioPlayer()
+
+            self.duration = NSTimeInterval(MusicManager.sharedInstance.avPlayer.currentItem!.getDuration())
+         
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
-            self.duration = NSTimeInterval(MusicManager.sharedInstance.avPlayer.currentItem!.getDuration())
-            avPlayer.currentTime = 0.0
+            
+            self.avPlayer.currentTime = 0.0
             self.avPlayer.volume = 1
             self.avPlayer.enableRate = true
             self.avPlayer.rate = 1
@@ -430,6 +433,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
         }
     }
+    
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         
         if tutorialScrollView == nil {

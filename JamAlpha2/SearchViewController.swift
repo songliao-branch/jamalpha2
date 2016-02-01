@@ -198,33 +198,27 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }else{
                     cell.albumCover.image = UIImage(named: "liweng")
                 }
-            } else { //web search in section 1
-                if searchResults.isEmpty{
-                    return cell
-                }
-                if let track = searchResults[indexPath.row].trackName {
-                    cell.titleLabel.text = track
-                }
-                if let artist = searchResults[indexPath.row].artistName {
-                    cell.subtitleLabel.text = artist
-                }
                 
-                if let imageURL = searchResults[indexPath.row].artworkUrl100 {
-                    cell.albumCover.image = nil
-                    let url = NSURL(string: imageURL)!
-                    let fetcher = NetworkFetcher<UIImage>(URL: url)
+            } else { //web search in section 1
+
+                cell.titleLabel.text = searchResults[indexPath.row].trackName
+                cell.subtitleLabel.text = searchResults[indexPath.row].artistName
+                
+                let imageUrl = searchResults[indexPath.row].artworkUrl100
+                
+                cell.albumCover.image = nil
+                let url = NSURL(string: imageUrl)!
+                let fetcher = NetworkFetcher<UIImage>(URL: url)
+                
+                let cache = Shared.imageCache
+                cache.fetch(fetcher: fetcher).onSuccess { image in
+                    cell.albumCover.image = image
                     
-                    let cache = Shared.imageCache
-                    cache.fetch(fetcher: fetcher).onSuccess { image in
-                        cell.albumCover.image = image
-                        
-                        if(indexPath.row < (self.searchResults.count)){
-                            self.searchResults[indexPath.row].image = nil
-                            self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
-                        }
+                    if(indexPath.row < (self.searchResults.count)){
+                        self.searchResults[indexPath.row].image = nil
+                        self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
                     }
                 }
-               
             }
         } else if !resultSearchController.active && indexPath.section == 0 {//if search is inactive
             // array of search history comes in time ascending order, we need descending order (newest on top)

@@ -18,7 +18,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     let cellHeight: CGFloat = 60
   
-    var songs = [LocalSong]()//for showing title and artist for the tableview
+    var songs = [SearchResult]()//for showing title and artist for the tableview
     
     var allTabsSets = [DownloadedTabsSet]()
     var allLyricsSets = [DownloadedLyricsSet]()
@@ -54,22 +54,24 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-    }
+    } 
     
     //also called when a set is deleted
     func loadData() {
-        songs = [LocalSong]()
+        songs = [SearchResult]()
         if isViewingTabs {
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             for t in self.allTabsSets {
-                let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
+                print("MY Tabs song: \(t.song.songId),\(t.song.getTitle()),\(t.song.getArtist()),\(t.song.getDuration())")
+
+                let song = SearchResult(songId: t.song.songId, title: t.song.getTitle(), artist: t.song.getArtist(), duration: t.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
         } else {
             self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
             for l in self.allLyricsSets {
-                let song = LocalSong(title: l.title, artist: l.artist, duration: l.duration)
+                let song = SearchResult(songId: l.song.songId, title: l.song.getTitle(), artist: l.song.getArtist(), duration: l.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
@@ -92,7 +94,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
         
-        
         optionMenu.addAction(editAction)
         optionMenu.addAction(deleteAction)
         optionMenu.addAction(cancelAction)
@@ -106,9 +107,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func goToEditor(index: Int) {
         let song = songs[index]
         guard let item = song.mediaItem else {
+
             return
         }
-        
         
         MusicManager.sharedInstance.player.pause()
         MusicManager.sharedInstance.setPlayerQueue([item])
@@ -156,8 +157,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
         cell.numberLabel.text = "\(indexPath.row + 1)"
 
-        cell.titleLabel.text = song.title
-        cell.subtitleLabel.text = song.artist
+        cell.titleLabel.text = song.getTitle()
+        cell.subtitleLabel.text = song.getArtist()
         
         cell.optionsButton.tag = indexPath.row
         cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
@@ -245,11 +246,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                 KGLOBAL_nowView.stop()
                 self.showConnectInternet(tableView)
             }
-            
-
-            
-        }  else if song.artist == "Alex Lisell" { //if demo song
+        }  else if song.getArtist() == "Alex Lisell" { //if demo song
             isSeekingPlayerState = false
+
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
             MusicManager.sharedInstance.player.pause()

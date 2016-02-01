@@ -189,9 +189,8 @@ class APIManager: NSObject {
                         
                         let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
                         
-                        t.title = set["song"]["title"].string!
-                        t.artist = set["song"]["artist"].string!
-
+                        let song = SearchResult(title: set["song"]["title"].string!, artist: set["song"]["artist"].string! , duration: set["song"]["duration"].float!)
+                        t.song = song
                         allDownloads.append(t)
                     }
                    //after completed, pass everything to the callback
@@ -300,8 +299,8 @@ class APIManager: NSObject {
                         
                         let l = DownloadedLyricsSet(id: set["id"].int!, lyricsPreview: set["lyrics_preview"].string!, numberOfLines: set["number_of_lines"].int!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
                         
-                        l.title = set["song"]["title"].string!
-                        l.artist = set["song"]["artist"].string!
+                        let song = SearchResult(title: set["song"]["title"].string!, artist: set["song"]["artist"].string! , duration: set["song"]["duration"].float!)
+                        l.song = song
                         
                         allDownloads.append(l)
                     }
@@ -471,9 +470,10 @@ class APIManager: NSObject {
                         t.visible = set["visible"].bool!
                         
                         var theTimes = [Float]()
-                        t.title = set["song"]["title"].string!
-                        t.artist = set["song"]["artist"].string!
-                        t.duration = set["song"]["duration"].float!
+                        
+                        let song = SearchResult(songId: set["song"]["id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!)
+
+                        t.song = song
                         for time in set["times"].arrayObject as! [String] {
                             theTimes.append(Float(time)!)
                         }
@@ -494,9 +494,9 @@ class APIManager: NSObject {
                         }
                         
                         l.times = theTimes
-                        l.title = set["song"]["title"].string!
-                        l.artist = set["song"]["artist"].string!
-                        l.duration = set["song"]["duration"].float!
+                        
+                        let song = SearchResult(songId: set["song"]["id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!)
+                        l.song = song
                         myLyricsSets.append(l)
                     }
                    completion(downloadedTabsSets: myTabsSets, downloadedLyricsSets: myLyricsSets)
@@ -530,15 +530,15 @@ class APIManager: NSObject {
         }
     }
     
-    class func getFavorites(completion: (( songs: [LocalSong]) -> Void)) {
+    class func getFavorites(completion: (( songs: [SearchResult]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/users/\(CoreDataManager.getCurrentUser()!.id)/favorite_songs").responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    var songs = [LocalSong]()
+                    var songs = [SearchResult]()
                     for song in json["users"].array! {
-                        let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
+                        let s = SearchResult(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
                         songs.append(s)
                     }
                     completion(songs: songs)
@@ -587,18 +587,20 @@ class APIManager: NSObject {
         }
     }
     
-    class func getTopSongs(completion: (( songs: [LocalSong]) -> Void)) {
+    class func getTopSongs(completion: (( songs: [SearchResult]) -> Void)) {
         Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-                    var songs = [LocalSong]()
+                    var results = [SearchResult]()
                     for song in json["songs"].array! {
-                        let s = LocalSong(title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!)
-                        songs.append(s)
+                        
+                        let result = SearchResult(songId: song["id"].int!, trackId: song["track_id"].int!, title: song["title"].string!, artist: song["artist"].string!, duration: song["duration"].float!, previewUrl: song["preview_url"].string!, trackViewUrl: song["store_link"].string!, artwork: song["artwork_url"].string!)
+
+                        results.append(result)
                     }
-                    completion(songs: songs)
+                    completion(songs: results)
                 }
             case .Failure(let error):
                 print("favorite song error: \(error)")
