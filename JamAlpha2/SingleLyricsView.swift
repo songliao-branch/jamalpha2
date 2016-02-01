@@ -48,7 +48,6 @@ extension SongViewController {
 }
 
 
-
 extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func setUpBackgroundEffect() {
         self.singleLyricsTableView.alpha = 0
