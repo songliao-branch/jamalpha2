@@ -310,6 +310,10 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             singleLyricsTableView.showsVerticalScrollIndicator = false
             setUpBackgroundEffect()
             self.view.insertSubview(singleLyricsTableView, aboveSubview: self.backgroundImageView)
+            let singleLyricsTableViewDoubleTapGesture = UITapGestureRecognizer(target: self, action: "lyricsModeChanged")
+            singleLyricsTableViewDoubleTapGesture.numberOfTouchesRequired = 1
+            singleLyricsTableViewDoubleTapGesture.numberOfTapsRequired = 2
+            singleLyricsTableView.addGestureRecognizer(singleLyricsTableViewDoubleTapGesture)
             
             for label in tuningLabels {
                 label.alpha = 0

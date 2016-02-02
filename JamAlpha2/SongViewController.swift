@@ -94,6 +94,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     var chordBaseTapGesture: UITapGestureRecognizer!
     var chordBaseDoubleTapGesture:UITapGestureRecognizer!
+    var lyricBaseDoubleTapGesture:UITapGestureRecognizer!
     //MARK: progress Container
     var progressBlockViewWidth:CGFloat?
     var progressBlockContainer:UIView!
@@ -179,6 +180,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // used to toggle should display chord name or tabs
     var isChordShown = true
     var isTabsShown = true
+    var isChordShownTemp = true
+    var isTabsShownTemp = true
     var isLyricsShown = true
     let isChordShownKey = "isChordShown"
     let isTabsShownKey = "isTabsShown"
@@ -927,6 +930,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         self.view.addSubview(lyricbase)
         
+        lyricBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "lyricsModeChanged")
+        lyricBaseDoubleTapGesture.numberOfTouchesRequired = 1
+        lyricBaseDoubleTapGesture.numberOfTapsRequired = 2
+        lyricbase.addGestureRecognizer(lyricBaseDoubleTapGesture)
+        
         let contentMargin: CGFloat = 5
         
         lyricbase.layer.cornerRadius = 20
@@ -992,8 +1000,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricsSwitch.on = isLyricsShown
         countdownSwitch.on = countdownOn
         
-        toggleChordsDisplayMode()
-        toggleLyrics()
+        toggleChordsDisplayMode(false)
+        toggleLyrics(false)
+        isChordShownTemp = isChordShown
+        isTabsShownTemp = isTabsShown
     }
     
     func registerMediaPlayerNotification(){
@@ -2346,6 +2356,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func refreshLyricsTableView() {
         if singleLyricsTableView != nil && lyricsArray.count > 0 {
+            if (!isDemoSong){
+                if self.player != nil && self.player.nowPlayingItem != nil {
+                    if self.player.nowPlayingItem != self.nowPlayingMediaItem {
+                        return
+                    }
+                }
+            }
             if tempCurrentLyricsIndex != currentLyricsIndex {
                 tempCurrentLyricsIndex = currentLyricsIndex
                 if tempScrollLine.hidden == true {
