@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "done_circle.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "done_circle.png",
       "scale" : "2x"
     },
     {

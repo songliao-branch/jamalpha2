@@ -33,6 +33,10 @@ class LyricsSyncTimeTableViewCell: UITableViewCell {
         self.currentTimeLabel.font = UIFont.systemFontOfSize(10)
         self.currentTimeLabel.textAlignment = NSTextAlignment.Center
         self.timeView.addSubview(self.currentTimeLabel)
+        
+        self.preservesSuperviewLayoutMargins = false
+        self.separatorInset = UIEdgeInsetsZero
+        self.layoutMargins = UIEdgeInsetsZero
     }
     
     

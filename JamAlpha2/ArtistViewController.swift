@@ -13,6 +13,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     var theArtist:Artist!
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
+    var isSeekingPlayerState = false
     
     @IBOutlet weak var artistTable: UITableView!
     
@@ -49,17 +50,12 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         synced(self) {
             let player = MusicManager.sharedInstance.player
             if player.repeatMode == .One {
-                print("\(player.nowPlayingItem!.title) is repeating")
                 return
             }
             
             if player.nowPlayingItem != nil {
-                if(MusicManager.sharedInstance.lastSelectedIndex >= 0){
-                    if !MusicManager.sharedInstance.lastPlayerQueue[MusicManager.sharedInstance.lastSelectedIndex].cloudItem && player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
-                        self.artistTable.reloadData()
-                    }
-                }else{
-                    if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                if player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex {
+                    if !self.isSeekingPlayerState {
                         self.artistTable.reloadData()
                     }
                 }
@@ -138,37 +134,29 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         let song = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
         
+        cell.titleTrailingConstant.constant = 15
+        cell.loudspeakerImage.hidden = true
         if MusicManager.sharedInstance.player.nowPlayingItem != nil && MusicManager.sharedInstance.avPlayer.currentItem == nil {
             if song == MusicManager.sharedInstance.player.nowPlayingItem {
                 cell.titleTrailingConstant.constant = 50
                 cell.loudspeakerImage.hidden = false
             }
-            else {
-                cell.titleTrailingConstant.constant = 15
-                cell.loudspeakerImage.hidden = true
-            }
-        } else {
-            cell.titleTrailingConstant.constant = 15
-            cell.loudspeakerImage.hidden = true
+           
         }
+        
+        if let _ = song.getURL() {
+            cell.cloudImage.hidden = true
+            cell.titleLeadingConstraint.constant = 5
+        } else {
+            cell.cloudImage.hidden = false
+            cell.titleLeadingConstraint.constant = 25
+        }
+        
         
         cell.titleLabel.text = song.title
         
         // assign empty string if no track number
         cell.trackNumberLabel.text = song.albumTrackNumber > 0 ? String(song.albumTrackNumber) : ""
-        
-        if(NetworkManager.sharedInstance.reachability.isReachableViaWWAN() || !NetworkManager.sharedInstance.reachability.isReachable() ){
-                if (song ).cloudItem{
-                    cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(0.5)
-                    cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(0.5)
-                }else{
-                    cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
-                    cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
-                }
-        }else{
-                cell.titleLabel.textColor = cell.titleLabel.textColor.colorWithAlphaComponent(1)
-                cell.trackNumberLabel.textColor = cell.trackNumberLabel.textColor.colorWithAlphaComponent(1)
-        }
         
         return cell
     }
@@ -180,7 +168,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     // when selecting section 2 2nd song, we iterate through all previous albums tracks
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         KGLOBAL_init_queue.suspended = true
         
         let albumIndex = indexPath.section
@@ -201,14 +189,14 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         ///////////////////////////////////////////
         if((artistAllSongs[indexToBePlayed]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                while (isSeekingPlayerState){
+                while (self.isSeekingPlayerState){
                     
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
                         KGLOBAL_nowView.stop()
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)                        }
-                        isSeekingPlayerState = false
+                        self.isSeekingPlayerState = false
                         break
                     }
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -224,7 +212,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                                     tableView.reloadData()
                                 })
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                     }

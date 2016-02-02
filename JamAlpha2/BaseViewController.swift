@@ -44,14 +44,11 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func registerMusicPlayerNotificationForPlaybackStateChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
-        print("registering notification in base view controller")
     }
     
     func playbackStateChanged(notification: NSNotification){
         let playbackState = player.playbackState
-        print("playbackStateChanged \(player.playbackState.rawValue)")
         if playbackState == .Playing {
-            print("now it starts again")
             KGLOBAL_nowView.start()
         } else  {
             KGLOBAL_nowView.stop()

@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Jun Zhou. All rights reserved.
 //
 
-
-
 import UIKit
 import MediaPlayer
 import AVFoundation
@@ -15,8 +13,13 @@ import YouTubePlayer
 
 let kmovingMainNoteSliderHeight:CGFloat = 26
 
-class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIGestureRecognizerDelegate, UITextFieldDelegate, UIScrollViewDelegate, YouTubePlayerDelegate {
+class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollViewDelegate {
     
+    var isCompleteStringViewScroll = false
+    var originaloffset:CGFloat = -1
+    var baseNoteLocation:CGFloat = -1
+    
+    // max, min pinch scale
     let maxScaleNumber: CGFloat = 20
     let minScaleNumber: CGFloat = 5
     
@@ -25,7 +28,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     var string3BackgroundImage: [String] = ["iPhone5_fret0", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret"]
     
     var playButtonImageView: UIImageView!
-
     
     var doubleArrowView: CustomizedView!
     var scrollTimer: NSTimer?
@@ -284,6 +286,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.collectionView.delegate = self
         setUpTuningControlMenu()
 
+        PlayChordsManager.sharedInstance.fret0Midi = PlayChordsManager.sharedInstance.standardFret0Midi
         PlayChordsManager.sharedInstance.changeVolumn(1.0)
     }
     
@@ -335,9 +338,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             isPlaying = false
             timer.invalidate()
             timer = NSTimer()
-//            if !self.intoEditView{
-//                self.progressBlock.alpha = 0.5
-//            }
         }
     }
     
@@ -511,7 +511,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // MARK: Main view data array, to store the tabs added on main view.
     func initialMainViewDataArray(sender: Int) {
-        for var i = sender; i < 25; i++ {
+        for i in sender..<25 {
             let temp: mainViewData = mainViewData()
             temp.fretNumber = i
             let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
@@ -520,488 +520,8 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    func setUpTutorial() {
-        tutorialOverlay = UIView(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
-        tutorialOverlay.backgroundColor = UIColor.tutorialBackgroundGray()
-        self.view.addSubview(tutorialOverlay)
-        
-        let playTutorialButton = UIButton(frame: CGRect(x: 0, y: 0, width: 223, height: 86))
-        playTutorialButton.setImage(UIImage(named: "play_tutorial"), forState: .Normal)
-        playTutorialButton.addTarget(self, action: "playTutorial", forControlEvents: .TouchUpInside)
-        playTutorialButton.center = CGPoint(x: trueWidth/2, y: trueHeight/2 )
-        tutorialOverlay.addSubview(playTutorialButton)
-        
-        let skipTutorialButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(playTutorialButton.frame), width: 70, height: 38))
-        skipTutorialButton.setImage(UIImage(named: "skip"), forState: .Normal)
-        skipTutorialButton.addTarget(self, action: "skipTutorial", forControlEvents: .TouchUpInside)
-        skipTutorialButton.center.x = trueWidth/2
-        tutorialOverlay.addSubview(skipTutorialButton)
-    }
-    
-    func playTutorial() {
-        videoPlayerView = YouTubePlayerView(frame: CGRect(x: 20, y: 20, width: trueWidth-40, height: trueHeight-40))
-        videoPlayerView.delegate = self
-        let url = NSURL(string: "https://www.youtube.com/watch?v=5ZDLU4ruk-M")!
-        videoPlayerView.loadVideoURL(url)
-        self.view.addSubview(videoPlayerView)
-    }
-    
-    func skipTutorial() {
-        tutorialOverlay.hidden = true
-        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
-    }
-    
-    //MARK: YouTubePlayerView delegate methods
-    func playerReady(videoPlayer: YouTubePlayerView) {
-        
-    }
-
-    func playerStateChanged(videoPlayer: YouTubePlayerView, playerState: YouTubePlayerState) {
-        if playerState == .Ended || playerState == .Paused {
-            tutorialOverlay.hidden = true
-            videoPlayerView.hidden = true
-            NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorial)
-        }
-    }
-    
-    func playerQualityChanged(videoPlayer: YouTubePlayerView, playbackQuality: YouTubePlaybackQuality) {
-        
-    }
-    
     // MARK: collection view functions, include required functions and move cell functions
     var tapGesture:UITapGestureRecognizer!
-    
-    func initCollectionView() {
-        for var i = 0; i < 25; i++ {
-            fretsNumber.append(i)
-        }
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        layout.itemSize = CGSize(width: self.trueWidth / 5, height: 12 / 20 * self.trueHeight)
-        //var flowLayout:UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        let scrollDirection = UICollectionViewScrollDirection.Horizontal
-        layout.scrollDirection = scrollDirection
-        let frame = CGRectMake(0, self.trueHeight * 8 / 20, self.trueWidth, 12 / 20 * self.trueHeight)
-        collectionView = UICollectionView(frame: frame, collectionViewLayout: layout)
-        collectionView.registerClass(FretCell.self, forCellWithReuseIdentifier: "fretcell")
-        collectionView.bounces = true
-        collectionView.backgroundColor = UIColor.clearColor()
-        collectionView.bounces = false
-        collectionView.delegate = self
-        self.view.addSubview(collectionView)
-        calculateBorders()
-
-        prepareMoveSwipeUpGesture.addTarget(self, action: "prepareMoveSwipeGesture:")
-        prepareMoveSwipeUpGesture.direction = .Up
-        prepareMoveSwipeUpGesture.delegate = self
-        prepareMoveSwipeUpGesture.requireGestureRecognizerToFail(self.collectionView.panGestureRecognizer)
-        collectionView.addGestureRecognizer(prepareMoveSwipeUpGesture)
-        
-        
-        prepareMoveSwipeDownGesture.addTarget(self, action: "prepareMoveSwipeGesture:")
-        prepareMoveSwipeDownGesture.direction = .Down
-        prepareMoveSwipeDownGesture.delegate = self
-        prepareMoveSwipeDownGesture.requireGestureRecognizerToFail(self.collectionView.panGestureRecognizer)
-        collectionView.addGestureRecognizer(prepareMoveSwipeDownGesture)
-        
-        checkPanGesture.addTarget(self, action: "checkScrollview:")
-        checkPanGesture.delegate = self
-        collectionView.addGestureRecognizer(checkPanGesture)
-
-
-        tapGesture = UITapGestureRecognizer(target: self, action: "singleTapOnCollectionView:")
-        collectionView.addGestureRecognizer(tapGesture)
-
-    }
-    
-
-    func checkScrollview(sender:UIPanGestureRecognizer){
-        let transfer = sender.velocityInView(self.collectionView)
-        if(sender.state == .Began){
-            if(abs(transfer.x) >= abs(transfer.y)){
-                self.collectionView.scrollEnabled = true
-            }else{
-                self.collectionView.scrollEnabled = false
-            }
-        }
-        
-        if(sender.state == .Ended || sender.state == .Cancelled){
-            self.collectionView.scrollEnabled = true
-        }
-    }
-    
-    func prepareMoveSwipeGesture(sender: UISwipeGestureRecognizer) {
-        if sender.direction == .Up {
-            self.startScrolling = false
-            let location = sender.locationInView(collectionView)
-            var positionX: CGFloat = 0
-            for var index = 0; index < self.string3FretPosition.count; index++ {
-                if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
-                    if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
-                        positionX = self.string3FretPosition[index] - self.collectionView.contentOffset.x
-                        self.doubleViewPositionX = self.string3FretPosition[index] + (self.trueWidth / 5 - 10)/2 + 5
-                        break
-                    }
-                }
-            }
-            let imageWidth: CGFloat = self.trueWidth / 5 - 10
-            let imageHeight: CGFloat = kmovingMainNoteSliderHeight
-            self.doubleArrowView = CustomizedView(frame: CGRectMake(positionX + 5, collectionView.frame.origin.y, imageWidth, imageHeight))
-            self.view.insertSubview(self.doubleArrowView, belowSubview: self.collectionView)
-            UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseIn,.AllowUserInteraction], animations: {
-                self.doubleArrowView.center.y = self.doubleArrowView.center.y - kmovingMainNoteSliderHeight
-                }, completion: {
-                    completed in
-                    self.doubleArrowView.removeFromSuperview()
-                    self.view.insertSubview(self.doubleArrowView, aboveSubview: self.collectionView)
-                    let gesture = UIPanGestureRecognizer(target: self,
-                        action: "handleGesture:")
-                    
-                    gesture.delegate = self
-                    self.doubleArrowView.addGestureRecognizer(gesture)
-                    self.doubleArrowView.userInteractionEnabled = true
-                    self.startScrollTimer()
-            })
-            self.prepareMoveSwipeUpGesture.enabled = false
-            self.prepareMoveSwipeDownGesture.enabled = true
-        
-         
-        } else if sender.direction == .Down {
-            self.removeDoubleArrowView()
-            self.prepareMoveSwipeUpGesture.enabled = true
-            self.prepareMoveSwipeDownGesture.enabled = false
-        }
-    }
-    var originaloffset:CGFloat = -1
-    var baseNoteLocation:CGFloat = -1
-    
-    func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
-        if isJiggling == false {
-            self.changeMenuButtonStatus(true)
-            var indexFret: Int = Int()
-            var indexString: Int = Int()
-            indexString = 5
-            let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
-            var original:CGPoint = CGPointMake(0,string3Height  - self.string3Position[2])
-            let location = sender.locationInView(self.collectionView)
-            // get the tap position for fret number and string number
-            for var index = 0; index < self.string3FretPosition.count; index++ {
-                if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
-                    if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
-                        let tempIndex = fretsNumber[index]
-                        indexFret = tempIndex
-                        original.x = (self.string3FretPosition[index] + self.string3FretPosition[index + 1])/2.0
-                        if(index != tempIndex){
-                            self.isCompleteStringViewScroll = true
-                        }
-                        baseNoteLocation = original.x - collectionView.contentOffset.x
-                        
-                        break
-                    }
-                }
-            }
-            for var index = 0; index < self.string3Position.count; index++ {
-                if location.y >= self.string3Position[index] - string3Height && location.y <= self.string3Position[index] + string3Height {
-                    indexString = index + 3
-                    original.y = string3Height  - self.string3Position[index]
-                }
-            }
-            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
-            // open the editor view and add note button
-            self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
-        } else {
-            self.stopMainViewJiggling()
-        }
-    }
-    
-    var isCompleteStringViewScroll = false
-    
-    func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int, original:CGPoint?=nil) {
-        if(self.doubleArrowView != nil){
-            self.doubleArrowView.alpha = 0
-        }
-        self.removeDoubleArrowView()
-        self.view.userInteractionEnabled = false
-        self.view.addSubview(self.editView)
-        if isDemoSong {
-            self.avPlayer.pause()
-        } else {
-            self.musicPlayer.pause()
-        }
-        self.timer.invalidate()
-        self.timer = NSTimer()
-        self.countDownNumber = 3
-        
-        self.addSpecificFingerPoint = false
-        self.musicControlView.alpha = 0
-        self.progressBlock.alpha = 0
-        self.collectionView.alpha = 0
-        self.statusLabel.text = "Add New Chords"
-        self.intoEditView = true
-        
-        self.addNewTab = true
-        self.addedNoteButtonOnCompleteView = true
-        self.addNoteButton(indexFret, indexString: indexString, originalPosition: original)
-        let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
-        self.completeStringView.contentOffset = self.collectionView.contentOffset
-        UIView.animateWithDuration(0.2, animations: {
-            self.completeStringView.alpha = 1
-            self.specificTabsScrollView.alpha = 1
-            self.tabNameTextField.alpha = 1
-            self.completeStringView.frame = CGRectMake(0, 3 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
-            },completion: {
-                completed in
-                UIView.animateWithDuration(0.5, animations: {
-                    if(self.isCompleteStringViewScroll){
-                        if (buttonFret - self.baseNoteLocation < 0 ){
-                            self.completeStringView.contentOffset.x = 0
-                        }else if (buttonFret - self.baseNoteLocation > self.string6FretPosition[self.string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth){
-                            self.completeStringView.contentOffset.x = self.string6FretPosition[self.string6FretPosition.count-1-Int(self.capoStepper.value)]-self.trueWidth
-                        }else{
-                            self.completeStringView.contentOffset.x = buttonFret - self.baseNoteLocation
-                        }
-                    }
-                })
-        })
-        self.backButtonRotation(isLeft: false)
-        self.view.userInteractionEnabled = true
-
-    }
-
-
-    func calculateBorders() {
-        if let collectionView = self.collectionView {
-            collectionViewFrameInCanvas = collectionView.frame
-            if self.view != collectionView.superview {
-                collectionViewFrameInCanvas = self.view!.convertRect(collectionViewFrameInCanvas, fromView: collectionView)
-            }
-            var leftRect : CGRect = collectionViewFrameInCanvas
-            leftRect.size.width = 20.0
-            hitTestRectagles["left"] = leftRect
-            var topRect : CGRect = collectionViewFrameInCanvas
-            topRect.size.height = 20.0
-            hitTestRectagles["top"] = topRect
-            var rightRect : CGRect = collectionViewFrameInCanvas
-            rightRect.origin.x = rightRect.size.width - 20.0
-            rightRect.size.width = 20.0
-            hitTestRectagles["right"] = rightRect
-            var bottomRect : CGRect = collectionViewFrameInCanvas
-            bottomRect.origin.y = bottomRect.origin.y + rightRect.size.height - 20.0
-            bottomRect.size.height = 20.0
-            hitTestRectagles["bottom"] = bottomRect
-        }
-    }
-    
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
-        return 0.0
-    }
-    
-    
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return mainViewDataArray.count
-    }
-    
-    
-    func startScrollTimer(){
-        if scrollingTimer == nil {
-            scrollingTimer = NSTimer()
-            scrollingTimer = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("changDoubleArrowPosition"), userInfo: nil, repeats: true)
-            NSRunLoop.mainRunLoop().addTimer(scrollingTimer, forMode: NSRunLoopCommonModes)
-        }
-    }
-    
-    func stopScrollTimer(){
-        if(scrollingTimer != nil){
-            scrollingTimer!.invalidate()
-            scrollingTimer = nil
-        }
-    }
-
-    func changDoubleArrowPosition(){
-        if(self.doubleArrowView == nil){
-            return
-        }else{
-            self.doubleArrowView.center.x = doubleViewPositionX - self.collectionView.contentOffset.x
-        }
-    }
-    
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("fretcell", forIndexPath: indexPath) as! FretCell
-        cell.imageView.backgroundColor = UIColor.clearColor()
-        cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
-        cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
-        
-        
-        for subview in cell.contentView.subviews {
-            if subview.isKindOfClass(UIButton){
-                subview.removeFromSuperview()
-            }
-        }
-        for item in self.mainViewDataArray[indexPath.item].noteButtonsWithTab {
-            cell.contentView.addSubview(item.noteButton)
-        }
-
-        if isJiggling {
-            stopMainViewJiggling()
-            startMainViewJiggling()
-        }
-        cell.backgroundColor = UIColor.clearColor()
-        return cell
-    }
-    
-    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if let ca = self.view {
-            if let cv = self.collectionView {
-                let tempX = gestureRecognizer.locationInView(ca).x
-                let tempY = gestureRecognizer.locationInView(ca).y + kmovingMainNoteSliderHeight
-                let pointPressedInCanvas = CGPointMake(tempX, tempY)
-                //let pointPressedInCanvas = gestureRecognizer.locationInView(ca)
-                for cell in cv.visibleCells() {
-                    let cellInCanvasFrame = ca.convertRect(cell.frame, fromView: cv)
-                    if CGRectContainsPoint(cellInCanvasFrame, pointPressedInCanvas ) {
-                        let representationImage = cell.snapshotViewAfterScreenUpdates(true)
-                        representationImage.frame = cellInCanvasFrame
-                        let offset = CGPointMake(pointPressedInCanvas.x - cellInCanvasFrame.origin.x, pointPressedInCanvas.y - cellInCanvasFrame.origin.y)
-                        let indexPath : NSIndexPath = cv.indexPathForCell(cell as UICollectionViewCell)!
-                        self.bundle = Bundle(offset: offset, sourceCell: cell, representationImageView:representationImage, currentIndexPath: indexPath, canvas: ca)
-                        break
-                    }
-                }
-            }
-        }
-        return (self.bundle != nil)
-    }
-    
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
-    }
-    
-    func checkForDraggingAtTheEdgeAndAnimatePaging(gestureRecognizer: UIGestureRecognizer) {
-        if self.animating == true {
-            return
-        }
-        if let bundle = self.bundle {
-            
-            var nextPageRect : CGRect = self.collectionView!.bounds
-            if self.layout.scrollDirection == UICollectionViewScrollDirection.Horizontal {
-                if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["left"]!) {
-                    nextPageRect.origin.x -= nextPageRect.size.width
-                    if nextPageRect.origin.x < 0.0 {
-                        nextPageRect.origin.x = 0.0
-                    }
-                }
-                else if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["right"]!) {
-                    nextPageRect.origin.x += nextPageRect.size.width
-                    if nextPageRect.origin.x + nextPageRect.size.width > self.collectionView!.contentSize.width {
-                        nextPageRect.origin.x = self.collectionView!.contentSize.width - nextPageRect.size.width
-                    }
-                }
-            }
-            else if self.layout.scrollDirection == UICollectionViewScrollDirection.Vertical {
-
-                if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["top"]!) {
-                    nextPageRect.origin.y -= nextPageRect.size.height
-                    if nextPageRect.origin.y < 0.0 {
-                        nextPageRect.origin.y = 0.0
-                    }
-                }
-                else if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["bottom"]!) {
-                    nextPageRect.origin.y += nextPageRect.size.height
-                    if nextPageRect.origin.y + nextPageRect.size.height > self.collectionView!.contentSize.height {
-                        nextPageRect.origin.y = self.collectionView!.contentSize.height - nextPageRect.size.height
-                    }
-                }
-            }
-            if !CGRectEqualToRect(nextPageRect, self.collectionView!.bounds){
-                let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.8 * Double(NSEC_PER_SEC)))
-                dispatch_after(delayTime, dispatch_get_main_queue(), {
-                    self.animating = false
-                    self.handleGesture(gestureRecognizer as! UIPanGestureRecognizer)
-                });
-                self.animating = true
-                self.collectionView!.scrollRectToVisible(nextPageRect, animated: true)
-            }
-        }
-    }
-    
-    func handleGesture(gesture: UIPanGestureRecognizer) -> Void {
-        if let bundle = self.bundle {
-            let dragPointOnCanvas = gesture.locationInView(self.view)
-            if gesture.state == UIGestureRecognizerState.Began {
-                self.collectionView.scrollEnabled = false
-                self.tapGesture.enabled = false
-                self.stopScrollTimer()
-                self.startScrolling = false
-                self.isPanning = true
-                bundle.sourceCell.hidden = true
-                self.view?.addSubview(bundle.representationImageView)
-                self.view.userInteractionEnabled = false
-                UIView.animateWithDuration(0.3, animations: { () -> Void in
-                    bundle.representationImageView.alpha = 0.8
-                })
-                self.view.userInteractionEnabled = false
-            }
-            if gesture.state == UIGestureRecognizerState.Changed {
-                // Update the representation image
-                var imageViewFrame = bundle.representationImageView.frame
-                var point = CGPointZero
-                point.x = dragPointOnCanvas.x - bundle.offset.x
-                point.y = dragPointOnCanvas.y - bundle.offset.y + kmovingMainNoteSliderHeight
-                imageViewFrame.origin = point
-                bundle.representationImageView.frame = imageViewFrame
-                let tempX = gesture.locationInView(self.collectionView).x
-                let tempY = gesture.locationInView(self.collectionView).y + kmovingMainNoteSliderHeight + self.collectionView.frame.size.height / 2
-                let dragPointOnCollectionView = CGPointMake(tempX, tempY)//gesture.locationInView(self.collectionView)
-                if let toIndexPath : NSIndexPath = self.collectionView?.indexPathForItemAtPoint(dragPointOnCollectionView) {
-                    self.checkForDraggingAtTheEdgeAndAnimatePaging(gesture)
-                    if toIndexPath.isEqual(bundle.currentIndexPath) == false {
-                        moveDataItem(bundle.currentIndexPath, toIndexPath: toIndexPath)
-                        self.collectionView!.moveItemAtIndexPath(bundle.currentIndexPath, toIndexPath: toIndexPath)
-                        self.bundle!.currentIndexPath = toIndexPath
-                    }
-                }
-                
-                self.doubleArrowView.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - kmovingMainNoteSliderHeight/2)
-            }
-            if gesture.state == UIGestureRecognizerState.Ended || gesture.state == UIGestureRecognizerState.Cancelled {
-                self.doubleArrowView.center.x = bundle.sourceCell.center.x - self.collectionView.contentOffset.x
-                self.doubleArrowView.frame.origin.y = self.collectionView.frame.origin.y - kmovingMainNoteSliderHeight
-                bundle.sourceCell.hidden = false
-                bundle.representationImageView.removeFromSuperview()
-                collectionView!.reloadData()
-                self.bundle = nil
-
-                self.doubleArrowView.removeGestureRecognizer(gesture)
-                self.removeDoubleArrowView()
-                self.tapGesture.enabled = true
-                self.view.userInteractionEnabled = true
-                self.isPanning = false
-                self.collectionView.scrollEnabled = true
-                for i in 0..<fretsNumber.count {
-                    self.string3FretChangeingPosition[fretsNumber[i]] = string3FretPosition[i]
-                }
-            }
-        }
-    }
-    
-    func removeDoubleArrowView(){
-        self.startScrolling = false
-        if(self.doubleArrowView != nil){
-            self.doubleArrowView.removeFromSuperview()
-            self.view.insertSubview(self.doubleArrowView, belowSubview: self.collectionView)
-            UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseOut,.AllowUserInteraction], animations: {
-                self.doubleArrowView.center.y = self.doubleArrowView.center.y + kmovingMainNoteSliderHeight
-                }, completion: {
-                    completed in
-                    if(self.doubleArrowView != nil){
-                        self.doubleArrowView.removeFromSuperview()
-                        self.doubleArrowView = nil
-                        self.prepareMoveSwipeUpGesture.enabled = true
-                        self.stopScrollTimer()
-                    }
-            })
-        }
-        
-    }
     
     // buttons
     var tuningButton: UIButton = UIButton()
@@ -1018,7 +538,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let musicView: UIView = UIView()
 
        
-        menuView.frame = CGRectMake(0, 0, self.trueWidth, 2 / 20 * self.trueHeight)
+        menuView.frame = CGRectMake(-1, 0, self.trueWidth+1, 2 / 20 * self.trueHeight)
         //menuView.backgroundColor = UIColor.clearColor()//UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)
         menuView.backgroundColor = UIColor(patternImage: UIImage(named: "topMenuBar")!)
 
@@ -1036,38 +556,38 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let buttonSpace = (0.5 * self.trueWidth - 3.5 * buttonWidth - 0.5 / 31.0 * self.trueWidth) / 3.0
         let buttonEdge: CGFloat = CGFloat(0.2 / 20) * self.trueHeight
         
-        backButton.frame = CGRectMake(0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        backButton.frame = CGRectMake(0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
         backButton.setImage(UIImage(named: "backButton"), forState: UIControlState.Normal)
         backButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)//CGFloat(0.6 / 20) * self.trueHeight
         menuView.addSubview(backButton)
         
-        statusLabel.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, 4 * (buttonWidth + buttonSpace), 2 / 20 * self.trueHeight)
+        statusLabel.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, 4 * (buttonWidth + buttonSpace), 2 / 20 * self.trueHeight)
         self.statusLabel.text = "Tabs Editor"
         statusLabel.textColor = UIColor.whiteColor()
         statusLabel.hidden = true
         statusLabel.textAlignment = NSTextAlignment.Center
         menuView.addSubview(statusLabel)
         
-        addButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        addButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         addButton.addTarget(self, action: "pressAddButton:", forControlEvents: UIControlEvents.TouchUpInside)
         addButton.setImage(UIImage(named: "addButton"), forState: UIControlState.Normal)
         addButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(addButton)
         
-        resetButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        resetButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
         resetButton.setImage(UIImage(named: "trashButton"), forState: UIControlState.Normal)
         resetButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(resetButton)
         
-        playPauseButton.frame = CGRectMake(3 * buttonWidth + 3 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        playPauseButton.frame = CGRectMake(3 * buttonWidth + 3 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         playPauseButton.addTarget(self, action: "singleTapOnMusicControlView:", forControlEvents: UIControlEvents.TouchUpInside)
         playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
         playPauseButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(playPauseButton)
         
-        tuningButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth, 0, buttonWidth, buttonWidth)
+        tuningButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
         tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
         tuningButton.setImage(UIImage(named: "tuningButton"), forState: UIControlState.Normal)
         tuningButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
@@ -1075,21 +595,21 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         
         
         let privacyDoneButtonContainer: UIImageView = UIImageView()
-        privacyDoneButtonContainer.frame = CGRectMake(30.5 / 31 * self.trueWidth - 2.5 * 1.6 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight, 2.5 * 1.6 / 20 * self.trueHeight, 1.6 / 20 * self.trueHeight)
+        privacyDoneButtonContainer.frame = CGRectMake(30.5 / 31 * self.trueWidth - 2.5 * 1.6 / 20 * self.trueHeight+1, 0.2 / 20 * self.trueHeight, 2.5 * 1.6 / 20 * self.trueHeight, 1.6 / 20 * self.trueHeight)
         privacyDoneButtonContainer.image = UIImage(named: "frame")
         privacyDoneButtonContainer.userInteractionEnabled = true
         
         menuView.addSubview(privacyDoneButtonContainer)
         
         //TODO: set button from the visible attribute itself
-        privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight, 0, buttonWidth, buttonWidth)
+        privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight+1, 0, buttonWidth, buttonWidth)
         privacyButton.backgroundColor = UIColor.clearColor()
         privacyButton.setImage(UIImage(named: "globeIcon"), forState: UIControlState.Normal)
         privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
         privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
         menuView.addSubview(privacyButton)
         
-        doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight, 0, 1.2 * buttonWidth, buttonWidth)
+        doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight+1, 0, 1.2 * buttonWidth, buttonWidth)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         doneButton.setImage(UIImage(named: "saveText"), forState: UIControlState.Normal)
         doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.4 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.7 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
@@ -1261,7 +781,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         if addedNoteButtonOnCompleteView == true {
             self.createEditFingerPoint(noteButton.tag)
         }
-        for var i = 6 - indexString; i <= 5; i++ {
+        for i in(6 - indexString)...5 {
             self.fingerPoint[i].hidden = false
         }
         
@@ -1277,7 +797,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             var indexFret: Int = Int()
             var indexString: Int = Int()
             let location = sender.locationInView(self.completeStringView)
-            for var index = 0; index < self.string6FretPosition.count; index++ {
+            for index in 0..<self.string6FretPosition.count {
                 if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
                     if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
                         indexFret = index
@@ -1285,7 +805,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 }
             }
-            for var index = 0; index < 6; index++ {
+            for index in 0..<6 {
                 if CGRectContainsPoint(self.string6View[index].frame, location) {
                     indexString = index
                 }
@@ -1307,7 +827,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if (indexString + 1) < self.currentBaseButton.tag / 100 {
                 moveFingerPoint(indexFret, indexString: indexString)
             }
-            print("index: \((indexString + 1) * 100 + indexFret))")
             PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
         } else {
             self.stopJiggling()
@@ -1319,7 +838,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     // move finger point when tap on 6 string view
     func moveFingerPoint(indexFret: Int, indexString: Int) {
-        print("move finger point")
         self.view.userInteractionEnabled = false
             let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
             let buttonX = (string6FretPosition[indexFret] + string6FretPosition[indexFret + 1]) / 2 - buttonWidth / 2
@@ -1398,7 +916,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.buttonOnSpecificScrollView.removeAll()
                 self.removeObjectsOnSpecificTabsScrollView()
                 self.longPressSpecificTabButton.removeAll()
-                for var i = 0; i < self.specificTabSets.count; i++ {
+                for i in 0..<self.specificTabSets.count {
                     if self.specificTabSets[i].content != "" {
                         let specificButton: UIButton = UIButton()
                         specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
@@ -1531,7 +1049,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
         
         let stringNumber = Int(self.specificTabSets[sender].index) / 100
-        for var i = 0 ; i <= 6 - stringNumber ; i++ {
+        for i in 0...(6 - stringNumber) {
             self.fingerPoint[i].hidden = true
         }
         
@@ -1682,7 +1200,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    
     // 1 second = 10 px
     func updateFramePosition() {
         for item in topLineView.subviews {
@@ -1703,26 +1220,32 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func setUpTopLine() {
         let presentPosition = CGFloat(Float(currentTime) / Float(self.duration))
-        
         progressBlock.frame = CGRectMake((0.5) * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier), progressBlock.frame.origin.y, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), progressBlock.frame.size.height)
         
         topLineView.frame = CGRectMake(0, 0, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 20)
-        
-
         var numberOfLine: Int = Int(CGFloat(theSong.getDuration()) / 10 * 2)
+        var lineSpace: CGFloat = 5
+        if tabsEditorProgressWidthMultiplier >= 15 {
+           numberOfLine = Int(CGFloat(theSong.getDuration()) / 10 * 4)
+            lineSpace = 2.5
+        }
         if numberOfLine % 2 == 0 {
             numberOfLine += 3
         } else {
             numberOfLine += 2
         }
-        for var i = 0; i < numberOfLine; i++ {
+        for i in 0..<numberOfLine {
             var frame: CGRect!
             if i % 2 == 0 {
-                frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier, 11, 2, 9)
+                frame = CGRectMake(CGFloat(i) * lineSpace * tabsEditorProgressWidthMultiplier, 11, 2, 9)
                 let timeLabel: UILabel = UILabel()
-                timeLabel.frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier - 15, 0, 30, 10)
-                let min: Int = i * 5 / 60
-                let sec: Int = (i * 5) % 60
+                timeLabel.frame = CGRectMake(CGFloat(i) * lineSpace * tabsEditorProgressWidthMultiplier - 15, 0, 30, 10)
+                var min: Int = (i * 5) / 60
+                var sec: Int = (i * 5) % 60
+                if lineSpace >= 2.4 && lineSpace <= 2.6 {
+                    min = (i * 5) / 2 / 60
+                    sec = ((i * 5) / 2) % 60
+                }
                 if min < 10 {
                     if sec < 10 {
                         timeLabel.text = "0\(min):0\(sec)"
@@ -1731,9 +1254,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     }
                 } else {
                     if sec < 10 {
-                        timeLabel.text = "0\(min):0\(sec)"
+                        timeLabel.text = "\(min):0\(sec)"
                     } else {
-                        timeLabel.text = "0\(min):\(sec)"
+                        timeLabel.text = "\(min):\(sec)"
                     }
                 }
                 timeLabel.font = UIFont.systemFontOfSize(9)
@@ -1741,7 +1264,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 timeLabel.textAlignment = .Center
                 topLineView.addSubview(timeLabel)
             } else {
-                frame = CGRectMake(CGFloat(i * 5) * tabsEditorProgressWidthMultiplier, 15, 1, 5)
+                frame = CGRectMake(CGFloat(i) * lineSpace * tabsEditorProgressWidthMultiplier, 15, 1, 5)
             }
             let tempView: UIView = UIView(frame: frame)
             tempView.backgroundColor = UIColor(red: 171 / 255, green: 171 / 255, blue: 171 / 255, alpha: 1)
@@ -1977,30 +1500,28 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func createStringAndFretPosition() {
         // the postion for 6 string view
         let string6Height: CGFloat = 7 / 60 * self.trueHeight
-        for var i = 0; i < 6; i++ {
-            if i == 0 {
-                self.string6Position.append(string6Height / 2)
-            } else {
-                self.string6Position.append(self.string6Position[i - 1] + string6Height)
-            }
-        }
         let fret6Width = self.trueWidth / 5
-        for var i = 0; i < 26; i++ {
-            self.string6FretPosition.append(CGFloat(i) * fret6Width)
-        }
         // the position for 3 string view
         let string3Height: CGFloat = 11 / 60 * self.trueHeight
-        for var i = 0; i < 3; i++ {
-            if i == 0 {
-                self.string3Position.append(string3Height / 2)
-            } else {
-                self.string3Position.append(self.string3Position[i - 1] + string3Height)
-            }
-        }
         let fret3Width = self.trueWidth / 5
-        for var i = 0; i < 26; i++ {
+        for i in 0..<26 {
+            self.string6FretPosition.append(CGFloat(i) * fret6Width)
             self.string3FretPosition.append(CGFloat(i) * fret3Width)
             self.string3FretChangeingPosition[i] = CGFloat(i) * fret3Width
+            if i < 6 {
+                if i == 0 {
+                    self.string6Position.append(string6Height / 2)
+                } else {
+                    self.string6Position.append(self.string6Position[i - 1] + string6Height)
+                }
+            }
+            if i < 3 {
+                if i == 0 {
+                    self.string3Position.append(string3Height / 2)
+                } else {
+                    self.string3Position.append(self.string3Position[i - 1] + string3Height)
+                }
+            }
         }
         
         
@@ -2008,7 +1529,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     
     func addString6View() {
         let string6Height: CGFloat = 7 / 60 * self.trueHeight
-        for var i = 0; i < 6; i++ {
+        for i in 0..<6 {
             let tempStringView: UIView = UIView()
             tempStringView.frame = CGRectMake(0, CGFloat(i) * string6Height, self.trueWidth * 5, string6Height)
             if i == 5 {
@@ -2024,9 +1545,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     func createSoundWave() {
         let frame = CGRectMake(0.5 * self.trueWidth, 2 / 20 * self.trueHeight, tabsEditorProgressWidthMultiplier * CGFloat(theSong.getDuration()), 6 / 20 * self.trueHeight)
         self.progressBlock = UIView(frame: frame)
-        if(theSong == nil){
-            print("the song is empty")
-        }
         if isDemoSong {
             let url: NSURL = theSong.getURL() as! NSURL
             self.avPlayer = try! AVAudioPlayer(contentsOfURL: url)
@@ -2065,11 +1583,15 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         }
 
         if !isPanning {
+            let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
             if startTime.toDecimalNumer() - Float(self.toTime) < (1 * speed ) && startTime.toDecimalNumer() - Float(self.toTime) >= 0 {
                 startTime.addTime(Int(100 / stepPerSecond))
                 self.currentTime = NSTimeInterval(startTime.toDecimalNumer()) - 0.01
+                if (tempPlaytime.isNaN || tempPlaytime == 0){
+                    startTime.setTime(0)
+                    self.currentTime = 0
+                }
             } else {
-                let tempPlaytime = !isDemoSong ? self.musicPlayer.currentPlaybackTime : self.avPlayer.currentTime
                 if !tempPlaytime.isNaN {
                     startTime.setTime(Float(tempPlaytime))
                     self.currentTime = NSTimeInterval(startTime.toDecimalNumer())
@@ -2096,7 +1618,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     }
     
     func moveDataItem(fromIndexPath : NSIndexPath, toIndexPath: NSIndexPath) {
-        print("move data item")
         let name = self.fretsNumber[fromIndexPath.item]
         self.fretsNumber.removeAtIndex(fromIndexPath.item)
         self.fretsNumber.insert(name, atIndex: toIndexPath.item)
@@ -2180,7 +1701,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         let labelHeight = ( self.progressBlock.frame.height - 20 ) / CGFloat(labelHeightNumber)
         let width = self.trueWidth / 18
         var frame: CGRect = CGRect()
-        for var i = 0; i < endIndex; i++ {
+        for i in 0..<endIndex {
             if self.compareTabs(allTabsOnMusicLine[i].tab, tab2: tab) {
                 let tempFrame = CGRectMake(0 + CGFloat(self.currentTime / self.duration) * (self.progressBlock.frame.width), allTabsOnMusicLine[i].tabView.frame.origin.y, allTabsOnMusicLine[i].tabView.frame.width, allTabsOnMusicLine[i].tabView.frame.height)
                 return tempFrame
@@ -2198,7 +1719,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // caluclate the tab on music line without repeat
     func numberOfUnrepeatedTabOnMainView(endIndex: Int, allTabsOnMusicLine: [tabOnMusicLine]) -> Int{
         var set = [String: Int]()
-        for var i = 0; i < endIndex; i++ {
+        for i in 0..<endIndex {
             if let val = set["\(allTabsOnMusicLine[i].tab.index) \(allTabsOnMusicLine[i].tab.name)"] {
                 set["\(allTabsOnMusicLine[i].tab.index) \(allTabsOnMusicLine[i].tab.name)"] = val + 1
             }
@@ -2297,7 +1818,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: nil))
                 alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler:{
                     handle in
-                    print("back to song view controller")
                     self.tuningMenu.hidden = true
                     self.progressBlock.hidden = true
                     self.removeNotification()
@@ -2305,6 +1825,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.avPlayer.pause()
                     } else {
                         self.musicPlayer.pause()
+                    }
+                    if let songVC = self.songViewController {
+                        if songVC.singleLyricsTableView != nil {
+                            songVC.updateSingleLyricsAlpha()
+                            songVC.updateSingleLyricsPosition(false)
+                        }
                     }
                     self.dismissViewControllerAnimated(true, completion: {
                         completed in
@@ -2320,7 +1846,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 }))
                 self.presentViewController(alertController, animated: true, completion: nil)
             }else{
-                print("back to song view controller")
                 tuningMenu.hidden = true
                 self.progressBlock.hidden = true
                 removeNotification()
@@ -2328,6 +1853,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     self.avPlayer.pause()
                 } else {
                     self.musicPlayer.pause()
+                }
+                if let songVC = self.songViewController {
+                    if songVC.singleLyricsTableView != nil {
+                        songVC.updateSingleLyricsAlpha()
+                        songVC.updateSingleLyricsPosition(false)
+                    }
                 }
                 self.dismissViewControllerAnimated(true, completion: {
                     completed in
@@ -2358,7 +1889,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
         self.view.userInteractionEnabled = true
     }
     func pressTuningButton(sender: UIButton) {
-        print("press tuning button")
         let tempx = self.collectionView.contentOffset.x
         self.view.userInteractionEnabled = false
         self.backToMainView()
@@ -2383,12 +1913,12 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             action in
             self.view.userInteractionEnabled = false
                 UIView.animateWithDuration(0.3, animations: {
-                    for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+                    for i in 0..<self.allTabsOnMusicLine.count {
                         self.allTabsOnMusicLine[i].tabView.alpha = 0
                     }
                     }, completion: {
                         completed in
-                        for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+                        for i in 0..<self.allTabsOnMusicLine.count {
                             self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
                         }
                         self.allTabsOnMusicLine.removeAll()
@@ -2513,7 +2043,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         }
                         addSuccessed = false
                     } else {
-                        for var i = 0; i < 6; i++ {
+                        for i in 0..<6 {
                             if self.fingerPoint[i].accessibilityIdentifier == "blackX" {
                                 content = content + "xx"
                             } else {
@@ -2524,7 +2054,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                                 }
                             }
                         }
-                        print("This is the new tab's content: \(content)")
                         self.currentSelectedSpecificTab = NormalTabs()
                         if let compareExistTabs = TabsDataManager.getUniqueTab(index, name: name, content: content)?.tabs {
                             self.currentSelectedSpecificTab.tabs = compareExistTabs
@@ -2536,7 +2065,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                         self.currentSelectedSpecificTab.index = index
                         self.currentSelectedSpecificTab.name = name
                         self.currentSelectedSpecificTab.content = content
-                        print("successfully add to database")
                         addSuccessed = true
                         self.addSpecificFingerPoint = true
                         self.backToMainView()
@@ -2547,9 +2075,9 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     var addNew: Bool = true
                     if let _ = self.currentSelectedSpecificTab {
                         let fretNumber = Int(self.currentSelectedSpecificTab.index) - Int(self.currentSelectedSpecificTab.index) / 100 * 100
-                        for var i = 0; i < self.mainViewDataArray.count; i++ {
+                        for i in 0..<self.mainViewDataArray.count {
                             if self.mainViewDataArray[i].fretNumber == fretNumber {
-                                for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
+                                for j in 0..<self.mainViewDataArray[i].noteButtonsWithTab.count {
                                     if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.currentSelectedSpecificTab) {
                                         let alertController = UIAlertController(title: "Warning", message: "This tab already exist on Main View", preferredStyle: UIAlertControllerStyle.Alert)
                                         alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: { action in
@@ -2605,7 +2133,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 allChords.append(oneline.tab.name)
                 allTabs.append(oneline.tab.content)
                 allTimes.append(Float(oneline.time))
-                print("TABS:\(oneline.tab.name) |Time:\(oneline.time)")
             }
             
             var tuningOfTheSong = ""
@@ -2614,6 +2141,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             }
             
             //check if tabsSet id is bigger than 0, if so, means this tabs has been saved to the cloud, then we use same tabsSetid, otherwise if less than one, it means it's new
+            if (allChords.count < 3) {
+                let alertController = UIAlertController(title: nil, message: "Please add at least THREE chords into your tab", preferredStyle: UIAlertControllerStyle.Alert)
+                alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+                self.presentViewController(alertController, animated: true, completion: nil)
+                return
+            }
+
             let savedTabsSetId = CoreDataManager.getTabs(theSong, fetchingUsers: true).3
             
             CoreDataManager.saveTabs(theSong, chords: allChords, tabs: allTabs, times: allTimes, tuning: tuningOfTheSong, capo: Int(capoStepper.value), userId:
@@ -2639,6 +2173,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 
                 CoreDataManager.saveCloudIdToTabs(self.isDemoSong ? demoItem : self.theSong, cloudId: cloudId)
             })
+            
+            if let songVC = self.songViewController {
+                if songVC.singleLyricsTableView != nil {
+                    songVC.updateSingleLyricsAlpha()
+                    songVC.updateSingleLyricsPosition(false)
+                }
+            }
             
             self.dismissViewControllerAnimated(true, completion: {
                 completed in
@@ -2690,7 +2231,6 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             if item.fretNumber == Int(tempTab.index) - Int(tempTab.index) / 100 * 100 {
                 item.noteButtonsWithTab.append(tempNoteButtonWithTab)
                 let temp6offset = self.string6FretPosition[tempTab.index.integerValue%100] - self.completeStringView.contentOffset.x
-                print("tempTab.index.integerValue%100:\(self.string3FretChangeingPosition[tempTab.index.integerValue%100]!)")
                 let temp3offset = self.string3FretChangeingPosition[tempTab.index.integerValue%100]! - temp6offset
                 if (temp3offset < 0){
                     self.originaloffset = 0
@@ -2724,7 +2264,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
             var buttonX2: [CGFloat] = [self.trueWidth / 5 / 2 - buttonWidth2, self.trueWidth / 5 / 2]
             var buttonX3: [CGFloat] = [0, self.trueWidth / 5 / 2 - buttonWidth3 / 2, self.trueWidth / 5 / 2 + buttonWidth3 / 2]
             
-            for var i = 4; i <= 6; i++ {
+            for i in 4...6 {
                 var tempButtonArray: [noteButtonWithTab] = [noteButtonWithTab]()
                 for buttonWithTab in item.noteButtonsWithTab {
                     if Int(buttonWithTab.tab.index) / 100 == i {
@@ -2737,13 +2277,13 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                     tempButtonArray[0].noteButton.titleLabel!.font = UIFont.boldSystemFontOfSize(UIFont.smallSystemFontSize())
                 }
                 if tempButtonArray.count == 2 {
-                    for var j = 0; j < tempButtonArray.count; j++ {
+                    for j in 0..<tempButtonArray.count {
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX2[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth2 / 2, buttonWidth2, buttonWidth2)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth2
                         tempButtonArray[j].noteButton.titleLabel!.font = UIFont.boldSystemFontOfSize(UIFont.smallSystemFontSize())
                     }
                 } else if tempButtonArray.count == 3 {
-                    for var j = 0; j < tempButtonArray.count; j++ {
+                    for j in 0..<tempButtonArray.count {
                         tempButtonArray[j].noteButton.frame = CGRectMake(buttonX3[j], self.string3Position[Int(tempButtonArray[j].tab.index) / 100 - 4] - buttonWidth3 / 2, buttonWidth3, buttonWidth3)
                         tempButtonArray[j].noteButton.layer.cornerRadius = 0.5 * buttonWidth3
                         tempButtonArray[j].noteButton.titleLabel!.font = UIFont.boldSystemFontOfSize(UIFont.smallSystemFontSize())
@@ -2989,7 +2529,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     // find the current tab according to the current music time
     func findCurrentTabView() {
         let stepper:Double = 10.0 / Double(self.tabsEditorProgressWidthMultiplier)
-        for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
+        for i in 0..<self.allTabsOnMusicLine.count {
             self.allTabsOnMusicLine[i].tabView.backgroundColor = UIColor.silverGray().colorWithAlphaComponent(0.6)
         }
         if self.allTabsOnMusicLine.count == 1 {
@@ -2998,7 +2538,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
                 self.currentTabViewIndex = 0
             }
         } else {
-            for var i = 1; i < self.allTabsOnMusicLine.count + 1; i++ {
+            for i in 1..<(self.allTabsOnMusicLine.count + 1) {
                 if i < self.allTabsOnMusicLine.count {
                     if self.currentTime > (self.allTabsOnMusicLine[i - 1].time - 0.1 * stepper) && (self.currentTime <= self.allTabsOnMusicLine[i].time) && self.currentTime <= (self.allTabsOnMusicLine[i - 1].time + 3.2 * stepper) {
                         self.allTabsOnMusicLine[i - 1].tabView.backgroundColor = UIColor(red: 0.941, green: 0.357, blue: 0.38, alpha: 1)//UIColor.brownColor()
@@ -3019,903 +2559,7 @@ class TabsEditorViewController: UIViewController, UICollectionViewDelegateFlowLa
     let kAnimationRotateDeg: Double = 1.0
 }
 
-
-//MARK: ADD exist chord to tab editor view
-extension TabsEditorViewController {
-    // get tabs from coredata and show it on tab editor
-    func getBasicNoteIndex(sender: [String]) -> Int {
-        for var i = 0; i < 6; i++ {
-            if sender[i] != "x" {
-                let stringIndex = 6 - i
-                let fretIndex = Int(sender[i])
-                return stringIndex * 100 + fretIndex!
-            }
-        }
-        return 0
-    }
-    
-    func getUnrepeatTabs(sender: [Chord]) -> [NormalTabs] {
-        var tabs: [NormalTabs] = [NormalTabs]()
-        for item in sender {
-            let tempNormalTabs = getNormalTabFromChord(item)
-            var unrepeat: Bool = false
-            for tab in tabs {
-                if tab.tabs == tempNormalTabs.tabs {
-                    unrepeat = true
-                }
-            }
-            if unrepeat == false {
-                tabs.append(tempNormalTabs)
-            }
-        }
-        return tabs
-    }
-    
-    func getNormalTabFromChord(sender: Chord) -> NormalTabs {
-        let index = getBasicNoteIndex(sender.tab.contentArray)
-        let name = sender.tab.name
-        let content = sender.tab.content
-        let tempNormalTabs = TabsDataManager.getUniqueTab(index, name: name, content: content)
-        return tempNormalTabs!
-    }
-    
-    func addTabsFromCoreDataToMainViewDataArray(sender: [Chord]) {
-        let unrepeatTabs = self.getUnrepeatTabs(sender)
-        //noteButtonWithTabArray.removeAll()
-        for item in unrepeatTabs {
-            self.addTabsToMainViewDataArray(item)
-        }
-        self.isShowDiscardAlert = false
-        reorganizeMainViewDataArray()
-        collectionView.reloadData()
-    }
-    
-    func addTabsFromCoreDataToMusicControlView(sender: [Chord]) {
-        for item in sender {
-            for var i = 0; i < noteButtonWithTabArray.count; i++ {
-                let normalTab = getNormalTabFromChord(item)
-                if normalTab.name == noteButtonWithTabArray[i].tab.name && normalTab.index == noteButtonWithTabArray[i].tab.index && normalTab.content == noteButtonWithTabArray[i].tab.content {
-                    self.currentTime = Double(item.time.toDecimalNumer())
-                    let presentPosition = CGFloat(self.currentTime / self.duration)
-                    //
-                    
-                    //self.progressBlock.setProgress(presentPosition)
-                    
-                    //
-                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
-                    
-                    let returnValue = addTabViewOnMusicControlView(i)
-                    
-                    self.allTabsOnMusicLine.append(returnValue.1)
-                    self.progressBlock.addSubview(returnValue.0)
-                }
-            }
-        }
-        
-        let current = 0.0
-        if isDemoSong {
-            self.avPlayer.currentTime = current
-        } else {
-            self.musicPlayer.currentPlaybackTime = current
-        }
-        update()
-        self.findCurrentTabView()
-    }
-
-    func checkChordsWithCoredata(chords: [Chord], completion: ((complete: [Chord]) -> Void)) {
-        var needAddNewChords: Bool = false
-        var newChords: [Chord] = chords
-        var needAddNewChordsArray: [Tab] = [Tab]()
-        for item in chords {
-            let index = self.getBasicNoteIndex(item.tab.contentArray)
-            if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
-                continue
-            } else {
-                needAddNewChords = true
-                needAddNewChordsArray.append(item.tab)
-            }
-        }
-        
-        if needAddNewChords {
-            var nameString: String = ""
-            var set:[String: Int] = [String: Int]()
-            for item in needAddNewChordsArray {
-                set[item.name] = 0
-            }
-            for item in set {
-                nameString = nameString + item.0 + ", "
-            }
-            let alertController = UIAlertController(title: nil, message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
-            
-            alertController.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default,handler: {
-                action in
-                for var i = chords.count - 1; i >= 0; i-- {
-                    let index = self.getBasicNoteIndex(chords[i].tab.contentArray)
-                    if let _ = TabsDataManager.getUniqueTab(index, name: chords[i].tab.name, content: chords[i].tab.content) {
-                        continue
-                    } else {
-                        newChords.removeAtIndex(i)
-                    }
-                }
-                completion(complete: newChords)
-            }))
-            
-            alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler: {
-                action in
-                for item in needAddNewChordsArray {
-                    let index = self.getBasicNoteIndex(item.contentArray)
-                    if let _ = TabsDataManager.getUniqueTab(index, name: item.name, content: item.content) {
-                        continue
-                    } else {
-                        TabsDataManager.addNewTabs(index, name: item.name, content: item.content)
-                    } 
-                }
-                completion(complete: newChords)
-            }))
-            
-            self.presentViewController(alertController, animated: true, completion: nil)
-        } else {
-            completion(complete: newChords)
-        }
-    }
-
-    // This is the main function to add the chord into editor view, I used this function in ViewDidLoad at line 203
-    func addChordToEditorView(sender: Findable) {
-        let tabs = CoreDataManager.getTabs(sender, fetchingUsers: true)
-        let chord: [Chord] = tabs.0
-        let tuning: String = tabs.1
-        let capoValue: Int = tabs.2
-        let visible: Bool = tabs.4
-        
-        //let visible
-        if chord.count > 0 {
-            self.checkChordsWithCoredata(chord, completion: {
-                complete in
-                self.addTabsFromCoreDataToMainViewDataArray(complete)
-                self.addTabsFromCoreDataToMusicControlView(complete)
-                let tuningValues = Tuning.toArray(tuning)
-                for i in 0..<self.tuningValueLabels.count {
-                    self.tuningValueLabels[i].text = tuningValues[i]
-                }
-                self.capoStepper.value = Double(capoValue)
-                self.capoLabel.text = "Capo: \(capoValue)"
-                self.isPublic = visible
-                if self.isPublic {
-                    self.privacyButton.setImage(UIImage(named: "globeIcon"), forState: .Normal)
-                    self.privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
-                } else {
-                    self.privacyButton.setImage(UIImage(named: "privateButton"), forState: .Normal)
-                    self.privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.3 / 20 * self.trueHeight, 1 / 20 * self.trueHeight, 0.8 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight)
-                }
-            })
-            
-            
-
-        }
-    }
-}
-
-//MARK: Jiggling button
-extension TabsEditorViewController {
-    func degreesToRadians(x: Double) -> Double { return M_PI * (x) / 180.0 }
-    
-    func startJiggling(sender: UIGestureRecognizer) {
-        if sender.isKindOfClass(UITapGestureRecognizer) {
-            self.jigglingChanged()
-            self.currentBaseButton.removeGestureRecognizer(self.jigglingLongPressGesture)
-        }else if sender.isKindOfClass(UILongPressGestureRecognizer) {
-            let tempSender = sender as! UILongPressGestureRecognizer
-            if tempSender.state == .Began {
-                self.jigglingChanged()
-            }
-            
-            handleCurrentBaseButtonLongPress(tempSender)
-        }
-    }
-    
-    func jigglingChanged(){
-        self.isJiggling = true
-        let buttonWidth = 9 / 60 * self.trueHeight
-        let center = self.currentBaseButton.center
-        
-        self.currentBaseButton.frame = CGRectMake(self.currentBaseButton.frame.origin.x, self.currentBaseButton.frame.origin.y, buttonWidth, buttonWidth)
-        self.currentBaseButton.center = center
-        self.currentBaseButton.layer.cornerRadius = 0.5 * buttonWidth
-        let randomInt: UInt32  = arc4random_uniform(500)
-        let r:Double = (Double(randomInt) / 500.0) + 5
-        
-        let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
-        let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
-        let originalX = self.currentBaseButton.center.x
-        self.currentBaseButton.center.x = originalX - 1
-        self.currentBaseButton.transform = leftWobble;  // starting point
-        self.currentBaseButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
-        let a:CGFloat = CGFloat((1 - sqrt(2.0))/2.0) * (self.currentBaseButton.frame.size.width/2.0) + (2/3)*(self.currentBaseButton.frame.size.width/4.0 - self.currentBaseButton.frame.size.width/6.0)
-        
-        deleteView.frame = CGRectMake( a ,  a, self.currentBaseButton.frame.size.width/3, self.currentBaseButton.frame.size.width/3)
-        
-        let image =  UIImage(named: "deleteX")
-        deleteView.image = image
-        
-        self.currentBaseButton.addSubview(deleteView)
-        
-        UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
-            UIView.setAnimationRepeatCount(Float(NSNotFound))
-            self.currentBaseButton.center.x = originalX+1
-            self.currentBaseButton.transform = rightWobble
-            
-            }, completion: nil)
-        self.currentBaseButton.removeGestureRecognizer(self.jigglingTapGesture)
-        self.jigglingPanGesture.addTarget(self, action: "handleCurrentBaseButtonPan:")
-        self.currentBaseButton.addGestureRecognizer(self.jigglingPanGesture)
-    }
-    
-    func stopJiggling() {
-        self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
-        self.currentBaseButton.addGestureRecognizer(self.jigglingLongPressGesture)
-        deleteView.removeFromSuperview()
-        self.currentBaseButton.layer.removeAllAnimations()
-        self.currentBaseButton.transform = CGAffineTransformIdentity
-        let buttonWidth = 7 / 60 * self.trueHeight
-        let center = self.currentBaseButton.center
-        self.currentBaseButton.frame = CGRectMake(self.currentBaseButton.frame.origin.x, self.currentBaseButton.frame.origin.y, buttonWidth, buttonWidth)
-        self.currentBaseButton.layer.cornerRadius = 0.5 * buttonWidth
-        self.currentBaseButton.center = CGPoint(x: center.x-1, y: center.y)
-        self.isJiggling = false
-        
-        
-    }
-    
-    
-    func handleCurrentBaseButtonPan(sender: UIPanGestureRecognizer) {
-        let transfer:CGPoint = sender.locationInView(self.completeStringView)
-        if sender.state == .Began {
-            self.currentBaseButton.removeGestureRecognizer(jigglingLongPressGesture)
-            self.currentBaseButton.alpha = 0.5
-            self.originalCenter = self.currentBaseButton.center
-            self.longPressX = transfer.x - originalCenter.x
-            self.longPressY = transfer.y - originalCenter.y
-        } else if sender.state == .Changed {
-            self.currentBaseButton.center = CGPointMake(transfer.x - longPressX, transfer.y - longPressY)
-            if(self.currentBaseButton.center.x > self.completeStringView.contentOffset.x + self.trueWidth/2){
-                stopLeftEdgeTimer()
-                startRightEdgeTimer()
-            }else{
-                stopRightEdgeTimer()
-                startLeftEdgeTimer()
-            }
-        } else if sender.state == .Ended || sender.state == .Cancelled {
-            stopLeftEdgeTimer()
-            stopRightEdgeTimer()
-            self.currentBaseButton.alpha = 0.8
-            var indexFret: Int = Int()
-            var indexString: Int = Int()
-            let location = self.currentBaseButton.center
-            for var index = 0; index < self.string6FretPosition.count; index++ {
-                if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
-                    if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
-                        indexFret = index
-                        break
-                    }
-                }
-            }
-            for var index = 0; index < 6; index++ {
-                if CGRectContainsPoint(self.string6View[index].frame, location) {
-                    indexString = index
-                }
-            }
-            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
-            
-            if indexString >= 3 {
-                let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
-                let buttonString = self.string6Position[indexString]
-                let buttonWidth = 9 / 60 * self.trueHeight
-                self.currentBaseButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
-                let noteButton = sender.view as! UIButton
-                let oldNoteButtonTag = noteButton.tag
-                noteButton.tag = (indexString + 1) * 100 + indexFret
-                let tabName = TabsDataManager.fretsBoard[indexString][indexFret]
-                noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
-                self.tabNameTextField.text = ""
-                self.fingerPoint[6 - (indexString + 1)].hidden = true
-                self.currentNoteButton = noteButton
-                self.currentBaseButton = noteButton
-                self.noteButtonOnCompeteScrollView = noteButton
-                if(oldNoteButtonTag != currentNoteButton.tag){
-                    self.addSpecificTabButton(noteButton.tag)
-                }
-                self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
-            } else {
-                self.currentBaseButton.center = self.originalCenter
-            }
-            self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
-            self.currentBaseButton.addGestureRecognizer(self.jigglingLongPressGesture)
-            self.stopJiggling()
-            self.currentBaseButton.removeGestureRecognizer(sender)
-        }
-    }
-    
-    func handleCurrentBaseButtonLongPress(sender: UILongPressGestureRecognizer) {
-        let transfer:CGPoint = sender.locationInView(self.completeStringView)
-        if sender.state == .Began {
-            self.currentBaseButton.removeGestureRecognizer(jigglingPanGesture)
-            self.currentBaseButton.alpha = 0.5
-            self.originalCenter = self.currentBaseButton.center
-            self.longPressX = transfer.x - originalCenter.x
-            self.longPressY = transfer.y - originalCenter.y
-          
-        } else if sender.state == .Changed {
-            self.currentBaseButton.center = CGPointMake(transfer.x - longPressX, transfer.y - longPressY)
-            if(self.currentBaseButton.center.x > self.completeStringView.contentOffset.x + self.trueWidth/2){
-                stopLeftEdgeTimer()
-                startRightEdgeTimer()
-            }else{
-                stopRightEdgeTimer()
-                startLeftEdgeTimer()
-            }
-        } else if sender.state == .Ended || sender.state == .Cancelled {
-            stopLeftEdgeTimer()
-            stopRightEdgeTimer()
-            
-            self.currentBaseButton.alpha = 0.8
-            var indexFret: Int = Int()
-            var indexString: Int = Int()
-            let location = self.currentBaseButton.center
-            for var index = 0; index < self.string6FretPosition.count; index++ {
-                if location.x < self.string6FretPosition[self.string6FretPosition.count - 2] {
-                    if location.x > self.string6FretPosition[index] && location.x < self.string6FretPosition[index + 1] {
-                        indexFret = index
-                        break
-                    }
-                }
-            }
-            for var index = 0; index < 6; index++ {
-                if CGRectContainsPoint(self.string6View[index].frame, location) {
-                    indexString = index
-                }
-            }
-            PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
-            var oldNoteButtonTag:Int = 0
-            if indexString >= 3 {
-                self.stopJiggling()
-                let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
-                let buttonString = self.string6Position[indexString]
-                let buttonWidth = 9 / 60 * self.trueHeight
-                self.currentBaseButton.frame = CGRectMake(buttonFret - buttonWidth / 2, buttonString - buttonWidth / 2, buttonWidth, buttonWidth)
-                self.currentBaseButton.layer.cornerRadius = buttonWidth/2
-                let noteButton = self.currentBaseButton
-                oldNoteButtonTag = noteButton.tag
-                noteButton.tag = (indexString + 1) * 100 + indexFret
-                let tabName = TabsDataManager.fretsBoard[indexString][indexFret]
-                noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
-                self.tabNameTextField.text = ""
-                self.fingerPoint[6 - (indexString + 1)].hidden = true
-                
-                self.currentNoteButton = noteButton
-                self.currentBaseButton = noteButton
-                self.noteButtonOnCompeteScrollView = noteButton
-                if(oldNoteButtonTag != currentNoteButton.tag){
-                    self.addSpecificTabButton(noteButton.tag)
-                }
-                self.checkTheFingerPoint(noteButton.tag, oldTag: oldNoteButtonTag, oldTagString4: oldTagString4, oldTagString5: oldTagString5)
-            } else {
-                self.currentBaseButton.center = self.originalCenter
-            }
-            self.currentBaseButton.removeGestureRecognizer(jigglingLongPressGesture)
-            self.jigglingChanged()
-            if abs(location.x - currentBaseButton.center.x) > 1 || abs(location.y - currentBaseButton.center.y) > 1 || oldNoteButtonTag != currentBaseButton.tag {
-                print("oldNoteButtonTag\(oldNoteButtonTag)     currentBaseButton.tag:\(currentBaseButton.tag) ")
-                self.currentBaseButton.addGestureRecognizer(self.jigglingTapGesture)
-                self.stopJiggling()
-                self.currentBaseButton.removeGestureRecognizer(jigglingPanGesture)
-            }else{
-                self.currentBaseButton.addGestureRecognizer(jigglingPanGesture)
-            }
-        }
-    }
-    
-    func startRightEdgeTimer(){
-        if rightEdgeTimer == nil {
-            self.stopEdgeStartTime = -1
-            rightEdgeTimer = NSTimer()
-            rightEdgeTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("autoScrollingOnEdgeToRight"), userInfo: nil, repeats: true)
-        }
-    }
-    
-    func stopRightEdgeTimer(){
-        if(rightEdgeTimer != nil){
-            rightEdgeTimer!.invalidate()
-            rightEdgeTimer = nil
-            self.stopEdgeStartTime = -1
-        }
-    }
-    
-    func startLeftEdgeTimer(){
-        if leftEdgeTimer == nil {
-            self.stopEdgeStartTime = -1
-            leftEdgeTimer = NSTimer()
-            leftEdgeTimer = NSTimer.scheduledTimerWithTimeInterval( 0.01, target: self, selector: Selector("autoScrollingOnEdgeToLeft"), userInfo: nil, repeats: true)
-        }
-    }
-    
-    func stopLeftEdgeTimer(){
-        if(leftEdgeTimer != nil){
-            leftEdgeTimer!.invalidate()
-            leftEdgeTimer = nil
-            self.stopEdgeStartTime = -1
-        }
-    }
-
-    func checkTheFingerPoint(newTag: Int, oldTag: Int, oldTagString4:Int, oldTagString5:Int) {
-        let indexString = newTag / 100
-        if indexString > oldTag / 100 {
-            self.moveFingerPoint(newTag%100, indexString: indexString-1)
-            self.fingerPoint[6 - indexString].hidden = true
-            self.fingerPoint[6 - indexString].accessibilityIdentifier = "grayButton"
-            self.fingerPoint[6 - indexString].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
-            if(!self.fingerPoint[3].hidden){
-                if(self.fingerPoint[2].hidden){
-                    self.moveFingerPoint(oldTagString4, indexString: 3)
-                }
-                self.fingerPoint[2].hidden = false
-                self.fingerPoint[2].accessibilityIdentifier = "grayButton"
-                self.fingerPoint[2].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
-                if indexString == 6 {
-                    self.moveFingerPoint(oldTagString5, indexString: 4)
-                    self.fingerPoint[1].hidden = false
-                    self.fingerPoint[1].accessibilityIdentifier = "grayButton"
-                    self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
-                }
-            }
-        } else {
-            if(indexString == 4){
-                if(oldTag/100 != newTag/100){
-                    self.oldTagString4 = fingerPoint[2].tag
-                    if(!fingerPoint[1].hidden){
-                        self.oldTagString5 = fingerPoint[1].tag
-                    }
-                }
-                self.moveFingerPoint(newTag%100, indexString: indexString-1)
-                self.moveFingerPoint(0, indexString: 4)
-                self.moveFingerPoint(0, indexString: 5)
-                self.fingerPoint[0].hidden = true
-                self.fingerPoint[1].hidden = true
-                self.fingerPoint[2].hidden = true
-                self.fingerPoint[0].accessibilityIdentifier = "blackX"
-                self.fingerPoint[1].accessibilityIdentifier = "blackX"
-                self.fingerPoint[2].accessibilityIdentifier = "grayButton"
-                self.fingerPoint[0].setImage(UIImage(named: "blackX"), forState: UIControlState.Normal)
-                self.fingerPoint[1].setImage(UIImage(named: "blackX"), forState: UIControlState.Normal)
-                self.fingerPoint[2].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
-            }else if (indexString == 5){
-                if(oldTag/100 != newTag/100){
-                    self.oldTagString4 = fingerPoint[2].tag
-                    self.oldTagString5 = fingerPoint[1].tag
-                }
-                self.moveFingerPoint(newTag%100, indexString: indexString-1)
-                self.moveFingerPoint(0, indexString: 5)
-                self.fingerPoint[0].hidden = true
-                self.fingerPoint[1].hidden = true
-                self.fingerPoint[0].accessibilityIdentifier = "blackX"
-                self.fingerPoint[1].accessibilityIdentifier = "grayButton"
-                self.fingerPoint[0].setImage(UIImage(named: "blackX"), forState: UIControlState.Normal)
-                self.fingerPoint[1].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
-            }else if(indexString == 6){
-                if(oldTag/100 != newTag/100){
-                    self.oldTagString5 = fingerPoint[1].tag
-                }
-                self.moveFingerPoint(newTag%100, indexString: indexString-1)
-                self.fingerPoint[0].hidden = true
-                self.fingerPoint[0].accessibilityIdentifier = "grayButton"
-                self.fingerPoint[0].setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
-                
-            }
-        }
-    }
-    
-    func shakeAnimationTextField(){
-        //remind and shake
-        let animation = CABasicAnimation(keyPath: "position")
-        animation.duration = 0.05
-        animation.repeatCount = 2
-        animation.autoreverses = true
-        animation.fromValue = NSValue(CGPoint: CGPointMake(self.tabNameTextField.center.x - 10, self.tabNameTextField.center.y))
-        animation.toValue = NSValue(CGPoint: CGPointMake(self.tabNameTextField.center.x + 10, self.tabNameTextField.center.y))
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-        self.tabNameTextField.layer.addAnimation(animation, forKey: "position")
-    }
-    
-    func shakeAnimationScrollView(){
-        //remind and shake
-        let animation = CABasicAnimation(keyPath: "position")
-        animation.duration = 0.05
-        animation.repeatCount = 2
-        animation.autoreverses = true
-        animation.fromValue = NSValue(CGPoint: CGPointMake(self.specificTabsScrollView.center.x - 10, self.specificTabsScrollView.center.y))
-        animation.toValue = NSValue(CGPoint: CGPointMake(self.specificTabsScrollView.center.x + 10, self.specificTabsScrollView.center.y))
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-        self.specificTabsScrollView.layer.addAnimation(animation, forKey: "position")
-    }
-    
-    func shakeAnimationStatusLabel(){
-        //remind and shake
-        let animation = CABasicAnimation(keyPath: "position")
-        animation.duration = 0.05
-        animation.repeatCount = 4
-        animation.autoreverses = true
-        animation.fromValue = NSValue(CGPoint: CGPointMake(self.statusLabel.center.x - 10, self.statusLabel.center.y))
-        animation.toValue = NSValue(CGPoint: CGPointMake(self.statusLabel.center.x + 10, self.statusLabel.center.y))
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-        self.statusLabel.layer.addAnimation(animation, forKey: "position")
-    }
-    
-    func AnimationStatusLabel(text:String){
-        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
-                self.statusLabel.alpha = 0
-            }, completion: {
-                completed in
-                self.statusLabel.text = text
-                UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
-                    self.statusLabel.alpha = 1
-                    }, completion: nil)
-        })
-    }
-    
-    func autoScrollingOnEdgeToRight() {
-        let currentCenter:CGPoint = self.currentBaseButton.center
-        let buttonWidth = 9 / 60 * self.trueHeight
-        if currentCenter.x - buttonWidth/2 > self.completeStringView.contentOffset.x+self.trueWidth - 1.2*buttonWidth {
-            if(self.completeStringView.contentOffset.x + self.trueWidth >= 5 * self.trueWidth - 10){
-                self.stopEdgeStartTime = -1
-                return
-            }
-            if(self.stopEdgeStartTime == -1){
-                self.stopEdgeStartTime = CACurrentMediaTime()
-            }
-            let nowTime = CACurrentMediaTime()
-            if(nowTime - self.stopEdgeStartTime >= 0.8){
-                self.stopEdgeStartTime = -1
-                UIView.animateWithDuration(0.5, delay: 0, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {
-                    self.completeStringView.contentOffset.x = self.completeStringView.contentOffset.x + self.trueWidth
-                    self.currentBaseButton.center.x = currentCenter.x + self.trueWidth
-                    }, completion: {
-                        completed in
-                        self.stopEdgeStartTime = -1
-                })
-            }
-        }else{
-            self.stopEdgeStartTime = -1
-        }
-    }
-    
-    func autoScrollingOnEdgeToLeft() {
-        let currentCenter:CGPoint = self.currentBaseButton.center
-        let buttonWidth = 9 / 60 * self.trueHeight
-        if currentCenter.x + buttonWidth/2 < self.completeStringView.contentOffset.x + 1.2*buttonWidth {
-            if(self.completeStringView.contentOffset.x < 10){
-                self.stopEdgeStartTime = -1
-                return
-            }
-            if(self.stopEdgeStartTime == -1){
-                self.stopEdgeStartTime = CACurrentMediaTime()
-            }
-            let nowTime = CACurrentMediaTime()
-            if(nowTime - self.stopEdgeStartTime >= 0.8){
-                self.stopEdgeStartTime = -1
-                UIView.animateWithDuration(0.5, delay: 0, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {
-                    self.completeStringView.contentOffset.x = self.completeStringView.contentOffset.x - self.trueWidth
-                    self.currentBaseButton.center.x = currentCenter.x - self.trueWidth
-                    }, completion: {
-                        completed in
-                        self.stopEdgeStartTime = -1
-                })
-            }
-        }else{
-            self.stopEdgeStartTime = -1
-        }
-
-    }
-}
-
-
-extension TabsEditorViewController {
-    func startMainViewJiggling(sender:UILongPressGestureRecognizer?=nil){
-        if(sender == nil || sender!.state == .Began){
-            for buttonWithTab in self.noteButtonWithTabArray {
-                let button = buttonWithTab.noteButton
-                let gesture = self.longPressMainViewNoteButton[button]
-                startNormalJinggling(gesture!)
-            }
-            self.tempTapView = UIView(frame: CGRectMake(musicControlView.frame.origin.x, musicControlView.frame.origin.y, musicControlView.frame.size.width, musicControlView.frame.size.height))
-            temptapOnEditView.addTarget(self, action: "tapOnEditView:")
-            self.tempTapView!.addGestureRecognizer(temptapOnEditView)
-            self.view.addSubview(self.tempTapView!)
-        }
-    }
-    
-    func stopMainViewJiggling(){
-        for buttonWithTab in self.noteButtonWithTabArray {
-            let button = buttonWithTab.noteButton
-            let gesture = self.longPressMainViewNoteButton[button]
-            stopNormalJinggling(gesture!, button: button)
-        }
-        self.completeStringView.userInteractionEnabled = true
-        self.musicControlView.userInteractionEnabled = true
-        if(tempTapView != nil){
-            tempTapView?.removeGestureRecognizer(temptapOnEditView)
-            tempTapView!.removeFromSuperview()
-            tempTapView = nil
-        }
-        self.isJiggling = false
-    }
-    
-    func startNormalJinggling(sender: UILongPressGestureRecognizer) {
-            if isJiggling {
-                 stopJiggling()
-            }
-            if(!intoEditView){
-                self.musicControlView.userInteractionEnabled = false
-            }
-            self.removeDoubleArrowView()
-            let tempView = sender.view!
-
-            let buttonWidth = tempView.frame.size.width
-
-            let buttonHeight = tempView.frame.size.height
-            let oldCornerRadius = tempView.layer.cornerRadius
-            var delta: CGFloat = 0
-            let originalX = tempView.center.x
-            // circle
-        if oldCornerRadius >= 0.5 * buttonWidth - 0.1 && oldCornerRadius <= 0.5 * buttonWidth + 0.1 {
-                sender.enabled = false
-                self.isJiggling = true
-                delta = CGFloat((1 - sqrt(2.0))/2.0) * (tempView.frame.size.width/2.0) + (tempView.frame.size.width/4.0 - tempView.frame.size.width/6.0)
-                tempView.center.x = originalX - 1
-                
-                let tempDeleteChordOnMainView = UITapGestureRecognizer(target: self, action: "deleteChordOnMainView:")
-                self.deleteChordOnMainView[tempView as! UIButton] = tempDeleteChordOnMainView
-                tempView.addGestureRecognizer(tempDeleteChordOnMainView)
-                let randomInt: UInt32  = arc4random_uniform(500)
-                let r:Double = (Double(randomInt) / 500.0) + 5
-                
-                let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(self.degreesToRadians( (self.kAnimationRotateDeg * -1.0) - r)))
-                let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(self.degreesToRadians( self.kAnimationRotateDeg + r)))
-                
-                tempView.transform = leftWobble;  // starting point
-                tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
-                
-                let tempDeleteView = UIImageView(image: UIImage(named: "deleteX"))
-                
-                tempDeleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
-                
-                self.deleteViewArray[tempView as! UIButton] = tempDeleteView
-                
-                tempView.addSubview(tempDeleteView)
-            
-                UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
-                    UIView.setAnimationRepeatCount(Float(NSNotFound))
-                    if oldCornerRadius == 0.5 * buttonWidth {
-                        tempView.center.x = originalX + 1
-                    }
-                    tempView.transform = rightWobble
-                    }, completion: nil
-                )
-                
-                self.completeStringView.userInteractionEnabled = false
-               
-            } else if sender.state == .Began {
-                sender.enabled = false
-                self.stopSpecificJiggling()
-                sender.enabled = false
-                self.isJiggling = true
-                delta = -(buttonHeight / 3 / 2 - buttonHeight / 15)
-                self.deleteChordOnSpecificTabView.addTarget(self, action: "deleteChordOnSpecificTabView:")
-                tempView.addGestureRecognizer(deleteChordOnSpecificTabView)
-                let randomInt: UInt32  = arc4random_uniform(500)
-                let r:Double = (Double(randomInt) / 500.0) + 2
-                
-                let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( (kAnimationRotateDeg * -1.0) - r)))
-                let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians( kAnimationRotateDeg + r)))
-                
-                tempView.transform = leftWobble;  // starting point
-                tempView.layer.anchorPoint = CGPointMake(0.5, 0.5)
-                
-                deleteView.frame = CGRectMake(delta, delta, buttonHeight / 3, buttonHeight / 3)
-                
-                
-                let image =  UIImage(named: "deleteX")
-                deleteView.image = image
-                
-                tempView.addSubview(deleteView)
-                
-                
-                UIView.animateWithDuration(0.1, delay: 0, options: [.AllowUserInteraction, .Repeat, .Autoreverse], animations: {
-                    UIView.setAnimationRepeatCount(Float(NSNotFound))
-                    tempView.transform = rightWobble
-                    }, completion: nil
-                )
-                self.completeStringView.userInteractionEnabled = false
-            }
-    }
-    
-    func stopNormalJinggling(sender: UILongPressGestureRecognizer, button:UIButton?=nil) {
-        if(sender.enabled){
-            return
-        }
-            if(button == nil){
-               self.completeStringView.userInteractionEnabled = true
-                self.isJiggling = false
-            }
-            sender.enabled = true
-            let tempView = sender.view!
-            tempView.removeGestureRecognizer(deleteChordOnSpecificTabView)
-            deleteView.removeFromSuperview()
-            tempView.layer.removeAllAnimations()
-            tempView.transform = CGAffineTransformIdentity
-            let buttonWidth = tempView.frame.size.width
-            let oldCornerRadius = tempView.layer.cornerRadius
-            let center = sender.view?.center
-            // circle
-            if oldCornerRadius >= 0.5 * buttonWidth - 0.1 && oldCornerRadius <= 0.5 * buttonWidth + 0.1 {
-                deleteViewArray[button!]!.removeFromSuperview()
-                deleteViewArray.removeValueForKey(button!)
-                tempView.center = CGPoint(x: center!.x - 1, y: center!.y)
-                tempView.removeGestureRecognizer(deleteChordOnMainView[button!]!)
-                deleteChordOnMainView.removeValueForKey(button!)
-            }
-    }
-    
-    func deleteChordOnSpecificTabView(sender: UITapGestureRecognizer) {
-        var needAlert: Bool = false
-        for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
-            if self.noteButtonWithTabArray[i].tab.index == Int(self.currentSelectedSpecificTab.index) && self.noteButtonWithTabArray[i].tab.name == self.currentSelectedSpecificTab.name && self.noteButtonWithTabArray[i].tab.content == self.currentSelectedSpecificTab.content {
-                needAlert = true
-                break
-            }
-        }
-        if needAlert == false {
-            for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-                if self.allTabsOnMusicLine[i].tab.index == Int(self.currentSelectedSpecificTab.index) && self.allTabsOnMusicLine[i].tab.name == self.currentSelectedSpecificTab.name && self.allTabsOnMusicLine[i].tab.content == self.currentSelectedSpecificTab.content {
-                    needAlert = true
-                    break
-                }
-            }
-        }
-        if needAlert {
-            let alertController = UIAlertController(title: nil, message: "This operation will delete all '\(self.currentSelectedSpecificTab.name)' you have already added to the song.", preferredStyle: UIAlertControllerStyle.Alert)
-            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default,handler: {
-                action in
-                self.stopSpecificJiggling()
-            }))
-            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: {
-                action in
-                self.deleteActionOnSpecificTabView()
-                
-            }))
-            self.presentViewController(alertController, animated: true, completion: nil)
-        } else {
-            self.deleteActionOnSpecificTabView()
-        }
-    }
-    
-    func deleteActionOnSpecificTabView() {
-        self.isShowDiscardAlert = true
-        self.deleteChordOnMainViewWhenDeleteOnEditView(Int(self.currentSelectedSpecificTab.index), name: self.currentSelectedSpecificTab.name, content: self.currentSelectedSpecificTab.content)
-        self.removeObjectsOnSpecificTabsScrollView()
-        TabsDataManager.removeTabs(self.currentSelectedSpecificTab.tabs)
-        self.tabNameTextField.text = self.currentNoteButton.titleLabel?.text
-        stopSpecificJiggling()
-        self.addSpecificTabButton(self.currentBaseButton.tag)
-    }
-    
-    func deleteChordOnMainView(sender: UITapGestureRecognizer) {
-        self.isShowDiscardAlert = true
-        let index: Int = (sender.view?.tag)!
-        self.stopNormalJinggling(longPressMainViewNoteButton[self.noteButtonWithTabArray[index].noteButton]!, button: self.noteButtonWithTabArray[index].noteButton)
-        let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
-        for var i = 0; i < self.mainViewDataArray.count; i++ {
-            if self.mainViewDataArray[i].fretNumber == fretNumber {
-                for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
-                    if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[index].tab) {
-                        self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
-                        self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
-                    }
-                }
-            }
-        }
-        self.noteButtonWithTabArray.removeAtIndex(index)
-        for var i = 0; i < noteButtonWithTabArray.count; i++ {
-            noteButtonWithTabArray[i].noteButton.tag = i
-        }
-        if(self.noteButtonWithTabArray.count == 0){
-            self.completeStringView.userInteractionEnabled = true
-            if(tempTapView != nil){
-                tempTapView?.removeGestureRecognizer(temptapOnEditView)
-                tempTapView!.removeFromSuperview()
-                tempTapView = nil
-            }
-            self.musicControlView.userInteractionEnabled = true
-            self.isJiggling = false
-        }
-        stopMainViewJiggling()
-         reorganizeMainViewDataArray()
-        startMainViewJiggling()
-    }
-    
-    // need to check whether the main view contain the delete tab
-    func deleteChordOnMainViewWhenDeleteOnEditView(index: Int, name: String, content: String) {
-        for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
-            if self.noteButtonWithTabArray[i].tab.index == index && self.noteButtonWithTabArray[i].tab.name == name && self.noteButtonWithTabArray[i].tab.content == content {
-                self.deleteChordOnString3View(i)
-            }
-        }
-        self.deleteChordOnMusicLine(index, name: name, content: content)
-    }
-    
-    func deleteChordOnString3View(sender: Int) {
-        let fretNumber = Int(noteButtonWithTabArray[sender].tab.index) - Int(noteButtonWithTabArray[sender].tab.index) / 100 * 100
-        for var i = 0; i < self.mainViewDataArray.count; i++ {
-            if self.mainViewDataArray[i].fretNumber == fretNumber {
-                for var j = 0; j < self.mainViewDataArray[i].noteButtonsWithTab.count; j++ {
-                    if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[sender].tab)  {
-                        self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
-                        self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
-                    }
-                }
-            }
-        }
-        self.noteButtonWithTabArray.removeAtIndex(sender)
-        for var i = 0; i < self.noteButtonWithTabArray.count; i++ {
-            self.noteButtonWithTabArray[i].noteButton.tag = i
-        }
-        reorganizeMainViewDataArray()
-    }
-    
-    func deleteChordOnMusicLine(index: Int, name: String, content: String) {
-        for var i = 0; i < self.allTabsOnMusicLine.count; i++ {
-            if self.allTabsOnMusicLine[i].tab.index == index && self.allTabsOnMusicLine[i].tab.name == name && self.allTabsOnMusicLine[i].tab.content == content {
-                self.allTabsOnMusicLine[i].tabView.removeFromSuperview()
-                self.allTabsOnMusicLine.removeAtIndex(i)
-                i--
-            }
-        }
-        reorganizeAllTabsOnMusicLine()
-    }
-    
-    func reorganizeAllTabsOnMusicLine() {
-        var tempAllTabsOnMusicLine: [tabOnMusicLine] = [tabOnMusicLine]()
-        for var j = 0; j < self.allTabsOnMusicLine.count; j++ {
-            self.currentTime = self.allTabsOnMusicLine[j].time
-            self.allTabsOnMusicLine[j].tabView.frame = self.setMainViewTabPositionInRange(self.allTabsOnMusicLine[j].tab, endIndex: tempAllTabsOnMusicLine.count, allTabsOnMusicLine: tempAllTabsOnMusicLine)
-
-            tempAllTabsOnMusicLine.append(self.allTabsOnMusicLine[j])
-
-        }
-        tempAllTabsOnMusicLine.removeAll()
-    }
-    
-    func backButtonRotation(isLeft isLeft:Bool){
-        let leftWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians(0)))
-        let rightWobble: CGAffineTransform  = CGAffineTransformMakeRotation(CGFloat(degreesToRadians(-90)))
-        
-        self.backButton.userInteractionEnabled = false
-        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseInOut, animations: {
-            if(isLeft){
-                self.backButton.imageView!.transform = leftWobble
-                self.backButton.imageView
-            }else{
-                self.backButton.imageView!.transform = rightWobble
-            }
-            
-            }, completion: {
-                completed in
-                self.backButton.userInteractionEnabled = true
-        })
-    }
-}
-
-extension TabsEditorViewController {
-    
+extension TabsEditorViewController {    
     func setupAudioPlayerWithFile(file: NSString, type: NSString) -> AVAudioPlayer? {
         let path = NSBundle.mainBundle().pathForResource(file as String, ofType: type as String)
         let url = NSURL.fileURLWithPath(path!)
@@ -3937,71 +2581,4 @@ extension TabsEditorViewController {
         
     }
 }
-
-extension TabsEditorViewController {
-    func generateFretNumberOnFullStringView(sender: Int) {
-        let count = 25
-        fretNumberOnFullStringView = UIView()
-        for item in fretNumberOnFullStringView.subviews {
-            item.removeFromSuperview()
-        }
-        fretNumberOnFullStringView.frame = CGRectMake(0, 14 / 20 * self.trueHeight, self.trueWidth / 5 * CGFloat(count - sender), 1 / 20 * self.trueHeight)
-        fretNumberOnFullStringView.backgroundColor = UIColor.clearColor()
-        let labelWidth: CGFloat = 1 / 20 * self.trueHeight
-        for var i = 0; i < count - sender; i++ {
-            let tempLabel: UILabel = UILabel()
-            let positionX = (self.string6FretPosition[i] + self.string6FretPosition[i + 1]) / 2
-            tempLabel.frame = CGRectMake(positionX - labelWidth / 2, 0, labelWidth, labelWidth)
-            tempLabel.text = "\(sender + i)"
-            tempLabel.backgroundColor = UIColor.clearColor()
-            tempLabel.textAlignment = .Center
-            tempLabel.font = UIFont.systemFontOfSize(10)
-            fretNumberOnFullStringView.addSubview(tempLabel)
-        }
-        self.completeImageView.addSubview(fretNumberOnFullStringView)
-    }
-    
-    func cropFullStringImageView(sender: Int) {
-        let count = 25
-        let croppedLength: CGFloat = self.trueWidth / 5 * CGFloat(count - sender)
-        let cropRect: CGRect = CGRectMake(0, 0, croppedLength, self.completeStringView.frame.size.height)
-        self.completeImageView.image = UIImage(named: "iPhone5_fullFretboard")
-        let image = self.completeImageView.cropViewWithRect(cropRect)
-        
-        self.completeStringView.contentSize = CGSizeMake(croppedLength, 15 / 20 * self.trueHeight)
-        self.completeImageView.frame = CGRectMake(0, 0, croppedLength, 15 / 20 * self.trueHeight)
-        self.completeImageView.image = image
-    }
-    
-    func updateCollectionView(sender: Int) {
-        let count = self.mainViewDataArray.count
-        if 25 - sender == count + 1 {
-            let maxFretNumber = count - 1
-            for var i = 0; i < count; i++ {
-                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
-                    let temp: mainViewData = mainViewData()
-                    temp.fretNumber = maxFretNumber + 1
-                    let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
-                    temp.noteButtonsWithTab = tempButton
-                    self.mainViewDataArray.insert(temp, atIndex: i + 1)
-                    self.string3BackgroundImage.insert("iPhone5_fret", atIndex: i + 1)
-                    self.fretsNumber.insert(maxFretNumber + 1, atIndex: i + 1)
-                    break
-                }
-            }
-        } else if 25 - sender == count - 1 {
-            let maxFretNumber = count - 1
-            for var i = 0; i < count; i++ {
-                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
-                    self.mainViewDataArray.removeAtIndex(i)
-                    self.string3BackgroundImage.removeAtIndex(i)
-                    self.fretsNumber.removeAtIndex(i)
-                    break
-                }
-            }
-        }
-        self.collectionView.reloadData()
-    }
-}
-
 

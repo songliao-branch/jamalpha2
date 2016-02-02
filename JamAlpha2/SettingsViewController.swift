@@ -15,10 +15,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var tableView: UITableView!
     
     var isFromUnLoginVC: Bool = false
+    var mc: MFMailComposeViewController!
+    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Contact Us","Demo Mode", "Tutorial"]
     
-    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam","Contact Us", "Demo", "Tutorial"]
-    
-    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "Demo Mode", "Tutorial"]
+    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Demo Mode", "Tutorial"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,15 +113,17 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
             
-            let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 3 : 4
-            let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
-            let indexOfTunerMode = CoreDataManager.getCurrentUser() == nil ? 5 : 6
+            let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
+            let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 5 : 6
             if indexPath.item == 0 {
                 let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
                 self.navigationController?.pushViewController(aboutVC, animated: true)
             } else if indexPath.item == 2 {
                 self.rateTwistjam()
-            } else if indexPath.item == 3 && CoreDataManager.getCurrentUser() != nil {
+            } else if indexPath.item == 3  {
+                let faqVC: FAQViewController = self.storyboard?.instantiateViewControllerWithIdentifier("faqVC") as! FAQViewController
+                self.navigationController?.pushViewController(faqVC, animated: true)
+            } else if indexPath.item == 4 && CoreDataManager.getCurrentUser() != nil {
                 self.contactUs()
             } else if indexPath.item == indexofDemoMode {
                 let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
@@ -153,7 +155,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         let messageBody = ""
         let toRecipents = ["jun@twistjam.com"]
         
-        let mc: MFMailComposeViewController = MFMailComposeViewController()
+        mc = MFMailComposeViewController()
         mc.navigationBar.tintColor = UIColor.mainPinkColor()
         
         if MFMailComposeViewController.canSendMail() {
@@ -162,26 +164,44 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             mc.setSubject(emailTitle)
             mc.setMessageBody(messageBody, isHTML: false)
             mc.setToRecipients(toRecipents)
-            
-            
-            UIApplication.sharedApplication().keyWindow?.rootViewController?.presentViewController(mc, animated: true, completion: nil)
+            self.presentViewController(mc, animated: true, completion: nil)
+            //UIApplication.sharedApplication().keyWindow?.rootViewController?.presentViewController(mc, animated: true, completion: nil)
         }
     }
     
     func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
         switch result.rawValue {
         case MFMailComposeResultCancelled.rawValue:
-            print("Mail cancelled")
+            print("cancel")
         case MFMailComposeResultSaved.rawValue:
-            print("Mail saved")
+            print("saved")
         case MFMailComposeResultSent.rawValue:
-            print("Mail sent")
+            print("sent")
         case MFMailComposeResultFailed.rawValue:
-            print("Mail sent failure: \(error!.localizedDescription)")
+            print("failed")
         default:
             break
         }
-        UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
+        self.mc.dismissViewControllerAnimated(true, completion: nil)
+        //UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
+    }
+    
+    func show() {
+//        let alertController = UIAlertController(title: nil, message: "You have cancelled the email.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//        
+//        let alertController = UIAlertController(title: nil, message: "You have saved the email.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//        
+//        let alertController = UIAlertController(title: nil, message: "The email has been sent.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//        
+//        let alertController = UIAlertController(title: nil, message: "Sorry, please check your networking and account setting and try again.", preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+//        self.presentViewController(alertController, animated: true, completion: nil)
     }
 
     func rateTwistjam() {

@@ -62,6 +62,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         addBackground()
         addTitleView()
         addLyricsTextView()
+        addGotoSafariButton()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -164,7 +165,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let backButton: UIButton = UIButton()
         backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
         backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        backButton.setTitle("B", forState: UIControlState.Normal)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
         backButton.center.y = 20 + 44/2
@@ -173,7 +173,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let doneButton: UIButton = UIButton()
         doneButton.frame = CGRectMake(17 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         doneButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        doneButton.setTitle("D", forState: UIControlState.Normal)
         doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(doneButton)
@@ -189,7 +188,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let deleteAllButton: UIButton = UIButton()
         deleteAllButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         deleteAllButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        deleteAllButton.setTitle("D", forState: UIControlState.Normal)
         deleteAllButton.setImage(UIImage(named: "lyrics_delete_circle"), forState: UIControlState.Normal)
         deleteAllButton.addTarget(self, action: "pressDeleteAllButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(deleteAllButton)
@@ -197,7 +195,6 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let reorganizeButton: UIButton = UIButton()
         reorganizeButton.frame = CGRectMake(14 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         reorganizeButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
-        reorganizeButton.setTitle("R", forState: UIControlState.Normal)
         reorganizeButton.setImage(UIImage(named: "lyrics_reorganize_circle"), forState: UIControlState.Normal)
         reorganizeButton.addTarget(self, action: "pressReorganizeButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(reorganizeButton)
@@ -239,9 +236,37 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addSubview(self.lyricsTextView)
     }
     
+    func addGotoSafariButton() {
+        let safariButton: UIButton = UIButton()
+        safariButton.frame = CGRectMake(self.view.frame.width - 60, self.view.frame.height - 60, 60, 60)
+        safariButton.imageEdgeInsets = UIEdgeInsetsMake(20, 20, 5, 5)
+        safariButton.setImage(UIImage(named: "safari"), forState: .Normal)
+        safariButton.addTarget(self, action: "pressSafariButton:", forControlEvents: .TouchUpInside)
+        self.view.addSubview(safariButton)
+        
+        if isDemoSong {
+            safariButton.removeFromSuperview()
+        }
+    }
+
+    func pressSafariButton(sender: UIButton) {
+        if !isDemoSong {
+            let name = theSong.getTitle().replace(" ", replacement: "+") + "+" + theSong.getArtist().replace(" ", replacement: "+")
+            let url:NSURL = NSURL(string: "x-web-search://?\(name)+lyrics")!
+            if !UIApplication.sharedApplication().openURL(url) {
+                print("cannot open")
+            }
+        }
+    }
+
     func pressBackButton(sender: UIButton) {
         tempLyricsTimeTuple.removeAll()
-       
+        if let songVC = self.songViewController {
+            if songVC.singleLyricsTableView != nil {
+                songVC.updateSingleLyricsAlpha()
+                songVC.updateSingleLyricsPosition(false)
+            }
+        }
         self.dismissViewControllerAnimated(true, completion: {
             completed in
             if let songVC = self.songViewController {
@@ -285,7 +310,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let lineArray: [String] = lyric.characters.split{$0 == "\n"}.map { String($0) }
         let letterOrnumber = NSCharacterSet.alphanumericCharacterSet()
         var result: [String] = [String]()
-        for var j = 0; j < lineArray.count; j++ {
+        for j in 0..<lineArray.count {
             var str = lineArray[j].stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()).unicodeScalars
             if str.count == 0{
                 continue
@@ -341,7 +366,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
 
     func array2String(sender: [String]) -> String {
         var tempString: String = String()
-        for var index = 0; index < sender.count; index++ {
+        for index in 0..<sender.count {
             tempString += sender[index]
             tempString += "\n"
         }

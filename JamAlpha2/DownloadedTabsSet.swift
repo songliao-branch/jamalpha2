@@ -35,11 +35,8 @@ class DownloadedTabsSet: NSObject {
     
     //only needed when this comes in a buck list for a user
     //when first signed in and initialized all tabs of the user, we need to match this with current database
-    var song_id = -1
-    var title = ""
-    var artist = ""
-    var duration: Float = 0
-
+    var song: SearchResult!
+    
     //this is only used for current user's tabs
     var visible = true
     

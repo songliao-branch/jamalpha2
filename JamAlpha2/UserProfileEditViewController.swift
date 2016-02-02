@@ -65,7 +65,6 @@ class UserProfileEditViewController: UIViewController {
     
     func tapOnUserImageView(sender: UITapGestureRecognizer) {
         //TODO: see the image fullscreen
-          print("tap on image")
         if let originImageData: NSData = CoreDataManager.getCurrentUser()?.profileImage {
             let originImage: UIImage = UIImage(data: originImageData)!
             let tempCornerRadius = sender.view?.layer.cornerRadius

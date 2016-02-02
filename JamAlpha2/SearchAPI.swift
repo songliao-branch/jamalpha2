@@ -10,31 +10,7 @@ import UIKit
 import Alamofire
 import Haneke
 import SwiftyJSON
-
-
-class SearchResult: NSObject {
-    
-    var wrapperType: String!
-    var kind: String!
-    
-    var trackId:Int?
-    var trackName: String?
-    var artistName: String?
-    var collectionName: String?
-    var trackTimeMillis: Float?
-    
-    
-    var artworkUrl100: String?//large 100
-    var previewUrl: String?
-    var trackViewUrl: String? // link to apple music or iTunes
-    
-    init(wrapperType: String, kind: String){
-        self.wrapperType = wrapperType
-        self.kind = kind
-    }
-    
-    var image: UIImage?
-}
+import MediaPlayer
 
 
 class SearchAPI: NSObject {
@@ -49,6 +25,8 @@ class SearchAPI: NSObject {
     
     class func searchSong(searchText: String, completion: ((results: [SearchResult]) -> Void)) {
         if searchText.characters.count < 1 {
+            let searchResults = [SearchResult]()
+            completion(results: searchResults)
             return
         }
         musicRequest?.cancel()
@@ -61,7 +39,8 @@ class SearchAPI: NSObject {
                 let json = JSON(data)
                 
                 for item in json["results"].array! {
-                    let searchResponse = SearchResult(wrapperType: item["wrapperType"].string!, kind: item["kind"].string!)
+
+                    let searchResponse = SearchResult()
                     
                     if let trackId = item["trackId"].number {
                         searchResponse.trackId = Int(trackId)
@@ -101,6 +80,7 @@ class SearchAPI: NSObject {
 
     class func getBackgroundImageForSong(searchText: String, imageSize: ImageSize, completion: ((image: UIImage) -> Void)) {
         if searchText.characters.count < 1 {
+            completion(image: UIImage(named: "liwengbg")!)
             return
         }
         musicRequest?.cancel()
@@ -114,7 +94,7 @@ class SearchAPI: NSObject {
                 
                 if json["resultCount"] > 0 {
                     let firstValue = json["results"].array![0]
-                    let searchResponse = SearchResult(wrapperType: firstValue["wrapperType"].string!, kind: firstValue["kind"].string!)
+                    let searchResponse = SearchResult()
                     
                     if let artwork = firstValue["artworkUrl100"].string {
                         let newString = artwork.replace("100x100", replacement: imageSize.rawValue)

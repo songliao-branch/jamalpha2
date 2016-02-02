@@ -84,7 +84,7 @@ class MeLoginOrSignupViewController: UIViewController{
     }
     
     override func viewWillDisappear(animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewWillDisappear(animated)
         self.navigationController?.navigationBarHidden = false
     }
     
@@ -197,7 +197,7 @@ class MeLoginOrSignupViewController: UIViewController{
         credentialTextFieldUnderline1.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(credentialTextFieldUnderline1)
         
-        emailTextField = UITextField(frame: CGRect(x: 0, y: CGRectGetMaxY(credentialTextFieldUnderline1.frame)+verticalMargin, width: viewWidth - 20, height: 44))
+        emailTextField = UITextField(frame: CGRect(x: 0, y: CGRectGetMaxY(credentialTextFieldUnderline1.frame)+verticalMargin, width: viewWidth, height: 44))
         emailTextField.placeholder = "Email"
         emailTextField.textAlignment = .Center
         emailTextField.center.x = self.view.center.x
@@ -237,7 +237,7 @@ class MeLoginOrSignupViewController: UIViewController{
         orLabel.hidden = true
         
         //log in screen
-        let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: emailTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: emailTextField.frame.width, height: 1))
+        let credentialTextFieldUnderline2 = UIView(frame: CGRect(x: nickNameTextField.frame.origin.x, y: CGRectGetMaxY(emailTextField.frame), width: nickNameTextField.frame.width, height: 1))
         credentialTextFieldUnderline2.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(credentialTextFieldUnderline2)
         
@@ -255,14 +255,17 @@ class MeLoginOrSignupViewController: UIViewController{
         passwordTextFieldUnderline.backgroundColor = UIColor.lightGrayColor()
         scrollView.addSubview(passwordTextFieldUnderline)
         
-        forgetPasswordButton = UIButton(frame: CGRect(x: 15, y: passwordTextField.frame.origin.y, width: 80, height: passwordTextField.frame.height))
-        forgetPasswordButton.setTitle("forget", forState: .Normal)
-        forgetPasswordButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        
+        forgetPasswordButton = UIButton(frame: CGRect(x: viewWidth/2 - 75, y: CGRectGetMaxY(passwordTextField.frame)+38, width: 150, height: 40))
+        //forgetPasswordButton.backgroundColor = UIColor.redColor()
+        forgetPasswordButton.setTitle("forgot your password?", forState: .Normal)
+        forgetPasswordButton.titleLabel!.font = UIFont.systemFontOfSize(12)
+        forgetPasswordButton.setTitleColor(UIColor.grayColor(), forState: .Normal)
         forgetPasswordButton.addTarget(self, action: "forgetPasswordPressed", forControlEvents: .TouchUpInside)
         forgetPasswordButton.hidden = true
         scrollView.addSubview(forgetPasswordButton)
         
-        submitButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: CGRectGetMaxY(passwordTextField.frame)+verticalMargin, width: 120, height: 44))
+        submitButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: CGRectGetMaxY(passwordTextField.frame) + 8, width: 120, height: 44))
         submitButton.setTitle("Sign Up", forState: .Normal)
         submitButton.addTarget(self, action: "submitPressed", forControlEvents: .TouchUpInside)
         submitButton.titleLabel?.textAlignment = .Center
@@ -279,7 +282,6 @@ class MeLoginOrSignupViewController: UIViewController{
             self.welcomeLabel.removeFromSuperview()
         }
         isSignUpSelected = true
-        
         
         self.passwordTextField.placeholder = "Password (Mininum 6 characters)"
         self.forgetPasswordButton.hidden = true
@@ -300,7 +302,6 @@ class MeLoginOrSignupViewController: UIViewController{
             self.scrollView.addSubview(self.welcomeLabel)
         }
         isSignUpSelected = false
-        
         self.passwordTextField.placeholder = "Password"
         self.forgetPasswordButton.hidden = false
         self.submitButton.setTitle("Log in", forState: .Normal)
@@ -331,6 +332,9 @@ class MeLoginOrSignupViewController: UIViewController{
     }
 
     func forgetPasswordPressed() {
+        UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 94)
+            }, completion: nil)
 
         let alert = UIAlertController(title: "", message: "Enter your email so we can send password reset instructions.", preferredStyle: .Alert)
         
@@ -351,9 +355,17 @@ class MeLoginOrSignupViewController: UIViewController{
                     self.showMessage("", message: message, actionTitle: "OK", completion: nil)
                 })
             }
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+                }, completion: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: {
+            _ in
+            UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseOut, animations: {
+                self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+                }, completion: nil)
+        }))
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
@@ -449,31 +461,38 @@ class MeLoginOrSignupViewController: UIViewController{
                                 userProfileVC.refreshUserImage()
                             }
 
-                            
-                            print("from core data we have \(CoreDataManager.getCurrentUser()?.email)")
-
                             //TODO: maybe put this in a background thread?
                             APIManager.downloadCurrentUserTabsAndLyrics({
                                 tabsSets, lyricsSets in
                                 
                                 for set in tabsSets {
-
-                                    let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
-                                    //initialize the song just in case we don't find it in existing core data
-                                    CoreDataManager.initializeSongToDatabase(localSong)
                                     
-                                    CoreDataManager.saveTabs(localSong, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible, lastEditedDate: set.lastEdited)
+                                    var song = SearchResult(title: set.song.getTitle(), artist: set.song.getArtist(), duration: set.song.getDuration())
+
+                                    //initialize the song just in case we don't find it in existing core data
+                                    
+                                    if let songOnDevice = CoreDataManager.findSongById(set.song.songId) {
+                                        song = SearchResult(title: songOnDevice.title, artist: songOnDevice.artist, duration: Float(songOnDevice.playbackDuration))
+                                    } else {
+                                        CoreDataManager.initializeSongToDatabase(song)
+                                    }
+                                    
+                                    
+                                    CoreDataManager.saveTabs(song, chords: set.chords, tabs: set.tabs, times: set.times, tuning: set.tuning, capo: set.capo, userId: set.editor.userId, tabsSetId: set.id, visible: set.visible, lastEditedDate: set.lastEdited)
                                 }
                                 
                                 for set in lyricsSets {
-                                    let localSong = LocalSong(title: set.title, artist: set.artist, duration: set.duration)
-                                    //initialize the song just in case we don't find it in
-                                    CoreDataManager.initializeSongToDatabase(localSong)
-
-                                    CoreDataManager.saveLyrics(localSong, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id, lastEditedDate: set.lastEdited)
+                                    
+                                    var song = SearchResult(title: set.song.getTitle(), artist: set.song.getArtist(), duration: set.song.getDuration())
+                                    
+                                    if let songOnDevice = CoreDataManager.findSongById(set.song.songId) {
+                                        song = SearchResult(title: songOnDevice.title, artist: songOnDevice.artist, duration: Float(songOnDevice.playbackDuration))
+                                    } else {
+                                        CoreDataManager.initializeSongToDatabase(song)
+                                    }
+                                    
+                                    CoreDataManager.saveLyrics(song, lyrics: set.lyrics, times: set.times, userId: set.editor.userId, lyricsSetId: set.id, lastEditedDate: set.lastEdited)
                                 }
-                                
-                                print("user has \(tabsSets.count) tabs and \(lyricsSets.count) lyrics")
                             })
                             
                             //mark all the user's favorite songs in the core data
@@ -535,8 +554,6 @@ class MeLoginOrSignupViewController: UIViewController{
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
                 (connection, result, error) -> Void in
                 if error == nil {
-                
-                    print(result)
                     let facebookEmail = result.valueForKey("email") as! String
                     let facebookName  = result.valueForKey("name") as! String
                     

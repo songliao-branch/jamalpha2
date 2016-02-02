@@ -18,11 +18,11 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     let cellHeight: CGFloat = 60
   
-    var songs = [LocalSong]()//for showing title and artist for the tableview
+    var songs = [SearchResult]()//for showing title and artist for the tableview
     
     var allTabsSets = [DownloadedTabsSet]()
     var allLyricsSets = [DownloadedLyricsSet]()
-    
+    var isSeekingPlayerState = false
     
     //status view pop up
     var statusView: UIView!
@@ -54,22 +54,24 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-    }
+    } 
     
     //also called when a set is deleted
     func loadData() {
-        songs = [LocalSong]()
+        songs = [SearchResult]()
         if isViewingTabs {
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             for t in self.allTabsSets {
-                let song = LocalSong(title: t.title, artist: t.artist, duration: t.duration)
+                print("MY Tabs song: \(t.song.songId),\(t.song.getTitle()),\(t.song.getArtist()),\(t.song.getDuration())")
+
+                let song = SearchResult(songId: t.song.songId, title: t.song.getTitle(), artist: t.song.getArtist(), duration: t.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
         } else {
             self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
             for l in self.allLyricsSets {
-                let song = LocalSong(title: l.title, artist: l.artist, duration: l.duration)
+                let song = SearchResult(songId: l.song.songId, title: l.song.getTitle(), artist: l.song.getArtist(), duration: l.song.getDuration())
                 song.findMediaItem()
                 songs.append(song)
             }
@@ -92,7 +94,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
         
-        
         optionMenu.addAction(editAction)
         optionMenu.addAction(deleteAction)
         optionMenu.addAction(cancelAction)
@@ -106,10 +107,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func goToEditor(index: Int) {
         let song = songs[index]
         guard let item = song.mediaItem else {
-            print("no media item found for \(song.title)")
+
             return
         }
-        
         
         MusicManager.sharedInstance.player.pause()
         MusicManager.sharedInstance.setPlayerQueue([item])
@@ -157,8 +157,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
         cell.numberLabel.text = "\(indexPath.row + 1)"
 
-        cell.titleLabel.text = song.title
-        cell.subtitleLabel.text = song.artist
+        cell.titleLabel.text = song.getTitle()
+        cell.subtitleLabel.text = song.getArtist()
         
         cell.optionsButton.tag = indexPath.row
         cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
@@ -181,7 +181,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
 
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         
         let song = songs[indexPath.row]
         
@@ -198,7 +198,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             
             if(item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    while (isSeekingPlayerState){
+                    while (self.isSeekingPlayerState){
                         
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
@@ -206,7 +206,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -221,7 +221,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                                         tableView.reloadData()
                                     })
                                 }
-                                isSeekingPlayerState = false
+                                self.isSeekingPlayerState = false
                                 break
                             }
                         }
@@ -246,11 +246,9 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                 KGLOBAL_nowView.stop()
                 self.showConnectInternet(tableView)
             }
-            
+        }  else if song.getArtist() == "Alex Lisell" { //if demo song
+            isSeekingPlayerState = false
 
-            
-        }  else if song.artist == "Alex Lisell" { //if demo song
-            
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
             MusicManager.sharedInstance.player.pause()
@@ -271,7 +269,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
             cell.searchIcon.hidden = true
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
-            
+            isSeekingPlayerState = false
             song.findSearchResult( {
                 result in
                 

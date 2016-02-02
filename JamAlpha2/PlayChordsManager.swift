@@ -98,7 +98,6 @@ class PlayChordsManager: NSObject {
     func playSingleNoteSound(index: Int) {
         soundBank.allNotesOff()
         let midi = convertIndexToMidi(index)
-        print("midi: \(midi)")
         soundBank.queueNote(midi, gain: 0.4)
         soundBank.playQueuedNotes()
     }
@@ -159,7 +158,7 @@ class PlayChordsManager: NSObject {
                 }
             }
         }
-        if(counter == 40){
+        if(counter == 100){
             stopTimer()
             arpeggioNotes.removeAllObjects()
             soundBank.allNotesOff()
@@ -167,7 +166,7 @@ class PlayChordsManager: NSObject {
     }
     
     func changeCapo(sender: Int) {
-        for var i = 0; i < fret0Midi.count; i++ {
+        for i in 0..<fret0Midi.count {
             fret0Midi[i] = standardFret0Midi[i] + sender
         }
     }

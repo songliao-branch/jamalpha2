@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "sync-lyrics.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "sync-lyrics.png",
       "scale" : "2x"
     },
     {

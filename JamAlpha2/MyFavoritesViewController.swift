@@ -12,8 +12,9 @@ import MediaPlayer
 class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
+    var isSeekingPlayerState = false
     
-    var songs = [LocalSong]()
+    var songs = [SearchResult]()
     var animator: CustomTransitionAnimation?
     
     override func viewDidLoad() {
@@ -34,13 +35,11 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     }
 
     func loadData() {
-        
         songs = CoreDataManager.getFavorites()
         for song in songs {
             song.findMediaItem()
         }
         self.tableView.reloadData()
-
     }
     
     func setUpNavigationBar() {
@@ -58,8 +57,8 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         let cell = tableView.dequeueReusableCellWithIdentifier("MyFavoritesCell", forIndexPath: indexPath) as! MyFavoritesCell
         let song = songs[indexPath.row]
         cell.numberLabel.text = "\(indexPath.row+1)"
-        cell.titleLabel.text = song.title
-        cell.subtitleLabel.text = song.artist
+        cell.titleLabel.text = song.getTitle()
+        cell.subtitleLabel.text = song.getArtist()
         
         cell.spinner.hidden = true
         if let _ = song.mediaItem {
@@ -78,7 +77,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        var isSeekingPlayerState = true
+        isSeekingPlayerState = true
         let song = songs[indexPath.row]
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
@@ -94,7 +93,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             
             if(item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() ){
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                    while (isSeekingPlayerState){
+                    while (self.isSeekingPlayerState){
                         
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
@@ -102,7 +101,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
-                            isSeekingPlayerState = false
+                            self.isSeekingPlayerState = false
                             break
                         }
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
@@ -117,7 +116,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                                         tableView.reloadData()
                                     })
                                 }
-                                isSeekingPlayerState = false
+                                self.isSeekingPlayerState = false
                                 break
                             }
                         }
@@ -142,9 +141,8 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 KGLOBAL_nowView.stop()
                 self.showConnectInternet(tableView)
             }
-            
-        }   else if song.artist == "Alex Lisell" { //if demo song
-            
+        }   else if song.getArtist() == "Alex Lisell" { //if demo song
+            isSeekingPlayerState = false
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
             MusicManager.sharedInstance.player.pause()
@@ -165,7 +163,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             cell.searchIcon.hidden = true
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
-            
+            isSeekingPlayerState = false
             song.findSearchResult( {
                 result in
                 

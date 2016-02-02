@@ -32,8 +32,8 @@ class TabsDataManager: NSObject {
         commonChords["40003"] = "xxxx00020101"
         commonChords["40300"] = "xxxx03020101"//F
         //5th string
-        for var i = 0; i < 4; i++ {
-            for var j = 0; j < 23; j++ {
+        for i in 0..<4 {
+            for j in 0..<23 {
                 if i == 0 { // major chords, e,g, A major -> xx 00 22 22 22 00
                     if j == 3 {
                         commonChords["50300"] = "xx0302000100"
@@ -80,8 +80,8 @@ class TabsDataManager: NSObject {
         }
         
         //6th string
-        for var i = 0; i < 3; i++ {
-            for var j = 0; j < 23; j++ {
+        for i in 0..<3 {
+            for j in 0..<23 {
                 if i == 0 {
                     if j == 3 {
                         commonChords["60300"] = "030200000003"
@@ -128,8 +128,8 @@ class TabsDataManager: NSObject {
         let results: NSArray = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(Tabs), withPredicate: nil, managedObjectContext: moc)
         if results.count < 1 { // if results are empty, we initiate original tabs
             let dict = commonChords()
-            for var i = 4; i < 7; i++ { //chord starts at 4th string
-                for var j = 0; j < 25; j++ {
+            for i in 4..<7 { //chord starts at 4th string
+                for j in 0..<25 {
                     let index = NSNumber(integer: i * 10000 + j * 100)
                     let note = fretsBoard[i - 1][j]
                     insertInitialTabs(index, name: note, dict: dict)
@@ -142,7 +142,7 @@ class TabsDataManager: NSObject {
     class func insertInitialTabs(index: NSNumber, name: String, dict: Dictionary<String, String>) {
     var tabSuffix: [String] = ["", "m", "7", "m7"]
 
-    for var i = 0; i < 4; i++ {
+    for i in 0..<4 {
         let temp = "\(Int(index) + i)"
         if dict[temp] != nil {
             let tab: Tabs = SwiftCoreDataHelper.insertManagedObject(NSStringFromClass(Tabs), managedObjectConect: moc) as! Tabs

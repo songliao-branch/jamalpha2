@@ -375,8 +375,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
         })
-
-        print("up button: \(button.tag) pressed")
     }
     
     func downVoted(button: UIButton) {
@@ -402,7 +400,6 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 self.resultsTableView.reloadRowsAtIndexPaths([i], withRowAnimation: UITableViewRowAnimation.None)
             }
         })
-        print("down button: \(button.tag) pressed")
     }
     
     

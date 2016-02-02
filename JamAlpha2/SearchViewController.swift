@@ -23,6 +23,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var searchBackgroundLabel = UILabel()
     
     var searchHistoryManager =  SearchHistoryManager()
+    var isSeekingPlayerState = false
 
     @IBOutlet weak var searchResultTableView: UITableView!
 
@@ -197,30 +198,27 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }else{
                     cell.albumCover.image = UIImage(named: "liweng")
                 }
-            } else { //web search in section 1
-                if let track = searchResults[indexPath.row].trackName {
-                    cell.titleLabel.text = track
-                }
-                if let artist = searchResults[indexPath.row].artistName {
-                    cell.subtitleLabel.text = artist
-                }
                 
-                if let imageURL = searchResults[indexPath.row].artworkUrl100 {
-                    cell.albumCover.image = nil
-                    let url = NSURL(string: imageURL)!
-                    let fetcher = NetworkFetcher<UIImage>(URL: url)
+            } else { //web search in section 1
+
+                cell.titleLabel.text = searchResults[indexPath.row].trackName
+                cell.subtitleLabel.text = searchResults[indexPath.row].artistName
+                
+                let imageUrl = searchResults[indexPath.row].artworkUrl100
+                
+                cell.albumCover.image = nil
+                let url = NSURL(string: imageUrl)!
+                let fetcher = NetworkFetcher<UIImage>(URL: url)
+                
+                let cache = Shared.imageCache
+                cache.fetch(fetcher: fetcher).onSuccess { image in
+                    cell.albumCover.image = image
                     
-                    let cache = Shared.imageCache
-                    cache.fetch(fetcher: fetcher).onSuccess { image in
-                        cell.albumCover.image = image
-                        
-                        if(indexPath.row < (self.searchResults.count)){
-                            self.searchResults[indexPath.row].image = nil
-                            self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
-                        }
+                    if(indexPath.row < (self.searchResults.count)){
+                        self.searchResults[indexPath.row].image = nil
+                        self.searchResults[indexPath.row].image = image //used to pass to songviewcontroller
                     }
                 }
-               
             }
         } else if !resultSearchController.active && indexPath.section == 0 {//if search is inactive
             // array of search history comes in time ascending order, we need descending order (newest on top)
@@ -246,7 +244,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             if indexPath.section == 0 {
                 
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-                var isSeekingPlayerState = true
+                isSeekingPlayerState = true
                 songVC.selectedFromTable = true
                 songVC.selectedFromSearchTab = true
                 
@@ -255,14 +253,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
                 if((filteredSongs[indexPath.row]).cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {
                     dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                        while (isSeekingPlayerState) {
+                        while (self.isSeekingPlayerState) {
                             if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                 MusicManager.sharedInstance.player.stop()
                                 KGLOBAL_nowView.stop()
                                 dispatch_async(dispatch_get_main_queue()) {
                                     self.showCellularEnablesStreaming(tableView)
                                 }
-                                isSeekingPlayerState = false
+                                self.isSeekingPlayerState = false
                                 
                                 break
                             }
@@ -280,7 +278,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                                             self.reloadMusicTable(true)
                                         })
                                     }
-                                    isSeekingPlayerState = false
+                                    self.isSeekingPlayerState = false
                                     break
                                 }
                             }
@@ -310,7 +308,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 
             }else {
                 let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-                var isSeekingPlayerState = true
+                isSeekingPlayerState = true
                 songVC.selectedFromTable = true
                 let searchSong = searchResults[indexPath.row]
                 var isReload = true
@@ -320,14 +318,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     MusicManager.sharedInstance.setIndexInTheQueue(0)
                     if(foundItem.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN()) {
                         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                            while (isSeekingPlayerState) {
+                            while (self.isSeekingPlayerState) {
                                 if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                     MusicManager.sharedInstance.player.stop()
                                     KGLOBAL_nowView.stop()
                                     dispatch_async(dispatch_get_main_queue()) {
                                         self.showCellularEnablesStreaming(tableView)
                                     }
-                                    isSeekingPlayerState = false
+                                    self.isSeekingPlayerState = false
                                     
                                     break
                                 }
@@ -345,7 +343,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                                                 self.reloadMusicTable(true)
                                             })
                                         }
-                                        isSeekingPlayerState = false
+                                        self.isSeekingPlayerState = false
                                         break
                                     }
                                 }
@@ -395,7 +393,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             searchHistoryManager.addNewHistory(resultSearchController.searchBar.text!)
             
         } else if !resultSearchController.active { //&& indexPath.section == 0 {
-            
+            self.isSeekingPlayerState = false
              // select in search history
             if indexPath.row == searchHistoryManager.getAllHistory().count {
                 searchHistoryManager.clearHistory()
