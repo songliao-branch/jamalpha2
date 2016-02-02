@@ -33,7 +33,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var isScrolling = false
     var backgroundBlurView: UIVisualEffectView!
     var bottomBlurView: UIView!
-    
+    var parentController:UIViewController!
     
     var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!

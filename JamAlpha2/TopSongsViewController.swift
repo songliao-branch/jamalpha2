@@ -157,6 +157,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                             if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                 dispatch_async(dispatch_get_main_queue()) {
                                     songVC.selectedFromTable = true
+                                    songVC.parentController = self
                                     songVC.transitioningDelegate = self.animator
                                     self.animator!.attachToViewController(songVC)
                                     self.presentViewController(songVC, animated: true, completion: {
@@ -177,6 +178,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                     MusicManager.sharedInstance.player.play()
                 }
                 songVC.selectedFromTable = true
+                songVC.parentController = self
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
@@ -198,6 +200,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             isSeekingPlayerState = false
             songVC.isSongNeedPurchase = true
             songVC.songNeedPurchase = song
+            songVC.parentController = self
             songVC.reloadBackgroundImageAfterSearch(song)
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
