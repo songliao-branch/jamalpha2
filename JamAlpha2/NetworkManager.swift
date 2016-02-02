@@ -37,7 +37,6 @@ class NetworkManager: NSObject {
             object: nil)
         
         self.reachability!.startNotifier()
- 
     }
     deinit{
         if(self.reachability != nil){
