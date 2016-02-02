@@ -251,7 +251,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
 
     func pressSafariButton(sender: UIButton) {
         if !isDemoSong {
-            let name:String = (theSong.getTitle().replace(" ", replacement: "+") + "+" + theSong.getArtist().replace(" ", replacement: "+") + "+lyrics").stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+            let name:String = (theSong.getTitle() + "+" + theSong.getArtist() + "+lyrics").stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
             let url:NSURL = NSURL(string: "x-web-search://?\(name)")!
             if !UIApplication.sharedApplication().openURL(url) {
                 print("cannot open")
