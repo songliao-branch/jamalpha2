@@ -397,7 +397,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         
         tutorialScrollView.contentSize = CGSize(width: CGFloat(numberOfTutorialPages) * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
         
-        tutorialCloseButton = UIButton(frame: CGRect(x: 30, y: 25, width: 50, height: 50))
+        tutorialCloseButton = UIButton(frame: CGRect(x: 20, y: 15, width: 30, height: 30))
         tutorialCloseButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
         tutorialCloseButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
         self.view.addSubview(tutorialCloseButton)
@@ -660,7 +660,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
 extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
     // MARK: Table view methods
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 4 / 31 * self.viewHeight
+        return 80
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
