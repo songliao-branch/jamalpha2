@@ -210,6 +210,23 @@ extension SongViewController {
         toggleChordsDisplayMode()
     }
     
+    func tabsModeChanged() {
+        isTabsShown = tabsSwitch.on
+        isChordShown = chordsSwitch.on
+        lyricsSwitch.on = !lyricsSwitch.on
+        isLyricsShown = lyricsSwitch.on
+        if isLyricsShown == false {
+            releaseSingleLyricsView()
+        }
+        if isChordShown {
+            releaseSingleLyricsView()
+            if self.isTabsShown && self.isLyricsShown {
+                self.lyricbase.hidden = false
+            }
+        }
+        toggleLyrics()
+    }
+    
     func tabsSwitchChanged(uiswitch: UISwitch) {
         isTabsShown = uiswitch.on
         if isTabsShown {
@@ -271,6 +288,15 @@ extension SongViewController {
         toggleLyrics()
     }
     
+    func lyricsModeChanged() {
+        lyricsSwitch.on = !lyricsSwitch.on
+        isLyricsShown = lyricsSwitch.on
+        if isLyricsShown == false {
+            releaseSingleLyricsView()
+        }
+        toggleLyrics()
+    }
+    
     func toggleLyrics() {
         // show lyrics if the boolean is not hidden
         if isLyricsShown {
@@ -325,17 +351,24 @@ extension SongViewController {
         } else if (isLyricsShown) {
             if (self.chordBase.frame.origin.y > CGRectGetMaxY(self.topView.frame) + 20){
                 if (self.isViewDidAppear){
+                    self.lyricbase.alpha = 0
+                    self.lyricbase.transform = CGAffineTransformMakeScale(0.95, 0.95)
                     UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
                         self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
                         for i in 0..<self.tuningLabels.count {
                             self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y:  CGRectGetMaxY(self.topView.frame) + 20 - 10)
                         }
                         }, completion: {
-                            finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            finished in
+                            UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: [.CurveEaseOut, .AllowUserInteraction], animations: {
                                 self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
                                 self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
                                 }, completion: nil)
                     })
+                    UIView.animateWithDuration(0.3, delay: 0.2, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
+                        self.lyricbase.alpha = 1
+                        self.lyricbase.transform = CGAffineTransformMakeScale(1, 1)
+                        },completion: nil)
                 }else{
                     self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
                     self.previousButton.frame.origin.y = self.chordBase.frame.origin.y

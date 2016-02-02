@@ -93,6 +93,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var addLyricsPrompt: UIButton!
     
     var chordBaseTapGesture: UITapGestureRecognizer!
+    var chordBaseDoubleTapGesture:UITapGestureRecognizer!
     //MARK: progress Container
     var progressBlockViewWidth:CGFloat?
     var progressBlockContainer:UIView!
@@ -889,7 +890,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //add tap gesture to chordbase too
         chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        chordBaseTapGesture.numberOfTouchesRequired = 1
+        chordBaseTapGesture.numberOfTapsRequired = 1
         chordBase.addGestureRecognizer(chordBaseTapGesture)
+        
+        chordBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "tabsModeChanged")
+        chordBaseDoubleTapGesture.numberOfTouchesRequired = 1
+        chordBaseDoubleTapGesture.numberOfTapsRequired = 2
+        chordBaseTapGesture.requireGestureRecognizerToFail(chordBaseDoubleTapGesture)
+        chordBase.addGestureRecognizer(chordBaseDoubleTapGesture)
+        
         
         addTabsPrompt = UIButton(frame: CGRect(x: 0, y: chordBase.frame.height-30, width: 200, height: 25))
         addTabsPrompt.setTitle("Add tabs here", forState: .Normal)
@@ -901,6 +911,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         chordBase.addSubview(addTabsPrompt)
         
         calculateXPoints()
+    }
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
     func setUpLyricsBase(){
