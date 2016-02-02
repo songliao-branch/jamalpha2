@@ -269,6 +269,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                                 if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                     dispatch_async(dispatch_get_main_queue()) {
                                         songVC.selectedFromTable = true
+                                        songVC.parentController = self
                                         songVC.transitioningDelegate = self.animator
                                         self.animator!.attachToViewController(songVC)
 
@@ -291,6 +292,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     }
                     
                     songVC.selectedFromTable = true
+                    songVC.parentController = self
                     songVC.transitioningDelegate = self.animator
                     self.animator!.attachToViewController(songVC)
                     self.presentViewController(songVC, animated: true, completion: {
@@ -334,6 +336,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                                     if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                         dispatch_async(dispatch_get_main_queue()) {
                                             songVC.selectedFromTable = true
+                                            songVC.parentController = self
                                             songVC.transitioningDelegate = self.animator
                                             self.animator!.attachToViewController(songVC)
                                             
@@ -356,6 +359,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                         }
                         
                         songVC.selectedFromTable = true
+                        songVC.parentController = self
                         songVC.transitioningDelegate = self.animator
                         self.animator!.attachToViewController(songVC)
                         self.presentViewController(songVC, animated: true, completion: {
@@ -372,6 +376,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }else{
                     isSeekingPlayerState = false
                     songVC.isSongNeedPurchase = true
+                    songVC.parentController = self
                     songVC.songNeedPurchase = searchResults[indexPath.row]
                     if let img = searchResults[indexPath.row].image {
                         songVC.backgroundImage = img
