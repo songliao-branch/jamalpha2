@@ -201,27 +201,38 @@ extension SongViewController {
     //MARK: functions called from guitar action views
     func chordsSwitchChanged(uiswitch: UISwitch) {
         isChordShown = uiswitch.on
+        isChordShownTemp = isChordShown
         if isChordShown {
             releaseSingleLyricsView()
             if self.isTabsShown && self.isLyricsShown {
                 self.lyricbase.hidden = false
             }
         }
-        toggleChordsDisplayMode()
+        toggleChordsDisplayMode(false)
+    }
+    
+    func tabsModeChanged() {
+        lyricsSwitch.on = !lyricsSwitch.on
+        isLyricsShown = lyricsSwitch.on
+        if isChordShown && self.isTabsShown && self.isLyricsShown {
+            self.lyricbase.hidden = false
+        }
+        toggleLyrics(false)
     }
     
     func tabsSwitchChanged(uiswitch: UISwitch) {
         isTabsShown = uiswitch.on
+        isTabsShownTemp = isTabsShown
         if isTabsShown {
             releaseSingleLyricsView()
             if self.isChordShown && self.isLyricsShown {
                 self.lyricbase.hidden = false
             }
         }
-        toggleChordsDisplayMode()
+        toggleChordsDisplayMode(false)
     }
     
-    func toggleChordsDisplayMode() {
+    func toggleChordsDisplayMode(isDoubleTap:Bool) {
         if isChordShown {
             NSUserDefaults.standardUserDefaults().setInteger(1, forKey: isChordShownKey)
         } else {
@@ -238,7 +249,7 @@ extension SongViewController {
         } else {
             chordBase.hidden = false
         }
-        self.chordBaseAnimation()
+        self.chordBaseAnimation(isDoubleTap)
         
         if isChordShown == false && isTabsShown == false && isLyricsShown {
             lyricbase.hidden = true
@@ -268,10 +279,40 @@ extension SongViewController {
         if isLyricsShown == false {
             releaseSingleLyricsView()
         }
-        toggleLyrics()
+        toggleLyrics(false)
     }
     
-    func toggleLyrics() {
+    func lyricsModeChanged() {
+        if(chordBase.hidden && lyricbase.hidden){
+            if (self.isChordShownTemp || self.isTabsShownTemp){
+                self.isChordShown = self.isChordShownTemp
+                self.isTabsShown = self.isTabsShownTemp
+                self.chordsSwitch.on = self.isChordShownTemp
+                self.tabsSwitch.on = self.isTabsShownTemp
+            }else{
+                self.isChordShown = true
+                self.isTabsShown = true
+                self.isChordShownTemp = true
+                self.isTabsShownTemp = true
+                self.chordsSwitch.on = self.isChordShownTemp
+                self.tabsSwitch.on = self.isTabsShownTemp
+            }
+        }else{
+            self.isChordShown = false
+            self.isTabsShown = false
+            self.chordsSwitch.on = false
+            self.tabsSwitch.on = false
+        }
+        if(self.isChordShownTemp || self.isTabsShownTemp){
+            releaseSingleLyricsView()
+        }
+        
+        
+        toggleChordsDisplayMode(true)
+        toggleLyrics(true)
+    }
+    
+    func toggleLyrics(isDoubleTap:Bool) {
         // show lyrics if the boolean is not hidden
         if isLyricsShown {
             lyricbase.hidden = false
@@ -279,7 +320,7 @@ extension SongViewController {
             lyricbase.hidden = true
         }
         
-        self.chordBaseAnimation()
+        self.chordBaseAnimation(isDoubleTap)
         
         if isChordShown == false && isTabsShown == false && isLyricsShown {
             lyricbase.hidden = true
@@ -296,7 +337,7 @@ extension SongViewController {
         applyEffectsToBackgroundImage(changeSong: false)
     }
     
-    func chordBaseAnimation(){
+    func chordBaseAnimation(isDoubleTap:Bool){
         if ((isChordShown || isTabsShown) && !isLyricsShown) {
             if (self.chordBase.frame.origin.y <= CGRectGetMaxY(self.topView.frame) + 21){
                 if (self.isViewDidAppear){
@@ -325,17 +366,31 @@ extension SongViewController {
         } else if (isLyricsShown) {
             if (self.chordBase.frame.origin.y > CGRectGetMaxY(self.topView.frame) + 20){
                 if (self.isViewDidAppear){
+                    self.lyricbase.alpha = 0
                     UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
                         self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
                         for i in 0..<self.tuningLabels.count {
                             self.tuningLabels[i].center = CGPoint(x: self.topPoints[i+1]+self.chordBase.frame.origin.x, y:  CGRectGetMaxY(self.topView.frame) + 20 - 10)
                         }
                         }, completion: {
-                            finished in UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                            finished in
+                            UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: [.CurveEaseOut, .AllowUserInteraction], animations: {
                                 self.previousButton.frame.origin.y = self.chordBase.frame.origin.y
                                 self.nextButton.frame.origin.y = self.chordBase.frame.origin.y
                                 }, completion: nil)
                     })
+                    if(isDoubleTap){
+                        UIView.animateWithDuration(0.2, delay: 0.1, options: [.CurveEaseIn, .AllowUserInteraction] , animations:{
+                            self.lyricbase.alpha = 1
+                        },completion: nil)
+                    }else{
+                        self.lyricbase.transform = CGAffineTransformMakeScale(0.95, 0.95)
+                        UIView.animateWithDuration(0.3, delay: 0.2, options: [.CurveEaseOut, .AllowUserInteraction] , animations: {
+                            self.lyricbase.alpha = 1
+                            self.lyricbase.transform = CGAffineTransformMakeScale(1, 1)
+                            },completion: nil)
+                    }
+                    
                 }else{
                     self.chordBase.frame.origin.y = CGRectGetMaxY(self.topView.frame) + 20
                     self.previousButton.frame.origin.y = self.chordBase.frame.origin.y

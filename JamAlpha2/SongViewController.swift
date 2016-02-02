@@ -93,6 +93,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var addLyricsPrompt: UIButton!
     
     var chordBaseTapGesture: UITapGestureRecognizer!
+    var chordBaseDoubleTapGesture:UITapGestureRecognizer!
+    var lyricBaseDoubleTapGesture:UITapGestureRecognizer!
     //MARK: progress Container
     var progressBlockViewWidth:CGFloat?
     var progressBlockContainer:UIView!
@@ -178,6 +180,8 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // used to toggle should display chord name or tabs
     var isChordShown = true
     var isTabsShown = true
+    var isChordShownTemp = true
+    var isTabsShownTemp = true
     var isLyricsShown = true
     let isChordShownKey = "isChordShown"
     let isTabsShownKey = "isTabsShown"
@@ -889,7 +893,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         //add tap gesture to chordbase too
         chordBaseTapGesture = UITapGestureRecognizer(target: self, action: "playPause:")
+        chordBaseTapGesture.numberOfTouchesRequired = 1
+        chordBaseTapGesture.numberOfTapsRequired = 1
         chordBase.addGestureRecognizer(chordBaseTapGesture)
+        
+        chordBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "tabsModeChanged")
+        chordBaseDoubleTapGesture.numberOfTouchesRequired = 1
+        chordBaseDoubleTapGesture.numberOfTapsRequired = 2
+        chordBaseTapGesture.requireGestureRecognizerToFail(chordBaseDoubleTapGesture)
+        chordBase.addGestureRecognizer(chordBaseDoubleTapGesture)
+        
         
         addTabsPrompt = UIButton(frame: CGRect(x: 0, y: chordBase.frame.height-30, width: 200, height: 25))
         addTabsPrompt.setTitle("Add tabs here", forState: .Normal)
@@ -903,6 +916,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         calculateXPoints()
     }
     
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
     func setUpLyricsBase(){
         //Lyric labels
         currentLyricsIndex = -1
@@ -912,6 +929,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricbase.backgroundColor = UIColor.baseColor()
         
         self.view.addSubview(lyricbase)
+        
+        lyricBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "lyricsModeChanged")
+        lyricBaseDoubleTapGesture.numberOfTouchesRequired = 1
+        lyricBaseDoubleTapGesture.numberOfTapsRequired = 2
+        lyricbase.addGestureRecognizer(lyricBaseDoubleTapGesture)
         
         let contentMargin: CGFloat = 5
         
@@ -978,8 +1000,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         lyricsSwitch.on = isLyricsShown
         countdownSwitch.on = countdownOn
         
-        toggleChordsDisplayMode()
-        toggleLyrics()
+        toggleChordsDisplayMode(false)
+        toggleLyrics(false)
+        isChordShownTemp = isChordShown
+        isTabsShownTemp = isTabsShown
     }
     
     func registerMediaPlayerNotification(){
@@ -1260,7 +1284,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             stopTimer()
             //fade down the soundwave
-            UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
+            UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction], animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     KGLOBAL_progressBlock!.alpha = 0.5
                     if (KGLOBAL_defaultProgressBar != nil){
@@ -1276,7 +1300,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             startTimer()
             //bring up the soundwave, give it a little jump animation
-            UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
+            UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {
                 KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 KGLOBAL_progressBlock!.alpha = 1.0
                 if (KGLOBAL_defaultProgressBar != nil){
@@ -2332,6 +2356,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     func refreshLyricsTableView() {
         if singleLyricsTableView != nil && lyricsArray.count > 0 {
+            if (!isDemoSong){
+                if self.player != nil && self.player.nowPlayingItem != nil {
+                    if self.player.nowPlayingItem != self.nowPlayingMediaItem {
+                        return
+                    }
+                }
+            }
             if tempCurrentLyricsIndex != currentLyricsIndex {
                 tempCurrentLyricsIndex = currentLyricsIndex
                 if tempScrollLine.hidden == true {
