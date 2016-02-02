@@ -1284,7 +1284,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             stopTimer()
             //fade down the soundwave
-            UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
+            UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction], animations: {
                     KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
                     KGLOBAL_progressBlock!.alpha = 0.5
                     if (KGLOBAL_defaultProgressBar != nil){
@@ -1300,7 +1300,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
             startTimer()
             //bring up the soundwave, give it a little jump animation
-            UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
+            UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {
                 KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
                 KGLOBAL_progressBlock!.alpha = 1.0
                 if (KGLOBAL_defaultProgressBar != nil){
