@@ -1554,7 +1554,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             self.avPlayer.volume = 1
         } else {
             self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
-            self.duration = (theSong as! MPMediaItem).playbackDuration
+            self.duration = ((theSong as! MPMediaItem).playbackDuration.isNaN ? 1500 : (theSong as! MPMediaItem).playbackDuration)
         }
         //self.progressBlock!.alpha = 0.5
 
@@ -1599,6 +1599,12 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     startTime.addTime(Int(100 / stepPerSecond))
                     self.currentTime = NSTimeInterval(startTime.toDecimalNumer()) - 0.01
                 }
+            }
+        }
+        
+        if !isDemoSong {
+            if(self.duration == 1500 && !(theSong as! MPMediaItem).playbackDuration.isNaN){
+                self.duration = (theSong as! MPMediaItem).playbackDuration
             }
         }
         //
