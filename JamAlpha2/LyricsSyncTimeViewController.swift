@@ -74,7 +74,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     var updateTimer: NSTimer!
     
     // count down section
-    var countdownTimer = NSTimer()
+    var countdownTimer: NSTimer!
     var countDownStartSecond = 3 //will count down from 3 to 1
     var countdownView: CountdownView!
     
@@ -125,6 +125,8 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             self.defaultProgressBar.removeFromSuperview()
             self.defaultProgressBar = nil
         }
+        stopCountDownTimer()
+        stopUpdateTimer()
     }
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
@@ -462,6 +464,20 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     
     var currentSelectIndex: Int = 0
     
+    func startCountDownTimer() {
+        if countdownTimer == nil {
+            countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
+            NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
+        }
+    }
+    
+    func stopCountDownTimer() {
+        if countdownTimer != nil {
+            countdownTimer.invalidate()
+            countdownTimer = nil
+        }
+    }
+    
     func playPause() {
         if self.isDemoSong ? !avPlayer.playing : (musicPlayer.playbackState != .Playing) {
             //start counting down 3 seconds
@@ -470,8 +486,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             progressBlockContainer.removeGestureRecognizer(tapGesture)
             countdownView.hidden = false
             countdownView.setNumber(countDownStartSecond)
-            countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
-            NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
+            startCountDownTimer()
             playButtonImageView.hidden = true
         } else {
             playButtonImageView.hidden = false
@@ -495,7 +510,6 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     }
 
     func startUpdateTimer() {
-
         if updateTimer == nil {
             if(isDemoSong){
                 self.avPlayer.rate = speed
@@ -522,10 +536,10 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
 
         if countDownStartSecond <= 0 {
             progressBlockContainer.addGestureRecognizer(tapGesture)
-            countdownTimer.invalidate()
+           
             countdownView.hidden = true
             countDownStartSecond = 3
-            countdownTimer = NSTimer()
+            self.stopCountDownTimer()
             // animate up the soundwave
             UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: .CurveEaseInOut, animations: {
                 self.progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
