@@ -164,8 +164,8 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let buttonWidth: CGFloat = 3.0 / 20 * self.viewWidth
         let backButton: UIButton = UIButton()
         backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
-        backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
+        backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
         backButton.center.y = 20 + 44/2
         titleView.addSubview(backButton)

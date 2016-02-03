@@ -71,7 +71,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     var avPlayer: AVAudioPlayer!
     var musicPlayer: MPMusicPlayerController!
     
-    var updateTimer = NSTimer()
+    var updateTimer: NSTimer!
     
     // count down section
     var countdownTimer = NSTimer()
@@ -182,8 +182,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         } else if musicPlayer.playbackState == .Paused {
             isPlaying = false
             playButtonImageView.hidden = false
-            updateTimer.invalidate()
-            updateTimer = NSTimer()
+            self.stopUpdateTimer()
             self.progressBlock.alpha = 0.5
             if (self.defaultProgressBar != nil){
                 self.defaultProgressBar.alpha = 0.5
@@ -490,14 +489,14 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             } else {
                 self.musicPlayer.pause()
             }
-            self.updateTimer.invalidate()
+            stopUpdateTimer()
            
         }
     }
 
     func startUpdateTimer() {
 
-        if !updateTimer.valid {
+        if updateTimer == nil {
             if(isDemoSong){
                 self.avPlayer.rate = speed
             }else{
@@ -507,6 +506,13 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             
             // make sure the timer is not interfered by scrollview scrolling
             NSRunLoop.mainRunLoop().addTimer(updateTimer, forMode: NSRunLoopCommonModes)
+        }
+    }
+    
+    func stopUpdateTimer() {
+        if updateTimer != nil {
+            updateTimer.invalidate()
+            updateTimer = nil
         }
     }
     
@@ -546,8 +552,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     func handleProgressPan(sender: UIPanGestureRecognizer) {
         if sender.state == .Began {
             self.isPanning = true
-            self.updateTimer.invalidate()
-            self.updateTimer = NSTimer()
+            self.stopUpdateTimer()
         } else if sender.state == .Ended {
             self.isPanning = false
             startTime.setTime(Float(self.currentTime))
@@ -598,8 +603,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             } else {
                 self.musicPlayer.pause()
             }
-            updateTimer.invalidate()
-            updateTimer = NSTimer()
+            self.stopUpdateTimer()
             startTime.setTime(0)
             self.currentTime = 0
             self.progressBlock.alpha = 0.5
@@ -664,7 +668,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
 extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
     // MARK: Table view methods
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 80
+        return 4 / 31 * viewHeight
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -800,8 +804,7 @@ extension LyricsSyncViewController {
         } else {
             musicPlayer.pause()
         }
-        updateTimer.invalidate()
-        updateTimer = NSTimer()
+        self.stopUpdateTimer()
         for i in 0..<self.addedLyricsWithTime.lyrics.count {
             if self.addedLyricsWithTime.timeAdded[i] == true {
                 tempLyricsTimeTuple.append((self.addedLyricsWithTime.lyrics[i], self.addedLyricsWithTime.time[i]))
@@ -818,8 +821,7 @@ extension LyricsSyncViewController {
         } else {
             musicPlayer.pause()
         }
-        updateTimer.invalidate()
-        updateTimer = NSTimer()
+        self.stopUpdateTimer()
         var lyricsTimesTuple = [(String, NSTimeInterval)]()
         
         for i in 0..<self.addedLyricsWithTime.lyrics.count {
