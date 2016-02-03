@@ -218,7 +218,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             musicPlayer = MusicManager.sharedInstance.player
             musicPlayer.currentPlaybackTime = 0.0
             registerNotification()
-            self.duration = musicPlayer.nowPlayingItem?.playbackDuration
+            self.duration = (musicPlayer.nowPlayingItem!.playbackDuration.isNaN ? 1500 : musicPlayer.nowPlayingItem!.playbackDuration)
         }
     }
 
@@ -632,7 +632,11 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
                 }
             }
         }
-        
+        if !isDemoSong {
+            if(self.duration >= 1499 && !self.musicPlayer.nowPlayingItem!.playbackDuration.isNaN){
+                self.duration = self.musicPlayer.nowPlayingItem!.playbackDuration
+            }
+        }
         refreshProgressBlock(currentTime)
         refreshTimeLabel(currentTime)
     }
