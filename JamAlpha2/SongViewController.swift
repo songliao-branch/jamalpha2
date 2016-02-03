@@ -59,7 +59,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     //MARK: tutorial-related
     var tutorialScrollView: UIScrollView!
-    var numberOfTutorialPages = 5
+    var numberOfTutorialPages = 2
     var tutorialIndicators = [UIView]()
     var indicatorOriginXPositions = [CGFloat]()
     var tutorialCloseButton: UIButton!
@@ -399,12 +399,22 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         tutorialScrollView.delegate = self
         for i in 0..<numberOfTutorialPages{
             let tutorialImage = UIImageView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: view.frame.height))
-            tutorialImage.image = UIImage(named: "tutorial_\(i+1)_iPhone6")
+            
+            if UIDevice.currentDevice().modelName == "iPhone 5" || UIDevice.currentDevice().modelName == "iPhone 5s" {
+                tutorialImage.image = UIImage(named: "song_tutorial_\(i+1)_iPhone5")
+            } else if UIDevice.currentDevice().modelName == "iPhone 6" || UIDevice.currentDevice().modelName == "iPhone 6s" {
+                tutorialImage.image = UIImage(named: "song_tutorial_\(i+1)_iPhone6")
+            } else if UIDevice.currentDevice().modelName == "iPhone 6 Plus" || UIDevice.currentDevice().modelName == "iPhone 6s Plus" {
+                tutorialImage.image = UIImage(named: "song_tutorial_\(i+1)_iPhone6+")
+                
+            } else {//iPhone4s
+                tutorialImage.image = UIImage(named: "song_tutorial_\(i+1)_iPhone4")
+            }
+
             tutorialScrollView.addSubview(tutorialImage)
         }
         
-        
-        tutorialCloseButton = UIButton(frame: CGRect(x: 30, y: 25, width: 50, height: 50))
+        tutorialCloseButton = UIButton(frame: CGRect(x: 15, y: 15, width: 50, height: 50))
         tutorialCloseButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
         tutorialCloseButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
         self.view.addSubview(tutorialCloseButton)
