@@ -1603,7 +1603,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         }
         
         if !isDemoSong {
-            if(self.duration == 1500 && !(theSong as! MPMediaItem).playbackDuration.isNaN){
+            if(self.duration >= 1499 && !(theSong as! MPMediaItem).playbackDuration.isNaN){
                 self.duration = (theSong as! MPMediaItem).playbackDuration
             }
         }

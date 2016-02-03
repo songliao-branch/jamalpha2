@@ -633,7 +633,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             }
         }
         if !isDemoSong {
-            if(self.duration == 1500 && !self.musicPlayer.nowPlayingItem!.playbackDuration.isNaN){
+            if(self.duration >= 1499 && !self.musicPlayer.nowPlayingItem!.playbackDuration.isNaN){
                 self.duration = self.musicPlayer.nowPlayingItem!.playbackDuration
             }
         }
