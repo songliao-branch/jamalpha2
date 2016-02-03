@@ -108,6 +108,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                             if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                 dispatch_async(dispatch_get_main_queue()) {
                                     songVC.selectedFromTable = true
+                                    songVC.parentController = self
                                     songVC.transitioningDelegate = self.animator
                                     self.animator!.attachToViewController(songVC)
                                     self.presentViewController(songVC, animated: true, completion: {
@@ -128,6 +129,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                     MusicManager.sharedInstance.player.play()
                 }
                 songVC.selectedFromTable = true
+                songVC.parentController = self
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
@@ -145,6 +147,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             isSeekingPlayerState = false
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
+            songVC.parentController = self
             MusicManager.sharedInstance.player.pause()
             MusicManager.sharedInstance.player.currentPlaybackTime = 0
             songVC.isDemoSong = true
@@ -179,6 +182,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 
                 songVC.isSongNeedPurchase = true
                 songVC.songNeedPurchase = song
+                songVC.parentController = self
                 songVC.reloadBackgroundImageAfterSearch(song)
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)

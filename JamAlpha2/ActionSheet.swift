@@ -672,9 +672,20 @@ extension SongViewController {
     func goToArtist(button: UIButton) {
         self.dismissViewControllerAnimated(false, completion: {
             completed in
+            if self.parentViewController != nil {
+                self.parentController.view.alpha = 1
+            }
             if(self.musicViewController != nil){
                 if(!self.isDemoSong){
                     self.musicViewController.goToArtist(self.player.nowPlayingItem!.artist!)
+                }
+            }else{
+                let rootVC:TabBarController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC as! TabBarController
+                let baseVC:BaseViewController = (rootVC.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+                rootVC.selectedIndex = 0
+                let musicVC:MusicViewController = baseVC.musicViewController
+                if(!self.isDemoSong){
+                    musicVC.goToArtist(self.player.nowPlayingItem!.artist!)
                 }
             }
         })
@@ -683,9 +694,20 @@ extension SongViewController {
     func goToAlbum(button: UIButton) {
         self.dismissViewControllerAnimated(false, completion: {
             completed in
+            if self.parentViewController != nil {
+                self.parentController.view.alpha = 1
+            }
             if(self.musicViewController != nil){
                 if(!self.isDemoSong){
                     self.musicViewController.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
+                }
+            }else{
+                let rootVC:TabBarController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC as! TabBarController
+                let baseVC:BaseViewController = (rootVC.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+                rootVC.selectedIndex = 0
+                let musicVC:MusicViewController = baseVC.musicViewController
+                if(!self.isDemoSong){
+                    musicVC.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
                 }
             }
             

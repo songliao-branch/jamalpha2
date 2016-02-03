@@ -213,6 +213,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                             if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                 dispatch_async(dispatch_get_main_queue()) {
                                     songVC.selectedFromTable = true
+                                    songVC.parentController = self
                                     songVC.transitioningDelegate = self.animator
                                     self.animator!.attachToViewController(songVC)
                                     self.presentViewController(songVC, animated: true, completion: {
@@ -233,6 +234,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                     MusicManager.sharedInstance.player.play()
                 }
                 songVC.selectedFromTable = true
+                songVC.parentController = self
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: {
@@ -251,6 +253,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
 
             MusicManager.sharedInstance.setDemoSongQueue(MusicManager.sharedInstance.demoSongs, selectedIndex: 0)
             songVC.selectedRow = 0
+            songVC.parentController = self
             MusicManager.sharedInstance.player.pause()
             MusicManager.sharedInstance.player.currentPlaybackTime = 0
             songVC.isDemoSong = true
@@ -284,6 +287,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                 }
                 
                 songVC.isSongNeedPurchase = true
+                songVC.parentController = self
                 songVC.songNeedPurchase = song
                 songVC.reloadBackgroundImageAfterSearch(song)
                 songVC.transitioningDelegate = self.animator

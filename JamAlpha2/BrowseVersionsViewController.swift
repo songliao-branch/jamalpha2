@@ -344,6 +344,12 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
                 CoreDataManager.saveLyrics(self.findable, lyrics: download.lyrics, times: download.times, userId: download.editor.userId, lyricsSetId: download.id)
                 
                 (self.songViewController.lyric, _) = CoreDataManager.getLyrics(self.findable, fetchingUsers: false)
+                if self.songViewController.singleLyricsTableView != nil {
+                    self.songViewController.setUpLyricsArray()
+                    self.songViewController.singleLyricsTableView.reloadData()
+                    self.songViewController.updateSingleLyricsAlpha()
+                    self.songViewController.updateSingleLyricsPosition(false)
+                }
                 self.dismissViewControllerAnimated(true, completion: nil)
             })
         }
