@@ -302,6 +302,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         lyricsSyncViewController.theSong  = self.theSong
         lyricsSyncViewController.recoverMode = self.recoverMode
         lyricsSyncViewController.isDemoSong = isDemoSong
+        lyricsSyncViewController.songViewController = self.songViewController
         self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
 

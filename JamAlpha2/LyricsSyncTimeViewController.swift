@@ -56,6 +56,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     var panGesture: UIPanGestureRecognizer!
     var currentTimeLabel: UILabel = UILabel()
     var totalTimeLabel: UILabel = UILabel()
+    var songViewController: SongViewController? //used to parse synced lyrics from LyricsSyncViewController
     
     var progressChangedOrigin: CGFloat!
     
@@ -285,7 +286,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             //TODO: add a placeholder album cover
             image = UIImage(named: "liwengbg")
         }
-        backgroundImage.image = image
+        backgroundImage.image = image != nil ? image : songViewController!.backgroundImage 
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
