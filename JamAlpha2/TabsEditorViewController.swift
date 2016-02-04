@@ -177,11 +177,12 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     var countDownNumber: Float = 3
     
     //MARK: tutorials
-    var tutorialOverlay: UIView!
+    var tutorialImage: UIImageView?
+    var tutorialCloseButton: UIButton!
+    var watchTutorialButton: UIButton!
     var videoPlayerView: YouTubePlayerView!
     
     var isShowDiscardAlert:Bool = false
-    
     
     // Mark: Main view data array structure
     class mainViewData {
@@ -293,9 +294,8 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     override func viewDidAppear(animated: Bool) {
         // MARK: add exist chord to tab editor view
         self.addChordToEditorView(theSong)
-        
-        if NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorial) {
-            setUpTutorial()
+        if NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorialA) {
+            showTutorial(first: true)
         }
     }
     
@@ -636,7 +636,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         self.tabNameTextField.layer.cornerRadius = 3
         self.tabNameTextField.autocorrectionType = UITextAutocorrectionType.No
         self.tabNameTextField.delegate = self
-        self.tabNameTextField.attributedPlaceholder = NSAttributedString(string:"Input Name",
+        self.tabNameTextField.attributedPlaceholder = NSAttributedString(string:"Chord Name",
             attributes:[NSForegroundColorAttributeName: UIColor(white: 0.8, alpha: 1), NSFontAttributeName: UIFont.boldSystemFontOfSize(17)])
         self.tabNameTextField.returnKeyType = .Done
         self.tabNameTextField.textAlignment = .Center
@@ -964,9 +964,9 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                             }, completion: nil)
                     }
                 if (self.specificTabsScrollView.subviews.count == 0){
-                    self.statusLabel.text = "Input Chord Name"
+                    self.statusLabel.text = "Create a custom chord"
                 }else{
-                    self.statusLabel.text = "Choose Chord Or Input Name"
+                    self.statusLabel.text = "Choose one or name one"
                 }
             }
         )
@@ -1685,6 +1685,12 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         self.removeObjectsOnSpecificTabsScrollView()
 
         self.view.userInteractionEnabled = true
+        
+        //show second tutorial when there is a chord on the fretboard for the first time
+        if !NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorialA) && NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorialB) && noteButtonWithTabArray.count > 0 {
+            showTutorial(first: false)
+        }
+
     }
     
     // correctly put the tabs on music line
@@ -1986,7 +1992,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         self.backgroundView.alpha = 0
         self.progressBlock.alpha = 0
         self.collectionView.alpha = 0
-        self.statusLabel.text = "Add New Chords"
+        self.statusLabel.text = "Add a new chord"
         self.intoEditView = true
         self.completeStringView.contentOffset = self.collectionView.contentOffset
         
@@ -2037,7 +2043,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             shakeAnimationStatusLabel()
                             self.shakeAnimationScrollView()
-                            self.AnimationStatusLabel("Choose Or Input Chord Name")
+                            self.AnimationStatusLabel("Choose or name a chord")
                             self.tabNameTextField.becomeFirstResponder()
                             pressDoneButton = true
                         }
