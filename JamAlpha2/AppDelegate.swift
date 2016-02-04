@@ -33,7 +33,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // by default we track the user location while in the background
         defaultsDictionary[kShowDemoSong] = true
         defaultsDictionary[kShowTutorial] = true
-        defaultsDictionary[kShowTabsEditorTutorial] = true
+        defaultsDictionary[kShowTabsEditorTutorialA] = true
+        defaultsDictionary[kShowTabsEditorTutorialB] = true
         defaultsDictionary[kShowLyricsTutorial] = true
         NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
         AWSS3Manager.createAWSS3FilePath()

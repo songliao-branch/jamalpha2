@@ -266,7 +266,6 @@ class CoreDataManager: NSObject {
         }
         
         return nil
-
     }
     
     

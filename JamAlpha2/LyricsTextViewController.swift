@@ -159,9 +159,8 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         titleView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(titleView)
         
-        let spacing: CGFloat = 0.5 / 20 * self.viewWidth
-        
-        let buttonWidth: CGFloat = 3.0 / 20 * self.viewWidth
+        let spacing: CGFloat = 10
+        let buttonWidth: CGFloat = 50
         let backButton: UIButton = UIButton()
         backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
         backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)

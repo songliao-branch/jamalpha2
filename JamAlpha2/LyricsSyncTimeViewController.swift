@@ -84,10 +84,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
     var defaultProgressBar:UIProgressView!
     
     // MARK: tutorial
-    var tutorialScrollView: UIScrollView!
-    var numberOfTutorialPages = 2
-    var tutorialIndicators = [UIView]()
-    var indicatorOriginXPositions = [CGFloat]()
+    var tutorialImage: UIImageView!
     var tutorialCloseButton: UIButton!
     
     // MARK: UIGestures
@@ -229,9 +226,8 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         titleView.backgroundColor = UIColor.mainPinkColor()
         self.view.addSubview(titleView)
         
-        let spacing: CGFloat = 0.5 / 20 * self.viewWidth
-        
-        let buttonWidth: CGFloat = 3.0 / 20 * self.viewWidth
+        let spacing: CGFloat = 10
+        let buttonWidth: CGFloat = 50
         let backButton: UIButton = UIButton()
         backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
         backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
@@ -379,86 +375,22 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         if !NSUserDefaults.standardUserDefaults().boolForKey(kShowLyricsTutorial) {
             return
         }
-        tutorialScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
-        tutorialScrollView.backgroundColor = UIColor.clearColor()
-        self.view.addSubview(tutorialScrollView)
         
-        tutorialScrollView.bounces = false
-        tutorialScrollView.pagingEnabled = true
-        tutorialScrollView.delegate = self
-        for i in 0..<numberOfTutorialPages{
-            let tutorialImage = UIImageView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: view.frame.height))
-            
-            tutorialImage.image = UIImage(named: "lyrics_tutorial_\(i+1)")
-            
-            tutorialScrollView.addSubview(tutorialImage)
-            
-        }
-        
-        tutorialScrollView.contentSize = CGSize(width: CGFloat(numberOfTutorialPages) * tutorialScrollView.frame.width, height: tutorialScrollView.frame.height)
-        
+        tutorialImage = UIImageView(frame: self.view.bounds)
+        tutorialImage.image = UIImage(named: "lyrics_tutorial")
+        self.view.addSubview(tutorialImage)
+ 
         tutorialCloseButton = UIButton(frame: CGRect(x: 20, y: 15, width: 30, height: 30))
         tutorialCloseButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
         tutorialCloseButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
         self.view.addSubview(tutorialCloseButton)
-        
-        let diameter = 6
-        let range = diameter * 2
-        let totalWidth = numberOfTutorialPages * diameter + Int(ceil(Float(numberOfTutorialPages/2))) * range
-        let firstOx = self.view.centerX - CGFloat(totalWidth/2)
-        
-        for i in 0..<numberOfTutorialPages {
-            let circle = UIView(frame: CGRect(x: firstOx + CGFloat(i * range), y: self.view.frame.height - 20, width: CGFloat(diameter), height: CGFloat(diameter)))
-            circle.backgroundColor = UIColor.whiteColor()
-            
-            if i == 0 {
-                circle.backgroundColor = UIColor.mainPinkColor()
-            }
-            circle.layer.cornerRadius = CGFloat(diameter)/2
-            tutorialScrollView.addSubview(circle)
-            tutorialIndicators.append(circle)
-            indicatorOriginXPositions.append(circle.frame.origin.x)
-        }
-    }
-    
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        if tutorialScrollView == nil {
-            return
-        }
-        if  tutorialScrollView.hidden {
-            return
-        }
-        
-        for i in 0..<numberOfTutorialPages {
-            tutorialIndicators[i].frame.origin.x = scrollView.contentOffset.x + indicatorOriginXPositions[i]
-        }
-    }
-    
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        
-        if tutorialScrollView == nil {
-            return
-        }
-        
-        if  tutorialScrollView.hidden {
-            return
-        }
-        
-        let currentPage = scrollView.contentOffset.x / self.view.frame.width
-        for i in 0..<numberOfTutorialPages {
-            if i == Int(currentPage) {
-                tutorialIndicators[i].backgroundColor = UIColor.mainPinkColor()
-            } else {
-                tutorialIndicators[i].backgroundColor = UIColor.whiteColor()
-            }
-        }
     }
     
     func hideTutorial() {
-        tutorialScrollView.hidden = true
+        tutorialImage.hidden = true
         tutorialCloseButton.hidden = true
         
-        NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowLyricsTutorial)
+         NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowLyricsTutorial)
     }
     
     var currentSelectIndex: Int = 0

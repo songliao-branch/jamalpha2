@@ -78,7 +78,7 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
                 cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(kShowTutorial)
                 
             } else {
-                cell.demoSwith.on =  NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorial)
+                cell.demoSwith.on =  NSUserDefaults.standardUserDefaults().boolForKey(kShowTabsEditorTutorialA)
             }
         }
 
@@ -108,7 +108,8 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
             if uiswitch.tag == 0 {
                 NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowTutorial)
             } else {
-                NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowTabsEditorTutorial)
+                NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowTabsEditorTutorialA)
+                NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowTabsEditorTutorialB)
             }
         }
         demoTable.reloadData()

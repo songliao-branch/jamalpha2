@@ -29,7 +29,7 @@
 		BFC136231C55F6C000D05899 /* TabsEditorCapo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136221C55F6C000D05899 /* TabsEditorCapo.swift */; };
 		BFC136251C55F70D00D05899 /* TabsEditorJinggling.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */; };
 		BFC136271C55F79600D05899 /* TabsEditorAddExistTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */; };
-		BFC136291C55F8A400D05899 /* TabsEditorYouTube.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */; };
+		BFC136291C55F8A400D05899 /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136281C55F8A400D05899 /* Tutorial.swift */; };
 		BFC1362D1C56B11100D05899 /* TabsEditorCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */; };
 		BFC136311C56C46A00D05899 /* FAQViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136301C56C46A00D05899 /* FAQViewController.swift */; };
 		BFC136331C56D06200D05899 /* FAQDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC136321C56D06200D05899 /* FAQDetailViewController.swift */; };
@@ -217,7 +217,7 @@
 		BFC136221C55F6C000D05899 /* TabsEditorCapo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorCapo.swift; sourceTree = "<group>"; };
 		BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorJinggling.swift; sourceTree = "<group>"; };
 		BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorAddExistTabs.swift; sourceTree = "<group>"; };
-		BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorYouTube.swift; sourceTree = "<group>"; };
+		BFC136281C55F8A400D05899 /* Tutorial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
 		BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsEditorCollectionView.swift; sourceTree = "<group>"; };
 		BFC136301C56C46A00D05899 /* FAQViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FAQViewController.swift; sourceTree = "<group>"; };
 		BFC136321C56D06200D05899 /* FAQDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FAQDetailViewController.swift; sourceTree = "<group>"; };
@@ -453,7 +453,7 @@
 				BFC136221C55F6C000D05899 /* TabsEditorCapo.swift */,
 				BFC136241C55F70D00D05899 /* TabsEditorJinggling.swift */,
 				BFC136261C55F79600D05899 /* TabsEditorAddExistTabs.swift */,
-				BFC136281C55F8A400D05899 /* TabsEditorYouTube.swift */,
+				BFC136281C55F8A400D05899 /* Tutorial.swift */,
 				BFC1362C1C56B11100D05899 /* TabsEditorCollectionView.swift */,
 				105B2EC61C316E20002BC17A /* CustomizedView.swift */,
 			);
@@ -917,7 +917,7 @@
 				TargetAttributes = {
 					E488773C1B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 978SMNLLT3;
+						DevelopmentTeam = 3ME9DMV2GU;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -1104,7 +1104,7 @@
 				C8F505081B9101920077F508 /* UIWindowEffects.swift in Sources */,
 				BFC136251C55F70D00D05899 /* TabsEditorJinggling.swift in Sources */,
 				BFB217351C582F0A00E27A32 /* SingleLyricsTableViewCell.swift in Sources */,
-				BFC136291C55F8A400D05899 /* TabsEditorYouTube.swift in Sources */,
+				BFC136291C55F8A400D05899 /* Tutorial.swift in Sources */,
 				E43713FB1C3486BE00517D03 /* MyFavoritesViewController.swift in Sources */,
 				E42DF9361BAF419F00187A95 /* LyricsSyncTimeViewController.swift in Sources */,
 				E48877471B151628004785D3 /* MusicViewController.swift in Sources */,

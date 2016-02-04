@@ -170,7 +170,7 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
         self.musicControlView.alpha = 0
         self.progressBlock.alpha = 0
         self.collectionView.alpha = 0
-        self.statusLabel.text = "Add New Chords"
+        self.statusLabel.text = "Add a new chord"
         self.intoEditView = true
         
         self.addNewTab = true
