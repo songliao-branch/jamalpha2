@@ -694,15 +694,19 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     var tempTapView:UIView?
     func textFieldDidBeginEditing(textField: UITextField) {
         self.tabFingerPointChanged = true
-        tempTapView = UIView()
-        tempTapView!.frame = self.completeStringView.frame
-        tempTapView!.backgroundColor = UIColor.clearColor()
-        self.editView.addSubview(self.tempTapView!)
+        if (tempTapView == nil) {
+            tempTapView = UIView()
+            tempTapView!.frame = self.completeStringView.frame
+            tempTapView!.backgroundColor = UIColor.clearColor()
+            self.editView.addSubview(self.tempTapView!)
+        }
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
-        tempTapView!.removeFromSuperview()
-        tempTapView = nil
+        if tempTapView != nil {
+            tempTapView!.removeFromSuperview()
+            tempTapView = nil
+        }
         if (self.specificTabsScrollView.subviews.count == 1 && self.specificTabsScrollView.subviews[0].isKindOfClass(UILabel) && !isTextChanged){
             self.removeObjectsOnSpecificTabsScrollView()
             self.tabNameTextField.text = ""

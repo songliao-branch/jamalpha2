@@ -438,10 +438,12 @@ extension TabsEditorViewController {
                 let gesture = self.longPressMainViewNoteButton[button]
                 startNormalJinggling(gesture!)
             }
-            self.tempTapView = UIView(frame: CGRectMake(musicControlView.frame.origin.x, musicControlView.frame.origin.y, musicControlView.frame.size.width, musicControlView.frame.size.height))
-            temptapOnEditView.addTarget(self, action: "tapOnEditView:")
-            self.tempTapView!.addGestureRecognizer(temptapOnEditView)
-            self.view.addSubview(self.tempTapView!)
+            if tempTapView == nil {
+                self.tempTapView = UIView(frame: CGRectMake(musicControlView.frame.origin.x, musicControlView.frame.origin.y, musicControlView.frame.size.width, musicControlView.frame.size.height))
+                temptapOnEditView.addTarget(self, action: "tapOnEditView:")
+                self.tempTapView!.addGestureRecognizer(temptapOnEditView)
+                self.view.addSubview(self.tempTapView!)
+            }
         }
     }
     
@@ -454,7 +456,7 @@ extension TabsEditorViewController {
         self.completeStringView.userInteractionEnabled = true
         self.musicControlView.userInteractionEnabled = true
         if(tempTapView != nil){
-            tempTapView?.removeGestureRecognizer(temptapOnEditView)
+            tempTapView!.removeGestureRecognizer(temptapOnEditView)
             tempTapView!.removeFromSuperview()
             tempTapView = nil
         }
@@ -639,6 +641,9 @@ extension TabsEditorViewController {
         for i in 0..<noteButtonWithTabArray.count {
             noteButtonWithTabArray[i].noteButton.tag = i
         }
+        stopMainViewJiggling()
+        reorganizeMainViewDataArray()
+        startMainViewJiggling()
         if(self.noteButtonWithTabArray.count == 0){
             self.completeStringView.userInteractionEnabled = true
             if(tempTapView != nil){
@@ -649,9 +654,6 @@ extension TabsEditorViewController {
             self.musicControlView.userInteractionEnabled = true
             self.isJiggling = false
         }
-        stopMainViewJiggling()
-        reorganizeMainViewDataArray()
-        startMainViewJiggling()
     }
     
     // need to check whether the main view contain the delete tab
