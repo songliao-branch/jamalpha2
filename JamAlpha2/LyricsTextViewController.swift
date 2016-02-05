@@ -163,8 +163,8 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let buttonWidth: CGFloat = 50
         let backButton: UIButton = UIButton()
         backButton.frame = CGRectMake(0, 0, buttonWidth, buttonWidth)
-        backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         backButton.setImage(UIImage(named: "lyrics_back_circle"), forState: UIControlState.Normal)
+        backButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
         backButton.center.y = 20 + 44/2
         titleView.addSubview(backButton)
@@ -301,6 +301,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         lyricsSyncViewController.theSong  = self.theSong
         lyricsSyncViewController.recoverMode = self.recoverMode
         lyricsSyncViewController.isDemoSong = isDemoSong
+        lyricsSyncViewController.songViewController = self.songViewController
         self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
 
@@ -339,10 +340,11 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func pressDeleteAllButton(sender: UIButton) {
+        self.lyricsTextView.resignFirstResponder()
         let alert = UIAlertController(title: "Warning", message: "Are you sure you want to delete all lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
-            self.lyricsTextView.text = "Put lyrics here..."
-            
+            self.lyricsTextView.text = "Put your lyrics here"
+            self.lyricsTextView.textColor = UIColor.lightGrayColor()
         }))
         alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
@@ -383,7 +385,12 @@ extension LyricsTextViewController: UITextViewDelegate {
         }
     }
     
-  
+    func textViewDidEndEditing(textView: UITextView) {
+        if textView.text == "" {
+            textView.text = "Put your lyrics here"
+            textView.textColor = UIColor.lightGrayColor()
+        }
+    }
 }
 
 

@@ -232,6 +232,8 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         // get the correct screen height and width
+
+        
         if self.view.frame.height > self.view.frame.width {
             trueWidth = self.view.frame.height
             trueHeight = self.view.frame.width
@@ -239,7 +241,6 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             trueWidth = self.view.frame.width
             trueHeight = self.view.frame.height
         }
-        
         //
         checkConverToMPMediaItem()
         
