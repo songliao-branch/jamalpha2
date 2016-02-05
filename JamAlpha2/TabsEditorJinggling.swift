@@ -632,7 +632,6 @@ extension TabsEditorViewController {
             for i in 0..<self.mainViewDataArray.count {
                 if self.mainViewDataArray[i].fretNumber == fretNumber {
                     for j in 0..<self.mainViewDataArray[i].noteButtonsWithTab.count {
-                        print(self.mainViewDataArray[i].noteButtonsWithTab.count)
                         if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[index].tab) {
                             self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
                             self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
