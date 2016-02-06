@@ -487,6 +487,7 @@ extension TabsEditorViewController {
             tempView.center.x = originalX - 1
             
             let tempDeleteChordOnMainView = UITapGestureRecognizer(target: self, action: "deleteChordOnMainView:")
+            tempDeleteChordOnMainView.delegate = self
             self.deleteChordOnMainView[tempView as! UIButton] = tempDeleteChordOnMainView
             tempView.addGestureRecognizer(tempDeleteChordOnMainView)
             let randomInt: UInt32  = arc4random_uniform(500)
@@ -623,36 +624,39 @@ extension TabsEditorViewController {
     }
     
     func deleteChordOnMainView(sender: UITapGestureRecognizer) {
-        self.isShowDiscardAlert = true
-        let index: Int = (sender.view?.tag)!
-        self.stopNormalJinggling(longPressMainViewNoteButton[self.noteButtonWithTabArray[index].noteButton]!, button: self.noteButtonWithTabArray[index].noteButton)
-        let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
-        for i in 0..<self.mainViewDataArray.count {
-            if self.mainViewDataArray[i].fretNumber == fretNumber {
-                for j in 0..<self.mainViewDataArray[i].noteButtonsWithTab.count {
-                    if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[index].tab) {
-                        self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
-                        self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
+        if !self.isTapedOnButton {
+            self.isShowDiscardAlert = true
+            let index: Int = (sender.view?.tag)!
+            self.stopNormalJinggling(longPressMainViewNoteButton[self.noteButtonWithTabArray[index].noteButton]!, button: self.noteButtonWithTabArray[index].noteButton)
+            let fretNumber = Int(self.noteButtonWithTabArray[index].tab.index) - Int(self.noteButtonWithTabArray[index].tab.index) / 100 * 100
+            for i in 0..<self.mainViewDataArray.count {
+                if self.mainViewDataArray[i].fretNumber == fretNumber {
+                    for j in 0..<self.mainViewDataArray[i].noteButtonsWithTab.count {
+                        if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[index].tab) {
+                            self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
+                            self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
+                            break
+                        }
                     }
                 }
             }
-        }
-        self.noteButtonWithTabArray.removeAtIndex(index)
-        for i in 0..<noteButtonWithTabArray.count {
-            noteButtonWithTabArray[i].noteButton.tag = i
-        }
-        stopMainViewJiggling()
-        reorganizeMainViewDataArray()
-        startMainViewJiggling()
-        if(self.noteButtonWithTabArray.count == 0){
-            self.completeStringView.userInteractionEnabled = true
-            if(tempTapView != nil){
-                tempTapView?.removeGestureRecognizer(temptapOnEditView)
-                tempTapView!.removeFromSuperview()
-                tempTapView = nil
+            self.noteButtonWithTabArray.removeAtIndex(index)
+            for i in 0..<noteButtonWithTabArray.count {
+                noteButtonWithTabArray[i].noteButton.tag = i
             }
-            self.musicControlView.userInteractionEnabled = true
-            self.isJiggling = false
+            stopMainViewJiggling()
+            reorganizeMainViewDataArray()
+            startMainViewJiggling()
+            if(self.noteButtonWithTabArray.count == 0){
+                self.completeStringView.userInteractionEnabled = true
+                if(tempTapView != nil){
+                    tempTapView?.removeGestureRecognizer(temptapOnEditView)
+                    tempTapView!.removeFromSuperview()
+                    tempTapView = nil
+                }
+                self.musicControlView.userInteractionEnabled = true
+                self.isJiggling = false
+            }
         }
     }
     
@@ -661,6 +665,7 @@ extension TabsEditorViewController {
         for i in 0..<self.noteButtonWithTabArray.count {
             if self.noteButtonWithTabArray[i].tab.index == index && self.noteButtonWithTabArray[i].tab.name == name && self.noteButtonWithTabArray[i].tab.content == content {
                 self.deleteChordOnString3View(i)
+                break
             }
         }
         self.deleteChordOnMusicLine(index, name: name, content: content)
@@ -674,6 +679,7 @@ extension TabsEditorViewController {
                     if self.compareTabs(self.mainViewDataArray[i].noteButtonsWithTab[j].tab, tab2: self.noteButtonWithTabArray[sender].tab)  {
                         self.mainViewDataArray[i].noteButtonsWithTab[j].noteButton.removeFromSuperview()
                         self.mainViewDataArray[i].noteButtonsWithTab.removeAtIndex(j)
+                        break
                     }
                 }
             }

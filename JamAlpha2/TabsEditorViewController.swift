@@ -15,6 +15,9 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollViewDelegate {
     
+    var isTapedOnButton: Bool = false
+    
+    
     var isCompleteStringViewScroll = false
     var originaloffset:CGFloat = -1
     var baseNoteLocation:CGFloat = -1
