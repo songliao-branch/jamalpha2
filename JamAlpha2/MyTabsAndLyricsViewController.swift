@@ -50,7 +50,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func setUpNavigationBar() {
-        self.navigationItem.title = isViewingTabs ? "My Tabs" : "My Lyrics"
+        self.navigationItem.title = isViewingTabs ? "My Chords" : "My Lyrics"
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false

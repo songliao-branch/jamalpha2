@@ -974,7 +974,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 if (self.specificTabsScrollView.subviews.count == 0){
                     self.statusLabel.text = "Create a custom chord"
                 }else{
-                    self.statusLabel.text = "Choose one or name one"
+                    self.statusLabel.text = "Choose a chord or customize one"
                 }
             }
         )
@@ -2057,7 +2057,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                             self.tabNameTextField.text = self.currentBaseButton.titleLabel?.text
                             shakeAnimationStatusLabel()
                             self.shakeAnimationScrollView()
-                            self.AnimationStatusLabel("Choose or name a chord")
+                            self.AnimationStatusLabel("Choose a chord or customize one")
                             self.tabNameTextField.becomeFirstResponder()
                             pressDoneButton = true
                         }
@@ -2127,14 +2127,14 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 self.removeObjectsOnSpecificTabsScrollView()
                 let addBaseNoteLabel: UILabel = UILabel()
                 addBaseNoteLabel.frame = CGRectMake(0, 0, self.specificTabsScrollView.frame.size.width, self.specificTabsScrollView.frame.size.height)
-                addBaseNoteLabel.text = "Please select a base note on the bottom three strings"
+                addBaseNoteLabel.text = "Please select a base note on the lower three strings"
                 addBaseNoteLabel.font = UIFont.systemFontOfSize(15)
                 addBaseNoteLabel.backgroundColor = UIColor(white: 0.7, alpha: 0.3)
                 addBaseNoteLabel.textAlignment = .Center
                 addBaseNoteLabel.textColor = UIColor.whiteColor()
                 self.specificTabsScrollView.addSubview(addBaseNoteLabel)
                 self.shakeAnimationScrollView()
-                self.AnimationStatusLabel("Choose Base Note")
+                self.AnimationStatusLabel("Choose bass note")
             }
         } else {
             if isDemoSong {
@@ -2160,9 +2160,11 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 tuningOfTheSong += "\(label.text!)-"
             }
             
+            
             //check if tabsSet id is bigger than 0, if so, means this tabs has been saved to the cloud, then we use same tabsSetid, otherwise if less than one, it means it's new
             if (allChords.count < 3) {
-                let alertController = UIAlertController(title: nil, message: "Please add at least THREE chords into your tab", preferredStyle: UIAlertControllerStyle.Alert)
+                
+                let alertController = UIAlertController(title: nil, message: "We need to sync at least 3 chords!", preferredStyle: UIAlertControllerStyle.Alert)
                 alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
                 self.presentViewController(alertController, animated: true, completion: nil)
                 return

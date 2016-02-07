@@ -56,7 +56,7 @@ extension SongViewController {
             }
         }
         
-        let names = ["Chords", "Tabs", "Lyrics", "Countdown"]
+        let names = ["Dm7", "xx0211", "Lyrics", "Countdown"]
         
         let sideMargin: CGFloat = 15
         var switchHolders = [UISwitch]()
@@ -119,45 +119,46 @@ extension SongViewController {
         
         // position 1
         addTabsButton = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: rowHeight))
-        addTabsButton.setTitle("Add your tabs", forState: .Normal)
+        addTabsButton.setTitle("Add chords", forState: .Normal)
         addTabsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         addTabsButton.addTarget(self, action: "goToTabsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addTabsButton)
         
         //position 2
         addLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight, width: width, height: rowHeight))
-        addLyricsButton.setTitle("Add your lyrics", forState: .Normal)
+        addLyricsButton.setTitle("Add lyrics", forState: .Normal)
         addLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         addLyricsButton.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(addLyricsButton)
         
         //position 3
-        goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
+        browseTabsButton = UIButton(frame: CGRect(x: 0, y: rowHeight*2, width: width, height: rowHeight))
+        browseTabsButton.setTitle("Browse all chords", forState: .Normal)
+        browseTabsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        browseTabsButton.addTarget(self, action: "browseTabs:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(browseTabsButton)
+        
+        //position 4
+        browseLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight*3, width: width, height: rowHeight))
+        browseLyricsButton.setTitle("Browse all lyrics", forState: .Normal)
+        browseLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
+        browseLyricsButton.addTarget(self, action: "browseLyrics:", forControlEvents: .TouchUpInside)
+        navigationOutActionView.addSubview(browseLyricsButton)
+        
+        //position 5
+        goToArtistButton = UIButton(frame: CGRect(x: 0, y: rowHeight*4, width: width, height: rowHeight))
         goToArtistButton.setTitle("Go to artist", forState: .Normal)
         goToArtistButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         goToArtistButton.addTarget(self, action: "goToArtist:", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(goToArtistButton)
         
-        //position 4
-        goToAlbumButton = UIButton(frame: CGRect(x: 0, y: rowHeight*3, width: width, height: rowHeight))
+        //position 6
+        goToAlbumButton = UIButton(frame: CGRect(x: 0, y: rowHeight*5, width: width, height: rowHeight))
         goToAlbumButton.setTitle("Go to album", forState: .Normal)
         goToAlbumButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         goToAlbumButton.addTarget(self, action: "goToAlbum:", forControlEvents: .TouchUpInside)
         navigationOutActionView.addSubview(goToAlbumButton)
-        
-        //position 5
-        browseTabsButton = UIButton(frame: CGRect(x: 0, y: rowHeight*4, width: width, height: rowHeight))
-        browseTabsButton.setTitle("Browse all tabs", forState: .Normal)
-        browseTabsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        browseTabsButton.addTarget(self, action: "browseTabs:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(browseTabsButton)
-        
-        //position 6
-        browseLyricsButton = UIButton(frame: CGRect(x: 0, y: rowHeight*5, width: width, height: rowHeight))
-        browseLyricsButton.setTitle("Browse all lyrics", forState: .Normal)
-        browseLyricsButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
-        browseLyricsButton.addTarget(self, action: "browseLyrics:", forControlEvents: .TouchUpInside)
-        navigationOutActionView.addSubview(browseLyricsButton)
+
         for i in 0..<5 {
             // draw gray separator between buttons
             let line = UIView(frame: CGRect(x: 0, y: rowHeight*CGFloat(i+1)-1, width: width, height: 1))
