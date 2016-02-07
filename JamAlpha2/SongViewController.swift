@@ -915,7 +915,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         
         
         addTabsPrompt = UIButton(frame: CGRect(x: 0, y: chordBase.frame.height-30, width: 200, height: 25))
-        addTabsPrompt.setTitle("Add tabs here", forState: .Normal)
+        addTabsPrompt.setTitle("add chords here", forState: .Normal)
         addTabsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
         addTabsPrompt.center.x = chordBase.frame.width/2
         addTabsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
