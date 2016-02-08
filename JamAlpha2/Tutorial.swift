@@ -14,7 +14,10 @@ extension TabsEditorViewController: YouTubePlayerDelegate {
     func showTutorial(first first: Bool) {
         tutorialImage = UIImageView(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
         let tutorialIndex = first ? "1" : "2"
-        tutorialImage!.image = UIImage(named: "tabs_tutorial_\(tutorialIndex)_iPhone6")
+        
+        let deviceModel = UIDevice.currentDevice().modelName == "iPhone 4s" ? "iPhone4s" :  "iPhone6"
+
+        tutorialImage!.image = UIImage(named: "tabs_tutorial_\(tutorialIndex)_\(deviceModel)")
         tutorialImage!.tag = Int(tutorialIndex)!
         tutorialImage!.userInteractionEnabled = true
         self.view.addSubview(tutorialImage!)
