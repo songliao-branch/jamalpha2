@@ -18,7 +18,9 @@ class Tuning: NSObject {
     // positive means bigger than orignal note
     
     //MARK: to find tuning in half step down or half step up, used in TuningView
-    let notes = ["A","Bb","B","C","C#","D","D#","E","F","F#","G","G#"]
+    
+    //default is sharps
+    let notes = ["A","A#","B","C","C#","D","D#","E","F","F#","G","G#"]
     
     init(originalNote: String){
         self.note = originalNote

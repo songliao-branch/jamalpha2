@@ -16,9 +16,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var isFromUnLoginVC: Bool = false
     var mc: MFMailComposeViewController!
-    let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Contact Us","Demo Mode", "Tutorial"]
     
-    let contentsNotLoggedIn = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Demo Mode", "Tutorial"]
+    //for first release, we exclude rate twistjam, faq
+    //original:     let firstSectionContent = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Contact Us","Demo", "Tutorial"]
+    let settingTitles = ["About", "Like us on Facebook","Demo", "Tutorial"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,19 +72,14 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        if CoreDataManager.getCurrentUser() == nil {
-            return contentsNotLoggedIn.count
-        }
         if section == 0 {
-            return firstSectionContent.count
+            return settingTitles.count
         }
-        return 1
+        return 1 //for logout
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-       
         if indexPath.section == 0 {
             if indexPath.item == 1 {
                 let cell: SettingFBCell = self.tableView.dequeueReusableCellWithIdentifier("fbcell") as! SettingFBCell
@@ -94,9 +90,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             } else {
                 let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath:
                     indexPath)
-                
-                var contents = CoreDataManager.getCurrentUser() == nil ? contentsNotLoggedIn : firstSectionContent
-                cell.textLabel?.text = contents[indexPath.item]
+                cell.textLabel?.text = settingTitles[indexPath.item]
     
                 return cell
             }
@@ -113,23 +107,14 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
             
-            let indexofDemoMode = CoreDataManager.getCurrentUser() == nil ? 4 : 5
-            let indexOfTutorialMode = CoreDataManager.getCurrentUser() == nil ? 5 : 6
             if indexPath.item == 0 {
                 let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
                 self.navigationController?.pushViewController(aboutVC, animated: true)
             } else if indexPath.item == 2 {
-                self.rateTwistjam()
-            } else if indexPath.item == 3  {
-                let faqVC: FAQViewController = self.storyboard?.instantiateViewControllerWithIdentifier("faqVC") as! FAQViewController
-                self.navigationController?.pushViewController(faqVC, animated: true)
-            } else if indexPath.item == 4 && CoreDataManager.getCurrentUser() != nil {
-                self.contactUs()
-            } else if indexPath.item == indexofDemoMode {
                 let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
                 demoVC.isFromUnLoginVC = self.isFromUnLoginVC
                 self.navigationController?.pushViewController(demoVC, animated: true)
-            } else if indexPath.item == indexOfTutorialMode {
+            } else if indexPath.item == 3 {
                 let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
                 demoVC.isFromUnLoginVC = self.isFromUnLoginVC
                 demoVC.isDemo = false
@@ -153,13 +138,13 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     func contactUs() {
         let emailTitle = "[\(CoreDataManager.getCurrentUser()!.email)]'s feed back"
         let messageBody = ""
-        let toRecipents = ["jun@twistjam.com"]
+        let toRecipents = ["feedback@twistjam.com"]
         
         mc = MFMailComposeViewController()
         mc.navigationBar.tintColor = UIColor.mainPinkColor()
         
         if MFMailComposeViewController.canSendMail() {
-            mc.title = "Feed Back"
+            mc.title = "Feedback"
             mc.mailComposeDelegate = self
             mc.setSubject(emailTitle)
             mc.setMessageBody(messageBody, isHTML: false)

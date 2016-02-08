@@ -231,7 +231,7 @@ class BrowseVersionsViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             cell.votesLabel.text = String(tabsSet.votesScore)
-            cell.titleLabel.text = tabsSet.chordsPreview + "..."
+            cell.titleLabel.text = tabsSet.chordsPreview
             cell.subtitleLabel.text = "Tuning: \(tuning) | Capo: \(tabsSet.capo)"
             cell.dateLabel.text = NSDate.timeAgoSinceDate(tabsSet.lastEdited!, numericDates: true)
             

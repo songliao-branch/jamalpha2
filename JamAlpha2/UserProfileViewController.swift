@@ -20,7 +20,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     var isCalledViewDidLoad:Bool = false
     
-    var cellTitles = ["My tabs", "My lyrics", "Favorites"]
+    var cellTitles = ["My chords", "My lyrics", "Favorites"]
     
     override func viewDidLoad() {
         super.viewDidLoad()

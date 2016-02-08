@@ -200,7 +200,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 }
                 
             } else { //web search in section 1
-
+                if searchResults.isEmpty {
+                    return cell
+                }
                 cell.titleLabel.text = searchResults[indexPath.row].trackName
                 cell.subtitleLabel.text = searchResults[indexPath.row].artistName
                 

@@ -222,23 +222,25 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func showTempScrollLyricsView() {
-        tempPlayButton.hidden = false
-        tempScrollLine.hidden = false
-        tempScrollTimeLabel.hidden = false
-        tempScrollTime = NSTimeInterval(startTime.toDecimalNumer())
-        let min: Int = Int(tempScrollTime) / 60
-        let sec: Int = Int(tempScrollTime) % 60
-        if min < 10 {
-            if sec < 10 {
-                tempScrollTimeLabel.text = "0\(min):0\(sec)"
+        if (tempPlayButton.hidden && tempScrollLine.hidden && tempScrollTimeLabel.hidden){
+            tempPlayButton.hidden = false
+            tempScrollLine.hidden = false
+            tempScrollTimeLabel.hidden = false
+            tempScrollTime = NSTimeInterval(startTime.toDecimalNumer())
+            let min: Int = Int(tempScrollTime) / 60
+            let sec: Int = Int(tempScrollTime) % 60
+            if min < 10 {
+                if sec < 10 {
+                    tempScrollTimeLabel.text = "0\(min):0\(sec)"
+                } else {
+                    tempScrollTimeLabel.text = "0\(min):\(sec)"
+                }
             } else {
-                tempScrollTimeLabel.text = "0\(min):\(sec)"
-            }
-        } else {
-            if sec < 10 {
-                tempScrollTimeLabel.text = "\(min):0\(sec)"
-            } else {
-                tempScrollTimeLabel.text = "\(min):\(sec)"
+                if sec < 10 {
+                    tempScrollTimeLabel.text = "\(min):0\(sec)"
+                } else {
+                    tempScrollTimeLabel.text = "\(min):\(sec)"
+                }
             }
         }
     }
