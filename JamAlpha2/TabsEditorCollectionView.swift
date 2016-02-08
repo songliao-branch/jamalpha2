@@ -266,7 +266,6 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
         cell.imageView.contentMode = .ScaleAspectFill
         cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
         
-        
         for subview in cell.contentView.subviews {
             if subview.isKindOfClass(UIButton){
                 subview.removeFromSuperview()

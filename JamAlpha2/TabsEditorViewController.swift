@@ -28,7 +28,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     
     var fretNumberOnFullStringView: UIView!
 
-    var string3BackgroundImage: [String] = ["iPhone5_fret0", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret", "iPhone5_fret"]
+    var string3BackgroundImage = [String]()
     
     var playButtonImageView: UIImageView!
     
@@ -237,6 +237,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         // get the correct screen height and width
 
         
+        loadFretImage()
         if self.view.frame.height > self.view.frame.width {
             trueWidth = self.view.frame.height
             trueHeight = self.view.frame.width
@@ -306,6 +307,18 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         PlayChordsManager.sharedInstance.deinitialSoundBank()
+    }
+    
+    
+    func loadFretImage() {
+        
+        if UIDevice.currentDevice().modelName == "iPhone 4s" {
+            string3BackgroundImage = Array<String>(count: 25, repeatedValue: "iPhone4s_fret")
+            string3BackgroundImage[0] = "iPhone4s_fret0"
+        } else {
+           string3BackgroundImage = Array<String>(count: 25, repeatedValue: "iPhone5_fret")
+            string3BackgroundImage[0] = "iPhone5_fret0"
+        }
     }
     
     // MARK: Notification
