@@ -368,12 +368,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
                             image in
                             dispatch_async(dispatch_get_main_queue()) {
-                                let data = UIImagePNGRepresentation(image)
-                                KGLOBAL_progressBlock.setWaveFormFromData(data!)
-                                CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data!)
+                              if let data = UIImagePNGRepresentation(image) {
+                                KGLOBAL_progressBlock.setWaveFormFromData(data)
+                                CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
                                 self.isGenerated = true
                                 self.soundwaveUrl = ""
                                 return
+                              }
                             }
                         })
                     }
