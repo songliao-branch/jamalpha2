@@ -107,22 +107,26 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
   
   func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
     if indexPath.section == 0 {
-      
       if indexPath.item == 0 {
         let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
         self.navigationController?.pushViewController(aboutVC, animated: true)
       } else if indexPath.item == 2 {
+        rateTwistjam()
+      } else if indexPath.item == 3 {
+        let faqVC: FAQViewController = self.storyboard?.instantiateViewControllerWithIdentifier("faqVC") as! FAQViewController
+        self.navigationController?.pushViewController(faqVC, animated: true)
+      } else if indexPath.item == 4 {
+        emailStatus = "email"
+        contactUs()
+      } else if indexPath.item == 5 {
         let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
         demoVC.isFromUnLoginVC = self.isFromUnLoginVC
         self.navigationController?.pushViewController(demoVC, animated: true)
-      } else if indexPath.item == 3 {
+      } else if indexPath.item == 6 {
         let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
         demoVC.isFromUnLoginVC = self.isFromUnLoginVC
         demoVC.isDemo = false
         self.navigationController?.pushViewController(demoVC, animated: true)
-      } else if indexPath.item == 4 {
-        emailStatus = "email"
-        contactUs()
       }
     } else {
       
@@ -179,16 +183,15 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
       complete in
       self.show()
     })
-    //UIApplication.sharedApplication().keyWindow?.rootViewController?.dismissViewControllerAnimated(false, completion: nil)
   }
   
   func show() {
     if emailStatus == "cancel" {
-      let alertController = UIAlertController(title: nil, message: "You have cancelled the email.", preferredStyle: UIAlertControllerStyle.Alert)
+      let alertController = UIAlertController(title: nil, message: "The email has been canceled.", preferredStyle: UIAlertControllerStyle.Alert)
       alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
       self.presentViewController(alertController, animated: true, completion: nil)
     } else if emailStatus == "saved" {
-      let alertController = UIAlertController(title: nil, message: "You have saved the email.", preferredStyle: UIAlertControllerStyle.Alert)
+      let alertController = UIAlertController(title: nil, message: "The email has been saved.", preferredStyle: UIAlertControllerStyle.Alert)
       alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
       self.presentViewController(alertController, animated: true, completion: nil)
     } else if emailStatus == "sent" {
@@ -196,14 +199,14 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
       alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
       self.presentViewController(alertController, animated: true, completion: nil)
     } else {
-      let alertController = UIAlertController(title: nil, message: "Sorry, please check your networking and account setting and try again.", preferredStyle: UIAlertControllerStyle.Alert)
+      let alertController = UIAlertController(title: nil, message: "Sorry, something goes wrong when you sent the email", preferredStyle: UIAlertControllerStyle.Alert)
       alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
       self.presentViewController(alertController, animated: true, completion: nil)
     }
   }
   
   func rateTwistjam() {
-    //        let url = "itms-apps://itunes.apple.com/app/id\(APP_STORE_ID)"
-    //        UIApplication.sharedApplication().openURL(NSURL(string: url)!)
+    let url = "itms-apps://itunes.apple.com/app/id\(APP_STORE_ID)"
+    UIApplication.sharedApplication().openURL(NSURL(string: url)!)
   }
 }

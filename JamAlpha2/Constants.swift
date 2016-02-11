@@ -45,3 +45,5 @@ let kIndexOfMyMusicPage = 0
 let kIndexOfSearchPage = 1
 let kIndexOfTopPage = 2
 let kIndexOfUserPage = 3
+
+let APP_STORE_ID = "106608131"
