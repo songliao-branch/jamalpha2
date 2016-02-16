@@ -39,7 +39,6 @@
 		BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */; };
 		BFE49ECD1C10D0BE00F26877 /* UpdateNickNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */; };
 		BFE49ED11C1220E700F26877 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED01C1220E700F26877 /* AboutViewController.swift */; };
-		BFE49ED61C12471200F26877 /* AppConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED51C12471200F26877 /* AppConstant.swift */; };
 		BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */; };
 		BFFAA5131C3CE0D400DC3253 /* PlayChordsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */; };
 		BFFAA5171C3CE12400DC3253 /* OpenALSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */; };
@@ -227,7 +226,6 @@
 		BFE49ECA1C10AEE600F26877 /* UserProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileEditViewController.swift; sourceTree = "<group>"; };
 		BFE49ECC1C10D0BE00F26877 /* UpdateNickNameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateNickNameViewController.swift; sourceTree = "<group>"; };
 		BFE49ED01C1220E700F26877 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
-		BFE49ED51C12471200F26877 /* AppConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConstant.swift; sourceTree = "<group>"; };
 		BFE49ED71C13828700F26877 /* SettingFBLikeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingFBLikeCell.swift; sourceTree = "<group>"; };
 		BFFAA5121C3CE0D400DC3253 /* PlayChordsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayChordsManager.swift; sourceTree = "<group>"; };
 		BFFAA5151C3CE12400DC3253 /* OpenALSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OpenALSupport.c; sourceTree = "<group>"; };
@@ -472,7 +470,6 @@
 		BFE49ECF1C1220C200F26877 /* SettingViewController */ = {
 			isa = PBXGroup;
 			children = (
-				BFE49ED51C12471200F26877 /* AppConstant.swift */,
 				BFE49ED01C1220E700F26877 /* AboutViewController.swift */,
 				E42032E91BFEEDB800A5D36D /* SettingsViewController.swift */,
 				10AC35A31C21509D00749744 /* DemoViewController.swift */,
@@ -1088,7 +1085,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFE49ED61C12471200F26877 /* AppConstant.swift in Sources */,
 				E431BA9D1B913AE700E32A0B /* String+Utils.swift in Sources */,
 				E455E7291BA272AD00210BD6 /* Song.swift in Sources */,
 				10FFBAB01C3F999D003DF489 /* NetworkManager.swift in Sources */,

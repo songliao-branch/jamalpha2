@@ -150,8 +150,10 @@ extension SongViewController {
         storeViewController = SKStoreProductViewController()
         storeViewController.delegate = self
         
+        
         let parameters = [SKStoreProductParameterITunesItemIdentifier :
-            NSNumber(integer: songNeedPurchase.trackId)]
+          NSNumber(integer: songNeedPurchase.trackId).stringValue, SKStoreProductParameterAffiliateToken: "1001l9DT"]
+      
         storeViewController.loadProductWithParameters(parameters,
             completionBlock: {result, error in
                 if error != nil {
