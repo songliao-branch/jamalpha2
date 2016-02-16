@@ -57,12 +57,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         viewDidAppear = true
         musicTable.reloadData()
         // if not generating, we start generating
-//        if !KEY_isSoundWaveformGeneratingInBackground {
-//            if(!uniqueSongs.isEmpty){
-//                generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-//            }
-//            KEY_isSoundWaveformGeneratingInBackground = true
-//        }
+        if !KEY_isSoundWaveformGeneratingInBackground {
+            if(!uniqueSongs.isEmpty){
+                generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
+            }
+            KEY_isSoundWaveformGeneratingInBackground = true
+        }
     }
     
     func loadAndSortMusic() {
