@@ -32,7 +32,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-        NetworkManager.sharedInstance.tableView = artistTable
+       // NetworkManager.sharedInstance.tableView = artistTable
     }
     
     func registerMusicPlayerNotificationForSongChanged(){

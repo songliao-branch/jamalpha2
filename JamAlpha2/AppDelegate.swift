@@ -64,8 +64,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let credentialsProvider = AWSCognitoCredentialsProvider(regionType: CognitoRegionType, identityPoolId: CognitoIdentityPoolId)
             let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
             AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
-            NetworkManager.sharedInstance.reachability.isReachable()
-            PlayChordsManager.sharedInstance.initialSoundBank()
         }
         
         return true

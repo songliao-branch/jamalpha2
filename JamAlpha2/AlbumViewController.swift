@@ -30,7 +30,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         //change navigation bar color
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
-        NetworkManager.sharedInstance.tableView = self.albumTable
+//        NetworkManager.sharedInstance.tableView = self.albumTable
     }
     func registerMusicPlayerNotificationForSongChanged(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
