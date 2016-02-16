@@ -369,6 +369,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                             image in
                             dispatch_async(dispatch_get_main_queue()) {
                                 let data = UIImagePNGRepresentation(image)
+                                if data == nil {return}
                                 KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                 CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data!)
                                 self.isGenerated = true
