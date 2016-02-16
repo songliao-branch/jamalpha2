@@ -554,6 +554,7 @@ class MeLoginOrSignupViewController: UIViewController{
             FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id, name, first_name, last_name, picture.type(large), email"]).startWithCompletionHandler({
                 (connection, result, error) -> Void in
                 if error == nil {
+                    
                     let facebookEmail = result.valueForKey("email") as! String
                     let facebookName  = result.valueForKey("name") as! String
                     
@@ -574,7 +575,8 @@ class MeLoginOrSignupViewController: UIViewController{
                             "email": facebookEmail,
                             "avatar_url_thumbnail": thumbnailUrl,
                             "avatar_url_medium": facebookAvatarUrl,
-                            "password": (facebookEmail + facebookLoginSalt).md5() //IMPORTANT: DO NOT MODIFY THIS SALT
+                            "password": facebookEmail + facebookLoginSalt, //IMPORTANT: DO NOT MODIFY THIS SALT
+                            "nickname": facebookName
                         ]
                         
                         self.signUpLoginRequest(parameters, afterRetrievingUser: {
