@@ -165,7 +165,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         tempScrollTime = NSTimeInterval(startTime.toDecimalNumer())
         
         tempScrollTimeLabel = UILabel()
-        tempScrollTimeLabel.frame = CGRectMake(self.view.frame.size.width - 22.5, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 - 7.5, 25, 15)
+        tempScrollTimeLabel.frame = CGRectMake(self.view.frame.size.width - 25, CGRectGetMaxY(topView.frame) + CGFloat(numberOfLineInSingleLyricsView) * 66 - 7.5, 25, 15)
         tempScrollTimeLabel.font = UIFont.systemFontOfSize(8)
         tempScrollTimeLabel.textColor = UIColor.whiteColor()
         let min: Int = Int(tempScrollTime) / 60

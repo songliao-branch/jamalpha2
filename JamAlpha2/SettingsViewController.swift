@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageUI
+import FBSDKCoreKit
 
 
 class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate {
@@ -128,6 +129,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             }))
             refreshAlert.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
                 CoreDataManager.logoutUser()
+              if FBSDKAccessToken.currentAccessToken() != nil {
+                FBSDKAccessToken.setCurrentAccessToken(nil)
+              }
+
                 self.navigationController?.popViewControllerAnimated(false)
             }))
             self.presentViewController(refreshAlert, animated: true, completion: nil)

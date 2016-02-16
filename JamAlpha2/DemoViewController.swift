@@ -67,7 +67,6 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
             cell.demoSwith.onTintColor = UIColor.mainPinkColor()
             cell.demoSwith.addTarget(self, action: "switchChanged:", forControlEvents: .ValueChanged)
             cell.demoSwith.tag = indexPath.row
-        
         if isDemo {
             cell.imfoLabel.text = "Show Demo"
             cell.demoSwith.on = NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong)
