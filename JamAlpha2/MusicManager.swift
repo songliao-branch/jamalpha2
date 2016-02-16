@@ -31,8 +31,6 @@ class MusicManager: NSObject {
     var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
     
-     var songs = [SearchResult]()
-    
     //in case mediaItem was changed outside the app when exit to background from Editor screen
     //we save these two so that when we come back we always have the correct item
     var lastPlayingItem: MPMediaItem!
@@ -51,12 +49,16 @@ class MusicManager: NSObject {
     
     override init() {
         super.init()
+        let t1 = CACurrentMediaTime()
+        print("t1 \(t1)")
         loadLocalSongs()
         loadDemoSongs()
         loadLocalAlbums()
         loadLocalArtist()
+        
         initializePlayer()
         addNotification()
+        print("init took :\(CACurrentMediaTime()-t1)")
     }
     
     //check when search a cloud item, if it matches, we use the song we already have
@@ -276,19 +278,7 @@ class MusicManager: NSObject {
             song in
             song.playbackDuration > 30
         }
-        
-        //initialize everything in core data, the song needs to be in the coredata so that when we fetched all cloud tabs for the user it can find the right match immediately
-        for song in uniqueSongs {
-            CoreDataManager.initializeSongToDatabase(song)
-        }
-        
-        APIManager.getTopSongs({
-            songs in
-            self.songs = songs
-            for song in songs {
-                song.findMediaItem()
-            }
-        })
+        print("** I have \(uniqueSongs.count) songs")
     }
     
     func loadDemoSongs() {

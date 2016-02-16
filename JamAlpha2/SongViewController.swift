@@ -264,6 +264,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 player = MusicManager.sharedInstance.player
                 self.nowPlayingMediaItem = player.nowPlayingItem
                 self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
+                CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
                 self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingMediaItem,completion: {succeed in Void()})
                 removeAllObserver()
             }
@@ -1056,6 +1057,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             self.nowPlayingMediaItem = self.player.nowPlayingItem
+            CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
             // if come back from Music app then this block will be called
             if(nowPlayingMediaItem == nil){
                 self.dismissViewControllerAnimated(true, completion: nil)
