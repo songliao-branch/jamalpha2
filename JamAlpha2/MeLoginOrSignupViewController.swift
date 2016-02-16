@@ -575,7 +575,7 @@ class MeLoginOrSignupViewController: UIViewController{
                             "email": facebookEmail,
                             "avatar_url_thumbnail": thumbnailUrl,
                             "avatar_url_medium": facebookAvatarUrl,
-                            "password": facebookEmail + facebookLoginSalt, //IMPORTANT: DO NOT MODIFY THIS SALT
+                            "password": facebookEmail + facebookLoginSalt,
                             "nickname": facebookName
                         ]
                         
