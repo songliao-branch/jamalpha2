@@ -16,12 +16,12 @@ extension TabsEditorViewController {
         for item in fretNumberOnFullStringView.subviews {
             item.removeFromSuperview()
         }
-        fretNumberOnFullStringView.frame = CGRectMake(0, 14 / 20 * self.trueHeight, self.trueWidth / 5 * CGFloat(count - sender), 1 / 20 * self.trueHeight)
+        fretNumberOnFullStringView.frame = CGRectMake(0, 14 / 20 * trueHeight, trueWidth / 5 * CGFloat(count - sender), 1 / 20 * trueHeight)
         fretNumberOnFullStringView.backgroundColor = UIColor.clearColor()
-        let labelWidth: CGFloat = 1 / 20 * self.trueHeight
+        let labelWidth: CGFloat = 1 / 20 * trueHeight
         for i in 0..<(count - sender) {
             let tempLabel: UILabel = UILabel()
-            let positionX = (self.string6FretPosition[i] + self.string6FretPosition[i + 1]) / 2
+            let positionX = (string6FretPosition[i] + string6FretPosition[i + 1]) / 2
             tempLabel.frame = CGRectMake(positionX - labelWidth / 2, 0, labelWidth, labelWidth)
             tempLabel.text = "\(sender + i)"
             tempLabel.backgroundColor = UIColor.clearColor()
@@ -29,7 +29,7 @@ extension TabsEditorViewController {
             tempLabel.font = UIFont.systemFontOfSize(10)
             fretNumberOnFullStringView.addSubview(tempLabel)
         }
-        self.completeImageView.addSubview(fretNumberOnFullStringView)
+        completeImageView.addSubview(fretNumberOnFullStringView)
     }
     
     func cropFullStringImageView(sender: Int) {
@@ -37,43 +37,40 @@ extension TabsEditorViewController {
         let croppedLength: CGFloat = 3409 * CGFloat(count - sender) / 25
         let cropRect: CGRect = CGRectMake(0, 0, croppedLength, 282)
         let croppedImage =  UIImage(named: "iPhone5_fullFretboard")?.cropImageWithRect(cropRect)
-        
-        let croppedViewLength: CGFloat = self.trueWidth / 5 * CGFloat(count - sender)
-        self.completeStringView.contentSize = CGSizeMake(croppedViewLength, 15 / 20 * self.trueHeight)
-        self.completeImageView.frame = CGRectMake(0, 0, croppedViewLength, 15 / 20 * self.trueHeight)
-        self.completeImageView.image = croppedImage
-
-        
+        let croppedViewLength: CGFloat = trueWidth / 5 * CGFloat(count - sender)
+        completeStringView.contentSize = CGSizeMake(croppedViewLength, 15 / 20 * trueHeight)
+        completeImageView.frame = CGRectMake(0, 0, croppedViewLength, 15 / 20 * trueHeight)
+        completeImageView.image = croppedImage        
     }
     
     func updateCollectionView(sender: Int) {
-        let count = self.mainViewDataArray.count
+        let count = mainViewDataArray.count
         if 25 - sender == count + 1 {
             let maxFretNumber = count - 1
             for i in 0..<count {
-                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
+                if mainViewDataArray[i].fretNumber == maxFretNumber {
                     let temp: mainViewData = mainViewData()
                     temp.fretNumber = maxFretNumber + 1
                     let tempButton: [noteButtonWithTab] = [noteButtonWithTab]()
                     temp.noteButtonsWithTab = tempButton
-                    self.mainViewDataArray.insert(temp, atIndex: i + 1)
-                    self.string3BackgroundImage.insert("iPhone5_fret", atIndex: i + 1)
-                    self.fretsNumber.insert(maxFretNumber + 1, atIndex: i + 1)
+                    mainViewDataArray.insert(temp, atIndex: i + 1)
+                    string3BackgroundImage.insert("iPhone5_fret", atIndex: i + 1)
+                    fretsNumber.insert(maxFretNumber + 1, atIndex: i + 1)
                     break
                 }
             }
         } else if 25 - sender == count - 1 {
             let maxFretNumber = count - 1
             for i in 0..<count {
-                if self.mainViewDataArray[i].fretNumber == maxFretNumber {
-                    self.mainViewDataArray.removeAtIndex(i)
-                    self.string3BackgroundImage.removeAtIndex(i)
-                    self.fretsNumber.removeAtIndex(i)
+                if mainViewDataArray[i].fretNumber == maxFretNumber {
+                    mainViewDataArray.removeAtIndex(i)
+                    string3BackgroundImage.removeAtIndex(i)
+                    fretsNumber.removeAtIndex(i)
                     break
                 }
             }
         }
-        self.collectionView.reloadData()
+        collectionView.reloadData()
     }
 }
 

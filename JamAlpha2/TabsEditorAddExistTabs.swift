@@ -49,12 +49,12 @@ extension TabsEditorViewController {
     }
     
     func addTabsFromCoreDataToMainViewDataArray(sender: [Chord]) {
-        let unrepeatTabs = self.getUnrepeatTabs(sender)
+        let unrepeatTabs = getUnrepeatTabs(sender)
         //noteButtonWithTabArray.removeAll()
         for item in unrepeatTabs {
-            self.addTabsToMainViewDataArray(item)
+            addTabsToMainViewDataArray(item)
         }
-        self.isShowDiscardAlert = false
+        isShowDiscardAlert = false
         reorganizeMainViewDataArray()
         collectionView.reloadData()
     }
@@ -64,31 +64,23 @@ extension TabsEditorViewController {
             for i in 0..<noteButtonWithTabArray.count {
                 let normalTab = getNormalTabFromChord(item)
                 if normalTab.name == noteButtonWithTabArray[i].tab.name && normalTab.index == noteButtonWithTabArray[i].tab.index && normalTab.content == noteButtonWithTabArray[i].tab.content {
-                    self.currentTime = Double(item.time.toDecimalNumer())
-                    let presentPosition = CGFloat(self.currentTime / self.duration)
-                    //
-                    
-                    //self.progressBlock.setProgress(presentPosition)
-                    
-                    //
-                    self.progressBlock.frame.origin.x = 0.5 * self.trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
-                    
+                    currentTime = Double(item.time.toDecimalNumer())
+                    let presentPosition = CGFloat(currentTime / duration)
+                    progressBlock.frame.origin.x = 0.5 * trueWidth - presentPosition * (CGFloat(theSong.getDuration()) * tabsEditorProgressWidthMultiplier)
                     let returnValue = addTabViewOnMusicControlView(i)
-                    
-                    self.allTabsOnMusicLine.append(returnValue.1)
-                    self.progressBlock.addSubview(returnValue.0)
+                    allTabsOnMusicLine.append(returnValue.1)
+                    progressBlock.addSubview(returnValue.0)
                 }
             }
         }
-        
         let current = 0.0
         if isDemoSong {
-            self.avPlayer.currentTime = current
+            avPlayer.currentTime = current
         } else {
-            self.musicPlayer.currentPlaybackTime = current
+            musicPlayer.currentPlaybackTime = current
         }
         update()
-        self.findCurrentTabView()
+        findCurrentTabView()
     }
     
     func checkChordsWithCoredata(chords: [Chord], completion: ((complete: [Chord]) -> Void)) {
@@ -96,7 +88,7 @@ extension TabsEditorViewController {
         var newChords: [Chord] = chords
         var needAddNewChordsArray: [Tab] = [Tab]()
         for item in chords {
-            let index = self.getBasicNoteIndex(item.tab.contentArray)
+            let index = getBasicNoteIndex(item.tab.contentArray)
             if let _ = TabsDataManager.getUniqueTab(index, name: item.tab.name, content: item.tab.content) {
                 continue
             } else {
@@ -104,7 +96,6 @@ extension TabsEditorViewController {
                 needAddNewChordsArray.append(item.tab)
             }
         }
-        
         if needAddNewChords {
             var nameString: String = ""
             var set:[String: Int] = [String: Int]()
@@ -115,7 +106,6 @@ extension TabsEditorViewController {
                 nameString = nameString + item.0 + ", "
             }
             let alertController = UIAlertController(title: nil, message: "This song contains \(nameString)do you want add them in your Chord Library?", preferredStyle: UIAlertControllerStyle.Alert)
-            
             alertController.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default,handler: {
                 action in
                 for var i = chords.count - 1; i >= 0; i-- {
@@ -128,7 +118,6 @@ extension TabsEditorViewController {
                 }
                 completion(complete: newChords)
             }))
-            
             alertController.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default,handler: {
                 action in
                 for item in needAddNewChordsArray {
@@ -141,7 +130,6 @@ extension TabsEditorViewController {
                 }
                 completion(complete: newChords)
             }))
-            
             self.presentViewController(alertController, animated: true, completion: nil)
         } else {
             completion(complete: newChords)
@@ -154,8 +142,7 @@ extension TabsEditorViewController {
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
-        let visible: Bool = tabs.4
-        
+        let visible: Bool = tabs.4        
         //let visible
         if chord.count > 0 {
             self.checkChordsWithCoredata(chord, completion: {

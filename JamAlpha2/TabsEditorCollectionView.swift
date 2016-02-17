@@ -15,76 +15,68 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
             fretsNumber.append(i)
         }
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        layout.itemSize = CGSize(width: self.trueWidth / 5, height: 12 / 20 * self.trueHeight)
+        layout.itemSize = CGSize(width: trueWidth / 5, height: 12 / 20 * trueHeight)
         //var flowLayout:UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         let scrollDirection = UICollectionViewScrollDirection.Horizontal
         layout.scrollDirection = scrollDirection
-        let frame = CGRectMake(0, self.trueHeight * 8 / 20, self.trueWidth, 12 / 20 * self.trueHeight)
+        let frame = CGRectMake(0, trueHeight * 8 / 20, trueWidth, 12 / 20 * trueHeight)
         collectionView = UICollectionView(frame: frame, collectionViewLayout: layout)
         collectionView.registerClass(FretCell.self, forCellWithReuseIdentifier: "fretcell")
         collectionView.bounces = true
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.bounces = false
         collectionView.delegate = self
-        self.view.addSubview(collectionView)
+        collectionView.dataSource = self
+        view.addSubview(collectionView)
         calculateBorders()
-        
         prepareMoveSwipeUpGesture.addTarget(self, action: "prepareMoveSwipeGesture:")
         prepareMoveSwipeUpGesture.direction = .Up
         prepareMoveSwipeUpGesture.delegate = self
-        prepareMoveSwipeUpGesture.requireGestureRecognizerToFail(self.collectionView.panGestureRecognizer)
+        prepareMoveSwipeUpGesture.requireGestureRecognizerToFail(collectionView.panGestureRecognizer)
         collectionView.addGestureRecognizer(prepareMoveSwipeUpGesture)
-        
-        
         prepareMoveSwipeDownGesture.addTarget(self, action: "prepareMoveSwipeGesture:")
         prepareMoveSwipeDownGesture.direction = .Down
         prepareMoveSwipeDownGesture.delegate = self
-        prepareMoveSwipeDownGesture.requireGestureRecognizerToFail(self.collectionView.panGestureRecognizer)
+        prepareMoveSwipeDownGesture.requireGestureRecognizerToFail(collectionView.panGestureRecognizer)
         collectionView.addGestureRecognizer(prepareMoveSwipeDownGesture)
-        
         checkPanGesture.addTarget(self, action: "checkScrollview:")
         checkPanGesture.delegate = self
         collectionView.addGestureRecognizer(checkPanGesture)
-        
-        
         tapGesture = UITapGestureRecognizer(target: self, action: "singleTapOnCollectionView:")
         collectionView.addGestureRecognizer(tapGesture)
-        
     }
     
     func checkScrollview(sender:UIPanGestureRecognizer){
-        let transfer = sender.velocityInView(self.collectionView)
+        let transfer = sender.velocityInView(collectionView)
         if(sender.state == .Began){
-            if(abs(transfer.x) >= abs(transfer.y)){
-                self.collectionView.scrollEnabled = true
-            }else{
-                self.collectionView.scrollEnabled = false
+            if abs(transfer.x) >= abs(transfer.y) {
+                collectionView.scrollEnabled = true
+                return
             }
-        }
-        
-        if(sender.state == .Ended || sender.state == .Cancelled){
-            self.collectionView.scrollEnabled = true
+            collectionView.scrollEnabled = false
+        } else if(sender.state == .Ended || sender.state == .Cancelled){
+            collectionView.scrollEnabled = true
         }
     }
     
     func prepareMoveSwipeGesture(sender: UISwipeGestureRecognizer) {
         if sender.direction == .Up {
-            self.startScrolling = false
+            startScrolling = false
             let location = sender.locationInView(collectionView)
             var positionX: CGFloat = 0
-            for index in 0..<self.string3FretPosition.count {
-                if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
-                    if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
-                        positionX = self.string3FretPosition[index] - self.collectionView.contentOffset.x
-                        self.doubleViewPositionX = self.string3FretPosition[index] + (self.trueWidth / 5 - 10)/2 + 5
+            for index in 0..<string3FretPosition.count {
+                if location.x < string3FretPosition[string3FretPosition.count - 1] {
+                    if location.x > string3FretPosition[index] && location.x < string3FretPosition[index + 1] {
+                        positionX = string3FretPosition[index] - collectionView.contentOffset.x
+                        doubleViewPositionX = string3FretPosition[index] + (trueWidth / 5 - 10)/2 + 5
                         break
                     }
                 }
             }
-            let imageWidth: CGFloat = self.trueWidth / 5 - 10
+            let imageWidth: CGFloat = trueWidth / 5 - 10
             let imageHeight: CGFloat = kmovingMainNoteSliderHeight
-            self.doubleArrowView = CustomizedView(frame: CGRectMake(positionX + 5, collectionView.frame.origin.y, imageWidth, imageHeight))
-            self.view.insertSubview(self.doubleArrowView, belowSubview: self.collectionView)
+            doubleArrowView = CustomizedView(frame: CGRectMake(positionX + 5, collectionView.frame.origin.y, imageWidth, imageHeight))
+            view.insertSubview(doubleArrowView, belowSubview: collectionView)
             UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseIn,.AllowUserInteraction], animations: {
                 self.doubleArrowView.center.y = self.doubleArrowView.center.y - kmovingMainNoteSliderHeight
                 }, completion: {
@@ -99,85 +91,80 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
                     self.doubleArrowView.userInteractionEnabled = true
                     self.startScrollTimer()
             })
-            self.prepareMoveSwipeUpGesture.enabled = false
-            self.prepareMoveSwipeDownGesture.enabled = true
-            
-            
+            prepareMoveSwipeUpGesture.enabled = false
+            prepareMoveSwipeDownGesture.enabled = true
         } else if sender.direction == .Down {
-            self.removeDoubleArrowView()
-            self.prepareMoveSwipeUpGesture.enabled = true
-            self.prepareMoveSwipeDownGesture.enabled = false
+            removeDoubleArrowView()
+            prepareMoveSwipeUpGesture.enabled = true
+            prepareMoveSwipeDownGesture.enabled = false
         }
     }
     
     func singleTapOnCollectionView(sender: UITapGestureRecognizer) {
         if isJiggling == false {
-            self.changeMenuButtonStatus(true)
+            changeMenuButtonStatus(true)
             var indexFret: Int = Int()
             var indexString: Int = Int()
             indexString = 5
-            let string3Height: CGFloat = 11 / 60 * self.trueHeight / 2
-            var original:CGPoint = CGPointMake(0,string3Height  - self.string3Position[2])
-            let location = sender.locationInView(self.collectionView)
+            let string3Height: CGFloat = 11 / 60 * trueHeight / 2
+            var original:CGPoint = CGPointMake(0,string3Height  - string3Position[2])
+            let location = sender.locationInView(collectionView)
             // get the tap position for fret number and string number
-            for index in 0..<self.string3FretPosition.count {
-                if location.x < self.string3FretPosition[self.string3FretPosition.count - 1] {
-                    if location.x > self.string3FretPosition[index] && location.x < self.string3FretPosition[index + 1] {
+            for index in 0..<string3FretPosition.count {
+                if location.x < string3FretPosition[string3FretPosition.count - 1] {
+                    if location.x > string3FretPosition[index] && location.x < string3FretPosition[index + 1] {
                         let tempIndex = fretsNumber[index]
                         indexFret = tempIndex
-                        original.x = (self.string3FretPosition[index] + self.string3FretPosition[index + 1])/2.0
+                        original.x = (string3FretPosition[index] + string3FretPosition[index + 1])/2.0
                         if(index != tempIndex){
-                            self.isCompleteStringViewScroll = true
+                            isCompleteStringViewScroll = true
                         }
                         baseNoteLocation = original.x - collectionView.contentOffset.x
-                        
                         break
                     }
                 }
             }
-            for index in 0..<self.string3Position.count {
-                if location.y >= self.string3Position[index] - string3Height && location.y <= self.string3Position[index] + string3Height {
+            for index in 0..<string3Position.count {
+                if location.y >= string3Position[index] - string3Height && location.y <= string3Position[index] + string3Height {
                     indexString = index + 3
-                    original.y = string3Height  - self.string3Position[index]
+                    original.y = string3Height  - string3Position[index]
                 }
             }
             PlayChordsManager.sharedInstance.playSingleNoteSound((indexString + 1) * 100 + indexFret)
             // open the editor view and add note button
-            self.addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
+            addButtonPress3StringView(indexFret: indexFret, indexString: indexString, original: original)
         } else {
-            self.stopMainViewJiggling()
+            stopMainViewJiggling()
         }
     }
     
     
     func addButtonPress3StringView(indexFret indexFret: Int, indexString: Int, original:CGPoint?=nil) {
-        if(self.doubleArrowView != nil){
-            self.doubleArrowView.alpha = 0
+        if doubleArrowView != nil {
+            doubleArrowView.alpha = 0
         }
-        self.removeDoubleArrowView()
-        self.view.userInteractionEnabled = false
-        self.view.addSubview(self.editView)
+        removeDoubleArrowView()
+        view.userInteractionEnabled = false
+        view.addSubview(editView)
         if isDemoSong {
-            self.avPlayer.pause()
+            avPlayer.pause()
         } else {
-            self.musicPlayer.pause()
+            musicPlayer.pause()
         }
-        self.timer.invalidate()
-        self.timer = NSTimer()
-        self.countDownNumber = 3
-        
-        self.addSpecificFingerPoint = false
-        self.musicControlView.alpha = 0
-        self.progressBlock.alpha = 0
-        self.collectionView.alpha = 0
-        self.statusLabel.text = "Add a new chord"
-        self.intoEditView = true
-        
-        self.addNewTab = true
-        self.addedNoteButtonOnCompleteView = true
-        self.addNoteButton(indexFret, indexString: indexString, originalPosition: original)
-        let buttonFret = (self.string6FretPosition[indexFret] + self.string6FretPosition[indexFret + 1]) / 2
-        self.completeStringView.contentOffset = self.collectionView.contentOffset
+        timer.invalidate()
+        timer = NSTimer()
+        countDownNumber = 3
+        addSpecificFingerPoint = false
+        musicControlView.alpha = 0
+        progressBlock.alpha = 0
+        collectionView.alpha = 0
+        statusLabel.text = "Add a new chord"
+        intoEditView = true
+        addNewTab = true
+        addedNoteButtonOnCompleteView = true
+        addNoteButton(indexFret, indexString: indexString, originalPosition: original)
+        let buttonFret = (string6FretPosition[indexFret] + string6FretPosition[indexFret + 1]) / 2
+        completeStringView.contentOffset = collectionView.contentOffset
         UIView.animateWithDuration(0.2, animations: {
             self.completeStringView.alpha = 1
             self.specificTabsScrollView.alpha = 1
@@ -197,17 +184,16 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
                     }
                 })
         })
-        self.backButtonRotation(isLeft: false)
-        self.view.userInteractionEnabled = true
-        
+        backButtonRotation(isLeft: false)
+        view.userInteractionEnabled = true
     }
     
     
     func calculateBorders() {
-        if let collectionView = self.collectionView {
+        if let collectionView = collectionView {
             collectionViewFrameInCanvas = collectionView.frame
-            if self.view != collectionView.superview {
-                collectionViewFrameInCanvas = self.view!.convertRect(collectionViewFrameInCanvas, fromView: collectionView)
+            if view != collectionView.superview {
+                collectionViewFrameInCanvas = view!.convertRect(collectionViewFrameInCanvas, fromView: collectionView)
             }
             var leftRect : CGRect = collectionViewFrameInCanvas
             leftRect.size.width = 20.0
@@ -245,18 +231,18 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
     }
     
     func stopScrollTimer(){
-        if(scrollingTimer != nil){
-            scrollingTimer!.invalidate()
-            scrollingTimer = nil
-        }
+      if scrollingTimer == nil {
+          return
+      }
+      scrollingTimer!.invalidate()
+      scrollingTimer = nil
     }
     
     func changDoubleArrowPosition(){
-        if(self.doubleArrowView == nil){
+        if doubleArrowView == nil {
             return
-        }else{
-            self.doubleArrowView.center.x = doubleViewPositionX - self.collectionView.contentOffset.x
         }
+        doubleArrowView.center.x = doubleViewPositionX - collectionView.contentOffset.x
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -264,17 +250,15 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
         cell.imageView.backgroundColor = UIColor.clearColor()
         cell.imageView.image = UIImage(named: string3BackgroundImage[indexPath.item])
         cell.imageView.contentMode = .ScaleAspectFill
-        cell.fretNumberLabel.text = "\(self.fretsNumber[indexPath.item])"
-        
+        cell.fretNumberLabel.text = "\(fretsNumber[indexPath.item])"
         for subview in cell.contentView.subviews {
             if subview.isKindOfClass(UIButton){
                 subview.removeFromSuperview()
             }
         }
-        for item in self.mainViewDataArray[indexPath.item].noteButtonsWithTab {
+        for item in mainViewDataArray[indexPath.item].noteButtonsWithTab {
             cell.contentView.addSubview(item.noteButton)
         }
-        
         if isJiggling {
             stopMainViewJiggling()
             startMainViewJiggling()
@@ -284,8 +268,8 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
     }
     
     func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if let ca = self.view {
-            if let cv = self.collectionView {
+        if let ca = view {
+            if let cv = collectionView {
                 let tempX = gestureRecognizer.locationInView(ca).x
                 let tempY = gestureRecognizer.locationInView(ca).y + kmovingMainNoteSliderHeight
                 let pointPressedInCanvas = CGPointMake(tempX, tempY)
@@ -297,13 +281,13 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
                         representationImage.frame = cellInCanvasFrame
                         let offset = CGPointMake(pointPressedInCanvas.x - cellInCanvasFrame.origin.x, pointPressedInCanvas.y - cellInCanvasFrame.origin.y)
                         let indexPath : NSIndexPath = cv.indexPathForCell(cell as UICollectionViewCell)!
-                        self.bundle = Bundle(offset: offset, sourceCell: cell, representationImageView:representationImage, currentIndexPath: indexPath, canvas: ca)
+                        bundle = Bundle(offset: offset, sourceCell: cell, representationImageView:representationImage, currentIndexPath: indexPath, canvas: ca)
                         break
                     }
                 }
             }
         }
-        return (self.bundle != nil)
+        return bundle != nil
     }
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -311,13 +295,12 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
     }
     
     func checkForDraggingAtTheEdgeAndAnimatePaging(gestureRecognizer: UIGestureRecognizer) {
-        if self.animating == true {
+        if animating == true {
             return
         }
-        if let bundle = self.bundle {
-            
-            var nextPageRect : CGRect = self.collectionView!.bounds
-            if self.layout.scrollDirection == UICollectionViewScrollDirection.Horizontal {
+        if let bundle = bundle {
+            var nextPageRect : CGRect = collectionView!.bounds
+            if layout.scrollDirection == UICollectionViewScrollDirection.Horizontal {
                 if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["left"]!) {
                     nextPageRect.origin.x -= nextPageRect.size.width
                     if nextPageRect.origin.x < 0.0 {
@@ -326,13 +309,12 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
                 }
                 else if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["right"]!) {
                     nextPageRect.origin.x += nextPageRect.size.width
-                    if nextPageRect.origin.x + nextPageRect.size.width > self.collectionView!.contentSize.width {
-                        nextPageRect.origin.x = self.collectionView!.contentSize.width - nextPageRect.size.width
+                    if nextPageRect.origin.x + nextPageRect.size.width > collectionView!.contentSize.width {
+                        nextPageRect.origin.x = collectionView!.contentSize.width - nextPageRect.size.width
                     }
                 }
             }
-            else if self.layout.scrollDirection == UICollectionViewScrollDirection.Vertical {
-                
+            else if layout.scrollDirection == UICollectionViewScrollDirection.Vertical {
                 if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["top"]!) {
                     nextPageRect.origin.y -= nextPageRect.size.height
                     if nextPageRect.origin.y < 0.0 {
@@ -341,39 +323,39 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
                 }
                 else if CGRectIntersectsRect(bundle.representationImageView.frame, hitTestRectagles["bottom"]!) {
                     nextPageRect.origin.y += nextPageRect.size.height
-                    if nextPageRect.origin.y + nextPageRect.size.height > self.collectionView!.contentSize.height {
-                        nextPageRect.origin.y = self.collectionView!.contentSize.height - nextPageRect.size.height
+                    if nextPageRect.origin.y + nextPageRect.size.height > collectionView!.contentSize.height {
+                        nextPageRect.origin.y = collectionView!.contentSize.height - nextPageRect.size.height
                     }
                 }
             }
-            if !CGRectEqualToRect(nextPageRect, self.collectionView!.bounds){
+            if !CGRectEqualToRect(nextPageRect, collectionView!.bounds){
                 let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.8 * Double(NSEC_PER_SEC)))
                 dispatch_after(delayTime, dispatch_get_main_queue(), {
                     self.animating = false
                     self.handleGesture(gestureRecognizer as! UIPanGestureRecognizer)
-                });
-                self.animating = true
-                self.collectionView!.scrollRectToVisible(nextPageRect, animated: true)
+                })
+                animating = true
+                collectionView!.scrollRectToVisible(nextPageRect, animated: true)
             }
         }
     }
     
     func handleGesture(gesture: UIPanGestureRecognizer) -> Void {
-        if let bundle = self.bundle {
-            let dragPointOnCanvas = gesture.locationInView(self.view)
+        if let bundle = bundle {
+            let dragPointOnCanvas = gesture.locationInView(view)
             if gesture.state == UIGestureRecognizerState.Began {
-                self.collectionView.scrollEnabled = false
-                self.tapGesture.enabled = false
-                self.stopScrollTimer()
-                self.startScrolling = false
-                self.isPanning = true
+                collectionView.scrollEnabled = false
+                tapGesture.enabled = false
+                stopScrollTimer()
+                startScrolling = false
+                isPanning = true
                 bundle.sourceCell.hidden = true
-                self.view?.addSubview(bundle.representationImageView)
-                self.view.userInteractionEnabled = false
+                view?.addSubview(bundle.representationImageView)
+                view.userInteractionEnabled = false
                 UIView.animateWithDuration(0.3, animations: { () -> Void in
                     bundle.representationImageView.alpha = 0.8
                 })
-                self.view.userInteractionEnabled = false
+                view.userInteractionEnabled = false
             }
             if gesture.state == UIGestureRecognizerState.Changed {
                 // Update the representation image
@@ -383,46 +365,45 @@ extension TabsEditorViewController: UICollectionViewDelegateFlowLayout, UICollec
                 point.y = dragPointOnCanvas.y - bundle.offset.y + kmovingMainNoteSliderHeight
                 imageViewFrame.origin = point
                 bundle.representationImageView.frame = imageViewFrame
-                let tempX = gesture.locationInView(self.collectionView).x
-                let tempY = gesture.locationInView(self.collectionView).y + kmovingMainNoteSliderHeight + self.collectionView.frame.size.height / 2
-                let dragPointOnCollectionView = CGPointMake(tempX, tempY)//gesture.locationInView(self.collectionView)
-                if let toIndexPath : NSIndexPath = self.collectionView?.indexPathForItemAtPoint(dragPointOnCollectionView) {
-                    self.checkForDraggingAtTheEdgeAndAnimatePaging(gesture)
+                let tempX = gesture.locationInView(collectionView).x
+                let tempY = gesture.locationInView(collectionView).y + kmovingMainNoteSliderHeight + collectionView.frame.size.height / 2
+                let dragPointOnCollectionView = CGPointMake(tempX, tempY)//gesture.locationInView(collectionView)
+                if let toIndexPath : NSIndexPath = collectionView?.indexPathForItemAtPoint(dragPointOnCollectionView) {
+                    checkForDraggingAtTheEdgeAndAnimatePaging(gesture)
                     if toIndexPath.isEqual(bundle.currentIndexPath) == false {
                         moveDataItem(bundle.currentIndexPath, toIndexPath: toIndexPath)
-                        self.collectionView!.moveItemAtIndexPath(bundle.currentIndexPath, toIndexPath: toIndexPath)
+                        collectionView!.moveItemAtIndexPath(bundle.currentIndexPath, toIndexPath: toIndexPath)
                         self.bundle!.currentIndexPath = toIndexPath
                     }
-                }
-                
-                self.doubleArrowView.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - kmovingMainNoteSliderHeight/2)
+                }                
+                doubleArrowView.center = CGPointMake(bundle.representationImageView.center.x, bundle.representationImageView.frame.origin.y - kmovingMainNoteSliderHeight/2)
             }
             if gesture.state == UIGestureRecognizerState.Ended || gesture.state == UIGestureRecognizerState.Cancelled {
-                self.doubleArrowView.center.x = bundle.sourceCell.center.x - self.collectionView.contentOffset.x
-                self.doubleArrowView.frame.origin.y = self.collectionView.frame.origin.y - kmovingMainNoteSliderHeight
+                doubleArrowView.center.x = bundle.sourceCell.center.x - collectionView.contentOffset.x
+                doubleArrowView.frame.origin.y = collectionView.frame.origin.y - kmovingMainNoteSliderHeight
                 bundle.sourceCell.hidden = false
                 bundle.representationImageView.removeFromSuperview()
                 collectionView!.reloadData()
                 self.bundle = nil
                 
-                self.doubleArrowView.removeGestureRecognizer(gesture)
-                self.removeDoubleArrowView()
-                self.tapGesture.enabled = true
-                self.view.userInteractionEnabled = true
-                self.isPanning = false
-                self.collectionView.scrollEnabled = true
+                doubleArrowView.removeGestureRecognizer(gesture)
+                removeDoubleArrowView()
+                tapGesture.enabled = true
+                view.userInteractionEnabled = true
+                isPanning = false
+                collectionView.scrollEnabled = true
                 for i in 0..<fretsNumber.count {
-                    self.string3FretChangeingPosition[fretsNumber[i]] = string3FretPosition[i]
+                    string3FretChangeingPosition[fretsNumber[i]] = string3FretPosition[i]
                 }
             }
         }
     }
     
     func removeDoubleArrowView(){
-        self.startScrolling = false
-        if(self.doubleArrowView != nil){
-            self.doubleArrowView.removeFromSuperview()
-            self.view.insertSubview(self.doubleArrowView, belowSubview: self.collectionView)
+        startScrolling = false
+        if(doubleArrowView != nil){
+            doubleArrowView.removeFromSuperview()
+            view.insertSubview(doubleArrowView, belowSubview: collectionView)
             UIView.animateWithDuration(0.2, delay: 0, options: [.CurveEaseOut,.AllowUserInteraction], animations: {
                 self.doubleArrowView.center.y = self.doubleArrowView.center.y + kmovingMainNoteSliderHeight
                 }, completion: {

@@ -311,7 +311,6 @@ class MusicManager: NSObject {
     //load artist must be called after getting all albums
     func loadLocalArtist() {
         uniqueArtists = [Artist]()
-        
         var artistDictionary = [String: [Album]]() //key is artistName
         for album in uniqueAlbums {
             if artistDictionary[album.getArtist()] == nil {
@@ -319,7 +318,6 @@ class MusicManager: NSObject {
             }
             artistDictionary [album.getArtist()]?.append(album)
         }
-        
         for (artistName, albums) in artistDictionary {
             let artist = Artist(artist: artistName)
             for album in albums {
