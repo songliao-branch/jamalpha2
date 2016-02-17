@@ -294,19 +294,18 @@ class MusicManager: NSObject {
     
     func loadLocalAlbums(){
         uniqueAlbums = [Album]()
-        //start new albums fresh
-        var collectionInAlbum = [MPMediaItem]() // a collection of each album's represenstative item
+      
         let albumQuery = MPMediaQuery()
         albumQuery.groupingType = MPMediaGrouping.Album
-        for album in albumQuery.collections!{
+      
+        for album in albumQuery.collections! {
             let representativeItem = album.representativeItem!
             if (representativeItem.getArtist().isEmpty){
                 continue
             }
             //there is no song shorter than 30 seconds
             if representativeItem.playbackDuration < 30 { continue }
-            
-            collectionInAlbum.append(representativeItem)
+          
             let thisAlbum = Album(theItem: representativeItem)
             uniqueAlbums.append(thisAlbum)
         }

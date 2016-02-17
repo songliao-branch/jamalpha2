@@ -577,8 +577,7 @@ class APIManager: NSObject {
         Alamofire.request(.PUT, jamBaseURL + "/songs/\(songId)", parameters: parameters).responseJSON { response in
             switch response.result {
             case .Success:
-                if let data = response.result.value {
-                    let json = JSON(data)
+                if let _ = response.result.value {
                     print("update soundwave url success")
                 }
             case .Failure(let error):

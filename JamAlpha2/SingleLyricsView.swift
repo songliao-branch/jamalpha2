@@ -74,7 +74,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func releaseBackgroundEffect() {
-        if ( (isChordShown || isTabsShown ) && isLyricsShown){
+        if  (isChordShown || isTabsShown ) && isLyricsShown {
             self.chordBase.alpha = 0
             if (isViewDidAppear) {
                 UIView.animateWithDuration(0.2, delay: 0.1, options: [.CurveEaseIn, .AllowUserInteraction], animations: {
@@ -204,7 +204,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
                 isPlaying = self.player.playbackState == .Playing
             }
         }
-        if (!isPlaying){
+        if !isPlaying {
             if isDemoSong {
                 self.avPlayer.rate = self.speed
             }else{
@@ -215,14 +215,14 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
 
         }
         self.isScrolling = false
-        if (self.currentLyricsIndex == 0 ){
+        if self.currentLyricsIndex == 0 {
             self.currentLyricsIndex = -1
         }
         startTimer()
     }
     
     func showTempScrollLyricsView() {
-        if (tempPlayButton.hidden && tempScrollLine.hidden && tempScrollTimeLabel.hidden){
+        if tempPlayButton.hidden && tempScrollLine.hidden && tempScrollTimeLabel.hidden {
             tempPlayButton.hidden = false
             tempScrollLine.hidden = false
             tempScrollTimeLabel.hidden = false
@@ -358,7 +358,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         let cell: SingleLyricsTableViewCell = self.singleLyricsTableView.dequeueReusableCellWithIdentifier("cell") as! SingleLyricsTableViewCell
         cell.backgroundColor = UIColor.clearColor()
         cell.selectionStyle = .None
-        if (indexPath.item < self.lyricsArray.count){
+        if (indexPath.item < self.lyricsArray.count) {
             cell.updateLyricsLabel(self.lyricsArray[indexPath.item].str, labelAlpha: self.lyricsArray[indexPath.item].alpha)
         }else{
             cell.updateLyricsLabel("", labelAlpha: 0.5)
@@ -378,7 +378,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func lyricDidScroll(){
+    func lyricDidScroll() {
         if tempScrollLine != nil && tempScrollLine.hidden == false {
             disapperCount = 0
             let centerPoint: CGPoint = self.tempScrollLine.center
@@ -390,8 +390,8 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             while min_loop <= max_loop {
                 let mid = Int((max_loop + min_loop) / 2)
                 let tempIndex: NSIndexPath = NSIndexPath(forItem: mid, inSection: 0)
-                let tempRect: CGRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
-                let superViewRect: CGRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
+                let tempRect = singleLyricsTableView.rectForRowAtIndexPath(tempIndex)
+                let superViewRect = singleLyricsTableView.convertRect(tempRect, toView: self.view)
                 
                 if CGRectContainsPoint(superViewRect, centerPoint) {
                     currentSelectTempIndex = NSIndexPath(forItem: mid, inSection: 0)
@@ -442,7 +442,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func lyricWillScroll(){
+    func lyricWillScroll() {
         isScrolling = true
         if singleLyricsTableView != nil {
             self.stopDisapperTimer()
@@ -452,73 +452,66 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func lyricEndDeceleration(){
-        if singleLyricsTableView != nil {
-            var isPlaying = false
-            if isDemoSong {
-                isPlaying = avPlayer.rate > 0
-            }else{
-                if(self.player != nil){
-                    isPlaying = self.player.playbackState == .Playing
-                }
-            }
-            if isPlaying {
-                startDisapperTimer()
-            }else{
-                isScrolling = false
-            }
-        }
+    func lyricEndDeceleration() {
+      if singleLyricsTableView == nil { return }
+      var isPlaying = false
+      if isDemoSong {
+          isPlaying = avPlayer.rate > 0
+      }else{
+          if(self.player != nil){
+              isPlaying = self.player.playbackState == .Playing
+          }
+      }
+      if isPlaying {
+          startDisapperTimer()
+      }else{
+          isScrolling = false
+      }
     }
     
     func lyricEndDraggin(decelerate:Bool){
-        if singleLyricsTableView != nil {
-            if !decelerate {
-                var isPlaying = false
-                if isDemoSong {
-                    isPlaying = avPlayer.rate > 0
-                }else{
-                    if(self.player != nil){
-                        isPlaying = self.player.playbackState == .Playing
-                    }
-                }
-                if isPlaying {
-                    startDisapperTimer()
-                }else{
-                    isScrolling = false
-                }
-            }
-        }
+      if singleLyricsTableView == nil { return }
+      if decelerate { return }
+      var isPlaying = false
+      if isDemoSong {
+          isPlaying = avPlayer.rate > 0
+      }else{
+          if(self.player != nil){
+              isPlaying = self.player.playbackState == .Playing
+          }
+      }
+      if isPlaying {
+          startDisapperTimer()
+      }else{
+          isScrolling = false
+      }
     }
     
     func startDisapperTimer(){
-        if disapperTimer == nil{
-            disapperTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "disapperCount:", userInfo: nil, repeats: true)
-            NSRunLoop.mainRunLoop().addTimer(disapperTimer, forMode: NSRunLoopCommonModes)
-        }
+      if disapperTimer != nil { return }
+      disapperTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "disapperCount:", userInfo: nil, repeats: true)
+      NSRunLoop.mainRunLoop().addTimer(disapperTimer, forMode: NSRunLoopCommonModes)
     }
     
     func stopDisapperTimer(){
-        if disapperTimer != nil {
-            disapperTimer.invalidate()
-            disapperTimer = nil
-            disapperCount = 0
-            self.isScrolling = false
-        }
+      if disapperTimer == nil { return }
+      disapperTimer.invalidate()
+      disapperTimer = nil
+      disapperCount = 0
+      self.isScrolling = false
     }
     
     
     func disapperCount(sender: NSTimer) {
-        if (self.singleLyricsTableView != nil){
-            disapperCount++
-            if disapperCount >= 1 {
-                isScrolling = false
-                disapperCount = 0
-                if self.lyricsArray.count > 0 {
-                    self.hideTempScrollLyricsView()
-                }
-                self.stopDisapperTimer()
-            }
-        }
+      if (self.singleLyricsTableView == nil) { return }
+      disapperCount++
+      if disapperCount >= 1 {
+          isScrolling = false
+          disapperCount = 0
+          if self.lyricsArray.count > 0 {
+              self.hideTempScrollLyricsView()
+          }
+          self.stopDisapperTimer()
+      }
     }
-
 }

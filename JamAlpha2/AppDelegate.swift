@@ -90,12 +90,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentVC = topViewController(rootViewController())
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
-            if(!currentSongVC.isSongNeedPurchase){
+            if(!currentSongVC.isSongNeedPurchase) {
                 currentSongVC.stopTimer()
             }
             
             // save music state if exit Twistjam when in Editor mode
-            if(currentVC.presentedViewController != nil){
+            if(currentVC.presentedViewController != nil) {
                 let presentVC = currentVC.presentedViewController!
                 if presentVC.isKindOfClass(TabsEditorViewController) || presentVC.isKindOfClass(LyricsTextViewController) {
                     var isDemoSong:Bool = false
@@ -117,7 +117,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
-        if(MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
+        if(MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil) {
             MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
             MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
         }
@@ -135,7 +135,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentVC = topViewController(rootViewController())
         
        
-        if(MusicManager.sharedInstance.player != nil){
+        if(MusicManager.sharedInstance.player != nil) {
             MusicManager.sharedInstance.player.shuffleMode = self.shuffleMode
             MusicManager.sharedInstance.player.repeatMode = repeatMode
         }

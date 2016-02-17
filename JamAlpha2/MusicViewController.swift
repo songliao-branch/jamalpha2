@@ -661,87 +661,85 @@ extension MusicViewController {
     
                 var op:NSBlockOperation?
                 op = KGLOBAL_init_operationCache[keyString]
-                if(op == nil){
-                    
-                    if nowPlayingItem.artist == nil {
-                        if(KGLOBAL_init_operationCache[keyString] != nil){
-                            KGLOBAL_init_operationCache.removeValueForKey(keyString)
-                        }
-                        self.incrementSongCountInThread()
-                        return
-                    }
-                    
-                    self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
-                        url in
-                        if url == "" || url.isEmpty {
-                            let tempNowPlayingItem = nowPlayingItem
-                            let tempkeyString:String = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
-                            guard let assetURL = nowPlayingItem.getURL() else {
-                                if(KGLOBAL_init_operationCache[tempkeyString] != nil){
-                                    KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
-                                }
-                                self.incrementSongCountInThread()
-                                return
-                            }
-                            // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-                            var progressBarWidth:CGFloat!
-                            progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
-                            let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
-                            op = NSBlockOperation(block: {
-                                
-                                if(op!.cancelled){
-                                    return
-                                }
-                                tempProgressBlock.SetSoundURL(assetURL as! NSURL)
-                                KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
-                                
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    NSOperationQueue.mainQueue().addOperationWithBlock({
-                                        tempProgressBlock.generateWaveforms()
-                                        let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                                        CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
-                                        let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
-                                        AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
-                                            succeeded in
-                                            if succeeded {
-                                                APIManager.updateSoundwaveUrl(CoreDataManager.getSongId(tempNowPlayingItem), url: soundwaveName)
-                                                print("uploaded image to AWS and updated the url for song \(tempNowPlayingItem.getTitle())")
-                                            }
-                                        })
-                                        self.incrementSongCountInThread()
-                                    })
-                                }
-                            })
-                            KGLOBAL_init_operationCache[tempkeyString] = op
-                            KGLOBAL_init_queue.addOperation(op!)
-                            
-                        }else{
-                            AWSS3Manager.downloadImage(url, isProfileBucket: false, completion: {
-                                image in
-                                    let data = UIImagePNGRepresentation(image)
-                                    if(KGLOBAL_init_operationCache[keyString] != nil){
-                                        KGLOBAL_init_operationCache.removeValueForKey(keyString)
-                                    }
-                                    CoreDataManager.saveSoundWave(nowPlayingItem, soundwaveImage: data!)
-                                    self.incrementSongCountInThread()
-                                    return
-                                
-                            })
-                        }
-                    })
+                if(op != nil){ return }
+                if nowPlayingItem.artist == nil {
+                  if(KGLOBAL_init_operationCache[keyString] != nil){
+                    KGLOBAL_init_operationCache.removeValueForKey(keyString)
+                  }
+                  self.incrementSongCountInThread()
+                  return
                 }
+                
+                self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
+                  url in
+                  if url == "" || url.isEmpty {
+                    let tempNowPlayingItem = nowPlayingItem
+                    let tempkeyString:String = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
+                    guard let assetURL = nowPlayingItem.getURL() else {
+                      if(KGLOBAL_init_operationCache[tempkeyString] != nil){
+                        KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
+                      }
+                      self.incrementSongCountInThread()
+                      return
+                    }
+                    // have to use the temp value to do the nsoperation, cannot use (self.) do that.
+                    var progressBarWidth:CGFloat!
+                    progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
+                    let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
+                    op = NSBlockOperation(block: {
+                      
+                      if(op!.cancelled){
+                        return
+                      }
+                      tempProgressBlock.SetSoundURL(assetURL as! NSURL)
+                      
+                      dispatch_async(dispatch_get_main_queue()) {
+                        NSOperationQueue.mainQueue().addOperationWithBlock({
+                          tempProgressBlock.generateWaveforms()
+                          let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                          CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
+                          let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
+                          AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
+                            succeeded in
+                            if succeeded {
+                              APIManager.updateSoundwaveUrl(CoreDataManager.getSongId(tempNowPlayingItem), url: soundwaveName)
+                              print("uploaded image to AWS and updated the url for song \(tempNowPlayingItem.getTitle())")
+                            }
+                          })
+                          KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
+                          self.incrementSongCountInThread()
+                        })
+                      }
+                    })
+                    KGLOBAL_init_operationCache[tempkeyString] = op
+                    KGLOBAL_init_queue.addOperation(op!)
+                    
+                  } else {
+                    AWSS3Manager.downloadImage(url, isProfileBucket: false, completion: {
+                      image in
+                      if let data = UIImagePNGRepresentation(image) {
+                           CoreDataManager.saveSoundWave(nowPlayingItem, soundwaveImage: data)
+                      }
+                      if(KGLOBAL_init_operationCache[keyString] != nil) {
+                        KGLOBAL_init_operationCache.removeValueForKey(keyString)
+                      }
+                      self.incrementSongCountInThread()
+                      return
+                    })
+                  }
+                })
             }
         }
     }
-    
-    func incrementSongCountInThread(){
+  
+    func incrementSongCountInThread() {
         pthread_rwlock_wrlock(&self.rwLock)
         if(Int(self.songCount) < self.uniqueSongs.count-1){
             self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&(self.songCount)))])
         }
         pthread_rwlock_unlock(&self.rwLock)
     }
-    
+  
     func getSongIdAndSoundwaveUrlFromCloud(item: Findable, completion: ((soundwave_url:String) -> Void)?) {
         APIManager.getSongInformation(item, completion: {
             id, soundwave_url in
