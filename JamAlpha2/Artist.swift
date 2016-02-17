@@ -32,8 +32,8 @@ class Artist: NSObject, Sortable {
     
     func addAlbum(album:Album){
         self.albums.append(album)
-        self.numberOfTracks += album.numberOfTracks
-        self.totalRunningTime += album.totalRunningTime
+        self.numberOfTracks += album.getNumberOfTracks()
+        self.totalRunningTime += album.getTotalRunningTime()
     }
     
     func getAlbums() -> [Album]{

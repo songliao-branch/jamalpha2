@@ -49,16 +49,23 @@ class MusicManager: NSObject {
     
     override init() {
         super.init()
-        let t1 = CACurrentMediaTime()
-        print("t1 \(t1)")
+        let songStartTime = CACurrentMediaTime()
         loadLocalSongs()
+        print("load songs took :\(CACurrentMediaTime()-songStartTime)")
+        
         loadDemoSongs()
+        
+        let albumStartTime = CACurrentMediaTime()
         loadLocalAlbums()
+        print("load album took: \(CACurrentMediaTime() - albumStartTime)")
+
+        let artistStartTime = CACurrentMediaTime()
         loadLocalArtist()
+        print("load artist took: \(CACurrentMediaTime()-artistStartTime)")
         
         initializePlayer()
         addNotification()
-        print("init took :\(CACurrentMediaTime()-t1)")
+        print("all took :\(CACurrentMediaTime()-songStartTime)")
     }
     
     //check when search a cloud item, if it matches, we use the song we already have
@@ -274,10 +281,7 @@ class MusicManager: NSObject {
     func loadLocalSongs(){
         uniqueSongs = [MPMediaItem]()
         let songCollection = MPMediaQuery.songsQuery()
-        uniqueSongs = songCollection.items!.filter {
-            song in
-            song.playbackDuration > 30
-        }
+        uniqueSongs = songCollection.items!
         print("** I have \(uniqueSongs.count) songs")
     }
     
@@ -295,20 +299,24 @@ class MusicManager: NSObject {
     func loadLocalAlbums(){
         uniqueAlbums = [Album]()
         //start new albums fresh
-        var collectionInAlbum = [MPMediaItem]() // a collection of each album's represenstative item
-        let albumQuery = MPMediaQuery()
-        albumQuery.groupingType = MPMediaGrouping.Album
-        for album in albumQuery.collections!{
-            let representativeItem = album.representativeItem!
-            if (representativeItem.getArtist().isEmpty){
+        
+        var albumDictionary = [String: [MPMediaItem]]()//key is artist+album to avoid two artists same album names
+        
+        let keySeparator = "TGI*X"//random thing
+        for song in uniqueSongs {
+            guard let album = song.albumTitle, let artist = song.artist else {
                 continue
             }
-            //there is no song shorter than 30 seconds
-            if representativeItem.playbackDuration < 30 { continue }
-            
-            collectionInAlbum.append(representativeItem)
-            let thisAlbum = Album(theItem: representativeItem)
-            uniqueAlbums.append(thisAlbum)
+            let key = artist+keySeparator+album
+            if albumDictionary[key] == nil {
+               albumDictionary[key] = []
+            }
+            albumDictionary[key]?.append(song)
+        }
+        
+        for (key, value) in albumDictionary {
+            let album = Album(album: key.componentsSeparatedByString(keySeparator)[1], collection: value)
+            uniqueAlbums.append(album)
         }
     }
     
@@ -318,17 +326,17 @@ class MusicManager: NSObject {
         
         var artistDictionary = [String: [Album]]() //key is artistName
         for album in uniqueAlbums {
-            if artistDictionary[album.artistName] == nil {
-                artistDictionary [album.artistName] = []
+            if artistDictionary[album.getArtist()] == nil {
+                artistDictionary [album.getArtist()] = []
             }
-            artistDictionary [album.artistName]?.append(album)
+            artistDictionary [album.getArtist()]?.append(album)
         }
         
         for artist in artistDictionary {
             let theArtist = Artist(artist: artist.0)
             
             let albumsByYearDescending = artist.1.sort({ album1, album2 in
-                return album1.yearReleased > album2.yearReleased
+                return album1.getYearReleased() > album2.getYearReleased()
             })
             
             for album in albumsByYearDescending {

@@ -301,7 +301,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 }else{
                     //get the first album cover
                     for album in theArtist.getAlbums() {
-                        if let cover = album.coverImage {
+                        if let cover = album.getCoverImage() {
                             let image = cover.imageWithSize(CGSize(width: 80, height: 80))
                             if let img = image {
                                 cell.coverImage.image = img
@@ -348,7 +348,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             if let coverimage = CoreDataManager.getCoverImage(theAlbum.songsIntheAlbum[0]){
                 cell.coverImage.image = coverimage
             }else{
-                if let cover = theAlbum.coverImage {
+                if let cover = theAlbum.getCoverImage() {
                     
                     cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
                     let image = cover.imageWithSize(CGSize(width: 80, height: 80))
@@ -371,7 +371,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             
             cell.loudspeakerImage.hidden = true
             
-            let numberOfTracks = theAlbum.numberOfTracks
+            let numberOfTracks = theAlbum.getNumberOfTracks()
             let trackPrompt = "track".addPluralSubscript(numberOfTracks)
             
             cell.mainTitle.text = theAlbum.albumTitle

@@ -68,7 +68,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return theAlbum.numberOfTracks
+        return theAlbum.getNumberOfTracks()
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {

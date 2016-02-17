@@ -81,7 +81,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         if let coverimage = CoreDataManager.getCoverImage(theArtist.getAlbums()[section].songsIntheAlbum[0]){
             cell.albumImageView.image = coverimage
         }else{
-            if let cover = theArtist.getAlbums()[section].coverImage {
+            if let cover = theArtist.getAlbums()[section].getCoverImage() {
                 
                 let image = cover.imageWithSize(CGSize(width: 85, height: 85))
                 if let img = image {
@@ -102,9 +102,9 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         
         cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
         
-        if theArtist.getAlbums()[section].yearReleased > 1000 { //album year exist
+        if theArtist.getAlbums()[section].getYearReleased() > 1000 { //album year exist
             cell.albumYearLabel.hidden = false
-            cell.albumYearLabel.text = "\(theArtist.getAlbums()[section].yearReleased)"
+            cell.albumYearLabel.text = "\(theArtist.getAlbums()[section].getYearReleased())"
         } else {
             cell.albumYearLabel.hidden = true
         }
@@ -126,7 +126,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        return theArtist.getAlbums()[section].numberOfTracks
+        return theArtist.getAlbums()[section].getNumberOfTracks()
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -175,7 +175,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         var songsInPreviousSections = 0
         if albumIndex > 0 {
             for i in 1...albumIndex {
-               songsInPreviousSections += theArtist.getAlbums()[i-1].numberOfTracks
+               songsInPreviousSections += theArtist.getAlbums()[i-1].getNumberOfTracks()
             }
         }
         let indexToBePlayed = songsInPreviousSections + indexPath.row
