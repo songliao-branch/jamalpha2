@@ -18,7 +18,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     {
         super.viewDidLoad()
         songsInTheAlbum = [MPMediaItem]()
-        songsInTheAlbum = theAlbum.songsIntheAlbum
+        songsInTheAlbum = theAlbum.getSongs()
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
@@ -74,7 +74,7 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
-        let song = theAlbum.songsIntheAlbum[indexPath.row]
+        let song = theAlbum.getSongs()[indexPath.row]
 
         cell.titleTrailingConstant.constant = 15
         cell.loudspeakerImage.hidden = true

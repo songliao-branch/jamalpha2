@@ -71,7 +71,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
 
         demoSongs = MusicManager.sharedInstance.demoSongs
-        
+
         songsByFirstAlphabet = sort(uniqueSongs)
         artistsByFirstAlphabet = sort(uniqueArtists)
         albumsByFirstAlphabet = sort(uniqueAlbums)
@@ -343,9 +343,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             
-            CoreDataManager.initializeSongToDatabase(theAlbum.songsIntheAlbum[0])
+            let songs = theAlbum.getSongs()
+            CoreDataManager.initializeSongToDatabase(songs[0])
             
-            if let coverimage = CoreDataManager.getCoverImage(theAlbum.songsIntheAlbum[0]){
+            if let coverimage = CoreDataManager.getCoverImage(songs[0]){
                 cell.coverImage.image = coverimage
             }else{
                 if let cover = theAlbum.getCoverImage() {
@@ -357,17 +358,15 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                     } else { //this happens somewhow when songs load too fast
                         //TODO: load something else
                         cell.coverImage.image = UIImage(named: "liweng")
-                        loadAPISearchImageToCell(cell, song: theAlbum.songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                        loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
                     }
                 }
                 
                 if(cell.coverImage.image == nil){
                     cell.coverImage.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: theAlbum.songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                    loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
             }
-            
-            
             
             cell.loudspeakerImage.hidden = true
             

@@ -7,14 +7,7 @@ import MediaPlayer
 class Album: NSObject, Sortable {
     
     var albumTitle: String = ""
-    var songsIntheAlbum: [MPMediaItem]!
-    
-    //derivatives
-//    var coverImage: MPMediaItemArtwork?
-//    var artistName: String = ""
-//    var numberOfTracks: Int = 0
-//    var totalRunningTime: NSTimeInterval = 0.0
-//    var yearReleased = 0 //can be nil if user add their own songs
+    private var songsIntheAlbum: [MPMediaItem]!
     
     init(album: String, collection: [MPMediaItem]) {
         self.albumTitle = album
@@ -58,6 +51,13 @@ class Album: NSObject, Sortable {
             }
         }
         return 0
+    }
+    
+    func getSongs() -> [MPMediaItem] {
+       return self.songsIntheAlbum.sort{
+            song1, song2 in
+            return song1.albumTrackNumber < song2.albumTrackNumber
+        }
     }
     
 //    init(theItem: MPMediaItem){

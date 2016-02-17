@@ -49,23 +49,11 @@ class MusicManager: NSObject {
     
     override init() {
         super.init()
-        let songStartTime = CACurrentMediaTime()
         loadLocalSongs()
-        print("load songs took :\(CACurrentMediaTime()-songStartTime)")
-        
-        loadDemoSongs()
-        
-        let albumStartTime = CACurrentMediaTime()
         loadLocalAlbums()
-        print("load album took: \(CACurrentMediaTime() - albumStartTime)")
-
-        let artistStartTime = CACurrentMediaTime()
         loadLocalArtist()
-        print("load artist took: \(CACurrentMediaTime()-artistStartTime)")
-        
         initializePlayer()
         addNotification()
-        print("all took :\(CACurrentMediaTime()-songStartTime)")
     }
     
     //check when search a cloud item, if it matches, we use the song we already have
@@ -282,7 +270,7 @@ class MusicManager: NSObject {
         uniqueSongs = [MPMediaItem]()
         let songCollection = MPMediaQuery.songsQuery()
         uniqueSongs = songCollection.items!
-        print("** I have \(uniqueSongs.count) songs")
+        loadDemoSongs()
     }
     
     func loadDemoSongs() {
@@ -332,23 +320,13 @@ class MusicManager: NSObject {
             artistDictionary [album.getArtist()]?.append(album)
         }
         
-        for artist in artistDictionary {
-            let theArtist = Artist(artist: artist.0)
-            
-            let albumsByYearDescending = artist.1.sort({ album1, album2 in
-                return album1.getYearReleased() > album2.getYearReleased()
-            })
-            
-            for album in albumsByYearDescending {
-                theArtist.addAlbum(album)
+        for (artistName, albums) in artistDictionary {
+            let artist = Artist(artist: artistName)
+            for album in albums {
+                artist.addAlbum(album)
             }
-            uniqueArtists.append(theArtist)
+            uniqueArtists.append(artist)
         }
-        //sort by artist name ascending
-        uniqueArtists.sortInPlace({
-            artist1, artist2 in
-            return artist1.artistName < artist2.artistName
-        })
     }
 
     // we manually set the repeat mode to one before going to tabs or lyrics Editor
