@@ -27,8 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
         // because it can change so much of how your app behaves
-        //
-        print("willFinishLaunchingWithOptions \(CACurrentMediaTime())")
+
         var defaultsDictionary: [String : AnyObject] = [:]
         
         // by default we track the user location while in the background
@@ -37,14 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         defaultsDictionary[kShowTabsEditorTutorialA] = true
         defaultsDictionary[kShowTabsEditorTutorialB] = true
         defaultsDictionary[kShowLyricsTutorial] = true
-        let amazonStart = CACurrentMediaTime()
-        
+
         NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
         AWSS3Manager.createAWSS3FilePath()
-        
-        let amazonFinish = CACurrentMediaTime()
-        print("amazon takes: \(amazonFinish-amazonStart)")
-        
         return true
     }
     
