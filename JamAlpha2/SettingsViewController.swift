@@ -20,7 +20,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
   var mc: MFMailComposeViewController!
   
   //for first release, we exclude rate twistjam, faq
-  let settingTitles = ["About", "Like us on Facebook", "Rate Twistjam", "FAQ", "Contact Us","Demo", "Tutorial"]
+  let settingTitles = ["About", "Like us on Facebook", "Rate Twistjam", "Contact Us","Demo", "Tutorial"]
+    
+  let settingTitlesNotSignedIn = ["About", "Like us on Facebook", "Rate Twistjam","Demo", "Tutorial"]
+
   //let settingTitles = ["About", "Like us on Facebook","Demo", "Tutorial"]
   
   override func viewDidLoad() {
@@ -75,6 +78,9 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
   
   func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if section == 0 {
+        if CoreDataManager.getCurrentUser() == nil {
+            return settingTitlesNotSignedIn.count
+        }
       return settingTitles.count
     }
     return 1 //for logout
@@ -91,8 +97,12 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
       } else {
         let cell = tableView.dequeueReusableCellWithIdentifier("settingscell", forIndexPath:
           indexPath)
-        cell.textLabel?.text = settingTitles[indexPath.item]
         
+        if CoreDataManager.getCurrentUser() == nil {
+            cell.textLabel?.text = settingTitlesNotSignedIn[indexPath.item]
+        } else {
+            cell.textLabel?.text = settingTitles[indexPath.item]
+        }
         return cell
       }
     } else {
@@ -105,28 +115,50 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
   }
   
   func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    
+
     if indexPath.section == 0 {
-      if indexPath.item == 0 {
-        let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
-        self.navigationController?.pushViewController(aboutVC, animated: true)
-      } else if indexPath.item == 2 {
-        rateTwistjam()
-      } else if indexPath.item == 3 {
-        let faqVC: FAQViewController = self.storyboard?.instantiateViewControllerWithIdentifier("faqVC") as! FAQViewController
-        self.navigationController?.pushViewController(faqVC, animated: true)
-      } else if indexPath.item == 4 {
-        emailStatus = "email"
-        contactUs()
-      } else if indexPath.item == 5 {
-        let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
-        demoVC.isFromUnLoginVC = self.isFromUnLoginVC
-        self.navigationController?.pushViewController(demoVC, animated: true)
-      } else if indexPath.item == 6 {
-        let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
-        demoVC.isFromUnLoginVC = self.isFromUnLoginVC
-        demoVC.isDemo = false
-        self.navigationController?.pushViewController(demoVC, animated: true)
-      }
+        
+        if CoreDataManager.getCurrentUser() == nil {
+        
+            if indexPath.item == 0 {
+                let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
+                self.navigationController?.pushViewController(aboutVC, animated: true)
+            } else if indexPath.item == 2 {
+                rateTwistjam()
+            } else if indexPath.item == 3 {
+                let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                demoVC.isFromUnLoginVC = self.isFromUnLoginVC
+                self.navigationController?.pushViewController(demoVC, animated: true)
+            } else if indexPath.item == 4 {
+                let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                demoVC.isFromUnLoginVC = self.isFromUnLoginVC
+                demoVC.isDemo = false
+                self.navigationController?.pushViewController(demoVC, animated: true)
+            }
+        } else {//user is signed in,
+            
+            if indexPath.item == 0 {
+                let aboutVC: AboutViewController = self.storyboard?.instantiateViewControllerWithIdentifier("aboutVC") as! AboutViewController
+                self.navigationController?.pushViewController(aboutVC, animated: true)
+            } else if indexPath.item == 2 {
+                rateTwistjam()
+            }
+            else if indexPath.item == 3 {
+                emailStatus = "email"
+                contactUs()
+            } else if indexPath.item == 4 {
+                let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                demoVC.isFromUnLoginVC = self.isFromUnLoginVC
+                self.navigationController?.pushViewController(demoVC, animated: true)
+            } else if indexPath.item == 5 {
+                let demoVC: DemoViewController = self.storyboard?.instantiateViewControllerWithIdentifier("demoVC") as! DemoViewController
+                demoVC.isFromUnLoginVC = self.isFromUnLoginVC
+                demoVC.isDemo = false
+                self.navigationController?.pushViewController(demoVC, animated: true)
+            }
+        }
+
     } else {
       let refreshAlert = UIAlertController(title: "Log Out", message: "Are you sure you want to Log Out?", preferredStyle: UIAlertControllerStyle.Alert)
       refreshAlert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
@@ -138,6 +170,8 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
       }))
       self.presentViewController(refreshAlert, animated: true, completion: nil)
       }
+    
+    tableView.deselectRowAtIndexPath(indexPath, animated: true)
   }
   
   func contactUs() {
