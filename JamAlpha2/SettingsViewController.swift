@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageUI
+import FBSDKCoreKit
 
 
 class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate {
@@ -80,7 +81,6 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
   }
   
   func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    
     if indexPath.section == 0 {
       if indexPath.item == 1 {
         let cell: SettingFBCell = self.tableView.dequeueReusableCellWithIdentifier("fbcell") as! SettingFBCell
@@ -102,7 +102,6 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
       cell.accessoryType = .None
       return cell
     }
-    
   }
   
   func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -129,7 +128,6 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         self.navigationController?.pushViewController(demoVC, animated: true)
       }
     } else {
-      
       let refreshAlert = UIAlertController(title: "Log Out", message: "Are you sure you want to Log Out?", preferredStyle: UIAlertControllerStyle.Alert)
       refreshAlert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
         self.dismissViewControllerAnimated(false, completion: nil)
@@ -139,15 +137,13 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         self.navigationController?.popViewControllerAnimated(false)
       }))
       self.presentViewController(refreshAlert, animated: true, completion: nil)
-    }
-    tableView.deselectRowAtIndexPath(indexPath, animated: true)
+      }
   }
   
   func contactUs() {
     let emailTitle = "[\(CoreDataManager.getCurrentUser()!.email)]'s feed back"
     let messageBody = ""
     let toRecipents = ["feedback@twistjam.com"]
-    
     mc = MFMailComposeViewController()
     mc.navigationBar.tintColor = UIColor.mainPinkColor()
     
