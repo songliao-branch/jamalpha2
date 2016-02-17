@@ -692,13 +692,13 @@ extension MusicViewController {
                                     return
                                 }
                                 tempProgressBlock.SetSoundURL(assetURL as! NSURL)
-                                KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
                                 
                                 dispatch_async(dispatch_get_main_queue()) {
                                     NSOperationQueue.mainQueue().addOperationWithBlock({
                                         tempProgressBlock.generateWaveforms()
-                                        let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                                        CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
+                                        if let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage) {
+                                          CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
+                                        }
                                         let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
                                         AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
                                             succeeded in
@@ -707,6 +707,7 @@ extension MusicViewController {
                                                 print("uploaded image to AWS and updated the url for song \(tempNowPlayingItem.getTitle())")
                                             }
                                         })
+                                        KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
                                         self.incrementSongCountInThread()
                                     })
                                 }
