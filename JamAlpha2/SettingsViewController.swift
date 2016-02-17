@@ -141,7 +141,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
   }
   
   func contactUs() {
-    let emailTitle = "[\(CoreDataManager.getCurrentUser()!.email)]'s feed back"
+    var emailTitle = "User's feedback"
+    if CoreDataManager.getCurrentUser() != nil {
+      emailTitle = "[\(CoreDataManager.getCurrentUser()!.email)]'s feedback"
+    }
     let messageBody = ""
     let toRecipents = ["feedback@twistjam.com"]
     mc = MFMailComposeViewController()
