@@ -82,17 +82,13 @@ class SearchResult: NSObject {
     }
     
     func findMediaItem() {
-        if let song = CoreDataManager.findSongById(songId) {
-            self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
-                item in
-                if song.title.lowercaseString == item.getTitle().lowercaseString && song.artist.lowercaseString == item.getArtist().lowercaseString && abs(Float(song.playbackDuration) - item.getDuration()) < 2 {
-                    return true
-                }
-                return false
-            }.first
-        } else {//TODO: songId might not have retrieved yet, find songId in cloud
-            
-        }
+        self.mediaItem = MusicManager.sharedInstance.uniqueSongs.filter{
+            item in
+            if self.trackName.lowercaseString == item.getTitle().lowercaseString && self.artistName.lowercaseString == item.getArtist().lowercaseString && abs(Float(self.trackTimeMillis) - item.getDuration()) < 2 {
+                return true
+            }
+            return false
+        }.first
     }
     
     func findSearchResult(completion: ((searchResult: SearchResult?) -> Void)) {

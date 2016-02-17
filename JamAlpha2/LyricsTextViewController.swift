@@ -12,31 +12,21 @@ import AVFoundation
 
 
 class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
-    
-    
     var formattedLyrics: Bool = false
-    
     var hiddenKeyboardView: UIView = UIView()
     let hiddenKeyboardPanGesture: UIPanGestureRecognizer = UIPanGestureRecognizer()
-
     var isDemoSong = false
-
     var recoverMode: (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval)!
-    
     var songViewController: SongViewController? //used to parse synced lyrics from LyricsSyncViewController
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
-    
     var theSong: Findable!
     var titleView = UIView()
     var lyricsTextView: UITextView = UITextView()
-    
     var textViewBottomLayoutGuideConstraint: NSLayoutConstraint!
-    
     var lyricsReorganizedArray: [String] = [String]()
-    
     var timeArray: [Float]!
-    
+  
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.Portrait
     }
@@ -52,13 +42,11 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        self.viewWidth = self.view.frame.width
-        self.viewHeight = self.view.frame.height
-        
+        viewWidth = view.frame.width
+        viewHeight = view.frame.height
         if !isDemoSong {
-            self.recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
+            recoverMode = MusicManager.sharedInstance.saveMusicPlayerState([theSong as! MPMediaItem])
         }
-
         addBackground()
         addTitleView()
         addLyricsTextView()
@@ -76,7 +64,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         let notificationCenter = NSNotificationCenter.defaultCenter()
         notificationCenter.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         notificationCenter.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
-        self.lyricsTextView.resignFirstResponder()
+        lyricsTextView.resignFirstResponder()
     }
 
     func handleKeyboardWillShowNotification(notification: NSNotification) {
@@ -98,25 +86,22 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         var originDelta: CGFloat = CGFloat()
         if showsKeyboard == true {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
-            self.hiddenKeyboardView.addGestureRecognizer(hiddenKeyboardPanGesture)
-            self.lyricsTextView.addGestureRecognizer(hiddenKeyboardPanGesture)
-            self.hiddenKeyboardView.frame = CGRectMake(0, keyboardViewEndFrame.origin.y - 5, self.viewWidth, 5)
-            self.view.addSubview(self.hiddenKeyboardView)
-            self.hiddenKeyboardView.hidden = false
+            hiddenKeyboardView.addGestureRecognizer(hiddenKeyboardPanGesture)
+            lyricsTextView.addGestureRecognizer(hiddenKeyboardPanGesture)
+            hiddenKeyboardView.frame = CGRectMake(0, keyboardViewEndFrame.origin.y - 5, viewWidth, 5)
+            view.addSubview(hiddenKeyboardView)
+            hiddenKeyboardView.hidden = false
         } else {
             originDelta = keyboardViewEndFrame.origin.y - keyboardViewBeginFrame.origin.y
-            self.hiddenKeyboardView.hidden = true
-            self.hiddenKeyboardView.removeGestureRecognizer(hiddenKeyboardPanGesture)
-            self.lyricsTextView.removeGestureRecognizer(hiddenKeyboardPanGesture)
+            hiddenKeyboardView.hidden = true
+            hiddenKeyboardView.removeGestureRecognizer(hiddenKeyboardPanGesture)
+            lyricsTextView.removeGestureRecognizer(hiddenKeyboardPanGesture)
         }
-
-        self.lyricsTextView.frame = CGRectMake(0, 20 + 44, self.viewWidth, self.lyricsTextView.frame.height + originDelta)
-
-        self.lyricsTextView.layer.opacity = 0.1
+        lyricsTextView.frame = CGRectMake(0, 20 + 44, viewWidth, lyricsTextView.frame.height + originDelta)
+        lyricsTextView.layer.opacity = 0.1
         UIView.animateWithDuration(1.4, animations: {
             self.lyricsTextView.layer.opacity = 1
             })
- 
     }
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -124,23 +109,20 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func hiddenKeyboardPanGesture(sender: UIPanGestureRecognizer) {
-        let location = sender.locationInView(self.hiddenKeyboardView)
+        let location = sender.locationInView(hiddenKeyboardView)
         if location.y > 0 {
-            self.lyricsTextView.resignFirstResponder()
+            lyricsTextView.resignFirstResponder()
         }
-
     }
     
 
     func addBackground() {
         hiddenKeyboardPanGesture.addTarget(self, action: "hiddenKeyboardPanGesture:")
         hiddenKeyboardPanGesture.delegate = self
-        
-        let backgroundImageWidth: CGFloat = self.viewHeight - 44 - 20
-
+        let backgroundImageWidth: CGFloat = viewHeight - 44 - 20
         let backgroundImage: UIImageView = UIImageView()
-        backgroundImage.frame = CGRectMake(self.viewWidth / 2 - backgroundImageWidth / 2, 44 + 20, backgroundImageWidth, backgroundImageWidth)
-        let size: CGSize = CGSizeMake(self.viewWidth, self.viewHeight)
+        backgroundImage.frame = CGRectMake(viewWidth / 2 - backgroundImageWidth / 2, 44 + 20, backgroundImageWidth, backgroundImageWidth)
+        let size: CGSize = CGSizeMake(viewWidth, viewHeight)
         var image:UIImage!
         if let artwork = theSong!.getArtWork() {
             image = artwork.imageWithSize(size)
@@ -151,13 +133,13 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         backgroundImage.image = image != nil ? image : songViewController!.backgroundImage
         let blurredImage: UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
-        self.view.addSubview(backgroundImage)
+        view.addSubview(backgroundImage)
     }
     
     func addTitleView() {
-        titleView.frame = CGRectMake(0, 0, self.viewWidth, 20 + 44)//status bar height and navigation bar height
+        titleView.frame = CGRectMake(0, 0, viewWidth, 20 + 44)//status bar height and navigation bar height
         titleView.backgroundColor = UIColor.mainPinkColor()
-        self.view.addSubview(titleView)
+        view.addSubview(titleView)
         
         let spacing: CGFloat = 10
         let buttonWidth: CGFloat = 50
@@ -170,7 +152,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         titleView.addSubview(backButton)
         
         let doneButton: UIButton = UIButton()
-        doneButton.frame = CGRectMake(17 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        doneButton.frame = CGRectMake(17 / 20 * viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         doneButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         doneButton.setImage(UIImage(named: "lyrics_done_circle"), forState: UIControlState.Normal)
         doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -185,14 +167,14 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
         titleView.addSubview(titleLabel)
         
         let deleteAllButton: UIButton = UIButton()
-        deleteAllButton.frame = CGRectMake(3 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        deleteAllButton.frame = CGRectMake(3 / 20 * viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         deleteAllButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         deleteAllButton.setImage(UIImage(named: "lyrics_delete_circle"), forState: UIControlState.Normal)
         deleteAllButton.addTarget(self, action: "pressDeleteAllButton:", forControlEvents: UIControlEvents.TouchUpInside)
         titleView.addSubview(deleteAllButton)
         
         let reorganizeButton: UIButton = UIButton()
-        reorganizeButton.frame = CGRectMake(14 / 20 * self.viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
+        reorganizeButton.frame = CGRectMake(14 / 20 * viewWidth, backButton.frame.origin.y, buttonWidth, buttonWidth)
         reorganizeButton.imageEdgeInsets = UIEdgeInsetsMake(spacing, spacing, spacing, spacing)
         reorganizeButton.setImage(UIImage(named: "lyrics_reorganize_circle"), forState: UIControlState.Normal)
         reorganizeButton.addTarget(self, action: "pressReorganizeButton:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -204,19 +186,17 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func tapOnTitleView(sender: UITapGestureRecognizer) {
-        self.lyricsTextView.resignFirstResponder()
+        lyricsTextView.resignFirstResponder()
     }
     
     func addLyricsTextView() {
-
-        self.lyricsTextView.frame = CGRect(x: 0, y: CGRectGetMaxY(titleView.frame), width: self.viewWidth, height: self.viewHeight - (20 + 44))
-        self.lyricsTextView.backgroundColor = UIColor.clearColor()
-        self.lyricsTextView.textAlignment = .Left
-        self.lyricsTextView.font = UIFont.systemFontOfSize(18)
-        self.lyricsTextView.textColor = UIColor.whiteColor()
-        self.lyricsTextView.tintColor = UIColor.mainPinkColor()
-        self.lyricsTextView.delegate = self
-
+        lyricsTextView.frame = CGRect(x: 0, y: CGRectGetMaxY(titleView.frame), width: viewWidth, height: viewHeight - (20 + 44))
+        lyricsTextView.backgroundColor = UIColor.clearColor()
+        lyricsTextView.textAlignment = .Left
+        lyricsTextView.font = UIFont.systemFontOfSize(18)
+        lyricsTextView.textColor = UIColor.whiteColor()
+        lyricsTextView.tintColor = UIColor.mainPinkColor()
+        lyricsTextView.delegate = self
         var lyrics: Lyric = Lyric()
         (lyrics, _) = CoreDataManager.getLyrics(theSong, fetchingUsers: true)
 
@@ -226,22 +206,22 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
                 lyricsToDisplay += line.str
                 lyricsToDisplay += "\n"
             }
-            self.lyricsTextView.text = lyricsToDisplay
-            self.lyricsTextView.textColor = UIColor.whiteColor()
+            lyricsTextView.text = lyricsToDisplay
+            lyricsTextView.textColor = UIColor.whiteColor()
         } else {
-            self.lyricsTextView.text = "Put your lyrics here"
-            self.lyricsTextView.textColor = UIColor.lightGrayColor()
+            lyricsTextView.text = "Put your lyrics here"
+            lyricsTextView.textColor = UIColor.lightGrayColor()
         }
-        self.view.addSubview(self.lyricsTextView)
+        view.addSubview(lyricsTextView)
     }
     
     func addGotoSafariButton() {
         let safariButton: UIButton = UIButton()
-        safariButton.frame = CGRectMake(self.view.frame.width - 60, self.view.frame.height - 60, 60, 60)
+        safariButton.frame = CGRectMake(view.frame.width - 60, view.frame.height - 60, 60, 60)
         safariButton.imageEdgeInsets = UIEdgeInsetsMake(20, 20, 5, 5)
         safariButton.setImage(UIImage(named: "safari"), forState: .Normal)
         safariButton.addTarget(self, action: "pressSafariButton:", forControlEvents: .TouchUpInside)
-        self.view.addSubview(safariButton)
+        view.addSubview(safariButton)
         
         if isDemoSong {
             safariButton.removeFromSuperview()
@@ -260,13 +240,13 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
 
     func pressBackButton(sender: UIButton) {
         tempLyricsTimeTuple.removeAll()
-        if let songVC = self.songViewController {
+        if let songVC = songViewController {
             if songVC.singleLyricsTableView != nil {
                 songVC.updateSingleLyricsAlpha()
                 songVC.updateSingleLyricsPosition(false)
             }
         }
-        self.dismissViewControllerAnimated(true, completion: {
+        dismissViewControllerAnimated(true, completion: {
             completed in
             if let songVC = self.songViewController {
                 if songVC.isDemoSong {
@@ -280,29 +260,25 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func pressDoneButton(sender: UIButton) {
-
-        if self.lyricsTextView.text.characters.count < 2 {
-            self.showMessage("Please add some lyrics before syncing", message: "", actionTitle: "OK", completion: nil)
+        if lyricsTextView.text.characters.count < 2 {
+            showMessage("Please add some lyrics before syncing", message: "", actionTitle: "OK", completion: nil)
             return
         }
-        
-
-        self.lyricsReorganizedArray = formatLyrics(self.lyricsTextView.text)
+        lyricsReorganizedArray = formatLyrics(lyricsTextView.text)
         let lyricsSyncViewController = storyboard!.instantiateViewControllerWithIdentifier("lyricssyncviewcontroller") as! LyricsSyncViewController
-        
         lyricsSyncViewController.lyricsTextViewController = self
         if lyricsTextView.text == "" {
             lyricsSyncViewController.lyricsFromTextView = "You don't have any lyrics"
             lyricsSyncViewController.lyricsOrganizedArray = ["You don't have any lyrics"]
         } else {
             lyricsSyncViewController.lyricsFromTextView = lyricsTextView.text
-            lyricsSyncViewController.lyricsOrganizedArray = self.lyricsReorganizedArray
+            lyricsSyncViewController.lyricsOrganizedArray = lyricsReorganizedArray
         }
-        lyricsSyncViewController.theSong  = self.theSong
-        lyricsSyncViewController.recoverMode = self.recoverMode
+        lyricsSyncViewController.theSong  = theSong
+        lyricsSyncViewController.recoverMode = recoverMode
         lyricsSyncViewController.isDemoSong = isDemoSong
-        lyricsSyncViewController.songViewController = self.songViewController
-        self.presentViewController(lyricsSyncViewController, animated: true, completion: nil)
+        lyricsSyncViewController.songViewController = songViewController
+        presentViewController(lyricsSyncViewController, animated: true, completion: nil)
     }
 
     func formatLyrics(lyric: String) -> [String]{
@@ -318,19 +294,14 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
             if(str.count <= maxCharPerLine)
             {
                 result.append("\(str)")
-            }
-            else{
+            } else {
                 var i: Int = maxCharPerLine
-                while i > 0 && i < str.count
-                {
-                    if !letterOrnumber.longCharacterIsMember(str[str.startIndex.advancedBy(i-1)].value) && Character(str[str.startIndex.advancedBy(i)]) == " "
-                    {
+                while i > 0 && i < str.count {
+                    if !letterOrnumber.longCharacterIsMember(str[str.startIndex.advancedBy(i-1)].value) && Character(str[str.startIndex.advancedBy(i)]) == " " {
                         result.append(("\(str)" as NSString).substringToIndex(i))
                         str.removeRange(str.startIndex..<str.startIndex.advancedBy(i+1))
                         i = maxCharPerLine
-                    }
-                    else
-                    {
+                    } else {
                         i--
                     }
                 }
@@ -340,7 +311,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func pressDeleteAllButton(sender: UIButton) {
-        self.lyricsTextView.resignFirstResponder()
+        lyricsTextView.resignFirstResponder()
         let alert = UIAlertController(title: "Warning", message: "Are you sure you want to delete all lyrics?", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
             self.lyricsTextView.text = "Put your lyrics here"
@@ -362,7 +333,7 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
             self.formattedLyrics = true
         }))
         alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+        presentViewController(alert, animated: true, completion: nil)
     }
 
     func array2String(sender: [String]) -> String {
