@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
         // it is important to registerDefaults as soon as possible,
         // because it can change so much of how your app behaves
-        //
+
         var defaultsDictionary: [String : AnyObject] = [:]
         
         // by default we track the user location while in the background
@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         defaultsDictionary[kShowTabsEditorTutorialA] = true
         defaultsDictionary[kShowTabsEditorTutorialB] = true
         defaultsDictionary[kShowLyricsTutorial] = true
+
         NSUserDefaults.standardUserDefaults().registerDefaults(defaultsDictionary)
         AWSS3Manager.createAWSS3FilePath()
         return true
@@ -43,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        
+        print("didFinishLaunchingWithOptions \(CACurrentMediaTime())")
         Fabric.with([Crashlytics.self])
 
         // Universal setting

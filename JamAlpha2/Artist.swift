@@ -32,18 +32,20 @@ class Artist: NSObject, Sortable {
     
     func addAlbum(album:Album){
         self.albums.append(album)
-        self.numberOfTracks += album.numberOfTracks
-        self.totalRunningTime += album.totalRunningTime
+        self.numberOfTracks += album.getNumberOfTracks()
+        self.totalRunningTime += album.getTotalRunningTime()
     }
     
     func getAlbums() -> [Album]{
-        return self.albums
+        return albums.sort({ album1, album2 in
+            return album1.getYearReleased() > album2.getYearReleased()
+        })
     }
     
     func getSongs()-> [MPMediaItem] {
         allSongs = [MPMediaItem]()
-        for album in albums {
-            for song in album.songsIntheAlbum {
+        for album in self.getAlbums() {
+            for song in album.getSongs() {
                 allSongs.append(song)
             }
         }
