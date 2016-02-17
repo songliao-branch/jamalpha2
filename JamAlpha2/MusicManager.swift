@@ -31,8 +31,6 @@ class MusicManager: NSObject {
     var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
     
-     var songs = [SearchResult]()
-    
     //in case mediaItem was changed outside the app when exit to background from Editor screen
     //we save these two so that when we come back we always have the correct item
     var lastPlayingItem: MPMediaItem!
@@ -52,7 +50,6 @@ class MusicManager: NSObject {
     override init() {
         super.init()
         loadLocalSongs()
-        loadDemoSongs()
         loadLocalAlbums()
         loadLocalArtist()
         initializePlayer()
@@ -272,23 +269,8 @@ class MusicManager: NSObject {
     func loadLocalSongs(){
         uniqueSongs = [MPMediaItem]()
         let songCollection = MPMediaQuery.songsQuery()
-        uniqueSongs = songCollection.items!.filter {
-            song in
-            song.playbackDuration > 30
-        }
-        
-        //initialize everything in core data, the song needs to be in the coredata so that when we fetched all cloud tabs for the user it can find the right match immediately
-        for song in uniqueSongs {
-            CoreDataManager.initializeSongToDatabase(song)
-        }
-        
-        APIManager.getTopSongs({
-            songs in
-            self.songs = songs
-            for song in songs {
-                song.findMediaItem()
-            }
-        })
+        uniqueSongs = songCollection.items!
+        loadDemoSongs()
     }
     
     func loadDemoSongs() {
@@ -305,20 +287,24 @@ class MusicManager: NSObject {
     func loadLocalAlbums(){
         uniqueAlbums = [Album]()
         //start new albums fresh
-        var collectionInAlbum = [MPMediaItem]() // a collection of each album's represenstative item
-        let albumQuery = MPMediaQuery()
-        albumQuery.groupingType = MPMediaGrouping.Album
-        for album in albumQuery.collections!{
-            let representativeItem = album.representativeItem!
-            if (representativeItem.getArtist().isEmpty){
+        
+        var albumDictionary = [String: [MPMediaItem]]()//key is artist+album to avoid two artists same album names
+        
+        let keySeparator = "TGI*X"//random thing
+        for song in uniqueSongs {
+            guard let album = song.albumTitle, let artist = song.artist else {
                 continue
             }
-            //there is no song shorter than 30 seconds
-            if representativeItem.playbackDuration < 30 { continue }
-            
-            collectionInAlbum.append(representativeItem)
-            let thisAlbum = Album(theItem: representativeItem)
-            uniqueAlbums.append(thisAlbum)
+            let key = artist+keySeparator+album
+            if albumDictionary[key] == nil {
+               albumDictionary[key] = []
+            }
+            albumDictionary[key]?.append(song)
+        }
+        
+        for (key, value) in albumDictionary {
+            let album = Album(album: key.componentsSeparatedByString(keySeparator)[1], collection: value)
+            uniqueAlbums.append(album)
         }
     }
     
@@ -327,26 +313,18 @@ class MusicManager: NSObject {
         uniqueArtists = [Artist]()
         var artistDictionary = [String: [Album]]() //key is artistName
         for album in uniqueAlbums {
-            if artistDictionary[album.artistName] == nil {
-                artistDictionary[album.artistName] = []
+            if artistDictionary[album.getArtist()] == nil {
+                artistDictionary [album.getArtist()] = []
             }
-            artistDictionary[album.artistName]?.append(album)
+            artistDictionary [album.getArtist()]?.append(album)
         }
-        for artist in artistDictionary {
-            let theArtist = Artist(artist: artist.0)
-            let albumsByYearDescending = artist.1.sort({ album1, album2 in
-                return album1.yearReleased > album2.yearReleased
-            })
-            for album in albumsByYearDescending {
-                theArtist.addAlbum(album)
+        for (artistName, albums) in artistDictionary {
+            let artist = Artist(artist: artistName)
+            for album in albums {
+                artist.addAlbum(album)
             }
-            uniqueArtists.append(theArtist)
+            uniqueArtists.append(artist)
         }
-        //sort by artist name ascending
-        uniqueArtists.sortInPlace({
-            artist1, artist2 in
-            return artist1.artistName < artist2.artistName
-        })
     }
 
     // we manually set the repeat mode to one before going to tabs or lyrics Editor

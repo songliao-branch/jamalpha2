@@ -287,7 +287,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if(completed){
-            
             let lastViewController = pageViewController.viewControllers!.last! as! MusicViewController
             self.currentPageIndex = lastViewController.pageIndex
             changeButtonColorOnScroll()

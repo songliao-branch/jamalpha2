@@ -75,13 +75,13 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         let cell = tableView.dequeueReusableCellWithIdentifier("albumsectioncell") as! AlbumSectionCell
         
         cell.albumImageView.image = nil
+        let songs = theArtist.getAlbums()[section].getSongs()
+        CoreDataManager.initializeSongToDatabase(songs[0])
         
-        CoreDataManager.initializeSongToDatabase(theArtist.getAlbums()[section].songsIntheAlbum[0])
-        
-        if let coverimage = CoreDataManager.getCoverImage(theArtist.getAlbums()[section].songsIntheAlbum[0]){
+        if let coverimage = CoreDataManager.getCoverImage(songs[0]){
             cell.albumImageView.image = coverimage
         }else{
-            if let cover = theArtist.getAlbums()[section].coverImage {
+            if let cover = theArtist.getAlbums()[section].getCoverImage() {
                 
                 let image = cover.imageWithSize(CGSize(width: 85, height: 85))
                 if let img = image {
@@ -89,22 +89,22 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                 } else { //this happens somewhow when songs load too fast
                     //TODO: load something else
                     cell.albumImageView.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: theArtist.getAlbums()[section].songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                    loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
                 }
             }
             
             if(cell.albumImageView.image == nil){
                 cell.albumImageView.image = UIImage(named: "liweng")
-                loadAPISearchImageToCell(cell, song: theArtist.getAlbums()[section].songsIntheAlbum[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+                loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
             }
         }
         
         
         cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
         
-        if theArtist.getAlbums()[section].yearReleased > 1000 { //album year exist
+        if theArtist.getAlbums()[section].getYearReleased() > 1000 { //album year exist
             cell.albumYearLabel.hidden = false
-            cell.albumYearLabel.text = "\(theArtist.getAlbums()[section].yearReleased)"
+            cell.albumYearLabel.text = "\(theArtist.getAlbums()[section].getYearReleased())"
         } else {
             cell.albumYearLabel.hidden = true
         }
@@ -126,13 +126,13 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        return theArtist.getAlbums()[section].numberOfTracks
+        return theArtist.getAlbums()[section].getNumberOfTracks()
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
         
-        let song = theArtist.getAlbums()[indexPath.section].songsIntheAlbum[indexPath.row]
+        let song = theArtist.getAlbums()[indexPath.section].getSongs()[indexPath.row]
         
         cell.titleTrailingConstant.constant = 15
         cell.loudspeakerImage.hidden = true
@@ -175,7 +175,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         var songsInPreviousSections = 0
         if albumIndex > 0 {
             for i in 1...albumIndex {
-               songsInPreviousSections += theArtist.getAlbums()[i-1].numberOfTracks
+               songsInPreviousSections += theArtist.getAlbums()[i-1].getNumberOfTracks()
             }
         }
         let indexToBePlayed = songsInPreviousSections + indexPath.row
@@ -218,7 +218,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
                     }
                 }
             }
-        }else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !artistAllSongs[indexToBePlayed].cloudItem){
+        } else if (NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !artistAllSongs[indexToBePlayed].cloudItem){
             isSeekingPlayerState = false
             if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
                 MusicManager.sharedInstance.player.play()
