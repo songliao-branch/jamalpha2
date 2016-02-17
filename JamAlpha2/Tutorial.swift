@@ -13,20 +13,16 @@ import YouTubePlayer
 extension TabsEditorViewController: YouTubePlayerDelegate {
     func showTutorial(first first: Bool) {
         tutorialImage = UIImageView(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
-        let tutorialIndex = first ? "1" : "2"
-        
+        let tutorialIndex = first ? "1" : "2"        
         let deviceModel = UIDevice.currentDevice().modelName == "iPhone 4s" ? "iPhone4s" :  "iPhone6"
-
         tutorialImage!.image = UIImage(named: "tabs_tutorial_\(tutorialIndex)_\(deviceModel)")
         tutorialImage!.tag = Int(tutorialIndex)!
         tutorialImage!.userInteractionEnabled = true
         self.view.addSubview(tutorialImage!)
-        
         tutorialCloseButton = UIButton(frame: CGRect(x: 15, y: 5, width: 50, height: 50))
         tutorialCloseButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
         tutorialCloseButton.addTarget(self, action: "hideTutorial", forControlEvents: .TouchUpInside)
         self.view.addSubview(tutorialCloseButton)
-        
         watchTutorialButton = UIButton(frame: CGRect(x: trueWidth-127-15, y: trueHeight-40-15, width: 127, height: 40))
         watchTutorialButton.setImage(UIImage(named: "watch_tutorial_button"), forState: .Normal)
         watchTutorialButton.addTarget(self, action: "playTutorial", forControlEvents: .TouchUpInside)
@@ -38,7 +34,6 @@ extension TabsEditorViewController: YouTubePlayerDelegate {
             image.hidden = true
             tutorialCloseButton.hidden = true
             watchTutorialButton.hidden = true
-            
             if image.tag == 1 {
                 NSUserDefaults.standardUserDefaults().setBool(false, forKey: kShowTabsEditorTutorialA)
             } else {

@@ -11,7 +11,6 @@ import FBSDKCoreKit
 import FBSDKLoginKit
 import Alamofire
 import SwiftyJSON
-import CryptoSwift
 import RSKImageCropper
 import AWSS3
 import AWSCore
