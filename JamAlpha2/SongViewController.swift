@@ -17,7 +17,7 @@ let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
 
-class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate, SKStoreProductViewControllerDelegate {
+class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     //MARK: When display lyrics only
     var singleLyricsTableView: UITableView!

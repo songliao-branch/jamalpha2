@@ -125,8 +125,6 @@ class CoreDataManager: NSObject {
     
     //User-related
     class func logoutUser() {
-
-        
         let userResults = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(User), withPredicate: nil, managedObjectContext: moc)
         let lyricsSetResults = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(LyricsSet), withPredicate: nil, managedObjectContext: moc)
         let tabsSetResults = SwiftCoreDataHelper.fetchEntities(NSStringFromClass(TabsSet), withPredicate: nil, managedObjectContext: moc)

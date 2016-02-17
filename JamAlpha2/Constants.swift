@@ -45,3 +45,9 @@ let kIndexOfMyMusicPage = 0
 let kIndexOfSearchPage = 1
 let kIndexOfTopPage = 2
 let kIndexOfUserPage = 3
+
+let APP_STORE_ID = "1066080131"
+
+let FACEBOOK_PAGE_URL = "https://www.facebook.com/twistjam"
+let VERSION_NUMBER = "1.0.0"
+let COPYRIGHTYEAR = "2015-2016"
