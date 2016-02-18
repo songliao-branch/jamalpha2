@@ -203,6 +203,9 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 if searchResults.isEmpty {
                     return cell
                 }
+                if indexPath.row >= searchResults.count {
+                  return cell
+                }
                 cell.titleLabel.text = searchResults[indexPath.row].trackName
                 cell.subtitleLabel.text = searchResults[indexPath.row].artistName
                 
