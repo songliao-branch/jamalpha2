@@ -166,6 +166,7 @@ extension TabsEditorViewController {
                 for i in 0..<self.tuningValueLabels.count {
                     self.tuningValueLabels[i].text = tuningValues[i]
                 }
+                PlayChordsManager.sharedInstance.changeCapo(capoValue)
                 self.capoStepper.value = Double(capoValue)
                 self.capoLabel.text = "Capo: \(capoValue)"
                 self.isPublic = visible

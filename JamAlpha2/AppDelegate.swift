@@ -82,6 +82,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         let currentVC = topViewController(rootViewController())
+        if currentVC.isKindOfClass(UIImagePickerController) {
+          let current = currentVC as! UIImagePickerController
+          current.dismissViewControllerAnimated(false, completion: nil)
+        }
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             if(!currentSongVC.isSongNeedPurchase){

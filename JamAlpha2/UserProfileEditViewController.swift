@@ -15,7 +15,7 @@ class UserProfileEditViewController: UIViewController {
     var viewWidth: CGFloat = CGFloat()
     var viewHeight: CGFloat = CGFloat()
 
-
+    var photoPicker: UIImagePickerController!
     var tableView: UITableView!
     
     var awsS3: AWSS3Manager = AWSS3Manager()
@@ -176,28 +176,26 @@ extension UserProfileEditViewController: UITableViewDelegate, UITableViewDataSou
 extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func pressUploadImageButton() {
-        let refreshAlert = UIAlertController(title: "Add Photo", message: "Camera or Photo Library", preferredStyle: UIAlertControllerStyle.Alert)
-        let photoPicker = UIImagePickerController()
+        let refreshAlert = UIAlertController(title: "Add Photo", message: "Camera or Photo Library", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        photoPicker = UIImagePickerController()
         photoPicker.setEditing(true, animated: true)
-        
         photoPicker.delegate = self
         photoPicker.preferredContentSize = CGSize(width: 54, height: 54)
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
             refreshAlert.addAction(UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-                photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
-                
-                self.presentViewController(photoPicker, animated: true, completion: nil)
+                self.photoPicker.sourceType = UIImagePickerControllerSourceType.Camera
+                self.presentViewController(self.photoPicker, animated: true, completion: nil)
             }))
         }
         refreshAlert.addAction(UIAlertAction(title: "Photo Library", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-            photoPicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
-            photoPicker.navigationBar.tintColor = UIColor.mainPinkColor()
-            self.presentViewController(photoPicker, animated: true, completion: nil)
+            self.photoPicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+            self.photoPicker.navigationBar.tintColor = UIColor.mainPinkColor()
+            self.presentViewController(self.photoPicker, animated: true, completion: nil)
         }))
         refreshAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
             self.dismissViewControllerAnimated(false, completion: nil)
         }))
-        presentViewController(refreshAlert, animated: true, completion: nil)
+        self.presentViewController(refreshAlert, animated: true, completion: nil)
     }
     
     
@@ -205,7 +203,7 @@ extension UserProfileEditViewController: UIImagePickerControllerDelegate, UINavi
         
         cropImage(image)
         
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismissViewControllerAnimated(false, completion: nil)
     }
 
 }
