@@ -66,7 +66,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
   }
   
   func pressLeftButton(sender: UIBarButtonItem) {
-    self.navigationController?.popToRootViewControllerAnimated(false)
+    self.navigationController?.popViewControllerAnimated(false)
   }
   
   func numberOfSectionsInTableView(tableView: UITableView) -> Int {
