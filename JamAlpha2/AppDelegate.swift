@@ -82,10 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         let currentVC = topViewController(rootViewController())
-        if currentVC.isKindOfClass(UIImagePickerController) {
-          let current = currentVC as! UIImagePickerController
-          current.dismissViewControllerAnimated(false, completion: nil)
-        }
+  
         if currentVC.isKindOfClass(SongViewController) {
             let currentSongVC = currentVC as! SongViewController
             if(!currentSongVC.isSongNeedPurchase){
@@ -131,8 +128,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         
         let currentVC = topViewController(rootViewController())
-        
-       
+      
+      if currentVC.isKindOfClass(TabBarController) {
+        if currentVC.childViewControllers[3].childViewControllers.count > 1 {
+          let profileEditView = currentVC.childViewControllers[3].childViewControllers[1]
+          if profileEditView.isKindOfClass(UserProfileEditViewController) {
+            if profileEditView.presentedViewController != nil {
+              let tempView = profileEditView as! UserProfileEditViewController
+              tempView.photoPicker.dismissViewControllerAnimated(false, completion: {
+                completed in
+                application.statusBarHidden = false
+              })
+            }
+          }
+        }
+      }
+      
+      
         if(MusicManager.sharedInstance.player != nil){
             MusicManager.sharedInstance.player.shuffleMode = self.shuffleMode
             MusicManager.sharedInstance.player.repeatMode = repeatMode
