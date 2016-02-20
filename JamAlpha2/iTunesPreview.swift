@@ -149,12 +149,12 @@ extension SongViewController: SKStoreProductViewControllerDelegate {
         UINavigationBar.appearance().tintColor = UIColor.mainPinkColor()
         storeViewController = SKStoreProductViewController()
         storeViewController.delegate = self
-        
-        
-        let parameters = [
-          SKStoreProductParameterITunesItemIdentifier : NSNumber(integer: songNeedPurchase.trackId).stringValue,SKStoreProductParameterAffiliateToken: "100l9DT"
-        ]
       
+        let parameters = [SKStoreProductParameterITunesItemIdentifier :
+          NSNumber(integer: songNeedPurchase.trackId),
+          SKStoreProductParameterAffiliateToken:"1001l9DT"]
+        
+
         storeViewController.loadProductWithParameters(parameters,
             completionBlock: {result, error in
                 if error != nil {

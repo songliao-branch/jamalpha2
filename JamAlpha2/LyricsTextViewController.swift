@@ -130,7 +130,11 @@ class LyricsTextViewController: UIViewController, UIGestureRecognizerDelegate {
             //TODO: add a placeholder album cover
             image = UIImage(named: "liwengbg")
         }
+      if songViewController != nil {
         backgroundImage.image = image != nil ? image : songViewController!.backgroundImage
+      } else {
+         backgroundImage.image = UIImage(named: "liwengbg")
+      }
         let blurredImage: UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         view.addSubview(backgroundImage)
