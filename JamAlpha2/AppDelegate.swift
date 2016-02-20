@@ -130,8 +130,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let currentVC = topViewController(rootViewController())
       
       if currentVC.isKindOfClass(TabBarController) {
-        if currentVC.childViewControllers[3].childViewControllers.count > 1 {
-          let profileEditView = currentVC.childViewControllers[3].childViewControllers[1]
+        if currentVC.childViewControllers[kIndexOfUserPage].childViewControllers.count > 1 {
+          let profileEditView = currentVC.childViewControllers[kIndexOfUserPage].childViewControllers[1]
           if profileEditView.isKindOfClass(UserProfileEditViewController) {
             if profileEditView.presentedViewController != nil {
               let tempView = profileEditView as! UserProfileEditViewController
