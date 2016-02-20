@@ -282,7 +282,11 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
             //TODO: add a placeholder album cover
             image = UIImage(named: "liwengbg")
         }
-        backgroundImage.image = image != nil ? image : songViewController!.backgroundImage 
+        if songViewController != nil {
+          backgroundImage.image = image != nil ? image : songViewController!.backgroundImage
+        } else {
+          backgroundImage.image = UIImage(named: "liwengbg")
+        }
         let blurredImage:UIImage = backgroundImage.image!.applyLightEffect()!
         backgroundImage.image = blurredImage
         self.view.addSubview(backgroundImage)
