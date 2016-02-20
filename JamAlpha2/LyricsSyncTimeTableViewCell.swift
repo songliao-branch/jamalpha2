@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import SWTableViewCell
 
-class LyricsSyncTimeTableViewCell: UITableViewCell {
+class LyricsSyncTimeTableViewCell: SWTableViewCell {
     
     var lyricsSentenceLabel: UILabel = UILabel()
     var timeView: UIView = UIView()
