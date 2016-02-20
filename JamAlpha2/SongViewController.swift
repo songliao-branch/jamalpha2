@@ -38,7 +38,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var soundwaveUrl = "" //url retreieved from backend to download image from S3
     var musicViewController: MusicViewController!
     private var rwLock = pthread_rwlock_t()
-    
+  
+    var isUpdateChord = true
+  
     var searchAPI:SearchAPI! = SearchAPI()
     
     //for nsoperation
@@ -1958,13 +1960,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }else{
             isChangedSpeed = true
         }
-        
-        
-        if(isRemoveProgressBlock){
+      
+        if isRemoveProgressBlock {
             NSNotificationCenter.defaultCenter().removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: player)
         }
         
-        if(isDemoSong){
+        if isDemoSong {
             avPlayer.removeObserver(self, forKeyPath: "rate")
         }
     }
@@ -2011,13 +2012,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     
-    func refreshChordLabel(){
+    func refreshChordLabel() {
         if chords.count < minimumChordCount {
             return
         }
         
         if !isChordShown && !isTabsShown { //return both to avoid unnecessary computations
             return
+        }
+        if !isUpdateChord {
+          return
         }
         
         if activelabels.count > 0 && start+1 < chords.count && (TimeNumber( time: startTime.toDecimalNumer() + timeToDisappear)).isLongerThan(chords[start+1].time)
@@ -2298,15 +2302,20 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
     
     func update(){
+        isUpdateChord = true
         if KGLOBAL_progressBlock == nil {
             return
         }
+      
         if !isPanning && !isSongNeedPurchase {
             let tempPlaytime = isDemoSong ? self.avPlayer.currentTime().seconds : self.player.currentPlaybackTime
             if !self.selectedFromSearchTab && (!isViewDidAppear || startTime.toDecimalNumer() < 2 || startTime.toDecimalNumer() > Float(isDemoSong ? demoItemDuration : nowPlayingItemDuration) - 2 || startTime.toDecimalNumer() - toTime < (1 * speed)) {
                 startTime.addTime(Int(100 / stepPerSecond))
                     if (tempPlaytime.isNaN || tempPlaytime == 0){
-                        startTime.setTime(0)
+                      if isViewDidAppear {
+                        isUpdateChord = false
+                      }
+                      startTime.setTime(0)
                     }
             } else {
                 if !tempPlaytime.isNaN {
@@ -2349,6 +2358,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 }
             }
         }
+      
         if(!self.chordBase.hidden){
             refreshChordLabel()
         }
