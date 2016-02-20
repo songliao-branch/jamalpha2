@@ -11,7 +11,7 @@ import UIKit
 import MediaPlayer
 import StoreKit
 
-extension SongViewController {
+extension SongViewController: SKStoreProductViewControllerDelegate {
     
     func initPurchaseItunsSongItem(){
         setUpPreviewButton()
@@ -149,10 +149,12 @@ extension SongViewController {
         UINavigationBar.appearance().tintColor = UIColor.mainPinkColor()
         storeViewController = SKStoreProductViewController()
         storeViewController.delegate = self
-        
+      
         let parameters = [SKStoreProductParameterITunesItemIdentifier :
           NSNumber(integer: songNeedPurchase.trackId),
           SKStoreProductParameterAffiliateToken:"1001l9DT"]
+        
+
         storeViewController.loadProductWithParameters(parameters,
             completionBlock: {result, error in
                 if error != nil {

@@ -11,7 +11,6 @@ import FBSDKCoreKit
 import FBSDKLoginKit
 import Alamofire
 import SwiftyJSON
-import CryptoSwift
 import RSKImageCropper
 import AWSS3
 import AWSCore
@@ -159,9 +158,8 @@ class MeLoginOrSignupViewController: UIViewController{
     
     func settingsButtonPressed() {
         let settingsVC = self.storyboard?.instantiateViewControllerWithIdentifier("settingsviewcontroller") as! SettingsViewController
-        let navigationController = UINavigationController(rootViewController: settingsVC)
         settingsVC.isFromUnLoginVC = true
-        self.presentViewController(navigationController, animated: false, completion: nil)
+        self.navigationController!.pushViewController(settingsVC, animated: false)    //(navigationController, animated: false, completion: nil)
     }
     
     func setUpViews() {
