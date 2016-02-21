@@ -1058,12 +1058,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             }
             
             self.nowPlayingMediaItem = self.player.nowPlayingItem
-            CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
             // if come back from Music app then this block will be called
             if(nowPlayingMediaItem == nil){
                 self.dismissViewControllerAnimated(true, completion: nil)
                 return
             }
+            CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
             self.nowPlayingItemDuration = nowPlayingMediaItem!.playbackDuration
             self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingMediaItem,completion: {succeed in Void()})
         
