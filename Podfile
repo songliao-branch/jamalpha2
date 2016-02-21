@@ -17,3 +17,5 @@ pod 'Fabric'
 pod 'Crashlytics'
 pod 'Reachability'
 pod 'YouTubePlayer'
+
+pod 'MGSwipeTableCell'

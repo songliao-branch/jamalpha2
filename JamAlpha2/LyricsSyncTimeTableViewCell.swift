@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import MGSwipeTableCell
 
-class LyricsSyncTimeTableViewCell: UITableViewCell {
+class LyricsSyncTimeTableViewCell: MGSwipeTableCell {
     
     var lyricsSentenceLabel: UILabel = UILabel()
     var timeView: UIView = UIView()

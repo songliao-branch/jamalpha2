@@ -9,6 +9,7 @@
 import UIKit
 import MediaPlayer
 import AVFoundation
+import MGSwipeTableCell
 
 var tempLyricsTimeTuple = [(String, NSTimeInterval)]()
 
@@ -573,14 +574,32 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
 }
 
 // table view
-extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
+extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate {
     // MARK: Table view methods
+  func getLeftButton() -> NSMutableArray {
+    let leftButton = NSMutableArray()
+    leftButton.addObject(MGSwipeButton(title: "+0.3", backgroundColor: UIColor.yellowColor()))
+    leftButton.addObject(MGSwipeButton(title: "-0.3", backgroundColor: UIColor.blueColor()))
+    return leftButton
+  }
+  
+  func getRightButton() -> NSMutableArray {
+    let rightButton = NSMutableArray()
+    rightButton.addObject(MGSwipeButton(title: "Delete", backgroundColor: UIColor.redColor()))
+    return rightButton
+  }
+  
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 4 / 31 * viewHeight
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: LyricsSyncTimeTableViewCell = lyricsTableView.dequeueReusableCellWithIdentifier("lyricsSyncCell") as! LyricsSyncTimeTableViewCell
+        cell.delegate = self
+        cell.leftButtons = getLeftButton() as [AnyObject]
+        cell.leftSwipeSettings.transition = .Drag
+        cell.rightButtons = getRightButton() as [AnyObject]
+        cell.rightSwipeSettings.transition = .Drag
         cell.initialTableViewCell(viewWidth, viewHeight: viewHeight)
         cell.backgroundColor = UIColor.clearColor()
         cell.lyricsSentenceLabel.backgroundColor = UIColor.clearColor()
@@ -629,11 +648,45 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
     }
-    
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+  
+  func swipeTableCell(cell: MGSwipeTableCell!, tappedButtonAtIndex index: Int, direction: MGSwipeDirection, fromExpansion: Bool) -> Bool {
+    if let indexPath = lyricsTableView.indexPathForCell(cell) {
+      if direction == .LeftToRight {
+        
+        return false
+      } else if direction == .RightToLeft {
+        if addedLyricsWithTime.timeAdded[indexPath.item] {
+          // handle delete (by removing the data from your array and updating the tableview)
+          var index = indexPath.row
+          while addedLyricsWithTime.timeAdded[index] {
+            addedLyricsWithTime.time[index] = 0
+            addedLyricsWithTime.timeAdded[index] = false
+            index++
+            if index == addedLyricsWithTime.lyrics.count {
+              break
+            }
+          }
+          lyricsTableView.reloadData()
+          if indexPath.row == 0 {
+            if isDemoSong {
+              avPlayer.currentTime = 0
+            } else {
+              musicPlayer.currentPlaybackTime = 0
+            }
+          } else {
+            if isDemoSong {
+              avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item - 1]
+            } else {
+              musicPlayer.currentPlaybackTime = addedLyricsWithTime.time[indexPath.item - 1]
+            }
+          }
+        }
         return true
+      }
     }
-    
+    return true
+  }
+  
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == UITableViewCellEditingStyle.Delete && addedLyricsWithTime.timeAdded[indexPath.item] {
             // handle delete (by removing the data from your array and updating the tableview)
