@@ -649,10 +649,23 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
         
     }
   
+  
   func swipeTableCell(cell: MGSwipeTableCell!, tappedButtonAtIndex index: Int, direction: MGSwipeDirection, fromExpansion: Bool) -> Bool {
     if let indexPath = lyricsTableView.indexPathForCell(cell) {
       if direction == .LeftToRight {
-        
+        if index == 0 {
+          if indexPath.item + 1 < addedLyricsWithTime.count {
+            if addedLyricsWithTime.time[indexPath.item + 1] > addedLyricsWithTime.time[indexPath.item] + 0.3 && addedLyricsWithTime.time[indexPath.item] + 0.3 < self.duration {
+              addedLyricsWithTime.time[indexPath.item] += 0.3
+            }
+          }
+        } else {
+          if indexPath.item - 1 < 0 {
+            if addedLyricsWithTime.time[indexPath.item - 1] < addedLyricsWithTime.time[indexPath.item] - 0.3 && addedLyricsWithTime.time[indexPath.item] - 0.3 >= 0 {
+              addedLyricsWithTime.time[indexPath.item] -= 0.3
+            }
+          }
+        }
         return false
       } else if direction == .RightToLeft {
         if addedLyricsWithTime.timeAdded[indexPath.item] {
