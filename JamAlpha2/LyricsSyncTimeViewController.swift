@@ -625,12 +625,20 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.row == 0 || addedLyricsWithTime.timeAdded[indexPath.item - 1]  {
             if addedLyricsWithTime.timeAdded[indexPath.item] == false {
-                
+              if indexPath.item - 1 >= 0 {
+                if addedLyricsWithTime.time[indexPath.item - 1] < currentTime {
+                  addedLyricsWithTime.time[indexPath.item] = currentTime
+                  addedLyricsWithTime.lyrics[indexPath.item] = lyricsOrganizedArray[indexPath.item]
+                  addedLyricsWithTime.timeAdded[indexPath.item] = true
+                  lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+                }
+              } else if indexPath.item == 0 {
                 addedLyricsWithTime.time[indexPath.item] = currentTime
                 addedLyricsWithTime.lyrics[indexPath.item] = lyricsOrganizedArray[indexPath.item]
                 addedLyricsWithTime.timeAdded[indexPath.item] = true
-                lyricsTableView.reloadData()
-            }else {
+                lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+              }
+            } else {
                 if isDemoSong {
                     avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item]
                     if !avPlayer.playing {
@@ -643,12 +651,17 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
                     }
                 }
             }
-        } else {
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
-        
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)      
     }
   
+  func swipeTableCell(cell: MGSwipeTableCell!, didChangeSwipeState state: MGSwipeState, gestureIsActive: Bool) {
+    if let indexPath = self.lyricsTableView.indexPathForCell(cell) {
+      if state.rawValue == 0 {
+        lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+      }
+    }
+  }
   
   func swipeTableCell(cell: MGSwipeTableCell!, tappedButtonAtIndex index: Int, direction: MGSwipeDirection, fromExpansion: Bool) -> Bool {
     if let indexPath = lyricsTableView.indexPathForCell(cell) {
@@ -660,7 +673,7 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
             }
           }
         } else {
-          if indexPath.item - 1 < 0 {
+          if indexPath.item - 1 > 0 {
             if addedLyricsWithTime.time[indexPath.item - 1] < addedLyricsWithTime.time[indexPath.item] - 0.3 && addedLyricsWithTime.time[indexPath.item] - 0.3 >= 0 {
               addedLyricsWithTime.time[indexPath.item] -= 0.3
             }
@@ -699,36 +712,6 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
     }
     return true
   }
-  
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == UITableViewCellEditingStyle.Delete && addedLyricsWithTime.timeAdded[indexPath.item] {
-            // handle delete (by removing the data from your array and updating the tableview)
-            var index = indexPath.row
-            while addedLyricsWithTime.timeAdded[index] {
-                addedLyricsWithTime.time[index] = 0
-                //addedLyricsWithTime.timeTextStyle[index] = "0.0:0.0"
-                addedLyricsWithTime.timeAdded[index] = false
-                index++
-                if index == addedLyricsWithTime.lyrics.count {
-                    break
-                }
-            }
-            lyricsTableView.reloadData()
-            if indexPath.row == 0 {
-                if isDemoSong {
-                    avPlayer.currentTime = 0
-                } else {
-                    musicPlayer.currentPlaybackTime = 0
-                }
-            } else {
-                if isDemoSong {
-                    avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item - 1]
-                } else {
-                    musicPlayer.currentPlaybackTime = addedLyricsWithTime.time[indexPath.item - 1]
-                }
-            }
-        }
-    }
 }
 
 // top view button reaction function 
