@@ -218,7 +218,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
         if (self.currentLyricsIndex == 0 ){
             self.currentLyricsIndex = -1
         }
-        startTimer()
+      if (!isSongNeedPurchase) {
+          startTimer()
+      }
     }
     
     func showTempScrollLyricsView() {
