@@ -74,7 +74,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             //设置最终位置
             let boundsRect:CGRect = UIScreen.mainScreen().bounds
             let originFrame:CGRect = transitionContext.initialFrameForViewController(fromVc)
-            let finalFrame:CGRect = CGRectOffset(originFrame, 0, boundsRect.size.height-20);
+            let finalFrame:CGRect = CGRectOffset(originFrame, 0, boundsRect.size.height);
             //UIView动画切换
             let interval:NSTimeInterval = self.transitionDuration(transitionContext)
             
