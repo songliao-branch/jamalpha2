@@ -24,11 +24,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         createTransitionAnimation()
         setUpNavigationBar()
         setUpRefreshControl()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
         loadData()
+
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -38,9 +35,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
                 musicVC.musicTable.reloadData()
             }
-
         }
-        
     }
     
     func setUpRefreshControl() {
