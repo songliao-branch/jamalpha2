@@ -578,8 +578,8 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
     // MARK: Table view methods
   func getLeftButton() -> NSMutableArray {
     let leftButton = NSMutableArray()
-    leftButton.addObject(MGSwipeButton(title: "+0.3", backgroundColor: UIColor.yellowColor()))
-    leftButton.addObject(MGSwipeButton(title: "-0.3", backgroundColor: UIColor.blueColor()))
+    leftButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeUp"), backgroundColor: UIColor.clearColor()))
+    leftButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeDown"), backgroundColor: UIColor.clearColor()))
     return leftButton
   }
   
@@ -597,7 +597,7 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
         let cell: LyricsSyncTimeTableViewCell = lyricsTableView.dequeueReusableCellWithIdentifier("lyricsSyncCell") as! LyricsSyncTimeTableViewCell
         cell.delegate = self
         cell.leftButtons = getLeftButton() as [AnyObject]
-        cell.leftSwipeSettings.transition = .Drag
+        cell.leftSwipeSettings.transition = .Rotate3D
         cell.rightButtons = getRightButton() as [AnyObject]
         cell.rightSwipeSettings.transition = .Drag
         cell.initialTableViewCell(viewWidth, viewHeight: viewHeight)
@@ -605,7 +605,6 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
         cell.lyricsSentenceLabel.backgroundColor = UIColor.clearColor()
         cell.lyricsSentenceLabel.textColor = UIColor.whiteColor()
         cell.currentTimeLabel.textColor = UIColor.whiteColor()
-        
         if addedLyricsWithTime.timeAdded[indexPath.item] {
             cell.currentTimeLabel.text = TimeNumber(time: Float(addedLyricsWithTime.time[indexPath.item])).toDisplayString()
             cell.timeView.backgroundColor = UIColor.mainPinkColor()
@@ -668,14 +667,14 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
       if direction == .LeftToRight {
         if index == 0 {
           if indexPath.item + 1 < addedLyricsWithTime.count {
-            if addedLyricsWithTime.time[indexPath.item + 1] > addedLyricsWithTime.time[indexPath.item] + 0.3 && addedLyricsWithTime.time[indexPath.item] + 0.3 < self.duration {
-              addedLyricsWithTime.time[indexPath.item] += 0.3
+            if addedLyricsWithTime.time[indexPath.item + 1] > addedLyricsWithTime.time[indexPath.item] + 0.3 && addedLyricsWithTime.time[indexPath.item] + 0.2 < self.duration {
+              addedLyricsWithTime.time[indexPath.item] += 0.2
             }
           }
         } else {
           if indexPath.item - 1 > 0 {
-            if addedLyricsWithTime.time[indexPath.item - 1] < addedLyricsWithTime.time[indexPath.item] - 0.3 && addedLyricsWithTime.time[indexPath.item] - 0.3 >= 0 {
-              addedLyricsWithTime.time[indexPath.item] -= 0.3
+            if addedLyricsWithTime.time[indexPath.item - 1] < addedLyricsWithTime.time[indexPath.item] - 0.3 && addedLyricsWithTime.time[indexPath.item] - 0.2 >= 0 {
+              addedLyricsWithTime.time[indexPath.item] -= 0.2
             }
           }
         }
