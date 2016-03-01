@@ -3,7 +3,6 @@ import MediaPlayer
 import AVFoundation
 import Alamofire
 import Haneke
-import StoreKit
 import SwiftyJSON
 
 let stepPerSecond: Float = 100   //steps of chord move persecond
@@ -227,8 +226,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     var previewProgress: KDCircularProgress!
     var previewProgressCenterView: UIView!
     var isViewDidAppear:Bool = false
-    
-    var storeViewController:SKStoreProductViewController!
     
     var isDemoSong = false
     
