@@ -8,19 +8,19 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     @IBOutlet weak var tableView: UITableView!
     
     var uniqueSongs = [MPMediaItem]()
-    private var uniqueArtists = [Artist]()
-    private var uniqueAlbums = [Album]()
+    private var uniqueArtists = [SimpleArtist]()
+    private var uniqueAlbums = [SimpleAlbum]()
     
     var demoSongs = [AVPlayerItem]()
     
     private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
-    private var artistsByFirstAlphabet = [(String, [Artist])]()
-    private var albumsByFirstAlphabet = [(String, [Album])]()
+    private var artistsByFirstAlphabet = [(String, [SimpleArtist])]()
+    private var albumsByFirstAlphabet = [(String, [SimpleAlbum])]()
     
     //a single array (sorted by alphabets) used for didSelectRow
     private var songsSorted = [MPMediaItem] ()
-    private var artistsSorted = [Artist]()
-    private var albumsSorted = [Album]()
+    private var artistsSorted = [SimpleArtist]()
+    private var albumsSorted = [SimpleAlbum]()
     
     private var rwLock = pthread_rwlock_t()
     
@@ -65,7 +65,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
     }
     
+    
     func loadAndSortMusic() {
+        let t = CACurrentMediaTime()
+        
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
@@ -79,6 +82,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         songsSorted = getAllSortedItems(songsByFirstAlphabet)
         artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
         albumsSorted = getAllSortedItems(albumsByFirstAlphabet)
+        
+        print("Music list sort took \(CACurrentMediaTime() - t)")
     }
     
     deinit{
@@ -294,87 +299,88 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.coverImage.image = nil
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
-            if theArtist.getSongs().count > 0 {
-                CoreDataManager.initializeSongToDatabase(theArtist.getSongs()[0])
-                if let coverImage = CoreDataManager.getCoverImage(theArtist.getSongs()[0]){
-                    cell.coverImage.image = coverImage
-                }else{
-                    //get the first album cover
-                    for album in theArtist.getAlbums() {
-                        if let cover = album.getCoverImage() {
-                            let image = cover.imageWithSize(CGSize(width: 80, height: 80))
-                            if let img = image {
-                                cell.coverImage.image = img
-                            } else { //this happens somewhow when songs load too fast
-                                //TODO: load something else
-                                cell.coverImage.image = UIImage(named: "liweng")
-                                loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                            }
-                            
-                            break
-                        }
-                    }
-                    
-                    if(cell.coverImage.image == nil){
-                        cell.coverImage.image = UIImage(named: "liweng")
-                        loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                    }
-                }
-            }else{
-                if(cell.coverImage.image == nil){
-                    cell.coverImage.image = UIImage(named: "liweng")
-                }
-            }
+//            if theArtist.getSongs().count > 0 {
+//                CoreDataManager.initializeSongToDatabase(theArtist.getSongs()[0])
+//                if let coverImage = CoreDataManager.getCoverImage(theArtist.getSongs()[0]){
+//                    cell.coverImage.image = coverImage
+//                }else{
+//                    //get the first album cover
+//                    for album in theArtist.getAlbums() {
+//                        if let cover = album.getCoverImage() {
+//                            let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+//                            if let img = image {
+//                                cell.coverImage.image = img
+//                            } else { //this happens somewhow when songs load too fast
+//                                //TODO: load something else
+//                                cell.coverImage.image = UIImage(named: "liweng")
+//                                loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+//                            }
+//                            
+//                            break
+//                        }
+//                    }
+//                    
+//                    if(cell.coverImage.image == nil){
+//                        cell.coverImage.image = UIImage(named: "liweng")
+//                        loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+//                    }
+//                }
+//            }else{
+//                if(cell.coverImage.image == nil){
+//                    cell.coverImage.image = UIImage(named: "liweng")
+//                }
+//            }
             
             
             cell.loudspeakerImage.hidden = true
-
-            let numberOfAlbums = theArtist.getAlbums().count
-            let albumPrompt = "album".addPluralSubscript(numberOfAlbums)
+//
+//            let numberOfAlbums = theArtist.getAlbums().count
+//            let albumPrompt = "album".addPluralSubscript(numberOfAlbums)
+//            
+//            let numberOfTracks = theArtist.numberOfTracks
+//            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
             
-            let numberOfTracks = theArtist.numberOfTracks
-            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
-            cell.mainTitle.text = theArtist.artistName
-            cell.subtitle.text = "\(numberOfAlbums) \(albumPrompt), \(numberOfTracks) \(trackPrompt)"
+            cell.mainTitle.text = theArtist.artist
+          //  cell.subtitle.text = "\(numberOfAlbums) \(albumPrompt), \(numberOfTracks) \(trackPrompt)"
             
         } else if pageIndex == 2 {
 
             let theAlbum = albumsByFirstAlphabet[indexPath.section].1[indexPath.row]
-            cell.imageWidth.constant = 80
-            cell.imageHeight.constant = 80
-            
-            let songs = theAlbum.getSongs()
-            CoreDataManager.initializeSongToDatabase(songs[0])
-            
-            if let coverimage = CoreDataManager.getCoverImage(songs[0]){
-                cell.coverImage.image = coverimage
-            }else{
-                if let cover = theAlbum.getCoverImage() {
-                    
-                    cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
-                    let image = cover.imageWithSize(CGSize(width: 80, height: 80))
-                    if let img = image {
-                        cell.coverImage.image = img
-                    } else { //this happens somewhow when songs load too fast
-                        //TODO: load something else
-                        cell.coverImage.image = UIImage(named: "liweng")
-                        loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                    }
-                }
-                
-                if(cell.coverImage.image == nil){
-                    cell.coverImage.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                }
-            }
-            
-            cell.loudspeakerImage.hidden = true
-            
-            let numberOfTracks = theAlbum.getNumberOfTracks()
-            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
-            
+//            cell.imageWidth.constant = 80
+//            cell.imageHeight.constant = 80
+//            
+//            let songs = theAlbum.getSongs()
+//            CoreDataManager.initializeSongToDatabase(songs[0])
+//            
+//            if let coverimage = CoreDataManager.getCoverImage(songs[0]){
+//                cell.coverImage.image = coverimage
+//            }else{
+//                if let cover = theAlbum.getCoverImage() {
+//                    
+//                    cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
+//                    let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+//                    if let img = image {
+//                        cell.coverImage.image = img
+//                    } else { //this happens somewhow when songs load too fast
+//                        //TODO: load something else
+//                        cell.coverImage.image = UIImage(named: "liweng")
+//                        loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+//                    }
+//                }
+//                
+//                if(cell.coverImage.image == nil){
+//                    cell.coverImage.image = UIImage(named: "liweng")
+//                    loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
+//                }
+//            }
+//            
+//            cell.loudspeakerImage.hidden = true
+//            
+//            let numberOfTracks = theAlbum.getNumberOfTracks()
+//            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
+//            
             cell.mainTitle.text = theAlbum.albumTitle
-            cell.subtitle.text = "\(numberOfTracks) \(trackPrompt)"
+           // cell.subtitle.text = "\(numberOfTracks) \(trackPrompt)"
         }
         
         if (!tableView.dragging && !tableView.decelerating) {
@@ -506,7 +512,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
-            artistVC.theArtist = artistsSorted[indexToBePlayed]
+            //artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
             
@@ -517,7 +523,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.musicViewController = self
-            albumVC.theAlbum = albumsSorted[indexToBePlayed]
+           // albumVC.theAlbum = albumsSorted[indexToBePlayed]
             
             self.showViewController(albumVC, sender: self)
         }
@@ -527,30 +533,30 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     // MARK: called from SongViewController action sheets
     func goToArtist(theArtist: String) {
         self.view.alpha = 1
-        for artist in MusicManager.sharedInstance.uniqueArtists {
-            if theArtist == artist.artistName {
-                let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
-                artistVC.musicViewController = self
-                artistVC.theArtist = artist
-                self.navigationController?.popToRootViewControllerAnimated(false)
-                self.showViewController(artistVC, sender: self)
-                break
-            }
-        }
+//        for artist in MusicManager.sharedInstance.uniqueArtists {
+//            if theArtist == artist.artistName {
+//                let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
+//                artistVC.musicViewController = self
+//                artistVC.theArtist = artist
+//                self.navigationController?.popToRootViewControllerAnimated(false)
+//                self.showViewController(artistVC, sender: self)
+//                break
+//            }
+//        }
     }
     
     func goToAlbum(theAlbum: String) {
         self.view.alpha = 1
-        for album in MusicManager.sharedInstance.uniqueAlbums {
-            if theAlbum == album.albumTitle {
-                let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
-                albumVC.musicViewController = self
-                albumVC.theAlbum = album
-                self.navigationController?.popToRootViewControllerAnimated(false)
-                self.showViewController(albumVC, sender: self)
-                break
-            }
-        }
+//        for album in MusicManager.sharedInstance.uniqueAlbums {
+//            if theAlbum == album.albumTitle {
+//                let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
+//                albumVC.musicViewController = self
+//                albumVC.theAlbum = album
+//                self.navigationController?.popToRootViewControllerAnimated(false)
+//                self.showViewController(albumVC, sender: self)
+//                break
+//            }
+//        }
     }
     
     // MARK: functions using generics to sort the array into sections sorted by first alphabet

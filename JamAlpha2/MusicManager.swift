@@ -25,8 +25,8 @@ class MusicManager: NSObject {
     var lastSelectedIndex = -1
     
     var uniqueSongs : [MPMediaItem]!
-    var uniqueAlbums = [Album]()
-    var uniqueArtists = [Artist]()
+    var uniqueAlbums = [SimpleAlbum]()
+    var uniqueArtists = [SimpleArtist]()
     
     var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
@@ -49,9 +49,11 @@ class MusicManager: NSObject {
     
     override init() {
         super.init()
+        let t = CACurrentMediaTime()
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
+        print("load took: \(CACurrentMediaTime() - t)")
         initializePlayer()
         addNotification()
     }
@@ -285,48 +287,67 @@ class MusicManager: NSObject {
     }
     
     func loadLocalAlbums(){
-        uniqueAlbums = [Album]()
-        //start new albums fresh
+        uniqueAlbums = [SimpleAlbum]()
+
+        let albumQuery = MPMediaQuery.albumsQuery()
+        let allAlbumsCollections = albumQuery.collections
         
-        var albumDictionary = [String: [MPMediaItem]]()//key is artist+album to avoid two artists same album names
-        
-        let keySeparator = "TGI*X"//random thing
-        for song in uniqueSongs {
-            guard let album = song.albumTitle, let artist = song.artist else {
-                continue
-            }
-            let key = artist+keySeparator+album
-            if albumDictionary[key] == nil {
-               albumDictionary[key] = []
-            }
-            albumDictionary[key]?.append(song)
-        }
-        
-        for (key, value) in albumDictionary {
-            let album = Album(album: key.componentsSeparatedByString(keySeparator)[1], collection: value)
+        for collection in allAlbumsCollections! {
+            let album = SimpleAlbum(item: collection.representativeItem!)
             uniqueAlbums.append(album)
         }
+        
+//        //start new albums fresh
+//        var albumDictionary = [String: [MPMediaItem]]()//key is artist+album to avoid two artists same album names
+//        
+//        let keySeparator = "TGI*X"//random thing
+//        for song in uniqueSongs {
+//            guard let album = song.albumTitle, let artist = song.artist else {
+//                continue
+//            }
+//            let key = artist+keySeparator+album
+//            if albumDictionary[key] == nil {
+//               albumDictionary[key] = []
+//            }
+//            albumDictionary[key]?.append(song)
+//        }
+//        
+//        for (key, value) in albumDictionary {
+//            let album = Album(album: key.componentsSeparatedByString(keySeparator)[1], collection: value)
+//            uniqueAlbums.append(album)
+//        }
     }
     
     //load artist must be called after getting all albums
     func loadLocalArtist() {
-        uniqueArtists = [Artist]()
-        //
-        var artistDictionary = [String: [Album]]() //key is artistName
-        for album in uniqueAlbums {
-            if artistDictionary[album.getArtist()] == nil {
-                artistDictionary [album.getArtist()] = []
-            }
-            artistDictionary [album.getArtist()]?.append(album)
-        }
+        uniqueArtists = [SimpleArtist]()
+    
+        let artistQuery = MPMediaQuery.artistsQuery()
+        let allAlbumsCollections = artistQuery.collections
         
-        for (artistName, albums) in artistDictionary {
-            let artist = Artist(artist: artistName)
-            for album in albums {
-                artist.addAlbum(album)
-            }
+        for collection in allAlbumsCollections! {
+            let artist = SimpleArtist(item: collection.representativeItem!)
             uniqueArtists.append(artist)
         }
+        
+        
+//        
+//        //
+//        var artistDictionary = [String: [Album]]() //key is artistName
+//        for album in uniqueAlbums {
+//            if artistDictionary[album.getArtist()] == nil {
+//                artistDictionary [album.getArtist()] = []
+//            }
+//            artistDictionary [album.getArtist()]?.append(album)
+//        }
+//        
+//        for (artistName, albums) in artistDictionary {
+//            let artist = Artist(artist: artistName)
+//            for album in albums {
+//                artist.addAlbum(album)
+//            }
+//            uniqueArtists.append(artist)
+//        }
     }
 
     // we manually set the repeat mode to one before going to tabs or lyrics Editor

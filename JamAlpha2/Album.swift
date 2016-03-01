@@ -2,6 +2,41 @@
 import Foundation
 import MediaPlayer
 
+class SimpleAlbum: NSObject, Sortable {
+    
+    var albumTitle = ""
+    
+    var representativeItem: MPMediaItem
+    
+    init(item: MPMediaItem) {
+        self.representativeItem = item
+        if let album = representativeItem.albumTitle {
+            self.albumTitle = album
+        }
+    }
+    
+    func getSortableName() -> String {
+        return albumTitle
+    }
+}
+
+class SimpleArtist: NSObject, Sortable {
+    var artist = ""
+    var representativeItem: MPMediaItem
+    
+    init(item: MPMediaItem) {
+    
+        self.representativeItem = item
+        
+        if let artist = representativeItem.artist {
+            self.artist = artist
+        }
+    }
+    
+    func getSortableName() -> String {
+        return artist
+    }
+}
 
 
 class Album: NSObject, Sortable {
