@@ -16,8 +16,8 @@ let kmovingMainNoteSliderHeight:CGFloat = 26
 class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollViewDelegate {
     
     var isTapedOnButton: Bool = false
-    
-    
+    let maxTuningConstant = [5, 5, 5, 5, 5, 5]
+    let minTuningConstant = [-5, -5, -5, -5, -5, -5]
     var isCompleteStringViewScroll = false
     var originaloffset:CGFloat = -1
     var baseNoteLocation:CGFloat = -1
@@ -163,10 +163,8 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     var isPlaying:Bool = false
     
     // count down section
-    
     var countdownTimer = NSTimer()
     var countDownStartSecond = 3 //will countdown from 3 to 1
-
     var countdownView: CountdownView!
     
     // key is the stepper value ranging from 0.7 to 1.3 in step of 0.1
@@ -453,6 +451,8 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             
             //initialize tuning with our custom class Tuning
             let originalTuning = Tuning(originalNote: defaultTunings[i])
+            originalTuning.maxTuningState = maxTuningConstant[i]
+            originalTuning.minTuningState = minTuningConstant[i]
             tunings.append(originalTuning)
             
             let tuningValueLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
@@ -509,23 +509,27 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     
     func stepUpPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
-        if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: true) {
-            currentNote.stepUp()
-            tuningValueLabels[button.tag].text = currentNote.toDisplayString()
-            let center = tuningValueLabels[button.tag].center
-            tuningValueLabels[button.tag].sizeToFit()
-            tuningValueLabels[button.tag].center = center
+        if currentNote.tuningStateIncrements + 1 <= currentNote.maxTuningState {
+            if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: true) {
+                currentNote.stepUp()
+                tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+                let center = tuningValueLabels[button.tag].center
+                tuningValueLabels[button.tag].sizeToFit()
+                tuningValueLabels[button.tag].center = center
+            }
         }
     }
     
     func stepDownPressed(button: UIButton) {
         let currentNote = tunings[button.tag]
-        if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: false) {
-            currentNote.stepDown()
-            tuningValueLabels[button.tag].text = currentNote.toDisplayString()
-            let center = tuningValueLabels[button.tag].center
-            tuningValueLabels[button.tag].sizeToFit()
-             tuningValueLabels[button.tag].center = center
+        if currentNote.tuningStateIncrements - 1 >= currentNote.minTuningState {
+            if PlayChordsManager.sharedInstance.tuningString(button.tag + 1, up: false) {
+                currentNote.stepDown()
+                tuningValueLabels[button.tag].text = currentNote.toDisplayString()
+                let center = tuningValueLabels[button.tag].center
+                tuningValueLabels[button.tag].sizeToFit()
+                tuningValueLabels[button.tag].center = center
+            }
         }
     }
     

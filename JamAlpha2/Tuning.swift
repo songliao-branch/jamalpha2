@@ -12,7 +12,10 @@ class Tuning: NSObject {
     
     let upArrow = "\u{2191}"
     let downArrow = "\u{2193}"
-    
+    static let standardMidi = [7, 2, 10, 5, 0, 7]
+  
+    var maxTuningState: Int!
+    var minTuningState: Int!
     var note: String!
     var tuningStateIncrements = 0 // 0 if equal to original note, negative means below original note,
     // positive means bigger than orignal note
@@ -20,7 +23,7 @@ class Tuning: NSObject {
     //MARK: to find tuning in half step down or half step up, used in TuningView
     
     //default is sharps
-    let notes = ["A","A#","B","C","C#","D","D#","E","F","F#","G","G#"]
+    static let notes = ["A","A#","B","C","C#","D","D#","E","F","F#","G","G#"]
     
     init(originalNote: String){
         self.note = originalNote
@@ -35,12 +38,12 @@ class Tuning: NSObject {
     //half step up
     func stepUp() {
         self.tuningStateIncrements++
-        for i in 0..<notes.count {
-            if self.note == notes[i] {
-                if i == notes.count-1 {
-                    self.note = notes[0]
+        for i in 0..<Tuning.notes.count {
+            if self.note == Tuning.notes[i] {
+                if i == Tuning.notes.count - 1 {
+                    self.note = Tuning.notes[0]
                 } else {
-                    self.note = notes[i+1]
+                    self.note = Tuning.notes[i + 1]
                 }
                 break
             }
@@ -50,12 +53,12 @@ class Tuning: NSObject {
     //half step down
     func stepDown() {
         self.tuningStateIncrements--
-        for i in 0..<notes.count {
-            if self.note == notes[i] {
+        for i in 0..<Tuning.notes.count {
+            if self.note == Tuning.notes[i] {
                 if i == 0 {
-                    self.note = notes[notes.count-1]
+                    self.note = Tuning.notes[Tuning.notes.count - 1]
                 } else {
-                    self.note = notes[i-1]
+                    self.note = Tuning.notes[i - 1]
                 }
                 break
             }
@@ -76,6 +79,66 @@ class Tuning: NSObject {
     //convert from format of 'E-A-B-D-A-E' to ['E', 'A', 'B', 'D', 'A', 'E']
     class func toArray(value: String) -> [String] {
         return value.characters.split{$0 == "-"}.map(String.init)
+    }
+  
+    class func arrayToMidiDiff(max: [Int], min: [Int], sender: [String]) -> [Int] {
+      var midiValue = [0, 0, 0, 0, 0, 0]
+      for i in 0..<6 {
+        let char = sender[i].characters
+        if char.count == 1 {
+          midiValue[i] = 0
+          break
+        } else if char.count == 2 {
+          let index = sender[i].startIndex.advancedBy(1)
+          let endIndex = sender[i].endIndex.advancedBy(0)
+          let tempChar = sender[i][Range(start: index, end: endIndex)]
+          if char.first == "\u{2191}" {
+            for var j = Tuning.standardMidi[i]; j <= Tuning.standardMidi[i] + max[i]; j++ {
+              let index = j % 12
+              if tempChar == Tuning.notes[index] {
+                midiValue[i] = j - Tuning.standardMidi[i]
+                break
+              }
+            }
+          } else if char.first == "\u{2193}" {
+            for var j = Tuning.standardMidi[i]; j >= Tuning.standardMidi[i] + min[i]; j-- {
+              var index = j % 12
+              if index < 0 {
+                index = index + 11
+              }
+              if tempChar == Tuning.notes[index] {
+                midiValue[i] = j - Tuning.standardMidi[i]
+                break
+              }
+            }
+          }
+        } else if char.count == 3 {
+          let index = sender[i].startIndex.advancedBy(1)
+          let endIndex = sender[i].endIndex.advancedBy(0)
+          let tempChar = sender[i][Range(start: index, end: endIndex)]
+          if char.first == "\u{2191}" {
+            for var j = Tuning.standardMidi[i]; j <= Tuning.standardMidi[i] + max[i]; j++ {
+              let index = j % 12
+              if tempChar == Tuning.notes[index] {
+                midiValue[i] = j - Tuning.standardMidi[i]
+                break
+              }
+            }
+          } else if char.first == "\u{2193}" {
+            for var j = Tuning.standardMidi[i]; j >= Tuning.standardMidi[i] + min[i]; j-- {
+              var index = j % 12
+              if index < 0 {
+                index = index + 11
+              }
+              if "\(tempChar)" == Tuning.notes[index] {
+                midiValue[i] = j - Tuning.standardMidi[i]
+                break
+              }
+            }
+          }
+        }
+      }
+      return midiValue
     }
 }
  
