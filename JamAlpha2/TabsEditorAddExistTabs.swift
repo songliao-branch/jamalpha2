@@ -164,9 +164,7 @@ extension TabsEditorViewController {
                 self.addTabsFromCoreDataToMusicControlView(complete)
                 let tuningValues = Tuning.toArray(tuning)
                 let midiValues = Tuning.arrayToMidiDiff(self.maxTuningConstant, min: self.minTuningConstant, sender: tuningValues)
-                for i in 0..<PlayChordsManager.sharedInstance.fret0Midi.count {
-                  PlayChordsManager.sharedInstance.fret0Midi[i] += midiValues[i]
-                }
+                PlayChordsManager.sharedInstance.changeTuning(midiValues)
                 for i in 0..<self.tuningValueLabels.count {
                     self.tuningValueLabels[i].text = tuningValues[i]
                 }
