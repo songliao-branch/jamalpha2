@@ -239,7 +239,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
-        
         if(!isSongNeedPurchase){
             if (KAVplayer != nil && KAVplayer.rate > 0){
                 KAVplayer.rate = 0
@@ -329,7 +328,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
+        KGLOBAL_init_queue.suspended = true
         // viewWillAppear is called everytime the view is dragged down
         // to prevent resumeSong() everytime, we make sure resumeSong()
         // is ONLY called when the view is fully dragged down or disappeared
@@ -1119,7 +1118,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         }
                     }
                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-                    KGLOBAL_init_queue.suspended = false
                 } else {
                     self.generateSoundWave(nowPlayingMediaItem!)
                 }
@@ -1208,7 +1206,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                     }
                 }
             KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-            KGLOBAL_init_queue.suspended = false
+            
         } else {
             self.generateSoundWave(demoItem!)
         }
@@ -1402,7 +1400,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         if(!isSongNeedPurchase){
             if let soundWaveData = CoreDataManager.getSongWaveFormImage(isDemoSong ? demoItem : nowPlayingMediaItem ) {
                 KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-                KGLOBAL_init_queue.suspended = false
+                
                 isGenerated = true
                 self.soundwaveUrl = ""
                 
@@ -1414,7 +1412,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         } else{
             if let soundWaveData = CoreDataManager.getSongWaveFormImage(songNeedPurchase) {
                 KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-                KGLOBAL_init_queue.suspended = false
+                
                 isGenerated = true
                 self.soundwaveUrl = ""
             }else{
@@ -1440,7 +1438,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
             op = KGLOBAL_operationCache[keyString]
             if(op == nil){
-                KGLOBAL_init_queue.suspended = true
                 KGLOBAL_queue.suspended = false
                 let tempNowPlayingItem = nowPlayingItem
                 let tempProgressBlock = KGLOBAL_progressBlock
@@ -1462,7 +1459,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                       KGLOBAL_progressBlock.setWaveFormFromData(data)
                                       CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
                                     }
-                                    KGLOBAL_init_queue.suspended = false
+                                    
                                     self.isGenerated = true
                                     self.soundwaveUrl = ""
                                     return
@@ -1471,7 +1468,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                         
                     }else{
                         guard let assetURL = nowPlayingItem.getURL() else {
-                            KGLOBAL_init_queue.suspended = false
+                            
                             self.setupDefaultProgressBar()
                             if (KGLOBAL_operationCache[tempkeyString] != nil){
                                 KGLOBAL_operationCache[tempkeyString]!.cancel()
@@ -1515,7 +1512,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                             KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                         }
                                         if(!KGLOBAL_queue.suspended){
-                                            KGLOBAL_init_queue.suspended = false
+                                            
                                         }
                                     }
                                 }else{
@@ -1528,7 +1525,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                             KGLOBAL_progressBlock.setWaveFormFromData(data!)
                                         }
                                         if(!KGLOBAL_queue.suspended) {
-                                            KGLOBAL_init_queue.suspended = false
+                                            
                                         }
                                     }
                                 }
@@ -1900,9 +1897,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     //stop timer,stop refreshing UIs after view is completely gone of sight
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
+      
         stopTimer()
         viewDidFullyDisappear = true
-        
+        KGLOBAL_init_queue.suspended = false
+      
         if(isRemoveProgressBlock){
             if(KGLOBAL_progressBlock != nil ){
                 KGLOBAL_progressBlock.removeFromSuperview()
@@ -2317,7 +2316,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                                 KGLOBAL_progressBlock.frame = CGRect(x: KGLOBAL_progressBlock.frame.origin.x, y: KGLOBAL_progressBlock.frame.origin.y, width: progressBarWidth, height: soundwaveHeight)
                                 if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem) {
                                     KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
-                                    KGLOBAL_init_queue.suspended = false
+                                    
                                     isGenerated = true
                                     self.soundwaveUrl = ""
                                 }else{
