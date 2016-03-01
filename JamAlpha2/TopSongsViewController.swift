@@ -41,7 +41,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     func setUpRefreshControl() {
         topSongsTable?.addPullToRefresh({ [weak self] in
             // some code
-            sleep(1)
             self!.loadData()
             
             })
@@ -72,7 +71,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
         self.navigationController?.navigationBar.translucent = false
-        
         let titleImageView: UIImageView = UIImageView()
         titleImageView.frame = CGRectMake(0, 0, self.view.frame.width/2, 22)
         titleImageView.image = UIImage(named: "topSongsText")
@@ -91,12 +89,10 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         cell.numberLabel.text = "\(indexPath.row + 1)"
         cell.titleLabel.text = song.trackName
         cell.subtitleLabel.text = song.artistName
-        
         cell.speaker.hidden = true
         if let item = song.mediaItem {
             cell.searchIcon.hidden = true
             cell.titleRightConstraint.constant = 15
-            
             if let nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem where nowPlayingItem == item {
                 cell.speaker.hidden = false
             }
@@ -104,7 +100,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             cell.searchIcon.hidden = false
             cell.titleRightConstraint.constant = 55
         }
-        
         cell.albumImage.image = nil
         let url = NSURL(string: song.artworkUrl100)!
         let fetcher = NetworkFetcher<UIImage>(URL: url)
@@ -112,8 +107,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         let cache = Shared.imageCache
         cache.fetch(fetcher: fetcher).onSuccess { image in
             cell.albumImage.image = image
-        }        
-        
+        }
         return cell
     }
     

@@ -32,7 +32,7 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
     }
     
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
-        return 0.5
+        return 0.25
     }
     
     //var rectStatusBarig
@@ -107,12 +107,11 @@ class CustomTransitionAnimation: NSObject,UIViewControllerAnimatedTransitioning,
             //用updateInteractiveTransition通知更新的百分比
             self.interactiveTransition.updateInteractiveTransition(percent)
             break;
-        case UIGestureRecognizerState.Ended:
-            //case UIGestureRecognizerState.Cancelled:
+        case UIGestureRecognizerState.Ended, UIGestureRecognizerState.Cancelled:
             //设置交互标识为false
             self.interacting = false
             //判断是否完成交互
-            if tranlation.y > 200 && gesture.state != UIGestureRecognizerState.Cancelled {
+            if tranlation.y > 180 && gesture.state != UIGestureRecognizerState.Cancelled {
                 self.interactiveTransition.finishInteractiveTransition()
                 presentingVC.dismissViewControllerAnimated(true, completion: nil)
             }else{
