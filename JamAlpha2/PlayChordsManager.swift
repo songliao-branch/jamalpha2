@@ -167,13 +167,13 @@ class PlayChordsManager: NSObject {
     
     func changeCapo(sender: Int) {
         for i in 0..<fret0Midi.count {
-            fret0Midi[i] = standardFret0Midi[i] + sender
+            fret0Midi[i] = fret0Midi[i] + sender
         }
     }
   
     func changeTuning(sender: [Int]) {
       for i in 0..<fret0Midi.count {
-        PlayChordsManager.sharedInstance.fret0Midi[i] += sender[i]
+        fret0Midi[i] = standardFret0Midi[i] + sender[i]
       }
     }
 }
