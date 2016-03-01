@@ -154,7 +154,6 @@ extension TabsEditorViewController {
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
-        myCapoValue = capoValue
         let visible: Bool = tabs.4
         
         //let visible
@@ -165,12 +164,14 @@ extension TabsEditorViewController {
                 self.addTabsFromCoreDataToMusicControlView(complete)
                 let tuningValues = Tuning.toArray(tuning)
                 let midiValues = Tuning.arrayToMidiDiff(self.maxTuningConstant, min: self.minTuningConstant, sender: tuningValues)
+                let notesArray = Tuning.toArrayWithoutArrow(tuningValues)
                 for i in 0..<self.tuningValueLabels.count {
                     self.tuningValueLabels[i].text = tuningValues[i]
+                    self.tunings[i].tuningStateIncrements = midiValues[i]
+                    self.tunings[i].note = notesArray[i]
                 }
                 PlayChordsManager.sharedInstance.changeCapo(capoValue)
                 PlayChordsManager.sharedInstance.changeTuning(midiValues)
-                self.capoStepper.value = Double(capoValue)
                 self.capoLabel.text = "Capo: \(capoValue)"
                 self.isPublic = visible
                 if self.isPublic {

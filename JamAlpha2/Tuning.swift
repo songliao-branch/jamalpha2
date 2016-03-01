@@ -45,7 +45,6 @@ class Tuning: NSObject {
                 } else {
                     self.note = Tuning.notes[i + 1]
                 }
-              print(self.note)
                 break
             }
         }
@@ -61,7 +60,6 @@ class Tuning: NSObject {
                 } else {
                     self.note = Tuning.notes[i - 1]
                 }
-              print(self.note)
                 break
             }
         }
@@ -83,6 +81,22 @@ class Tuning: NSObject {
         return value.characters.split{$0 == "-"}.map(String.init)
     }
   
+  class func toArrayWithoutArrow(sender: [String]) -> [String] {
+    var midiValue = ["", "", "", "", "", ""]
+    for i in 0..<6 {
+      let char = sender[i].characters
+      if char.count == 1 {
+        midiValue[i] = sender[i]
+      } else {
+        let index = sender[i].startIndex.advancedBy(1)
+        let endIndex = sender[i].endIndex.advancedBy(0)
+        let tempChar = sender[i][Range(start: index, end: endIndex)]
+        midiValue[i] = tempChar
+      }
+    }
+    return midiValue
+  }
+  
     class func arrayToMidiDiff(max: [Int], min: [Int], sender: [String]) -> [Int] {
       var midiValue = [0, 0, 0, 0, 0, 0]
       for i in 0..<6 {
@@ -90,7 +104,7 @@ class Tuning: NSObject {
         if char.count == 1 {
           midiValue[i] = 0
           break
-        } else if char.count == 2 {
+        } else {
           let index = sender[i].startIndex.advancedBy(1)
           let endIndex = sender[i].endIndex.advancedBy(0)
           let tempChar = sender[i][Range(start: index, end: endIndex)]
@@ -109,30 +123,6 @@ class Tuning: NSObject {
                 index = index + 11
               }
               if tempChar == Tuning.notes[index] {
-                midiValue[i] = j - Tuning.standardMidi[i]
-                break
-              }
-            }
-          }
-        } else if char.count == 3 {
-          let index = sender[i].startIndex.advancedBy(1)
-          let endIndex = sender[i].endIndex.advancedBy(0)
-          let tempChar = sender[i][Range(start: index, end: endIndex)]
-          if char.first == "\u{2191}" {
-            for var j = Tuning.standardMidi[i]; j <= Tuning.standardMidi[i] + max[i]; j++ {
-              let index = j % 12
-              if tempChar == Tuning.notes[index] {
-                midiValue[i] = j - Tuning.standardMidi[i]
-                break
-              }
-            }
-          } else if char.first == "\u{2193}" {
-            for var j = Tuning.standardMidi[i]; j >= Tuning.standardMidi[i] + min[i]; j-- {
-              var index = j % 12
-              if index < 0 {
-                index = index + 11
-              }
-              if "\(tempChar)" == Tuning.notes[index] {
                 midiValue[i] = j - Tuning.standardMidi[i]
                 break
               }

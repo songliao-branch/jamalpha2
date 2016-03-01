@@ -722,7 +722,6 @@ extension TabsEditorViewController {
         UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseInOut, animations: {
             if(isLeft){
                 self.backButton.imageView!.transform = leftWobble
-                self.backButton.imageView
             }else{
                 self.backButton.imageView!.transform = rightWobble
             }

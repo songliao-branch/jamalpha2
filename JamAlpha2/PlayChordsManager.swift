@@ -45,13 +45,13 @@ class PlayChordsManager: NSObject {
     func tuningString(stringIndex: Int, up: Bool) -> Bool {
         if up {
             let temp = fret0Midi[stringIndex - 1] + 1
-            if temp <= standardFret0Midi[stringIndex - 1] + 4 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
+            if temp <= standardFret0Midi[stringIndex - 1] + 5 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
                 fret0Midi[stringIndex - 1]++
                 return true
             }
         } else {
             let temp = fret0Midi[stringIndex - 1] - 1
-            if  temp <= standardFret0Midi[stringIndex - 1] + 4 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
+            if  temp <= standardFret0Midi[stringIndex - 1] + 5 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
                 fret0Midi[stringIndex - 1]--
                 return true
             }
