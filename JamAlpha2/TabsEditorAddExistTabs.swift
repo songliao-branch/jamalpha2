@@ -154,6 +154,7 @@ extension TabsEditorViewController {
         let chord: [Chord] = tabs.0
         let tuning: String = tabs.1
         let capoValue: Int = tabs.2
+        myCapoValue = capoValue
         let visible: Bool = tabs.4
         
         //let visible

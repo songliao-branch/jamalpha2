@@ -14,7 +14,7 @@ import YouTubePlayer
 let kmovingMainNoteSliderHeight:CGFloat = 26
 
 class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollViewDelegate {
-    
+    var myCapoValue = 0
     var isTapedOnButton: Bool = false
     let maxTuningConstant = [5, 5, 5, 5, 5, 5]
     let minTuningConstant = [-5, -5, -5, -5, -5, -5]
@@ -451,8 +451,10 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             
             //initialize tuning with our custom class Tuning
             let originalTuning = Tuning(originalNote: defaultTunings[i])
-            originalTuning.maxTuningState = maxTuningConstant[i]
-            originalTuning.minTuningState = minTuningConstant[i]
+            originalTuning.maxTuningState = maxTuningConstant[i] - myCapoValue
+            originalTuning.minTuningState = minTuningConstant[i] - myCapoValue
+          print(originalTuning.maxTuningState)
+          print(originalTuning.minTuningState)
             tunings.append(originalTuning)
             
             let tuningValueLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
@@ -502,9 +504,20 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     
     func capoStepperValueChanged(stepper: UIStepper) {
         capoLabel.text = "Capo: \(Int(stepper.value))"
-        PlayChordsManager.sharedInstance.changeCapo(Int(stepper.value))
-        updateCollectionView(Int(stepper.value))
-        
+        var ableToChange = true
+        for i in 0..<tunings.count {
+          if maxTuningConstant[i] - Int(stepper.value) < 0 {
+            ableToChange = false
+          }
+        }
+        if ableToChange {
+          for i in 0..<tunings.count {
+            tunings[i].maxTuningState = maxTuningConstant[i] - Int(stepper.value)
+            tunings[i].minTuningState = minTuningConstant[i] - Int(stepper.value)
+          }
+          PlayChordsManager.sharedInstance.changeCapo(Int(stepper.value))
+          updateCollectionView(Int(stepper.value))
+        }
     }
     
     func stepUpPressed(button: UIButton) {
