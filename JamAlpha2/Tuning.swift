@@ -45,6 +45,7 @@ class Tuning: NSObject {
                 } else {
                     self.note = Tuning.notes[i + 1]
                 }
+              print(self.note)
                 break
             }
         }
@@ -60,6 +61,7 @@ class Tuning: NSObject {
                 } else {
                     self.note = Tuning.notes[i - 1]
                 }
+              print(self.note)
                 break
             }
         }

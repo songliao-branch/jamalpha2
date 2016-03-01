@@ -164,11 +164,11 @@ extension TabsEditorViewController {
                 self.addTabsFromCoreDataToMusicControlView(complete)
                 let tuningValues = Tuning.toArray(tuning)
                 let midiValues = Tuning.arrayToMidiDiff(self.maxTuningConstant, min: self.minTuningConstant, sender: tuningValues)
-                PlayChordsManager.sharedInstance.changeTuning(midiValues)
                 for i in 0..<self.tuningValueLabels.count {
                     self.tuningValueLabels[i].text = tuningValues[i]
                 }
                 PlayChordsManager.sharedInstance.changeCapo(capoValue)
+                PlayChordsManager.sharedInstance.changeTuning(midiValues)
                 self.capoStepper.value = Double(capoValue)
                 self.capoLabel.text = "Capo: \(capoValue)"
                 self.isPublic = visible

@@ -36,8 +36,7 @@ class PlayChordsManager: NSObject {
         initialSoundBank()
     }
     
-    func convertIndexToMidi(index: Int) -> Int32 {
-        
+    func convertIndexToMidi(index: Int) -> Int32 {        
         let stringIndex = index / 100
         let fretIndex = index - stringIndex * 100
         return Int32(fret0Midi[stringIndex - 1] + fretIndex)
@@ -167,13 +166,13 @@ class PlayChordsManager: NSObject {
     
     func changeCapo(sender: Int) {
         for i in 0..<fret0Midi.count {
-            fret0Midi[i] = fret0Midi[i] + sender
+            fret0Midi[i] = standardFret0Midi[i] + sender
         }
     }
   
     func changeTuning(sender: [Int]) {
       for i in 0..<fret0Midi.count {
-        fret0Midi[i] = standardFret0Midi[i] + sender[i]
+        fret0Midi[i] = fret0Midi[i] + sender[i]
       }
     }
 }
