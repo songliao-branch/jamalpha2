@@ -653,7 +653,6 @@ extension MusicViewController {
       
         if let _ = CoreDataManager.getSongWaveFormImage(nowPlayingItem) {
             // songCount can be only incremented in one queue no matter how many threads
-          print(self.songCount)
             self.incrementSongCountInThread()
         } else {
             dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
@@ -668,7 +667,6 @@ extension MusicViewController {
                     if(op!.cancelled) {
                       return
                     }
-                    print(self.songCount)
                     
                     if nowPlayingItem.artist == nil {
                       if(KGLOBAL_init_operationCache[keyString] != nil){
@@ -677,17 +675,16 @@ extension MusicViewController {
                       self.incrementSongCountInThread()
                       return
                     }
-                    
+                    guard let assetURL = nowPlayingItem.getURL() else {
+                      if(KGLOBAL_init_operationCache[tempkeyString] != nil){
+                        KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
+                      }
+                      self.incrementSongCountInThread()
+                      return
+                    }
                     self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
                       url in
                       if url == "" || url.isEmpty {
-                        guard let assetURL = nowPlayingItem.getURL() else {
-                          if(KGLOBAL_init_operationCache[tempkeyString] != nil){
-                            KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
-                          }
-                          self.incrementSongCountInThread()
-                          return
-                        }
                         // have to use the temp value to do the nsoperation, cannot use (self.) do that.
                         var progressBarWidth:CGFloat!
                         progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
@@ -698,6 +695,7 @@ extension MusicViewController {
                           NSOperationQueue.mainQueue().addOperationWithBlock({
                             tempProgressBlock.generateWaveforms()
                             if let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage) {
+                              CoreDataManager.initializeSongToDatabase(tempNowPlayingItem)
                               CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
                             }
                             let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
@@ -717,9 +715,10 @@ extension MusicViewController {
                           image in
                           let data = UIImagePNGRepresentation(image)
                           if(KGLOBAL_init_operationCache[keyString] != nil){
-                            KGLOBAL_init_operationCache.removeValueForKey(keyString)
+                            KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
                           }
-                          CoreDataManager.saveSoundWave(nowPlayingItem, soundwaveImage: data!)
+                          CoreDataManager.initializeSongToDatabase(tempNowPlayingItem)
+                          CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
                           self.incrementSongCountInThread()
                           return
                         })
