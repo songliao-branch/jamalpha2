@@ -11,6 +11,16 @@ import AVFoundation
 import MediaPlayer
 import UIKit
 
+protocol Sortable {
+    func getSortableName()-> String
+}
+
+extension MPMediaItem: Sortable {
+    func getSortableName() -> String {
+        return self.title!
+    }
+}
+
 class MusicManager: NSObject {
     
     let _TAG = "MusicManager"

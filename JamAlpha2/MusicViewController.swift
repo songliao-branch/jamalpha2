@@ -538,30 +538,31 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     // MARK: called from SongViewController action sheets
     func goToArtist(theArtist: String) {
         self.view.alpha = 1
-//        for artist in MusicManager.sharedInstance.uniqueArtists {
-//            if theArtist == artist.artistName {
-//                let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
-//                artistVC.musicViewController = self
-//                artistVC.theArtist = artist
-//                self.navigationController?.popToRootViewControllerAnimated(false)
-//                self.showViewController(artistVC, sender: self)
-//                break
-//            }
-//        }
+        for artist in MusicManager.sharedInstance.uniqueArtists {
+            if theArtist == artist.getArtist() {
+            
+                let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
+                artistVC.musicViewController = self
+                artistVC.theArtist = artist
+                self.navigationController?.popToRootViewControllerAnimated(false)
+                self.showViewController(artistVC, sender: self)
+                break
+            }
+        }
     }
     
     func goToAlbum(theAlbum: String) {
         self.view.alpha = 1
-//        for album in MusicManager.sharedInstance.uniqueAlbums {
-//            if theAlbum == album.albumTitle {
-//                let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
-//                albumVC.musicViewController = self
-//                albumVC.theAlbum = album
-//                self.navigationController?.popToRootViewControllerAnimated(false)
-//                self.showViewController(albumVC, sender: self)
-//                break
-//            }
-//        }
+        for album in MusicManager.sharedInstance.uniqueAlbums {
+            if theAlbum == album.getAlbumTitle() {
+                let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
+                albumVC.musicViewController = self
+                albumVC.theAlbum = album
+                self.navigationController?.popToRootViewControllerAnimated(false)
+                self.showViewController(albumVC, sender: self)
+                break
+            }
+        }
     }
     
     // MARK: functions using generics to sort the array into sections sorted by first alphabet
