@@ -75,16 +75,15 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 
         demoSongs = MusicManager.sharedInstance.demoSongs
 
-        songsByFirstAlphabet = sort(uniqueSongs)
-        print("Sort songs took \(CACurrentMediaTime() - t)")
-        artistsByFirstAlphabet = sort(uniqueArtists)
-        print("Sort awrt took \(CACurrentMediaTime() - t)")
-        albumsByFirstAlphabet = sort(uniqueAlbums)
-        print("Sort album took \(CACurrentMediaTime() - t)")
+        songsByFirstAlphabet = MusicManager.sharedInstance.songsByFirstAlphabet
+        artistsByFirstAlphabet = MusicManager.sharedInstance.artistsByFirstAlphabet
+        albumsByFirstAlphabet = MusicManager.sharedInstance.albumsByFirstAlphabet
         
-        songsSorted = getAllSortedItems(songsByFirstAlphabet)
-        artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
-        albumsSorted = getAllSortedItems(albumsByFirstAlphabet)
+        songsSorted = MusicManager.sharedInstance.songsSorted
+        artistsSorted = MusicManager.sharedInstance.artistsSorted
+        albumsSorted = MusicManager.sharedInstance.albumsSorted
+        
+        print("load songs at index \(pageIndex) \(CACurrentMediaTime() - t )")
     }
     
     deinit{
@@ -101,7 +100,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         objc_sync_exit(lock)
     }
     
-    
+
     func reloadDataAndTable() {
         loadAndSortMusic()
         musicTable.reloadData()
@@ -348,9 +347,15 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         } else if pageIndex == 2 {
 
             let theAlbum = albumsByFirstAlphabet[indexPath.section].1[indexPath.row]
-//            cell.imageWidth.constant = 80
-//            cell.imageHeight.constant = 80
-//            
+            cell.imageWidth.constant = 80
+            cell.imageHeight.constant = 80
+            
+            if let cover = theAlbum.getArtwork() {
+                let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                cell.coverImage.image = image
+            }
+            
+            
 //            let songs = theAlbum.getSongs()
 //            CoreDataManager.initializeSongToDatabase(songs[0])
 //            
@@ -375,9 +380,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 //                    loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
 //                }
 //            }
-//            
+
             cell.loudspeakerImage.hidden = true
-//
             cell.mainTitle.text = theAlbum.getAlbumTitle()
             cell.subtitle.text = theAlbum.getArtist()
         }
@@ -594,17 +598,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
     }
     
-    // Used in didSelectForRow
-    // return sorted items in a single array
-    func getAllSortedItems<T: Sortable> (collectionTuples: [(String, [T])]) -> [T] {
-        var allItemsSorted = [T]()
-        for itemSectionByAlphabet in collectionTuples {
-            for item in itemSectionByAlphabet.1 {
-                allItemsSorted.append(item)
-            }
-        }
-        return allItemsSorted
-    }
     
     // For songs, because we need to use the whole collection for the player queue instead an alphabet section, 
     // but indexPath.section and indexPath.row is only return the index of the alphabet section, so to find the

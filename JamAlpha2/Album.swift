@@ -24,6 +24,15 @@ class SimpleAlbum: NSObject, Sortable {
         return ""
     }
     
+    func getArtwork() -> MPMediaItemArtwork? {
+        for item in self.songCollection.items {
+            if let artwork = item.artwork {
+                return artwork
+            }
+        }
+        return nil
+    }
+
     func getSortableName() -> String {
         return getAlbumTitle()
     }
