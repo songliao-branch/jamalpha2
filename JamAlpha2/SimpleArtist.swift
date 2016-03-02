@@ -53,9 +53,7 @@ class SimpleArtist: NSObject, Sortable {
     
     
     func getAlbums() -> [SimpleAlbum] {
-        
-        if albums.count == 0 {
-            print("generate albums")
+        if albums.count == 0 {//make sure this sort gets called once because this function is used across ArtistViewController
             var itemsDictionary = [String: [MPMediaItem]]()
             
             for item in songCollection.items {
@@ -63,12 +61,14 @@ class SimpleArtist: NSObject, Sortable {
                 
                 if itemsDictionary[album] == nil {
                     itemsDictionary[album] = []
-                    
                 }
                 itemsDictionary[album]?.append(item)
             }
             for (_, values) in itemsDictionary {
-                let album = SimpleAlbum(collection: MPMediaItemCollection(items: values))
+
+                let album = SimpleAlbum(collection: MPMediaItemCollection(items: values.sort({ song1, song2 in
+                    return song1.albumTrackNumber < song2.albumTrackNumber
+                })))
                 albums.append(album)
             }
             
