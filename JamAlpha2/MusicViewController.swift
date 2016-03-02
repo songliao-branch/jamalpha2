@@ -76,14 +76,15 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         demoSongs = MusicManager.sharedInstance.demoSongs
 
         songsByFirstAlphabet = sort(uniqueSongs)
+        print("Sort songs took \(CACurrentMediaTime() - t)")
         artistsByFirstAlphabet = sort(uniqueArtists)
+        print("Sort awrt took \(CACurrentMediaTime() - t)")
         albumsByFirstAlphabet = sort(uniqueAlbums)
-
+        print("Sort album took \(CACurrentMediaTime() - t)")
+        
         songsSorted = getAllSortedItems(songsByFirstAlphabet)
         artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
         albumsSorted = getAllSortedItems(albumsByFirstAlphabet)
-        
-        print("Music list sort took \(CACurrentMediaTime() - t)")
     }
     
     deinit{
@@ -337,11 +338,12 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 //            let numberOfAlbums = theArtist.getAlbums().count
 //            let albumPrompt = "album".addPluralSubscript(numberOfAlbums)
 //            
-//            let numberOfTracks = theArtist.numberOfTracks
-//            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
+            let numberOfTracks = theArtist.songCollection.items.count
+            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
             
-            cell.mainTitle.text = theArtist.artist
-          //  cell.subtitle.text = "\(numberOfAlbums) \(albumPrompt), \(numberOfTracks) \(trackPrompt)"
+            cell.mainTitle.text = theArtist.getArtist()
+         
+            cell.subtitle.text = "\(numberOfTracks) \(trackPrompt)"
             
         } else if pageIndex == 2 {
 
@@ -374,13 +376,10 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
 //                }
 //            }
 //            
-//            cell.loudspeakerImage.hidden = true
-//            
-//            let numberOfTracks = theAlbum.getNumberOfTracks()
-//            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
-//            
-            cell.mainTitle.text = theAlbum.albumTitle
-           // cell.subtitle.text = "\(numberOfTracks) \(trackPrompt)"
+            cell.loudspeakerImage.hidden = true
+//
+            cell.mainTitle.text = theAlbum.getAlbumTitle()
+            cell.subtitle.text = theAlbum.getArtist()
         }
         
         if (!tableView.dragging && !tableView.decelerating) {
@@ -515,7 +514,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             //artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
-            
         }
         else if pageIndex == 2 {
             isSeekingPlayerState = false
@@ -523,7 +521,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             
             let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
             albumVC.musicViewController = self
-           // albumVC.theAlbum = albumsSorted[indexToBePlayed]
+            albumVC.theAlbum = albumsSorted[indexToBePlayed]
             
             self.showViewController(albumVC, sender: self)
         }

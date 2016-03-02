@@ -3,38 +3,56 @@ import Foundation
 import MediaPlayer
 
 class SimpleAlbum: NSObject, Sortable {
+
+    var songCollection: MPMediaItemCollection!
+
+    init(collection: MPMediaItemCollection) {
+      self.songCollection = collection
+    }
     
-    var albumTitle = ""
-    
-    var representativeItem: MPMediaItem
-    
-    init(item: MPMediaItem) {
-        self.representativeItem = item
-        if let album = representativeItem.albumTitle {
-            self.albumTitle = album
+    func getAlbumTitle() -> String {
+        if let title = self.songCollection.representativeItem?.albumTitle {
+            return title
         }
+        return ""
+    }
+    
+    func getArtist() -> String {
+        if let artist = self.songCollection.representativeItem?.artist {
+            return artist
+        }
+        return ""
     }
     
     func getSortableName() -> String {
-        return albumTitle
+        return getAlbumTitle()
     }
 }
 
 class SimpleArtist: NSObject, Sortable {
-    var artist = ""
-    var representativeItem: MPMediaItem
+
+    var songCollection: MPMediaItemCollection!
     
-    init(item: MPMediaItem) {
+    init(collection: MPMediaItemCollection) {
+        self.songCollection = collection
+    }
     
-        self.representativeItem = item
-        
-        if let artist = representativeItem.artist {
-            self.artist = artist
+    func getAlbumTitle() -> String {
+        if let title = self.songCollection.representativeItem?.albumTitle {
+            return title
         }
+        return ""
+    }
+    
+    func getArtist() -> String {
+        if let artist = self.songCollection.representativeItem?.artist {
+            return artist
+        }
+        return ""
     }
     
     func getSortableName() -> String {
-        return artist
+        return getArtist()
     }
 }
 

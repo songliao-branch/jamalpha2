@@ -293,11 +293,11 @@ class MusicManager: NSObject {
         let allAlbumsCollections = albumQuery.collections
         
         for collection in allAlbumsCollections! {
-            let album = SimpleAlbum(item: collection.representativeItem!)
+            let album = SimpleAlbum(collection: collection)
             uniqueAlbums.append(album)
         }
         
-//        //start new albums fresh
+        //        //start new albums fresh
 //        var albumDictionary = [String: [MPMediaItem]]()//key is artist+album to avoid two artists same album names
 //        
 //        let keySeparator = "TGI*X"//random thing
@@ -326,11 +326,9 @@ class MusicManager: NSObject {
         let allAlbumsCollections = artistQuery.collections
         
         for collection in allAlbumsCollections! {
-            let artist = SimpleArtist(item: collection.representativeItem!)
+            let artist = SimpleArtist(collection: collection)
             uniqueArtists.append(artist)
         }
-        
-        
 //        
 //        //
 //        var artistDictionary = [String: [Album]]() //key is artistName

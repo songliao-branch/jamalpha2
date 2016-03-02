@@ -10,7 +10,7 @@ import MediaPlayer
 class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate{
     
     var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
-    var theArtist:Artist!
+    var theArtist: Artist!
     var animator: CustomTransitionAnimation?
     var artistAllSongs:[MPMediaItem]!
     var isSeekingPlayerState = false
@@ -20,7 +20,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        artistAllSongs = theArtist.getSongs()
+       // artistAllSongs = theArtist.songCollection.items
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
