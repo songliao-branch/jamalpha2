@@ -9,9 +9,8 @@
 import Foundation
 import UIKit
 import MediaPlayer
-import StoreKit
 
-extension SongViewController: SKStoreProductViewControllerDelegate {
+extension SongViewController {
     
     func initPurchaseItunsSongItem(){
         setUpPreviewButton()
@@ -145,46 +144,14 @@ extension SongViewController: SKStoreProductViewControllerDelegate {
     }
     
     func goToiTunes(){
-        storeViewController = nil
-        UINavigationBar.appearance().tintColor = UIColor.mainPinkColor()
-        storeViewController = SKStoreProductViewController()
-        storeViewController.delegate = self
-      
-        let parameters = [SKStoreProductParameterITunesItemIdentifier :
-          NSNumber(integer: songNeedPurchase.trackId),
-          SKStoreProductParameterAffiliateToken:"1001l9DT"]
-        
-
-        storeViewController.loadProductWithParameters(parameters,
-            completionBlock: {result, error in
-                if error != nil {
-                    print(error)
-                }
-        })
-        self.presentViewController(storeViewController,
-            animated: true, completion: {
-                self.dismissAction()
-        })
+      self.dismissAction()
+      let suffix = "&app=itunes&at=1001l9DT"
+      UIApplication.sharedApplication().openURL(NSURL(string:songNeedPurchase.trackViewUrl + suffix)!)
     }
     
     func goToAppleMusic(){
         self.dismissAction()
         UIApplication.sharedApplication().openURL(NSURL(string: songNeedPurchase.trackViewUrl)!)
-    }
-    
-    func productViewControllerDidFinish(viewController: SKStoreProductViewController) {
-        if let purchasedItem = MusicManager.sharedInstance.itemFoundInCollection(songNeedPurchase){
-            MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
-            MusicManager.sharedInstance.setIndexInTheQueue(0)
-            
-            self.recoverToNormalSongVC(purchasedItem)
-            
-        }else{
-            print("didn't purchase the song")
-        }
-        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
-        viewController.dismissViewControllerAnimated(true, completion: nil)
-        
     }
     
     func recoverToNormalSongVC(PlayingItem:MPMediaItem){
