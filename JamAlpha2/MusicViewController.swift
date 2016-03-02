@@ -67,8 +67,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     
     
     func loadAndSortMusic() {
-        let t = CACurrentMediaTime()
-        
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
@@ -82,8 +80,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         songsSorted = MusicManager.sharedInstance.songsSorted
         artistsSorted = MusicManager.sharedInstance.artistsSorted
         albumsSorted = MusicManager.sharedInstance.albumsSorted
-        
-        print("load songs at index \(pageIndex) \(CACurrentMediaTime() - t )")
     }
     
     deinit{
@@ -299,6 +295,13 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.coverImage.image = nil
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
+            
+        
+            if let cover = theArtist.getArtwork() {
+                let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                cell.coverImage.image = image
+            }
+            
 //            if theArtist.getSongs().count > 0 {
 //                CoreDataManager.initializeSongToDatabase(theArtist.getSongs()[0])
 //                if let coverImage = CoreDataManager.getCoverImage(theArtist.getSongs()[0]){
@@ -515,7 +518,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             let indexToBePlayed = findIndexToBePlayed(artistsByFirstAlphabet, section: indexPath.section, currentRow: indexPath.row)
             let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
             artistVC.musicViewController = self
-            //artistVC.theArtist = artistsSorted[indexToBePlayed]
+            artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
         }

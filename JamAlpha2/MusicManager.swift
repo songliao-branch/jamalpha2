@@ -311,26 +311,6 @@ class MusicManager: NSObject {
         
         albumsByFirstAlphabet = sort(uniqueAlbums)
         albumsSorted = getAllSortedItems(albumsByFirstAlphabet)
-        
-        //        //start new albums fresh
-//        var albumDictionary = [String: [MPMediaItem]]()//key is artist+album to avoid two artists same album names
-//        
-//        let keySeparator = "TGI*X"//random thing
-//        for song in uniqueSongs {
-//            guard let album = song.albumTitle, let artist = song.artist else {
-//                continue
-//            }
-//            let key = artist+keySeparator+album
-//            if albumDictionary[key] == nil {
-//               albumDictionary[key] = []
-//            }
-//            albumDictionary[key]?.append(song)
-//        }
-//        
-//        for (key, value) in albumDictionary {
-//            let album = Album(album: key.componentsSeparatedByString(keySeparator)[1], collection: value)
-//            uniqueAlbums.append(album)
-//        }
     }
     
     //load artist must be called after getting all albums
@@ -347,23 +327,6 @@ class MusicManager: NSObject {
         
         artistsByFirstAlphabet = sort(uniqueArtists)
         artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
-//        
-//        //
-//        var artistDictionary = [String: [Album]]() //key is artistName
-//        for album in uniqueAlbums {
-//            if artistDictionary[album.getArtist()] == nil {
-//                artistDictionary [album.getArtist()] = []
-//            }
-//            artistDictionary [album.getArtist()]?.append(album)
-//        }
-//        
-//        for (artistName, albums) in artistDictionary {
-//            let artist = Artist(artist: artistName)
-//            for album in albums {
-//                artist.addAlbum(album)
-//            }
-//            uniqueArtists.append(artist)
-//        }
     }
 
     let characters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
