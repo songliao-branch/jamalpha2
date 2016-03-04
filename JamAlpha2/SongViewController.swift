@@ -338,7 +338,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     // to prevent resumeSong() everytime, we make sure resumeSong()
     // is ONLY called when the view is fully dragged down or disappeared
     if viewDidFullyDisappear {
-      viewDidFullyDisappear = false
       if !isSongNeedPurchase {
         resumeSong()
       }
@@ -350,37 +349,50 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
   
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
-    if(!isRemoveProgressBlock){
-      isRemoveProgressBlock = true
-      if(!isSongNeedPurchase){
-        self.removeAllObserver()
-        self.registerMediaPlayerNotification()
+    if viewDidFullyDisappear {
+      viewDidFullyDisappear = false
+      if(!isRemoveProgressBlock){
+        isRemoveProgressBlock = true
+        if(!isSongNeedPurchase){
+          self.removeAllObserver()
+          self.registerMediaPlayerNotification()
+        }
+      }else{
+        if(!isSongNeedPurchase){
+          self.registerMediaPlayerNotification()
+        }
       }
-    }else{
-      if(!isSongNeedPurchase){
-        self.registerMediaPlayerNotification()
-      }
-    }
-    if(!isGenerated && !isSongNeedPurchase){
-      generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
-    }else if (!isGenerated && isSongNeedPurchase) {
-      self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
-        succeed in
-        if !self.soundwaveUrl.isEmpty {
-          AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
-            image in
+      if(!isGenerated && !isSongNeedPurchase){
+        generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
+      } else if (!isGenerated && isSongNeedPurchase) {
+        self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
+          succeed in
+          if !self.soundwaveUrl.isEmpty {
+            AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
+              image in
+              dispatch_async(dispatch_get_main_queue()) {
+                if let data = UIImagePNGRepresentation(image) {
+                  KGLOBAL_progressBlock.setWaveFormFromData(data)
+                  CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
+                  self.isGenerated = true
+                  self.soundwaveUrl = ""
+                  return
+                }
+              }
+            })
+          } else {
             dispatch_async(dispatch_get_main_queue()) {
-              if let data = UIImagePNGRepresentation(image) {
-                KGLOBAL_progressBlock.setWaveFormFromData(data)
-                CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
-                self.isGenerated = true
-                self.soundwaveUrl = ""
-                return
+              if KGLOBAL_progressBlock.generatedNormalImage == nil {
+                KGLOBAL_progressBlock.generateWaveforms()
+                let data = UIImagePNGRepresentation(KGLOBAL_progressBlock.generatedNormalImage)
+                if(KGLOBAL_progressBlock != nil ) {
+                  KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                }
               }
             }
-          })
-        }
-      })
+          }
+        })
+      }
     }
     isViewDidAppear = true
   }
@@ -1402,8 +1414,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
   
   
   // to generate sound wave in a nsoperation thread
-  func generateSoundWave(nowPlayingItem: Findable){
-    print("~~~~~~~~~~~~~~\(nowPlayingItem.getDuration())")
+  func generateSoundWave(nowPlayingItem: Findable) {
     dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
       var op:NSBlockOperation?
       let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
