@@ -1115,12 +1115,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
     
     if let soundWaveData = CoreDataManager.getSongWaveFormImage(nowPlayingMediaItem!) {
-      dispatch_async(dispatch_get_main_queue()){
-        if (KGLOBAL_defaultProgressBar != nil){
-          KGLOBAL_defaultProgressBar.removeFromSuperview()
-          KGLOBAL_defaultProgressBar = nil
-        }
-      }
       KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
     } else {
       self.generateSoundWave(nowPlayingMediaItem!)
@@ -1203,12 +1197,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     self.progressBlockContainer.addSubview(KGLOBAL_progressBlock)
     
     if let soundWaveData = CoreDataManager.getSongWaveFormImage(demoItem!) {
-      dispatch_async(dispatch_get_main_queue()){
-        if (KGLOBAL_defaultProgressBar != nil){
-          KGLOBAL_defaultProgressBar.removeFromSuperview()
-          KGLOBAL_defaultProgressBar = nil
-        }
-      }
       KGLOBAL_progressBlock.setWaveFormFromData(soundWaveData)
     } else {
       self.generateSoundWave(demoItem!)
@@ -1250,9 +1238,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
           KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
           KGLOBAL_progressBlock!.alpha = 0.5
-          if (KGLOBAL_defaultProgressBar != nil){
-            KGLOBAL_defaultProgressBar.alpha = 0.5
-          }
           }, completion: nil)
       }else{
         updateAll(Float(avPlayer.currentTime().seconds))
@@ -1261,9 +1246,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
           KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.2)
           KGLOBAL_progressBlock!.alpha = 1.0
-          if (KGLOBAL_defaultProgressBar != nil){
-            KGLOBAL_defaultProgressBar.alpha = 1
-          }
           }, completion: { finished in
             if(KGLOBAL_progressBlock == nil){
               return
@@ -1297,9 +1279,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
       UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction], animations: {
         KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
         KGLOBAL_progressBlock!.alpha = 0.5
-        if (KGLOBAL_defaultProgressBar != nil){
-          KGLOBAL_defaultProgressBar.alpha = 0.5
-        }
         }, completion: nil)
       
     }
@@ -1313,9 +1292,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
       UIView.animateWithDuration(0.6, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: [.CurveEaseInOut, .AllowUserInteraction], animations: {
         KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 1.0)
         KGLOBAL_progressBlock!.alpha = 1.0
-        if (KGLOBAL_defaultProgressBar != nil){
-          KGLOBAL_defaultProgressBar.alpha = 1
-        }
         }, completion: nil
       )
     }
@@ -1345,9 +1321,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
           // progress bar should be lowered
           KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
           KGLOBAL_progressBlock!.alpha = 0.5
-          if (KGLOBAL_defaultProgressBar != nil){
-            KGLOBAL_defaultProgressBar.alpha = 0.5
-          }
           self.speed = 1  //restore to original speed
         }
       } else {
@@ -1361,9 +1334,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
           // progress bar should be lowered
           KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
           KGLOBAL_progressBlock!.alpha = 0.5
-          if (KGLOBAL_defaultProgressBar != nil){
-            KGLOBAL_defaultProgressBar.alpha = 0.5
-          }
           self.speed = 1  //restore to original speed
         }
         
@@ -1433,6 +1403,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
   
   // to generate sound wave in a nsoperation thread
   func generateSoundWave(nowPlayingItem: Findable){
+    print("~~~~~~~~~~~~~~\(nowPlayingItem.getDuration())")
     dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
       var op:NSBlockOperation?
       let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
@@ -1451,10 +1422,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                   KGLOBAL_operationCache[tempkeyString]!.cancel()
                   KGLOBAL_operationCache.removeValueForKey(tempkeyString)
                 }
-                if (KGLOBAL_defaultProgressBar != nil){
-                  KGLOBAL_defaultProgressBar.removeFromSuperview()
-                  KGLOBAL_defaultProgressBar = nil
-                }
                 if let data = UIImagePNGRepresentation(image) {
                   KGLOBAL_progressBlock.setWaveFormFromData(data)
                   CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
@@ -1467,7 +1434,13 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             
           }else{
             guard let assetURL = nowPlayingItem.getURL() else {
-              self.setupDefaultProgressBar()
+              dispatch_async(dispatch_get_main_queue()) {
+                tempProgressBlock.generateWaveforms()
+                let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                if(KGLOBAL_progressBlock != nil ) {
+                  KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                }
+              }
               if (KGLOBAL_operationCache[tempkeyString] != nil){
                 KGLOBAL_operationCache[tempkeyString]!.cancel()
                 KGLOBAL_operationCache.removeValueForKey(tempkeyString)
@@ -1484,9 +1457,9 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
             self.soundwaveUrl = ""
             
             dispatch_async(dispatch_get_main_queue()) {
-              KGLOBAL_operationCache.removeValueForKey(tempkeyString)
               NSOperationQueue.mainQueue().addOperationWithBlock({
                 tempProgressBlock.generateWaveforms()
+                KGLOBAL_operationCache.removeValueForKey(tempkeyString)
                 let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                 CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
                 
@@ -1501,20 +1474,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
                 if self.isDemoSong {
                   if((tempNowPlayingItem as! AVPlayerItem) == self.avPlayer.currentItem){
                     if(KGLOBAL_progressBlock != nil ){
-                      if (KGLOBAL_defaultProgressBar != nil){
-                        KGLOBAL_defaultProgressBar.removeFromSuperview()
-                        KGLOBAL_defaultProgressBar = nil
-                      }
                       KGLOBAL_progressBlock.setWaveFormFromData(data!)
                     }
                   }
                 }else{
                   if((tempNowPlayingItem as! MPMediaItem) == self.player.nowPlayingItem){
                     if(KGLOBAL_progressBlock != nil ) {
-                      if (KGLOBAL_defaultProgressBar != nil) {
-                        KGLOBAL_defaultProgressBar.removeFromSuperview()
-                        KGLOBAL_defaultProgressBar = nil
-                      }
                       KGLOBAL_progressBlock.setWaveFormFromData(data!)
                     }
                   }
@@ -1529,28 +1494,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
   }
   
-  func setupDefaultProgressBar() {
-    dispatch_async(dispatch_get_main_queue()) {
-      if (KGLOBAL_defaultProgressBar == nil) {
-        KGLOBAL_defaultProgressBar = UIProgressView(frame: CGRectMake(0,self.progressBlockContainer.frame.height * 3 / 7,self.view.width,10))
-        if(!self.selectedFromTable){
-          KGLOBAL_defaultProgressBar.progress = 1.0 - self.startTime.toDecimalNumer()/Float(self.nowPlayingItemDuration)
-        }else{
-          KGLOBAL_defaultProgressBar.progress = 1.0
-        }
-        
-        KGLOBAL_defaultProgressBar.trackTintColor = UIColor.mainPinkColor()
-        KGLOBAL_defaultProgressBar.progressTintColor = UIColor.whiteColor()
-        if (KGLOBAL_progressBlock == nil){
-          self.progressBlockContainer.addSubview(KGLOBAL_defaultProgressBar)
-        }else{
-          self.progressBlockContainer.insertSubview( KGLOBAL_defaultProgressBar , aboveSubview: KGLOBAL_progressBlock)
-        }
-        
-      }
-    }
-    
-  }
+ 
   
   var newPosition:CGFloat! = 0
   var toTime:Float! = 0
@@ -1892,10 +1836,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         KGLOBAL_progressBlock.removeFromSuperview()
         KGLOBAL_progressBlock = nil
       }
-      if (KGLOBAL_defaultProgressBar != nil){
-        KGLOBAL_defaultProgressBar.removeFromSuperview()
-        KGLOBAL_defaultProgressBar = nil
-      }
       if isSongNeedPurchase{
         self.displayLink.paused = true
         self.displayLink.invalidate()
@@ -2080,9 +2020,6 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
       KGLOBAL_progressBlock.setProgress(newProgressPosition)
     }
     KGLOBAL_progressBlock.frame.origin.x = newOriginX
-    if(KGLOBAL_defaultProgressBar != nil){
-      KGLOBAL_defaultProgressBar.progress = 1 - Float(newProgressPosition)
-    }
   }
   
   func refreshTimeLabel(){

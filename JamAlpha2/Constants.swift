@@ -15,7 +15,6 @@ var KGLOBAL_operationCache = [String:NSBlockOperation]()
 
 
 var KGLOBAL_progressBlock: SoundWaveView!
-var KGLOBAL_defaultProgressBar:UIProgressView!
 
 var KGLOBAL_timer:NSTimer!
 

@@ -223,22 +223,49 @@ class SoundWaveView: UIView {
         let halfGraphHeight:Float = Float(heightInPixels) / 2
         
         var currentX:CGFloat = 0
-        for averageSample in self.originalSampleBuffer!
+      //////////////////////////////////////////////////////////////////////////
+      //generate fake soundwave
+      if originalSampleBuffer == nil || self.originalSampleBuffer!.count == 0 {
+        let range = Int(size.width/40)
+        for i in 0..<Int(size.width/4)
         {
-            renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*self.songVCSampleRate+1.5)
-            
-            currentX++
+          var fakeSample = Double(arc4random_uniform(5)+18)
+          if i < range {
+            fakeSample = Double(arc4random_uniform(6)+25)
+          } else if i >= range && i <= 2*range {
+            fakeSample = Double(arc4random_uniform(8)+20)
+          } else if i > 9 * range {
+            fakeSample = Double(arc4random_uniform(6)+25)
+          } else if i > 8 * range && i <= 9 * range {
+            fakeSample = Double(arc4random_uniform(8)+20)
+          }
+          if i == Int(size.width/4) - 2 {
+            fakeSample = Double(arc4random_uniform(5)+30)
+          }
+          if i == Int(size.width/4) - 1 {
+            fakeSample = Double(arc4random_uniform(5)+40)
+          }
+          
+          renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: -fakeSample, x: currentX*self.songVCSampleRate+1.5)
+          
+          currentX++
         }
+        return
+      }
+      //////////////////////////////////////////////////////////////////////////
+      for averageSample in self.originalSampleBuffer!
+      {
+        print(averageSample)
+        renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*self.songVCSampleRate+1.5)
+          
+          currentX++
+      }
     }
-    
 
     /*******************************************************/
-    
-    
-    
+
+  
     func generateWaveformImage(color:UIColor, size:CGSize, antialiasingEnabled:Bool) -> UIImage{
-        
-        
         let ratio:CGFloat = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width * ratio, size.height * ratio), false, 1);
         
@@ -251,6 +278,7 @@ class SoundWaveView: UIView {
         
         return image;
     }
+  
     
     
     class func recolorizeImage(image:UIImage, color:UIColor) -> UIImage{
@@ -280,7 +308,16 @@ class SoundWaveView: UIView {
         self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
         self.progressImageView.image = generatedProgressImage
     }
-    
+  
+    func setWaveFormFromImage(image: UIImage) {
+      self.generatedNormalImage = image
+      self.normalImageView.image = generatedNormalImage
+      normalColorDirty = false
+      
+      self.generatedProgressImage = SoundWaveView.recolorizeImage(self.generatedNormalImage, color: progressColor)
+      self.progressImageView.image = generatedProgressImage
+    }
+  
     func generateWaveforms(){
         
         let rect:CGRect = self.bounds
