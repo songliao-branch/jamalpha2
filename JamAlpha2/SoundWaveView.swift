@@ -255,7 +255,6 @@ class SoundWaveView: UIView {
       //////////////////////////////////////////////////////////////////////////
       for averageSample in self.originalSampleBuffer!
       {
-        print(averageSample)
         renderPixelWaveformInContext(context, halfGraphHeigh: halfGraphHeight, sample: averageSample as! Double, x: currentX*self.songVCSampleRate+1.5)
           
           currentX++
