@@ -3,7 +3,7 @@ import MediaPlayer
 import Haneke
 
 
-class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
+class MusicViewController: UIViewController, UITableViewDataSource, UITableViewDelegate  {
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -56,13 +56,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         super.viewDidAppear(animated)
         viewDidAppear = true
         musicTable.reloadData()
-        // if not generating, we start generating
-        if !KEY_isSoundWaveformGeneratingInBackground {
-            if(!uniqueSongs.isEmpty){
-                generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-            }
-            KEY_isSoundWaveformGeneratingInBackground = true
-        }
     }
     
     
@@ -323,12 +316,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.mainTitle.text = theAlbum.getAlbumTitle()
             cell.subtitle.text = theAlbum.getArtist()
         }
-        
-        if (!tableView.dragging && !tableView.decelerating) {
-            KGLOBAL_init_queue.suspended = false
-        }else{
-            KGLOBAL_init_queue.suspended = true
-        }
         return cell
     }
     
@@ -352,8 +339,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         var isDemoSong = false
         isSeekingPlayerState = true
         if pageIndex == 0 {
-            KGLOBAL_init_queue.suspended = true
-            
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             var indexToBePlayed:Int = 0
             if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
@@ -565,126 +550,5 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
 }
 
-extension MusicViewController {
-    
-    override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        queueSuspended = KGLOBAL_queue.suspended
-        KGLOBAL_init_queue.suspended = true
-        KGLOBAL_queue.suspended = true
-    }
-    
-    override func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate {
-             KGLOBAL_init_queue.suspended = false
-            KGLOBAL_queue.suspended = queueSuspended
-        }
-    }
-    
-    override func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        KGLOBAL_init_queue.suspended = false
-        KGLOBAL_queue.suspended = queueSuspended
-    }
-    
-    func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
-        
-        if let _ = CoreDataManager.getSongWaveFormImage(nowPlayingItem) {
-            // songCount can be only incremented in one queue no matter how many threads
-            self.incrementSongCountInThread()
-        } else {
-            dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
-    
-                var op:NSBlockOperation?
-                op = KGLOBAL_init_operationCache[keyString]
-                if(op == nil){
-                    
-                    if nowPlayingItem.artist == nil {
-                        if(KGLOBAL_init_operationCache[keyString] != nil){
-                            KGLOBAL_init_operationCache.removeValueForKey(keyString)
-                        }
-                        self.incrementSongCountInThread()
-                        return
-                    }
-                    
-                    self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
-                        url in
-                        if url == "" || url.isEmpty {
-                            let tempNowPlayingItem = nowPlayingItem
-                            let tempkeyString:String = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
-                            guard let assetURL = nowPlayingItem.getURL() else {
-                                if(KGLOBAL_init_operationCache[tempkeyString] != nil){
-                                    KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
-                                }
-                                self.incrementSongCountInThread()
-                                return
-                            }
-                            // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-                            var progressBarWidth:CGFloat!
-                            progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
-                            let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
-                            op = NSBlockOperation(block: {
-                                
-                                if(op!.cancelled){
-                                    return
-                                }
-                                tempProgressBlock.SetSoundURL(assetURL as! NSURL)
-                                
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    NSOperationQueue.mainQueue().addOperationWithBlock({
-                                        tempProgressBlock.generateWaveforms()
-                                        if let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage) {
-                                          CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
-                                        }
-                                        let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
-                                        AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
-                                            succeeded in
-                                            if succeeded {
-                                                APIManager.updateSoundwaveUrl(CoreDataManager.getSongId(tempNowPlayingItem), url: soundwaveName)
-                                                print("uploaded image to AWS and updated the url for song \(tempNowPlayingItem.getTitle())")
-                                            }
-                                        })
-                                        KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
-                                        self.incrementSongCountInThread()
-                                    })
-                                }
-                            })
-                            KGLOBAL_init_operationCache[tempkeyString] = op
-                            KGLOBAL_init_queue.addOperation(op!)
-                            
-                        }else{
-                            AWSS3Manager.downloadImage(url, isProfileBucket: false, completion: {
-                                image in
-                                    let data = UIImagePNGRepresentation(image)
-                                    if(KGLOBAL_init_operationCache[keyString] != nil){
-                                        KGLOBAL_init_operationCache.removeValueForKey(keyString)
-                                    }
-                                    CoreDataManager.saveSoundWave(nowPlayingItem, soundwaveImage: data!)
-                                    self.incrementSongCountInThread()
-                                    return
-                                
-                            })
-                        }
-                    })
-                }
-            }
-        }
-    }
-    
-    func incrementSongCountInThread(){
-        pthread_rwlock_wrlock(&self.rwLock)
-        if(Int(self.songCount) < self.uniqueSongs.count-1){
-            self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&(self.songCount)))])
-        }
-        pthread_rwlock_unlock(&self.rwLock)
-    }
-    
-    func getSongIdAndSoundwaveUrlFromCloud(item: Findable, completion: ((soundwave_url:String) -> Void)?) {
-        APIManager.getSongInformation(item, completion: {
-            id, soundwave_url in
-            CoreDataManager.setSongId(item, id: id)
-            completion!(soundwave_url:soundwave_url)
-        })
-    }
-}
 
 

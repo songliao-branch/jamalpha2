@@ -72,7 +72,6 @@ class MusicManager: NSObject {
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
-        
         print("load took: \(CACurrentMediaTime() - t)")
         initializePlayer()
         addNotification()
@@ -115,10 +114,6 @@ class MusicManager: NSObject {
         // we manually reload MusicViewController table
         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
             musicVC.reloadDataAndTable()
-            if(!musicVC.uniqueSongs.isEmpty){
-                musicVC.songCount = 0
-                musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
-            }
         }
         
         searchVC.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
@@ -301,10 +296,6 @@ class MusicManager: NSObject {
         //we have one demo song so far
         demoSongs = kSongNames.map {
             AVPlayerItem(URL: NSBundle.mainBundle().URLForResource($0, withExtension: "mp3")!)
-        }
-        
-        for song in demoSongs {
-            CoreDataManager.initializeSongToDatabase(song)
         }
     }
     

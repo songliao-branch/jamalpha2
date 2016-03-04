@@ -3,7 +3,7 @@
 import UIKit
 import MediaPlayer
 
-class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UITableViewDataSource{
+class AlbumViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
 
     var musicViewController: MusicViewController! // for songviewcontroller to go to artist or album from musicviewcontroller
     
@@ -107,7 +107,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         isSeekingPlayerState = true
-        KGLOBAL_init_queue.suspended = true
        
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
         MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)

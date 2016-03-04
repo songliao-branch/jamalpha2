@@ -160,7 +160,6 @@
 		E4CBC0061B9E88BA00473FC4 /* TJDatabase.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E4CBC0021B9E88BA00473FC4 /* TJDatabase.xcdatamodeld */; };
 		E4D2F19B1B4CA6A800091A45 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */; };
 		E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */; };
-		E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */; };
 		E4D58E401BE9BC4700D54174 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D58E3F1BE9BC4700D54174 /* Constants.swift */; };
 		E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */; };
 		E4F01BC11B3B8CA00097E766 /* Chord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F01BC01B3B8CA00097E766 /* Chord.swift */; };
@@ -353,7 +352,6 @@
 		E4CBC0031B9E88BA00473FC4 /* TJDatabase.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TJDatabase.xcdatamodel; sourceTree = "<group>"; };
 		E4D2F19A1B4CA6A800091A45 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		E4D2F8931B5F32BB004B90FD /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
-		E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuspendThreadViewController.swift; sourceTree = "<group>"; };
 		E4D58E3F1BE9BC4700D54174 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E4EC432D1BBDCA0D003E8350 /* CountdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownView.swift; sourceTree = "<group>"; };
 		E4F01BC01B3B8CA00097E766 /* Chord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chord.swift; sourceTree = "<group>"; };
@@ -590,7 +588,6 @@
 				E48877461B151628004785D3 /* MusicViewController.swift */,
 				E45F6BB71B16C1860018645D /* ArtistViewController.swift */,
 				E44FB4001B1D6B8A000D2053 /* AlbumViewController.swift */,
-				E4D58E3C1BE9BA0400D54174 /* SuspendThreadViewController.swift */,
 			);
 			name = MusicListControllers;
 			sourceTree = "<group>";
@@ -1167,7 +1164,6 @@
 				E4BE9F181B8A7F8200C87960 /* AlbumSectionCell.swift in Sources */,
 				E48877681B151E2B004785D3 /* MusicCell.swift in Sources */,
 				BFFAA5131C3CE0D400DC3253 /* PlayChordsManager.swift in Sources */,
-				E4D58E3D1BE9BA0400D54174 /* SuspendThreadViewController.swift in Sources */,
 				E4CBBFF91B9E88A600473FC4 /* TabsDataManager.swift in Sources */,
 				E4D2F8941B5F32BB004B90FD /* SearchResultCell.swift in Sources */,
 				E4EC432E1BBDCA0D003E8350 /* CountdownView.swift in Sources */,

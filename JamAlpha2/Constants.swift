@@ -13,8 +13,6 @@ import AVFoundation
 let KGLOBAL_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_operationCache = [String:NSBlockOperation]()
 
-let KGLOBAL_init_queue:NSOperationQueue = NSOperationQueue()
-var KGLOBAL_init_operationCache = [String:NSBlockOperation]()
 
 var KGLOBAL_progressBlock: SoundWaveView!
 var KGLOBAL_defaultProgressBar:UIProgressView!

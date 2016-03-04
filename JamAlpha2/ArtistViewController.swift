@@ -7,7 +7,7 @@
 //July 7, 2015
 import UIKit
 import MediaPlayer
-class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate{
+class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
     
     var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
     var theArtist: SimpleArtist!
@@ -169,7 +169,6 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         isSeekingPlayerState = true
-        KGLOBAL_init_queue.suspended = true
         
         let albumIndex = indexPath.section
         var songsInPreviousSections = 0
