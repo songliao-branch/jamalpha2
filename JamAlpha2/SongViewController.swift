@@ -223,7 +223,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
   var playPreveiwButton:UIButton!
   var previewActionViewHeight: CGFloat = 54 * 4 + 3
   var previewView:UIView!
-  var displayLink: CADisplayLink!
+  var displayLink: CADisplayLink?
   var previewProgress: KDCircularProgress!
   var previewProgressCenterView: UIView!
   var isViewDidAppear:Bool = false
@@ -1848,9 +1848,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         KGLOBAL_progressBlock = nil
       }
       if isSongNeedPurchase{
-        self.displayLink.paused = true
-        self.displayLink.invalidate()
-        self.displayLink = nil
+        if let tempDisPlaylink = self.displayLink {
+          tempDisPlaylink.paused = true
+          tempDisPlaylink.invalidate()
+          self.displayLink = nil
+        }
         return
       }
     }
@@ -2403,7 +2405,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
           finished in
           self.previewProgress.setColors(UIColor.mainPinkColor())
           self.previewProgress.angle = 360
-          self.displayLink.paused = true
+          if let tempDisPlaylink = self.displayLink {
+            tempDisPlaylink.paused = true
+          }
+          
       })
     }
   }

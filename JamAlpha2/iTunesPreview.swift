@@ -27,8 +27,8 @@ extension SongViewController: SKStoreProductViewControllerDelegate {
         let playerItem = AVPlayerItem( URL:url)
         KAVplayer = AVPlayer(playerItem:playerItem)
         displayLink = CADisplayLink(target: self, selector: ("updateSliderProgress"))
-        displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        displayLink.paused = true
+        displayLink!.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+        displayLink!.paused = true
         
     }
     
@@ -128,7 +128,9 @@ extension SongViewController: SKStoreProductViewControllerDelegate {
                     self.previewProgressCenterView.layer.cornerRadius = CGRectGetHeight(self.previewProgressCenterView.bounds)/2
                 }, completion: {
                     finished in
-                    self.displayLink.paused = false
+                  if let tempDisPlaylink = self.displayLink {
+                     tempDisPlaylink.paused = false
+                  }
                     KAVplayer.play()
             })
         }else{
@@ -138,7 +140,9 @@ extension SongViewController: SKStoreProductViewControllerDelegate {
                     self.previewProgressCenterView.layer.cornerRadius = 0
                 }, completion: {
                     finished in
-                    self.displayLink.paused = true
+                    if let tempDisPlaylink = self.displayLink {
+                      tempDisPlaylink.paused = true
+                    }
                     KAVplayer.pause()
             })
         }
@@ -189,9 +193,12 @@ extension SongViewController: SKStoreProductViewControllerDelegate {
     
     func recoverToNormalSongVC(PlayingItem:MPMediaItem){
         //delete
-        self.displayLink.paused = true
-        self.displayLink.invalidate()
+      if let tempDisplayLink = self.displayLink {
+        tempDisplayLink.paused = true
+        tempDisplayLink.invalidate()
         self.displayLink = nil
+      }
+      
         self.previewView = nil
         self.playPreveiwButton.removeFromSuperview()
         self.playPreveiwButton = nil
