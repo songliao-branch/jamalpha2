@@ -9,6 +9,17 @@
 import Foundation
 import AVFoundation
 import MediaPlayer
+import UIKit
+
+protocol Sortable {
+    func getSortableName()-> String
+}
+
+extension MPMediaItem: Sortable {
+    func getSortableName() -> String {
+        return self.title!
+    }
+}
 
 class MusicManager: NSObject {
     
@@ -25,8 +36,16 @@ class MusicManager: NSObject {
     var lastSelectedIndex = -1
     
     var uniqueSongs : [MPMediaItem]!
-    var uniqueAlbums = [Album]()
-    var uniqueArtists = [Artist]()
+    var uniqueAlbums = [SimpleAlbum]()
+    var uniqueArtists = [SimpleArtist]()
+    
+    var songsByFirstAlphabet = [(String, [MPMediaItem])]()
+    var artistsByFirstAlphabet = [(String, [SimpleArtist])]()
+    var albumsByFirstAlphabet = [(String, [SimpleAlbum])]()
+    
+    var songsSorted : [MPMediaItem]!
+    var albumsSorted = [SimpleAlbum]()
+    var artistsSorted = [SimpleArtist]()
     
     var demoSongs: [AVPlayerItem]!
     var lastLocalPlayerQueue = [AVPlayerItem]()
@@ -92,11 +111,7 @@ class MusicManager: NSObject {
         // if the collection is different i.e. new songs are added/old songs are removed
         // we manually reload MusicViewController table
         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-            musicVC.reloadDataAndTable()
-            if(!musicVC.uniqueSongs.isEmpty){
-                musicVC.songCount = 0
-                musicVC.generateWaveFormInBackEnd(musicVC.uniqueSongs[Int(musicVC.songCount)])
-            }
+            musicVC.reloadData()
         }
         
         searchVC.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
@@ -270,6 +285,9 @@ class MusicManager: NSObject {
         uniqueSongs = [MPMediaItem]()
         let songCollection = MPMediaQuery.songsQuery()
         uniqueSongs = songCollection.items!
+        songsByFirstAlphabet = sort(uniqueSongs)
+        songsSorted = getAllSortedItems(songsByFirstAlphabet)
+        
         loadDemoSongs()
     }
     
@@ -278,57 +296,77 @@ class MusicManager: NSObject {
         demoSongs = kSongNames.map {
             AVPlayerItem(URL: NSBundle.mainBundle().URLForResource($0, withExtension: "mp3")!)
         }
-        
-        for song in demoSongs {
-            CoreDataManager.initializeSongToDatabase(song)
-        }
     }
     
     func loadLocalAlbums(){
-        uniqueAlbums = [Album]()
-        //start new albums fresh
+        uniqueAlbums = [SimpleAlbum]()
+
+        let albumQuery = MPMediaQuery.albumsQuery()
+        let allAlbumsCollections = albumQuery.collections
         
-        var albumDictionary = [String: [MPMediaItem]]()//key is artist+album to avoid two artists same album names
-        
-        let keySeparator = "TGI*X"//random thing
-        for song in uniqueSongs {
-            guard let album = song.albumTitle, let artist = song.artist else {
-                continue
-            }
-            let key = artist+keySeparator+album
-            if albumDictionary[key] == nil {
-               albumDictionary[key] = []
-            }
-            albumDictionary[key]?.append(song)
-        }
-        
-        for (key, value) in albumDictionary {
-            let album = Album(album: key.componentsSeparatedByString(keySeparator)[1], collection: value)
+        for collection in allAlbumsCollections! {
+            let album = SimpleAlbum(collection: collection)
             uniqueAlbums.append(album)
         }
+        
+        albumsByFirstAlphabet = sort(uniqueAlbums)
+        albumsSorted = getAllSortedItems(albumsByFirstAlphabet)
     }
     
     //load artist must be called after getting all albums
     func loadLocalArtist() {
-        uniqueArtists = [Artist]()
-        //
-        var artistDictionary = [String: [Album]]() //key is artistName
-        for album in uniqueAlbums {
-            if artistDictionary[album.getArtist()] == nil {
-                artistDictionary [album.getArtist()] = []
-            }
-            artistDictionary [album.getArtist()]?.append(album)
-        }
+        uniqueArtists = [SimpleArtist]()
+    
+        let artistQuery = MPMediaQuery.artistsQuery()
+        let allAlbumsCollections = artistQuery.collections
         
-        for (artistName, albums) in artistDictionary {
-            let artist = Artist(artist: artistName)
-            for album in albums {
-                artist.addAlbum(album)
-            }
+        for collection in allAlbumsCollections! {
+            let artist = SimpleArtist(collection: collection)
             uniqueArtists.append(artist)
         }
+        
+        artistsByFirstAlphabet = sort(uniqueArtists)
+        artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
     }
 
+    let characters = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+    
+    
+    func sort<T: Sortable >(collection: [T]) -> [(String,[T])] {
+     
+        var itemsDictionary = [String: [T]]()
+        for item in collection {
+            var firstAlphabet = item.getSortableName()[0..<1].uppercaseString //get first letter
+            firstAlphabet = characters.indexOf(firstAlphabet) == nil ? "#" : firstAlphabet
+            
+            if itemsDictionary[firstAlphabet] == nil {
+                itemsDictionary[firstAlphabet] = []
+            }
+            itemsDictionary[firstAlphabet]?.append(item)
+        }
+        return itemsDictionary.sort{
+            (left, right) in
+            if left.0 == "#" { //put # at last
+                return false
+            } else if right.0 == "#" {
+                return true
+            }
+            return left.0 < right.0
+        }
+    }
+    
+    // Used in didSelectForRow
+    // return sorted items in a single array
+    func getAllSortedItems<T: Sortable> (collectionTuples: [(String, [T])]) -> [T] {
+        var allItemsSorted = [T]()
+        for itemSectionByAlphabet in collectionTuples {
+            for item in itemSectionByAlphabet.1 {
+                allItemsSorted.append(item)
+            }
+        }
+        return allItemsSorted
+    }
+    
     // we manually set the repeat mode to one before going to tabs or lyrics Editor
     // we save the shuffle, repeat, currentPlaying time state so that when we come back from editors we can resume correctly
     func saveMusicPlayerState(collection: [MPMediaItem]) -> (MPMusicRepeatMode, MPMusicShuffleMode, NSTimeInterval) {

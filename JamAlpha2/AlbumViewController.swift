@@ -3,11 +3,11 @@
 import UIKit
 import MediaPlayer
 
-class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UITableViewDataSource{
+class AlbumViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
 
     var musicViewController: MusicViewController! // for songviewcontroller to go to artist or album from musicviewcontroller
     
-    var theAlbum:Album!
+    var theAlbum: SimpleAlbum!
     var animator: CustomTransitionAnimation?
     var songsInTheAlbum: [MPMediaItem]!
     var isSeekingPlayerState = false
@@ -18,7 +18,8 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     {
         super.viewDidLoad()
         songsInTheAlbum = [MPMediaItem]()
-        songsInTheAlbum = theAlbum.getSongs()
+        songsInTheAlbum = theAlbum.songCollection.items
+        
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
@@ -68,13 +69,13 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return theAlbum.getNumberOfTracks()
+        return theAlbum.songCollection.items.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
-        let song = theAlbum.getSongs()[indexPath.row]
+        let song = theAlbum.songCollection.items[indexPath.row]
 
         cell.titleTrailingConstant.constant = 15
         cell.loudspeakerImage.hidden = true
@@ -106,7 +107,6 @@ class AlbumViewController: SuspendThreadViewController, UITableViewDelegate, UIT
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         isSeekingPlayerState = true
-        KGLOBAL_init_queue.suspended = true
        
         MusicManager.sharedInstance.setPlayerQueue(songsInTheAlbum)
         MusicManager.sharedInstance.setIndexInTheQueue(indexPath.row)

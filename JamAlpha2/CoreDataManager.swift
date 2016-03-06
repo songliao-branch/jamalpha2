@@ -277,11 +277,10 @@ class CoreDataManager: NSObject {
     
     class func getCoverImage(item: Findable) -> UIImage? {
         if let matchedSong = findSong(item) {
-            return   UIImage(data: matchedSong.albumCover)
+            return UIImage(data: matchedSong.albumCover)
         }
         
         return nil
-        
     }
     
     // MARK: save, retrieve lyrics, userId can be either localuserId or downloaded lyricsSet's user id

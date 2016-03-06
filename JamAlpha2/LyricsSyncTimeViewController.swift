@@ -281,11 +281,15 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         view.bringSubviewToFront(playButtonImageView)
 
         progressBlock = SoundWaveView(frame: CGRectMake(view.center.x, 0, CGFloat(theSong.getDuration()) * 2, soundwaveHeight))
-        if let soundWaveData = CoreDataManager.getSongWaveFormImage(theSong) {
-            progressBlock.setWaveFormFromData(soundWaveData)
+      
+        if KGLOBAL_progressBlock != nil && KGLOBAL_progressBlock.generatedNormalImage != nil {
+          progressBlock.setWaveFormFromImage(KGLOBAL_progressBlock.generatedNormalImage)
+        } else if let soundWaveData = CoreDataManager.getSongWaveFormImage(theSong) {
+          progressBlock.setWaveFormFromData(soundWaveData)
         } else {
-            setupDefaultProgressBar()
+          setupDefaultProgressBar()
         }
+      
         progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
         progressBlock!.alpha = 0.5
         if defaultProgressBar != nil {

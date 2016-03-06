@@ -586,17 +586,11 @@ extension SongViewController {
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
-            if (KGLOBAL_defaultProgressBar != nil){
-                KGLOBAL_defaultProgressBar.alpha = 0.5
-            }
         } else {
             self.player.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
-            if (KGLOBAL_defaultProgressBar != nil){
-                KGLOBAL_defaultProgressBar.alpha = 0.5
-            }
         }
         let tabsEditorVC = self.storyboard?.instantiateViewControllerWithIdentifier("tabseditorviewcontroller") as! TabsEditorViewController
         tabsEditorVC.theSong = isDemoSong ? demoItem : nowPlayingMediaItem
@@ -649,17 +643,11 @@ extension SongViewController {
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
-            if (KGLOBAL_defaultProgressBar != nil){
-                KGLOBAL_defaultProgressBar.alpha = 0.5
-            }
         } else {
             self.player.pause()
             stopTimer()
             KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
             KGLOBAL_progressBlock!.alpha = 0.5
-            if (KGLOBAL_defaultProgressBar != nil){
-                KGLOBAL_defaultProgressBar.alpha = 0.5
-            }
         }
         self.clearActions()
         let lyricsEditor = self.storyboard?.instantiateViewControllerWithIdentifier("lyricstextviewcontroller")

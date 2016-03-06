@@ -18,7 +18,6 @@ import Crashlytics
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var suspended:Bool = false
     
     var shuffleMode:MPMusicShuffleMode!
     var repeatMode:MPMusicRepeatMode!
@@ -116,10 +115,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             MusicManager.sharedInstance.lastPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem
             MusicManager.sharedInstance.lastPlayingTime = MusicManager.sharedInstance.player.currentPlaybackTime
         }
-        
-        self.suspended = KGLOBAL_init_queue.suspended
+      
         KGLOBAL_queue.suspended = true
-        KGLOBAL_init_queue.suspended = true
         shuffleMode = MusicManager.sharedInstance.player.shuffleMode
         repeatMode = MusicManager.sharedInstance.player.repeatMode
     }
@@ -205,7 +202,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         }
                     }
                     KGLOBAL_queue.suspended = false
-                    KGLOBAL_init_queue.suspended = self.suspended
                 }
             } else {
                 if MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem == nil && !currentSongVC.isDemoSong {
@@ -217,13 +213,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         currentSongVC.dismissViewControllerAnimated(true, completion: {
                             completed in
                             KGLOBAL_queue.suspended = false
-                            KGLOBAL_init_queue.suspended = self.suspended
                             MusicManager.sharedInstance.initializePlayer()
                         })
                     } else {
                         currentSongVC.registerMediaPlayerNotification()
                         KGLOBAL_queue.suspended = false
-                        KGLOBAL_init_queue.suspended = self.suspended
                     }
                 } else {
                     currentSongVC.registerMediaPlayerNotification()
@@ -233,7 +227,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         currentSongVC.resumeSong()
                     }
                     KGLOBAL_queue.suspended = false
-                    KGLOBAL_init_queue.suspended = self.suspended
                 }
             }
         } else {
@@ -248,7 +241,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 KGLOBAL_nowView.stop()
             }
             KGLOBAL_queue.suspended = false
-            KGLOBAL_init_queue.suspended = self.suspended
         }
         
         KGLOBAL_isNeedToCheckIndex = true

@@ -7,12 +7,12 @@
 //July 7, 2015
 import UIKit
 import MediaPlayer
-class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate{
+class ArtistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
     
     var musicViewController: MusicViewController! //for songviewcontroller to go to artist or album from musicviewcontroller
-    var theArtist:Artist!
+    var theArtist: SimpleArtist!
     var animator: CustomTransitionAnimation?
-    var artistAllSongs:[MPMediaItem]!
+    var artistAllSongs: [MPMediaItem]!
     var isSeekingPlayerState = false
     
     @IBOutlet weak var artistTable: UITableView!
@@ -20,7 +20,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        artistAllSongs = theArtist.getSongs()
+        artistAllSongs = theArtist.getAllSongs()
         self.createTransitionAnimation()
         self.automaticallyAdjustsScrollViewInsets = false
         registerMusicPlayerNotificationForSongChanged()
@@ -75,13 +75,13 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         let cell = tableView.dequeueReusableCellWithIdentifier("albumsectioncell") as! AlbumSectionCell
         
         cell.albumImageView.image = nil
-        let songs = theArtist.getAlbums()[section].getSongs()
+        let songs = theArtist.getAlbums()[section].songCollection.items
         CoreDataManager.initializeSongToDatabase(songs[0])
         
         if let coverimage = CoreDataManager.getCoverImage(songs[0]){
             cell.albumImageView.image = coverimage
         }else{
-            if let cover = theArtist.getAlbums()[section].getCoverImage() {
+            if let cover = theArtist.getAlbums()[section].getArtwork() {
                 
                 let image = cover.imageWithSize(CGSize(width: 85, height: 85))
                 if let img = image {
@@ -100,7 +100,7 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
         }
         
         
-        cell.albumNameLabel.text  = theArtist.getAlbums()[section].albumTitle
+        cell.albumNameLabel.text  = theArtist.getAlbums()[section].getAlbumTitle()
         
         if theArtist.getAlbums()[section].getYearReleased() > 1000 { //album year exist
             cell.albumYearLabel.hidden = false
@@ -126,13 +126,13 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        return theArtist.getAlbums()[section].getNumberOfTracks()
+        return theArtist.getAlbums()[section].songCollection.items.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("albumtrackcell", forIndexPath: indexPath) as! AlbumTrackCell
         
-        let song = theArtist.getAlbums()[indexPath.section].getSongs()[indexPath.row]
+        let song = theArtist.getAlbums()[indexPath.section].songCollection.items[indexPath.row]
         
         cell.titleTrailingConstant.constant = 15
         cell.loudspeakerImage.hidden = true
@@ -169,13 +169,12 @@ class ArtistViewController: SuspendThreadViewController, UITableViewDataSource, 
     // so we have 3 + 2 plus current selected indexPath.row which returns a single index of 3 + 2 + 1 = 6
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         isSeekingPlayerState = true
-        KGLOBAL_init_queue.suspended = true
         
         let albumIndex = indexPath.section
         var songsInPreviousSections = 0
         if albumIndex > 0 {
             for i in 1...albumIndex {
-               songsInPreviousSections += theArtist.getAlbums()[i-1].getNumberOfTracks()
+               songsInPreviousSections += theArtist.getAlbums()[i-1].songCollection.items.count
             }
         }
         let indexToBePlayed = songsInPreviousSections + indexPath.row

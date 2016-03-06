@@ -3,24 +3,24 @@ import MediaPlayer
 import Haneke
 
 
-class MusicViewController: SuspendThreadViewController, UITableViewDataSource, UITableViewDelegate  {
+class MusicViewController: UIViewController, UITableViewDataSource, UITableViewDelegate  {
 
     @IBOutlet weak var tableView: UITableView!
     
     var uniqueSongs = [MPMediaItem]()
-    private var uniqueArtists = [Artist]()
-    private var uniqueAlbums = [Album]()
+    private var uniqueArtists = [SimpleArtist]()
+    private var uniqueAlbums = [SimpleAlbum]()
     
     var demoSongs = [AVPlayerItem]()
     
     private var songsByFirstAlphabet = [(String, [MPMediaItem])]()
-    private var artistsByFirstAlphabet = [(String, [Artist])]()
-    private var albumsByFirstAlphabet = [(String, [Album])]()
+    private var artistsByFirstAlphabet = [(String, [SimpleArtist])]()
+    private var albumsByFirstAlphabet = [(String, [SimpleAlbum])]()
     
     //a single array (sorted by alphabets) used for didSelectRow
     private var songsSorted = [MPMediaItem] ()
-    private var artistsSorted = [Artist]()
-    private var albumsSorted = [Album]()
+    private var artistsSorted = [SimpleArtist]()
+    private var albumsSorted = [SimpleAlbum]()
     
     private var rwLock = pthread_rwlock_t()
     
@@ -41,7 +41,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
-        loadAndSortMusic()
+        reloadData()
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
         UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
@@ -56,29 +56,38 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         super.viewDidAppear(animated)
         viewDidAppear = true
         musicTable.reloadData()
-        // if not generating, we start generating
-        if !KEY_isSoundWaveformGeneratingInBackground {
-            if(!uniqueSongs.isEmpty){
-                generateWaveFormInBackEnd(uniqueSongs[Int(songCount)])
-            }
-            KEY_isSoundWaveformGeneratingInBackground = true
-        }
     }
     
-    func loadAndSortMusic() {
+    func clearData() {
+        uniqueSongs.removeAll()
+        uniqueArtists.removeAll()
+        uniqueAlbums.removeAll()
+        songsByFirstAlphabet = [(String, [MPMediaItem])]()
+        artistsByFirstAlphabet = [(String, [SimpleArtist])]()
+        albumsByFirstAlphabet = [(String, [SimpleAlbum])]()
+        songsSorted.removeAll()
+        albumsSorted.removeAll()
+        artistsSorted.removeAll()
+        
+    }
+    
+    func reloadData() {
+        clearData()
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
 
         demoSongs = MusicManager.sharedInstance.demoSongs
 
-        songsByFirstAlphabet = sort(uniqueSongs)
-        artistsByFirstAlphabet = sort(uniqueArtists)
-        albumsByFirstAlphabet = sort(uniqueAlbums)
-
-        songsSorted = getAllSortedItems(songsByFirstAlphabet)
-        artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
-        albumsSorted = getAllSortedItems(albumsByFirstAlphabet)
+        songsByFirstAlphabet = MusicManager.sharedInstance.songsByFirstAlphabet
+        artistsByFirstAlphabet = MusicManager.sharedInstance.artistsByFirstAlphabet
+        albumsByFirstAlphabet = MusicManager.sharedInstance.albumsByFirstAlphabet
+        
+        songsSorted = MusicManager.sharedInstance.songsSorted
+        artistsSorted = MusicManager.sharedInstance.artistsSorted
+        albumsSorted = MusicManager.sharedInstance.albumsSorted
+        
+        musicTable.reloadData()
     }
     
     deinit{
@@ -93,12 +102,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         objc_sync_enter(lock)
         closure()
         objc_sync_exit(lock)
-    }
-    
-    
-    func reloadDataAndTable() {
-        loadAndSortMusic()
-        musicTable.reloadData()
     }
     
     func currentSongChanged(notification: NSNotification){
@@ -262,29 +265,14 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
                 cell.titleLeftConstraint.constant = 30
             }
             
-            if viewDidAppear {
-                 CoreDataManager.initializeSongToDatabase(song)
-            }
-            
-            if let coverimage = CoreDataManager.getCoverImage(song){
-                cell.coverImage.image = coverimage
-            } else {
-                // some song does not have an album cover
-                if let cover = song.getArtWork() {
-                    let image = cover.imageWithSize(CGSize(width: 54, height: 54))
-                    if let img = image {
-                        cell.coverImage.image = img
-                    } else { //this happens somewhow when songs load too fast
-                        //TODO: load something else
-                        if viewDidAppear {
-                            cell.coverImage.image = UIImage(named: "liweng")
-                            loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
-                        }
-                    }
-                } else {
-                    cell.coverImage.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
-                }
+            if let cover = song.getArtWork() { //if this item has artwork
+                cell.coverImage.image = cover.imageWithSize(CGSize(width: 54, height: 54))
+            } else if let cover = CoreDataManager.getCoverImage(song) {//then we try to find the cover we saved from iTunes last time we searched it
+                cell.coverImage.image = cover
+            } else { //find the cover in iTunes
+                cell.coverImage.image = UIImage(named: DEFAULT_COVER)
+                CoreDataManager.initializeSongToDatabase(song)
+                loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
             }
             
         } else if pageIndex == 1  {
@@ -294,48 +282,26 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.coverImage.image = nil
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
-            if theArtist.getSongs().count > 0 {
-                CoreDataManager.initializeSongToDatabase(theArtist.getSongs()[0])
-                if let coverImage = CoreDataManager.getCoverImage(theArtist.getSongs()[0]){
-                    cell.coverImage.image = coverImage
-                }else{
-                    //get the first album cover
-                    for album in theArtist.getAlbums() {
-                        if let cover = album.getCoverImage() {
-                            let image = cover.imageWithSize(CGSize(width: 80, height: 80))
-                            if let img = image {
-                                cell.coverImage.image = img
-                            } else { //this happens somewhow when songs load too fast
-                                //TODO: load something else
-                                cell.coverImage.image = UIImage(named: "liweng")
-                                loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                            }
-                            
-                            break
-                        }
-                    }
-                    
-                    if(cell.coverImage.image == nil){
-                        cell.coverImage.image = UIImage(named: "liweng")
-                        loadAPISearchImageToCell(cell, song: theArtist.getSongs()[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                    }
-                }
-            }else{
-                if(cell.coverImage.image == nil){
-                    cell.coverImage.image = UIImage(named: "liweng")
-                }
-            }
             
+            let song = theArtist.songCollection.representativeItem!
+            
+            if let cover = theArtist.getArtwork() {
+                let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                cell.coverImage.image = image
+            } else if let cover = CoreDataManager.getCoverImage(song) {
+                cell.coverImage.image = cover
+            } else {
+                cell.coverImage.image = UIImage(named: DEFAULT_COVER)
+                 loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
+            }
+        
             
             cell.loudspeakerImage.hidden = true
-
-            let numberOfAlbums = theArtist.getAlbums().count
-            let albumPrompt = "album".addPluralSubscript(numberOfAlbums)
-            
-            let numberOfTracks = theArtist.numberOfTracks
+            let numberOfTracks = theArtist.songCollection.items.count
             let trackPrompt = "track".addPluralSubscript(numberOfTracks)
-            cell.mainTitle.text = theArtist.artistName
-            cell.subtitle.text = "\(numberOfAlbums) \(albumPrompt), \(numberOfTracks) \(trackPrompt)"
+            
+            cell.mainTitle.text = theArtist.getArtist()
+            cell.subtitle.text = "\(numberOfTracks) \(trackPrompt)"
             
         } else if pageIndex == 2 {
 
@@ -343,44 +309,21 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             cell.imageWidth.constant = 80
             cell.imageHeight.constant = 80
             
-            let songs = theAlbum.getSongs()
-            CoreDataManager.initializeSongToDatabase(songs[0])
+            let song = theAlbum.songCollection.items[0]
             
-            if let coverimage = CoreDataManager.getCoverImage(songs[0]){
-                cell.coverImage.image = coverimage
-            }else{
-                if let cover = theAlbum.getCoverImage() {
-                    
-                    cell.coverImage.image = cover.imageWithSize(CGSize(width: 80, height: 80))
-                    let image = cover.imageWithSize(CGSize(width: 80, height: 80))
-                    if let img = image {
-                        cell.coverImage.image = img
-                    } else { //this happens somewhow when songs load too fast
-                        //TODO: load something else
-                        cell.coverImage.image = UIImage(named: "liweng")
-                        loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                    }
-                }
-                
-                if(cell.coverImage.image == nil){
-                    cell.coverImage.image = UIImage(named: "liweng")
-                    loadAPISearchImageToCell(cell, song: songs[0], imageSize: SearchAPI.ImageSize.Thumbnail)
-                }
+            if let cover = theAlbum.getArtwork() {
+                let image = cover.imageWithSize(CGSize(width: 80, height: 80))
+                cell.coverImage.image = image
+            } else if let cover = CoreDataManager.getCoverImage(song) {
+                cell.coverImage.image = cover
+            } else {
+                cell.coverImage.image = UIImage(named: DEFAULT_COVER)
+                loadAPISearchImageToCell(cell, song: song, imageSize: SearchAPI.ImageSize.Thumbnail)
             }
-            
-            cell.loudspeakerImage.hidden = true
-            
-            let numberOfTracks = theAlbum.getNumberOfTracks()
-            let trackPrompt = "track".addPluralSubscript(numberOfTracks)
-            
-            cell.mainTitle.text = theAlbum.albumTitle
-            cell.subtitle.text = "\(numberOfTracks) \(trackPrompt)"
-        }
         
-        if (!tableView.dragging && !tableView.decelerating) {
-            KGLOBAL_init_queue.suspended = false
-        }else{
-            KGLOBAL_init_queue.suspended = true
+            cell.loudspeakerImage.hidden = true
+            cell.mainTitle.text = theAlbum.getAlbumTitle()
+            cell.subtitle.text = theAlbum.getArtist()
         }
         return cell
     }
@@ -405,8 +348,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         var isDemoSong = false
         isSeekingPlayerState = true
         if pageIndex == 0 {
-            KGLOBAL_init_queue.suspended = true
-            
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             var indexToBePlayed:Int = 0
             if NSUserDefaults.standardUserDefaults().boolForKey(kShowDemoSong) {
@@ -509,7 +450,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
             artistVC.theArtist = artistsSorted[indexToBePlayed]
             
             self.showViewController(artistVC, sender: self)
-            
         }
         else if pageIndex == 2 {
             isSeekingPlayerState = false
@@ -528,7 +468,8 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func goToArtist(theArtist: String) {
         self.view.alpha = 1
         for artist in MusicManager.sharedInstance.uniqueArtists {
-            if theArtist == artist.artistName {
+            if theArtist == artist.getArtist() {
+            
                 let artistVC = self.storyboard?.instantiateViewControllerWithIdentifier("artistviewstoryboard") as! ArtistViewController
                 artistVC.musicViewController = self
                 artistVC.theArtist = artist
@@ -542,7 +483,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     func goToAlbum(theAlbum: String) {
         self.view.alpha = 1
         for album in MusicManager.sharedInstance.uniqueAlbums {
-            if theAlbum == album.albumTitle {
+            if theAlbum == album.getAlbumTitle() {
                 let albumVC = self.storyboard?.instantiateViewControllerWithIdentifier("albumviewstoryboard") as! AlbumViewController
                 albumVC.musicViewController = self
                 albumVC.theAlbum = album
@@ -590,17 +531,6 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
         }
     }
     
-    // Used in didSelectForRow
-    // return sorted items in a single array
-    func getAllSortedItems<T: Sortable> (collectionTuples: [(String, [T])]) -> [T] {
-        var allItemsSorted = [T]()
-        for itemSectionByAlphabet in collectionTuples {
-            for item in itemSectionByAlphabet.1 {
-                allItemsSorted.append(item)
-            }
-        }
-        return allItemsSorted
-    }
     
     // For songs, because we need to use the whole collection for the player queue instead an alphabet section, 
     // but indexPath.section and indexPath.row is only return the index of the alphabet section, so to find the
@@ -629,126 +559,5 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
 }
 
-extension MusicViewController {
-    
-    override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        queueSuspended = KGLOBAL_queue.suspended
-        KGLOBAL_init_queue.suspended = true
-        KGLOBAL_queue.suspended = true
-    }
-    
-    override func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate {
-             KGLOBAL_init_queue.suspended = false
-            KGLOBAL_queue.suspended = queueSuspended
-        }
-    }
-    
-    override func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        KGLOBAL_init_queue.suspended = false
-        KGLOBAL_queue.suspended = queueSuspended
-    }
-    
-    func generateWaveFormInBackEnd(nowPlayingItem: MPMediaItem){
-        
-        if let _ = CoreDataManager.getSongWaveFormImage(nowPlayingItem) {
-            // songCount can be only incremented in one queue no matter how many threads
-            self.incrementSongCountInThread()
-        } else {
-            dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
-                let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
-    
-                var op:NSBlockOperation?
-                op = KGLOBAL_init_operationCache[keyString]
-                if(op == nil){
-                    
-                    if nowPlayingItem.artist == nil {
-                        if(KGLOBAL_init_operationCache[keyString] != nil){
-                            KGLOBAL_init_operationCache.removeValueForKey(keyString)
-                        }
-                        self.incrementSongCountInThread()
-                        return
-                    }
-                    
-                    self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingItem, completion: {
-                        url in
-                        if url == "" || url.isEmpty {
-                            let tempNowPlayingItem = nowPlayingItem
-                            let tempkeyString:String = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
-                            guard let assetURL = nowPlayingItem.getURL() else {
-                                if(KGLOBAL_init_operationCache[tempkeyString] != nil){
-                                    KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
-                                }
-                                self.incrementSongCountInThread()
-                                return
-                            }
-                            // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-                            var progressBarWidth:CGFloat!
-                            progressBarWidth = CGFloat(nowPlayingItem.playbackDuration) * progressWidthMultiplier
-                            let tempProgressBlock = SoundWaveView(frame: CGRect(x: 0, y: 0, width: progressBarWidth, height: soundwaveHeight))
-                            op = NSBlockOperation(block: {
-                                
-                                if(op!.cancelled){
-                                    return
-                                }
-                                tempProgressBlock.SetSoundURL(assetURL as! NSURL)
-                                
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    NSOperationQueue.mainQueue().addOperationWithBlock({
-                                        tempProgressBlock.generateWaveforms()
-                                        if let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage) {
-                                          CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
-                                        }
-                                        let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
-                                        AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
-                                            succeeded in
-                                            if succeeded {
-                                                APIManager.updateSoundwaveUrl(CoreDataManager.getSongId(tempNowPlayingItem), url: soundwaveName)
-                                                print("uploaded image to AWS and updated the url for song \(tempNowPlayingItem.getTitle())")
-                                            }
-                                        })
-                                        KGLOBAL_init_operationCache.removeValueForKey(tempkeyString)
-                                        self.incrementSongCountInThread()
-                                    })
-                                }
-                            })
-                            KGLOBAL_init_operationCache[tempkeyString] = op
-                            KGLOBAL_init_queue.addOperation(op!)
-                            
-                        }else{
-                            AWSS3Manager.downloadImage(url, isProfileBucket: false, completion: {
-                                image in
-                                    let data = UIImagePNGRepresentation(image)
-                                    if(KGLOBAL_init_operationCache[keyString] != nil){
-                                        KGLOBAL_init_operationCache.removeValueForKey(keyString)
-                                    }
-                                    CoreDataManager.saveSoundWave(nowPlayingItem, soundwaveImage: data!)
-                                    self.incrementSongCountInThread()
-                                    return
-                                
-                            })
-                        }
-                    })
-                }
-            }
-        }
-    }
-    
-    func incrementSongCountInThread(){
-        pthread_rwlock_wrlock(&self.rwLock)
-        if(Int(self.songCount) < self.uniqueSongs.count-1){
-            self.generateWaveFormInBackEnd(self.uniqueSongs[Int(OSAtomicIncrement64(&(self.songCount)))])
-        }
-        pthread_rwlock_unlock(&self.rwLock)
-    }
-    
-    func getSongIdAndSoundwaveUrlFromCloud(item: Findable, completion: ((soundwave_url:String) -> Void)?) {
-        APIManager.getSongInformation(item, completion: {
-            id, soundwave_url in
-            CoreDataManager.setSongId(item, id: id)
-            completion!(soundwave_url:soundwave_url)
-        })
-    }
-}
 
 

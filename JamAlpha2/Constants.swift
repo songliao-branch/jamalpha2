@@ -13,11 +13,8 @@ import AVFoundation
 let KGLOBAL_queue:NSOperationQueue = NSOperationQueue()
 var KGLOBAL_operationCache = [String:NSBlockOperation]()
 
-let KGLOBAL_init_queue:NSOperationQueue = NSOperationQueue()
-var KGLOBAL_init_operationCache = [String:NSBlockOperation]()
 
 var KGLOBAL_progressBlock: SoundWaveView!
-var KGLOBAL_defaultProgressBar:UIProgressView!
 
 var KGLOBAL_timer:NSTimer!
 
@@ -49,5 +46,7 @@ let kIndexOfUserPage = 3
 let APP_STORE_ID = "1066080131"
 
 let FACEBOOK_PAGE_URL = "https://www.facebook.com/twistjam"
-let VERSION_NUMBER = "1.0.0"
+let VERSION_NUMBER = "1.0.0"//TODO: change this
 let COPYRIGHTYEAR = "2015-2016"
+
+let DEFAULT_COVER = "liweng"

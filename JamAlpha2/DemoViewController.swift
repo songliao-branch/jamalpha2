@@ -90,11 +90,11 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
             NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowDemoSong)
             if(uiswitch.on){
                 for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                    musicVC.reloadDataAndTable()
+                    musicVC.reloadData()
                 }
             }else{
                 for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                    musicVC.reloadDataAndTable()
+                    musicVC.reloadData()
                 }
             }
             if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
