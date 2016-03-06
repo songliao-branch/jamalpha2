@@ -41,7 +41,7 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
-        loadAndSortMusic()
+        reloadData()
         createTransitionAnimation()
         registerMusicPlayerNotificationForSongChanged()
         UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
@@ -58,8 +58,21 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         musicTable.reloadData()
     }
     
+    func clearData() {
+        uniqueSongs.removeAll()
+        uniqueArtists.removeAll()
+        uniqueAlbums.removeAll()
+        songsByFirstAlphabet = [(String, [MPMediaItem])]()
+        artistsByFirstAlphabet = [(String, [SimpleArtist])]()
+        albumsByFirstAlphabet = [(String, [SimpleAlbum])]()
+        songsSorted.removeAll()
+        albumsSorted.removeAll()
+        artistsSorted.removeAll()
+        
+    }
     
-    func loadAndSortMusic() {
+    func reloadData() {
+        clearData()
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
@@ -73,6 +86,8 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         songsSorted = MusicManager.sharedInstance.songsSorted
         artistsSorted = MusicManager.sharedInstance.artistsSorted
         albumsSorted = MusicManager.sharedInstance.albumsSorted
+        
+        musicTable.reloadData()
     }
     
     deinit{
@@ -87,12 +102,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         objc_sync_enter(lock)
         closure()
         objc_sync_exit(lock)
-    }
-    
-
-    func reloadDataAndTable() {
-        loadAndSortMusic()
-        musicTable.reloadData()
     }
     
     func currentSongChanged(notification: NSNotification){

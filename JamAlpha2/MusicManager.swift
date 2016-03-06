@@ -68,11 +68,9 @@ class MusicManager: NSObject {
     
     override init() {
         super.init()
-        let t = CACurrentMediaTime()
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
-        print("load took: \(CACurrentMediaTime() - t)")
         initializePlayer()
         addNotification()
     }
@@ -113,7 +111,7 @@ class MusicManager: NSObject {
         // if the collection is different i.e. new songs are added/old songs are removed
         // we manually reload MusicViewController table
         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-            musicVC.reloadDataAndTable()
+            musicVC.reloadData()
         }
         
         searchVC.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
@@ -287,9 +285,10 @@ class MusicManager: NSObject {
         uniqueSongs = [MPMediaItem]()
         let songCollection = MPMediaQuery.songsQuery()
         uniqueSongs = songCollection.items!
-        loadDemoSongs()
         songsByFirstAlphabet = sort(uniqueSongs)
         songsSorted = getAllSortedItems(songsByFirstAlphabet)
+        
+        loadDemoSongs()
     }
     
     func loadDemoSongs() {
@@ -330,25 +329,15 @@ class MusicManager: NSObject {
         artistsSorted = getAllSortedItems(artistsByFirstAlphabet)
     }
 
-    let characters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+    let characters = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+    
     
     func sort<T: Sortable >(collection: [T]) -> [(String,[T])] {
+     
         var itemsDictionary = [String: [T]]()
         for item in collection {
-            var firstAlphabet = item.getSortableName()[0..<1] //get first letter
-            var isLetter = false
-            //We put every non-alphabet items into a section called "#"
-            for character in characters {
-                if firstAlphabet.lowercaseString == character {
-                    isLetter = true
-                    break
-                }
-            }
-            if !isLetter {
-                firstAlphabet = "#"
-            } else {
-                firstAlphabet = firstAlphabet.uppercaseString
-            }
+            var firstAlphabet = item.getSortableName()[0..<1].uppercaseString //get first letter
+            firstAlphabet = characters.indexOf(firstAlphabet) == nil ? "#" : firstAlphabet
             
             if itemsDictionary[firstAlphabet] == nil {
                 itemsDictionary[firstAlphabet] = []
