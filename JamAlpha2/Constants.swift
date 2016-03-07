@@ -38,9 +38,9 @@ let kLocalSetId = -1
 
 var KAVplayer: AVPlayer!
 
-let kIndexOfMyMusicPage = 0
-let kIndexOfSearchPage = 1
-let kIndexOfTopPage = 2
+let kIndexOfTopPage = 0
+let kIndexOfMyMusicPage = 1
+let kIndexOfSearchPage = 2
 let kIndexOfUserPage = 3
 
 let APP_STORE_ID = "1066080131"

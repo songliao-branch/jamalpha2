@@ -670,7 +670,7 @@ extension SongViewController {
                 }
             }else{
                 let rootVC:TabBarController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC as! TabBarController
-                let baseVC:BaseViewController = (rootVC.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+                let baseVC:BaseViewController = (rootVC.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
                 rootVC.selectedIndex = 0
                 let musicVC:MusicViewController = baseVC.musicViewController
                 if(!self.isDemoSong){
@@ -692,7 +692,7 @@ extension SongViewController {
                 }
             }else{
                 let rootVC:TabBarController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC as! TabBarController
-                let baseVC:BaseViewController = (rootVC.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+                let baseVC:BaseViewController = (rootVC.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
                 rootVC.selectedIndex = 0
                 let musicVC:MusicViewController = baseVC.musicViewController
                 if(!self.isDemoSong){

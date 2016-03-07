@@ -15,38 +15,23 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
     var isDemo = true //false means we are showing tutorial
     var tutorialTexts = ["Show music player tutorial", "Show tabs editor tutorial"]
     @IBOutlet weak var demoTable: UITableView!
-    var cell:DemoCell!
-    var baseVC:BaseViewController!
+    
+    var cell: DemoCell!
+    var baseVC: BaseViewController!
     
     var isFromUnLoginVC: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpNavigationBar()
-        findMusicVC()
+        self.navigationItem.title = isDemo ? "Demo" : "Tutorial"
     }
     
-    func findMusicVC(){
-        if isFromUnLoginVC {
-            baseVC = (UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController
-        } else {
-            baseVC = self.parentViewController!.parentViewController?.childViewControllers[0].childViewControllers[0] as! BaseViewController
-        }
-    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         //come back from MusicViewController to DemoViewController should refresh this variable
         if !isDemo {
             demoTable.reloadData()
-        }
-    }
-
-    func setUpNavigationBar() {
-        if isDemo {
-            self.navigationItem.title = "Demo"
-        } else {
-            self.navigationItem.title = "Tutorial"
         }
     }
     
@@ -88,16 +73,14 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
     func switchChanged(uiswitch: UISwitch){
         if isDemo {
             NSUserDefaults.standardUserDefaults().setBool(uiswitch.on, forKey: kShowDemoSong)
-            if(uiswitch.on){
-                for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                    musicVC.reloadData()
-                }
-            }else{
-                for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-                    musicVC.reloadData()
-                }
+        
+            let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
+            
+            for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+                musicVC.musicTable.reloadData()
             }
-            if(MusicManager.sharedInstance.avPlayer.currentItem != nil){
+            
+            if (MusicManager.sharedInstance.avPlayer.currentItem != nil) {
                 MusicManager.sharedInstance.avPlayer.pause()
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 MusicManager.sharedInstance.avPlayer.removeAllItems()

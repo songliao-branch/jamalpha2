@@ -277,7 +277,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         MusicManager.sharedInstance.avPlayer.removeAllItems()
       }
       self.selectedFromSearchTab = true
-      let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
+      let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[kIndexOfMyMusicPage].childViewControllers[0] as! BaseViewController)
       for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
         self.musicViewController = musicVC
       }
