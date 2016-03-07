@@ -138,7 +138,7 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
             for i in 0..<numberOfLineInSingleLyricsView {
                 lyricsArray.append(("", 0, 0.5, CGFloat(i * 66) + contentOff))
             }
-            lyricsArray.append(("No lyrics found yet, we are wating for you to add it here!", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + contentOff))
+            lyricsArray.append(("No lyrics found yet, we are wating for you to add it!", 0, 0.5, CGFloat(numberOfLineInSingleLyricsView * 66) + contentOff))
             if (self.singleLyricsTableView != nil){
                 singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
             }
@@ -375,7 +375,9 @@ extension SongViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if lyric.lyric.count == 0 {
             if indexPath.item == numberOfLineInSingleLyricsView {
+              if !isSongNeedPurchase {
                 self.goToLyricsEditor()
+              }
             }
         }
     }
