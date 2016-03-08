@@ -68,9 +68,7 @@ class MusicManager: NSObject {
     
     override init() {
         super.init()
-        loadLocalSongs()
-        loadLocalAlbums()
-        loadLocalArtist()
+        loadCollections()
         initializePlayer()
         addNotification()
     }
@@ -79,9 +77,7 @@ class MusicManager: NSObject {
     func itemFoundInCollection(songToCheck: Findable) -> MPMediaItem? {
         let result = uniqueSongs.filter{
             (item: MPMediaItem) -> Bool in
-            
             return MusicManager.sharedInstance.songsMatched(findableA: songToCheck, findableB: item)
-
         }.first
         if(result != nil){
             return result!
@@ -147,10 +143,14 @@ class MusicManager: NSObject {
         topSongVC.loadData()
     }
     
-    func reloadCollections() {
+    func loadCollections() {
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()
+    }
+    
+    func reloadCollections() {
+        loadCollections()
         queueChanged = true
     }
     
@@ -215,7 +215,10 @@ class MusicManager: NSObject {
     }
 
     func setPlayerQueue(collection: [MPMediaItem]){
-
+        //for iOS 8.1 devices, MPMediaItemCollectionInitException causes a crash if no music found
+        if collection.isEmpty {
+            return
+        }
         if lastPlayerQueue == collection { // if we are the same queue
             queueChanged = false
         } else { //if different queue, means we are getting a new collection, reset the player queue
@@ -281,7 +284,7 @@ class MusicManager: NSObject {
     }
     
     // MARK: get all MPMediaItems
-    func loadLocalSongs(){
+    func loadLocalSongs() {
         uniqueSongs = [MPMediaItem]()
         let songCollection = MPMediaQuery.songsQuery()
         uniqueSongs = songCollection.items!
