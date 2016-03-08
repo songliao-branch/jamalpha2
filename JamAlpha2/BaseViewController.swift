@@ -39,11 +39,20 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         setupSegmentButtons()
         setUpSelector()//the horizontal bar that moves with button tapped
         setUpPageViewController()
-        registerMusicPlayerNotificationForPlaybackStateChanged()
+        registerNotifications()
     }
     
-    func registerMusicPlayerNotificationForPlaybackStateChanged(){
+    func registerNotifications(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshData", name: MPMediaLibraryDidChangeNotification, object: nil)
+    }
+    
+    func refreshData() {
+        MusicManager.sharedInstance.reloadCollections()
+        for musicVC in self.pageViewController.childViewControllers as! [MusicViewController] {
+            musicVC.loadData()
+        }
     }
     
     func playbackStateChanged(notification: NSNotification){
@@ -274,15 +283,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
         let nextViewController = pendingViewControllers[0] as! MusicViewController
-        if(nextViewController.pageIndex == 0){
-            nextViewController.musicTable.reloadData()
-        }
-        else if(nextViewController.pageIndex == 1){
-            nextViewController.musicTable.reloadData()
-        }
-        else if(nextViewController.pageIndex == 2){
-            nextViewController.musicTable.reloadData()
-        }
+        nextViewController.musicTable.reloadData()
     }
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {

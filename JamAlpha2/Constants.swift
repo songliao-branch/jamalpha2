@@ -38,6 +38,7 @@ let kLocalSetId = -1
 
 var KAVplayer: AVPlayer!
 
+let kMusicLibaryChangedNotification = "MusicLibraryChanged"
 let kIndexOfTopPage = 0
 let kIndexOfMyMusicPage = 1
 let kIndexOfSearchPage = 2
