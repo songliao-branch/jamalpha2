@@ -33,6 +33,7 @@ class lyricsWithTime {
 }
 
 class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
+  var storeTheTableSwipeOffset: [CGFloat]!
     var currentTime: NSTimeInterval = 0
     var isDemoSong = false
     var isPlaying:Bool = false
@@ -267,6 +268,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         lyricsTableView.registerClass(LyricsSyncTimeTableViewCell.self, forCellReuseIdentifier: "lyricsSyncCell")
         lyricsTableView.backgroundColor = UIColor.clearColor()
         view.addSubview(lyricsTableView)
+      storeTheTableSwipeOffset = [CGFloat](count: lyricsOrganizedArray.count, repeatedValue: 0)
     }
 
     func setUpProgressBlock() {
@@ -586,6 +588,8 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
   func getRightButton() -> NSMutableArray {
     let rightButton = NSMutableArray()
     rightButton.addObject(MGSwipeButton(title: "Delete", backgroundColor: UIColor.redColor()))
+    rightButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeUp"), backgroundColor: UIColor.clearColor(), insets: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)))
+    rightButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeDown"), backgroundColor: UIColor.clearColor(), insets: UIEdgeInsets(top: 0, left: 30, bottom: 0, right: 0)))
     return rightButton
   }
   
@@ -596,7 +600,9 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: LyricsSyncTimeTableViewCell = lyricsTableView.dequeueReusableCellWithIdentifier("lyricsSyncCell") as! LyricsSyncTimeTableViewCell
         cell.delegate = self
-        cell.leftButtons = getLeftButton() as [AnyObject]
+        cell.setSwipeOffset(storeTheTableSwipeOffset[indexPath.item], animated: false, completion: nil)
+        //cell.swipeOffset = storeTheTableSwipeOffset[indexPath.item]
+        storeTheTableSwipeOffset[indexPath.item] = 0
         cell.leftSwipeSettings.transition = .Rotate3D
         cell.rightButtons = getRightButton() as [AnyObject]
         cell.rightSwipeSettings.transition = .Drag
@@ -654,59 +660,66 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, 
         tableView.deselectRowAtIndexPath(indexPath, animated: true)      
     }
   
-  func swipeTableCell(cell: MGSwipeTableCell!, didChangeSwipeState state: MGSwipeState, gestureIsActive: Bool) {
-    if let indexPath = self.lyricsTableView.indexPathForCell(cell) {
-      if state.rawValue == 0 {
-        lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
-      }
-    }
-  }
-  
   func swipeTableCell(cell: MGSwipeTableCell!, tappedButtonAtIndex index: Int, direction: MGSwipeDirection, fromExpansion: Bool) -> Bool {
     if let indexPath = lyricsTableView.indexPathForCell(cell) {
-      if direction == .LeftToRight {
+      if direction == .RightToLeft {
         if index == 0 {
-          if indexPath.item + 1 < addedLyricsWithTime.count {
-            if addedLyricsWithTime.time[indexPath.item + 1] > addedLyricsWithTime.time[indexPath.item] + 0.3 && addedLyricsWithTime.time[indexPath.item] + 0.2 < self.duration {
-              addedLyricsWithTime.time[indexPath.item] += 0.2
+          if addedLyricsWithTime.timeAdded[indexPath.item] {
+            // handle delete (by removing the data from your array and updating the tableview)
+            var index = indexPath.row
+            while addedLyricsWithTime.timeAdded[index] {
+              addedLyricsWithTime.time[index] = 0
+              addedLyricsWithTime.timeAdded[index] = false
+              index++
+              if index == addedLyricsWithTime.lyrics.count {
+                break
+              }
+            }
+            lyricsTableView.reloadData()
+            if indexPath.row == 0 {
+              if isDemoSong {
+                avPlayer.currentTime = 0
+              } else {
+                musicPlayer.currentPlaybackTime = 0
+              }
+            } else {
+              if isDemoSong {
+                avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item - 1]
+              } else {
+                musicPlayer.currentPlaybackTime = addedLyricsWithTime.time[indexPath.item - 1]
+              }
             }
           }
+          return true
+        } else if index == 1 {
+          if indexPath.item + 1 < addedLyricsWithTime.count {
+            if addedLyricsWithTime.time[indexPath.item + 1] > addedLyricsWithTime.time[indexPath.item] + 0.2 && addedLyricsWithTime.time[indexPath.item] + 0.2 < self.duration {
+              addedLyricsWithTime.time[indexPath.item] += 0.2
+              for i in 0..<lyricsTableView.visibleCells.count {
+                guard let mgItem = lyricsTableView.visibleCells[i] as? MGSwipeTableCell else {
+                  return true
+                }
+                storeTheTableSwipeOffset[i] = mgItem.swipeOffset
+              }
+              lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+            }
+          }
+          return false
         } else {
           if indexPath.item - 1 > 0 {
-            if addedLyricsWithTime.time[indexPath.item - 1] < addedLyricsWithTime.time[indexPath.item] - 0.3 && addedLyricsWithTime.time[indexPath.item] - 0.2 >= 0 {
+            if addedLyricsWithTime.time[indexPath.item - 1] < addedLyricsWithTime.time[indexPath.item] - 0.2 && addedLyricsWithTime.time[indexPath.item] - 0.2 >= 0 {
               addedLyricsWithTime.time[indexPath.item] -= 0.2
+              for i in 0..<lyricsTableView.visibleCells.count {
+                guard let mgItem = lyricsTableView.visibleCells[i] as? MGSwipeTableCell else {
+                  return true
+                }
+                storeTheTableSwipeOffset[i] = mgItem.swipeOffset
+              }
+              lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
             }
           }
+          return false
         }
-        return false
-      } else if direction == .RightToLeft {
-        if addedLyricsWithTime.timeAdded[indexPath.item] {
-          // handle delete (by removing the data from your array and updating the tableview)
-          var index = indexPath.row
-          while addedLyricsWithTime.timeAdded[index] {
-            addedLyricsWithTime.time[index] = 0
-            addedLyricsWithTime.timeAdded[index] = false
-            index++
-            if index == addedLyricsWithTime.lyrics.count {
-              break
-            }
-          }
-          lyricsTableView.reloadData()
-          if indexPath.row == 0 {
-            if isDemoSong {
-              avPlayer.currentTime = 0
-            } else {
-              musicPlayer.currentPlaybackTime = 0
-            }
-          } else {
-            if isDemoSong {
-              avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item - 1]
-            } else {
-              musicPlayer.currentPlaybackTime = addedLyricsWithTime.time[indexPath.item - 1]
-            }
-          }
-        }
-        return true
       }
     }
     return true
