@@ -20,12 +20,6 @@ class UserTabsLyricsCell: UITableViewCell {
     
     @IBOutlet weak var optionsButton: UIButton!
     
-    
-    @IBOutlet weak var searchIcon: UIImageView!
-    
     @IBOutlet weak var spinner: UIActivityIndicatorView!
-    
-    @IBOutlet weak var titleRightConstraint: NSLayoutConstraint!
-    
-    @IBOutlet weak var subtitleRightConstraint: NSLayoutConstraint!
+   
 }

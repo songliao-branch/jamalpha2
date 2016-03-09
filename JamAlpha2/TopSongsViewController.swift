@@ -56,9 +56,10 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         APIManager.getTopSongs({
             songs in
             self.songs = songs
-            for song in songs {
-                song.findMediaItem()
-            }
+            
+//            for song in songs {
+//                song.findMediaItem()
+//            }
             //TODO: this crashes somehow, needs to find out how to reproduce the crash
             if let table = self.topSongsTable {
                 table.reloadData()
