@@ -2,7 +2,7 @@
 import UIKit
 import MediaPlayer
 
-class BaseViewController: TwistJamController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
+class BaseViewController: MusicLibraryController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
     
     var player: MPMusicPlayerController! // set to singleton in MusicManager

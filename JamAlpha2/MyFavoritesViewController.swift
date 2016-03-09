@@ -9,7 +9,7 @@
 import UIKit
 import MediaPlayer
 
-class MyFavoritesViewController: TwistJamController, UITableViewDelegate, UITableViewDataSource {
+class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
     var isSeekingPlayerState = false

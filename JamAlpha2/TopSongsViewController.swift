@@ -11,7 +11,7 @@ import MediaPlayer
 import Haneke
 
 //TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
-class TopSongsViewController: TwistJamController, UITableViewDelegate, UITableViewDataSource {
+class TopSongsViewController: MusicLibraryController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var topSongsTable: UITableView?
     

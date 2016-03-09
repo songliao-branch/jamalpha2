@@ -6,7 +6,7 @@ import Alamofire
 import Haneke
 import SwiftyJSON
 
-class SearchViewController: TwistJamController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
+class SearchViewController: MusicLibraryController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
     

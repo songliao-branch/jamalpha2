@@ -95,63 +95,8 @@ class MusicManager: NSObject {
       reloadCollections()
       NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: reloadCollectionsNotificationKey, object: nil))
     }
-    
-  
-        
-//        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC
-//        
-//        let currentVC = (UIApplication.sharedApplication().delegate as! AppDelegate).topViewController(rootViewController)
-//    
-//        let baseVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
-//        
-//        let searchVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfSearchPage].childViewControllers[0]) as! SearchViewController
-//        
-//        let topSongVC = ((rootViewController as! TabBarController).childViewControllers[kIndexOfTopPage].childViewControllers[0]) as! TopSongsViewController
-//        
-//        let userBarItemVC = (rootViewController as! TabBarController).childViewControllers[kIndexOfUserPage]
-        
-        // if the collection is different i.e. new songs are added/old songs are removed
-        // we manually reload MusicViewController table
-//        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-//            musicVC.reloadData()
-//        }
-//        
-//        NSNotificationCenter.defaultCenter().postNotificationName(kMusicLibaryChangedNotification, object: self)
-        
-//        searchVC.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
-//        if searchVC.searchResultTableView != nil && searchVC.resultSearchController.active {
-//            searchVC.filterLocalSongs(searchVC.resultSearchController.searchBar.text!)
-//            searchVC.searchResultTableView.reloadData() 
-//        }
-//       
-//        if(currentVC.isKindOfClass(SongViewController)){
-//            let currentSongVC = currentVC as! SongViewController
-//            if (currentSongVC.isSongNeedPurchase) {
-//                
-//                if let purchasedItem = (itemFoundInCollection(currentSongVC.songNeedPurchase)){
-//                    setPlayerQueue([purchasedItem])
-//                    setIndexInTheQueue(0)
-//                    currentSongVC.recoverToNormalSongVC(purchasedItem)
-//                }
-//            }
-//        }
-//       
-//        
-//        if userBarItemVC.childViewControllers.count > 1 { //means navigation controller has at least pushed one view controller (the root navigation controller is UserProfileViewController)
-//            let firstPushedVC = userBarItemVC.childViewControllers[1]
-//            if firstPushedVC.isKindOfClass(MyTabsAndLyricsViewController) {
-//                let myTabsLyricsVC = firstPushedVC as! MyTabsAndLyricsViewController
-//                myTabsLyricsVC.loadData()
-//            } else if firstPushedVC.isKindOfClass(MyFavoritesViewController) {
-//                let myFavoritesVC = firstPushedVC as! MyFavoritesViewController
-//                myFavoritesVC.loadData()
-//            }
-//        }
-//        
-//        topSongVC.loadData()
-    
+
     func loadCollections() {
-        print("load collections")
         loadLocalSongs()
         loadLocalAlbums()
         loadLocalArtist()

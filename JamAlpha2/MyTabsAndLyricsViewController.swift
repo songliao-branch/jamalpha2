@@ -9,7 +9,7 @@
 import UIKit
 import MediaPlayer
 
-class MyTabsAndLyricsViewController: TwistJamController, UITableViewDataSource, UITableViewDelegate {
+class MyTabsAndLyricsViewController: MusicLibraryController, UITableViewDataSource, UITableViewDelegate {
     
     var isViewingTabs = true //false means lyrics
 

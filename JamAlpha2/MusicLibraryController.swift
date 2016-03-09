@@ -11,7 +11,8 @@ import UIKit
 import MediaPlayer
 
 
-class TwistJamController: UIViewController {
+class MusicLibraryController: UIViewController {
+    
   override func viewDidLoad() {
     super.viewDidLoad()
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshData", name: reloadCollectionsNotificationKey, object: nil)
