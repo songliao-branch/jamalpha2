@@ -56,10 +56,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         APIManager.getTopSongs({
             songs in
             self.songs = songs
-            
-//            for song in songs {
-//                song.findMediaItem()
-//            }
             //TODO: this crashes somehow, needs to find out how to reproduce the crash
             if let table = self.topSongsTable {
                 table.reloadData()
@@ -90,17 +86,17 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         cell.numberLabel.text = "\(indexPath.row + 1)"
         cell.titleLabel.text = song.trackName
         cell.subtitleLabel.text = song.artistName
+        
+        //toggle speaker icon for current playing item
         cell.speaker.hidden = true
+        cell.titleRightConstraint.constant = 20
         if let item = song.mediaItem {
-            cell.searchIcon.hidden = true
-            cell.titleRightConstraint.constant = 15
-            if let nowPlayingItem = MusicManager.sharedInstance.player.nowPlayingItem where nowPlayingItem == item {
+            if MusicManager.sharedInstance.player.nowPlayingItem == item {
                 cell.speaker.hidden = false
+                cell.titleRightConstraint.constant = 50
             }
-        } else {
-            cell.searchIcon.hidden = false
-            cell.titleRightConstraint.constant = 55
         }
+        
         cell.albumImage.image = nil
         let url = NSURL(string: song.artworkUrl100)!
         let fetcher = NetworkFetcher<UIImage>(URL: url)
@@ -117,7 +113,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         isSeekingPlayerState = true
         
         let song = songs[indexPath.row]
-        
+        song.findMediaItem()
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
@@ -184,8 +180,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             
         } else { //if the mediaItem is not found, and an searchResult is found
             let cell = tableView.cellForRowAtIndexPath(indexPath) as! TopSongsCell
-            
-            cell.searchIcon.hidden = true
+
             isSeekingPlayerState = false
             songVC.isSongNeedPurchase = true
             songVC.songNeedPurchase = song

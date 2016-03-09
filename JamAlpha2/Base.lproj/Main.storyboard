@@ -1241,13 +1241,6 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="search" translatesAutoresizingMaskIntoConstraints="NO" id="k4S-yU-jRx">
-                                                    <rect key="frame" x="280" y="17" width="25" height="25"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="25" id="cmL-9Z-s5E"/>
-                                                        <constraint firstAttribute="height" constant="25" id="elb-dF-hqR"/>
-                                                    </constraints>
-                                                </imageView>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1SJ-lb-sGr">
                                                     <rect key="frame" x="31" y="2" width="54" height="54"/>
                                                     <constraints>
@@ -1274,13 +1267,11 @@
                                                 <constraint firstItem="1SJ-lb-sGr" firstAttribute="centerY" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="8ym-hS-Bdt"/>
                                                 <constraint firstItem="40J-Hf-f2i" firstAttribute="centerY" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="Afg-TF-6R5"/>
                                                 <constraint firstItem="Rez-N2-DUn" firstAttribute="leading" secondItem="1SJ-lb-sGr" secondAttribute="trailing" constant="8" id="NSA-aE-TYb"/>
-                                                <constraint firstItem="k4S-yU-jRx" firstAttribute="centerY" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="Swm-lS-XcA"/>
                                                 <constraint firstAttribute="trailing" secondItem="gsT-Aw-DN3" secondAttribute="trailing" constant="15" id="Yrb-S8-6xc"/>
                                                 <constraint firstItem="gsT-Aw-DN3" firstAttribute="leading" secondItem="1SJ-lb-sGr" secondAttribute="trailing" constant="8" id="a9w-Rw-jFM"/>
                                                 <constraint firstItem="1SJ-lb-sGr" firstAttribute="leading" secondItem="40J-Hf-f2i" secondAttribute="trailing" id="aY7-2I-nM9"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="Lcd-7m-JL0" secondAttribute="trailing" constant="12" id="bWn-JO-Msp"/>
                                                 <constraint firstItem="40J-Hf-f2i" firstAttribute="leading" secondItem="KfJ-NL-2sm" secondAttribute="leading" constant="8" id="dR8-62-koQ"/>
-                                                <constraint firstAttribute="trailing" secondItem="k4S-yU-jRx" secondAttribute="trailing" constant="15" id="eHg-UX-UbV"/>
                                                 <constraint firstItem="Rez-N2-DUn" firstAttribute="top" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="epi-5m-nDI"/>
                                                 <constraint firstItem="Lcd-7m-JL0" firstAttribute="centerY" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="spq-bU-b8y"/>
                                                 <constraint firstItem="gsT-Aw-DN3" firstAttribute="bottom" secondItem="KfJ-NL-2sm" secondAttribute="centerY" id="yHT-WZ-UPc"/>
@@ -1289,7 +1280,6 @@
                                         <connections>
                                             <outlet property="albumImage" destination="1SJ-lb-sGr" id="imc-vQ-HRM"/>
                                             <outlet property="numberLabel" destination="40J-Hf-f2i" id="BHJ-X9-U7U"/>
-                                            <outlet property="searchIcon" destination="k4S-yU-jRx" id="uYj-P8-2BJ"/>
                                             <outlet property="speaker" destination="Lcd-7m-JL0" id="Tcl-gc-NNI"/>
                                             <outlet property="subtitleLabel" destination="Rez-N2-DUn" id="fCI-Fn-f9b"/>
                                             <outlet property="titleLabel" destination="gsT-Aw-DN3" id="fjo-Mr-KID"/>
