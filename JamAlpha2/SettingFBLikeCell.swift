@@ -26,3 +26,10 @@ class SettingFBCell: UITableViewCell {
         self.contentView.addSubview(likeControl)
     }
 }
+
+func schemeAvailable(scheme: String) -> Bool {
+  if let url = NSURL.init(string: scheme) {
+    return UIApplication.sharedApplication().canOpenURL(url)
+  }
+  return false
+}

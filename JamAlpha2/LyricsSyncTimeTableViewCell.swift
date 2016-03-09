@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import MGSwipeTableCell
 
-class LyricsSyncTimeTableViewCell: UITableViewCell {
+class LyricsSyncTimeTableViewCell: MGSwipeTableCell {
     
     var lyricsSentenceLabel: UILabel = UILabel()
     var timeView: UIView = UIView()
@@ -26,7 +27,7 @@ class LyricsSyncTimeTableViewCell: UITableViewCell {
         
         self.timeView.frame = CGRectMake(17 / 20 * viewWidth, 1 / 31 * viewHeight, 2.75 / 20 * viewWidth, 2 / 31 * viewHeight)
         self.timeView.backgroundColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
-        self.timeView.layer.cornerRadius = 2
+        self.timeView.layer.cornerRadius = 5
         self.contentView.addSubview(self.timeView)
         
         self.currentTimeLabel.frame = CGRectMake(0, 0, self.timeView.frame.width, self.timeView.frame.height)

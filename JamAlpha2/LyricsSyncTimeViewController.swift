@@ -9,6 +9,7 @@
 import UIKit
 import MediaPlayer
 import AVFoundation
+import MGSwipeTableCell
 
 var tempLyricsTimeTuple = [(String, NSTimeInterval)]()
 
@@ -32,6 +33,7 @@ class lyricsWithTime {
 }
 
 class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
+  var storeTheTableSwipeOffset: [CGFloat]!
     var currentTime: NSTimeInterval = 0
     var isDemoSong = false
     var isPlaying:Bool = false
@@ -266,6 +268,7 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
         lyricsTableView.registerClass(LyricsSyncTimeTableViewCell.self, forCellReuseIdentifier: "lyricsSyncCell")
         lyricsTableView.backgroundColor = UIColor.clearColor()
         view.addSubview(lyricsTableView)
+      storeTheTableSwipeOffset = [CGFloat](count: lyricsOrganizedArray.count, repeatedValue: 0)
     }
 
     func setUpProgressBlock() {
@@ -577,20 +580,41 @@ class LyricsSyncViewController: UIViewController, UIScrollViewDelegate {
 }
 
 // table view
-extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
+extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate {
     // MARK: Table view methods
+  func getLeftButton() -> NSMutableArray {
+    let leftButton = NSMutableArray()
+    leftButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeUp"), backgroundColor: UIColor.clearColor()))
+    leftButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeDown"), backgroundColor: UIColor.clearColor()))
+    return leftButton
+  }
+  
+  func getRightButton() -> NSMutableArray {
+    let rightButton = NSMutableArray()
+    rightButton.addObject(MGSwipeButton(title: "Delete", backgroundColor: UIColor.redColor()))
+    rightButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeUp"), backgroundColor: UIColor.clearColor(), insets: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)))
+    rightButton.addObject(MGSwipeButton(title: "", icon: UIImage(named: "timeDown"), backgroundColor: UIColor.clearColor(), insets: UIEdgeInsets(top: 0, left: 30, bottom: 0, right: 0)))
+    return rightButton
+  }
+  
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 4 / 31 * viewHeight
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: LyricsSyncTimeTableViewCell = lyricsTableView.dequeueReusableCellWithIdentifier("lyricsSyncCell") as! LyricsSyncTimeTableViewCell
+        cell.delegate = self
+        cell.setSwipeOffset(storeTheTableSwipeOffset[indexPath.item], animated: false, completion: nil)
+        //cell.swipeOffset = storeTheTableSwipeOffset[indexPath.item]
+        storeTheTableSwipeOffset[indexPath.item] = 0
+        cell.leftSwipeSettings.transition = .Rotate3D
+        cell.rightButtons = getRightButton() as [AnyObject]
+        cell.rightSwipeSettings.transition = .Drag
         cell.initialTableViewCell(viewWidth, viewHeight: viewHeight)
         cell.backgroundColor = UIColor.clearColor()
         cell.lyricsSentenceLabel.backgroundColor = UIColor.clearColor()
         cell.lyricsSentenceLabel.textColor = UIColor.whiteColor()
         cell.currentTimeLabel.textColor = UIColor.whiteColor()
-        
         if addedLyricsWithTime.timeAdded[indexPath.item] {
             cell.currentTimeLabel.text = TimeNumber(time: Float(addedLyricsWithTime.time[indexPath.item])).toDisplayString()
             cell.timeView.backgroundColor = UIColor.mainPinkColor()
@@ -610,12 +634,20 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.row == 0 || addedLyricsWithTime.timeAdded[indexPath.item - 1]  {
             if addedLyricsWithTime.timeAdded[indexPath.item] == false {
-                
+              if indexPath.item - 1 >= 0 {
+                if addedLyricsWithTime.time[indexPath.item - 1] < currentTime {
+                  addedLyricsWithTime.time[indexPath.item] = currentTime
+                  addedLyricsWithTime.lyrics[indexPath.item] = lyricsOrganizedArray[indexPath.item]
+                  addedLyricsWithTime.timeAdded[indexPath.item] = true
+                  lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+                }
+              } else if indexPath.item == 0 {
                 addedLyricsWithTime.time[indexPath.item] = currentTime
                 addedLyricsWithTime.lyrics[indexPath.item] = lyricsOrganizedArray[indexPath.item]
                 addedLyricsWithTime.timeAdded[indexPath.item] = true
-                lyricsTableView.reloadData()
-            }else {
+                lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+              }
+            } else {
                 if isDemoSong {
                     avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item]
                     if !avPlayer.playing {
@@ -628,45 +660,74 @@ extension LyricsSyncViewController: UITableViewDelegate, UITableViewDataSource {
                     }
                 }
             }
-        } else {
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
-        
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)      
     }
-    
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == UITableViewCellEditingStyle.Delete && addedLyricsWithTime.timeAdded[indexPath.item] {
+  
+  func swipeTableCell(cell: MGSwipeTableCell!, tappedButtonAtIndex index: Int, direction: MGSwipeDirection, fromExpansion: Bool) -> Bool {
+    if let indexPath = lyricsTableView.indexPathForCell(cell) {
+      if direction == .RightToLeft {
+        if index == 0 {
+          if addedLyricsWithTime.timeAdded[indexPath.item] {
             // handle delete (by removing the data from your array and updating the tableview)
             var index = indexPath.row
             while addedLyricsWithTime.timeAdded[index] {
-                addedLyricsWithTime.time[index] = 0
-                //addedLyricsWithTime.timeTextStyle[index] = "0.0:0.0"
-                addedLyricsWithTime.timeAdded[index] = false
-                index++
-                if index == addedLyricsWithTime.lyrics.count {
-                    break
-                }
+              addedLyricsWithTime.time[index] = 0
+              addedLyricsWithTime.timeAdded[index] = false
+              index++
+              if index == addedLyricsWithTime.lyrics.count {
+                break
+              }
             }
             lyricsTableView.reloadData()
             if indexPath.row == 0 {
-                if isDemoSong {
-                    avPlayer.currentTime = 0
-                } else {
-                    musicPlayer.currentPlaybackTime = 0
-                }
+              if isDemoSong {
+                avPlayer.currentTime = 0
+              } else {
+                musicPlayer.currentPlaybackTime = 0
+              }
             } else {
-                if isDemoSong {
-                    avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item - 1]
-                } else {
-                    musicPlayer.currentPlaybackTime = addedLyricsWithTime.time[indexPath.item - 1]
-                }
+              if isDemoSong {
+                avPlayer.currentTime = addedLyricsWithTime.time[indexPath.item - 1]
+              } else {
+                musicPlayer.currentPlaybackTime = addedLyricsWithTime.time[indexPath.item - 1]
+              }
             }
+          }
+          return true
+        } else if index == 1 {
+          if indexPath.item + 1 < addedLyricsWithTime.count {
+            if addedLyricsWithTime.time[indexPath.item + 1] > addedLyricsWithTime.time[indexPath.item] + 0.2 && addedLyricsWithTime.time[indexPath.item] + 0.2 < self.duration {
+              addedLyricsWithTime.time[indexPath.item] += 0.2
+              for i in 0..<lyricsTableView.visibleCells.count {
+                guard let mgItem = lyricsTableView.visibleCells[i] as? MGSwipeTableCell else {
+                  return true
+                }
+                storeTheTableSwipeOffset[i] = mgItem.swipeOffset
+              }
+              lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+            }
+          }
+          return false
+        } else {
+          if indexPath.item - 1 > 0 {
+            if addedLyricsWithTime.time[indexPath.item - 1] < addedLyricsWithTime.time[indexPath.item] - 0.2 && addedLyricsWithTime.time[indexPath.item] - 0.2 >= 0 {
+              addedLyricsWithTime.time[indexPath.item] -= 0.2
+              for i in 0..<lyricsTableView.visibleCells.count {
+                guard let mgItem = lyricsTableView.visibleCells[i] as? MGSwipeTableCell else {
+                  return true
+                }
+                storeTheTableSwipeOffset[i] = mgItem.swipeOffset
+              }
+              lyricsTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+            }
+          }
+          return false
         }
+      }
     }
+    return true
+  }
 }
 
 // top view button reaction function 
