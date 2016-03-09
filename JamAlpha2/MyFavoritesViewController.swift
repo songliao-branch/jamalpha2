@@ -9,7 +9,7 @@
 import UIKit
 import MediaPlayer
 
-class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class MyFavoritesViewController: TwistJamController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
     var isSeekingPlayerState = false
@@ -27,7 +27,11 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         super.viewWillAppear(animated)
         loadData()
     }
-    
+  
+    override func refreshData() {
+      loadData()
+    }
+  
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()

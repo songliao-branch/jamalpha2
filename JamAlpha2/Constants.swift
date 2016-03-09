@@ -51,3 +51,5 @@ let VERSION_NUMBER = "1.0.0"//TODO: change this
 let COPYRIGHTYEAR = "2015-2016"
 
 let DEFAULT_COVER = "liweng"
+
+let reloadCollectionsNotificationKey = "com.twistjam.twistjam.reloadCollections"

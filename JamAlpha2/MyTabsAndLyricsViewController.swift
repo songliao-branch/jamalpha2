@@ -9,7 +9,7 @@
 import UIKit
 import MediaPlayer
 
-class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MyTabsAndLyricsViewController: TwistJamController, UITableViewDataSource, UITableViewDelegate {
     
     var isViewingTabs = true //false means lyrics
 
@@ -42,6 +42,10 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         super.viewWillAppear(animated)
         loadData()
     }
+  
+  override func refreshData() {
+     loadData()
+  }
     
     func createTransitionAnimation(){
         if(animator == nil){

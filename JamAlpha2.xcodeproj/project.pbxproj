@@ -14,6 +14,7 @@
 		10CBDB3C1C17FDA600D160C3 /* ImageZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */; };
 		10CBDB3F1C17FE6700D160C3 /* PhotoViewerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */; };
 		10E930A01C15753400C1D0C9 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */; };
+		10F878831C8FADCD00A6F3AA /* TwistJamController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F878821C8FADCD00A6F3AA /* TwistJamController.swift */; };
 		10FFBAA91C3A41EB003DF489 /* SearchAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FFBAA81C3A41EB003DF489 /* SearchAPI.swift */; };
 		10FFBAB01C3F999D003DF489 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FFBAAF1C3F999D003DF489 /* NetworkManager.swift */; };
 		1E985CF67DB46C056C046995 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E225B71031C3EA2120F8192 /* Pods.framework */; };
@@ -197,6 +198,7 @@
 		10CBDB3B1C17FDA600D160C3 /* ImageZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageZoomAnimation.swift; sourceTree = "<group>"; };
 		10CBDB3E1C17FE6700D160C3 /* PhotoViewerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewerViewController.swift; sourceTree = "<group>"; };
 		10E9309F1C15753400C1D0C9 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
+		10F878821C8FADCD00A6F3AA /* TwistJamController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwistJamController.swift; sourceTree = "<group>"; };
 		10FFBAA81C3A41EB003DF489 /* SearchAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchAPI.swift; sourceTree = "<group>"; };
 		10FFBAAF1C3F999D003DF489 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		1E225B71031C3EA2120F8192 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -805,6 +807,7 @@
 				E4BFA92F1B86CAA00061CA48 /* NSDate+comparison.swift */,
 				E431BA9C1B913AE700E32A0B /* String+Utils.swift */,
 				BFC136681C580EA000D05899 /* UIScrollViewExtension.swift */,
+				10F878821C8FADCD00A6F3AA /* TwistJamController.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -911,7 +914,7 @@
 				TargetAttributes = {
 					E488773C1B151628004785D3 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 3ME9DMV2GU;
+						DevelopmentTeam = 978SMNLLT3;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -1107,6 +1110,7 @@
 				E424537E1C5F31D800D5E1CE /* ActionSheet.swift in Sources */,
 				E4A9A5531BF04FB9000E5F1C /* BrowseVersionsViewController.swift in Sources */,
 				E42032C01BFA977600A5D36D /* DownloadedLyricsSet.swift in Sources */,
+				10F878831C8FADCD00A6F3AA /* TwistJamController.swift in Sources */,
 				E46EA8061BD0CAE8006EAB31 /* Tuning.swift in Sources */,
 				BFE49ECB1C10AEE600F26877 /* UserProfileEditViewController.swift in Sources */,
 				E42032E81BFED9E300A5D36D /* UserProfileViewController.swift in Sources */,

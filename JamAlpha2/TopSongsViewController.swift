@@ -11,7 +11,7 @@ import MediaPlayer
 import Haneke
 
 //TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
-class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class TopSongsViewController: TwistJamController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var topSongsTable: UITableView?
     
@@ -27,6 +27,10 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         loadData()
 
     }
+  
+  override func refreshData() {
+    loadData()
+  }
     
     func setUpRefreshControl() {
         topSongsTable?.addPullToRefresh({ [weak self] in

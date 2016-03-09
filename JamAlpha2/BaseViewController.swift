@@ -2,7 +2,7 @@
 import UIKit
 import MediaPlayer
 
-class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
+class BaseViewController: TwistJamController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
     
     var player: MPMusicPlayerController! // set to singleton in MusicManager
@@ -42,17 +42,14 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         registerNotifications()
     }
     
-    func registerNotifications(){
+    func registerNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshData", name: MPMediaLibraryDidChangeNotification, object: nil)
     }
-    
-    func refreshData() {
-        MusicManager.sharedInstance.reloadCollections()
-        for musicVC in self.pageViewController.childViewControllers as! [MusicViewController] {
-            musicVC.loadData()
-        }
+  
+    override func refreshData() {
+      for musicVC in self.pageViewController.childViewControllers as! [MusicViewController] {
+        musicVC.loadData()
+      }
     }
     
     func playbackStateChanged(notification: NSNotification){

@@ -17,7 +17,7 @@ let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
 
-class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+class SongViewController: TwistJamController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
   
   //MARK: When display lyrics only
   var singleLyricsTableView: UITableView!
@@ -315,6 +315,16 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
   
   deinit{
     pthread_rwlock_destroy(&rwLock)
+  }
+  
+  override func refreshData() {
+    if (isSongNeedPurchase) {
+      if let purchasedItem = (MusicManager.sharedInstance.itemFoundInCollection(songNeedPurchase)){
+          MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
+          MusicManager.sharedInstance.setIndexInTheQueue(0)
+          recoverToNormalSongVC(purchasedItem)
+      }
+    }
   }
   
   func removeAllObserver(){

@@ -86,13 +86,17 @@ class MusicManager: NSObject {
     }
     
     func addNotification(){
+       NSNotificationCenter.defaultCenter().addObserver(self, selector: "musicLibraryDidChange", name: MPMediaLibraryDidChangeNotification, object: nil)
         MPMediaLibrary.defaultMediaLibrary().beginGeneratingLibraryChangeNotifications()
     }
     
     
-    func musicLibraryDidChange(){
-        
-       // reloadCollections()
+    func musicLibraryDidChange() {
+      reloadCollections()
+      NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: reloadCollectionsNotificationKey, object: nil))
+    }
+    
+  
         
 //        let rootViewController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC
 //        
@@ -145,7 +149,6 @@ class MusicManager: NSObject {
 //        }
 //        
 //        topSongVC.loadData()
-    }
     
     func loadCollections() {
         print("load collections")

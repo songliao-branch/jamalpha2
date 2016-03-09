@@ -6,7 +6,7 @@ import Alamofire
 import Haneke
 import SwiftyJSON
 
-class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
+class SearchViewController: TwistJamController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
     
@@ -35,7 +35,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         setUpSearchBar()
         setUpSearchPromptBackground()
     }
-    
+  
+    override func refreshData() {
+      self.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+      if searchResultTableView != nil && resultSearchController.active {
+          filterLocalSongs(resultSearchController.searchBar.text!)
+          searchResultTableView.reloadData()
+      }
+    }
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
