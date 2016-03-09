@@ -37,9 +37,9 @@ DEPENDENCIES:
   - AWSS3
   - Crashlytics
   - Fabric
-  - FBSDKCoreKit (= 4.2.0)
-  - FBSDKLoginKit (= 4.1.0)
-  - FBSDKShareKit (= 4.2.0)
+  - FBSDKCoreKit (~> 4.2.0)
+  - FBSDKLoginKit (~> 4.1.0)
+  - FBSDKShareKit (~> 4.2.0)
   - HanekeSwift
   - MGSwipeTableCell
   - Reachability
