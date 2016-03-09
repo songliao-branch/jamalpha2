@@ -80,8 +80,9 @@ class MyTabsAndLyricsViewController: MusicLibraryController, UITableViewDataSour
                 songs.append(song)
             }
         }
-        
+      dispatch_async(dispatch_get_main_queue()){
         self.tableView.reloadData()
+      }
     }
 
     func optionsButtonPressed(sender: UIButton) {

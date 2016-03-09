@@ -55,7 +55,9 @@ class TopSongsViewController: MusicLibraryController, UITableViewDelegate, UITab
             }
             //TODO: this crashes somehow, needs to find out how to reproduce the crash
             if let table = self.topSongsTable {
-                table.reloadData()
+              dispatch_async(dispatch_get_main_queue()){
+                  table.reloadData()
+              }
             }
         })
     }

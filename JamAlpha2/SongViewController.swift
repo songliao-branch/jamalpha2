@@ -318,11 +318,13 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
   }
   
   override func refreshData() {
-    if (isSongNeedPurchase) {
-      if let purchasedItem = (MusicManager.sharedInstance.itemFoundInCollection(songNeedPurchase)){
+    dispatch_async(dispatch_get_main_queue()){
+      if (self.isSongNeedPurchase) {
+        if let purchasedItem = (MusicManager.sharedInstance.itemFoundInCollection(self.songNeedPurchase)){
           MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
           MusicManager.sharedInstance.setIndexInTheQueue(0)
-          recoverToNormalSongVC(purchasedItem)
+          self.recoverToNormalSongVC(purchasedItem)
+        }
       }
     }
   }

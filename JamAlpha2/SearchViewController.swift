@@ -40,7 +40,9 @@ class SearchViewController: MusicLibraryController, UITableViewDataSource, UITab
       self.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
       if searchResultTableView != nil && resultSearchController.active {
           filterLocalSongs(resultSearchController.searchBar.text!)
-          searchResultTableView.reloadData()
+          dispatch_async(dispatch_get_main_queue()){
+            self.searchResultTableView.reloadData()
+          }
       }
     }
     func createTransitionAnimation(){

@@ -29,7 +29,9 @@ class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UI
     }
   
     override func refreshData() {
-      loadData()
+      dispatch_async(dispatch_get_main_queue()){
+        self.loadData()
+      }
     }
   
     func createTransitionAnimation(){
@@ -43,6 +45,7 @@ class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UI
         for song in songs {
             song.findMediaItem()
         }
+        
         self.tableView.reloadData()
     }
     
