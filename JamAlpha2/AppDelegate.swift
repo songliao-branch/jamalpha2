@@ -57,10 +57,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let credentialsProvider = AWSCognitoCredentialsProvider(regionType: CognitoRegionType, identityPoolId: CognitoIdentityPoolId)
             let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
             AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
-            NetworkManager.sharedInstance.reachability.isReachable()
+            NetworkManager.sharedInstance
             PlayChordsManager.sharedInstance.initialSoundBank()
         }
-        
         return true
     }
     
@@ -252,6 +251,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //facebook
         FBSDKAppEvents.activateApp()
+        dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0))) {
+           MusicManager.sharedInstance
+        }
     }
 
     func applicationWillTerminate(application: UIApplication) {

@@ -277,10 +277,6 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
         MusicManager.sharedInstance.avPlayer.removeAllItems()
       }
       self.selectedFromSearchTab = true
-      let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[kIndexOfMyMusicPage].childViewControllers[0] as! BaseViewController)
-      for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-        self.musicViewController = musicVC
-      }
       KGLOBAL_nowView.stop()
       CoreDataManager.initializeSongToDatabase(songNeedPurchase)
     }

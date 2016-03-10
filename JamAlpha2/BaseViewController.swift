@@ -72,7 +72,6 @@ class BaseViewController: MusicLibraryController, UIPageViewControllerDataSource
     }
     
     func setUpNowView(){
-        KGLOBAL_nowView.initWithNumberOfBars(4)
         KGLOBAL_nowView.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         KGLOBAL_nowView.addGestureRecognizer(tapRecognizer)
