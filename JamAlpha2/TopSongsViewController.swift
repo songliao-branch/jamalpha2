@@ -23,6 +23,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         createTransitionAnimation()
         setUpNavigationBar()
+        setUpTopSection()
         setUpRefreshControl()
         loadData()
     }
@@ -53,15 +54,63 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func setUpNavigationBar() {
-        self.automaticallyAdjustsScrollViewInsets = false
+        self.automaticallyAdjustsScrollViewInsets = true
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor()
+        self.navigationController?.navigationBar.barTintColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.5)
         self.navigationController?.navigationBar.translucent = false
-        let titleImageView: UIImageView = UIImageView()
-        titleImageView.frame = CGRectMake(0, 0, self.view.frame.width/2, 22)
-        titleImageView.image = UIImage(named: "topSongsText")
-        titleImageView.contentMode = .ScaleAspectFit
-        self.navigationItem.titleView = titleImageView
+//        let titleImageView: UIImageView = UIImageView()
+//        titleImageView.frame = CGRectMake(0, 0, self.view.frame.width/2, 22)
+//        titleImageView.image = UIImage(named: "topSongsText")
+//        titleImageView.contentMode = .ScaleAspectFit
+//        self.navigationItem.titleView = titleImageView
+        
+        
+    }
+    
+    //a horizontal scrollview for 15 top songs
+    func setUpTopSection() {
+        
+        
+        
+        
+        let topSectionHeight: CGFloat = 160
+        self.topSongsTable?.contentInset = UIEdgeInsetsMake(topSectionHeight, 0, 0, 0)
+        
+        //white background
+        let sectionBackground = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: topSectionHeight))
+        sectionBackground.backgroundColor = UIColor.whiteColor()
+        self.view.addSubview(sectionBackground)
+        
+        //Top 100 button
+        let topSongPromptButton = UIButton(frame: CGRect(x: 9, y: 14, width: 200, height: 18))
+        topSongPromptButton.setTitle("Top 100 >", forState: .Normal)
+        topSongPromptButton.titleLabel?.font = UIFont.systemFontOfSize(15)
+        sectionBackground.addSubview(topSongPromptButton)
+
+        //scrollview
+        let padding: CGFloat = 5
+        let scrollview = UIScrollView(frame: CGRect(x: 0, y: CGRectGetMaxY(topSongPromptButton.frame) + padding, width: self.view.frame.width, height: topSectionHeight - padding - CGRectGetMaxY(topSongPromptButton.frame)))
+        sectionBackground.addSubview(scrollview)
+        
+        
+        
+    }
+    
+    func createTopSongCard(index: Int, song: SearchResult) {
+        let imageDimension: CGFloat = 90
+        let albumImage = UIImageView(frame: CGRect(x: 0, y: 0, width: imageDimension, height: imageDimension))
+        
+//        
+//        cell.albumImage.image = nil
+//        let url = NSURL(string: song.artworkUrl100)!
+//        let fetcher = NetworkFetcher<UIImage>(URL: url)
+//        
+//        let cache = Shared.imageCache
+//        cache.fetch(fetcher: fetcher).onSuccess { image in
+//            cell.albumImage.image = image
+//        }
+//        
+        
     }
     
     
