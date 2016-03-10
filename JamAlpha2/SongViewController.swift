@@ -17,7 +17,7 @@ let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
 
-class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
   
   //MARK: When display lyrics only
   var singleLyricsTableView: UITableView!
@@ -277,7 +277,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         MusicManager.sharedInstance.avPlayer.removeAllItems()
       }
       self.selectedFromSearchTab = true
-      let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
+      let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[kIndexOfMyMusicPage].childViewControllers[0] as! BaseViewController)
       for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
         self.musicViewController = musicVC
       }
@@ -315,6 +315,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
   
   deinit{
     pthread_rwlock_destroy(&rwLock)
+  }
+  
+  override func refreshData() {
+    dispatch_async(dispatch_get_main_queue()){
+      if (self.isSongNeedPurchase) {
+        if let purchasedItem = (MusicManager.sharedInstance.itemFoundInCollection(self.songNeedPurchase)){
+          MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
+          MusicManager.sharedInstance.setIndexInTheQueue(0)
+          self.recoverToNormalSongVC(purchasedItem)
+        }
+      }
+    }
   }
   
   func removeAllObserver(){

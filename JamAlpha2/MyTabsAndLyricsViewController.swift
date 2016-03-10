@@ -33,16 +33,12 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadData()
         self.setUpNavigationBar()
         createTransitionAnimation()
         setUpStatusView()
     }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        loadData()
-    }
-    
+  
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -62,22 +58,19 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         if isViewingTabs {
             self.allTabsSets = CoreDataManager.getAllUserTabsOnDisk()
             for t in self.allTabsSets {
-                print("MY Tabs song: \(t.song.songId),\(t.song.getTitle()),\(t.song.getArtist()),\(t.song.getDuration())")
-
                 let song = SearchResult(songId: t.song.songId, title: t.song.getTitle(), artist: t.song.getArtist(), duration: t.song.getDuration())
-                song.findMediaItem()
                 songs.append(song)
             }
         } else {
             self.allLyricsSets = CoreDataManager.getAllUserLyricsOnDisk()
             for l in self.allLyricsSets {
                 let song = SearchResult(songId: l.song.songId, title: l.song.getTitle(), artist: l.song.getArtist(), duration: l.song.getDuration())
-                song.findMediaItem()
                 songs.append(song)
             }
         }
-        
+      dispatch_async(dispatch_get_main_queue()){
         self.tableView.reloadData()
+      }
     }
 
     func optionsButtonPressed(sender: UIButton) {
@@ -155,7 +148,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         
         let song = songs[indexPath.row] //TODO: Filter by edit date
         let cell = tableView.dequeueReusableCellWithIdentifier("UserTabsLyricsCell", forIndexPath: indexPath) as! UserTabsLyricsCell
-        cell.numberLabel.text = "\(indexPath.row + 1)"
+        
+        cell.numberLabel.text = "\(self.songs.count - indexPath.row)"
 
         cell.titleLabel.text = song.getTitle()
         cell.subtitleLabel.text = song.getArtist()
@@ -164,16 +158,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
         
         cell.spinner.hidden = true
-        
-        if let _ = song.mediaItem {
-            cell.searchIcon.hidden = true
-            cell.titleRightConstraint.constant = 35
-            cell.subtitleRightConstraint.constant = 35
-        } else {
-            cell.searchIcon.hidden = false
-            cell.titleRightConstraint.constant = 75
-            cell.subtitleRightConstraint.constant = 75
-        }
         
         return cell
     }
@@ -188,7 +172,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
-
+        song.findMediaItem()
+        
         if let item = song.mediaItem {
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
@@ -269,7 +254,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         } else { //if the mediaItem is not found, and an searchResult is found
             let cell = tableView.cellForRowAtIndexPath(indexPath) as! UserTabsLyricsCell
             
-            cell.searchIcon.hidden = true
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
             isSeekingPlayerState = false
@@ -278,7 +262,6 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                 
                 cell.spinner.stopAnimating()
                 cell.spinner.hidden = true
-                cell.searchIcon.hidden = false
                 
                 guard let song = result else {
                     

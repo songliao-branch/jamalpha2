@@ -6,7 +6,7 @@ import Alamofire
 import Haneke
 import SwiftyJSON
 
-class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
+class SearchViewController: MusicLibraryController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
     
@@ -35,7 +35,16 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         setUpSearchBar()
         setUpSearchPromptBackground()
     }
-    
+  
+    override func refreshData() {
+      self.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+      if searchResultTableView != nil && resultSearchController.active {
+          filterLocalSongs(resultSearchController.searchBar.text!)
+          dispatch_async(dispatch_get_main_queue()){
+            self.searchResultTableView.reloadData()
+          }
+      }
+    }
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -453,7 +462,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(needStart:Bool){
-        let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
+        let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
         for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
             musicVC.musicTable.reloadData()
         }
