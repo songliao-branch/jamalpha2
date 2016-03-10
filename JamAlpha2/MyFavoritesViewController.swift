@@ -9,7 +9,7 @@
 import UIKit
 import MediaPlayer
 
-class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UITableViewDataSource {
+class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
     var isSeekingPlayerState = false
@@ -19,21 +19,12 @@ class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UI
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadData()
         createTransitionAnimation()
         setUpNavigationBar()
     }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        loadData()
-    }
   
-    override func refreshData() {
-      dispatch_async(dispatch_get_main_queue()){
-        self.loadData()
-      }
-    }
-  
+
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -42,10 +33,6 @@ class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UI
 
     func loadData() {
         songs = CoreDataManager.getFavorites()
-        for song in songs {
-            song.findMediaItem()
-        }
-        
         self.tableView.reloadData()
     }
     
@@ -68,16 +55,6 @@ class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UI
         cell.subtitleLabel.text = song.getArtist()
         
         cell.spinner.hidden = true
-        if let _ = song.mediaItem {
-            cell.searchIcon.hidden = true
-            cell.titleRightConstraint.constant = 15
-            cell.subtitleRightConstraint.constant = 15
-        } else {
-            cell.searchIcon.hidden = false
-            cell.titleRightConstraint.constant = 50
-            cell.subtitleRightConstraint.constant = 50
-        }
-        
         return cell
     }
     
@@ -169,8 +146,6 @@ class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UI
             
         } else { //if the mediaItem is not found, and an searchResult is MyFavoritesCell
             let cell = tableView.cellForRowAtIndexPath(indexPath) as! MyFavoritesCell
-            
-            cell.searchIcon.hidden = true
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
             isSeekingPlayerState = false
@@ -179,8 +154,7 @@ class MyFavoritesViewController: MusicLibraryController, UITableViewDelegate, UI
                 
                 cell.spinner.stopAnimating()
                 cell.spinner.hidden = true
-                cell.searchIcon.hidden = false
-                
+        
                 guard let song = result else {
                     
                     self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)
