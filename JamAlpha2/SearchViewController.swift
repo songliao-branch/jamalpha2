@@ -462,10 +462,13 @@ class SearchViewController: MusicLibraryController, UITableViewDataSource, UITab
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(needStart:Bool){
-        let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
-        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+      if let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as? BaseViewController {
+        if let musicVCs = baseVC.pageViewController?.viewControllers as? [MusicViewController] {
+          for musicVC in musicVCs {
             musicVC.musicTable.reloadData()
+          }
         }
+      }
     }
     
 }
