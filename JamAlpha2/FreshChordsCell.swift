@@ -8,14 +8,14 @@
 
 import UIKit
 
-class TopSongsCell: UITableViewCell {
-
-    @IBOutlet weak var numberLabel: UILabel!
+class FreshChordsCell: UITableViewCell {
+    
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var subtitleLabel: UILabel!
-
-    @IBOutlet weak var titleRightConstraint: NSLayoutConstraint!
     
     @IBOutlet weak var albumImage: UIImageView!
-    @IBOutlet weak var speaker: UIImageView!
+
+    @IBOutlet weak var contributorImage: UIImageView!
+
+    @IBOutlet weak var contributorNameLabel: UILabel!
 }
