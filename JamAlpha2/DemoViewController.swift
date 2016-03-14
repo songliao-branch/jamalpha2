@@ -85,6 +85,7 @@ class DemoViewController: UIViewController,UITableViewDataSource, UITableViewDel
                 MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
                 MusicManager.sharedInstance.avPlayer.removeAllItems()
                 KGLOBAL_nowView.stop()
+              KGLOBAL_nowView_topSong.stop()
             }
         } else {
             if uiswitch.tag == 0 {

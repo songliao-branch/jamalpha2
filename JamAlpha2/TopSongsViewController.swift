@@ -14,6 +14,7 @@ import Haneke
 class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var topSongsTable: UITableView?
+    var player: MPMusicPlayerController! // set to singleton in MusicManager
     
     var songs = [SearchResult]()
     var animator: CustomTransitionAnimation?
@@ -21,11 +22,14 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        player = MusicManager.sharedInstance.player
         createTransitionAnimation()
         setUpNavigationBar()
         setUpTopSection()
         setUpRefreshControl()
         loadData()
+        setUpNowView()
+        registerNotifications()
     }
   
     func setUpRefreshControl() {
@@ -52,7 +56,46 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             }
         })
     }
-    
+  
+    func registerNotifications() {
+      NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
+    }
+  
+    func playbackStateChanged(notification: NSNotification){
+      let playbackState = player.playbackState
+      if playbackState == .Playing {
+        KGLOBAL_nowView_topSong.start()
+      } else  {
+        KGLOBAL_nowView_topSong.stop()
+      }
+    }
+  
+    func setUpNowView() {
+      KGLOBAL_nowView_topSong.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
+      let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
+      KGLOBAL_nowView_topSong.addGestureRecognizer(tapRecognizer)
+      self.navigationController!.navigationBar.addSubview(KGLOBAL_nowView_topSong)
+      
+      if player.playbackState == .Playing {
+        KGLOBAL_nowView_topSong.start()
+      } else {
+        KGLOBAL_nowView_topSong.stop()
+      }
+    }
+  
+    func goToNowPlaying(){
+      let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+      
+      if MusicManager.sharedInstance.avPlayer.currentItem != nil {
+        songVC.isDemoSong = true
+      }
+      
+      songVC.selectedFromTable = false
+      songVC.transitioningDelegate = self.animator
+      self.animator!.attachToViewController(songVC)
+      self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
+    }
+  
     func setUpNavigationBar() {
         self.automaticallyAdjustsScrollViewInsets = true
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
@@ -170,6 +213,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
+                          KGLOBAL_nowView_topSong.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
@@ -213,6 +257,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 KGLOBAL_nowView.stop()
+                KGLOBAL_nowView_topSong.stop()
                 self.showConnectInternet(tableView)
             }
             

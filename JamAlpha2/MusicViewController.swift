@@ -135,7 +135,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         }
       
         songVC.selectedFromTable = false
-        songVC.musicViewController = self
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
@@ -390,6 +389,7 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
+                          KGLOBAL_nowView_topSong.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                               self.showCellularEnablesStreaming(tableView)
                             }
@@ -404,7 +404,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                                     songVC.selectedFromTable = true
                                     songVC.transitioningDelegate = self.animator
                                     self.animator!.attachToViewController(songVC)
-                                    songVC.musicViewController = self //for goToArtist and goToAlbum from here
                                     
                                     self.presentViewController(songVC, animated: true, completion: {
                                         completed in
@@ -429,7 +428,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                     songVC.selectedFromTable = true
                     songVC.transitioningDelegate = self.animator
                     self.animator!.attachToViewController(songVC)
-                    songVC.musicViewController = self //for goToArtist and goToAlbum from here
           
                     self.presentViewController(songVC, animated: true, completion: {
                         completed in

@@ -193,6 +193,7 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
                     if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                         MusicManager.sharedInstance.player.stop()
                         KGLOBAL_nowView.stop()
+                      KGLOBAL_nowView_topSong.stop()
                         dispatch_async(dispatch_get_main_queue()) {
                             self.showCellularEnablesStreaming(tableView)                        }
                         self.isSeekingPlayerState = false
@@ -204,7 +205,6 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
                                 songVC.selectedFromTable = true
                                 songVC.transitioningDelegate = self.animator
                                 self.animator!.attachToViewController(songVC)
-                                songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
                                 self.presentViewController(songVC, animated: true, completion: {
                                     completed in
                                     //reload table to show loudspeaker icon on current selected row
@@ -225,7 +225,6 @@ class ArtistViewController: UIViewController, UITableViewDataSource, UITableView
             songVC.selectedFromTable = true
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
-            songVC.musicViewController = self.musicViewController //for goToArtist and goToAlbum from here
             self.presentViewController(songVC, animated: true, completion: {
                 completed in
                 //reload table to show loudspeaker icon on current selected row

@@ -271,6 +271,7 @@ class SearchViewController: MusicLibraryController, UITableViewDataSource, UITab
                             if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                 MusicManager.sharedInstance.player.stop()
                                 KGLOBAL_nowView.stop()
+                              KGLOBAL_nowView_topSong.stop()
                                 dispatch_async(dispatch_get_main_queue()) {
                                     self.showCellularEnablesStreaming(tableView)
                                 }
@@ -318,6 +319,7 @@ class SearchViewController: MusicLibraryController, UITableViewDataSource, UITab
                     isSeekingPlayerState = false
                     MusicManager.sharedInstance.player.stop()
                     KGLOBAL_nowView.stop()
+                  KGLOBAL_nowView_topSong.stop()
                     self.showConnectInternet(tableView)
                 }
                 
@@ -338,6 +340,7 @@ class SearchViewController: MusicLibraryController, UITableViewDataSource, UITab
                                 if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                     MusicManager.sharedInstance.player.stop()
                                     KGLOBAL_nowView.stop()
+                                  KGLOBAL_nowView_topSong.stop()
                                     dispatch_async(dispatch_get_main_queue()) {
                                         self.showCellularEnablesStreaming(tableView)
                                     }
@@ -385,6 +388,7 @@ class SearchViewController: MusicLibraryController, UITableViewDataSource, UITab
                         isSeekingPlayerState = false
                         MusicManager.sharedInstance.player.stop()
                         KGLOBAL_nowView.stop()
+                      KGLOBAL_nowView_topSong.stop()
                         self.showConnectInternet(tableView)
                     }
                 }else{
