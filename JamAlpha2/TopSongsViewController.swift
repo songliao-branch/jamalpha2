@@ -69,29 +69,19 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     
-    
-    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-       
-         guard let tableViewCell = cell as? TopSectionCell else { return }
-        
-        tableViewCell.sectionCollectionView.delegate = self
-        tableViewCell.sectionCollectionView.dataSource = self
-
-    }
-    
-    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         if indexPath.row == 0 {
     
-             let cell = tableView.dequeueReusableCellWithIdentifier("TopSectionCell", forIndexPath: indexPath) as! TopSectionCell
+            let cell = tableView.dequeueReusableCellWithIdentifier("TopSectionCell", forIndexPath: indexPath) as! TopSectionCell
             cell.sectionCollectionView.delegate = self
             cell.sectionCollectionView.dataSource = self
             cell.sectionCollectionView.reloadData()
             return cell
         }
+        
         let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
-        let song = songs[indexPath.row]
+        let song = songs[indexPath.row-1]
         cell.titleLabel.text = song.trackName
         cell.subtitleLabel.text = song.artistName
         
@@ -111,7 +101,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         
         isSeekingPlayerState = true
         
-        let song = songs[indexPath.row]
+        let song = songs[indexPath.row-1]
         song.findMediaItem()
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
