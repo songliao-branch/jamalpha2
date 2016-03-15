@@ -16,8 +16,11 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var topSongsTable: UITableView?
     
     var songs = [SearchResult]()
+    var newFreshSongs = NSMutableSet()
     var animator: CustomTransitionAnimation?
     var isSeekingPlayerState = false
+    var isLoadingMoreData = true
+    var pageIndex = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +28,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         setUpNavigationBar()
         setUpRefreshControl()
         loadData()
+      
     }
   
     func setUpRefreshControl() {
@@ -48,10 +52,31 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
               dispatch_async(dispatch_get_main_queue()){
                   table.reloadData()
               }
+              
             }
         })
+        isLoadingMoreData = false
+        pageIndex = 1
+        loadNewFresh(pageIndex)
     }
-    
+  
+  func loadNewFresh(index: Int) {
+    APIManager.downloadFreshSongsInfo(index, completion: {
+      downloadedTabsSet in
+      if(downloadedTabsSet.isEmpty) {
+        return
+      }
+      self.newFreshSongs.addObjectsFromArray(downloadedTabsSet)
+      self.pageIndex++
+      if let table = self.topSongsTable {
+        dispatch_async(dispatch_get_main_queue()){
+          table.reloadData()
+          self.isLoadingMoreData = false
+        }
+      }
+    })
+    }
+  
     
     func setUpNavigationBar() {
         self.automaticallyAdjustsScrollViewInsets = true
@@ -61,7 +86,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1 + self.songs.count
+        return 1 + self.newFreshSongs.count
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -81,12 +106,13 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         }
         
         let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
-        let song = songs[indexPath.row-1]
-        cell.titleLabel.text = song.trackName
-        cell.subtitleLabel.text = song.artistName
+        let tempNewFreshSongs = newFreshSongs.allObjects
+        let newFreshSong = tempNewFreshSongs[newFreshSongs.count - indexPath.row] as! DownloadedTabsSet
+        cell.titleLabel.text = newFreshSong.song.trackName
+        cell.subtitleLabel.text = newFreshSong.song.artistName
         
         cell.albumImage.image = nil
-        let url = NSURL(string: song.artworkUrl100)!
+        let url = NSURL(string: newFreshSong.song.artworkUrl100)!
         let fetcher = NetworkFetcher<UIImage>(URL: url)
         
         let cache = Shared.imageCache
@@ -101,13 +127,14 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         
         isSeekingPlayerState = true
         
-        let song = songs[indexPath.row-1]
-        song.findMediaItem()
+        let tempNewFreshSongs = newFreshSongs.allObjects
+        let newFreshSong = tempNewFreshSongs[newFreshSongs.count - indexPath.row] as! DownloadedTabsSet
+        newFreshSong.song.findMediaItem()
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
         
-        if let item = song.mediaItem {
+        if let item = newFreshSong.song.mediaItem {
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
             MusicManager.sharedInstance.avPlayer.pause()
@@ -170,9 +197,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         
             isSeekingPlayerState = false
             songVC.isSongNeedPurchase = true
-            songVC.songNeedPurchase = song
+            songVC.songNeedPurchase = newFreshSong.song
             songVC.parentController = self
-            songVC.reloadBackgroundImageAfterSearch(song)
+            songVC.reloadBackgroundImageAfterSearch(newFreshSong.song)
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)
@@ -203,4 +230,15 @@ extension TopSongsViewController: UICollectionViewDelegate, UICollectionViewData
         }
         return cell
     }
+}
+
+extension TopSongsViewController: UIScrollViewDelegate {
+  func scrollViewDidScroll(scrollView: UIScrollView) {
+    if scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height {
+      if !isLoadingMoreData {
+        isLoadingMoreData = true
+        loadNewFresh(pageIndex)
+      }
+    }
+  }
 }

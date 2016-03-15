@@ -53,6 +53,17 @@ class DownloadedTabsSet: NSObject {
              self.lastEdited = date
         }
     }
+  
+    override func isEqual(object: AnyObject?) -> Bool {
+      if let object = object as? DownloadedTabsSet {
+        return self.id == object.id
+      }
+      return false
+    }
+  
+    override var hash: Int {
+      return self.id
+    }
 
 }
 

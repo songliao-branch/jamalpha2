@@ -607,9 +607,43 @@ class APIManager: NSObject {
             }
         }
     }
+  
+    class func downloadFreshSongsInfo(pageIndex: Int, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
+      
+      var allDownloads = [DownloadedTabsSet]()
+      
+      //given a song's title, artist, and duration, we can find all its corresponding tabs
+      var parameters = [String: AnyObject]()
+      
+      parameters = ["page": pageIndex]
+      
+      Alamofire.request(.GET, jamBaseURL + "/get_fresh_chords", parameters: parameters).responseJSON { response in
+        switch response.result {
+        case .Success:
+          if let data = response.result.value {
+            let json = JSON(data)
+            
+            for set in json["tabs_sets"].array! {
+              
+              let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
+              
+              let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
+              
+              let song = SearchResult(title: set["song"]["title"].string!, artist: set["song"]["artist"].string! , duration: set["song"]["duration"].float!)
+              t.song = song
+              allDownloads.append(t)
+            }
+            //after completed, pass everything to the callback
+            completion(downloads: allDownloads)
+          }
+        case .Failure(let error):
+          print(error)
+        }
+      }
+    }
 
     class func sendPasswordResetInstructions(email: String, completion: ((message: String) -> Void)) {
-        
+      
         Alamofire.request(.POST, jamBaseURL + "/password_resets", parameters: ["email": email], encoding: .JSON).responseJSON
             {
                 response in
