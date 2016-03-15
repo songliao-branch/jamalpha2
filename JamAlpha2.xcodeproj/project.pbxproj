@@ -113,6 +113,7 @@
 		E42DF9371BAF419F00187A95 /* LyricsTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */; };
 		E431BA9B1B913A1B00E32A0B /* MusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E431BA9A1B913A1B00E32A0B /* MusicManager.swift */; };
 		E431BA9D1B913AE700E32A0B /* String+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E431BA9C1B913AE700E32A0B /* String+Utils.swift */; };
+		E43223981C968880000F2638 /* SongCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43223971C968880000F2638 /* SongCardCell.swift */; };
 		E43713F11C34851200517D03 /* MyFavoritesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713F01C34851200517D03 /* MyFavoritesCell.swift */; };
 		E43713F51C34853600517D03 /* UserTabsLyricsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713F41C34853600517D03 /* UserTabsLyricsCell.swift */; };
 		E43713FB1C3486BE00517D03 /* MyFavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43713FA1C3486BD00517D03 /* MyFavoritesViewController.swift */; };
@@ -303,6 +304,7 @@
 		E42DF9351BAF419F00187A95 /* LyricsTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LyricsTextViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E431BA9A1B913A1B00E32A0B /* MusicManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicManager.swift; sourceTree = "<group>"; };
 		E431BA9C1B913AE700E32A0B /* String+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Utils.swift"; sourceTree = "<group>"; };
+		E43223971C968880000F2638 /* SongCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongCardCell.swift; sourceTree = "<group>"; };
 		E43713F01C34851200517D03 /* MyFavoritesCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFavoritesCell.swift; sourceTree = "<group>"; };
 		E43713F41C34853600517D03 /* UserTabsLyricsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserTabsLyricsCell.swift; sourceTree = "<group>"; };
 		E43713FA1C3486BD00517D03 /* MyFavoritesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFavoritesViewController.swift; sourceTree = "<group>"; };
@@ -684,6 +686,7 @@
 				E45604411C472218004CA96B /* FreshChordsCell.swift */,
 				BFB217341C582F0A00E27A32 /* SingleLyricsTableViewCell.swift */,
 				E455F7441C965D6100FA90CC /* TopSectionCell.swift */,
+				E43223971C968880000F2638 /* SongCardCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -1178,6 +1181,7 @@
 				E44359021B1947660091E926 /* SimpleAlbum.swift in Sources */,
 				BFFAA51A1C3CE13100DC3253 /* SoundBankPlayer.m in Sources */,
 				BFE49ED81C13828700F26877 /* SettingFBLikeCell.swift in Sources */,
+				E43223981C968880000F2638 /* SongCardCell.swift in Sources */,
 				BF4B83E31BFA713A00AF8A2A /* MeContentProfileTableViewCell.swift in Sources */,
 				BFC136661C580E8A00D05899 /* PullToRefreshConst.swift in Sources */,
 				C820A3CD1B817E1F0029A253 /* MarqueeLabel.swift in Sources */,

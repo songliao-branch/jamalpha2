@@ -61,28 +61,39 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.songs.count
+        return 1 + self.songs.count
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 90
+        return indexPath.row == 0 ? 160 : 90
     }
     
+    
+    
+    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+       
+         guard let tableViewCell = cell as? TopSectionCell else { return }
+        
+        tableViewCell.sectionCollectionView.delegate = self
+        tableViewCell.sectionCollectionView.dataSource = self
+
+    }
+    
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        if indexPath.row == 0 {
+    
+             let cell = tableView.dequeueReusableCellWithIdentifier("TopSectionCell", forIndexPath: indexPath) as! TopSectionCell
+            cell.sectionCollectionView.delegate = self
+            cell.sectionCollectionView.dataSource = self
+            
+            return cell
+        }
         let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
         let song = songs[indexPath.row]
         cell.titleLabel.text = song.trackName
         cell.subtitleLabel.text = song.artistName
-        
-//        //toggle speaker icon for current playing item
-//        cell.speaker.hidden = true
-//        cell.titleRightConstraint.constant = 20
-//        if let item = song.mediaItem {
-//            if MusicManager.sharedInstance.player.nowPlayingItem == item {
-//                cell.speaker.hidden = false
-//                cell.titleRightConstraint.constant = 50
-//            }
-//        }
         
         cell.albumImage.image = nil
         let url = NSURL(string: song.artworkUrl100)!
@@ -93,6 +104,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             cell.albumImage.image = image
         }
         return cell
+        
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -177,5 +189,29 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
     }
+}
 
+extension TopSongsViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.songs.count
+    }
+    
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("SongCardCell", forIndexPath: indexPath) as! SongCardCell
+
+        let song = songs[indexPath.row]
+        cell.titleLabel.text = song.trackName
+        cell.subtitleLabel.text = song.artistName
+        
+        cell.albumImage.image = nil
+        let url = NSURL(string: song.artworkUrl100)!
+        let fetcher = NetworkFetcher<UIImage>(URL: url)
+        
+        let cache = Shared.imageCache
+        cache.fetch(fetcher: fetcher).onSuccess { image in
+            cell.albumImage.image = image
+        }
+        return cell
+    }
 }
