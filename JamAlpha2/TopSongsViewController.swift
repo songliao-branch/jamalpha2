@@ -87,7 +87,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
              let cell = tableView.dequeueReusableCellWithIdentifier("TopSectionCell", forIndexPath: indexPath) as! TopSectionCell
             cell.sectionCollectionView.delegate = self
             cell.sectionCollectionView.dataSource = self
-            
+            cell.sectionCollectionView.reloadData()
             return cell
         }
         let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
@@ -199,7 +199,6 @@ extension TopSongsViewController: UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("SongCardCell", forIndexPath: indexPath) as! SongCardCell
-
         let song = songs[indexPath.row]
         cell.titleLabel.text = song.trackName
         cell.subtitleLabel.text = song.artistName
