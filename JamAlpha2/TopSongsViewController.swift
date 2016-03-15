@@ -19,8 +19,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     var newFreshSongs = NSMutableSet()
     var animator: CustomTransitionAnimation?
     var isSeekingPlayerState = false
-    var isLoadingMoreData = true
+    var isLoadingMoreData = false
     var pageIndex = 1
+    var viewdidAppear = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,8 +29,13 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         setUpNavigationBar()
         setUpRefreshControl()
         loadData()
-      
     }
+  
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    viewdidAppear = true
+  }
+  
   
     func setUpRefreshControl() {
         topSongsTable?.addPullToRefresh {
@@ -49,10 +55,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             self.songs = songs
             //TODO: this crashes somehow, needs to find out how to reproduce the crash
             if let table = self.topSongsTable {
-              dispatch_async(dispatch_get_main_queue()){
                   table.reloadData()
-              }
-              
             }
         })
         isLoadingMoreData = false
@@ -69,11 +72,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
       self.newFreshSongs.addObjectsFromArray(downloadedTabsSet)
       self.pageIndex++
       if let table = self.topSongsTable {
-        dispatch_async(dispatch_get_main_queue()){
           table.reloadData()
-          self.isLoadingMoreData = false
-        }
       }
+      self.isLoadingMoreData = false
     })
     }
   
@@ -234,6 +235,9 @@ extension TopSongsViewController: UICollectionViewDelegate, UICollectionViewData
 
 extension TopSongsViewController: UIScrollViewDelegate {
   func scrollViewDidScroll(scrollView: UIScrollView) {
+    if !viewdidAppear {
+      return
+    }
     if scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height {
       if !isLoadingMoreData {
         isLoadingMoreData = true
