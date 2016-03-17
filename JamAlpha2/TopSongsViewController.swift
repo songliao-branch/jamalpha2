@@ -15,7 +15,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
 
     @IBOutlet weak var topSongsTable: UITableView?
     
-    var songs = [SearchResult]()
+    var topSongs = [SearchResult]()
     var freshChords = NSMutableSet()
     var animator: CustomTransitionAnimation?
     var isSeekingPlayerState = false
@@ -52,7 +52,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     func loadData() {
         APIManager.getTopSongs({
             songs in
-            self.songs = songs
+            self.topSongs = songs
             //TODO: this crashes somehow, needs to find out how to reproduce the crash
             if let table = self.topSongsTable {
                   table.reloadData()
@@ -140,16 +140,20 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
+        if indexPath.row == 0 {
+            return
+        }
         isSeekingPlayerState = true
         
-        let tempNewFreshSongs = freshChords.allObjects
-        let newFreshSong = tempNewFreshSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
-        newFreshSong.song.findMediaItem()
+        let newSongs = freshChords.allObjects
+        let newSong = newSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
+        newSong.song.findMediaItem()
+        
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
         
-        if let item = newFreshSong.song.mediaItem {
+        if let item = newSong.song.mediaItem {
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
             MusicManager.sharedInstance.avPlayer.pause()
@@ -212,9 +216,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         
             isSeekingPlayerState = false
             songVC.isSongNeedPurchase = true
-            songVC.songNeedPurchase = newFreshSong.song
+            songVC.songNeedPurchase = newSong.song
             songVC.parentController = self
-            songVC.reloadBackgroundImageAfterSearch(newFreshSong.song)
+            songVC.reloadBackgroundImageAfterSearch(newSong.song)
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)
@@ -226,12 +230,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
 extension TopSongsViewController: UICollectionViewDelegate, UICollectionViewDataSource {
 
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.songs.count
+        return self.topSongs.count
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("SongCardCell", forIndexPath: indexPath) as! SongCardCell
-        let song = songs[indexPath.row]
+        let song = topSongs[indexPath.row]
         cell.titleLabel.text = song.trackName
         cell.subtitleLabel.text = song.artistName
         
@@ -244,6 +248,46 @@ extension TopSongsViewController: UICollectionViewDelegate, UICollectionViewData
             cell.albumImage.image = image
         }
         return cell
+    }
+    
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        print("\(indexPath.item) selected")
+        
+        let newSong = topSongs[indexPath.item]
+        
+        newSong.findMediaItem()
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        
+        songVC.selectedFromTable = true
+        
+        if let item = newSong.mediaItem {
+            MusicManager.sharedInstance.setPlayerQueue([item])
+            MusicManager.sharedInstance.setIndexInTheQueue(0)
+            MusicManager.sharedInstance.avPlayer.pause()
+            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+            MusicManager.sharedInstance.avPlayer.removeAllItems()
+            
+            if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                MusicManager.sharedInstance.player.stop()
+                KGLOBAL_nowView.stop()
+            }
+            
+            songVC.selectedFromTable = true
+            songVC.parentController = self
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            self.presentViewController(songVC, animated: true, completion: nil)
+            
+        } else { //cannot find song in local libary, show iTunes result
+
+            songVC.isSongNeedPurchase = true
+            songVC.songNeedPurchase = newSong
+            songVC.parentController = self
+            songVC.reloadBackgroundImageAfterSearch(newSong)
+            songVC.transitioningDelegate = self.animator
+            self.animator!.attachToViewController(songVC)
+            self.presentViewController(songVC, animated: true, completion: nil)
+        }
     }
 }
 
