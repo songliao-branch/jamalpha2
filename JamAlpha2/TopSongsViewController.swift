@@ -16,7 +16,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var topSongsTable: UITableView?
     
     var songs = [SearchResult]()
-    var newFreshSongs = NSMutableSet()
+    var freshChords = NSMutableSet()
     var animator: CustomTransitionAnimation?
     var isSeekingPlayerState = false
     var isLoadingMoreData = false
@@ -64,12 +64,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
   
   func loadNewFresh(index: Int) {
-    APIManager.downloadFreshSongsInfo(index, completion: {
+    APIManager.downloadFreshChords(index, completion: {
       downloadedTabsSet in
       if(downloadedTabsSet.isEmpty) {
         return
       }
-      self.newFreshSongs.addObjectsFromArray(downloadedTabsSet)
+      self.freshChords.addObjectsFromArray(downloadedTabsSet)
       self.pageIndex++
       if let table = self.topSongsTable {
           table.reloadData()
@@ -87,7 +87,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1 + self.newFreshSongs.count
+        return 1 + self.freshChords.count
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -107,8 +107,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         }
         
         let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
-        let tempNewFreshSongs = newFreshSongs.allObjects
-        let newFreshSong = tempNewFreshSongs[newFreshSongs.count - indexPath.row] as! DownloadedTabsSet
+        let tempNewFreshSongs = freshChords.allObjects
+        let newFreshSong = tempNewFreshSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
         cell.titleLabel.text = newFreshSong.song.trackName
         cell.subtitleLabel.text = newFreshSong.song.artistName
         
@@ -128,8 +128,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         
         isSeekingPlayerState = true
         
-        let tempNewFreshSongs = newFreshSongs.allObjects
-        let newFreshSong = tempNewFreshSongs[newFreshSongs.count - indexPath.row] as! DownloadedTabsSet
+        let tempNewFreshSongs = freshChords.allObjects
+        let newFreshSong = tempNewFreshSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
         newFreshSong.song.findMediaItem()
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
