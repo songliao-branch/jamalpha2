@@ -188,6 +188,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
+                          KGLOBAL_nowView_topSong.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
@@ -231,6 +232,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 KGLOBAL_nowView.stop()
+              KGLOBAL_nowView_topSong.stop()
                 self.showConnectInternet(tableView)
             }
         }  else if song.getArtist() == "Alex Lisell" { //if demo song

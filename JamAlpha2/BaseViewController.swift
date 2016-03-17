@@ -56,8 +56,10 @@ class BaseViewController: MusicLibraryController, UIPageViewControllerDataSource
         let playbackState = player.playbackState
         if playbackState == .Playing {
             KGLOBAL_nowView.start()
+          KGLOBAL_nowView_topSong.start()
         } else  {
-            KGLOBAL_nowView.stop()
+          KGLOBAL_nowView.stop()
+          KGLOBAL_nowView_topSong.stop()
         }
     }
     
@@ -113,6 +115,7 @@ class BaseViewController: MusicLibraryController, UIPageViewControllerDataSource
         }
         self.currentPageIndex = 0
     }
+  
     func goToNowPlaying() { //tell me when it kicks in
         for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
             if player.nowPlayingItem != nil || MusicManager.sharedInstance.avPlayer.currentItem != nil {

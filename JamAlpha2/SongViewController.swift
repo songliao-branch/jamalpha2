@@ -19,6 +19,8 @@ let soundwaveHeight: CGFloat = 161
 
 class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
   
+  let rootVC:TabBarController = (UIApplication.sharedApplication().keyWindow?.rootViewController) as! TabBarController
+  
   //MARK: When display lyrics only
   var singleLyricsTableView: UITableView!
   var lyricsArray: [(str: String, time: NSTimeInterval, alpha: CGFloat, offSet: CGFloat)]!
@@ -278,8 +280,11 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
       }
       self.selectedFromSearchTab = true
       KGLOBAL_nowView.stop()
+      KGLOBAL_nowView_topSong.stop()
       CoreDataManager.initializeSongToDatabase(songNeedPurchase)
     }
+    let baseVC:BaseViewController =  (rootVC.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
+    self.musicViewController = baseVC.musicViewController
     
     //hide tab bar
     self.tabBarController?.tabBar.hidden = true
@@ -1871,9 +1876,11 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     if isDemoSong {
       if avPlayer.rate > 0 {
         KGLOBAL_nowView.start()
+        KGLOBAL_nowView_topSong.start()
         
       } else {
         KGLOBAL_nowView.stop()
+        KGLOBAL_nowView_topSong.stop()
       }
       
       if avPlayer.rate > 0 {
@@ -1885,8 +1892,10 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     }else{
       if player.playbackState == .Playing {
         KGLOBAL_nowView.start()
+        KGLOBAL_nowView_topSong.start()
       } else {
         KGLOBAL_nowView.stop()
+        KGLOBAL_nowView_topSong.stop()
       }
       
       if player.playbackState == MPMusicPlaybackState.Playing {

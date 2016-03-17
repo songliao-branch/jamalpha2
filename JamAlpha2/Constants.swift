@@ -21,6 +21,8 @@ var KGLOBAL_timer:NSTimer!
 var KGLOBAL_isNeedToCheckIndex:Bool = false
 
 var KGLOBAL_nowView = VisualizerView()
+var KGLOBAL_nowView_topSong = VisualizerView()
+
 // value is a BOOL
 var KEY_isSoundWaveformGeneratingInBackground:Bool = false
 

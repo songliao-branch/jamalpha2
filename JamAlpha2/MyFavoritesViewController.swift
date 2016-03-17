@@ -82,6 +82,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
+                          KGLOBAL_nowView_topSong.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
@@ -125,6 +126,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 KGLOBAL_nowView.stop()
+              KGLOBAL_nowView_topSong.stop()
                 self.showConnectInternet(tableView)
             }
         }   else if song.getArtist() == "Alex Lisell" { //if demo song

@@ -659,47 +659,28 @@ extension SongViewController {
     }
     
     func goToArtist(button: UIButton) {
+        rootVC.selectedIndex = kIndexOfMyMusicPage
         self.dismissViewControllerAnimated(false, completion: {
             completed in
             if self.parentViewController != nil {
                 self.parentController.view.alpha = 1
             }
-            if(self.musicViewController != nil){
-                if(!self.isDemoSong){
-                    self.musicViewController.goToArtist(self.player.nowPlayingItem!.artist!)
-                }
-            }else{
-                let rootVC:TabBarController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC as! TabBarController
-                let baseVC:BaseViewController = (rootVC.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
-                rootVC.selectedIndex = 0
-                let musicVC:MusicViewController = baseVC.musicViewController
-                if(!self.isDemoSong){
-                    musicVC.goToArtist(self.player.nowPlayingItem!.artist!)
-                }
+            if(!self.isDemoSong){
+                self.musicViewController.goToArtist(self.player.nowPlayingItem!.artist!)
             }
         })
     }
     
     func goToAlbum(button: UIButton) {
-        self.dismissViewControllerAnimated(false, completion: {
+        rootVC.selectedIndex = kIndexOfMyMusicPage
+        self.dismissViewControllerAnimated(true, completion: {
             completed in
             if self.parentViewController != nil {
                 self.parentController.view.alpha = 1
             }
-            if(self.musicViewController != nil){
-                if(!self.isDemoSong){
-                    self.musicViewController.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
-                }
-            }else{
-                let rootVC:TabBarController = (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC as! TabBarController
-                let baseVC:BaseViewController = (rootVC.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
-                rootVC.selectedIndex = 0
-                let musicVC:MusicViewController = baseVC.musicViewController
-                if(!self.isDemoSong){
-                    musicVC.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
-                }
+            if(!self.isDemoSong){
+                self.musicViewController.goToAlbum(self.player.nowPlayingItem!.albumTitle!)
             }
-            
         })
     }
     
