@@ -641,6 +641,7 @@ class APIManager: NSObject {
             
             let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
             
+            print("\(set["user"]["nickname"].string!)'s thumbnail:\(set["user"]["avatar_url_thumbnail"].string!)")
             let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
             let song = SearchResult(songId: set["song"]["id"].int!, trackId: set["song"]["track_id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!, previewUrl: set["song"]["preview_url"].string!, trackViewUrl: set["song"]["store_link"].string!, artwork: set["song"]["artwork_url"].string!)
             t.song = song

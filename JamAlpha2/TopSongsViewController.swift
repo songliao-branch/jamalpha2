@@ -66,7 +66,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
   func loadNewFresh(index: Int) {
     APIManager.downloadFreshChords(index, completion: {
       downloadedTabsSet in
-      if(downloadedTabsSet.isEmpty) {
+      if downloadedTabsSet.isEmpty {
         return
       }
       self.freshChords.addObjectsFromArray(downloadedTabsSet)
@@ -107,19 +107,33 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         }
         
         let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
-        let tempNewFreshSongs = freshChords.allObjects
-        let newFreshSong = tempNewFreshSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
-        cell.titleLabel.text = newFreshSong.song.trackName
-        cell.subtitleLabel.text = newFreshSong.song.artistName
+        
+        let newSongs = freshChords.allObjects
+        let newSong = newSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
+        cell.titleLabel.text = newSong.song.trackName
+        cell.subtitleLabel.text = newSong.song.artistName
         
         cell.albumImage.image = nil
-        let url = NSURL(string: newFreshSong.song.artworkUrl100)!
+        let url = NSURL(string: newSong.song.artworkUrl100)!
         let fetcher = NetworkFetcher<UIImage>(URL: url)
         
         let cache = Shared.imageCache
         cache.fetch(fetcher: fetcher).onSuccess { image in
             cell.albumImage.image = image
         }
+        
+        cell.contributorNameLabel.text = "by \(newSong.editor.nickname) \(NSDate.timeAgoSinceDate(newSong.lastEdited!, numericDates: true))"
+        
+        AWSS3Manager.downloadImage(newSong.editor.avatarUrlThumbnail, isProfileBucket: true,completion: {
+            image in
+            dispatch_async(dispatch_get_main_queue()) {
+                cell.contributorImage.image = image
+                cell.contributorImage.layer.cornerRadius = cell.contributorImage.frame.height/2
+                cell.contributorImage.layer.masksToBounds = true
+                }
+            }
+        )
+        
         return cell
         
     }
