@@ -54,14 +54,14 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func loadData() {
-        APIManager.getTopSongs({
-            songs in
-            self.topSongs = songs
-            //TODO: this crashes somehow, needs to find out how to reproduce the crash
-            if let table = self.topSongsTable {
-                  table.reloadData()
-            }
-        })
+//        APIManager.getTopSongs({
+//            songs in
+//            self.topSongs = songs
+//            //TODO: this crashes somehow, needs to find out how to reproduce the crash
+//            if let table = self.topSongsTable {
+//                  table.reloadData()
+//            }
+//        })
         shouldLoadMoreChords = false
         pageIndex = 1
         loadMoreFreshChords(pageIndex)
@@ -130,29 +130,20 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1 + self.freshChords.count
+        return self.freshChords.count
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return indexPath.row == 0 ? 160 : 90
+        return 90
     }
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        if indexPath.row == 0 {
-    
-            let cell = tableView.dequeueReusableCellWithIdentifier("TopSectionCell", forIndexPath: indexPath) as! TopSectionCell
-            cell.sectionCollectionView.delegate = self
-            cell.sectionCollectionView.dataSource = self
-            cell.sectionCollectionView.reloadData()
-            return cell
-        }
-        
         let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
         
         let newSongs = freshChords.allObjects
-        let newSong = newSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
+        let newSong = newSongs[freshChords.allObjects.count - indexPath.row - 1] as! DownloadedTabsSet
         cell.titleLabel.text = newSong.song.trackName
         cell.subtitleLabel.text = newSong.song.artistName
         
@@ -183,13 +174,10 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        if indexPath.row == 0 {
-            return
-        }
         isSeekingPlayerState = true
         
         let newSongs = freshChords.allObjects
-        let newSong = newSongs[freshChords.count - indexPath.row] as! DownloadedTabsSet
+        let newSong = newSongs[freshChords.allObjects.count - indexPath.row - 1] as! DownloadedTabsSet
         newSong.song.findMediaItem()
         
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
@@ -272,69 +260,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
 }
 
-extension TopSongsViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.topSongs.count
-    }
-    
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("SongCardCell", forIndexPath: indexPath) as! SongCardCell
-        let song = topSongs[indexPath.row]
-        cell.titleLabel.text = song.trackName
-        cell.subtitleLabel.text = song.artistName
-        
-        cell.albumImage.image = nil
-        let url = NSURL(string: song.artworkUrl100)!
-        let fetcher = NetworkFetcher<UIImage>(URL: url)
-        
-        let cache = Shared.imageCache
-        cache.fetch(fetcher: fetcher).onSuccess { image in
-            cell.albumImage.image = image
-        }
-        return cell
-    }
-    
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        print("\(indexPath.item) selected")
-        
-        let newSong = topSongs[indexPath.item]
-        
-        newSong.findMediaItem()
-        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-        
-        songVC.selectedFromTable = true
-        
-        if let item = newSong.mediaItem {
-            MusicManager.sharedInstance.setPlayerQueue([item])
-            MusicManager.sharedInstance.setIndexInTheQueue(0)
-            MusicManager.sharedInstance.avPlayer.pause()
-            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
-            MusicManager.sharedInstance.avPlayer.removeAllItems()
-            
-            if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
-                MusicManager.sharedInstance.player.stop()
-                KGLOBAL_nowView.stop()
-            }
-            
-            songVC.selectedFromTable = true
-            songVC.parentController = self
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            self.presentViewController(songVC, animated: true, completion: nil)
-            
-        } else { //cannot find song in local libary, show iTunes result
-
-            songVC.isSongNeedPurchase = true
-            songVC.songNeedPurchase = newSong
-            songVC.parentController = self
-            songVC.reloadBackgroundImageAfterSearch(newSong)
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            self.presentViewController(songVC, animated: true, completion: nil)
-        }
-    }
-}
 
 extension TopSongsViewController: UIScrollViewDelegate {
   func scrollViewDidScroll(scrollView: UIScrollView) {
