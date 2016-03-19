@@ -18,4 +18,6 @@ class FreshChordsCell: UITableViewCell {
     @IBOutlet weak var contributorImage: UIImageView!
 
     @IBOutlet weak var contributorNameLabel: UILabel!
+    
+        @IBOutlet weak var timeLabel: UILabel!
 }

@@ -134,7 +134,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 90
+        return 120
     }
     
     
@@ -157,7 +157,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             cell.albumImage.image = image
         }
         
-        cell.contributorNameLabel.text = "by \(newSong.editor.nickname) \(NSDate.timeAgoSinceDate(newSong.lastEdited!, numericDates: true))"
+        cell.contributorNameLabel.text = "\(newSong.editor.nickname)"
+        
+        cell.timeLabel.text = NSDate.timeAgoSinceDate(newSong.lastEdited!, numericDates: true)
         
         AWSS3Manager.downloadImage(newSong.editor.avatarUrlThumbnail, isProfileBucket: true,completion: {
             image in
@@ -214,6 +216,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             self.presentViewController(songVC, animated: true, completion: nil)
         }
 
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }
 
