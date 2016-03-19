@@ -1409,8 +1409,8 @@
                             <rect key="frame" x="57" y="5.5" width="206" height="33"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <segments>
-                                <segment title="New"/>
-                                <segment title="Top"/>
+                                <segment title="Fresh Chords"/>
+                                <segment title="Top 100"/>
                             </segments>
                             <connections>
                                 <action selector="segmentSelected:" destination="vik-ZA-XSq" eventType="valueChanged" id="noF-Ig-yHd"/>

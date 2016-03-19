@@ -697,7 +697,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     self.view.addSubview(previousButton)
     self.view.addSubview(nextButton)
     
-    if(isSongNeedPurchase || isDemoSong){
+    if(isSongNeedPurchase || isDemoSong || MusicManager.sharedInstance.lastPlayerQueue.count == 1) {
       previousButton.hidden = true
       nextButton.hidden = true
     }
@@ -964,8 +964,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     let sideMargin: CGFloat = 20
     
     lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
-    lyricbase.backgroundColor = UIColor.baseColor()
-    
+    lyricbase.backgroundColor = UIColor.clearColor()
     self.view.addSubview(lyricbase)
     
     lyricBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "lyricsModeChanged")
@@ -975,24 +974,24 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     
     let contentMargin: CGFloat = 5
     
-    lyricbase.layer.cornerRadius = 20
+    //lyricbase.layer.cornerRadius = 20
     
     topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
     topLyricLabel.center.y = lyricbase.frame.height / 3
     topLyricLabel.numberOfLines = 3
     topLyricLabel.textAlignment = NSTextAlignment.Center
-    topLyricLabel.font = UIFont.systemFontOfSize(23)
+    topLyricLabel.font = UIFont.systemFontOfSize(21)
     topLyricLabel.lineBreakMode = .ByWordWrapping
-    topLyricLabel.textColor = UIColor.silverGray()
+    topLyricLabel.textColor = UIColor.whiteColor()
     lyricbase.addSubview(topLyricLabel)
     
     bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
     bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
     bottomLyricLabel.numberOfLines = 3
     bottomLyricLabel.textAlignment = NSTextAlignment.Center
-    bottomLyricLabel.font = UIFont.systemFontOfSize(16)
+    bottomLyricLabel.font = UIFont.systemFontOfSize(18)
     bottomLyricLabel.lineBreakMode = .ByWordWrapping
-    bottomLyricLabel.textColor = UIColor.silverGray()
+    bottomLyricLabel.textColor = UIColor.whiteColor()
     lyricbase.addSubview(bottomLyricLabel)
     
     addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
