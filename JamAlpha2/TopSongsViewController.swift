@@ -11,13 +11,18 @@ import MediaPlayer
 import Haneke
 
 //TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
+
 class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var topSongsTable: UITableView?
+    let indexOfFreshChords = 0
+    let indexOfTopSongs = 1
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
+    
     var player: MPMusicPlayerController! // set to singleton in MusicManager
     
     var topSongs = [SearchResult]()
-    var freshChords = NSMutableSet()
+    var freshChords = [DownloadedTabsSet]()
     var animator: CustomTransitionAnimation?
     var isSeekingPlayerState = false
     var shouldLoadMoreChords = false
@@ -35,10 +40,10 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         registerNotifications()
     }
   
-  override func viewDidAppear(animated: Bool) {
-    super.viewDidAppear(animated)
-    viewdidAppear = true
-  }
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        viewdidAppear = true
+    }
   
   
     func setUpRefreshControl() {
@@ -54,14 +59,15 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func loadData() {
-//        APIManager.getTopSongs({
-//            songs in
-//            self.topSongs = songs
-//            //TODO: this crashes somehow, needs to find out how to reproduce the crash
-//            if let table = self.topSongsTable {
-//                  table.reloadData()
-//            }
-//        })
+        
+        APIManager.getTopSongs({
+            songs in
+            self.topSongs = songs
+            if let table = self.topSongsTable {
+                  table.reloadData()
+            }
+        })
+        
         shouldLoadMoreChords = false
         pageIndex = 1
         loadMoreFreshChords(pageIndex)
@@ -73,8 +79,11 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         sets in
         
         if sets.isEmpty { return }
+    
+        for set in sets {
+            self.freshChords.append(set)
+        }
         
-        self.freshChords.addObjectsFromArray(sets)
         self.pageIndex++
         if let table = self.topSongsTable {
             table.reloadData()
@@ -130,74 +139,97 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.freshChords.count
+        if segmentedControl.selectedSegmentIndex == indexOfFreshChords {
+            return self.freshChords.count
+        }
+        return self.topSongs.count
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 120
+        if segmentedControl.selectedSegmentIndex == indexOfFreshChords {
+            return 120
+        }
+        return 90
     }
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-    
-        let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
-        
-        let newSongs = freshChords.allObjects
-        let newSong = newSongs[freshChords.allObjects.count - indexPath.row - 1] as! DownloadedTabsSet
-        cell.titleLabel.text = newSong.song.trackName
-        cell.subtitleLabel.text = newSong.song.artistName
-        
-        cell.albumImage.image = nil
-        let url = NSURL(string: newSong.song.artworkUrl100)!
-        let fetcher = NetworkFetcher<UIImage>(URL: url)
-        
-        let cache = Shared.imageCache
-        cache.fetch(fetcher: fetcher).onSuccess { image in
-            cell.albumImage.image = image
-        }
-        
-        cell.contributorNameLabel.text = "\(newSong.editor.nickname)"
-        
-        cell.timeLabel.text = NSDate.timeAgoSinceDate(newSong.lastEdited!, numericDates: true)
-        
-        AWSS3Manager.downloadImage(newSong.editor.avatarUrlThumbnail, isProfileBucket: true,completion: {
-            image in
-            dispatch_async(dispatch_get_main_queue()) {
-                cell.contributorImage.image = image
-                cell.contributorImage.layer.cornerRadius = cell.contributorImage.frame.height/2
-                cell.contributorImage.layer.masksToBounds = true
-                }
+        if segmentedControl.selectedSegmentIndex == indexOfFreshChords {
+            let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
+            
+            let newSong = freshChords[indexPath.row]
+            cell.titleLabel.text = newSong.song.trackName
+            cell.subtitleLabel.text = newSong.song.artistName
+            
+            cell.albumImage.image = nil
+            let url = NSURL(string: newSong.song.artworkUrl100)!
+            let fetcher = NetworkFetcher<UIImage>(URL: url)
+            
+            let cache = Shared.imageCache
+            cache.fetch(fetcher: fetcher).onSuccess { image in
+                cell.albumImage.image = image
             }
-        )
-        
-        return cell
-        
+            
+            cell.contributorNameLabel.text = "\(newSong.editor.nickname)"
+            
+            cell.timeLabel.text = NSDate.timeAgoSinceDate(newSong.lastEdited!, numericDates: true)
+            
+            AWSS3Manager.downloadImage(newSong.editor.avatarUrlThumbnail, isProfileBucket: true,completion: {
+                image in
+                dispatch_async(dispatch_get_main_queue()) {
+                    cell.contributorImage.image = image
+                    cell.contributorImage.layer.cornerRadius = cell.contributorImage.frame.height/2
+                    cell.contributorImage.layer.masksToBounds = true
+                    }
+                }
+            )
+            
+            return cell
+            
+        } else if segmentedControl.selectedSegmentIndex == indexOfTopSongs {
+            
+            let cell = tableView.dequeueReusableCellWithIdentifier("TopSongCell", forIndexPath: indexPath) as! TopSongCell
+            
+            let topSong = topSongs[indexPath.row]
+            cell.titleLabel.text = topSong.trackName
+            cell.subtitleLabel.text = topSong.artistName
+            cell.numberLabel.text = "\(indexPath.row + 1)."
+            
+            cell.albumImage.image = nil
+            let url = NSURL(string: topSong.artworkUrl100)!
+            let fetcher = NetworkFetcher<UIImage>(URL: url)
+            
+            let cache = Shared.imageCache
+            cache.fetch(fetcher: fetcher).onSuccess { image in
+                cell.albumImage.image = image
+            }
+            return cell
+        }
+        return UITableViewCell()
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        isSeekingPlayerState = true
-        
-        let newSongs = freshChords.allObjects
-        let newSong = newSongs[freshChords.allObjects.count - indexPath.row - 1] as! DownloadedTabsSet
-        newSong.song.findMediaItem()
+        let song = segmentedControl.selectedSegmentIndex == indexOfFreshChords ? freshChords[indexPath.row].song : topSongs[indexPath.row]
+      
+        song.findMediaItem()
 
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         songVC.selectedFromTable = true
-        
-        if let item = newSong.song.mediaItem {
+       
+        if let item = song.mediaItem {
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
-            MusicManager.sharedInstance.avPlayer.pause()
-            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
-            MusicManager.sharedInstance.avPlayer.removeAllItems()
+//            MusicManager.sharedInstance.avPlayer.pause()
+//            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
+//            MusicManager.sharedInstance.avPlayer.removeAllItems()
             
-            if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
-                MusicManager.sharedInstance.player.stop()
-                KGLOBAL_nowView.stop()
-            }
+//            if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+//                MusicManager.sharedInstance.player.stop()
+//                KGLOBAL_nowView.stop()
+//            }
             
             songVC.selectedFromTable = true
             songVC.parentController = self
@@ -208,9 +240,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         } else { //cannot find song in local libary, show iTunes result
             
             songVC.isSongNeedPurchase = true
-            songVC.songNeedPurchase = newSong.song
+            songVC.songNeedPurchase = song
             songVC.parentController = self
-            songVC.reloadBackgroundImageAfterSearch(newSong.song)
+            songVC.reloadBackgroundImageAfterSearch(song)
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)
@@ -218,8 +250,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
 
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
+    
+    
+    @IBAction func segmentSelected(sender: UISegmentedControl) {
+        topSongsTable?.reloadData()
+    }
 }
-
 
 extension TopSongsViewController: UIScrollViewDelegate {
   func scrollViewDidScroll(scrollView: UIScrollView) {
