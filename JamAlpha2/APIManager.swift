@@ -574,8 +574,9 @@ class APIManager: NSObject {
         }
     }
     
-    class func getTopSongs(completion: (( songs: [SearchResult]) -> Void)) {
-        Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
+    class func getTopSongs(index: Int, completion: (( songs: [SearchResult]) -> Void)) {
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_top_songs", parameters: ["page": index]).responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {

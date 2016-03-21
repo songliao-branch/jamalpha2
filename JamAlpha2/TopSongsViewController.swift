@@ -13,7 +13,7 @@ import Haneke
 //TODO: this view controller has exactly same function as my favorites view controller, depending on the future designs we separate this controller as an indvidual
 
 class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-
+    
     @IBOutlet weak var topSongsTable: UITableView?
     let indexOfFreshChords = 0
     let indexOfTopSongs = 1
@@ -25,8 +25,13 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     var freshChords = [DownloadedTabsSet]()
     var animator: CustomTransitionAnimation?
     var isSeekingPlayerState = false
+    
     var shouldLoadMoreChords = false
-    var pageIndex = 1
+    var pageIndexFreshChords = 1
+    
+    var shouldLoadMoreTopSongs = false
+    var pageIndexTopSongs = 1
+    
     var viewdidAppear = false
     
     override func viewDidLoad() {
@@ -39,13 +44,13 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         setUpNowView()
         registerNotifications()
     }
-  
+    
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         viewdidAppear = true
     }
-  
-  
+    
+    
     func setUpRefreshControl() {
         topSongsTable?.addPullToRefresh {
             self.loadData()
@@ -59,78 +64,102 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func loadData() {
+    
+        shouldLoadMoreChords = false
+        pageIndexFreshChords = 1
+        loadMoreFreshChords(pageIndexFreshChords)
         
-        APIManager.getTopSongs({
-            songs in
-            self.topSongs = songs
+        //TODO: fix this
+        shouldLoadMoreTopSongs = false
+        pageIndexTopSongs = 1
+        loadMoreTopSongs(pageIndexTopSongs)
+    }
+    
+    func loadMoreFreshChords(index: Int) {
+        
+        APIManager.downloadFreshChords(index, completion: {
+            sets in
+            
+            if sets.isEmpty { return }
+            
+            for set in sets {
+                self.freshChords.append(set)
+            }
+            
+            self.pageIndexFreshChords++
             if let table = self.topSongsTable {
-                  table.reloadData()
+                table.reloadData()
+            }
+            self.shouldLoadMoreChords = false
+        })
+    }
+    
+    func loadMoreTopSongs(index: Int) {
+        APIManager.getTopSongs(index, completion: {
+            songs in
+            
+            if songs.isEmpty { return }
+            
+            for song in songs {
+                self.topSongs.append(song)
+            }
+            
+            self.pageIndexTopSongs++
+            self.shouldLoadMoreTopSongs = false
+            if let table = self.topSongsTable {
+                table.reloadData()
             }
         })
-        
-        shouldLoadMoreChords = false
-        pageIndex = 1
-        loadMoreFreshChords(pageIndex)
     }
-  
-  func loadMoreFreshChords(index: Int) {
-    
-    APIManager.downloadFreshChords(index, completion: {
-        sets in
         
-        if sets.isEmpty { return }
-    
-        for set in sets {
-            self.freshChords.append(set)
-        }
-        
-        self.pageIndex++
-        if let table = self.topSongsTable {
-            table.reloadData()
-        }
-        self.shouldLoadMoreChords = false
-      })
-    }
-  
     func registerNotifications() {
-      NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
     }
-  
+    
     func playbackStateChanged(notification: NSNotification){
-      let playbackState = player.playbackState
-      if playbackState == .Playing {
-        KGLOBAL_nowView_topSong.start()
-      } else  {
-        KGLOBAL_nowView_topSong.stop()
-      }
+        let playbackState = player.playbackState
+        if playbackState == .Playing {
+            KGLOBAL_nowView_topSong.start()
+        } else  {
+            KGLOBAL_nowView_topSong.stop()
+        }
     }
-  
+    
     func setUpNowView() {
-      KGLOBAL_nowView_topSong.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
-      let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
-      KGLOBAL_nowView_topSong.addGestureRecognizer(tapRecognizer)
-      self.navigationController!.navigationBar.addSubview(KGLOBAL_nowView_topSong)
-      
-      if player.playbackState == .Playing {
-        KGLOBAL_nowView_topSong.start()
-      } else {
-        KGLOBAL_nowView_topSong.stop()
-      }
+        KGLOBAL_nowView_topSong.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
+        let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
+        KGLOBAL_nowView_topSong.addGestureRecognizer(tapRecognizer)
+        self.navigationController!.navigationBar.addSubview(KGLOBAL_nowView_topSong)
+        
+        if player.playbackState == .Playing {
+            KGLOBAL_nowView_topSong.start()
+        } else {
+            KGLOBAL_nowView_topSong.stop()
+        }
     }
-  
+    
     func goToNowPlaying(){
-      let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
-      
-      if MusicManager.sharedInstance.avPlayer.currentItem != nil {
-        songVC.isDemoSong = true
-      }
-      
-      songVC.selectedFromTable = false
-      songVC.transitioningDelegate = self.animator
-      self.animator!.attachToViewController(songVC)
-      self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
+        
+        ///TODO: if now playing item nil, pressing this will crash?
+        //BUG: play a normal song, go to a search song and preview, press now view, bang!
+        //
+        if MusicManager.sharedInstance.player.nowPlayingItem == nil {
+            print("nothing cannot go to current playing screen")
+            return
+        }
+        
+        let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
+        
+        if MusicManager.sharedInstance.avPlayer.currentItem != nil {
+            songVC.isDemoSong = true
+        }
+        
+        songVC.selectedFromTable = false
+        songVC.transitioningDelegate = self.animator
+        self.animator!.attachToViewController(songVC)
+        self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
     }
-  
+    
     func setUpNavigationBar() {
         self.automaticallyAdjustsScrollViewInsets = true
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
@@ -181,7 +210,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                     cell.contributorImage.image = image
                     cell.contributorImage.layer.cornerRadius = cell.contributorImage.frame.height/2
                     cell.contributorImage.layer.masksToBounds = true
-                    }
+                }
                 }
             )
             
@@ -214,7 +243,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         isSeekingPlayerState = true
         
         let song = segmentedControl.selectedSegmentIndex == indexOfFreshChords ? freshChords[indexPath.row].song : topSongs[indexPath.row]
-      
+        
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
         song.findMediaItem()
@@ -222,11 +251,11 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         if let item = song.mediaItem {
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
-        
+            
             //if the cloud item is on LTE (not on wifi), since the music player can be still seeking and the player.nowPlayingItem might be nil, we are using a background thread to constantly check when it finishes seeking and return the item
             if item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() {
                 //checkPlayerSeekingState(tableView, songVC: songVC)
-            
+                
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                     while (self.isSeekingPlayerState) {
                         print("Running\(CACurrentMediaTime())")
@@ -258,13 +287,13 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                     }
                 }
                 
-            //if not network
+                //if not network
             } else if item.cloudItem && !NetworkManager.sharedInstance.reachability.isReachable() {
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 self.showConnectInternet(tableView)
                 
-            // if it is a local song
+                // if it is a local song
             } else {
                 isSeekingPlayerState = false
                 songVC.selectedFromTable = true
@@ -272,7 +301,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: nil)
             }
-        
+            
         } else {
             
             songVC.isSongNeedPurchase = true
@@ -282,9 +311,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)
-        
+            
         }
-    
+        
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
@@ -295,15 +324,23 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
 }
 
 extension TopSongsViewController: UIScrollViewDelegate {
-  func scrollViewDidScroll(scrollView: UIScrollView) {
-    if !viewdidAppear {
-      return
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if !viewdidAppear {
+            return
+        }
+    
+        if scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height {
+            if segmentedControl.selectedSegmentIndex == indexOfFreshChords {
+                if !shouldLoadMoreChords {
+                    shouldLoadMoreChords = true
+                    loadMoreFreshChords(pageIndexFreshChords)
+                }
+            } else {
+                if !shouldLoadMoreTopSongs {
+                    shouldLoadMoreTopSongs = true
+                    loadMoreTopSongs(pageIndexTopSongs)
+                }
+            }
+        }
     }
-    if scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height {
-      if !shouldLoadMoreChords {
-        shouldLoadMoreChords = true
-        loadMoreFreshChords(pageIndex)
-      }
-    }
-  }
 }
