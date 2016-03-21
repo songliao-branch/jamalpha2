@@ -11,9 +11,16 @@ import UIKit
 class TabBarController: UITabBarController, UITabBarControllerDelegate {
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         self.delegate = self
          (UIApplication.sharedApplication().delegate as! AppDelegate).rootVC = self
+        KGLOBAL_nowView.initWithNumberOfBars(4)
+        KGLOBAL_nowView_topSong.initWithNumberOfBars(4)
+        if let viewControllers = self.viewControllers {
+          let _ = (viewControllers[1].childViewControllers[0] as! BaseViewController).view
+        }
     }
+  
     override func shouldAutorotate() -> Bool {
         return false
     }

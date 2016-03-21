@@ -6,7 +6,7 @@ import Alamofire
 import Haneke
 import SwiftyJSON
 
-class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
+class SearchViewController: MusicLibraryController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
 
     var resultSearchController = UISearchController()
     
@@ -35,7 +35,16 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         setUpSearchBar()
         setUpSearchPromptBackground()
     }
-    
+  
+    override func refreshData() {
+      self.uniqueSongs = MusicManager.sharedInstance.uniqueSongs
+      if searchResultTableView != nil && resultSearchController.active {
+          filterLocalSongs(resultSearchController.searchBar.text!)
+          dispatch_async(dispatch_get_main_queue()){
+            self.searchResultTableView.reloadData()
+          }
+      }
+    }
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -262,6 +271,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                             if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                 MusicManager.sharedInstance.player.stop()
                                 KGLOBAL_nowView.stop()
+                              KGLOBAL_nowView_topSong.stop()
                                 dispatch_async(dispatch_get_main_queue()) {
                                     self.showCellularEnablesStreaming(tableView)
                                 }
@@ -309,6 +319,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                     isSeekingPlayerState = false
                     MusicManager.sharedInstance.player.stop()
                     KGLOBAL_nowView.stop()
+                  KGLOBAL_nowView_topSong.stop()
                     self.showConnectInternet(tableView)
                 }
                 
@@ -329,6 +340,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                                 if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                                     MusicManager.sharedInstance.player.stop()
                                     KGLOBAL_nowView.stop()
+                                  KGLOBAL_nowView_topSong.stop()
                                     dispatch_async(dispatch_get_main_queue()) {
                                         self.showCellularEnablesStreaming(tableView)
                                     }
@@ -376,6 +388,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                         isSeekingPlayerState = false
                         MusicManager.sharedInstance.player.stop()
                         KGLOBAL_nowView.stop()
+                      KGLOBAL_nowView_topSong.stop()
                         self.showConnectInternet(tableView)
                     }
                 }else{
@@ -453,10 +466,13 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 
     // MARK: to refresh now playing loudspeaker icon in musicviewcontroller
     func reloadMusicTable(needStart:Bool){
-        let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[0].childViewControllers[0]) as! BaseViewController
-        for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
+      if let baseVC:BaseViewController = (self.tabBarController?.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as? BaseViewController {
+        if let musicVCs = baseVC.pageViewController?.viewControllers as? [MusicViewController] {
+          for musicVC in musicVCs {
             musicVC.musicTable.reloadData()
+          }
         }
+      }
     }
     
 }

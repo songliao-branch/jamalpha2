@@ -2,7 +2,7 @@
 import UIKit
 import MediaPlayer
 
-class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
+class BaseViewController: MusicLibraryController, UIPageViewControllerDataSource, UIPageViewControllerDelegate,UINavigationControllerDelegate, UIScrollViewDelegate {
     
     
     var player: MPMusicPlayerController! // set to singleton in MusicManager
@@ -39,19 +39,27 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         setupSegmentButtons()
         setUpSelector()//the horizontal bar that moves with button tapped
         setUpPageViewController()
-        registerMusicPlayerNotificationForPlaybackStateChanged()
+        registerNotifications()
     }
     
-    func registerMusicPlayerNotificationForPlaybackStateChanged(){
+    func registerNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
+    }
+  
+    override func refreshData() {
+      for musicVC in self.pageViewController.childViewControllers as! [MusicViewController] {
+        musicVC.loadData()
+      }
     }
     
     func playbackStateChanged(notification: NSNotification){
         let playbackState = player.playbackState
         if playbackState == .Playing {
             KGLOBAL_nowView.start()
+          KGLOBAL_nowView_topSong.start()
         } else  {
-            KGLOBAL_nowView.stop()
+          KGLOBAL_nowView.stop()
+          KGLOBAL_nowView_topSong.stop()
         }
     }
     
@@ -66,7 +74,6 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     }
     
     func setUpNowView(){
-        KGLOBAL_nowView.initWithNumberOfBars(4)
         KGLOBAL_nowView.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
         let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
         KGLOBAL_nowView.addGestureRecognizer(tapRecognizer)
@@ -108,6 +115,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
         }
         self.currentPageIndex = 0
     }
+  
     func goToNowPlaying() { //tell me when it kicks in
         for musicViewController in self.pageViewController.viewControllers as! [MusicViewController] {
             if player.nowPlayingItem != nil || MusicManager.sharedInstance.avPlayer.currentItem != nil {
@@ -274,15 +282,7 @@ class BaseViewController: UIViewController, UIPageViewControllerDataSource, UIPa
     
     func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
         let nextViewController = pendingViewControllers[0] as! MusicViewController
-        if(nextViewController.pageIndex == 0){
-            nextViewController.musicTable.reloadData()
-        }
-        else if(nextViewController.pageIndex == 1){
-            nextViewController.musicTable.reloadData()
-        }
-        else if(nextViewController.pageIndex == 2){
-            nextViewController.musicTable.reloadData()
-        }
+        nextViewController.musicTable.reloadData()
     }
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {

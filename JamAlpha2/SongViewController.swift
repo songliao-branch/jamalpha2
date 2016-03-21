@@ -17,7 +17,9 @@ let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
 
-class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+  
+  let rootVC:TabBarController = (UIApplication.sharedApplication().keyWindow?.rootViewController) as! TabBarController
   
   //MARK: When display lyrics only
   var singleLyricsTableView: UITableView!
@@ -277,13 +279,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         MusicManager.sharedInstance.avPlayer.removeAllItems()
       }
       self.selectedFromSearchTab = true
-      let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
-      for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-        self.musicViewController = musicVC
-      }
       KGLOBAL_nowView.stop()
+      KGLOBAL_nowView_topSong.stop()
       CoreDataManager.initializeSongToDatabase(songNeedPurchase)
     }
+    let baseVC:BaseViewController =  (rootVC.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
+    self.musicViewController = baseVC.musicViewController
     
     //hide tab bar
     self.tabBarController?.tabBar.hidden = true
@@ -315,6 +316,18 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
   
   deinit{
     pthread_rwlock_destroy(&rwLock)
+  }
+  
+  override func refreshData() {
+    dispatch_async(dispatch_get_main_queue()){
+      if (self.isSongNeedPurchase) {
+        if let purchasedItem = (MusicManager.sharedInstance.itemFoundInCollection(self.songNeedPurchase)){
+          MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
+          MusicManager.sharedInstance.setIndexInTheQueue(0)
+          self.recoverToNormalSongVC(purchasedItem)
+        }
+      }
+    }
   }
   
   func removeAllObserver(){
@@ -1863,9 +1876,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     if isDemoSong {
       if avPlayer.rate > 0 {
         KGLOBAL_nowView.start()
+        KGLOBAL_nowView_topSong.start()
         
       } else {
         KGLOBAL_nowView.stop()
+        KGLOBAL_nowView_topSong.stop()
       }
       
       if avPlayer.rate > 0 {
@@ -1877,8 +1892,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }else{
       if player.playbackState == .Playing {
         KGLOBAL_nowView.start()
+        KGLOBAL_nowView_topSong.start()
       } else {
         KGLOBAL_nowView.stop()
+        KGLOBAL_nowView_topSong.stop()
       }
       
       if player.playbackState == MPMusicPlaybackState.Playing {

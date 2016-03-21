@@ -41,9 +41,9 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         pthread_rwlock_init(&rwLock, nil)
-        reloadData()
+        loadData()
         createTransitionAnimation()
-        registerMusicPlayerNotificationForSongChanged()
+       
         UITableView.appearance().sectionIndexColor = UIColor.mainPinkColor()
     }
     
@@ -71,14 +71,13 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         
     }
     
-    func reloadData() {
+    func loadData() {
         clearData()
         uniqueSongs = MusicManager.sharedInstance.uniqueSongs
         uniqueArtists = MusicManager.sharedInstance.uniqueArtists
         uniqueAlbums = MusicManager.sharedInstance.uniqueAlbums
-
         demoSongs = MusicManager.sharedInstance.demoSongs
-
+        
         songsByFirstAlphabet = MusicManager.sharedInstance.songsByFirstAlphabet
         artistsByFirstAlphabet = MusicManager.sharedInstance.artistsByFirstAlphabet
         albumsByFirstAlphabet = MusicManager.sharedInstance.albumsByFirstAlphabet
@@ -90,13 +89,15 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         musicTable.reloadData()
     }
     
+    
     deinit{
         pthread_rwlock_destroy(&rwLock)
     }
 
-    func registerMusicPlayerNotificationForSongChanged(){
+    func registerNotifications(){
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
     }
+    
     
     func synced(lock: AnyObject, closure: () -> ()) {
         objc_sync_enter(lock)
@@ -134,7 +135,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         }
       
         songVC.selectedFromTable = false
-        songVC.musicViewController = self
         songVC.transitioningDelegate = self.animator
         self.animator!.attachToViewController(songVC)
         self.navigationController!.presentViewController(songVC, animated: true, completion: nil)
@@ -389,6 +389,7 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
+                          KGLOBAL_nowView_topSong.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                               self.showCellularEnablesStreaming(tableView)
                             }
@@ -403,7 +404,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                                     songVC.selectedFromTable = true
                                     songVC.transitioningDelegate = self.animator
                                     self.animator!.attachToViewController(songVC)
-                                    songVC.musicViewController = self //for goToArtist and goToAlbum from here
                                     
                                     self.presentViewController(songVC, animated: true, completion: {
                                         completed in
@@ -428,7 +428,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                     songVC.selectedFromTable = true
                     songVC.transitioningDelegate = self.animator
                     self.animator!.attachToViewController(songVC)
-                    songVC.musicViewController = self //for goToArtist and goToAlbum from here
           
                     self.presentViewController(songVC, animated: true, completion: {
                         completed in
