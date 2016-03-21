@@ -312,6 +312,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     
     movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     loadDisplayMode()
+    downloadSoundwaveOrGenerate()
   }
   
   deinit{
@@ -360,56 +361,67 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     }
   }
   
+
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
+
     if viewDidFullyDisappear {
-      viewDidFullyDisappear = false
-      if(!isRemoveProgressBlock){
-        isRemoveProgressBlock = true
-        if(!isSongNeedPurchase){
-          self.removeAllObserver()
-          self.registerMediaPlayerNotification()
-        }
-      }else{
-        if(!isSongNeedPurchase){
-          self.registerMediaPlayerNotification()
-        }
-      }
-      if(!isGenerated && !isSongNeedPurchase){
-        generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
-      } else if (!isGenerated && isSongNeedPurchase) {
-        self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
-          succeed in
-          if !self.soundwaveUrl.isEmpty {
-            AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
-              image in
-              dispatch_async(dispatch_get_main_queue()) {
-                if let data = UIImagePNGRepresentation(image) {
-                  KGLOBAL_progressBlock.setWaveFormFromData(data)
-                  CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
-                  self.isGenerated = true
-                  self.soundwaveUrl = ""
-                  return
-                }
-              }
-            })
-          } else {
-            dispatch_async(dispatch_get_main_queue()) {
-              if KGLOBAL_progressBlock.generatedNormalImage == nil {
-                KGLOBAL_progressBlock.generateWaveforms()
-                let data = UIImagePNGRepresentation(KGLOBAL_progressBlock.generatedNormalImage)
-                if(KGLOBAL_progressBlock != nil ) {
-                  KGLOBAL_progressBlock.setWaveFormFromData(data!)
-                }
-              }
+        viewDidFullyDisappear = false
+        if(!isRemoveProgressBlock){
+            isRemoveProgressBlock = true
+            if(!isSongNeedPurchase){
+                self.removeAllObserver()
+                self.registerMediaPlayerNotification()
             }
-          }
-        })
-      }
+            
+        } else {
+            if(!isSongNeedPurchase){
+                self.registerMediaPlayerNotification()
+            }
+        }
+        
+        isViewDidAppear = true
     }
-    isViewDidAppear = true
-  }
-  
+    }
+    
+    func downloadSoundwaveOrGenerate() {
+        if !isGenerated && !isSongNeedPurchase {
+            generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
+        } else if (!isGenerated && isSongNeedPurchase) {
+            //download soundwave
+            self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
+                succeed in
+                if !self.soundwaveUrl.isEmpty {
+                
+                    AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
+                        image in
+                        dispatch_async(dispatch_get_main_queue()) {
+                            if let data = UIImagePNGRepresentation(image) {
+                                //TODO: fix this crash, KGLOBAL_progressBlock is nil
+                                KGLOBAL_progressBlock.setWaveFormFromData(data)
+                                CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
+                                self.isGenerated = true
+                                self.soundwaveUrl = ""
+                            }
+                        }
+                    })
+                } else { //if no soundwave yet found, we create a fake one
+                    dispatch_async(dispatch_get_main_queue()) {
+                        if KGLOBAL_progressBlock.generatedNormalImage == nil {
+                            KGLOBAL_progressBlock.generateWaveforms()
+                            let data = UIImagePNGRepresentation(KGLOBAL_progressBlock.generatedNormalImage)
+                            if(KGLOBAL_progressBlock != nil ) {
+                                KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+        
+    
+    
   
   func showTutorial() {
     if isDemoSong {
