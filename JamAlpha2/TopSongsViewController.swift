@@ -209,35 +209,76 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         return UITableViewCell()
     }
     
+    var isSeekingState = false
+    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        isSeekingState = true
         
         let song = segmentedControl.selectedSegmentIndex == indexOfFreshChords ? freshChords[indexPath.row].song : topSongs[indexPath.row]
       
-        song.findMediaItem()
-
         let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
         
-        songVC.selectedFromTable = true
-       
+        song.findMediaItem()
+        
         if let item = song.mediaItem {
             MusicManager.sharedInstance.setPlayerQueue([item])
             MusicManager.sharedInstance.setIndexInTheQueue(0)
-//            MusicManager.sharedInstance.avPlayer.pause()
-//            MusicManager.sharedInstance.avPlayer.seekToTime(kCMTimeZero)
-//            MusicManager.sharedInstance.avPlayer.removeAllItems()
-            
-//            if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
-//                MusicManager.sharedInstance.player.stop()
-//                KGLOBAL_nowView.stop()
-//            }
-            
-            songVC.selectedFromTable = true
-            songVC.parentController = self
-            songVC.transitioningDelegate = self.animator
-            self.animator!.attachToViewController(songVC)
-            self.presentViewController(songVC, animated: true, completion: nil)
-            
-        } else { //cannot find song in local libary, show iTunes result
+        
+            //if the cloud item is on LTE (not on wifi), since the music player can be still seeking and the player.nowPlayingItem might be nil, we are using a background thread to constantly check when it finishes seeking and return the item
+            if item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() {
+                dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
+                    while (self.isSeekingPlayerState) {
+                        if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
+                            MusicManager.sharedInstance.player.stop()
+                            KGLOBAL_nowView.stop()
+                            KGLOBAL_nowView_topSong.stop()
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.showCellularEnablesStreaming(tableView)
+                            }
+                            self.isSeekingPlayerState = false
+                            
+                            break
+                        }
+                        
+                        if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
+                            if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    songVC.selectedFromTable = true
+                                    songVC.transitioningDelegate = self.animator
+                                    self.animator!.attachToViewController(songVC)
+                                    
+                                    self.presentViewController(songVC, animated: true, completion: {
+                                        completed in
+                                        //reload table to show loudspeaker icon on current selected row
+                                        tableView.reloadData()
+                                    })
+                                }
+                                self.isSeekingPlayerState = false
+                                break
+                            }
+                        }
+                    }
+                }
+                
+                // if not network
+            } else if item.cloudItem && !NetworkManager.sharedInstance.reachability.isReachable() {
+                isSeekingPlayerState = false
+                MusicManager.sharedInstance.player.stop()
+                self.showConnectInternet(tableView)
+                
+            } else  {
+                // if it is a local song
+                isSeekingPlayerState = false
+                
+                songVC.selectedFromTable = true
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                
+                self.presentViewController(songVC, animated: true, completion: nil)
+            }
+        
+        } else {
             
             songVC.isSongNeedPurchase = true
             songVC.songNeedPurchase = song
@@ -246,8 +287,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             songVC.transitioningDelegate = self.animator
             self.animator!.attachToViewController(songVC)
             self.presentViewController(songVC, animated: true, completion: nil)
+        
         }
-
+    
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     

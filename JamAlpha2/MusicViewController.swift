@@ -347,6 +347,7 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var isDemoSong = false
         isSeekingPlayerState = true
+        
         if pageIndex == 0 {
             let songVC = self.storyboard?.instantiateViewControllerWithIdentifier("songviewcontroller") as! SongViewController
             var indexToBePlayed:Int = 0
@@ -389,15 +390,15 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
-                          KGLOBAL_nowView_topSong.stop()
+                            KGLOBAL_nowView_topSong.stop()
                             dispatch_async(dispatch_get_main_queue()) {
-                              self.showCellularEnablesStreaming(tableView)
+                                self.showCellularEnablesStreaming(tableView)
                             }
                             self.isSeekingPlayerState = false
-                        
+                            
                             break
                         }
-                     
+                        
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem == MusicManager.sharedInstance.lastSelectedIndex && MusicManager.sharedInstance.player.playbackState != .SeekingForward){
                             if(MusicManager.sharedInstance.player.nowPlayingItem != nil){
                                 dispatch_async(dispatch_get_main_queue()) {
@@ -417,23 +418,23 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                         }
                     }
                 }
-            }else if (isDemoSong || NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem ){
-                    isSeekingPlayerState = false
-                    if(!isDemoSong){
-                        if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
-                            MusicManager.sharedInstance.player.play()
-                        }
+            } else if (isDemoSong || NetworkManager.sharedInstance.reachability.isReachableViaWiFi() || !songsSorted[indexToBePlayed].cloudItem ){
+                isSeekingPlayerState = false
+                if(!isDemoSong){
+                    if(MusicManager.sharedInstance.player.nowPlayingItem == nil){
+                        MusicManager.sharedInstance.player.play()
                     }
+                }
                 
-                    songVC.selectedFromTable = true
-                    songVC.transitioningDelegate = self.animator
-                    self.animator!.attachToViewController(songVC)
-          
-                    self.presentViewController(songVC, animated: true, completion: {
-                        completed in
-                        //reload table to show loudspeaker icon on current selected row
-                        tableView.reloadData()
-                    })
+                songVC.selectedFromTable = true
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                
+                self.presentViewController(songVC, animated: true, completion: {
+                    completed in
+                    //reload table to show loudspeaker icon on current selected row
+                    tableView.reloadData()
+                })
             } else if ( songsSorted.count > 0 && !NetworkManager.sharedInstance.reachability.isReachable() && songsSorted[indexToBePlayed].cloudItem) {
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()

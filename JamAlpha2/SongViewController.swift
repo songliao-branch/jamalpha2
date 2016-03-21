@@ -266,6 +266,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
         }
         player = MusicManager.sharedInstance.player
         self.nowPlayingMediaItem = player.nowPlayingItem
+        //TODO: this baby crashes a lot!
         self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
         CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
         self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingMediaItem,completion: {succeed in Void()})
