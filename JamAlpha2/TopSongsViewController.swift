@@ -209,11 +209,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         return UITableViewCell()
     }
     
-    var isSeekingState = false
-    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        isSeekingState = true
+        isSeekingPlayerState = true
         
         let song = segmentedControl.selectedSegmentIndex == indexOfFreshChords ? freshChords[indexPath.row].song : topSongs[indexPath.row]
       
@@ -227,8 +225,11 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         
             //if the cloud item is on LTE (not on wifi), since the music player can be still seeking and the player.nowPlayingItem might be nil, we are using a background thread to constantly check when it finishes seeking and return the item
             if item.cloudItem && NetworkManager.sharedInstance.reachability.isReachableViaWWAN() {
+                //checkPlayerSeekingState(tableView, songVC: songVC)
+            
                 dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))) {
                     while (self.isSeekingPlayerState) {
+                        print("Running\(CACurrentMediaTime())")
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
@@ -248,11 +249,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                                     songVC.transitioningDelegate = self.animator
                                     self.animator!.attachToViewController(songVC)
                                     
-                                    self.presentViewController(songVC, animated: true, completion: {
-                                        completed in
-                                        //reload table to show loudspeaker icon on current selected row
-                                        tableView.reloadData()
-                                    })
+                                    self.presentViewController(songVC, animated: true, completion: nil)
                                 }
                                 self.isSeekingPlayerState = false
                                 break
@@ -261,20 +258,18 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                     }
                 }
                 
-                // if not network
+            //if not network
             } else if item.cloudItem && !NetworkManager.sharedInstance.reachability.isReachable() {
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 self.showConnectInternet(tableView)
                 
-            } else  {
-                // if it is a local song
+            // if it is a local song
+            } else {
                 isSeekingPlayerState = false
-                
                 songVC.selectedFromTable = true
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
-                
                 self.presentViewController(songVC, animated: true, completion: nil)
             }
         
