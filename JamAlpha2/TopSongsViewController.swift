@@ -42,9 +42,11 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         createTransitionAnimation()
         setUpNavigationBar()
         setUpRefreshControl()
-        loadData()
         setUpNowView()
         registerNotifications()
+        
+        fetchFreshChords()
+        fetchTopSongs()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -55,7 +57,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func setUpRefreshControl() {
         self.refreshControl = UIRefreshControl()
-        self.refreshControl.addTarget(self, action: #selector(TopSongsViewController.loadData), forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl.addTarget(self, action: #selector(TopSongsViewController.fetchSelected), forControlEvents: UIControlEvents.ValueChanged)
         self.topSongsTable!.addSubview(self.refreshControl) // not required when using UITableViewController
     }
     
@@ -66,18 +68,27 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
-    func loadData() {
-        topSongs = [SearchResult]()
+ 
+    func fetchFreshChords() {
         freshChords = [DownloadedTabsSet]()
-        
         shouldLoadMoreChords = false
         pageIndexFreshChords = 1
         loadMoreFreshChords(pageIndexFreshChords)
-        
-        //TODO: fix this
+    }
+ 
+    func fetchTopSongs() {
+        topSongs = [SearchResult]()
         shouldLoadMoreTopSongs = false
         pageIndexTopSongs = 1
         loadMoreTopSongs(pageIndexTopSongs)
+    }
+    
+    func fetchSelected() {
+        if segmentedControl.selectedSegmentIndex == indexOfFreshChords {
+            fetchFreshChords()
+        } else {
+            fetchTopSongs()
+        }
     }
     
     func loadMoreFreshChords(index: Int) {
@@ -103,7 +114,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     func loadMoreTopSongs(index: Int) {
         APIManager.getTopSongs(index, completion: {
             songs in
-            
+
             if songs.isEmpty { return }
             
             for song in songs {
@@ -120,7 +131,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
         
     func registerNotifications() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSongsViewController.playbackStateChanged(_:)), name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: MusicManager.sharedInstance.player)
     }
     
     func playbackStateChanged(notification: NSNotification){
