@@ -21,6 +21,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     var player: MPMusicPlayerController! // set to singleton in MusicManager
     
+    var refreshControl: UIRefreshControl!
+    
     var topSongs = [SearchResult]()
     var freshChords = [DownloadedTabsSet]()
     var animator: CustomTransitionAnimation?
@@ -52,11 +54,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     
     func setUpRefreshControl() {
-        topSongsTable?.addPullToRefresh {
-            self.loadData()
-        }
+        self.refreshControl = UIRefreshControl()
+        self.refreshControl.addTarget(self, action: #selector(TopSongsViewController.loadData), forControlEvents: UIControlEvents.ValueChanged)
+        self.topSongsTable!.addSubview(self.refreshControl) // not required when using UITableViewController
     }
     
+
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -64,7 +67,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func loadData() {
-    
+        topSongs = [SearchResult]()
+        freshChords = [DownloadedTabsSet]()
+        
         shouldLoadMoreChords = false
         pageIndexFreshChords = 1
         loadMoreFreshChords(pageIndexFreshChords)
@@ -86,11 +91,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 self.freshChords.append(set)
             }
             
-            self.pageIndexFreshChords++
+            self.pageIndexFreshChords+=1
             if let table = self.topSongsTable {
                 table.reloadData()
             }
             self.shouldLoadMoreChords = false
+            self.refreshControl.endRefreshing()
         })
     }
     
@@ -104,11 +110,12 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 self.topSongs.append(song)
             }
             
-            self.pageIndexTopSongs++
+            self.pageIndexTopSongs+=1
             self.shouldLoadMoreTopSongs = false
             if let table = self.topSongsTable {
                 table.reloadData()
             }
+            self.refreshControl.endRefreshing()
         })
     }
         
