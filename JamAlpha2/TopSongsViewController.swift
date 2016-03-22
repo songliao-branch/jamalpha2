@@ -14,7 +14,7 @@ import Haneke
 
 class TopSongsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    @IBOutlet weak var topSongsTable: UITableView?
+    @IBOutlet weak var mainTable: UITableView!
     let indexOfFreshChords = 0
     let indexOfTopSongs = 1
     @IBOutlet weak var segmentedControl: UISegmentedControl!
@@ -57,8 +57,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func setUpRefreshControl() {
         self.refreshControl = UIRefreshControl()
-        self.refreshControl.addTarget(self, action: #selector(TopSongsViewController.fetchSelected), forControlEvents: UIControlEvents.ValueChanged)
-        self.topSongsTable!.addSubview(self.refreshControl) // not required when using UITableViewController
+        self.refreshControl.addTarget(self, action: #selector(TopSongsViewController.refreshData), forControlEvents: UIControlEvents.ValueChanged)
+        self.mainTable.addSubview(self.refreshControl) // not required when using UITableViewController
     }
     
 
@@ -70,20 +70,19 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
  
     func fetchFreshChords() {
-        freshChords = [DownloadedTabsSet]()
         shouldLoadMoreChords = false
         pageIndexFreshChords = 1
         loadMoreFreshChords(pageIndexFreshChords)
     }
  
     func fetchTopSongs() {
-        topSongs = [SearchResult]()
+        //topSongs = [SearchResult]()
         shouldLoadMoreTopSongs = false
         pageIndexTopSongs = 1
         loadMoreTopSongs(pageIndexTopSongs)
     }
     
-    func fetchSelected() {
+    func refreshData() {
         if segmentedControl.selectedSegmentIndex == indexOfFreshChords {
             fetchFreshChords()
         } else {
@@ -92,20 +91,26 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func loadMoreFreshChords(index: Int) {
-        
+    
         APIManager.downloadFreshChords(index, completion: {
             sets in
             
-            if sets.isEmpty { return }
+            //we only re-intialized the data array here after we got new data back
+            //because when uirefreshcontrol is refreshing cellforRow will be called
+            //and the data array would be out of index if it is re-initialized before the callback
+            if self.refreshControl.refreshing {
+                self.freshChords = [DownloadedTabsSet]()
+            }
+            if sets.isEmpty {
+                return
+            }
             
             for set in sets {
                 self.freshChords.append(set)
             }
             
             self.pageIndexFreshChords+=1
-            if let table = self.topSongsTable {
-                table.reloadData()
-            }
+            self.mainTable.reloadData()
             self.shouldLoadMoreChords = false
             self.refreshControl.endRefreshing()
         })
@@ -115,6 +120,9 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
         APIManager.getTopSongs(index, completion: {
             songs in
 
+            if self.refreshControl.refreshing {
+                self.topSongs = [SearchResult]()
+            }
             if songs.isEmpty { return }
             
             for song in songs {
@@ -123,9 +131,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
             
             self.pageIndexTopSongs+=1
             self.shouldLoadMoreTopSongs = false
-            if let table = self.topSongsTable {
-                table.reloadData()
-            }
+            self.mainTable.reloadData()
             self.refreshControl.endRefreshing()
         })
     }
@@ -145,7 +151,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func setUpNowView() {
         KGLOBAL_nowView_topSong.frame = CGRectMake(self.view.frame.width-55 ,0 ,45 , 40)
-        let tapRecognizer = UITapGestureRecognizer(target: self, action:Selector("goToNowPlaying"))
+        let tapRecognizer = UITapGestureRecognizer(target: self, action:#selector(TopSongsViewController.goToNowPlaying))
         KGLOBAL_nowView_topSong.addGestureRecognizer(tapRecognizer)
         self.navigationController!.navigationBar.addSubview(KGLOBAL_nowView_topSong)
         
@@ -201,7 +207,6 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
         if segmentedControl.selectedSegmentIndex == indexOfFreshChords {
             let cell = tableView.dequeueReusableCellWithIdentifier("FreshChordsCell", forIndexPath: indexPath) as! FreshChordsCell
             
@@ -311,15 +316,22 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
                 MusicManager.sharedInstance.player.stop()
                 self.showConnectInternet(tableView)
                 
-                // if it is a local song
-            } else {
+                // check if current playing item, preventing nil
+            } else if MusicManager.sharedInstance.player.nowPlayingItem != nil { //TODO: sometimes music player cannot load the song, a clouditem will be mistakenly taken here and crashes the app in the SongViewController
                 isSeekingPlayerState = false
                 songVC.selectedFromTable = true
                 songVC.transitioningDelegate = self.animator
                 self.animator!.attachToViewController(songVC)
                 self.presentViewController(songVC, animated: true, completion: nil)
+            } else { //unknown error
+                songVC.isSongNeedPurchase = true
+                songVC.songNeedPurchase = song
+                songVC.parentController = self
+                songVC.reloadBackgroundImageAfterSearch(song)
+                songVC.transitioningDelegate = self.animator
+                self.animator!.attachToViewController(songVC)
+                self.presentViewController(songVC, animated: true, completion: nil)
             }
-            
         } else {
             
             songVC.isSongNeedPurchase = true
@@ -337,7 +349,7 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     
     @IBAction func segmentSelected(sender: UISegmentedControl) {
-        topSongsTable?.reloadData()
+        mainTable.reloadData()
     }
 }
 

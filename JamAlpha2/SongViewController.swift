@@ -363,26 +363,26 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
   }
   
 
-  override func viewDidAppear(animated: Bool) {
-    super.viewDidAppear(animated)
-
-    if viewDidFullyDisappear {
-        viewDidFullyDisappear = false
-        if(!isRemoveProgressBlock){
-            isRemoveProgressBlock = true
-            if(!isSongNeedPurchase){
-                self.removeAllObserver()
-                self.registerMediaPlayerNotification()
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if viewDidFullyDisappear {
+            viewDidFullyDisappear = false
+            if(!isRemoveProgressBlock){
+                isRemoveProgressBlock = true
+                if(!isSongNeedPurchase){
+                    self.removeAllObserver()
+                    self.registerMediaPlayerNotification()
+                }
+                
+            } else {
+                if(!isSongNeedPurchase){
+                    self.registerMediaPlayerNotification()
+                }
             }
             
-        } else {
-            if(!isSongNeedPurchase){
-                self.registerMediaPlayerNotification()
-            }
+            isViewDidAppear = true
         }
-        
-        isViewDidAppear = true
-    }
     }
     
     func downloadSoundwaveOrGenerate() {
@@ -393,11 +393,14 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
             self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
                 succeed in
                 if !self.soundwaveUrl.isEmpty {
-                
+                    
                     AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
                         image in
                         dispatch_async(dispatch_get_main_queue()) {
-                            if let data = UIImagePNGRepresentation(image) {
+                            if let data = UIImagePNGRepresentation(image)  {
+                                
+                                //after download the image songviewcontroller might been dismissed
+                                if KGLOBAL_progressBlock == nil { return  }
                                 //TODO: fix this crash, KGLOBAL_progressBlock is nil
                                 KGLOBAL_progressBlock.setWaveFormFromData(data)
                                 CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
@@ -420,10 +423,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
             })
         }
     }
-        
     
-    
-  
   func showTutorial() {
     if isDemoSong {
       avPlayer.pause()
@@ -1471,6 +1471,9 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
           }else{
             guard let assetURL = nowPlayingItem.getURL() else {
               dispatch_async(dispatch_get_main_queue()) {
+                
+                //TODO: if unknown error for the cloud item mistaken to be a local item, and go to music app successfully stream the song,
+                //come back to Twistjam this will crash
                 tempProgressBlock.generateWaveforms()
                 let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
                 if(KGLOBAL_progressBlock != nil ) {
