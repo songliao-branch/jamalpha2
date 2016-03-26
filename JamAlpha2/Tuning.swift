@@ -10,6 +10,8 @@ import Foundation
 
 class Tuning: NSObject {
     
+    static var STANDARD = "E-B-G-D-A-E-"
+    
     let upArrow = "\u{2191}"
     let downArrow = "\u{2193}"
     

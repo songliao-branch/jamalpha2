@@ -621,6 +621,12 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
       tuningLabels[i].sizeToFit()
       tuningLabels[i].center = CGPoint(x: topPoints[i+1]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
     }
+    
+    if tuning == Tuning.STANDARD {
+        for label in tuningLabels {
+            label.hidden = true
+        }
+    }
   }
   
   private func updateCapo(capo: Int) {
@@ -1430,15 +1436,14 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
       }
     }
     
-    
     panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
     panRecognizer.delegate = self
     progressBlockContainer.addGestureRecognizer(panRecognizer)
     progressContainerTapGesture = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
     progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
   }
-  
-  
+  // lots of mistakes
+
   // to generate sound wave in a nsoperation thread
     func generateSoundWave(nowPlayingItem: Findable) {
         dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
@@ -1495,8 +1500,6 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
                         
                         
                         // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-                        
-                        
                         tempProgressBlock.SetSoundURL(assetURL as! NSURL)
                         self.isGenerated = true
                         self.soundwaveUrl = ""

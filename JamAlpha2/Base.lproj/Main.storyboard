@@ -1227,7 +1227,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fPN-1b-xy2" customClass="BorderedCellView" customModule="JamAlpha2" customModuleProvider="target">
-                                                    <rect key="frame" x="8" y="8" width="304" height="117"/>
+                                                    <rect key="frame" x="8" y="4" width="304" height="117"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="TYU-dW-Rfp">
                                                             <rect key="frame" x="8" y="8" width="65" height="65"/>
@@ -1303,9 +1303,9 @@
                                             </subviews>
                                             <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
-                                                <constraint firstItem="fPN-1b-xy2" firstAttribute="top" secondItem="Ff1-68-A2a" secondAttribute="top" constant="8.5" id="WHX-3s-j2T"/>
+                                                <constraint firstItem="fPN-1b-xy2" firstAttribute="top" secondItem="Ff1-68-A2a" secondAttribute="top" constant="4" id="WHX-3s-j2T"/>
                                                 <constraint firstItem="fPN-1b-xy2" firstAttribute="leading" secondItem="Ff1-68-A2a" secondAttribute="leading" constant="8" id="fcB-fi-hX2"/>
-                                                <constraint firstAttribute="bottom" secondItem="fPN-1b-xy2" secondAttribute="bottom" id="qbB-Vm-JSR"/>
+                                                <constraint firstAttribute="bottom" secondItem="fPN-1b-xy2" secondAttribute="bottom" constant="4" id="qbB-Vm-JSR"/>
                                                 <constraint firstAttribute="trailing" secondItem="fPN-1b-xy2" secondAttribute="trailing" constant="8" id="un4-CJ-OnC"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -1326,7 +1326,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wyz-Kf-4ok" customClass="BorderedCellView" customModule="JamAlpha2" customModuleProvider="target">
-                                                    <rect key="frame" x="8" y="8" width="304" height="82"/>
+                                                    <rect key="frame" x="8" y="4" width="304" height="82"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="W2A-5f-miI">
                                                             <rect key="frame" x="37" y="9" width="65" height="65"/>
@@ -1374,9 +1374,9 @@
                                             </subviews>
                                             <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="wyz-Kf-4ok" secondAttribute="bottom" id="4Ba-F4-myO"/>
+                                                <constraint firstAttribute="bottom" secondItem="wyz-Kf-4ok" secondAttribute="bottom" constant="4" id="4Ba-F4-myO"/>
                                                 <constraint firstItem="wyz-Kf-4ok" firstAttribute="leading" secondItem="sB8-we-UXQ" secondAttribute="leading" constant="8" id="H4w-ML-pcE"/>
-                                                <constraint firstItem="wyz-Kf-4ok" firstAttribute="top" secondItem="sB8-we-UXQ" secondAttribute="top" constant="8" id="dZn-rG-FD7"/>
+                                                <constraint firstItem="wyz-Kf-4ok" firstAttribute="top" secondItem="sB8-we-UXQ" secondAttribute="top" constant="4" id="dZn-rG-FD7"/>
                                                 <constraint firstAttribute="trailing" secondItem="wyz-Kf-4ok" secondAttribute="trailing" constant="8" id="vok-fH-vhl"/>
                                             </constraints>
                                         </tableViewCellContentView>
