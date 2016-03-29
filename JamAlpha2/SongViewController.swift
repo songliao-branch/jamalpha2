@@ -993,7 +993,6 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     lyricbase.addGestureRecognizer(lyricBaseDoubleTapGesture)
     
     let contentMargin: CGFloat = 5
-    
     //lyricbase.layer.cornerRadius = 20
     
     topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
