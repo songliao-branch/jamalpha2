@@ -57,10 +57,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let credentialsProvider = AWSCognitoCredentialsProvider(regionType: CognitoRegionType, identityPoolId: CognitoIdentityPoolId)
             let configuration = AWSServiceConfiguration(region: DefaultServiceRegionType, credentialsProvider: credentialsProvider)
             AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
-            NetworkManager.sharedInstance.reachability.isReachable()
+            NetworkManager.sharedInstance
             PlayChordsManager.sharedInstance.initialSoundBank()
         }
-        
         return true
     }
     
@@ -233,12 +232,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if (MusicManager.sharedInstance.player != nil && MusicManager.sharedInstance.player.nowPlayingItem != nil){
                 if(MusicManager.sharedInstance.player.playbackState == .Playing){
                     KGLOBAL_nowView.start()
+                  KGLOBAL_nowView_topSong.start()
                 }
                 if (MusicManager.sharedInstance.avPlayer.rate == 0 && MusicManager.sharedInstance.player.currentPlaybackTime != 0){
                     MusicManager.sharedInstance.avPlayer.removeAllItems()
                 }
             }else{
                 KGLOBAL_nowView.stop()
+              KGLOBAL_nowView_topSong.stop()
             }
             KGLOBAL_queue.suspended = false
         }

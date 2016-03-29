@@ -53,7 +53,6 @@ class DownloadedTabsSet: NSObject {
              self.lastEdited = date
         }
     }
-
 }
 
 

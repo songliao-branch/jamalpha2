@@ -12,7 +12,17 @@ import MediaPlayer
 
 extension UIViewController {
     
-    func showMessage(title:String, message:String, actionTitle:String,completion: (() -> Void)? ){
+    //TODO: use this standard to retrieve music view controller
+    func getTabBarItemControllerAtIndex(index: Int) -> UIViewController {
+        return ((self.tabBarController?.childViewControllers[index])?.childViewControllers[0])!
+    }
+    
+    func getMusicViewControllers(currentVC: UIViewController) -> [MusicViewController] {
+        let baseVC = getTabBarItemControllerAtIndex(kIndexOfMyMusicPage) as! BaseViewController
+        return baseVC.pageViewController.viewControllers as! [MusicViewController]
+    }
+
+    func showMessage(title:String, message:String, actionTitle:String, completion: (() -> Void)? ) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(title: actionTitle, style: UIAlertActionStyle.Default, handler: nil))
         presentViewController(alertController, animated:true, completion: completion)

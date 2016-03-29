@@ -164,9 +164,7 @@ class APIManager: NSObject {
 
     //download all tabs sets for one song, the callback return the result
     class func downloadTabs(findable: Findable, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
-        
-        var allDownloads = [DownloadedTabsSet]()
-        
+    
         //given a song's title, artist, and duration, we can find all its corresponding tabs
         var parameters = [String: AnyObject]()
         
@@ -182,19 +180,8 @@ class APIManager: NSObject {
             case .Success:
                 if let data = response.result.value {
                     let json = JSON(data)
-
-                    for set in json["tabs_sets"].array! {
-                        
-                        let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
-                        
-                        let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
-                        
-                        let song = SearchResult(title: set["song"]["title"].string!, artist: set["song"]["artist"].string! , duration: set["song"]["duration"].float!)
-                        t.song = song
-                        allDownloads.append(t)
-                    }
                    //after completed, pass everything to the callback
-                   completion(downloads: allDownloads)
+                   completion(downloads: createTabsSetsFromJson(json))
                 }
             case .Failure(let error):
                 print(error)
@@ -587,8 +574,9 @@ class APIManager: NSObject {
         }
     }
     
-    class func getTopSongs(completion: (( songs: [SearchResult]) -> Void)) {
-        Alamofire.request(.GET, jamBaseURL + "/get_top_songs").responseJSON { response in
+    class func getTopSongs(index: Int, completion: (( songs: [SearchResult]) -> Void)) {
+        
+        Alamofire.request(.GET, jamBaseURL + "/get_top_songs", parameters: ["page": index]).responseJSON { response in
             switch response.result {
             case .Success:
                 if let data = response.result.value {
@@ -607,9 +595,31 @@ class APIManager: NSObject {
             }
         }
     }
+  
+    class func downloadFreshChords(pageIndex: Int, completion: ((downloads: [DownloadedTabsSet]) -> Void)) {
+
+      //given a song's title, artist, and duration, we can find all its corresponding tabs
+      var parameters = [String: AnyObject]()
+      
+      parameters = ["page": pageIndex]
+      
+      Alamofire.request(.GET, jamBaseURL + "/get_fresh_chords", parameters: parameters).responseJSON { response in
+        switch response.result {
+        case .Success:
+          if let data = response.result.value {
+            let json = JSON(data)
+            
+            //after completed, pass everything to the callback
+            completion(downloads: createTabsSetsFromJson(json))
+          }
+        case .Failure(let error):
+          print(error)
+        }
+      }
+    }
 
     class func sendPasswordResetInstructions(email: String, completion: ((message: String) -> Void)) {
-        
+      
         Alamofire.request(.POST, jamBaseURL + "/password_resets", parameters: ["email": email], encoding: .JSON).responseJSON
             {
                 response in
@@ -623,6 +633,21 @@ class APIManager: NSObject {
                     print("Failed to get a password reset request")
                 }
         }
+    }
+    
+    //helper
+    private class func createTabsSetsFromJson(json: JSON ) -> [DownloadedTabsSet] {
+        var allDownloads = [DownloadedTabsSet]()
+        for set in json["tabs_sets"].array! {
+            
+            let editor = Editor(userId: set["user"]["id"].int!, nickname: set["user"]["nickname"].string!, avatarUrlMedium: set["user"]["avatar_url_medium"].string!, avatarUrlThumbnail: set["user"]["avatar_url_thumbnail"].string!)
+            
+            let t = DownloadedTabsSet(id: set["id"].int!, tuning: set["tuning"].string!, capo: set["capo"].int!, chordsPreview: set["chords_preview"].string!, votesScore: set["cached_votes_score"].int!, voteStatus: set["vote_status"].string!, editor: editor, lastEdited: set["last_edited"].string!)
+            let song = SearchResult(songId: set["song"]["id"].int!, trackId: set["song"]["track_id"].int!, title: set["song"]["title"].string!, artist: set["song"]["artist"].string!, duration: set["song"]["duration"].float!, previewUrl: set["song"]["preview_url"].string!, trackViewUrl: set["song"]["store_link"].string!, artwork: set["song"]["artwork_url"].string!)
+            t.song = song
+            allDownloads.append(t)
+        }
+        return allDownloads
     }
 
 }

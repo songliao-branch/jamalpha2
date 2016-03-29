@@ -21,6 +21,8 @@ var KGLOBAL_timer:NSTimer!
 var KGLOBAL_isNeedToCheckIndex:Bool = false
 
 var KGLOBAL_nowView = VisualizerView()
+var KGLOBAL_nowView_topSong = VisualizerView()
+
 // value is a BOOL
 var KEY_isSoundWaveformGeneratingInBackground:Bool = false
 
@@ -38,9 +40,10 @@ let kLocalSetId = -1
 
 var KAVplayer: AVPlayer!
 
-let kIndexOfMyMusicPage = 0
-let kIndexOfSearchPage = 1
-let kIndexOfTopPage = 2
+let kMusicLibaryChangedNotification = "MusicLibraryChanged"
+let kIndexOfTopPage = 0
+let kIndexOfMyMusicPage = 1
+let kIndexOfSearchPage = 2
 let kIndexOfUserPage = 3
 
 let APP_STORE_ID = "1066080131"
@@ -50,3 +53,5 @@ let VERSION_NUMBER = "1.0.0"//TODO: change this
 let COPYRIGHTYEAR = "2015-2016"
 
 let DEFAULT_COVER = "liweng"
+
+let reloadCollectionsNotificationKey = "com.twistjam.twistjam.reloadCollections"

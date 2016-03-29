@@ -19,15 +19,12 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadData()
         createTransitionAnimation()
         setUpNavigationBar()
     }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        loadData()
-    }
-    
+  
+
     func createTransitionAnimation(){
         if(animator == nil){
             self.animator = CustomTransitionAnimation()
@@ -36,9 +33,6 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
 
     func loadData() {
         songs = CoreDataManager.getFavorites()
-        for song in songs {
-            song.findMediaItem()
-        }
         self.tableView.reloadData()
     }
     
@@ -61,16 +55,6 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
         cell.subtitleLabel.text = song.getArtist()
         
         cell.spinner.hidden = true
-        if let _ = song.mediaItem {
-            cell.searchIcon.hidden = true
-            cell.titleRightConstraint.constant = 15
-            cell.subtitleRightConstraint.constant = 15
-        } else {
-            cell.searchIcon.hidden = false
-            cell.titleRightConstraint.constant = 50
-            cell.subtitleRightConstraint.constant = 50
-        }
-        
         return cell
     }
     
@@ -98,6 +82,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                         if(MusicManager.sharedInstance.player.indexOfNowPlayingItem != MusicManager.sharedInstance.lastSelectedIndex){
                             MusicManager.sharedInstance.player.stop()
                             KGLOBAL_nowView.stop()
+                          KGLOBAL_nowView_topSong.stop()
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.showCellularEnablesStreaming(tableView)
                             }
@@ -141,6 +126,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 isSeekingPlayerState = false
                 MusicManager.sharedInstance.player.stop()
                 KGLOBAL_nowView.stop()
+              KGLOBAL_nowView_topSong.stop()
                 self.showConnectInternet(tableView)
             }
         }   else if song.getArtist() == "Alex Lisell" { //if demo song
@@ -162,8 +148,6 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
             
         } else { //if the mediaItem is not found, and an searchResult is MyFavoritesCell
             let cell = tableView.cellForRowAtIndexPath(indexPath) as! MyFavoritesCell
-            
-            cell.searchIcon.hidden = true
             cell.spinner.hidden = false
             cell.spinner.startAnimating()
             isSeekingPlayerState = false
@@ -172,8 +156,7 @@ class MyFavoritesViewController: UIViewController, UITableViewDelegate, UITableV
                 
                 cell.spinner.stopAnimating()
                 cell.spinner.hidden = true
-                cell.searchIcon.hidden = false
-                
+        
                 guard let song = result else {
                     
                     self.showMessage("Ooops.. we can't find this song in iTunes.", message: "", actionTitle: "OK", completion: nil)

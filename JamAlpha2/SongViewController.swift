@@ -17,7 +17,9 @@ let progressWidthMultiplier:CGFloat = 2
 let soundwaveHeight: CGFloat = 161
 
 
-class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, UIScrollViewDelegate {
+  
+  let rootVC:TabBarController = (UIApplication.sharedApplication().keyWindow?.rootViewController) as! TabBarController
   
   //MARK: When display lyrics only
   var singleLyricsTableView: UITableView!
@@ -264,6 +266,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         }
         player = MusicManager.sharedInstance.player
         self.nowPlayingMediaItem = player.nowPlayingItem
+        //TODO: this baby crashes a lot!
         self.nowPlayingItemDuration = self.nowPlayingMediaItem.playbackDuration
         CoreDataManager.initializeSongToDatabase(nowPlayingMediaItem)
         self.getSongIdAndSoundwaveUrlFromCloud(nowPlayingMediaItem,completion: {succeed in Void()})
@@ -277,13 +280,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
         MusicManager.sharedInstance.avPlayer.removeAllItems()
       }
       self.selectedFromSearchTab = true
-      let baseVC = ((UIApplication.sharedApplication().delegate as! AppDelegate).rootViewController().childViewControllers[0].childViewControllers[0] as! BaseViewController)
-      for musicVC in baseVC.pageViewController.viewControllers as! [MusicViewController] {
-        self.musicViewController = musicVC
-      }
       KGLOBAL_nowView.stop()
+      KGLOBAL_nowView_topSong.stop()
       CoreDataManager.initializeSongToDatabase(songNeedPurchase)
     }
+    let baseVC:BaseViewController =  (rootVC.childViewControllers[kIndexOfMyMusicPage].childViewControllers[0]) as! BaseViewController
+    self.musicViewController = baseVC.musicViewController
     
     //hide tab bar
     self.tabBarController?.tabBar.hidden = true
@@ -311,10 +313,23 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     
     movePerstep = maxylocation / CGFloat(stepPerSecond * freefallTime)
     loadDisplayMode()
+    downloadSoundwaveOrGenerate()
   }
   
   deinit{
     pthread_rwlock_destroy(&rwLock)
+  }
+  
+  override func refreshData() {
+    dispatch_async(dispatch_get_main_queue()){
+      if (self.isSongNeedPurchase) {
+        if let purchasedItem = (MusicManager.sharedInstance.itemFoundInCollection(self.songNeedPurchase)){
+          MusicManager.sharedInstance.setPlayerQueue([purchasedItem])
+          MusicManager.sharedInstance.setIndexInTheQueue(0)
+          self.recoverToNormalSongVC(purchasedItem)
+        }
+      }
+    }
   }
   
   func removeAllObserver(){
@@ -347,57 +362,69 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }
   }
   
-  override func viewDidAppear(animated: Bool) {
-    super.viewDidAppear(animated)
-    if viewDidFullyDisappear {
-      viewDidFullyDisappear = false
-      if(!isRemoveProgressBlock){
-        isRemoveProgressBlock = true
-        if(!isSongNeedPurchase){
-          self.removeAllObserver()
-          self.registerMediaPlayerNotification()
-        }
-      }else{
-        if(!isSongNeedPurchase){
-          self.registerMediaPlayerNotification()
-        }
-      }
-      if(!isGenerated && !isSongNeedPurchase){
-        generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
-      } else if (!isGenerated && isSongNeedPurchase) {
-        self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
-          succeed in
-          if !self.soundwaveUrl.isEmpty {
-            AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
-              image in
-              dispatch_async(dispatch_get_main_queue()) {
-                if let data = UIImagePNGRepresentation(image) {
-                  KGLOBAL_progressBlock.setWaveFormFromData(data)
-                  CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
-                  self.isGenerated = true
-                  self.soundwaveUrl = ""
-                  return
+
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if viewDidFullyDisappear {
+            viewDidFullyDisappear = false
+            if(!isRemoveProgressBlock){
+                isRemoveProgressBlock = true
+                if(!isSongNeedPurchase){
+                    self.removeAllObserver()
+                    self.registerMediaPlayerNotification()
                 }
-              }
-            })
-          } else {
-            dispatch_async(dispatch_get_main_queue()) {
-              if KGLOBAL_progressBlock.generatedNormalImage == nil {
-                KGLOBAL_progressBlock.generateWaveforms()
-                let data = UIImagePNGRepresentation(KGLOBAL_progressBlock.generatedNormalImage)
-                if(KGLOBAL_progressBlock != nil ) {
-                  KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                
+            } else {
+                if(!isSongNeedPurchase){
+                    self.registerMediaPlayerNotification()
                 }
-              }
             }
-          }
-        })
-      }
+            
+            isViewDidAppear = true
+        }
     }
-    isViewDidAppear = true
-  }
-  
-  
+    
+    func downloadSoundwaveOrGenerate() {
+        if !isGenerated && !isSongNeedPurchase {
+            generateSoundWave(isDemoSong ? demoItem : nowPlayingMediaItem )
+        } else if (!isGenerated && isSongNeedPurchase) {
+            //download soundwave
+            self.getSongIdAndSoundwaveUrlFromCloud(songNeedPurchase,completion: {
+                succeed in
+                
+                //after download the image songviewcontroller might been dismissed
+                if KGLOBAL_progressBlock == nil { return  }
+            
+                if !self.soundwaveUrl.isEmpty {
+                    
+                    AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
+                        image in
+                        dispatch_async(dispatch_get_main_queue()) {
+                            if let data = UIImagePNGRepresentation(image)  {
+                                //TODO: fix this crash, KGLOBAL_progressBlock is nil
+                                KGLOBAL_progressBlock.setWaveFormFromData(data)
+                                CoreDataManager.saveSoundWave(self.songNeedPurchase, soundwaveImage: data)
+                                self.isGenerated = true
+                                self.soundwaveUrl = ""
+                            }
+                        }
+                    })
+                } else { //if no soundwave yet found, we create a fake one
+                    dispatch_async(dispatch_get_main_queue()) {
+                        if KGLOBAL_progressBlock.generatedNormalImage == nil {
+                            KGLOBAL_progressBlock.generateWaveforms()
+                            let data = UIImagePNGRepresentation(KGLOBAL_progressBlock.generatedNormalImage)
+                            if(KGLOBAL_progressBlock != nil ) {
+                                KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+    
   func showTutorial() {
     if isDemoSong {
       avPlayer.pause()
@@ -594,6 +621,12 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
       tuningLabels[i].sizeToFit()
       tuningLabels[i].center = CGPoint(x: topPoints[i+1]+chordBase.frame.origin.x, y: chordBase.frame.origin.y-10)
     }
+    
+    if tuning == Tuning.STANDARD {
+        for label in tuningLabels {
+            label.hidden = true
+        }
+    }
   }
   
   private func updateCapo(capo: Int) {
@@ -684,7 +717,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     self.view.addSubview(previousButton)
     self.view.addSubview(nextButton)
     
-    if(isSongNeedPurchase || isDemoSong){
+    if(isSongNeedPurchase || isDemoSong || MusicManager.sharedInstance.lastPlayerQueue.count == 1) {
       previousButton.hidden = true
       nextButton.hidden = true
     }
@@ -951,8 +984,7 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     let sideMargin: CGFloat = 20
     
     lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
-    lyricbase.backgroundColor = UIColor.baseColor()
-    
+    lyricbase.backgroundColor = UIColor.clearColor()
     self.view.addSubview(lyricbase)
     
     lyricBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "lyricsModeChanged")
@@ -961,25 +993,24 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     lyricbase.addGestureRecognizer(lyricBaseDoubleTapGesture)
     
     let contentMargin: CGFloat = 5
-    
-    lyricbase.layer.cornerRadius = 20
+    //lyricbase.layer.cornerRadius = 20
     
     topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
     topLyricLabel.center.y = lyricbase.frame.height / 3
     topLyricLabel.numberOfLines = 3
     topLyricLabel.textAlignment = NSTextAlignment.Center
-    topLyricLabel.font = UIFont.systemFontOfSize(23)
+    topLyricLabel.font = UIFont.systemFontOfSize(24)
     topLyricLabel.lineBreakMode = .ByWordWrapping
-    topLyricLabel.textColor = UIColor.silverGray()
+    topLyricLabel.textColor = UIColor.whiteColor()
     lyricbase.addSubview(topLyricLabel)
     
     bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
     bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
     bottomLyricLabel.numberOfLines = 3
     bottomLyricLabel.textAlignment = NSTextAlignment.Center
-    bottomLyricLabel.font = UIFont.systemFontOfSize(16)
+    bottomLyricLabel.font = UIFont.systemFontOfSize(20)
     bottomLyricLabel.lineBreakMode = .ByWordWrapping
-    bottomLyricLabel.textColor = UIColor.silverGray()
+    bottomLyricLabel.textColor = UIColor.whiteColor()
     lyricbase.addSubview(bottomLyricLabel)
     
     addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
@@ -1404,106 +1435,111 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
       }
     }
     
-    
     panRecognizer = UIPanGestureRecognizer(target: self, action:Selector("handleProgressPan:"))
     panRecognizer.delegate = self
     progressBlockContainer.addGestureRecognizer(panRecognizer)
     progressContainerTapGesture = UITapGestureRecognizer(target: self, action: Selector("playPause:"))
     progressBlockContainer.addGestureRecognizer(progressContainerTapGesture)
   }
-  
-  
+  // lots of mistakes
+
   // to generate sound wave in a nsoperation thread
-  func generateSoundWave(nowPlayingItem: Findable) {
-    dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
-      var op:NSBlockOperation?
-      let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
-      op = KGLOBAL_operationCache[keyString]
-      if(op == nil){
-        KGLOBAL_queue.suspended = false
-        let tempNowPlayingItem = nowPlayingItem
-        let tempProgressBlock = KGLOBAL_progressBlock
-        let tempkeyString = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
-        op = NSBlockOperation(block: {
-          if !self.soundwaveUrl.isEmpty {
-            AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
-              image in
-              dispatch_async(dispatch_get_main_queue()) {
-                if (KGLOBAL_operationCache[tempkeyString] != nil){
-                  KGLOBAL_operationCache[tempkeyString]!.cancel()
-                  KGLOBAL_operationCache.removeValueForKey(tempkeyString)
-                }
-                if let data = UIImagePNGRepresentation(image) {
-                  KGLOBAL_progressBlock.setWaveFormFromData(data)
-                  CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
-                }
-                self.isGenerated = true
-                self.soundwaveUrl = ""
-                return
-              }
-            })
-            
-          }else{
-            guard let assetURL = nowPlayingItem.getURL() else {
-              dispatch_async(dispatch_get_main_queue()) {
-                tempProgressBlock.generateWaveforms()
-                let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                if(KGLOBAL_progressBlock != nil ) {
-                  KGLOBAL_progressBlock.setWaveFormFromData(data!)
-                }
-              }
-              if (KGLOBAL_operationCache[tempkeyString] != nil){
-                KGLOBAL_operationCache[tempkeyString]!.cancel()
-                KGLOBAL_operationCache.removeValueForKey(tempkeyString)
-              }
-              return
-            }
-            
-            
-            // have to use the temp value to do the nsoperation, cannot use (self.) do that.
-            
-            
-            tempProgressBlock.SetSoundURL(assetURL as! NSURL)
-            self.isGenerated = true
-            self.soundwaveUrl = ""
-            
-            dispatch_async(dispatch_get_main_queue()) {
-              NSOperationQueue.mainQueue().addOperationWithBlock({
-                tempProgressBlock.generateWaveforms()
-                KGLOBAL_operationCache.removeValueForKey(tempkeyString)
-                let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
-                CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
-                
-                //when we get the soundwave we will upload it to the cloud
-                let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
-                AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
-                  succeeded in
-                  if succeeded {
-                    APIManager.updateSoundwaveUrl(CoreDataManager.getSongId(tempNowPlayingItem), url: soundwaveName)
-                  }
+    func generateSoundWave(nowPlayingItem: Findable) {
+        dispatch_async((dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))) {
+            var op:NSBlockOperation?
+            let keyString:String = nowPlayingItem.getArtist()+nowPlayingItem.getTitle()
+            op = KGLOBAL_operationCache[keyString]
+            if(op == nil){
+                KGLOBAL_queue.suspended = false
+                let tempNowPlayingItem = nowPlayingItem
+                let tempProgressBlock = KGLOBAL_progressBlock
+                let tempkeyString = tempNowPlayingItem.getArtist()+tempNowPlayingItem.getTitle()
+                op = NSBlockOperation(block: {
+                    if !self.soundwaveUrl.isEmpty {
+                        AWSS3Manager.downloadImage(self.soundwaveUrl, isProfileBucket: false, completion: {
+                            image in
+                            dispatch_async(dispatch_get_main_queue()) {
+                                if (KGLOBAL_operationCache[tempkeyString] != nil){
+                                    KGLOBAL_operationCache[tempkeyString]!.cancel()
+                                    KGLOBAL_operationCache.removeValueForKey(tempkeyString)
+                                }
+                                if let data = UIImagePNGRepresentation(image) {
+                                    
+                                    //TODO: make this a local variable
+                                    if KGLOBAL_progressBlock != nil {
+                                        KGLOBAL_progressBlock.setWaveFormFromData(data)
+                                    }
+                                    
+                                    CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data)
+                                }
+                                self.isGenerated = true
+                                self.soundwaveUrl = ""
+                                return
+                            }
+                        })
+                        
+                    }else{
+                        guard let assetURL = nowPlayingItem.getURL() else {
+                            dispatch_async(dispatch_get_main_queue()) {
+                                
+                                //TODO: if unknown error for the cloud item mistaken to be a local item, and go to music app successfully stream the song,
+                                //come back to Twistjam this will crash
+                                tempProgressBlock.generateWaveforms()
+                                let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                                if(KGLOBAL_progressBlock != nil ) {
+                                    KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                }
+                            }
+                            if (KGLOBAL_operationCache[tempkeyString] != nil){
+                                KGLOBAL_operationCache[tempkeyString]!.cancel()
+                                KGLOBAL_operationCache.removeValueForKey(tempkeyString)
+                            }
+                            return
+                        }
+                        
+                        
+                        // have to use the temp value to do the nsoperation, cannot use (self.) do that.
+                        tempProgressBlock.SetSoundURL(assetURL as! NSURL)
+                        self.isGenerated = true
+                        self.soundwaveUrl = ""
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            NSOperationQueue.mainQueue().addOperationWithBlock({
+                                tempProgressBlock.generateWaveforms()
+                                KGLOBAL_operationCache.removeValueForKey(tempkeyString)
+                                let data = UIImagePNGRepresentation(tempProgressBlock.generatedNormalImage)
+                                CoreDataManager.saveSoundWave(tempNowPlayingItem, soundwaveImage: data!)
+                                
+                                //when we get the soundwave we will upload it to the cloud
+                                let soundwaveName = AWSS3Manager.concatenateFileNameForSoundwave(tempNowPlayingItem)
+                                AWSS3Manager.uploadImage(tempProgressBlock.generatedNormalImage, fileName: soundwaveName, isProfileBucket: false, completion: {
+                                    succeeded in
+                                    if succeeded {
+                                        APIManager.updateSoundwaveUrl(CoreDataManager.getSongId(tempNowPlayingItem), url: soundwaveName)
+                                    }
+                                })
+                                if self.isDemoSong {
+                                    if((tempNowPlayingItem as! AVPlayerItem) == self.avPlayer.currentItem){
+                                        if(KGLOBAL_progressBlock != nil ){
+                                            KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                        }
+                                    }
+                                }else{
+                                    if((tempNowPlayingItem as! MPMediaItem) == self.player.nowPlayingItem){
+                                        if(KGLOBAL_progressBlock != nil ) {
+                                            KGLOBAL_progressBlock.setWaveFormFromData(data!)
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    }
                 })
-                if self.isDemoSong {
-                  if((tempNowPlayingItem as! AVPlayerItem) == self.avPlayer.currentItem){
-                    if(KGLOBAL_progressBlock != nil ){
-                      KGLOBAL_progressBlock.setWaveFormFromData(data!)
-                    }
-                  }
-                }else{
-                  if((tempNowPlayingItem as! MPMediaItem) == self.player.nowPlayingItem){
-                    if(KGLOBAL_progressBlock != nil ) {
-                      KGLOBAL_progressBlock.setWaveFormFromData(data!)
-                    }
-                  }
-                }
-              })
+                KGLOBAL_operationCache[keyString] = op
+                KGLOBAL_queue.addOperation(op!)
             }
-          }
-        })
-        KGLOBAL_operationCache[keyString] = op
-        KGLOBAL_queue.addOperation(op!)
-      }
+        }
     }
-  }
   
  
   
@@ -1863,9 +1899,11 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     if isDemoSong {
       if avPlayer.rate > 0 {
         KGLOBAL_nowView.start()
+        KGLOBAL_nowView_topSong.start()
         
       } else {
         KGLOBAL_nowView.stop()
+        KGLOBAL_nowView_topSong.stop()
       }
       
       if avPlayer.rate > 0 {
@@ -1877,8 +1915,10 @@ class SongViewController: UIViewController, UIGestureRecognizerDelegate, UIScrol
     }else{
       if player.playbackState == .Playing {
         KGLOBAL_nowView.start()
+        KGLOBAL_nowView_topSong.start()
       } else {
         KGLOBAL_nowView.stop()
+        KGLOBAL_nowView_topSong.stop()
       }
       
       if player.playbackState == MPMusicPlaybackState.Playing {
