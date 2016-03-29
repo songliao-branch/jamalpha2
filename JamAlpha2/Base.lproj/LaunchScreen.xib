@@ -18,9 +18,17 @@
                         <constraint firstAttribute="width" constant="128" id="u1f-Kg-9qD"/>
                     </constraints>
                 </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading music library.." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G4L-uT-VnW">
+                    <rect key="frame" x="75" y="367" width="171" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" red="0.92156862750000001" green="0.36078431370000003" blue="0.3921568627" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
-            <color key="backgroundColor" red="0.94117647058823528" green="0.35686274509803922" blue="0.38431372549019605" alpha="1" colorSpace="calibratedRGB"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
+                <constraint firstItem="G4L-uT-VnW" firstAttribute="top" secondItem="X5E-R5-pwg" secondAttribute="bottom" constant="19" id="1g4-ll-ubp"/>
+                <constraint firstItem="G4L-uT-VnW" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="EdD-mj-Y6G"/>
                 <constraint firstItem="X5E-R5-pwg" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="ovi-sf-ZxA"/>
                 <constraint firstItem="X5E-R5-pwg" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="ucs-qi-55J"/>
             </constraints>
