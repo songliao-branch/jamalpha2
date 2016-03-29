@@ -112,14 +112,14 @@ class MusicManager: NSObject {
         var lastPlayingItem: MPMediaItem?
         var lastPlayTime: NSTimeInterval = 0
         var rate:Float = 0
-        if let nowPlayingItem = MPMusicPlayerController.applicationMusicPlayer().nowPlayingItem {
+        if let nowPlayingItem = MPMusicPlayerController.systemMusicPlayer().nowPlayingItem {
             lastPlayingItem = nowPlayingItem
-            lastPlayTime = MPMusicPlayerController.applicationMusicPlayer().currentPlaybackTime
-            rate = MPMusicPlayerController.applicationMusicPlayer().currentPlaybackRate
+            lastPlayTime = MPMusicPlayerController.systemMusicPlayer().currentPlaybackTime
+            rate = MPMusicPlayerController.systemMusicPlayer().currentPlaybackRate
         }
         
-        MPMusicPlayerController.applicationMusicPlayer().nowPlayingItem = nil
-        player = MPMusicPlayerController.applicationMusicPlayer()
+        MPMusicPlayerController.systemMusicPlayer().nowPlayingItem = nil
+        player = MPMusicPlayerController.systemMusicPlayer()
         player.repeatMode = .All
         player.shuffleMode = .Off
         
