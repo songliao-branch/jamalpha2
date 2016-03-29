@@ -903,7 +903,7 @@
 						DevelopmentTeam = 3ME9DMV2GU;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
