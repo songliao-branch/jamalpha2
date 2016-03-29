@@ -1611,11 +1611,11 @@
             </objects>
             <point key="canvasLocation" x="1546" y="1574"/>
         </scene>
-        <!--Top Songs-->
+        <!--New-->
         <scene sceneID="cpi-9D-fcB">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="bcS-KD-6jB" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Top Songs" image="top_songs" id="c5L-l2-P69">
+                    <tabBarItem key="tabBarItem" title="New" image="top_songs" id="c5L-l2-P69">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="image" keyPath="selectedImage" value="top_songs"/>
                             <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
