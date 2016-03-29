@@ -1000,7 +1000,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     topLyricLabel.center.y = lyricbase.frame.height / 3
     topLyricLabel.numberOfLines = 3
     topLyricLabel.textAlignment = NSTextAlignment.Center
-    topLyricLabel.font = UIFont.systemFontOfSize(21)
+    topLyricLabel.font = UIFont.systemFontOfSize(24)
     topLyricLabel.lineBreakMode = .ByWordWrapping
     topLyricLabel.textColor = UIColor.whiteColor()
     lyricbase.addSubview(topLyricLabel)
@@ -1009,7 +1009,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
     bottomLyricLabel.numberOfLines = 3
     bottomLyricLabel.textAlignment = NSTextAlignment.Center
-    bottomLyricLabel.font = UIFont.systemFontOfSize(18)
+    bottomLyricLabel.font = UIFont.systemFontOfSize(20)
     bottomLyricLabel.lineBreakMode = .ByWordWrapping
     bottomLyricLabel.textColor = UIColor.whiteColor()
     lyricbase.addSubview(bottomLyricLabel)
