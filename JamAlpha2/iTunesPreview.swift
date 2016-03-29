@@ -21,12 +21,12 @@ extension SongViewController: SKStoreProductViewControllerDelegate {
     func setUpPreviewButton(){
         playPreveiwButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width/2-35,UIScreen.mainScreen().bounds.size.height-bottomViewHeight-90,70,70))
         playPreveiwButton.setImage((UIImage(named: "playbutton")), forState: UIControlState.Normal)
-        playPreveiwButton.addTarget(self, action: "showPreviewActionView", forControlEvents: UIControlEvents.TouchUpInside)
+        playPreveiwButton.addTarget(self, action: #selector(SongViewController.showPreviewActionView), forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(playPreveiwButton)
         let url: NSURL = NSURL(string: songNeedPurchase.previewUrl)!
         let playerItem = AVPlayerItem( URL:url)
         KAVplayer = AVPlayer(playerItem:playerItem)
-        displayLink = CADisplayLink(target: self, selector: ("updateSliderProgress"))
+        displayLink = CADisplayLink(target: self, selector: (Selector("updateSliderProgress")))
         displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
         displayLink.paused = true
         

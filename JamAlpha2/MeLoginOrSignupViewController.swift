@@ -91,7 +91,7 @@ class MeLoginOrSignupViewController: UIViewController{
         topView = UIView()
         topView.frame = CGRectMake(0, 0, self.viewWidth, 200)
         topView.backgroundColor = UIColor(patternImage: UIImage(named: "meVCTopBackground")!)
-        let topViewTapGesture = UITapGestureRecognizer(target: self, action: "topViewTapGesture:")
+        let topViewTapGesture = UITapGestureRecognizer(target: self, action: #selector(MeLoginOrSignupViewController.topViewTapGesture(_:)))
         topView.addGestureRecognizer(topViewTapGesture)
         self.view.addSubview(topView)
         
@@ -118,13 +118,13 @@ class MeLoginOrSignupViewController: UIViewController{
         signUpTabButton.setTitle("Sign Up", forState: .Normal)
         signUpTabButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
         signUpTabButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
-        signUpTabButton.addTarget(self, action: "signUpTabPressed", forControlEvents: .TouchUpInside)
+        signUpTabButton.addTarget(self, action: #selector(MeLoginOrSignupViewController.signUpTabPressed), forControlEvents: .TouchUpInside)
         topView.addSubview(signUpTabButton)
         
         loginTabButton = UIButton(frame: CGRect(x: viewWidth/2, y: signUpTabButton.frame.origin.y, width: viewWidth/2, height: 50))
         loginTabButton.setTitle("Log In", forState: .Normal)
         loginTabButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 17)
-        loginTabButton.addTarget(self, action: "loginTabPressed", forControlEvents: .TouchUpInside)
+        loginTabButton.addTarget(self, action: #selector(MeLoginOrSignupViewController.loginTabPressed), forControlEvents: .TouchUpInside)
         loginTabButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         topView.addSubview(loginTabButton)
         
@@ -135,12 +135,12 @@ class MeLoginOrSignupViewController: UIViewController{
         
         closeButton = UIButton(frame: CGRect(x: 25, y: 25, width: 35, height: 35))
         closeButton.setImage(UIImage(named: "closebutton"), forState: .Normal)
-        closeButton.addTarget(self, action: "closeButtonPressed", forControlEvents: .TouchUpInside)
+        closeButton.addTarget(self, action: #selector(MeLoginOrSignupViewController.closeButtonPressed), forControlEvents: .TouchUpInside)
         topView.addSubview(closeButton)
         
         settingsButton = UIButton(frame: CGRect(x: self.view.frame.width-25-25, y: 25, width: 25, height: 25))
         settingsButton.setImage(UIImage(named: "settings_icon"), forState: .Normal)
-        settingsButton.addTarget(self, action: "settingsButtonPressed", forControlEvents: .TouchUpInside)
+        settingsButton.addTarget(self, action: #selector(MeLoginOrSignupViewController.settingsButtonPressed), forControlEvents: .TouchUpInside)
         topView.addSubview(settingsButton)
         
         if !showCloseButton {
@@ -168,7 +168,7 @@ class MeLoginOrSignupViewController: UIViewController{
         scrollView.showsVerticalScrollIndicator = false
         scrollView.contentSize.height = self.scrollView.frame.size.height + 15
         scrollView.delegate = self
-        let scrollViewTapGesture = UITapGestureRecognizer(target: self, action: "scrollViewTapGesture:")
+        let scrollViewTapGesture = UITapGestureRecognizer(target: self, action: #selector(MeLoginOrSignupViewController.scrollViewTapGesture(_:)))
         scrollView.addGestureRecognizer(scrollViewTapGesture)
         self.view.addSubview(self.scrollView)
         
@@ -227,7 +227,7 @@ class MeLoginOrSignupViewController: UIViewController{
             0)
         facebookButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         facebookButton.center.x = self.view.center.x
-        facebookButton.addTarget(self, action: "pressFacebookButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        facebookButton.addTarget(self, action: #selector(MeLoginOrSignupViewController.pressFacebookButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         scrollView.addSubview(facebookButton)
         
         //TODO: hide facebook in beta mode
@@ -259,13 +259,13 @@ class MeLoginOrSignupViewController: UIViewController{
         forgetPasswordButton.setTitle("forgot your password?", forState: .Normal)
         forgetPasswordButton.titleLabel!.font = UIFont.systemFontOfSize(12)
         forgetPasswordButton.setTitleColor(UIColor.grayColor(), forState: .Normal)
-        forgetPasswordButton.addTarget(self, action: "forgetPasswordPressed", forControlEvents: .TouchUpInside)
+        forgetPasswordButton.addTarget(self, action: #selector(MeLoginOrSignupViewController.forgetPasswordPressed), forControlEvents: .TouchUpInside)
         forgetPasswordButton.hidden = true
         scrollView.addSubview(forgetPasswordButton)
         
         submitButton = UIButton(frame: CGRect(x: viewWidth/2-60, y: CGRectGetMaxY(passwordTextField.frame) + 8, width: 120, height: 44))
         submitButton.setTitle("Sign Up", forState: .Normal)
-        submitButton.addTarget(self, action: "submitPressed", forControlEvents: .TouchUpInside)
+        submitButton.addTarget(self, action: #selector(MeLoginOrSignupViewController.submitPressed), forControlEvents: .TouchUpInside)
         submitButton.titleLabel?.textAlignment = .Center
         submitButton.setTitleColor(UIColor.mainPinkColor(), forState: .Normal)
         submitButton.setTitleColor(UIColor.grayColor(), forState: .Disabled)

@@ -327,8 +327,8 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
     // MARK: Notification
     func registerNotification() {
         if musicPlayer != nil {
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("playbackStateChanged:"), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: musicPlayer)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabsEditorViewController.playbackStateChanged(_:)), name:MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: musicPlayer)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabsEditorViewController.currentSongChanged(_:)), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: musicPlayer)
             musicPlayer.beginGeneratingPlaybackNotifications()
         }
     }
@@ -385,7 +385,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         // a gray button covers the entire background behind tuning menu, is to dismiss the tuning menus
         actionDismissLayerButton = UIButton(frame: CGRect(x: 0, y: 0, width: trueWidth, height: trueHeight))
         actionDismissLayerButton.backgroundColor = UIColor.clearColor()
-        actionDismissLayerButton.addTarget(self, action: "dismissAction", forControlEvents: .TouchUpInside)
+        actionDismissLayerButton.addTarget(self, action: #selector(TabsEditorViewController.dismissAction), forControlEvents: .TouchUpInside)
         self.view.addSubview(actionDismissLayerButton)
         actionDismissLayerButton.hidden = true
         
@@ -417,7 +417,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         speedStepper.maximumValue = 1.3
         speedStepper.stepValue = 0.1
         speedStepper.value = 1.0 //default
-        speedStepper.addTarget(self, action: "speedStepperValueChanged:", forControlEvents: .ValueChanged)
+        speedStepper.addTarget(self, action: #selector(TabsEditorViewController.speedStepperValueChanged(_:)), forControlEvents: .ValueChanged)
         tuningMenu.addSubview(speedStepper)
         
         
@@ -435,7 +435,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         capoStepper.maximumValue = 12
         capoStepper.stepValue = 1
         capoStepper.value = 0 //default
-        capoStepper.addTarget(self, action: "capoStepperValueChanged:", forControlEvents: .ValueChanged)
+        capoStepper.addTarget(self, action: #selector(TabsEditorViewController.capoStepperValueChanged(_:)), forControlEvents: .ValueChanged)
         tuningMenu.addSubview(capoStepper)
         
         let buttonDimension: CGFloat = 20
@@ -467,7 +467,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             stepUpButton.setImage(UIImage(named: "vote_up_pink"), forState: .Normal)
             stepUpButton.contentMode = .ScaleToFill
             stepUpButton.tag = i
-            stepUpButton.addTarget(self, action: "stepUpPressed:", forControlEvents: .TouchUpInside)
+            stepUpButton.addTarget(self, action: #selector(TabsEditorViewController.stepUpPressed(_:)), forControlEvents: .TouchUpInside)
             stepUpButton.center = CGPoint(x: tuningValueLabel.center.x + buttonDimension + 10, y: tuningValueLabel.center.y)
             tuningMenu.addSubview(stepUpButton)
             stepUpButtons.append(stepUpButton)
@@ -475,7 +475,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             let stepDownButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 20))
             
             stepDownButton.tag = i
-            stepDownButton.addTarget(self, action: "stepDownPressed:", forControlEvents: .TouchUpInside)
+            stepDownButton.addTarget(self, action: #selector(TabsEditorViewController.stepDownPressed(_:)), forControlEvents: .TouchUpInside)
             stepDownButton.setImage(UIImage(named: "vote_down_pink"), forState: .Normal)
             stepDownButton.contentMode = .ScaleToFill
             stepDownButton.center = CGPoint(x: tuningValueLabel.center.x - buttonDimension - 10, y: tuningValueLabel.center.y)
@@ -577,7 +577,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         let buttonEdge: CGFloat = CGFloat(0.2 / 20) * self.trueHeight
         
         backButton.frame = CGRectMake(0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
-        backButton.addTarget(self, action: "pressBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        backButton.addTarget(self, action: #selector(TabsEditorViewController.pressBackButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         backButton.setImage(UIImage(named: "backButton"), forState: UIControlState.Normal)
         backButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)//CGFloat(0.6 / 20) * self.trueHeight
         menuView.addSubview(backButton)
@@ -590,25 +590,25 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         menuView.addSubview(statusLabel)
         
         addButton.frame = CGRectMake(1 * buttonWidth + 1 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
-        addButton.addTarget(self, action: "pressAddButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        addButton.addTarget(self, action: #selector(TabsEditorViewController.pressAddButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         addButton.setImage(UIImage(named: "addButton"), forState: UIControlState.Normal)
         addButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(addButton)
         
         resetButton.frame = CGRectMake(2 * buttonWidth + 2 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
-        resetButton.addTarget(self, action: "pressResetButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        resetButton.addTarget(self, action: #selector(TabsEditorViewController.pressResetButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         resetButton.setImage(UIImage(named: "trashButton"), forState: UIControlState.Normal)
         resetButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(resetButton)
         
         playPauseButton.frame = CGRectMake(3 * buttonWidth + 3 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
-        playPauseButton.addTarget(self, action: "singleTapOnMusicControlView:", forControlEvents: UIControlEvents.TouchUpInside)
+        playPauseButton.addTarget(self, action: #selector(TabsEditorViewController.singleTapOnMusicControlView(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         playPauseButton.setImage(UIImage(named: "playButton"), forState: UIControlState.Normal)
         playPauseButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(playPauseButton)
         
         tuningButton.frame = CGRectMake(4 * buttonWidth + 4 * buttonSpace + 0.5 / 31 * self.trueWidth+1, 0, buttonWidth, buttonWidth)
-        tuningButton.addTarget(self, action: "pressTuningButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        tuningButton.addTarget(self, action: #selector(TabsEditorViewController.pressTuningButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         tuningButton.setImage(UIImage(named: "tuningButton"), forState: UIControlState.Normal)
         tuningButton.imageEdgeInsets = UIEdgeInsetsMake(buttonEdge, buttonEdge + 0.25 / 20 * self.trueHeight, buttonEdge + 0.5 / 20 * self.trueHeight, buttonEdge + 0.25 / 20 * self.trueHeight)
         menuView.addSubview(tuningButton)
@@ -625,18 +625,18 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         privacyButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 3 * 1.6 / 20 * self.trueHeight+1, 0, buttonWidth, buttonWidth)
         privacyButton.backgroundColor = UIColor.clearColor()
         privacyButton.setImage(UIImage(named: "globeIcon"), forState: UIControlState.Normal)
-        privacyButton.addTarget(self, action: "privacyButtonPressed:", forControlEvents: .TouchUpInside)
+        privacyButton.addTarget(self, action: #selector(TabsEditorViewController.privacyButtonPressed(_:)), forControlEvents: .TouchUpInside)
         privacyButton.imageEdgeInsets = UIEdgeInsetsMake(0.43 / 20 * self.trueHeight, 1.1 / 20 * self.trueHeight, 0.93 / 20 * self.trueHeight, 0.2 / 20 * self.trueHeight)
         menuView.addSubview(privacyButton)
         
         doneButton.frame = CGRectMake(30.5 / 31 * self.trueWidth - 1.5 * 1.6 / 20 * self.trueHeight+1, 0, 1.2 * buttonWidth, buttonWidth)
-        doneButton.addTarget(self, action: "pressDoneButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        doneButton.addTarget(self, action: #selector(TabsEditorViewController.pressDoneButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         doneButton.setImage(UIImage(named: "saveText"), forState: UIControlState.Normal)
         doneButton.imageEdgeInsets = UIEdgeInsetsMake(0.4 / 20 * self.trueHeight, 0.1 / 20 * self.trueHeight, 0.7 / 20 * self.trueHeight, 0.6 / 20 * self.trueHeight)
         menuView.addSubview(doneButton)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapOnEditView.addTarget(self, action: "tapOnEditView:")
+        tapOnEditView.addTarget(self, action: #selector(TabsEditorViewController.tapOnEditView(_:)))
         menuView.addGestureRecognizer(tapOnEditView)
         
         self.view.addSubview(self.progressBlock)
@@ -661,7 +661,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         self.tabNameTextField.returnKeyType = .Done
         self.tabNameTextField.textAlignment = .Center
         self.editView.addSubview(tabNameTextField)
-        self.tabNameTextField.addTarget(self, action: "textFieldTextChanged:", forControlEvents: UIControlEvents.EditingChanged)
+        self.tabNameTextField.addTarget(self, action: #selector(TabsEditorViewController.textFieldTextChanged(_:)), forControlEvents: UIControlEvents.EditingChanged)
         
         self.completeStringView.frame = CGRectMake(0, 6 / 20 * self.trueHeight, self.trueWidth, 15 / 20 * self.trueHeight)
         self.completeStringView.contentSize = CGSizeMake(5 * self.trueWidth, 15 / 20 * self.trueHeight)
@@ -672,11 +672,11 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         self.completeStringView.addSubview(completeImageView)
         self.editView.addSubview(completeStringView)
         
-        let singleTapOnString6View: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "singleTapOnString6View:")
+        let singleTapOnString6View: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(TabsEditorViewController.singleTapOnString6View(_:)))
         self.completeStringView.addGestureRecognizer(singleTapOnString6View)
         
         let tapOnEditView: UITapGestureRecognizer = UITapGestureRecognizer()
-        tapOnEditView.addTarget(self, action: "tapOnEditView:")
+        tapOnEditView.addTarget(self, action: #selector(TabsEditorViewController.tapOnEditView(_:)))
         self.editView.addGestureRecognizer(tapOnEditView)
         
         self.addString6View()
@@ -768,7 +768,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         noteButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
         noteButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
         noteButton.tag = (indexString + 1) * 100 + indexFret
-        noteButton.addTarget(self, action: "pressNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        noteButton.addTarget(self, action: #selector(TabsEditorViewController.pressNoteButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         let tabName = TabsDataManager.fretsBoard[indexString][indexFret]
         noteButton.setTitle("\(tabName)", forState: UIControlState.Normal)
         self.currentNoteButton = noteButton
@@ -888,7 +888,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         }
         
         self.fingerPoint.removeAll(keepCapacity: false)
-        for var i = 5; i >= 0; i-- {
+        for i in (0...5).reverse() {
             let fingerButton: UIButton = UIButton()
             let buttonWidth: CGFloat = 5 / 60 * self.trueHeight
             var buttonX = (string6FretPosition[0] + string6FretPosition[1]) / 2 - buttonWidth / 2
@@ -902,7 +902,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             fingerButton.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
             fingerButton.layer.cornerRadius = 0.5 * buttonWidth
             fingerButton.setImage(UIImage(named: "grayButton"), forState: UIControlState.Normal)
-            fingerButton.addTarget(self, action: "pressEditFingerButton:", forControlEvents: UIControlEvents.TouchUpInside)
+            fingerButton.addTarget(self, action: #selector(TabsEditorViewController.pressEditFingerButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             if i + 1 > stringNumber {
                 fingerButton.accessibilityIdentifier = "blackX"
             } else {
@@ -946,7 +946,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                         specificButton.frame = CGRectMake(0.5 / 20 * self.trueWidth * CGFloat(i + 1) + buttonWidth * CGFloat(i), 0.25 / 20 * self.trueHeight, buttonWidth, buttonHeight)
                         specificButton.backgroundColor = UIColor.mainPinkColor().colorWithAlphaComponent(0.8)
                         specificButton.layer.cornerRadius = 4
-                        specificButton.addTarget(self, action: "pressSpecificTabButton:", forControlEvents:UIControlEvents.TouchUpInside)
+                        specificButton.addTarget(self, action: #selector(TabsEditorViewController.pressSpecificTabButton(_:)), forControlEvents:UIControlEvents.TouchUpInside)
                         specificButton.setTitle(self.specificTabSets[i].name, forState: UIControlState.Normal)
                         specificButton.tag = i
                         specificButton.alpha = 0
@@ -1031,7 +1031,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         for var i = 11; i >= 0; i = i - 2 {
             let startIndex = content.startIndex.advancedBy(11 - i)
             let endIndex = content.startIndex.advancedBy(11 - i + 2)
-            let charAtIndex = content[Range(start: startIndex, end: endIndex)]
+            let charAtIndex = content[Range(startIndex..<endIndex)]
             let fingerButton: UIButton = UIButton()
             var image: UIImage = UIImage()
             var temp: Int = Int()
@@ -1055,7 +1055,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                     maxButtonX = buttonX + buttonWidth
                 }
             }
-            fingerButton.addTarget(self, action: "pressEditFingerButton:", forControlEvents: UIControlEvents.TouchUpInside)
+            fingerButton.addTarget(self, action: #selector(TabsEditorViewController.pressEditFingerButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             fingerButton.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonWidth)
             fingerButton.setImage(image, forState: UIControlState.Normal)
             fingerButton.alpha = 0
@@ -1157,15 +1157,15 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         previousButton.frame = CGRectMake(28 / 31 * self.trueWidth, 20, 3 / 31 * self.trueWidth, 6 / 20 * self.trueHeight-20)
         previousButton.imageEdgeInsets = UIEdgeInsetsMake(3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth - 10, 0, 3 / 20 * self.trueHeight - 3 / 31 * self.trueWidth - 10, 0)
         previousButton.userInteractionEnabled = true
-        previousButton.addTarget(self, action: "pressPreviousButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        previousButton.addTarget(self, action: #selector(TabsEditorViewController.pressPreviousButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         previousButton.setImage(UIImage(named: "backspace"), forState: UIControlState.Normal)
         self.musicControlView.addSubview(previousButton)
 
-        let musicPinchRecognizer: UIPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: "pinchOnMusicControlView:")
+        let musicPinchRecognizer: UIPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(TabsEditorViewController.pinchOnMusicControlView(_:)))
         self.musicControlView.addGestureRecognizer(musicPinchRecognizer)
         
         
-        let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "panOnMusicControlView:")
+        let musicPanRecognizer: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TabsEditorViewController.panOnMusicControlView(_:)))
         self.musicControlView.addGestureRecognizer(musicPanRecognizer)
         self.setUpTimeLabels()
         self.setUpPinchLable()
@@ -1450,13 +1450,13 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             //self.playButtonImageView.hidden = true
             playPauseButton.setImage(UIImage(named: "pauseButton"), forState: UIControlState.Normal)
             self.removeDoubleArrowView()
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: Selector("update"), userInfo: nil, repeats: true)
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(1 / Double(stepPerSecond) / Double(speed), target: self, selector: #selector(TabsEditorViewController.update), userInfo: nil, repeats: true)
              NSRunLoop.mainRunLoop().addTimer(timer, forMode: NSRunLoopCommonModes)
         }
     }
 
     func startCountdown() {
-        countDownStartSecond--
+        countDownStartSecond -= 1
         countdownView.setNumber(countDownStartSecond)
 
         if countDownStartSecond <= 0 {
@@ -1515,7 +1515,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
             countdownView.hidden = false
 
             countdownView.setNumber(countDownStartSecond)
-            countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "startCountdown", userInfo: nil, repeats: true)
+            countdownTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: #selector(TabsEditorViewController.startCountdown), userInfo: nil, repeats: true)
             NSRunLoop.mainRunLoop().addTimer(countdownTimer, forMode: NSRunLoopCommonModes)
         }
     }
@@ -1776,7 +1776,7 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
                 complete in
             })
             let returnValue = addTabViewOnMusicControlView(index)
-            for var i = 0; i < self.allTabsOnMusicLine.count - 1; i++ {
+            for i in 0 ..< self.allTabsOnMusicLine.count - 1 {
                 if self.currentTime <= self.allTabsOnMusicLine[0].time {
                     if(returnValue.1.tab.content == self.allTabsOnMusicLine[0].tab.content && returnValue.1.time == self.allTabsOnMusicLine[0].time){
                         self.findCurrentTabView()
@@ -2245,11 +2245,11 @@ class TabsEditorViewController: UIViewController, UITextFieldDelegate, UIScrollV
         tempButton.setTitle(sender.name, forState: UIControlState.Normal)
         tempButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
         tempButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
-        tempButton.addTarget(self, action: "pressMainViewNoteButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        tempButton.addTarget(self, action: #selector(TabsEditorViewController.pressMainViewNoteButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         tempButton.layer.cornerRadius = 0.5 * buttonWidth
         tempButton.frame = CGRectMake(fretPosition, stringPosition, buttonWidth, buttonWidth)
         
-        let longPress = UILongPressGestureRecognizer(target: self, action: "startMainViewJiggling:")
+        let longPress = UILongPressGestureRecognizer(target: self, action: Selector("startMainViewJiggling:"))
         self.longPressMainViewNoteButton[tempButton] = longPress
         tempButton.addGestureRecognizer(longPress)
         

@@ -86,7 +86,7 @@ class MusicViewController: SuspendThreadViewController, UITableViewDataSource, U
     }
 
     func registerMusicPlayerNotificationForSongChanged(){
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("currentSongChanged:"), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MusicViewController.currentSongChanged(_:)), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: MusicManager.sharedInstance.player)
     }
     
     func synced(lock: AnyObject, closure: () -> ()) {

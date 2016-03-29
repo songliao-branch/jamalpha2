@@ -47,13 +47,13 @@ class PlayChordsManager: NSObject {
         if up {
             let temp = fret0Midi[stringIndex - 1] + 1
             if temp <= standardFret0Midi[stringIndex - 1] + 4 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
-                fret0Midi[stringIndex - 1]++
+                fret0Midi[stringIndex - 1] += 1
                 return true
             }
         } else {
             let temp = fret0Midi[stringIndex - 1] - 1
             if  temp <= standardFret0Midi[stringIndex - 1] + 4 && temp >= standardFret0Midi[stringIndex - 1] - 5 {
-                fret0Midi[stringIndex - 1]--
+                fret0Midi[stringIndex - 1] -= 1
                 return true
             }
         }
@@ -65,7 +65,7 @@ class PlayChordsManager: NSObject {
         for var i = 11; i >= 0; i = i - 2 {
             let startIndex = content.startIndex.advancedBy(11 - i)
             let endIndex = content.startIndex.advancedBy(11 - i + 2)
-            let charAtIndex = content[Range(start: startIndex, end: endIndex)]
+            let charAtIndex = content[Range(startIndex..<endIndex)]
             var indexFret: Int = Int()
             if charAtIndex == "xx" {
                 indexFret = 0
@@ -130,7 +130,7 @@ class PlayChordsManager: NSObject {
     func startTimer() {
         counter = 0
         if(self.timer == nil){
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.05, target: self, selector: "handleTimer:", userInfo: nil, repeats: true)
+            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.05, target: self, selector: #selector(PlayChordsManager.handleTimer(_:)), userInfo: nil, repeats: true)
              NSRunLoop.mainRunLoop().addTimer(self.timer, forMode: NSRunLoopCommonModes)
         }
     }

@@ -13,7 +13,7 @@ struct Tab {
         for var i = 11; i >= 0; i = i - 2 {
             let startIndex = content.startIndex.advancedBy(11 - i)
             let endIndex = content.startIndex.advancedBy(11 - i + 2)
-            let charAtIndex = content[Range(start: startIndex, end: endIndex)]
+            let charAtIndex = content[Range(startIndex..<endIndex)]
             if let number = Int(charAtIndex)  {
                  contentArray.append(String(number))
             } else if charAtIndex == "xx" {

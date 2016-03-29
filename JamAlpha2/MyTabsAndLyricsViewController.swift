@@ -161,7 +161,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
         cell.subtitleLabel.text = song.getArtist()
         
         cell.optionsButton.tag = indexPath.row
-        cell.optionsButton.addTarget(self, action: "optionsButtonPressed:", forControlEvents: .TouchUpInside)
+        cell.optionsButton.addTarget(self, action: #selector(MyTabsAndLyricsViewController.optionsButtonPressed(_:)), forControlEvents: .TouchUpInside)
         
         cell.spinner.hidden = true
         
@@ -351,7 +351,7 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func startHideStatusViewTimer() {
-        hideStatusViewTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: Selector("hideStatusView"), userInfo: nil, repeats: false)
+        hideStatusViewTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: #selector(MyTabsAndLyricsViewController.hideStatusView), userInfo: nil, repeats: false)
     }
     
     func hideStatusView() {

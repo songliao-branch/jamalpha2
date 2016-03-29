@@ -578,7 +578,7 @@ class APIManager: NSObject {
             switch response.result {
             case .Success:
                 if let data = response.result.value {
-                    let json = JSON(data)
+                    _ = JSON(data)
                     print("update soundwave url success")
                 }
             case .Failure(let error):
