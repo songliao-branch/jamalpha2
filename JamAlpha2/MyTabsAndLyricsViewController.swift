@@ -99,8 +99,8 @@ class MyTabsAndLyricsViewController: UIViewController, UITableViewDataSource, UI
     
     func goToEditor(index: Int) {
         let song = songs[index]
+        song.findMediaItem()
         guard let item = song.mediaItem else {
-
             return
         }
         
