@@ -137,13 +137,13 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
   let speedMatcher = [0.7: 0.50, 0.8:0.67 ,0.9: 0.79,  1.0:1.00 ,1.1: 1.25  ,1.2 :1.50, 1.3: 2.00]
   let speedLabels = [0.7: "0.5x", 0.8: "0.65x" ,0.9: "0.8x",  1.0: "1.0x" ,1.1: "1.25x"  ,1.2 : "1.5x", 1.3: "2x"]
   //Lyric
-  var lyricbase: UIView!
+  //var lyricbase: UIView!
   
-  var topLyricLabel: UILabel = UILabel()
-  var bottomLyricLabel: UILabel = UILabel()
+  //var topLyricLabel: UILabel = UILabel()
+  //var bottomLyricLabel: UILabel = UILabel()
   
-  var currentLyricsIndex: Int = 0    //current line of lyric
-  var lyric: Lyric = Lyric()
+  //var currentLyricsIndex: Int = 0    //current line of lyric
+  //var lyric: Lyric = Lyric()
   
   //for displaying 4 buttons, Favorite, Shuffle state, Changed chord version, dots
   var topView:UIView!
@@ -166,7 +166,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
   var speedLabel: UILabel!
   var chordsSwitch: UISwitch!
   var tabsSwitch: UISwitch!
-  var lyricsSwitch: UISwitch!
+  //var lyricsSwitch: UISwitch!
   var countdownSwitch: UISwitch!
   
   // for actions used inside this class
@@ -174,8 +174,8 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
   var navigationOutActionView: UIView!
   var browseTabsButton: UIButton!
   var addTabsButton: UIButton!
-  var browseLyricsButton: UIButton!
-  var addLyricsButton: UIButton!
+  //var browseLyricsButton: UIButton!
+ // var addLyricsButton: UIButton!
   var goToArtistButton: UIButton!
   var goToAlbumButton: UIButton!
   
@@ -184,17 +184,18 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
   var isTabsShown = true
   var isChordShownTemp = true
   var isTabsShownTemp = true
-  var isLyricsShown = true
+  //var isLyricsShown = true
   let isChordShownKey = "isChordShown"
   let isTabsShownKey = "isTabsShown"
-  let isLyricsShownKey = "isLyricsShown"
+ // let isLyricsShownKey = "isLyricsShown"
   var countdownOn = false
   var countdownOnKey = "countdownOn"
   
-  var actionViewHeight: CGFloat = 44 * 6 + 5// a row height * number of rows + 5 lines of separator of height 1
+  var actionViewHeight: CGFloat = 44 * 5 + 5// a row height * number of rows + 5 lines of separator of height 1
   //var navigationOutActionViewHeight: CGFloat = 44 * 4 + 4 //4 rows of height + 4 lines
   var actionDismissLayerButton: UIButton!
   
+  let navigationViewHeight: CGFloat = 44 * 4 + 3
   //background images
   var currentImage:UIImage?
   
@@ -295,14 +296,14 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     //set up views from top to bottom
     setUpChordBase()
     setUpTuningLabels()
-    setUpLyricsBase()
+   // setUpLyricsBase()
     setUpControlButtons()
     setUpProgressContainer()
     setUpTimeLabels()
     setUpBottomViewWithButtons()
     setUpActionViews()
     setUpCountdownView()
-    setUpScrollLine()
+    //setUpScrollLine()
     if(!isSongNeedPurchase){
       updateMusicData(isDemoSong ? demoItem : nowPlayingMediaItem )
       updateFavoriteStatus(isDemoSong ? demoItem : nowPlayingMediaItem)
@@ -485,10 +486,10 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
   var currentSelectTempIndex: NSIndexPath = NSIndexPath(forItem: 0, inSection: 0)
   
   
-  func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-    self.lyricEndDraggin(decelerate)
-    
-  }
+//  func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+//    self.lyricEndDraggin(decelerate)
+//    
+//  }
   
   func hideTutorial() {
     tutorialScrollView.hidden = true
@@ -564,12 +565,13 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
       self.backgroundImage = image
       self.blurredImage = image.applyLightEffect()!
       self.isBlurred = !self.isBlurred
-      if (self.isChordShown || self.isTabsShown || self.isLyricsShown) && !self.isBlurred {
+        
+      if (self.isChordShown || self.isTabsShown) && !self.isBlurred {
         dispatch_async(dispatch_get_main_queue()) {
           self.backgroundImageView.image = self.blurredImage
         }
         self.isBlurred = true
-      } else if (!self.isChordShown && !self.isTabsShown && !self.isLyricsShown && self.isBlurred) { //
+      } else if (!self.isChordShown && !self.isTabsShown && self.isBlurred) { //
         dispatch_async(dispatch_get_main_queue()) {
           self.backgroundImageView.image = self.backgroundImage
         }
@@ -590,12 +592,12 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     pulldownButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
     pulldownButton.setImage(UIImage(named: "pullDown"), forState: UIControlState.Normal)
     pulldownButton.center = CGPoint(x: buttonMargin, y: buttonCenterY)
-    pulldownButton.addTarget(self, action: "dismissController:", forControlEvents: UIControlEvents.TouchUpInside)
+    pulldownButton.addTarget(self, action: #selector(SongViewController.dismissController(_:)), forControlEvents: UIControlEvents.TouchUpInside)
     topView.addSubview(pulldownButton)
     
     capoButton = UIButton(frame: CGRect(x: 0, y: 0, width: buttonDimension, height: buttonDimension))
     capoButton.setImage(UIImage(named: "blankCircle"), forState: .Normal)
-    capoButton.addTarget(self, action: "tuningPressed:", forControlEvents: .TouchUpInside)
+    capoButton.addTarget(self, action: #selector(SongViewController.tuningPressed(_:)), forControlEvents: .TouchUpInside)
     capoButton.center = CGPoint(x: buttonMargin * 11, y: buttonCenterY)
     topView.addSubview(capoButton)
     
@@ -799,29 +801,29 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     return false
   }
   
-  private func canFindLyricsFromCoreData(song: Findable) -> Bool {
-    self.lyric = Lyric()
-    self.topLyricLabel.text = ""
-    self.bottomLyricLabel.text = ""
-    
-    var lyric = Lyric()
-    (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: false)
-    
-    if lyric.lyric.count > 1 {
-      self.lyric = lyric
-      self.addLyricsPrompt.hidden = true
-      self.setUpLyricsArray()
-      dispatch_async(dispatch_get_main_queue()){
-        if(self.singleLyricsTableView != nil) {
-          self.singleLyricsTableView.reloadData()
-          self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
-        }
-      }
-      return true
-    }
-    return false
-  }
-  
+//  private func canFindLyricsFromCoreData(song: Findable) -> Bool {
+//    self.lyric = Lyric()
+//    self.topLyricLabel.text = ""
+//    self.bottomLyricLabel.text = ""
+//    
+//    var lyric = Lyric()
+//    (lyric, _) = CoreDataManager.getLyrics(song, fetchingUsers: false)
+//    
+//    if lyric.lyric.count > 1 {
+//      self.lyric = lyric
+//      self.addLyricsPrompt.hidden = true
+//      //self.setUpLyricsArray()
+//      dispatch_async(dispatch_get_main_queue()){
+//        if(self.singleLyricsTableView != nil) {
+//          self.singleLyricsTableView.reloadData()
+//          self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
+//        }
+//      }
+//      return true
+//    }
+//    return false
+//  }
+//  
   func updateMusicData(song: Findable) {
     //if nothing in core data, we look up the cloud
     if !canFindTabsFromCoreData(song) {
@@ -856,80 +858,80 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
         }
       })
     }
-    
-    if !canFindLyricsFromCoreData(song) {
-      APIManager.downloadMostLikedLyrics(song, completion: {
-        found, download in
-        //if still not found, we show a prompt
-        if !found {
-          if !self.isSongNeedPurchase{
-            self.addLyricsPrompt.hidden = false
-          }
-          self.setUpLyricsArray()
-          dispatch_async(dispatch_get_main_queue()){
-            if(self.singleLyricsTableView != nil) {
-              self.singleLyricsTableView.reloadData()
-              self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
-            }
-          }
-          return
-        }
-        self.addLyricsPrompt.hidden = true
-        
-        var times = [Float]()
-        for t in download.times {
-          times.append(Float(t))
-        }
-        CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, userId: download.editor.userId, lyricsSetId: download.id)
-        
-        self.setUpLyricsArray()
-        dispatch_async(dispatch_get_main_queue()){
-          if(self.singleLyricsTableView != nil) {
-            self.singleLyricsTableView.reloadData()
-            self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
-          }
-        }
-        
-        if self.canFindLyricsFromCoreData(song) {
-          dispatch_async(dispatch_get_main_queue()){
-            if(!self.isSongNeedPurchase){
-              let tempPlaytime = self.isDemoSong ?  self.avPlayer.currentTime().seconds
-                : self.player.currentPlaybackTime
-              if !tempPlaytime.isNaN {
-                self.updateAll(Float(tempPlaytime))
-              } else {
-                self.updateAll(0)
-              }
-            }else{
-              self.updateAll(0)
-            }
-          }
-        }
-      })
-    }
+//    
+//    if !canFindLyricsFromCoreData(song) {
+//      APIManager.downloadMostLikedLyrics(song, completion: {
+//        found, download in
+//        //if still not found, we show a prompt
+//        if !found {
+//          if !self.isSongNeedPurchase{
+//            self.addLyricsPrompt.hidden = false
+//          }
+//          self.setUpLyricsArray()
+//          dispatch_async(dispatch_get_main_queue()){
+//            if(self.singleLyricsTableView != nil) {
+//              self.singleLyricsTableView.reloadData()
+//              self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
+//            }
+//          }
+//          return
+//        }
+//        self.addLyricsPrompt.hidden = true
+//        
+//        var times = [Float]()
+//        for t in download.times {
+//          times.append(Float(t))
+//        }
+//        CoreDataManager.saveLyrics(song, lyrics: download.lyrics, times: times, userId: download.editor.userId, lyricsSetId: download.id)
+//        
+//        self.setUpLyricsArray()
+//        dispatch_async(dispatch_get_main_queue()){
+//          if(self.singleLyricsTableView != nil) {
+//            self.singleLyricsTableView.reloadData()
+//            self.singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: false)
+//          }
+//        }
+//        
+//        if self.canFindLyricsFromCoreData(song) {
+//          dispatch_async(dispatch_get_main_queue()){
+//            if(!self.isSongNeedPurchase){
+//              let tempPlaytime = self.isDemoSong ?  self.avPlayer.currentTime().seconds
+//                : self.player.currentPlaybackTime
+//              if !tempPlaytime.isNaN {
+//                self.updateAll(Float(tempPlaytime))
+//              } else {
+//                self.updateAll(0)
+//              }
+//            }else{
+//              self.updateAll(0)
+//            }
+//          }
+//        }
+//      })
+//    }
     
   }
   
   //for testing
-  func setUpTestData(song: MPMediaItem){
-    if song.title == "Rolling In The Deep" {
-      chords = Chord.getRollingChords()
-      lyric = Lyric.getRollingLyrics()
-    } else if song.title == "I'm Yours"{
-      chords = Chord.getJasonMrazChords()
-      lyric = Lyric.getJasonMrazLyrics()
-    }else if song.title == "Daughters" {
-      chords = Chord.getDaughters()
-      lyric = Lyric.getDaughters()
-      
-    } else if song.title == "More Than Words"{ // use more than words for everything else for now
-      chords = Chord.getExtremeChords()
-      lyric = Lyric.getExtremeLyrics()
-    }
-    updateTuning("E-B-G-D-A-E")
-    updateCapo(0)
-  }
-  
+//  func setUpTestData(song: MPMediaItem){
+//    if song.title == "Rolling In The Deep" {
+//      chords = Chord.getRollingChords()
+//      lyric = Lyric.getRollingLyrics()
+//    } else if song.title == "I'm Yours"{
+//      chords = Chord.getJasonMrazChords()
+//      lyric = Lyric.getJasonMrazLyrics()
+//    }else if song.title == "Daughters" {
+//      chords = Chord.getDaughters()
+//      lyric = Lyric.getDaughters()
+//      
+//    } else if song.title == "More Than Words"{ // use more than words for everything else for now
+//      chords = Chord.getExtremeChords()
+//      lyric = Lyric.getExtremeLyrics()
+//    }
+//    updateTuning("E-B-G-D-A-E")
+//    updateCapo(0)
+//  }
+//  
   
   func setUpChordBase(){
     let marginToTopView: CGFloat = 20
@@ -978,51 +980,51 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     return true
   }
   
-  func setUpLyricsBase(){
-    //Lyric labels
-    currentLyricsIndex = -1
-    let sideMargin: CGFloat = 20
-    
-    lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
-    lyricbase.backgroundColor = UIColor.clearColor()
-    self.view.addSubview(lyricbase)
-    
-    lyricBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "lyricsModeChanged")
-    lyricBaseDoubleTapGesture.numberOfTouchesRequired = 1
-    lyricBaseDoubleTapGesture.numberOfTapsRequired = 2
-    lyricbase.addGestureRecognizer(lyricBaseDoubleTapGesture)
-    
-    let contentMargin: CGFloat = 5
-    //lyricbase.layer.cornerRadius = 20
-    
-    topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
-    topLyricLabel.center.y = lyricbase.frame.height / 3
-    topLyricLabel.numberOfLines = 3
-    topLyricLabel.textAlignment = NSTextAlignment.Center
-    topLyricLabel.font = UIFont.systemFontOfSize(24)
-    topLyricLabel.lineBreakMode = .ByWordWrapping
-    topLyricLabel.textColor = UIColor.whiteColor()
-    lyricbase.addSubview(topLyricLabel)
-    
-    bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
-    bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
-    bottomLyricLabel.numberOfLines = 3
-    bottomLyricLabel.textAlignment = NSTextAlignment.Center
-    bottomLyricLabel.font = UIFont.systemFontOfSize(20)
-    bottomLyricLabel.lineBreakMode = .ByWordWrapping
-    bottomLyricLabel.textColor = UIColor.whiteColor()
-    lyricbase.addSubview(bottomLyricLabel)
-    
-    addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
-    addLyricsPrompt.setTitle("Add lyrics here", forState: .Normal)
-    addLyricsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
-    addLyricsPrompt.center = CGPoint(x: lyricbase.frame.width/2, y: lyricbase.frame.height/2)
-    addLyricsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
-    addLyricsPrompt.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
-    addLyricsPrompt.hidden = true
-    lyricbase.addSubview(addLyricsPrompt)
-  }
-  
+//  func setUpLyricsBase(){
+//    //Lyric labels
+//    currentLyricsIndex = -1
+//    let sideMargin: CGFloat = 20
+//    
+//    lyricbase = UIView(frame: CGRect(x: sideMargin, y: CGRectGetMaxY(chordBase.frame) + marginBetweenBases, width: self.view.frame.width - 2 * sideMargin, height: basesHeight * 0.4))
+//    lyricbase.backgroundColor = UIColor.clearColor()
+//    self.view.addSubview(lyricbase)
+//    
+//    lyricBaseDoubleTapGesture = UITapGestureRecognizer(target: self, action: "lyricsModeChanged")
+//    lyricBaseDoubleTapGesture.numberOfTouchesRequired = 1
+//    lyricBaseDoubleTapGesture.numberOfTapsRequired = 2
+//    lyricbase.addGestureRecognizer(lyricBaseDoubleTapGesture)
+//    
+//    let contentMargin: CGFloat = 5
+//    //lyricbase.layer.cornerRadius = 20
+//    
+//    topLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, 2 * lyricbase.frame.height / 3)
+//    topLyricLabel.center.y = lyricbase.frame.height / 3
+//    topLyricLabel.numberOfLines = 3
+//    topLyricLabel.textAlignment = NSTextAlignment.Center
+//    topLyricLabel.font = UIFont.systemFontOfSize(24)
+//    topLyricLabel.lineBreakMode = .ByWordWrapping
+//    topLyricLabel.textColor = UIColor.whiteColor()
+//    lyricbase.addSubview(topLyricLabel)
+//    
+//    bottomLyricLabel.frame = CGRectMake(contentMargin, 0, lyricbase.frame.width - 2 * contentMargin, lyricbase.frame.height / 3)
+//    bottomLyricLabel.center.y =  2 * lyricbase.frame.height / 3 + 10
+//    bottomLyricLabel.numberOfLines = 3
+//    bottomLyricLabel.textAlignment = NSTextAlignment.Center
+//    bottomLyricLabel.font = UIFont.systemFontOfSize(20)
+//    bottomLyricLabel.lineBreakMode = .ByWordWrapping
+//    bottomLyricLabel.textColor = UIColor.whiteColor()
+//    lyricbase.addSubview(bottomLyricLabel)
+//    
+//    addLyricsPrompt = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
+//    addLyricsPrompt.setTitle("Add lyrics here", forState: .Normal)
+//    addLyricsPrompt.titleLabel?.font = UIFont.systemFontOfSize(20)
+//    addLyricsPrompt.center = CGPoint(x: lyricbase.frame.width/2, y: lyricbase.frame.height/2)
+//    addLyricsPrompt.setTitleColor(UIColor.silverGray(), forState: .Normal)
+//    addLyricsPrompt.addTarget(self, action: "goToLyricsEditor", forControlEvents: .TouchUpInside)
+//    addLyricsPrompt.hidden = true
+//    lyricbase.addSubview(addLyricsPrompt)
+//  }
+//  
   
   func loadDisplayMode() {
     // zero means never been set before, 1 means true, 2 means false
@@ -1038,11 +1040,11 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
       isTabsShown = false
     }
     
-    if NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 1 {
-      isLyricsShown = true
-    } else {
-      isLyricsShown = false
-    }
+//    if NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(isLyricsShownKey) == 1 {
+//      isLyricsShown = true
+//    } else {
+//      isLyricsShown = false
+//    }
     
     // if countdown has never been set before, default is false
     if NSUserDefaults.standardUserDefaults().integerForKey(countdownOnKey) == 0 || NSUserDefaults.standardUserDefaults().integerForKey(countdownOnKey) == 2 {
@@ -1053,11 +1055,11 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     
     chordsSwitch.on = isChordShown
     tabsSwitch.on = isTabsShown
-    lyricsSwitch.on = isLyricsShown
+//    lyricsSwitch.on = isLyricsShown
     countdownSwitch.on = countdownOn
     
     toggleChordsDisplayMode(false)
-    toggleLyrics(false)
+    //toggleLyrics(false)
     isChordShownTemp = isChordShown
     isTabsShownTemp = isTabsShown
   }
@@ -1128,10 +1130,10 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     
     self.updateMusicData(nowPlayingMediaItem!)
     self.updateFavoriteStatus(nowPlayingMediaItem!)
-    if self.singleLyricsTableView != nil {
-      singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
-      currentLyricsIndex = -1
-    }
+//    if self.singleLyricsTableView != nil {
+//      singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
+//      currentLyricsIndex = -1
+//    }
     // The following won't run when selected from table
     // update the progressblockWidth
     
@@ -1215,10 +1217,10 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     // use current item's playbackduration to validate nowPlayingItem duration
     // if they are not equal, i.e. not the same song
     self.updateMusicData(demoItem!)
-    if self.singleLyricsTableView != nil {
-      singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
-      currentLyricsIndex = -1
-    }
+//    if self.singleLyricsTableView != nil {
+//      singleLyricsTableView.setContentOffset(CGPoint(x: 0, y: self.lyricsArray[0].offSet), animated: true)
+//      currentLyricsIndex = -1
+//    }
     
     // The following won't run when selected from table
     // update the progressblockWidth
@@ -1273,10 +1275,10 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     if keyPath == "rate"{
       if self.avPlayer.rate == 0 {
         stopTimer()
-        if singleLyricsTableView != nil && self.lyric.lyric.count > 0 {
-          self.stopDisapperTimer()
-          showTempScrollLyricsView()
-        }
+//        if singleLyricsTableView != nil && self.lyric.lyric.count > 0 {
+//          self.stopDisapperTimer()
+//          showTempScrollLyricsView()
+//        }
         //fade down the soundwave
         UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveLinear, animations: {
           KGLOBAL_progressBlock!.transform = CGAffineTransformMakeScale(1.0, 0.5)
@@ -1312,11 +1314,11 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     }
     let playbackState = player.playbackState
     if playbackState == .Paused {
-      if singleLyricsTableView != nil && self.lyric.lyric.count > 0 {
-        self.stopDisapperTimer()
-        showTempScrollLyricsView()
-        self.isScrolling = false
-      }
+//      if singleLyricsTableView != nil && self.lyric.lyric.count > 0 {
+//        self.stopDisapperTimer()
+//        showTempScrollLyricsView()
+//        self.isScrolling = false
+//      }
       stopTimer()
       //fade down the soundwave
       UIView.animateWithDuration(0.3, delay: 0.0, options: [.CurveEaseOut, .AllowUserInteraction], animations: {
@@ -1599,10 +1601,10 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
             startTimer()
           }
         }
-        if(self.chordBase.hidden){
-          refreshLyrics()
-          refreshLyricsTableView()
-        }
+//        if(self.chordBase.hidden){
+//          refreshLyrics()
+//          refreshLyricsTableView()
+//        }
       }
       break
     default:
@@ -2080,47 +2082,47 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     self.currentTimeLabel.text = startTime.toDisplayString()
   }
   
-  func refreshLyrics() {
-    if lyric.lyric.count < 2 {
-      return
-    }
-    
-    if !isLyricsShown { // avoid unnecessary computation if lyrics is hidden
-      return
-    }
-    
-    if currentLyricsIndex + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(currentLyricsIndex+1).time) {
-      currentLyricsIndex++
-      topLyricLabel.text = lyric.get(currentLyricsIndex).str
-      
-      if currentLyricsIndex + 1 < lyric.lyric.count {
-        bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
-      }
-    }
-    
-    currentLyricsIndex = -1
-    while(currentLyricsIndex + 1 < lyric.lyric.count){
-      if lyric.get(currentLyricsIndex + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
-        break
-      }
-      currentLyricsIndex++
-    }
-    
-    if currentLyricsIndex == -1{
-      topLyricLabel.text = "..."
-    }
-    else {
-      topLyricLabel.text = lyric.get(currentLyricsIndex).str
-    }
-    if currentLyricsIndex + 1 < lyric.lyric.count {
-      bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
-    }
-    else {
-      bottomLyricLabel.text = "--"
-    }
-  }
-  
-  
+//  func refreshLyrics() {
+//    if lyric.lyric.count < 2 {
+//      return
+//    }
+//    
+//    if !isLyricsShown { // avoid unnecessary computation if lyrics is hidden
+//      return
+//    }
+//    
+//    if currentLyricsIndex + 1 < lyric.lyric.count && startTime.isLongerThan(lyric.get(currentLyricsIndex+1).time) {
+//      currentLyricsIndex++
+//      topLyricLabel.text = lyric.get(currentLyricsIndex).str
+//      
+//      if currentLyricsIndex + 1 < lyric.lyric.count {
+//        bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
+//      }
+//    }
+//    
+//    currentLyricsIndex = -1
+//    while(currentLyricsIndex + 1 < lyric.lyric.count){
+//      if lyric.get(currentLyricsIndex + 1).time.toDecimalNumer() > startTime.toDecimalNumer() {
+//        break
+//      }
+//      currentLyricsIndex++
+//    }
+//    
+//    if currentLyricsIndex == -1{
+//      topLyricLabel.text = "..."
+//    }
+//    else {
+//      topLyricLabel.text = lyric.get(currentLyricsIndex).str
+//    }
+//    if currentLyricsIndex + 1 < lyric.lyric.count {
+//      bottomLyricLabel.text = lyric.get(currentLyricsIndex+1).str
+//    }
+//    else {
+//      bottomLyricLabel.text = "--"
+//    }
+//  }
+//  
+//  
   
   func updateAll(time: Float) {
     
@@ -2257,7 +2259,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
       // make sure the timer is not interfered by scrollview scrolling
       NSRunLoop.mainRunLoop().addTimer(KGLOBAL_timer, forMode: NSRunLoopCommonModes)
     }
-    self.hideTempScrollLyricsView()
+   // self.hideTempScrollLyricsView()
   }
   
   func stopTimer(){
@@ -2265,7 +2267,7 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
       KGLOBAL_timer!.invalidate()
       KGLOBAL_timer = nil
     }
-    stopDisapperTimer()
+    //stopDisapperTimer()
   }
   
   func update(){
@@ -2322,50 +2324,50 @@ class SongViewController: MusicLibraryController, UIGestureRecognizerDelegate, U
     if(!self.chordBase.hidden){
       refreshChordLabel()
     }
-    refreshLyrics()
-    if(self.chordBase.hidden) {
-      if (!isScrolling){
-        if(!isPanning){
-          refreshLyricsTableView()
-        } else {
-          refreshLyricsTableViewAlpha()
-        }
-      } else {
-        refreshLyricsTableViewAlpha()
-      }
-    }
+//    refreshLyrics()
+//    if(self.chordBase.hidden) {
+//      if (!isScrolling){
+//        if(!isPanning){
+//          refreshLyricsTableView()
+//        } else {
+//          refreshLyricsTableViewAlpha()
+//        }
+//      } else {
+//        refreshLyricsTableViewAlpha()
+//      }
+//    }
     refreshProgressBlock()
     refreshTimeLabel()
   }
   
-  func refreshLyricsTableView() {
-    if singleLyricsTableView != nil && lyricsArray.count > 0 {
-      if (!isDemoSong){
-        if self.player != nil && self.player.nowPlayingItem != nil {
-          if self.player.nowPlayingItem != self.nowPlayingMediaItem {
-            return
-          }
-        }
-      }
-      if tempCurrentLyricsIndex != currentLyricsIndex {
-        tempCurrentLyricsIndex = currentLyricsIndex
-        if tempScrollLine.hidden == true {
-          updateSingleLyricsAlpha()
-          updateSingleLyricsPosition(true)
-        }
-      }
-    }
-  }
-  
-  func refreshLyricsTableViewAlpha() {
-    if singleLyricsTableView != nil && lyricsArray.count > 0 {
-      if tempCurrentLyricsIndex != currentLyricsIndex {
-        tempCurrentLyricsIndex = currentLyricsIndex
-        updateSingleLyricsAlpha()
-      }
-    }
-  }
-  
+//  func refreshLyricsTableView() {
+//    if singleLyricsTableView != nil && lyricsArray.count > 0 {
+//      if (!isDemoSong){
+//        if self.player != nil && self.player.nowPlayingItem != nil {
+//          if self.player.nowPlayingItem != self.nowPlayingMediaItem {
+//            return
+//          }
+//        }
+//      }
+//      if tempCurrentLyricsIndex != currentLyricsIndex {
+//        tempCurrentLyricsIndex = currentLyricsIndex
+//        if tempScrollLine.hidden == true {
+//          updateSingleLyricsAlpha()
+//          updateSingleLyricsPosition(true)
+//        }
+//      }
+//    }
+//  }
+//  
+//  func refreshLyricsTableViewAlpha() {
+//    if singleLyricsTableView != nil && lyricsArray.count > 0 {
+//      if tempCurrentLyricsIndex != currentLyricsIndex {
+//        tempCurrentLyricsIndex = currentLyricsIndex
+//        updateSingleLyricsAlpha()
+//      }
+//    }
+//  }
+//  
   
   func createLabels(name: String, fretPositions: [String]) -> (labels: [UIView], ylocation: CGFloat, alpha: Int){
     var res = [UIView]()

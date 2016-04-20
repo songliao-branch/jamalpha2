@@ -751,29 +751,29 @@ extension LyricsSyncViewController {
             cloudId in
             CoreDataManager.saveCloudIdToLyrics(self.isDemoSong ? MusicManager.sharedInstance.demoSongs[0]: self.theSong, cloudId: cloudId)
         })
-        if let songVC = lyricsTextViewController.songViewController {
-            if songVC.singleLyricsTableView != nil {
-                songVC.updateSingleLyricsAlpha()
-                songVC.updateSingleLyricsPosition(false)
-            }
-        }
-        presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: {
-            completed in
-            if let songVC = self.lyricsTextViewController.songViewController {
-                songVC.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
-                if songVC.singleLyricsTableView != nil {
-                    songVC.setUpLyricsArray()
-                    songVC.singleLyricsTableView.reloadData()
-                }
-                songVC.addLyricsPrompt.hidden = true
-                if songVC.isDemoSong {
-                    songVC.avPlayer.play()
-                } else {
-                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
-                    songVC.player.play()
-                }
-            }
-        })
+//        if let songVC = lyricsTextViewController.songViewController {
+//            if songVC.singleLyricsTableView != nil {
+//                songVC.updateSingleLyricsAlpha()
+//                songVC.updateSingleLyricsPosition(false)
+//            }
+//        }
+//        presentingViewController?.presentingViewController?.dismissViewControllerAnimated( true, completion: {
+//            completed in
+//            if let songVC = self.lyricsTextViewController.songViewController {
+//                songVC.lyric = Lyric(lyricsTimesTuple: lyricsTimesTuple)
+//                if songVC.singleLyricsTableView != nil {
+//                    songVC.setUpLyricsArray()
+//                    songVC.singleLyricsTableView.reloadData()
+//                }
+//                songVC.addLyricsPrompt.hidden = true
+//                if songVC.isDemoSong {
+//                    songVC.avPlayer.play()
+//                } else {
+//                    MusicManager.sharedInstance.recoverMusicPlayerState(self.recoverMode, currentSong: self.theSong as! MPMediaItem)
+//                    songVC.player.play()
+//                }
+//            }
+//        })
     }
 }
 
