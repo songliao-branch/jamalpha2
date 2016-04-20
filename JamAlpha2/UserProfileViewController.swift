@@ -20,7 +20,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     var isCalledViewDidLoad:Bool = false
     
-    var cellTitles = ["My chords", "My lyrics", "Favorites"]
+    var cellTitles = ["My chords", "Favorites"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -110,7 +110,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         if section == 0 || section == 2 {
             return 1
         }
-        return 3
+        return 2
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -160,11 +160,15 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 let myTabsVC = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsandlyricsVC") as! MyTabsAndLyricsViewController
                 myTabsVC.isViewingTabs = true
                 self.navigationController?.pushViewController(myTabsVC, animated: true)
-            } else if indexPath.item == 1{
-                let myLyricsVC = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsandlyricsVC") as! MyTabsAndLyricsViewController
-                myLyricsVC.isViewingTabs = false
-                self.navigationController?.pushViewController(myLyricsVC, animated: true)
-            } else if indexPath.item == 2 {
+            }
+//            
+//            else if indexPath.item == 1{
+//                let myLyricsVC = self.storyboard?.instantiateViewControllerWithIdentifier("mytabsandlyricsVC") as! MyTabsAndLyricsViewController
+//                myLyricsVC.isViewingTabs = false
+//                self.navigationController?.pushViewController(myLyricsVC, animated: true)
+//            }
+//            
+            else if indexPath.item == 1 {
                 let favoritesVC = self.storyboard?.instantiateViewControllerWithIdentifier("MyFavoritesViewController") as! MyFavoritesViewController
                 
                 self.navigationController?.pushViewController(favoritesVC, animated: true)
