@@ -44,6 +44,9 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         if isSelectingSongs {
             self.navigationItem.title = "select a song to add chords";
             KGLOBAL_nowView.hidden = true
+        } else {
+            //somehow this tableview hides behind the uitabbarcontroller. in order to bring it up front by giving it 49, height of tab bar to the bottom
+            self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 49, right: 0)
         }
         
         pthread_rwlock_init(&rwLock, nil)
@@ -343,7 +346,6 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
             return 60
         }
         else if pageIndex == 1 {
-        
             return 100
         }
         else if pageIndex == 2 {

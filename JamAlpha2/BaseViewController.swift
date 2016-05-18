@@ -98,13 +98,12 @@ class BaseViewController: MusicLibraryController, UIPageViewControllerDataSource
         let allViewControllers: [UIViewController] = [startVC]
         self.pageViewController.setViewControllers(allViewControllers, direction: .Forward, animated: true, completion: nil)
         
-        //let heightOffset: CGFloat = 5 // height of table looks cut without minus 5
-        self.pageViewController.view.frame = CGRectMake(0, statusAndNavigationBarHeight+CGRectGetMaxY(musicUnderlineSelector.frame), self.view.frame.width, self.view.frame.size.height + 60)
+
+        self.pageViewController.view.frame = CGRectMake(0, statusAndNavigationBarHeight+CGRectGetMaxY(musicUnderlineSelector.frame), self.view.frame.width, self.view.frame.size.height)
         
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMoveToParentViewController(self)
-        
         
         //set up scroll view
         for view in self.pageViewController.view.subviews {
