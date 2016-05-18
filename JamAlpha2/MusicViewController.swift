@@ -24,6 +24,7 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     private var rwLock = pthread_rwlock_t()
     
+    var isSelectingSongs = false
     var pageIndex = 0
     var searchAPI:SearchAPI! = SearchAPI()
     var isSeekingPlayerState = false
@@ -40,6 +41,11 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if isSelectingSongs {
+            self.navigationItem.title = "select a song to add chords";
+            KGLOBAL_nowView.hidden = true
+        }
+        
         pthread_rwlock_init(&rwLock, nil)
         loadData()
         createTransitionAnimation()
@@ -57,6 +63,8 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
         viewDidAppear = true
         musicTable.reloadData()
     }
+    
+
     
     func clearData() {
         uniqueSongs.removeAll()
@@ -119,6 +127,7 @@ class MusicViewController: UIViewController, UITableViewDataSource, UITableViewD
                 }
             }
         }
+        
     }
 
     func createTransitionAnimation(){

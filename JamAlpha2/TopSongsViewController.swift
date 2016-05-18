@@ -55,6 +55,8 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     
+    
+    
     func setUpRefreshControl() {
         self.refreshControl = UIRefreshControl()
         self.refreshControl.addTarget(self, action: #selector(TopSongsViewController.refreshData), forControlEvents: UIControlEvents.ValueChanged)
@@ -350,6 +352,13 @@ class TopSongsViewController: UIViewController, UITableViewDelegate, UITableView
     
     @IBAction func segmentSelected(sender: UISegmentedControl) {
         mainTable.reloadData()
+    }
+    
+    @IBAction func plusButtonPressed(sender: AnyObject) {
+        let musicViewController = self.storyboard?.instantiateViewControllerWithIdentifier("musicviewcontroller") as! MusicViewController
+        musicViewController.pageIndex = 0
+        musicViewController.isSelectingSongs = true
+        self.showViewController(musicViewController, sender: self)
     }
 }
 

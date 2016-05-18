@@ -1405,6 +1405,11 @@
                     </view>
                     <navigationItem key="navigationItem" id="mD0-KC-NbN">
                         <nil key="title"/>
+                        <barButtonItem key="leftBarButtonItem" systemItem="add" id="LQA-o9-R5I">
+                            <connections>
+                                <action selector="plusButtonPressed:" destination="vik-ZA-XSq" id="d0m-oD-Ud4"/>
+                            </connections>
+                        </barButtonItem>
                         <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="Xgq-lr-UDs">
                             <rect key="frame" x="57" y="5.5" width="206" height="33"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
