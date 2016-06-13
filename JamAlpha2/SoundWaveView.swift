@@ -120,7 +120,7 @@ class SoundWaveView: UIView {
                 let formatDesc:NSArray = songTrack.formatDescriptions
                
                 
-                for(var i:Int = 0; i < formatDesc.count; i++){
+                for(var i:Int = 0; i < formatDesc.count; i++) {
                     
                     let item:CMAudioFormatDescriptionRef = formatDesc[i] as! CMAudioFormatDescriptionRef
                     let fmtDesc:AudioStreamBasicDescription? = CMAudioFormatDescriptionGetStreamBasicDescription(item).memory

@@ -51,6 +51,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 self.userTable.reloadData()
                 self.isCalledViewDidLoad = false
             } else {
+                print(avatarUrl)
                 AWSS3Manager.downloadImage(avatarUrl, isProfileBucket: true, completion: {
                     image in
                     dispatch_async(dispatch_get_main_queue()) {
